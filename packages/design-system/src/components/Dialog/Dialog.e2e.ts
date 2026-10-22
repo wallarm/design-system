@@ -229,6 +229,7 @@ test.describe('Component: Dialog', () => {
           '[data-scope="dialog"][data-part="content"]',
         );
         const nestedDialog = dialogContents[dialogContents.length - 1];
+        if (!nestedDialog) return false;
         const calRect = el.getBoundingClientRect();
         const dialogRect = nestedDialog.getBoundingClientRect();
         const x =

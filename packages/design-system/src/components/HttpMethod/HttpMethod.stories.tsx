@@ -36,7 +36,7 @@ export default meta;
 /**
  * One badge on the controls, for trying a method or a size the stories below do not cover.
  */
-export const Playground: StoryFn<typeof meta> = args => <HttpMethod {...args} />;
+export const Playground: StoryFn<typeof HttpMethod> = args => <HttpMethod {...args} />;
 
 /**
  * The seven methods with their locked colours, and an unrecognised verb underneath taking

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { Meta, StoryFn } from '@storybook/react';
 import { fn } from 'storybook/test';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   FilterInputChip,
   type FilterInputChipProps,
@@ -49,7 +49,7 @@ const meta = {
 
 export default meta;
 
-const Template: StoryFn<typeof meta> = (args: FilterInputChipProps) => (
+const Template: StoryFn<typeof FilterInputChip> = (args: FilterInputChipProps) => (
   <FilterInputChip {...args} />
 );
 

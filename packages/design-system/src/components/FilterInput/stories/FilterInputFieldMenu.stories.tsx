@@ -1,5 +1,5 @@
 import { type FC, useMemo, useRef, useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook-react-rsbuild';
 import { ChevronDown } from '../../../icons';
 import { Button } from '../../Button';
 import { FilterInputFieldMenu, type FilterInputFieldMenuProps } from '../FilterInputMenu';
@@ -44,7 +44,8 @@ const meta = {
 } satisfies Meta<typeof FilterInputFieldMenu>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+// Every story renders its own harness, so the meta carries no default args.
+type Story = StoryObj;
 
 /**
  * The menu takes no trigger of its own: `FilterInput` owns `open` and hands it a

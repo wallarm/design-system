@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook-react-rsbuild';
 import { Heading } from '../../components/Heading';
 import { Input } from '../../components/Input';
 import {

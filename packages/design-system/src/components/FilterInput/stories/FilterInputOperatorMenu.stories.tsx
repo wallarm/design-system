@@ -1,5 +1,5 @@
 import { type FC, useMemo, useRef, useState } from 'react';
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown } from '../../../icons';
 import { Button } from '../../Button';
 import { FilterInputOperatorMenu } from '../FilterInputMenu';
@@ -28,25 +28,6 @@ const meta = {
       control: 'select',
       options: ['string', 'integer', 'float', 'date', 'boolean', 'enum'],
       description: 'The field type to determine which operators to show',
-    },
-    selectedOperator: {
-      control: 'select',
-      options: [
-        '=',
-        '!=',
-        '>',
-        '<',
-        '>=',
-        '<=',
-        'like',
-        'not_like',
-        'in',
-        'not_in',
-        'is_null',
-        'is_not_null',
-        'between',
-      ],
-      description: 'The currently selected operator',
     },
     open: {
       control: 'boolean',
@@ -93,7 +74,6 @@ const OperatorMenuHarness: FC<{ fieldType: FieldType }> = ({ fieldType }) => {
 
       <FilterInputOperatorMenu
         fieldType={fieldType}
-        selectedOperator={selectedOperator}
         onSelect={operator => {
           setSelectedOperator(operator);
           setOpen(false);

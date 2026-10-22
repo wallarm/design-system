@@ -12,6 +12,11 @@ const tableStory = createStoryHelper('data-display-table', [
   'Row Reordering',
   'Sticky Group Parent',
   'Sticky Group Parent Virtualized',
+  'Infinite Scroll Window In Pane',
+  'Infinite Scroll Window In Pane Anchored',
+  'Infinite Scroll Window In Pane Late Rows',
+  'Infinite Scroll Window In Hidden Pane Anchored',
+  'Infinite Scroll Window In Scrolled Pane',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".

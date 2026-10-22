@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
+import type { Meta, StoryObj } from 'storybook-react-rsbuild';
 import { Skeleton } from '../../Skeleton';
 import { FilterInput } from '../FilterInput';
 import {

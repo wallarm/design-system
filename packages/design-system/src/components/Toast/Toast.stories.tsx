@@ -106,7 +106,7 @@ const ToastDemo = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           {types.map(({ label, icon, type, title, description }) => (
             <Button
               key={label}
@@ -122,7 +122,7 @@ const ToastDemo = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           {types.map(({ label, icon, type, title, description }) => (
             <Button
               key={label}
@@ -244,7 +244,7 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => createToast()}>
             Create loading toast
           </Button>
@@ -255,7 +255,7 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => createToast(STATIC_DURATION)}>
             Create loading toast
           </Button>
@@ -288,7 +288,7 @@ export const DescriptionKeepsExtended: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => withDescription()}>
             Simple with description
           </Button>
@@ -299,7 +299,7 @@ export const DescriptionKeepsExtended: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button
             variant='secondary'
             color='neutral'
@@ -361,7 +361,7 @@ export const SimpleWithActions: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => single()}>
             Simple Toast with Action
           </Button>
@@ -372,7 +372,7 @@ export const SimpleWithActions: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => single(STATIC_DURATION)}>
             Simple Toast with Action
           </Button>
@@ -428,7 +428,7 @@ export const ExtendedWithActions: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => single()}>
             Extended Toast with Action
           </Button>
@@ -439,7 +439,7 @@ export const ExtendedWithActions: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => single(STATIC_DURATION)}>
             Extended Toast with Action
           </Button>
@@ -482,7 +482,7 @@ export const LongText: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => simpleLong()}>
             Simple with long title
           </Button>
@@ -493,7 +493,7 @@ export const LongText: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => simpleLong(STATIC_DURATION)}>
             Simple with long title
           </Button>
@@ -524,7 +524,7 @@ export const WithoutCloseButton: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => create()}>
             Non-closable Toast
           </Button>
@@ -532,7 +532,7 @@ export const WithoutCloseButton: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => create(STATIC_DURATION)}>
             Non-closable Toast
           </Button>
@@ -570,7 +570,7 @@ export const CustomIcon: StoryFn = () => {
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>timed</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='outline' color='neutral' onClick={() => withColor()}>
             Custom Icon with own color
           </Button>
@@ -581,7 +581,7 @@ export const CustomIcon: StoryFn = () => {
       </VStack>
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
-        <HStack gap={8} wrap>
+        <HStack gap={8} wrap='wrap'>
           <Button variant='secondary' color='neutral' onClick={() => withColor(STATIC_DURATION)}>
             Custom Icon with own color
           </Button>

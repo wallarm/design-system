@@ -139,7 +139,7 @@ export const ExpandableFitsInline: StoryFn<typeof meta> = () => (
 /**
  * The props on controls, for trying a segment list or a method the stories above skip.
  */
-export const Playground: StoryFn<typeof meta> = args => <ParameterPath {...args} />;
+export const Playground: StoryFn<typeof ParameterPath> = args => <ParameterPath {...args} />;
 Playground.args = {
   method: 'POST' satisfies HttpMethodName,
   segments: ['JSON', 'nginx_config'],

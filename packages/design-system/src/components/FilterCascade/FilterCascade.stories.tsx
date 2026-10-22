@@ -110,6 +110,7 @@ const regions = createFilterCascadeCollection([
   },
   { value: 'sg', label: 'Singapore' },
 ]);
+type Region = (typeof regions.items)[number];
 
 const meta = {
   title: 'Patterns/FilterCascade',
@@ -119,7 +120,7 @@ const meta = {
     docs: { description: { component: DESCRIPTION } },
   },
   args: { label: 'Region', collection: regions },
-} satisfies Meta<typeof FilterCascade>;
+} satisfies Meta<typeof FilterCascade<Region>>;
 
 export default meta;
 
@@ -203,7 +204,9 @@ export const Picked: StoryFn<typeof FilterCascade> = () => (
   <FilterCascade
     label='Scope'
     collection={longCollection}
-    loadChildren={async () => [{ kind: 'application', uid: 'checkout', name: 'checkout-api' }]}
+    loadChildren={async (): Promise<Scope[]> => [
+      { kind: 'application', uid: 'checkout', name: 'checkout-api' },
+    ]}
     defaultValue={['eu1', 'checkout']}
     data-testid='filter-cascade-picked'
   >

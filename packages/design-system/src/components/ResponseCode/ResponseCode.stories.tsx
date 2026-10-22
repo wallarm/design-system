@@ -34,7 +34,7 @@ export default meta;
 /**
  * One badge on the controls, for checking which class a particular code lands in.
  */
-export const Playground: StoryFn<typeof meta> = args => <ResponseCode {...args} />;
+export const Playground: StoryFn<typeof ResponseCode> = args => <ResponseCode {...args} />;
 
 /**
  * The five classes at their round numbers. This is the colour vocabulary, and like

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CircleDashed } from '../../icons';
@@ -103,7 +103,7 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => {
         <Button
           variant='secondary'
           color='neutral'
-          onClick={e => {
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
             onButtonClick(e);
             setLastClick('button');
           }}

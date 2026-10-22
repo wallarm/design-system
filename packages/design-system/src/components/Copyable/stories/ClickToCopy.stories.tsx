@@ -151,12 +151,7 @@ export const ValueText: StoryFn<typeof meta> = () => {
       <AttributeLabel>IP Address</AttributeLabel>
       <AttributeValue>
         <Copyable text={value} tooltip>
-          <Text
-            size='sm'
-            className='cursor-pointer hover:bg-states-primary-hover active:bg-states-primary-pressed rounded-6 -mx-4 px-4'
-          >
-            {value}
-          </Text>
+          <Text size='sm'>{value}</Text>
         </Copyable>
       </AttributeValue>
     </Attribute>

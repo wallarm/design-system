@@ -78,7 +78,7 @@ export const Decorative: StoryFn<typeof meta> = () => (
       <Text size='xs' color='secondary'>
         What it is not for — running copy belongs to the text ramp
       </Text>
-      <Text size='sm' color='secondary' className='max-w-100'>
+      <Text size='sm' color='secondary'>
         Wallarm did not find any attacks in the selected period. Try widening the time range, or
         check that the filters above are not excluding traffic you expect to see.
       </Text>
