@@ -1,10 +1,14 @@
 version: 2
 updates:
-  # pnpm workspace: root lockfile covers apps/* and packages/*, incl. the catalog in pnpm-workspace.yaml
+  # pnpm workspace (Dependabot has no separate `pnpm` ecosystem — `npm` detects pnpm-lock.yaml): root lockfile covers apps/* and packages/*, incl. the catalog in pnpm-workspace.yaml
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: monthly
+      interval: daily
+      time: "06:00"
+      timezone: Europe/Berlin # CET/CEST
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     commit-message:
       prefix: chore
@@ -16,7 +20,11 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: daily
+      time: "06:00"
+      timezone: Europe/Berlin # CET/CEST
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: ci
     groups:
