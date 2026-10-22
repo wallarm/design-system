@@ -665,3 +665,24 @@ Runs after Tasks 18+19.
 - [ ] **Step 1:** Implement. **Step 2: Run** `typecheck`, biome, `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success.
 - [ ] **Step 3: Manual check** in `preview`, with screenshots `home-blur-light.png`, `home-blur-dark.png` and `home-blur-mobile.png` (390px) in the SDD folder. The background is visible, text is readable, there is no horizontal scrollbar, and with emulated reduced motion the blobs don't animate (Playwright `emulateMedia({ reducedMotion: 'reduce' })`).
 - [ ] **Step 4: Commit** `feat(docs): blur background on the home page`
+
+---
+
+### Task 21: Clean search index (found 2026-10-22)
+
+Runs after Task 20.
+
+**Problem:** Searching "button" returns hits whose text is raw MDX from generated pages, such as `../../packages/design-system/src/components/button/Button.stories.tsx')} name='Basic'>`, which is a `StoryPreview` `load` attribute. It also returns fragments of example code. Both crowd out real prose and headings.
+
+**Files:** `apps/docs/rspress.config.ts`, plus a local plugin if needed (e.g. `apps/docs/plugins/cleanSearchIndex.ts`) and its test.
+
+**Behavior:**
+- No search hit contains `import(`, `load=`, `name='`, `StoryPreview`, `Explorer` or `TokenTable`.
+- Example code is not indexed: set `search.codeBlocks: false`.
+- Headings, descriptions, prop tables and prose stay indexed.
+
+**Approach:** First, find out how Rspress 2.0.23 builds the index from MDX (`node_modules/@rspress/core/dist`, the search index / `modifySearchIndexData` plugin hook). Strip component tags and their attributes from `PageIndexInfo.content` before indexing. Preferred: a small `RspressPlugin` using `modifySearchIndexData`, with a pure `stripJsx(content: string): string` that has a unit test. If Rspress already exposes an option to ignore JSX in the index, use that instead.
+
+- [ ] **Step 1:** TDD for `stripJsx`. Cases: a `<StoryPreview load={() => import('…')} name='Basic'>` opening tag is removed; `</StoryPreview>` is removed; plain prose is kept; a `<TokenTable tokens={[…]}>` with a long JSON attribute is removed. Run `pnpm --filter @wallarm-org/docs test:run` (RED, then GREEN).
+- [ ] **Step 2:** Wire it up. Run the turbo build, then in `preview` search for "button", "dialog" and "token". Hits show headings and prose only. Save screenshot `search-results-clean.png`.
+- [ ] **Step 3: Commit** `fix(docs): keep component markup out of the search index`
