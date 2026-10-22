@@ -333,7 +333,7 @@ Prints `docs build OK` on success.
 - Create: `.github/workflows/deploy-site.yml`
 - Modify: `.github/workflows/main.yml`, `packages/design-system/.storybook/main.ts` (`assetPrefix`), `packages/design-system/src/components/Selection/SelectionBulkBar/SelectionBulkBar.e2e.ts` (Storybook URLs), `packages/design-system/nginx.conf` (`location /design-system/` → `location /design-system/storybook/`)
 - Modify docs:
-  - `CLAUDE.md`: "Deployment" line; Pipeline Jobs item 4 (readiness URL), item 8 (`deploy-storybook` → `deploy-site.yml` dispatched by `release`), new `docs` item, the separate-workflows sentence (add `deploy-site.yml`); Success Criteria item 6
+  - `CLAUDE.md`: "Deployment" line; Pipeline Jobs item 4 (readiness URL), item 8 (`deploy-storybook` → `deploy-site.yml` dispatched by `release`), the separate-workflows sentence (add `deploy-site.yml`); Success Criteria item 6
   - `README.md:132,231`; `RELEASE.md:136,156,224`; `.claude/agents/ci.md:25,39,78`
   - `.claude/skills/storybook-docs/references/frame.md:74-81` (serve `storybook-static` at `design-system/storybook/`)
   - `packages/design-system/README.md:9,119` + its "40+ components" line
@@ -343,7 +343,7 @@ Prints `docs build OK` on success.
 **`main.yml` changes** (refer to jobs/steps by name, not line numbers):
 - Top-level `permissions`: add `actions: write`. `release` has no job-level `permissions` and inherits it; a job-level block would replace the whole set.
 - `build` → "Build all packages": `pnpm build --filter='!@wallarm-org/docs'`.
-- New `docs` job: `needs: [setup, build]`, no `if`. Same checkout/pnpm/node/cache/install steps as `build`. Download `built-packages` to `packages`, then `pnpm --filter @wallarm-org/docs build` and `pnpm --filter @wallarm-org/docs check:build`. Shallow checkout is fine: Task 13 logs one warning and shows no "new" badges. Never set `DOCS_SITE_ORIGIN` / `DOCS_OUT_DIR` in CI.
+- No docs build on regular pushes or feature branches (user decision, 2026-10-22: release first, then site). The site is built only by `deploy-site.yml`, from the release tag. `apps/docs` unit tests still run in `quality` via `pnpm test:run`.
 - `e2e` "Serve Storybook & Run E2E tests" and `e2e-update-screenshots` "Update screenshots": keep `pnpm exec http-server` / `timeout 60` / `curl -fs`; change only:
   ```bash
   mkdir -p storybook-serve/design-system/storybook
@@ -352,11 +352,10 @@ Prints `docs build OK` on success.
   timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/storybook/iframe.html; do sleep 1; done'
   ```
   and `STORYBOOK_URL: http://localhost:6006/design-system/storybook`.
-- `release`: `needs: [setup, build, e2e, docs]`, so it can read the docs result. Its `if` does **not** require docs success (user decision, 2026-10-22: a broken docs build never blocks npm). Keep the existing `always() && …` conditions unchanged.
 - `release`: between "Release design-system" and "Check migrator release". It must sit there, because the migrator and mcp releases add commits that move HEAD off the `v*` tag:
   ```yaml
   - name: Deploy site for stable release
-    if: github.ref_name == 'main' && needs.docs.result == 'success'   # docs failure: publish npm, skip the site
+    if: github.ref_name == 'main'
     continue-on-error: true   # design-system is already on npm; never block migrator/mcp
     env:
       PRE_RELEASE_SHA: ${{ steps.pre-release.outputs.sha }}
@@ -398,6 +397,7 @@ Prints `docs build OK` on success.
 - `SelectionBulkBar.e2e.ts`: `https://wallarm.github.io/design-system/storybook/` and `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`.
 
 **Rollout:**
+- A docs build failure surfaces only in `deploy-site.yml` after a release; the site stays on the previous version until a fix lands and is redeployed with `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z` (the tag must contain the fix, so the fix ships with the next release).
 - Merge with a releasing title (`feat(docs): … (WDS-xxx)`) (user decision, 2026-10-22). That release dispatches the first site deploy. Until it runs, Pages keeps the old Storybook at `/design-system/`.
 - Deployable tags: the first release after this merge, and every later one. Older tags fail the guard.
 - Manual redeploy, rollback, or recovery after a cancelled or failed dispatch: `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`.
@@ -411,9 +411,8 @@ Prints `docs build OK` on success.
 - [ ] **Step 5: Run** `pnpm lint` and `pnpm --filter @wallarm-org/docs test:run` — expected: PASS.
 - [ ] **Step 6: Commit** `ci: build docs on every push, deploy docs and Storybook after stable releases`
 - [ ] **Step 7:** Push the branch. E2E runs in CI only (project rule).
-  - Expected: `build`, `docs` (including `check:build`) and `e2e` green, with `e2e` actually run, not skipped (`.storybook/main.ts` is in `E2E_PATHS`).
+  - Expected: `build`, `quality` (incl. `apps/docs` unit tests) and `e2e` green; there is no docs job, with `e2e` actually run, not skipped (`.storybook/main.ts` is in `E2E_PATHS`).
   - The deploy step is skipped by its `if` (not `main`).
-  - Record the `docs` job duration.
 
 ---
 
