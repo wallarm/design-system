@@ -117,7 +117,8 @@ Section order (mirrors Chakra):
 Extend `scripts/metadata/parse-examples.ts` (so MCP benefits too):
 - read every story file of a component, including `stories/` subfolders;
 - strip the `(args) =>` wrapper and `{...args}` spreads;
-- emit imports rewritten to public paths (`@wallarm-org/design-system/<Comp>`, `@wallarm-org/design-system/icons`).
+- emit imports rewritten to public paths (`@wallarm-org/design-system/<Comp>`, `@wallarm-org/design-system/icons`);
+- drop Storybook annotation labels — JSX elements whose `className` contains the `sb-annotation` / `sb-annotation-alt` class — from the shown code; the live preview still renders them **(user, 2026-10-22)**.
 Keep `components.json` the single source for both MCP and site.
 
 ### 6.3 Story cleanup (incremental, non-blocking)

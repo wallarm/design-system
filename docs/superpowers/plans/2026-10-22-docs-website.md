@@ -372,3 +372,26 @@ Changes:
 - Hand-written per-component prose (SimpleCharts docs, Table design, Slider usage).
 - RemoteShell nav items without `href`.
 - Accessibility sections; PR previews; MCP Registry listing; sitemap/OG images.
+
+---
+
+### Task 11: Strip `sb-annotation` labels from shown code (user request, 2026-10-22)
+
+Runs after Task 6, before Task 7.
+
+**Files:**
+- Modify: `packages/design-system/scripts/metadata/story-source.ts`
+- Test: `packages/design-system/scripts/metadata/__tests__/story-source.test.ts`
+
+**Interfaces:**
+- `toCopyableCode(...)` (Task 1) additionally removes every JSX element (`JsxElement` or `JsxSelfClosingElement`) whose `className` attribute is a string literal (or a no-substitution template) whose whitespace-separated classes include `sb-annotation` or `sb-annotation-alt`. It removes the whole element, children included, and runs before the used-imports filter, so imports used only by annotations disappear. Annotations in a non-children position (e.g. the sole returned expression, `cond && <span className='sb-annotation'>…`) are left unchanged. A `className` built with `cn(...)` or another expression is left unchanged. After removal, lines that are left blank are dropped.
+
+- [ ] **Step 1: Write failing tests:**
+  - `strips annotation labels`: `<VStack><span className='sb-annotation'>Brand</span><HStack><Button>A</Button></HStack></VStack>` → output contains no `sb-annotation` and no `Brand`, and still contains `<HStack>`.
+  - `strips alt annotations and keeps other classes`: `<span className="text-sm sb-annotation-alt">x</span>` is removed; `<span className='sb-annotations'>y</span>` is kept (the class token must match exactly).
+  - `drops imports only used by annotations`: an annotation containing `<Text>` where `Text` appears nowhere else → no `Text` import line.
+  - `leaves non-children annotations`: `() => <span className='sb-annotation'>only</span>` is unchanged.
+- [ ] **Step 2: Run** `pnpm --filter @wallarm-org/design-system exec rstest run scripts/metadata` — expected: FAIL.
+- [ ] **Step 3: Implement** with the ts-morph AST.
+- [ ] **Step 4: Run** the same command — expected: PASS. Then `pnpm --filter @wallarm-org/design-system generate-metadata` and `jq '[.components[].examples[] | select(.code | test("sb-annotation"))] | length' packages/design-system/dist/metadata/components.json` — expected: `0`, or only non-children cases, listed in the report.
+- [ ] **Step 5: Commit** `feat(metadata): omit storybook annotation labels from example code`
