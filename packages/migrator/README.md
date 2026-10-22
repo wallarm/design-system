@@ -8,7 +8,7 @@ Codemod CLI that migrates consumer apps across `@wallarm-org/design-system` brea
 migrator --from <version> [--to <version>] [--dry-run] [paths...]
 ```
 
-- `--from` (required): the design-system version you are migrating from.
+- `--from` (required): the exact stable design-system version you are migrating from. A prerelease `--from` is rejected: pass the stable version your code matches.
 - `--to`: target version (default: the installed `@wallarm-org/design-system`).
 - `--dry-run`: print changes, write nothing.
 - `--help`, `--version`.

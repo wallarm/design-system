@@ -41,7 +41,7 @@ migrator --from <version> [--to <version>] [--dry-run] [paths...]
 
 | Flag | Meaning |
 |---|---|
-| `--from` | Required. Exact semver the project was on before the upgrade. A range (`^2.9.0`) → exit 1. |
+| `--from` | Required. Exact semver the project was on before the upgrade. A range (`^2.9.0`) or a prerelease (`3.0.0-rc.x.1`) → exit 1. |
 | `--to` | Target version. Default: installed design-system version (D6). |
 | `--dry-run` | Print what would change (file, line, before → after) and the manual items; write nothing, including the report file. |
 | `paths...` | Explicit files/dirs instead of `git ls-files`. |
@@ -52,7 +52,7 @@ Steps: validate versions → select migrations whose version is in `(from, to]`,
 Exit codes:
 
 - `0` — ran, with or without manual items. Manual items must not fail the run: Renovate has to open the MR so the team sees it; D8's CI check does the blocking.
-- `1` — bad args, `from` not exact, `from > to`, `from < 1.0.0`, or **migrator too old**: `to` is a stable release with `major(to) > major(latest)` → "design-system X is newer than this migrator knows; retry later or update @wallarm-org/migrator". Prerelease `to` skips the "too old" check.
+- `1` — bad args, `from` not exact, `from` is a prerelease ("--from <v> is a prerelease; pass the stable version your code matches": semver ranks `3.0.0` above `3.0.0-rc.x.1`, so it would re-apply migrations), `from > to`, `from < 1.0.0`, or **migrator too old**: `to` is a stable release with `major(to) > major(latest)` → "design-system X is newer than this migrator knows; retry later or update @wallarm-org/migrator". Prerelease `to` skips the "too old" check.
 
 What Renovate does with exit 1 (verified in Renovate source): it records an artifact error. For a release younger than 2 hours with no existing branch it creates nothing and retries next run; after that it opens the MR with a red `renovate/artifacts` check and the stderr in a comment. Either way nothing unmigrated gets merged silently.
 

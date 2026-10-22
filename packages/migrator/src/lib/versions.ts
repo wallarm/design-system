@@ -7,6 +7,12 @@ export function parseExactVersion(input: string, flag: '--from' | '--to'): strin
   if (!version) {
     throw new UsageError(`${flag} must be an exact version (e.g. 2.9.0), got "${input}"`);
   }
+  // semver ranks 3.0.0 above 3.0.0-rc.x, so a prerelease `from` would re-select already-applied migrations.
+  if (flag === '--from' && prerelease(version)) {
+    throw new UsageError(
+      `--from ${version} is a prerelease; pass the stable version your code matches`,
+    );
+  }
   return version;
 }
 

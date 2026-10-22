@@ -19,6 +19,12 @@ describe('parseExactVersion', () => {
       expect(() => parseExactVersion(bad, '--from')).toThrow(UsageError);
     }
   });
+  it('rejects a prerelease --from, accepts a prerelease --to', () => {
+    expect(() => parseExactVersion('3.0.0-rc.avatar.1', '--from')).toThrow(
+      '--from 3.0.0-rc.avatar.1 is a prerelease; pass the stable version your code matches',
+    );
+    expect(parseExactVersion('3.0.0-rc.avatar.1', '--to')).toBe('3.0.0-rc.avatar.1');
+  });
 });
 
 describe('selectMigrations', () => {

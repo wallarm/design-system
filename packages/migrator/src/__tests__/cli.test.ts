@@ -98,6 +98,9 @@ describe('main', () => {
     err = [];
     expect(await run('--from', '2.9.0', '--to', '4.0.0')).toBe(1);
     expect(err.join('\n')).toContain('newer than this migrator knows');
+    err = [];
+    expect(await run('--from', '3.0.0-rc.avatar.1', '--to', '3.0.0')).toBe(1);
+    expect(err.join('\n')).toContain('is a prerelease');
   });
 
   it('needs git or explicit paths', async () => {
