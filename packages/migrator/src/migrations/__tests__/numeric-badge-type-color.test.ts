@@ -81,6 +81,19 @@ describe('numeric-badge-type-color', () => {
     }
   });
 
+  it('spread after type: rewrites and reports the possible override', () => {
+    const r = run('<NumericBadge type="primary" {...p} />');
+    expect(r.code).toBe(`${IMPORT}<NumericBadge type="secondary" color="neutral" {...p} />`);
+    expect(r.reports).toHaveLength(1);
+    expect(r.reports[0]).toContain('may override');
+  });
+
+  it('spread before type: rewrites without a report', () => {
+    const r = run('<NumericBadge {...p} type="primary" />');
+    expect(r.code).toBe(`${IMPORT}<NumericBadge {...p} type="secondary" color="neutral" />`);
+    expect(r.reports).toEqual([]);
+  });
+
   it('local NumericBadge untouched', () => {
     const code = "import { NumericBadge } from './x';\n<NumericBadge type='brand' />";
     const r = apply(migration, code);

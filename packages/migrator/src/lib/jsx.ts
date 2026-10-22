@@ -59,6 +59,12 @@ export function hasSpread(el: JsxElementLike): boolean {
   return el.getAttributes().some(a => Node.isJsxSpreadAttribute(a));
 }
 
+/** A spread after `attr` can override it at runtime; one before it cannot. */
+export function hasSpreadAfter(el: JsxElementLike, attr: JsxAttribute): boolean {
+  const attrs = el.getAttributes();
+  return attrs.slice(attrs.indexOf(attr) + 1).some(a => Node.isJsxSpreadAttribute(a));
+}
+
 function staticLiteral(attr: JsxAttribute) {
   const init = attr.getInitializer();
   const inner = init && Node.isJsxExpression(init) ? init.getExpression() : init;

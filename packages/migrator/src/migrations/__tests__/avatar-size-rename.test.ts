@@ -61,6 +61,13 @@ describe('avatar-size-rename', () => {
     expect(r.reports).toEqual([]);
   });
 
+  it('spread after size: rewrites and reports the possible override', () => {
+    const r = run("<Avatar size='xs' {...p} />");
+    expect(r.code).toBe(`${IMPORT}<Avatar size='md' {...p} />`);
+    expect(r.reports).toHaveLength(1);
+    expect(r.reports[0]).toContain('may override');
+  });
+
   it('local Avatar untouched', () => {
     const code = "import { Avatar } from './Avatar';\n<Avatar size='xs' />";
     const r = apply(migration, code);
