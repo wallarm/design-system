@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { BrowserOnly } from '@rspress/core/runtime';
 import {
   Alert,
@@ -12,6 +12,7 @@ import {
   SegmentedControlItem,
 } from '@wallarm-org/design-system/SegmentedControl';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
+import { useInView } from './useInView';
 import { type StoryLoader, useStory } from './useStory';
 
 export interface StoryPreviewProps {
@@ -35,10 +36,26 @@ export function StoryError({ error }: { error: Error }) {
   );
 }
 
-function Live({ load, name }: { load: StoryLoader; name: string }) {
+/** Fixed-height stand-in until a story mounts, so the scroll position stays put. */
+export function StoryPlaceholder() {
+  return <Skeleton width='100%' height='200px' transparent={false} />;
+}
+
+function Loaded({ load, name }: { load: StoryLoader; name: string }) {
   const { Story, error } = useStory(load, name);
   if (error) return <StoryError error={error} />;
-  return Story ? <Story /> : <Skeleton width='100%' height='80px' transparent={false} />;
+  return Story ? <Story /> : <StoryPlaceholder />;
+}
+
+/** Loads and mounts the story only once it scrolls near the viewport. */
+function Live({ load, name }: { load: StoryLoader; name: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
+  return (
+    <div ref={ref} className='flex w-full items-center justify-center'>
+      {inView ? <Loaded load={load} name={name} /> : <StoryPlaceholder />}
+    </div>
+  );
 }
 
 function Preview({ load, name, hideCode = false, children }: StoryPreviewProps) {
@@ -56,7 +73,7 @@ function Preview({ load, name, hideCode = false, children }: StoryPreviewProps) 
         children
       ) : (
         <div className='rp-not-doc flex min-h-120 items-center justify-center rounded-12 border border-border-primary-light p-24'>
-          <BrowserOnly fallback={<Skeleton width='100%' height='80px' transparent={false} />}>
+          <BrowserOnly fallback={<StoryPlaceholder />}>
             {() => <Live load={load} name={name} />}
           </BrowserOnly>
         </div>

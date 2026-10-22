@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { BrowserOnly } from '@rspress/core/runtime';
 import { collectSlots } from './collectSlots';
-import { StoryError } from './StoryPreview';
+import { StoryError, StoryPlaceholder } from './StoryPreview';
+import { useInView } from './useInView';
 import { type StoryLoader, useStory } from './useStory';
 
 export interface ExplorerProps {
@@ -122,10 +123,22 @@ function Anatomy({ load, name }: ExplorerProps) {
   );
 }
 
+/** Mounts the anatomy view (and loads its story) only once it scrolls near the viewport. */
+function LazyAnatomy(props: ExplorerProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
+  if (inView) return <Anatomy {...props} />;
+  return (
+    <div ref={ref} className='my-16'>
+      <StoryPlaceholder />
+    </div>
+  );
+}
+
 /** Client-only anatomy view: lists the story's `data-slot`s and outlines them on hover/click. */
 export function Explorer(props: ExplorerProps) {
   if (import.meta.env.SSG_MD) return null;
-  return <BrowserOnly fallback={null}>{() => <Anatomy {...props} />}</BrowserOnly>;
+  return <BrowserOnly fallback={null}>{() => <LazyAnatomy {...props} />}</BrowserOnly>;
 }
 
 // Rspress injects markdown.globalComponents as default imports.
