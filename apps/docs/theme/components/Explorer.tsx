@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { BrowserOnly } from '@rspress/core/runtime';
 import { collectSlots } from './collectSlots';
+import { StoryError } from './StoryPreview';
 import { type StoryLoader, useStory } from './useStory';
 
 export interface ExplorerProps {
@@ -28,7 +29,7 @@ function scanRoots(container: Element | null, overlay: Element | null): Element[
 }
 
 function Anatomy({ load, name }: ExplorerProps) {
-  const Story = useStory(load, name);
+  const { Story, error } = useStory(load, name);
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [slots, setSlots] = useState<string[]>([]);
@@ -80,7 +81,7 @@ function Anatomy({ load, name }: ExplorerProps) {
   return (
     <div className='rp-not-doc my-16 flex gap-16 rounded-12 border border-border-primary-light p-16'>
       <div ref={containerRef} className='flex min-h-120 flex-1 items-center justify-center'>
-        {Story && <Story />}
+        {error ? <StoryError error={error} /> : Story && <Story />}
       </div>
       {/* Modal stories cover the page and set `pointer-events: none` on <body>: lift the list above them. */}
       <ul className='pointer-events-auto relative z-[2147483646] flex w-200 shrink-0 flex-col gap-2 border-l border-border-primary-light pl-16'>

@@ -1,6 +1,13 @@
 import { type ReactNode, useState } from 'react';
 import { BrowserOnly } from '@rspress/core/runtime';
 import {
+  Alert,
+  AlertContent,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+} from '@wallarm-org/design-system/Alert';
+import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@wallarm-org/design-system/SegmentedControl';
@@ -15,8 +22,22 @@ export interface StoryPreviewProps {
   children: ReactNode;
 }
 
+/** Shown in place of a story that failed to load. */
+export function StoryError({ error }: { error: Error }) {
+  return (
+    <Alert color='destructive'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Story failed to load</AlertTitle>
+        <AlertDescription>{error.message}</AlertDescription>
+      </AlertContent>
+    </Alert>
+  );
+}
+
 function Live({ load, name }: { load: StoryLoader; name: string }) {
-  const Story = useStory(load, name);
+  const { Story, error } = useStory(load, name);
+  if (error) return <StoryError error={error} />;
   return Story ? <Story /> : <Skeleton width='100%' height='80px' transparent={false} />;
 }
 
