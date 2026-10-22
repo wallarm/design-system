@@ -16,7 +16,6 @@ permissions:
   checks: write
   id-token: write
   issues: write
-  actions: write
 
 env:
   HUSKY: "0"
@@ -595,6 +594,14 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: [setup, build, e2e]
+    # Job-level permissions replace the workflow defaults: semantic-release (contents, issues,
+    # pull-requests), npm provenance (id-token), `gh workflow run deploy-site.yml` (actions)
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+      actions: write
     if: |
       always() &&
       needs.build.result == 'success' &&
