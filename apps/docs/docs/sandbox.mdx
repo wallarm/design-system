@@ -6,3 +6,17 @@ import { Button } from '@wallarm-org/design-system/Button';
 Smoke check that DS components render with DS styles.
 
 <BrowserOnly fallback={null}>{() => <Button>Design system button</Button>}</BrowserOnly>
+
+## Story preview
+
+<StoryPreview load={() => import('../../../packages/design-system/src/components/Button/Button.stories.tsx')} name='Basic'>
+
+```tsx
+<Button>Button</Button>
+```
+
+</StoryPreview>
+
+## Anatomy explorer
+
+<Explorer load={() => import('../../../packages/design-system/src/components/Dialog/Dialog.stories.tsx')} name='Basic' />

@@ -15,6 +15,12 @@ export default defineConfig({
   description: 'React components, tokens and AI tooling for Wallarm products',
   llms: true,
   globalStyles: path.join(dir, 'styles/global.css'),
+  markdown: {
+    globalComponents: [
+      path.join(dir, 'theme/components/StoryPreview.tsx'),
+      path.join(dir, 'theme/components/Explorer.tsx'),
+    ],
+  },
   themeConfig: {
     socialLinks: [
       { icon: 'github', mode: 'link', content: 'https://github.com/wallarm/design-system' },
