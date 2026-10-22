@@ -352,11 +352,11 @@ Prints `docs build OK` on success.
   timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/storybook/iframe.html; do sleep 1; done'
   ```
   and `STORYBOOK_URL: http://localhost:6006/design-system/storybook`.
-- `release`: `needs: [setup, build, e2e, docs]`; add `needs.docs.result == 'success' &&` to `if`. A tag is published only if its site builds.
+- `release`: `needs: [setup, build, e2e, docs]`, so it can read the docs result. Its `if` does **not** require docs success (user decision, 2026-10-22: a broken docs build never blocks npm). Keep the existing `always() && …` conditions unchanged.
 - `release`: between "Release design-system" and "Check migrator release". It must sit there, because the migrator and mcp releases add commits that move HEAD off the `v*` tag:
   ```yaml
   - name: Deploy site for stable release
-    if: github.ref_name == 'main'
+    if: github.ref_name == 'main' && needs.docs.result == 'success'   # docs failure: publish npm, skip the site
     continue-on-error: true   # design-system is already on npm; never block migrator/mcp
     env:
       PRE_RELEASE_SHA: ${{ steps.pre-release.outputs.sha }}
@@ -398,7 +398,7 @@ Prints `docs build OK` on success.
 - `SelectionBulkBar.e2e.ts`: `https://wallarm.github.io/design-system/storybook/` and `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`.
 
 **Rollout:**
-- Merge with a releasing title (`feat(docs): … (WDS-xxx)`). That release dispatches the first site deploy. Until it runs, Pages keeps the old Storybook at `/design-system/`.
+- Merge with a releasing title (`feat(docs): … (WDS-xxx)`) (user decision, 2026-10-22). That release dispatches the first site deploy. Until it runs, Pages keeps the old Storybook at `/design-system/`.
 - Deployable tags: the first release after this merge, and every later one. Older tags fail the guard.
 - Manual redeploy, rollback, or recovery after a cancelled or failed dispatch: `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`.
 - Docs PRs get no preview: Pages hosts one site per repo (see Follow-ups).
