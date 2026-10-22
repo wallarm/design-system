@@ -1,6 +1,11 @@
 import path from 'path';
-import { type Project, type SourceFile, SyntaxKind } from 'ts-morph';
+import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
 import type { ExampleMetadata } from '@wallarm-org/mcp-core';
+
+// Stories are read syntactically, so they get their own type-checker-free project:
+// adding them to the caller's tsconfig project invalidates its program, and the
+// next type query (parseComponentProps) rebuilds it — ~1s per component.
+const storiesProject = new Project();
 
 /**
  * Parse usage examples from Storybook stories.
@@ -18,14 +23,15 @@ export const parseExamples = (
   componentName: string,
 ): ExampleMetadata[] => {
   const storiesPath = path.join(componentDir, `${componentName}.stories.tsx`);
-  const sourceFile = project.addSourceFileAtPathIfExists(storiesPath);
+  const sourceFile =
+    project.getSourceFile(storiesPath) ?? storiesProject.addSourceFileAtPathIfExists(storiesPath);
   if (!sourceFile) return [];
 
   const descriptions = collectDescriptions(sourceFile);
   const examples: ExampleMetadata[] = [];
 
   for (const varStatement of sourceFile.getVariableStatements()) {
-    if (!varStatement.isExported()) continue;
+    if (!varStatement.hasExportKeyword()) continue;
 
     for (const decl of varStatement.getDeclarations()) {
       const name = decl.getName();
@@ -72,7 +78,7 @@ const collectDescriptions = (sourceFile: SourceFile): Map<string, string> => {
 
   // Source 1: JSDoc comments on variable statements
   for (const varStatement of sourceFile.getVariableStatements()) {
-    if (!varStatement.isExported()) continue;
+    if (!varStatement.hasExportKeyword()) continue;
     const jsDocs = varStatement.getJsDocs();
     if (jsDocs.length > 0) {
       const doc = jsDocs.at(0);
