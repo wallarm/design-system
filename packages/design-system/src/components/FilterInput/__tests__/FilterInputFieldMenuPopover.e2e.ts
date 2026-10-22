@@ -16,7 +16,7 @@ const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
 const gotoFieldMenu = async (page: Page, storyName: Parameters<typeof fieldMenuStory.goto>[1]) => {
   await fieldMenuStory.goto(page, storyName);
   await page.getByTestId('field-menu-trigger').click();
-  await expect(page.locator('[data-slot="filter-input-field-menu"]')).toBeVisible({
+  await expect(page.getByTestId('field-menu')).toBeVisible({
     timeout: 15000,
   });
 };
@@ -36,7 +36,7 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     await gotoFieldMenu(page, 'With Descriptions');
     await page.getByRole('menuitem', { name: /^Attack type$/ }).hover();
 
-    const menu = page.locator('[data-slot="filter-input-field-menu"]');
+    const menu = page.getByTestId('field-menu');
     const popover = page.getByTestId('field-menu-popover');
     await expect(popover).toBeVisible();
 
@@ -118,7 +118,7 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
 
   test('follows the row under the cursor when the list scrolls beneath it', async ({ page }) => {
     await gotoFieldMenu(page, 'With Scrollable Descriptions');
-    const menu = page.locator('[data-slot="filter-input-field-menu"]');
+    const menu = page.getByTestId('field-menu');
     const popover = page.getByTestId('field-menu-popover');
 
     const box = await menu.boundingBox();
@@ -144,7 +144,7 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     // directly (a real `scroll` event — what the handler listens for) sidesteps
     // headless wheel-target quirks while still exercising the re-hit-test path.
     await page.evaluate(() => {
-      const menuEl = document.querySelector('[data-slot="filter-input-field-menu"]');
+      const menuEl = document.querySelector('[data-testid="field-menu"]');
       if (!menuEl) return;
       const scroller =
         menuEl.scrollHeight > menuEl.clientHeight
@@ -170,7 +170,7 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     page,
   }) => {
     await gotoFieldMenu(page, 'With Scrollable Descriptions');
-    const menu = page.locator('[data-slot="filter-input-field-menu"]');
+    const menu = page.getByTestId('field-menu');
     const popover = page.getByTestId('field-menu-popover');
 
     const box = await menu.boundingBox();
@@ -189,7 +189,7 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
         const highlighted = await page.evaluate(
           () =>
             document
-              .querySelector('[data-slot="filter-input-field-menu"] [data-highlighted]')
+              .querySelector('[data-testid="field-menu"] [data-highlighted]')
               ?.textContent?.trim() ?? null,
         );
         const text = (await popover.textContent())?.trim() ?? '';
@@ -203,9 +203,9 @@ test.describe('Component: FilterInput chip attribute tooltip (AS-1060)', () => {
   test('shows the description in a dark tooltip on the attribute segment', async ({ page }) => {
     await filterInputStory.goto(page, 'With Described Chip');
 
-    const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+    const chip = page.getByTestId('filter-input--condition-chip').first();
     await expect(chip).toBeVisible();
-    await chip.locator('[data-slot="segment-attribute"]').hover();
+    await chip.getByTestId('filter-input--condition-chip--attribute').hover();
 
     const tooltip = page.getByRole('tooltip');
     await expect(tooltip).toBeVisible();
@@ -217,9 +217,9 @@ test.describe('Component: FilterInput chip attribute tooltip (AS-1060)', () => {
   test('does not show the tooltip when hovering the value segment', async ({ page }) => {
     await filterInputStory.goto(page, 'With Described Chip');
 
-    const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+    const chip = page.getByTestId('filter-input--condition-chip').first();
     await expect(chip).toBeVisible();
-    await chip.locator('[data-slot="segment-value"]').hover();
+    await chip.getByTestId('filter-input--condition-chip--value').hover();
 
     await expect(page.getByRole('tooltip')).toBeHidden();
   });

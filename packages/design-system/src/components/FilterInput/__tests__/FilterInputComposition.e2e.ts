@@ -61,7 +61,7 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        const menu = page.locator('[data-slot="filter-input-field-menu"]');
+        const menu = page.getByTestId('filter-input--field-menu');
         await expect(menu).toBeVisible({ timeout: 2000 });
 
         const menuItems = page.locator('[role="menuitem"]');
@@ -76,10 +76,9 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        await page.waitForSelector('[data-slot="filter-input-field-menu"]', {
-          state: 'visible',
-          timeout: 2000,
-        });
+        await page
+          .getByTestId('filter-input--field-menu')
+          .waitFor({ state: 'visible', timeout: 2000 });
         const statusField = page.locator('[role="menuitem"]').filter({ hasText: 'Status' });
         await statusField.click();
 
@@ -94,7 +93,7 @@ test.describe
         await activeValue.click();
 
         await page.waitForTimeout(300);
-        const chip = page.locator('[data-slot="filter-input-chip"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
         await expect(chip).toBeVisible();
         await expect(chip).toContainText('Status');
         await expect(chip).toContainText('Active');
@@ -105,12 +104,12 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
         await expect(chip).toBeVisible();
 
         await chip.hover();
         await page.waitForTimeout(200);
-        const deleteButton = page.locator('[data-slot="filter-input-chip-delete"]');
+        const deleteButton = page.getByTestId('filter-input--condition-chip--remove-button');
         await expect(deleteButton).toBeVisible();
         await deleteButton.click();
 
@@ -122,10 +121,10 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
         await expect(chip).toBeVisible();
 
-        const field = page.locator('[data-slot="filter-input"]');
+        const field = page.getByTestId('filter-input');
         await field.hover();
         await page.waitForTimeout(200);
 
@@ -141,8 +140,8 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
-        const operatorSegment = chip.locator('[data-slot="segment-operator"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
+        const operatorSegment = chip.getByTestId('filter-input--condition-chip--operator');
         await operatorSegment.click();
 
         await expect(chip).toBeVisible();
@@ -158,8 +157,8 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
-        const valueSegment = chip.locator('[data-slot="segment-value"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
+        const valueSegment = chip.getByTestId('filter-input--condition-chip--value');
         await valueSegment.click();
 
         await expect(chip).toBeVisible();
@@ -175,14 +174,14 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await attributeSegment.click();
 
         await expect(chip).toBeVisible();
 
         await page.waitForTimeout(300);
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
       });
 
@@ -192,7 +191,7 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        const menu = page.locator('[data-slot="filter-input-field-menu"]');
+        const menu = page.getByTestId('filter-input--field-menu');
         await expect(menu).toBeVisible({ timeout: 2000 });
 
         await page.waitForTimeout(100);
@@ -207,10 +206,9 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        await page.waitForSelector('[data-slot="filter-input-field-menu"]', {
-          state: 'visible',
-          timeout: 2000,
-        });
+        await page
+          .getByTestId('filter-input--field-menu')
+          .waitFor({ state: 'visible', timeout: 2000 });
 
         await page.keyboard.press('ArrowDown');
         await page.keyboard.press('ArrowDown');
@@ -235,16 +233,16 @@ test.describe
         await createChipWithSelection(page, 'Status', 'Active');
 
         const firstChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'Status' });
         await expect(firstChip).toBeVisible();
 
         await createChipWithSelection(page, 'Priority', 'Low');
 
-        const allChips = page.locator('[data-slot="filter-input-chip"]');
+        const allChips = page.getByTestId('filter-input--condition-chip');
         await expect(allChips).toHaveCount(3);
 
-        const andChip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'AND' });
+        const andChip = page.getByTestId('filter-input--connector-chip').filter({ hasText: 'AND' });
         await expect(andChip).toBeVisible();
       });
 
@@ -254,13 +252,13 @@ test.describe
         await createChipWithSelection(page, 'Status', 'Active');
         await createChipWithSelection(page, 'Priority', 'Low');
 
-        const andChip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'AND' });
+        const andChip = page.getByTestId('filter-input--connector-chip').filter({ hasText: 'AND' });
         await expect(andChip).toBeVisible();
 
         await andChip.click();
         await page.waitForTimeout(200);
 
-        const orChip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'OR' });
+        const orChip = page.getByTestId('filter-input--connector-chip').filter({ hasText: 'OR' });
         await expect(orChip).toBeVisible();
 
         await expect(andChip).not.toBeVisible();
@@ -272,20 +270,20 @@ test.describe
         await createChipWithSelection(page, 'Status', 'Active');
         await createChipWithSelection(page, 'Priority', 'Low');
 
-        const allChips = page.locator('[data-slot="filter-input-chip"]');
+        const allChips = page.getByTestId('filter-input--condition-chip');
         await expect(allChips).toHaveCount(3);
 
         const statusChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'Status' });
         await statusChip.hover();
         await page.waitForTimeout(200);
-        const deleteButton = statusChip.locator('[data-slot="filter-input-chip-delete"]');
+        const deleteButton = statusChip.getByTestId('filter-input--condition-chip--remove-button');
         await deleteButton.click();
         await page.waitForTimeout(300);
 
         await expect(allChips).toHaveCount(1);
-        const andChip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'AND' });
+        const andChip = page.getByTestId('filter-input--connector-chip').filter({ hasText: 'AND' });
         await expect(andChip).not.toBeVisible();
       });
 
@@ -294,11 +292,11 @@ test.describe
 
         await createChip(page);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
         await expect(chip).toBeVisible();
 
         // Click the empty space to the right of the chips (the cursor-text wrapper)
-        const filterInput = page.locator('[data-slot="filter-input"]');
+        const filterInput = page.getByTestId('filter-input');
         const filterInputBox = await filterInput.boundingBox();
         expect(filterInputBox).toBeTruthy();
 
@@ -308,7 +306,7 @@ test.describe
           filterInputBox!.y + filterInputBox!.height / 2,
         );
 
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
       });
 
@@ -336,14 +334,14 @@ test.describe
       test('Should have combobox role', async ({ page }) => {
         await compositionStory.goto(page, 'Simple');
 
-        const field = page.locator('[data-slot="filter-input"]');
+        const field = page.getByTestId('filter-input');
         await expect(field).toHaveAttribute('role', 'combobox');
       });
 
       test('Should indicate expanded state when menu open', async ({ page }) => {
         await compositionStory.goto(page, 'Simple');
 
-        const field = page.locator('[data-slot="filter-input"]');
+        const field = page.getByTestId('filter-input');
         await expect(field).toHaveAttribute('aria-expanded', 'false');
 
         const input = page.locator('input[type="text"]');
@@ -361,10 +359,9 @@ test.describe
         const input = page.locator('input[type="text"]');
         await expect(input).toBeFocused();
 
-        await page.waitForSelector('[data-slot="filter-input-field-menu"]', {
-          state: 'visible',
-          timeout: 2000,
-        });
+        await page
+          .getByTestId('filter-input--field-menu')
+          .waitFor({ state: 'visible', timeout: 2000 });
 
         await page.keyboard.press('ArrowDown');
         await page.keyboard.press('Enter');
@@ -378,7 +375,7 @@ test.describe
         await page.keyboard.press('Enter');
         await page.waitForTimeout(300);
 
-        const chip = page.locator('[data-slot="filter-input-chip"]');
+        const chip = page.getByTestId('filter-input--condition-chip');
         await expect(chip).toBeVisible();
       });
 
@@ -388,11 +385,10 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        await page.waitForSelector('[data-slot="filter-input-field-menu"]', {
-          state: 'visible',
-          timeout: 2000,
-        });
-        const menu = page.locator('[data-slot="filter-input-field-menu"]');
+        await page
+          .getByTestId('filter-input--field-menu')
+          .waitFor({ state: 'visible', timeout: 2000 });
+        const menu = page.getByTestId('filter-input--field-menu');
         await expect(menu).toHaveAttribute('role', 'menu');
 
         const menuItems = page.locator('[role="menuitem"]');

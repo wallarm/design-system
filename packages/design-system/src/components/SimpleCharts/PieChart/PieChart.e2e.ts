@@ -36,13 +36,13 @@ test.describe('PieChart', () => {
 
     test('Hovered (legend → slice)', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.locator('[data-slot=pie-chart-legend-item]').nth(2).hover();
+      await page.getByTestId('pie-chart--legend-item').nth(2).hover();
       await expect(page).toHaveScreenshot();
     });
 
     test('Selected', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.locator('[data-slot=pie-chart-legend-item]').nth(2).click();
+      await page.getByTestId('pie-chart--legend-item').nth(2).click();
       await expect(page).toHaveScreenshot();
     });
 
@@ -88,7 +88,10 @@ test.describe('PieChart', () => {
       await pieChartStory.goto(page, 'Selectable');
       // Add 2XX to the default {4XX} so the screenshot captures the multi-selection
       // dim — non-selected slices/rows fade, selected ones stay bright.
-      await page.locator('[data-slot=pie-chart-legend-item][data-name="2XX"]').click();
+      await page
+        .getByTestId('pie-chart--legend-item')
+        .and(page.locator('[data-name="2XX"]'))
+        .click();
       await expect(page).toHaveScreenshot();
     });
 
@@ -103,7 +106,10 @@ test.describe('PieChart', () => {
       await pieChartStory.goto(page, 'Selectable');
       // Hover takes precedence over selection — only the hovered row stays bright,
       // even when 4XX is the default selection.
-      await page.locator('[data-slot=pie-chart-legend-item][data-name="5XX"]').hover();
+      await page
+        .getByTestId('pie-chart--legend-item')
+        .and(page.locator('[data-name="5XX"]'))
+        .hover();
       await expect(page).toHaveScreenshot();
     });
 
@@ -121,7 +127,7 @@ test.describe('PieChart', () => {
   test.describe('Interactions', () => {
     test('Should mark a row as selected when clicked', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       await expect(row).not.toHaveAttribute('aria-current', 'true');
       await row.click();
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -129,7 +135,7 @@ test.describe('PieChart', () => {
 
     test('Should activate selection with Enter', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       await row.focus();
       await page.keyboard.press('Enter');
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -137,7 +143,7 @@ test.describe('PieChart', () => {
 
     test('Should activate selection with Space', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       await row.focus();
       await page.keyboard.press(' ');
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -147,34 +153,39 @@ test.describe('PieChart', () => {
       await pieChartStory.goto(page, 'Default');
 
       const targetName = '5XX';
-      const row = page.locator(`[data-slot=pie-chart-legend-item][data-name="${targetName}"]`);
+      const row = page
+        .getByTestId('pie-chart--legend-item')
+        .and(page.locator(`[data-name="${targetName}"]`));
       await row.hover();
 
-      const activeSlice = page.locator(
-        `[data-slot=pie-chart-slice][data-name="${targetName}"][data-active="true"]`,
-      );
+      const activeSlice = page
+        .getByTestId('pie-chart--slice')
+        .and(page.locator(`[data-name="${targetName}"][data-active="true"]`));
       await expect(activeSlice).toHaveCount(1);
 
       // Inactive slices omit `data-active` entirely (the component only sets it
       // on the active slice), so attribute-presence is the assertion.
-      const inactiveSlices = page.locator('[data-slot=pie-chart-slice]:not([data-active="true"])');
+      const inactiveSlices = page
+        .getByTestId('pie-chart--slice')
+        .and(page.locator(':not([data-active="true"])'));
       await expect(inactiveSlices).toHaveCount(DEFAULT_SLICE_COUNT - 1);
     });
 
     test('Should reset hover state when leaving a legend row', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
 
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       await row.hover();
       await expect(row).toHaveAttribute('data-active', 'true');
 
-      await page.locator('[data-slot=chart-title]').hover();
+      // Move the pointer off the legend entirely.
+      await page.mouse.move(0, 0);
       await expect(row).not.toHaveAttribute('data-active', 'true');
     });
 
     test('Should render every percent at 0% when total is zero', async ({ page }) => {
       await pieChartStory.goto(page, 'Zero Total');
-      const percents = page.locator('[data-slot=pie-chart-legend-percent]');
+      const percents = page.getByTestId('pie-chart--legend-percent');
       const count = await percents.count();
       expect(count).toBeGreaterThan(0);
       for (let i = 0; i < count; i++) {
@@ -190,8 +201,10 @@ test.describe('PieChart', () => {
       // the cursor — same browser hit-test path as a real user. `.hover()` on the
       // <path> directly is unreliable: recharts' animation pipeline can briefly
       // reset the geometry, so Playwright's actionability check times out.
-      await page.locator('[data-slot=pie-chart-donut]').hover();
-      const activeRows = page.locator('[data-slot=pie-chart-legend-item][data-active="true"]');
+      await page.getByTestId('pie-chart--donut').hover();
+      const activeRows = page
+        .getByTestId('pie-chart--legend-item')
+        .and(page.locator('[data-active="true"]'));
       await expect(activeRows).toHaveCount(0);
     });
 
@@ -199,20 +212,23 @@ test.describe('PieChart', () => {
       page,
     }) => {
       await pieChartStory.goto(page, 'Single Slice');
-      const slices = page.locator('[data-slot=pie-chart-slice]');
+      const slices = page.getByTestId('pie-chart--slice');
       await expect(slices).toHaveCount(1);
-      await expect(page.locator('[data-slot=pie-chart-legend-item]')).toHaveCount(1);
-      await expect(page.locator('[data-slot=pie-chart-legend-percent]')).toContainText('100');
+      await expect(page.getByTestId('pie-chart--legend-item')).toHaveCount(1);
+      await expect(page.getByTestId('pie-chart--legend-percent')).toContainText('100');
     });
 
     test('Should swap centre value to the hovered slice value', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const centreValue = page.locator('[data-slot=pie-chart-center-value]');
+      const centreValue = page.getByTestId('pie-chart--center-value');
       // Total of baseRows = 100; 5XX = 15.
       await expect(centreValue).toContainText('100');
       await expect(centreValue).not.toHaveAttribute('data-hovered', 'true');
 
-      await page.locator('[data-slot=pie-chart-legend-item][data-name="5XX"]').hover();
+      await page
+        .getByTestId('pie-chart--legend-item')
+        .and(page.locator('[data-name="5XX"]'))
+        .hover();
 
       await expect(centreValue).toContainText('15');
       await expect(centreValue).toHaveAttribute('data-hovered', 'true');
@@ -221,12 +237,12 @@ test.describe('PieChart', () => {
     test('Should pluralize the centre label based on the active value', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
       // Default uses `{ one: 'request', other: 'requests' }`; total = 100 → plural.
-      await expect(page.locator('[data-slot=pie-chart-center-label]')).toHaveText('requests');
+      await expect(page.getByTestId('pie-chart--center-label')).toHaveText('requests');
     });
 
     test('Should not set role=button on a non-interactive row', async ({ page }) => {
       await pieChartStory.goto(page, 'Two Slices');
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       await expect(row).not.toHaveAttribute('role', 'button');
       await expect(row).not.toHaveAttribute('tabindex', '0');
     });
@@ -241,7 +257,7 @@ test.describe('PieChart', () => {
 
     test('Should reach the first interactive row via forward Tab', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const row = page.locator('[data-slot=pie-chart-legend-item]').first();
+      const row = page.getByTestId('pie-chart--legend-item').first();
       // Don't hardcode the Tab count: preceding tab stops include Storybook chrome,
       // the Settings action button (whose 0-width hidden state has browser-specific
       // focusability), and recharts' SVG. Tab forward up to 6 times — that's enough
@@ -256,16 +272,16 @@ test.describe('PieChart', () => {
 
     test('Should mark the donut as decorative with aria-hidden', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      const donut = page.locator('[data-slot=pie-chart-donut]');
+      const donut = page.getByTestId('pie-chart--donut');
       await expect(donut.locator('[aria-hidden="true"]').first()).toBeVisible();
     });
 
     test('Should announce the skeleton loading state', async ({ page }) => {
       await pieChartStory.goto(page, 'Loading');
-      const skeleton = page.locator('[data-slot=pie-chart-skeleton]');
+      const skeleton = page.getByTestId('pie-chart-skeleton');
       await expect(skeleton).toHaveAttribute('aria-busy', 'true');
       await expect(skeleton).toHaveAttribute('aria-live', 'polite');
-      await expect(page.locator('[data-slot=pie-chart-skeleton-row]')).toHaveCount(5);
+      await expect(page.getByTestId('pie-chart-skeleton--skeleton-row')).toHaveCount(5);
     });
   });
 });

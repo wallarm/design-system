@@ -19,8 +19,8 @@ test.describe('Chart', () => {
 
     test('Default (hovered)', async ({ page }) => {
       await chartStory.goto(page, 'Default');
-      await page.locator('[data-slot=chart]').hover();
-      await expect(page.locator('[data-slot=chart-actions]')).toBeVisible();
+      await page.getByTestId('chart').hover();
+      await expect(page.getByTestId('chart--actions')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -60,10 +60,10 @@ test.describe('Chart', () => {
     test('Should reveal actions when card is hovered', async ({ page }) => {
       await chartStory.goto(page, 'Default');
 
-      const actions = page.locator('[data-slot=chart-actions]');
+      const actions = page.getByTestId('chart--actions');
       await expect(actions).toHaveCSS('opacity', '0');
 
-      await page.locator('[data-slot=chart]').hover();
+      await page.getByTestId('chart').hover();
 
       await expect(actions).toHaveCSS('opacity', '1');
     });
@@ -71,7 +71,7 @@ test.describe('Chart', () => {
     test('Should keep always-visible actions shown without hover', async ({ page }) => {
       await chartStory.goto(page, 'With Always Visible Actions');
 
-      const actions = page.locator('[data-slot=chart-actions]');
+      const actions = page.getByTestId('chart--actions');
       await expect(actions).toHaveCSS('opacity', '1');
     });
   });
@@ -80,7 +80,7 @@ test.describe('Chart', () => {
     test('Should reveal actions when an element inside the card gains focus', async ({ page }) => {
       await chartStory.goto(page, 'Default');
 
-      const actions = page.locator('[data-slot=chart-actions]');
+      const actions = page.getByTestId('chart--actions');
       await expect(actions).toHaveCSS('opacity', '0');
 
       await page.keyboard.press('Tab');

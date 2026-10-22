@@ -89,6 +89,7 @@ const FieldMenuHarness: FC<
       )}
 
       <FilterInputFieldMenu
+        data-testid='field-menu'
         {...menuProps}
         open={open}
         onOpenChange={setOpen}

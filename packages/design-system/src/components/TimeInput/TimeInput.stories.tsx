@@ -247,18 +247,18 @@ export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
       <span className='sb-annotation'>Locale</span>
-      <TimeInput readOnly defaultValue={new Time(22, 0)} />
+      <TimeInput readOnly defaultValue={new Time(22, 0)} data-testid='time-input-read-only' />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
         <span className='sb-annotation'>12-hour</span>
-        <TimeInput readOnly defaultValue={new Time(22, 0)} />
+        <TimeInput readOnly defaultValue={new Time(22, 0)} data-testid='time-input-read-only-12h' />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
         <span className='sb-annotation'>24-hour</span>
-        <TimeInput readOnly defaultValue={new Time(22, 0)} />
+        <TimeInput readOnly defaultValue={new Time(22, 0)} data-testid='time-input-read-only-24h' />
       </VStack>
     </DateFormatProvider>
   </HStack>

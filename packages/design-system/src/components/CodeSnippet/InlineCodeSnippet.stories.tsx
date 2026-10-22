@@ -30,7 +30,9 @@ export default meta;
 export const Default: StoryFn<typeof meta> = () => (
   <VStack align='start'>
     <p className='text-xs text-text-primary'>
-      Small text: Run <InlineCodeSnippet code='npm install @wads/ui' /> to install dependencies.
+      Small text: Run{' '}
+      <InlineCodeSnippet code='npm install @wads/ui' data-testid='inline-code-copyable' /> to
+      install dependencies.
     </p>
     <p className='text-sm text-text-primary'>
       Medium text: Run <InlineCodeSnippet code='npm install @wads/ui' /> to install dependencies.
@@ -77,7 +79,12 @@ export const Sizes: StoryFn<typeof meta> = () => (
  */
 export const NonCopyable: StoryFn<typeof meta> = () => (
   <p className='text-sm text-text-primary'>
-    This code is not copyable: <InlineCodeSnippet code='npm install @wads/ui' copyable={false} />
+    This code is not copyable:{' '}
+    <InlineCodeSnippet
+      code='npm install @wads/ui'
+      copyable={false}
+      data-testid='inline-code-non-copyable'
+    />
   </p>
 );
 

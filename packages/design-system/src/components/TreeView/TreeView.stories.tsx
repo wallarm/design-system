@@ -25,6 +25,9 @@ const DESCRIPTION = [
 const meta = {
   title: 'Navigation/TreeView',
   component: TreeView,
+  args: {
+    'data-testid': 'tree-view',
+  },
   parameters: {
     layout: 'centered',
     docs: {
@@ -389,7 +392,7 @@ export const WithHeaderAndSearch: StoryFn<TreeViewProps> = () => {
 
   return (
     <div className='w-320'>
-      <TreeView>
+      <TreeView data-testid='tree-view'>
         {/* Header — expand/collapse buttons grouped tightly, close set apart */}
         <div className='flex items-center gap-8 px-8 pt-8 pb-4'>
           <Text size='xs' weight='medium' color='secondary' grow truncate>

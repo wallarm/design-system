@@ -40,7 +40,7 @@ export default meta;
  */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='w-400'>
-    <Chart>
+    <Chart data-testid='chart'>
       <ChartHeader>
         <ChartTitle>Top 5 Endpoints</ChartTitle>
         <ChartActions>
@@ -63,7 +63,7 @@ export const Default: StoryFn<typeof meta> = () => (
  */
 export const WithAlwaysVisibleActions: StoryFn<typeof meta> = () => (
   <div className='w-400'>
-    <Chart>
+    <Chart data-testid='chart'>
       <ChartHeader>
         <ChartTitle>Top 5 Endpoints</ChartTitle>
         <ChartActions alwaysVisible>

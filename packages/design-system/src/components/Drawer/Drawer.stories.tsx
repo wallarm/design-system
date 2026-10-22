@@ -454,7 +454,7 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Drawer width={480} open={open} onOpenChange={setOpen}>
+    <Drawer data-testid='drawer' width={480} open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant='outline' color='neutral'>
           Open Resizable Drawer with OverflowList
@@ -471,9 +471,14 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
             <AttributeLabel>Attack types</AttributeLabel>
             <AttributeValue>
               <OverflowList
+                data-testid='tags-overflow-list'
                 className='gap-4'
                 items={DRAWER_TAGS}
-                itemRenderer={item => <Tag key={item}>{item}</Tag>}
+                itemRenderer={item => (
+                  <Tag key={item} data-testid='tag'>
+                    {item}
+                  </Tag>
+                )}
               />
             </AttributeValue>
           </Attribute>

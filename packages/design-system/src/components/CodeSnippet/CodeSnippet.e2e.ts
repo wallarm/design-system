@@ -197,7 +197,7 @@ test.describe('CodeSnippet', () => {
       await codeSnippetStory.goto(page, 'Show More');
 
       // Scope to the first snippet (12 lines, maxLines=7)
-      const firstSnippet = page.locator('[data-slot="code-snippet"]').first();
+      const firstSnippet = page.getByTestId('show-more-clipped');
 
       // Should show "Show more (5 lines)" button (12 total - 7 maxLines = 5 hidden)
       const showMoreButton = firstSnippet.getByRole('button', { name: /Show more/ });
@@ -224,7 +224,7 @@ test.describe('CodeSnippet', () => {
 
       // Second snippet (9 lines, maxLines=7) should NOT show "Show more" button
       // because only 2 lines would be hidden (below MIN_HIDDEN_LINES_THRESHOLD of 3)
-      const secondSnippet = page.locator('[data-slot="code-snippet"]').nth(1);
+      const secondSnippet = page.getByTestId('show-more-threshold');
       await expect(secondSnippet.getByRole('button', { name: /Show more/ })).not.toBeVisible();
       const secondCodeLines = secondSnippet.locator('code:not(#error-stack) > div');
       await expect(secondCodeLines).toHaveCount(9);
@@ -295,13 +295,13 @@ test.describe('InlineCodeSnippet', () => {
 
       // Test copyable: Default story has copyable inline snippets
       await inlineStory.goto(page, 'Default');
-      const copyableSnippet = page.locator('[data-slot="inline-code-snippet"]').first();
+      const copyableSnippet = page.getByTestId('inline-code-copyable');
       await copyableSnippet.click();
       await expect(page.getByText('Copied')).toBeVisible();
 
       // Test non-copyable: NonCopyable story has copyable={false}
       await inlineStory.goto(page, 'Non Copyable');
-      const nonCopyableSnippet = page.locator('[data-slot="inline-code-snippet"]').first();
+      const nonCopyableSnippet = page.getByTestId('inline-code-non-copyable');
       await nonCopyableSnippet.click();
 
       // "Copied" tooltip should NOT appear

@@ -47,8 +47,8 @@ test.describe('Component: Tree', () => {
     test('Should expand collapsed item when header is clicked', async ({ page }) => {
       await treeStory.goto(page, 'Collapsible');
 
-      const itemContent = page.locator('[data-slot="tree-item-content"]').nth(1);
-      const itemHeader = page.locator('[data-slot="tree-item-header"]').nth(1);
+      const itemContent = page.getByTestId('tree--content').nth(1);
+      const itemHeader = page.getByTestId('tree--header').nth(1);
 
       await expect(itemContent).toHaveAttribute('data-state', 'closed');
       await itemHeader.click();
@@ -58,8 +58,8 @@ test.describe('Component: Tree', () => {
     test('Should collapse expanded item on second click', async ({ page }) => {
       await treeStory.goto(page, 'Collapsible');
 
-      const itemContent = page.locator('[data-slot="tree-item-content"]').first();
-      const itemHeader = page.locator('[data-slot="tree-item-header"]').first();
+      const itemContent = page.getByTestId('tree--content').first();
+      const itemHeader = page.getByTestId('tree--header').first();
 
       await expect(itemContent).toHaveAttribute('data-state', 'open');
       await itemHeader.click();
@@ -69,7 +69,7 @@ test.describe('Component: Tree', () => {
     test('Should render expanded state correctly after toggle', async ({ page }) => {
       await treeStory.goto(page, 'Collapsible');
 
-      const itemHeader = page.locator('[data-slot="tree-item-header"]').nth(1);
+      const itemHeader = page.getByTestId('tree--header').nth(1);
       await itemHeader.click();
 
       await expect(page).toHaveScreenshot();
@@ -77,20 +77,20 @@ test.describe('Component: Tree', () => {
   });
 
   test.describe('Accessibility', () => {
-    test('Should have tree-item slots for each item', async ({ page }) => {
+    test('Should render an item for each tree node', async ({ page }) => {
       await treeStory.goto(page, 'Basic');
-      const items = page.locator('[data-slot="tree-item"]');
+      const items = page.getByTestId('tree--item');
       await expect(items).toHaveCount(3);
     });
 
     test('Should toggle via keyboard when header is focused', async ({ page }) => {
       await treeStory.goto(page, 'Collapsible');
 
-      const itemHeader = page.locator('[data-slot="tree-item-header"]').nth(1);
-      const itemContent = page.locator('[data-slot="tree-item-content"]').nth(1);
+      const itemHeader = page.getByTestId('tree--header').nth(1);
+      const itemContent = page.getByTestId('tree--content').nth(1);
 
       await expect(itemContent).toHaveAttribute('data-state', 'closed');
-      await itemHeader.locator('button').focus();
+      await itemHeader.getByRole('button').focus();
       await page.keyboard.press('Enter');
       await expect(itemContent).toHaveAttribute('data-state', 'open');
     });

@@ -55,7 +55,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <Input placeholder='Enter' />
+      <Input placeholder='Enter' data-testid='input-group-input' />
       <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>

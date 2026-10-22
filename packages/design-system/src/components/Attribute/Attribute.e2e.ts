@@ -135,7 +135,7 @@ test.describe('Component: Attribute', () => {
     }) => {
       await attributeStory.goto(page, 'Horizontal With Actions');
 
-      const badge = page.locator('[data-slot="badge"]').first();
+      const badge = page.getByTestId('attr-badge-value');
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
 
       await expect(badge).toBeVisible();
@@ -149,7 +149,8 @@ test.describe('Component: Attribute', () => {
     }) => {
       await attributeStory.goto(page, 'Horizontal With Actions');
 
-      const tag = page.locator('[data-slot="tag"]:visible').first();
+      // OverflowList also renders hidden measurement copies of each tag.
+      const tag = page.getByTestId('attr-tag').filter({ visible: true }).first();
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
 
       await expect(tag).toBeVisible();

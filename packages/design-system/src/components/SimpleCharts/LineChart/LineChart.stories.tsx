@@ -126,11 +126,16 @@ export const DefaultMulti: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
     <div className='w-560'>
-      <Chart>
+      <Chart data-testid='chart'>
         <ChartHeader>
           <ChartTitle>Traffic, errors, and latency</ChartTitle>
         </ChartHeader>
-        <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp'>
+        <LineChart
+          data-testid='line-chart'
+          data={hourlyData24}
+          series={multiSeries}
+          xKey='timestamp'
+        >
           <LineChartLegend>
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
@@ -563,7 +568,7 @@ export const Filterable: StoryFn<typeof meta> = () => {
 
   return (
     <div className='w-560'>
-      <Chart>
+      <Chart data-testid='chart'>
         <ChartHeader>
           <ChartTitle>Click a row to isolate, click another to add</ChartTitle>
           <ChartActions alwaysVisible={filtered}>
@@ -585,7 +590,13 @@ export const Filterable: StoryFn<typeof meta> = () => {
             )}
           </ChartActions>
         </ChartHeader>
-        <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp' filteredKeys={hidden}>
+        <LineChart
+          data-testid='line-chart'
+          data={hourlyData24}
+          series={multiSeries}
+          xKey='timestamp'
+          filteredKeys={hidden}
+        >
           <LineChartLegend>
             {multiSeries.map(s => (
               <Tooltip key={s.key}>
@@ -734,7 +745,7 @@ const ZoomControlledChart = () => {
   }, [isZoomed, handleZoom]);
 
   return (
-    <Chart ref={chartRef}>
+    <Chart ref={chartRef} data-testid='chart'>
       <ChartHeader>
         <ChartTitle>Drag on the plot, then click "Zoom in" — Esc to cancel</ChartTitle>
         <ChartActions alwaysVisible={isZoomed}>
@@ -756,7 +767,13 @@ const ZoomControlledChart = () => {
           )}
         </ChartActions>
       </ChartHeader>
-      <LineChart data={visibleData} series={multiSeries} xKey='timestamp' onZoomChange={handleZoom}>
+      <LineChart
+        data-testid='line-chart'
+        data={visibleData}
+        series={multiSeries}
+        xKey='timestamp'
+        onZoomChange={handleZoom}
+      >
         <MultiLegend />
         <LineChartBody height={220}>
           <LineChartGrid />

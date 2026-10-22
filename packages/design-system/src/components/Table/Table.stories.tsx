@@ -719,9 +719,14 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
         size: 240,
         cell: ({ row }) => (
           <OverflowList
+            data-testid='tags-overflow-list'
             className='gap-4'
             items={row.original.tags}
-            itemRenderer={(item: string) => <Tag key={item}>{item}</Tag>}
+            itemRenderer={(item: string) => (
+              <Tag key={item} data-testid='tag'>
+                {item}
+              </Tag>
+            )}
           />
         ),
       }),
@@ -737,6 +742,7 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
       getRowId={row => row.id}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
+      data-testid='resizing-overflow-table'
     />
   );
 };
@@ -2351,6 +2357,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
         meta: EDITABLE_CELL_COLUMN_META,
         cell: ({ row, getValue }) => (
           <EditableTextCell
+            data-testid='editable-text-cell'
             value={getValue()}
             aria-label='Edit object name'
             onCommit={value => updateCell(row.id, 'objectName', value)}
@@ -2363,6 +2370,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
         meta: EDITABLE_CELL_COLUMN_META,
         cell: ({ row, getValue }) => (
           <EditableSelectCell
+            data-testid='editable-select-cell'
             value={getValue()}
             items={statusItems}
             onCommit={value => updateCell(row.id, 'status', value as SecurityEvent['status'])}

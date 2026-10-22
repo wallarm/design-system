@@ -88,8 +88,9 @@ test.describe('Component: Accordion', () => {
 
     test('Should not nest interactive elements inside the trigger button', async ({ page }) => {
       await accordionStory.goto(page, 'Section With Actions');
-      const nestedButtons = page.locator('[data-slot="accordion-trigger"] button');
-      await expect(nestedButtons).toHaveCount(0);
+      const triggers = page.getByTestId(/^accordion-section-actions--item-.+--trigger$/);
+      await expect(triggers.first()).toBeVisible();
+      await expect(triggers.locator('button')).toHaveCount(0);
     });
 
     test('Should keep disabled item collapsed when clicked', async ({ page }) => {

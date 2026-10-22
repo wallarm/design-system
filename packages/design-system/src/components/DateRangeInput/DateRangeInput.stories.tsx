@@ -194,7 +194,7 @@ export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
       <span className='sb-annotation'>Date range</span>
-      <DateRangeInput defaultValue={sampleRange} />
+      <DateRangeInput defaultValue={sampleRange} data-testid='date-range-input-filled' />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={4}>
@@ -290,11 +290,20 @@ export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
       <span className='sb-annotation'>Date range</span>
-      <DateRangeInput readOnly defaultValue={sampleRange} />
+      <DateRangeInput
+        readOnly
+        defaultValue={sampleRange}
+        data-testid='date-range-input-read-only'
+      />
     </VStack>
     <VStack gap={12}>
       <span className='sb-annotation'>Date + time range</span>
-      <DateRangeInput readOnly granularity='minute' defaultValue={sampleRangeDateTime} />
+      <DateRangeInput
+        readOnly
+        granularity='minute'
+        defaultValue={sampleRangeDateTime}
+        data-testid='date-range-input-read-only-datetime'
+      />
     </VStack>
   </HStack>
 );

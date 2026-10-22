@@ -641,6 +641,7 @@ export const Default: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={fields}
           value={expression}
           onChange={setExpression}
@@ -672,6 +673,7 @@ export const SuggestionsOnly: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={suggestionFields}
           value={expression}
           onChange={setExpression}
@@ -720,6 +722,7 @@ export const Simple: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={simpleFields}
           value={expression}
           onChange={expr => {
@@ -759,6 +762,7 @@ export const BackendIntegration: Story = {
 
     return (
       <FilterInput
+        data-testid='filter-input'
         fields={metadata}
         value={expression}
         onChange={setExpression}

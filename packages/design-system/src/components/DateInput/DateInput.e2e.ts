@@ -98,13 +98,15 @@ test.describe('Component: DateInput', () => {
       await dateInputStory.goto(page, 'Read Only');
       // X icon inside the clear button is the only way to trigger setValue(null) —
       // verifying it's absent guarantees the value can't be wiped by a click.
-      const clearButton = page.locator('[data-slot="date-input"] button[type="button"]');
-      await expect(clearButton).toHaveCount(0);
+      for (const testId of ['date-input-read-only', 'date-input-read-only-datetime']) {
+        await expect(page.getByTestId(testId)).toBeVisible();
+        await expect(page.getByTestId(testId).locator('button[type="button"]')).toHaveCount(0);
+      }
     });
 
     test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await dateInputStory.goto(page, 'Read Only');
-      const daySegment = page.locator('[data-slot="date-input"] [data-segment="day"]').first();
+      const daySegment = page.getByTestId('date-input-read-only').locator('[data-segment="day"]');
 
       await expect(daySegment).toHaveAttribute('aria-hidden', 'true');
       await expect(daySegment).not.toHaveAttribute('tabindex', /.*/);

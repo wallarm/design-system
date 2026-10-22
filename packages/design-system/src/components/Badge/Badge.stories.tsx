@@ -258,7 +258,7 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
         <tr key={color}>
           {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
             <td key={type} className='p-8'>
-              <Badge type={type} color={color}>
+              <Badge data-testid='badge' type={type} color={color}>
                 {label}
               </Badge>
             </td>
@@ -290,7 +290,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   {label}
                 </Badge>
               </td>
@@ -300,7 +300,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   {label}
 
                   <X />
@@ -312,7 +312,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   <PenTool />
                   {label}
                 </Badge>
@@ -323,7 +323,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   <PenTool />
                   {label}
                   <X />
@@ -335,7 +335,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color} variant='dotted'>
+                <Badge data-testid='badge' type={type} color={color} variant='dotted'>
                   {label}
                 </Badge>
               </td>
@@ -345,7 +345,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color} variant='dotted'>
+                <Badge data-testid='badge' type={type} color={color} variant='dotted'>
                   {label}
                   <X />
                 </Badge>
@@ -356,7 +356,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   {label}
                   <Info />
                 </Badge>
@@ -367,7 +367,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
               <td key={type} className='p-8'>
-                <Badge type={type} color={color}>
+                <Badge data-testid='badge' type={type} color={color}>
                   <PenTool />
                 </Badge>
               </td>
@@ -379,7 +379,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
               {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
                 <td key={type} className='p-8'>
                   {isMutedSupported(type, color) ? (
-                    <Badge type={type} color={color} muted>
+                    <Badge data-testid='badge' type={type} color={color} muted>
                       {capitalize(color)}
                     </Badge>
                   ) : null}

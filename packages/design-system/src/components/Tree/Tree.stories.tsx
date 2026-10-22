@@ -15,6 +15,9 @@ const DESCRIPTION = [
 const meta = {
   title: 'Navigation/Tree',
   component: Tree,
+  args: {
+    'data-testid': 'tree',
+  },
   parameters: {
     layout: 'centered',
     docs: {

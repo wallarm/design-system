@@ -7,7 +7,8 @@ const cardStory = createStoryHelper('data-display-card', [
   'Various Content',
 ] as const);
 
-const getCards = (page: Page) => page.locator('[data-slot="card"]');
+const getCards = (page: Page) => page.getByTestId('card');
+const getDisabledCards = (page: Page) => page.getByTestId('disabled-card');
 
 test.describe('Card Component', () => {
   test.describe('View', () => {
@@ -76,7 +77,7 @@ test.describe('Card Component', () => {
       const card = getCards(page).first();
       await expect(card).toHaveAttribute('data-last-click', 'none');
 
-      await card.locator('[data-slot="card-content"]').click();
+      await card.getByTestId('card--content').click();
 
       await expect(card).toHaveAttribute('data-last-click', 'card');
     });
@@ -88,12 +89,14 @@ test.describe('Card Component', () => {
     });
 
     test('Disabled cards - aria-disabled present', async ({ page }) => {
-      const disabledCards = page.locator('[data-slot="card"][aria-disabled="true"]');
+      const disabledCards = getDisabledCards(page);
       await expect(disabledCards).toHaveCount(2);
+      await expect(disabledCards.nth(0)).toHaveAttribute('aria-disabled', 'true');
+      await expect(disabledCards.nth(1)).toHaveAttribute('aria-disabled', 'true');
     });
 
     test('Disabled card - pointer events none', async ({ page }) => {
-      const disabledCard = page.locator('[data-slot="card"][aria-disabled="true"]').first();
+      const disabledCard = getDisabledCards(page).first();
       await expect(disabledCard).toHaveCSS('pointer-events', 'none');
     });
   });

@@ -33,7 +33,13 @@ export default meta;
  * parameter that was hit.
  */
 export const FullPath: StoryFn<typeof meta> = () => (
-  <ParameterPath method='POST' segments={['JSON', 'nginx_config']} encoding='BASE64' attack />
+  <ParameterPath
+    data-testid='parameter-path'
+    method='POST'
+    segments={['JSON', 'nginx_config']}
+    encoding='BASE64'
+    attack
+  />
 );
 
 /**
@@ -74,6 +80,7 @@ export const Cookie: StoryFn<typeof meta> = () => (
 export const DeepNestedTruncated: StoryFn<typeof meta> = () => (
   <div style={{ width: 280 }}>
     <ParameterPath
+      data-testid='parameter-path'
       method='POST'
       segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}
       attack
@@ -100,6 +107,7 @@ export const ExpandableTruncated: StoryFn<typeof meta> = () => (
     {/* The root is w-full (it must span the available space to measure it),
         so centering happens inside the component, not on the container. */}
     <ParameterPath
+      data-testid='parameter-path'
       className='justify-center'
       method='POST'
       segments={[
@@ -128,6 +136,7 @@ export const ExpandableTruncated: StoryFn<typeof meta> = () => (
 export const ExpandableFitsInline: StoryFn<typeof meta> = () => (
   <div style={{ width: 720, display: 'flex', justifyContent: 'center' }}>
     <ParameterPath
+      data-testid='parameter-path'
       method='POST'
       segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}
       attack

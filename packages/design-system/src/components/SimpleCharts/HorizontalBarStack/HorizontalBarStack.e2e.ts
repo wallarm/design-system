@@ -66,11 +66,11 @@ test.describe('HorizontalBarStack', () => {
 
     test('Should announce the skeleton loading state', async ({ page }) => {
       await story.goto(page, 'Loading');
-      const skeleton = page.locator('[data-slot=horizontal-bar-stack-skeleton]');
+      const skeleton = page.getByTestId('horizontal-bar-stack-skeleton');
       await expect(skeleton).toHaveAttribute('aria-busy', 'true');
       await expect(skeleton).toHaveAttribute('aria-live', 'polite');
       await expect(
-        page.locator('[data-slot=horizontal-bar-stack-skeleton-legend-item]'),
+        page.getByTestId('horizontal-bar-stack-skeleton--skeleton-legend-item'),
       ).toHaveCount(3);
     });
   });

@@ -63,7 +63,7 @@ test.describe('Component: ParameterPath', () => {
     test('Should show full path tooltip when truncated', async ({ page }) => {
       await parameterPathStory.goto(page, 'Deep Nested Truncated');
 
-      const path = page.locator('[data-slot="parameter-path"]');
+      const path = page.getByTestId('parameter-path');
       await path.hover();
 
       const tooltip = page.getByRole('tooltip');
@@ -75,7 +75,7 @@ test.describe('Component: ParameterPath', () => {
     test('Should not show tooltip when path fits the container', async ({ page }) => {
       await parameterPathStory.goto(page, 'Full Path');
 
-      const path = page.locator('[data-slot="parameter-path"]');
+      const path = page.getByTestId('parameter-path');
       await path.hover();
 
       // Wait briefly to let any tooltip render if it were going to.
@@ -86,9 +86,9 @@ test.describe('Component: ParameterPath', () => {
     test('Should expand a collapsed path on click and collapse it back', async ({ page }) => {
       await parameterPathStory.goto(page, 'Expandable Truncated');
 
-      const path = page.locator('[data-slot="parameter-path"]');
+      const path = page.getByTestId('parameter-path');
       const visibleRow = path.locator('[data-row="visible"]');
-      const ellipsis = visibleRow.locator('[data-slot="parameter-path-ellipsis"]');
+      const ellipsis = page.getByTestId('parameter-path--ellipsis');
 
       // Collapsed: ellipsis pill instead of the middle segments, expand affordance on.
       await expect(ellipsis).toBeVisible();
@@ -120,12 +120,12 @@ test.describe('Component: ParameterPath', () => {
       // click does not toggle an expanded state.
       await parameterPathStory.goto(page, 'Expandable Fits Inline');
 
-      const path = page.locator('[data-slot="parameter-path"]');
+      const path = page.getByTestId('parameter-path');
       // Scope text queries to the visible row: the off-screen measurement row
       // always renders every segment to measure widths, so a global text query
       // would also match its hidden copy.
       const visibleRow = path.locator('[data-row="visible"]');
-      const ellipsis = visibleRow.locator('[data-slot="parameter-path-ellipsis"]');
+      const ellipsis = page.getByTestId('parameter-path--ellipsis');
 
       // Full path shown inline: no ellipsis, every segment visible.
       await expect(ellipsis).toHaveCount(0);
@@ -146,7 +146,7 @@ test.describe('Component: ParameterPath', () => {
 
       await parameterPathStory.goto(page, 'Full Path');
 
-      const path = page.locator('[data-slot="parameter-path"]');
+      const path = page.getByTestId('parameter-path');
       await path.click();
 
       const isMac = process.platform === 'darwin';

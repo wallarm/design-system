@@ -63,10 +63,10 @@ test.describe('Component: TreeView', () => {
       await treeViewStory.goto(page, 'Basic');
 
       const utils = itemByText(page, 'Utils');
-      const group = utils.locator('[data-slot="tree-view-group"]').first();
+      const group = utils.getByTestId('tree-view--group').first();
 
       await expect(group).toBeHidden();
-      await utils.locator('[data-slot="tree-view-toggle"]').first().click();
+      await utils.getByTestId('tree-view--toggle').first().click();
       await expect(group).toBeVisible();
     });
 
@@ -83,7 +83,7 @@ test.describe('Component: TreeView', () => {
       await treeViewStory.goto(page, 'With Header And Search');
 
       const src = itemByText(page, 'src');
-      const group = src.locator('[data-slot="tree-view-group"]').first();
+      const group = src.getByTestId('tree-view--group').first();
 
       await expect(group).toBeVisible();
       await page.getByRole('button', { name: 'Collapse all' }).click();
@@ -95,7 +95,7 @@ test.describe('Component: TreeView', () => {
 
       await page.getByRole('button', { name: 'Collapse all' }).click();
       const src = itemByText(page, 'src');
-      const group = src.locator('[data-slot="tree-view-group"]').first();
+      const group = src.getByTestId('tree-view--group').first();
       await expect(group).toBeHidden();
 
       await page.getByRole('button', { name: 'Expand all' }).click();
@@ -160,7 +160,7 @@ test.describe('Component: TreeView', () => {
       await treeViewStory.goto(page, 'Basic');
 
       const utils = itemByText(page, 'Utils');
-      const group = utils.locator('[data-slot="tree-view-group"]').first();
+      const group = utils.getByTestId('tree-view--group').first();
 
       await expect(group).toBeHidden();
       await utils.focus();

@@ -131,25 +131,25 @@ export const VerticalMultiple: StoryFn = () => (
       </Ip>
     </IpList>
     <IpList>
-      <Ip>
+      <Ip data-testid='ip'>
         <IpCountry code='NL' />
         <IpAddress>52.94.76.0</IpAddress>
       </Ip>
-      <Ip>
+      <Ip data-testid='ip'>
         <IpCountry code='NL' />
         <IpAddress>20.33.0.0</IpAddress>
       </Ip>
-      <Ip>
+      <Ip data-testid='ip'>
         <IpCountry code='AZ' />
         <IpAddress>35.190.0.0</IpAddress>
         <IpProvider>GCP</IpProvider>
       </Ip>
-      <Ip>
+      <Ip data-testid='ip'>
         <IpCountry code='US' />
         <IpAddress>169.55.0.0</IpAddress>
         <IpProvider>IBM Cloud</IpProvider>
       </Ip>
-      <Ip>
+      <Ip data-testid='ip'>
         <IpAddress>88.198.0.0</IpAddress>
         <IpPort>:8080</IpPort>
       </Ip>

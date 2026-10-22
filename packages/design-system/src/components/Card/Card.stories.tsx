@@ -83,6 +83,7 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => {
 
   return (
     <Card
+      data-testid='card'
       onClick={e => {
         onCardClick(e);
         setLastClick('card');
@@ -187,7 +188,7 @@ export const Variants: StoryFn<CardProps> = () => (
     </HStack>
 
     <HStack gap={16} align='center'>
-      <Card color='primary' disabled onClick={onCardClick}>
+      <Card data-testid='disabled-card' color='primary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Primary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -202,7 +203,7 @@ export const Variants: StoryFn<CardProps> = () => (
         </CardFooter>
       </Card>
 
-      <Card color='secondary' disabled onClick={onCardClick}>
+      <Card data-testid='disabled-card' color='secondary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Secondary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -227,7 +228,7 @@ export const Variants: StoryFn<CardProps> = () => (
 export const VariousContent: StoryFn<CardProps> = () => (
   <HStack gap={16}>
     <VStack gap={16} align='stretch'>
-      <Card>
+      <Card data-testid='card'>
         <CardHeader>
           <CardTitle>Card title</CardTitle>
           <Badge size='medium' type='solid' color='slate'>

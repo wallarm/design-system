@@ -75,11 +75,16 @@ export const Default: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
     <div className='w-560'>
-      <Chart>
+      <Chart data-testid='chart'>
         <ChartHeader>
           <ChartTitle>Traffic breakdown (stacked)</ChartTitle>
         </ChartHeader>
-        <AreaChart data={hourlyData24} series={multiSeries} xKey='timestamp'>
+        <AreaChart
+          data-testid='area-chart'
+          data={hourlyData24}
+          series={multiSeries}
+          xKey='timestamp'
+        >
           <MultiLegend />
           <AreaChartBody>
             <LineChartGrid />
@@ -177,7 +182,7 @@ export const Filterable: StoryFn<typeof meta> = () => {
 
   return (
     <div className='w-560'>
-      <Chart>
+      <Chart data-testid='chart'>
         <ChartHeader>
           <ChartTitle>Click a row to isolate, click another to add</ChartTitle>
           <ChartActions alwaysVisible={filtered}>
@@ -199,7 +204,13 @@ export const Filterable: StoryFn<typeof meta> = () => {
             )}
           </ChartActions>
         </ChartHeader>
-        <AreaChart data={hourlyData24} series={multiSeries} xKey='timestamp' filteredKeys={hidden}>
+        <AreaChart
+          data-testid='area-chart'
+          data={hourlyData24}
+          series={multiSeries}
+          xKey='timestamp'
+          filteredKeys={hidden}
+        >
           <LineChartLegend>
             {multiSeries.map(s => (
               <Tooltip key={s.key}>

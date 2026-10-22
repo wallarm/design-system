@@ -14,10 +14,6 @@ const sliderStory = createStoryHelper('inputs-slider', [
   'Field With Value',
 ] as const);
 
-// The inline value Input (the slider's own HiddenInput carries no data-slot="input").
-// The root is the layout row now, so scope to it (the old slider-input-row wrapper is gone).
-const VALUE_INPUT = '[data-slot="slider"] input[data-slot="input"]';
-
 test.describe('Component: Slider', () => {
   test.describe('Visual', () => {
     test('Should render the basic single-value slider correctly', async ({ page }) => {
@@ -83,7 +79,7 @@ test.describe('Component: Slider', () => {
     test('Should sync the slider when the inline input changes', async ({ page }) => {
       await sliderStory.goto(page, 'With Input');
       const thumb = page.getByRole('slider');
-      const input = page.locator(VALUE_INPUT);
+      const input = page.getByTestId('slider-with-input--input');
       await input.fill('30');
       await input.blur();
       await expect(thumb).toHaveAttribute('aria-valuenow', '30');
@@ -92,7 +88,7 @@ test.describe('Component: Slider', () => {
     test('Should clamp an out-of-range inline input entry to the maximum', async ({ page }) => {
       await sliderStory.goto(page, 'With Input');
       const thumb = page.getByRole('slider');
-      const input = page.locator(VALUE_INPUT);
+      const input = page.getByTestId('slider-with-input--input');
       await input.fill('150');
       await input.blur();
       await expect(thumb).toHaveAttribute('aria-valuenow', '100');
@@ -100,7 +96,7 @@ test.describe('Component: Slider', () => {
 
     test('Should clamp the min inline input so it cannot cross the max thumb', async ({ page }) => {
       await sliderStory.goto(page, 'Range With Input');
-      const minInput = page.locator(VALUE_INPUT).first();
+      const minInput = page.getByTestId('slider-range-with-input--input-0');
       // Range starts at [20, 80]; typing 90 into the min box must not cross the max (80).
       await minInput.fill('90');
       await minInput.blur();

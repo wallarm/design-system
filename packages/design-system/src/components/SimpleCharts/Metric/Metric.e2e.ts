@@ -24,7 +24,7 @@ test.describe('Metric', () => {
   test.describe('Accessibility', () => {
     test('Should announce the skeleton loading state', async ({ page }) => {
       await story.goto(page, 'Loading');
-      const skeleton = page.locator('[data-slot=metric-skeleton]');
+      const skeleton = page.getByTestId('metric-skeleton');
       await expect(skeleton).toHaveAttribute('aria-busy', 'true');
       await expect(skeleton).toHaveAttribute('aria-live', 'polite');
     });

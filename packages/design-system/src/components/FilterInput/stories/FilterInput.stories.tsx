@@ -38,6 +38,9 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
+  args: {
+    'data-testid': 'filter-input',
+  },
   argTypes: {
     placeholder: {
       control: 'text',
@@ -122,6 +125,7 @@ export const WithDescribedChip: Story = {
 
     return (
       <FilterInput
+        data-testid='filter-input'
         fields={describedChipFields}
         value={expression}
         onChange={setExpression}
@@ -153,6 +157,7 @@ export const WithPresetValue: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
@@ -183,6 +188,7 @@ export const WithMultiConditionPreset: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
@@ -210,6 +216,7 @@ export const ErrorWithValue: Story = {
 
     return (
       <FilterInput
+        data-testid='filter-input'
         fields={attackVectorFields}
         value={expression}
         onChange={setExpression}
@@ -236,6 +243,7 @@ export const WithDisabledChips: Story = {
     return (
       <>
         <FilterInput
+          data-testid='filter-input'
           fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
@@ -271,6 +279,7 @@ export const AllChipsDisabled: Story = {
 
     return (
       <FilterInput
+        data-testid='filter-input'
         fields={attackVectorFields}
         value={expression}
         onChange={setExpression}
@@ -343,7 +352,14 @@ export const PairedField: Story = {
   render: () => {
     const ParentComponent = () => {
       const [value, setValue] = useState<ExprNode | null>(null);
-      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+      return (
+        <FilterInput
+          data-testid='filter-input'
+          fields={pairedFields}
+          value={value}
+          onChange={setValue}
+        />
+      );
     };
     return <ParentComponent />;
   },
@@ -361,7 +377,14 @@ export const PairedFieldValueIsSet: Story = {
           { type: 'condition', field: 'context_value', operator: 'is_null', value: null },
         ],
       });
-      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+      return (
+        <FilterInput
+          data-testid='filter-input'
+          fields={pairedFields}
+          value={value}
+          onChange={setValue}
+        />
+      );
     };
     return <ParentComponent />;
   },
@@ -407,7 +430,14 @@ export const PairedFieldValueDescriptions: Story = {
   render: () => {
     const ParentComponent = () => {
       const [value, setValue] = useState<ExprNode | null>(null);
-      return <FilterInput fields={describedParamFields} value={value} onChange={setValue} />;
+      return (
+        <FilterInput
+          data-testid='filter-input'
+          fields={describedParamFields}
+          value={value}
+          onChange={setValue}
+        />
+      );
     };
     return <ParentComponent />;
   },
@@ -424,7 +454,14 @@ export const PairedFieldPreset: Story = {
         value: 'header',
         pair: { operator: '=', value: 'authorization' },
       });
-      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+      return (
+        <FilterInput
+          data-testid='filter-input'
+          fields={pairedFields}
+          value={value}
+          onChange={setValue}
+        />
+      );
     };
     return <ParentComponent />;
   },
@@ -548,6 +585,7 @@ export const NestedValueSubmenu: Story = {
       return (
         <>
           <FilterInput
+            data-testid='filter-input'
             fields={attackTypeNestedFields}
             value={value}
             onChange={setValue}

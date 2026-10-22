@@ -27,7 +27,7 @@ async function createChipWithSelection(page: any, fieldText: string, valueText: 
   await valueItem.click();
 
   // Wait for chip to appear
-  const chip = page.locator('[data-slot="filter-input-chip"]');
+  const chip = page.getByTestId('filter-input--condition-chip');
   await expect(chip.first()).toBeVisible({ timeout: 5000 });
 }
 
@@ -61,7 +61,7 @@ async function createMultiSelectChip(
   await page.keyboard.press('Escape');
 
   // Wait for chip to appear
-  const chip = page.locator('[data-slot="filter-input-chip"]');
+  const chip = page.getByTestId('filter-input--condition-chip');
   await expect(chip.first()).toBeVisible({ timeout: 5000 });
 }
 
@@ -75,15 +75,15 @@ test.describe
         // Create a Status chip
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
         await expect(chip).toBeVisible();
 
         // Click attribute segment to edit
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await attributeSegment.click();
 
         await page.waitForTimeout(300);
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
 
         // Select different field
@@ -92,7 +92,7 @@ test.describe
 
         // Chip should now show Priority, not Status
         const updatedChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'Priority' });
         await expect(updatedChip).toBeVisible();
 
@@ -109,15 +109,15 @@ test.describe
         // Create a Status chip with value "Active"
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
         await expect(chip).toBeVisible();
 
         // Click attribute to edit it
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await attributeSegment.click();
 
         await page.waitForTimeout(300);
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
 
         // Change to Priority — "Active" is not a valid Priority value
@@ -137,14 +137,16 @@ test.describe
         // Create a Status chip
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await attributeSegment.click();
 
         await page.waitForTimeout(300);
 
         // Type a custom attribute that doesn't exist
-        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        const segmentInput = page
+          .getByTestId(/^filter-input--condition-chip--(attribute|operator|value)$/)
+          .locator('input');
         await segmentInput.fill('UnknownField');
         await page.keyboard.press('Enter');
 
@@ -152,7 +154,7 @@ test.describe
 
         // Should show the unknown attribute name
         const updatedChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'UnknownField' });
         await expect(updatedChip).toBeVisible();
 
@@ -169,30 +171,32 @@ test.describe
         // Create a chip with Status, then change attribute to unknown
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await attributeSegment.click();
 
         await page.waitForTimeout(300);
 
         // Type unknown attribute
-        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        const segmentInput = page
+          .getByTestId(/^filter-input--condition-chip--(attribute|operator|value)$/)
+          .locator('input');
         await segmentInput.fill('BadField');
         await page.keyboard.press('Enter');
         await page.waitForTimeout(300);
 
         // Now click attribute of the error chip
         const errorChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'BadField' });
         await expect(errorChip).toBeVisible();
 
-        const errorAttr = errorChip.locator('[data-slot="segment-attribute"]');
+        const errorAttr = errorChip.getByTestId('filter-input--condition-chip--attribute');
         await errorAttr.click();
         await page.waitForTimeout(300);
 
         // Field dropdown should appear
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
 
         // Select a valid field to fix the error
@@ -201,7 +205,7 @@ test.describe
 
         // Chip should now show Status
         const fixedChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'Status' });
         await expect(fixedChip).toBeVisible();
       });
@@ -214,7 +218,7 @@ test.describe
         const input = page.locator('input[type="text"]');
         await input.click();
 
-        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        const fieldMenu = page.getByTestId('filter-input--field-menu');
         await expect(fieldMenu).toBeVisible({ timeout: 2000 });
 
         // No item should be highlighted when focus is on input
@@ -238,8 +242,8 @@ test.describe
         await page.waitForTimeout(300);
 
         // Click value segment to edit
-        const chip = page.locator('[data-slot="filter-input-chip"]').first();
-        const valueSegment = chip.locator('[data-slot="segment-value"]');
+        const chip = page.getByTestId('filter-input--condition-chip').first();
+        const valueSegment = chip.getByTestId('filter-input--condition-chip--value');
         await valueSegment.click();
 
         await page.waitForTimeout(300);
@@ -259,22 +263,24 @@ test.describe
 
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
         await expect(chip).toBeVisible({ timeout: 5000 });
 
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await expect(attributeSegment).toBeVisible({ timeout: 5000 });
         await attributeSegment.click();
 
         // Type a valid field name and press Enter
-        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        const segmentInput = page
+          .getByTestId(/^filter-input--condition-chip--(attribute|operator|value)$/)
+          .locator('input');
         await expect(segmentInput).toBeVisible({ timeout: 5000 });
         await segmentInput.fill('Priority');
         await page.keyboard.press('Enter');
 
         // Chip should now show Priority
         const updatedChip = page
-          .locator('[data-slot="filter-input-chip"]')
+          .getByTestId('filter-input--condition-chip')
           .filter({ hasText: 'Priority' });
         await expect(updatedChip).toBeVisible({ timeout: 5000 });
       });
@@ -284,15 +290,17 @@ test.describe
 
         await createChipWithSelection(page, 'Status', 'Active');
 
-        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const chip = page.getByTestId('filter-input--condition-chip').filter({ hasText: 'Status' });
         await expect(chip).toBeVisible({ timeout: 5000 });
 
-        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        const attributeSegment = chip.getByTestId('filter-input--condition-chip--attribute');
         await expect(attributeSegment).toBeVisible({ timeout: 5000 });
         await attributeSegment.click();
 
         // Type something then cancel
-        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        const segmentInput = page
+          .getByTestId(/^filter-input--condition-chip--(attribute|operator|value)$/)
+          .locator('input');
         await expect(segmentInput).toBeVisible({ timeout: 5000 });
         await segmentInput.fill('Priority');
         await page.keyboard.press('Escape');

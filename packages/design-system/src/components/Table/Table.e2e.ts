@@ -72,14 +72,14 @@ test.describe('Component: Table', () => {
 
       const countVisibleTagsInFirstRow = () =>
         page
-          .locator('[data-slot="overflow-list"]')
+          .getByTestId('tags-overflow-list')
           .first()
-          .locator('[data-slot="tag"]')
+          .getByTestId('tag')
           .filter({ hasNotText: /^\+\d+$/ })
           .count();
 
       // Wait for the table to fully render; initial state shows 1 visible tag (overflowed)
-      await expect(page.locator('[data-slot="overflow-list"]').first()).toBeVisible();
+      await expect(page.getByTestId('tags-overflow-list').first()).toBeVisible();
 
       const before = await countVisibleTagsInFirstRow();
       expect(before).toBeGreaterThan(0);
@@ -88,7 +88,7 @@ test.describe('Component: Table', () => {
       const tagsHeader = page.getByRole('columnheader', { name: 'Tags' });
       await expect(tagsHeader).toBeVisible();
 
-      const handle = tagsHeader.locator('[data-slot="resize-handle"]');
+      const handle = tagsHeader.getByTestId('resizing-overflow-table--container--resize');
       const box = await handle.boundingBox();
       if (!box) throw new Error('Tags column resize handle not found');
 

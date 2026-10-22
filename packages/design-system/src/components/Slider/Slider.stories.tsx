@@ -164,7 +164,7 @@ export const WithTooltip: StoryFn<SliderProps> = args => (
  * half-typed number.
  */
 export const WithInput: StoryFn<SliderProps> = args => (
-  <Slider {...args}>
+  <Slider {...args} data-testid='slider-with-input'>
     <SliderControl>
       <SliderThumb aria-label='Value' />
     </SliderControl>
@@ -177,7 +177,7 @@ export const WithInput: StoryFn<SliderProps> = args => (
  * fields cannot produce a range the track could not.
  */
 export const RangeWithInput: StoryFn<SliderProps> = args => (
-  <Slider {...args} defaultValue={[20, 80]}>
+  <Slider {...args} defaultValue={[20, 80]} data-testid='slider-range-with-input'>
     <SliderInput index={0} />
     <SliderControl>
       <SliderThumb index={0} />

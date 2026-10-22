@@ -331,11 +331,16 @@ export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
       <span className='sb-annotation'>Date</span>
-      <DateInput readOnly defaultValue={sampleDate} />
+      <DateInput readOnly defaultValue={sampleDate} data-testid='date-input-read-only' />
     </VStack>
     <VStack gap={12}>
       <span className='sb-annotation'>Date + time</span>
-      <DateInput readOnly granularity='minute' defaultValue={sampleDateTime} />
+      <DateInput
+        readOnly
+        granularity='minute'
+        defaultValue={sampleDateTime}
+        data-testid='date-input-read-only-datetime'
+      />
     </VStack>
   </HStack>
 );

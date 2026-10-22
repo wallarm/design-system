@@ -27,6 +27,9 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  args: {
+    'data-testid': 'filter-input-chip',
+  },
   argTypes: {
     attribute: {
       control: 'text',
@@ -177,6 +180,7 @@ export const InteractiveDeleteExample: StoryFn = () => {
               />
             )}
             <FilterInputChip
+              data-testid='filter-input-chip'
               attribute={chip.attribute}
               operator={chip.operator}
               value={chip.value}

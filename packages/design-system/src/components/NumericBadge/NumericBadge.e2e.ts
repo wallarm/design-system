@@ -42,7 +42,7 @@ test.describe('Component: NumericBadge', () => {
 
     test('Should render badge and icon sizes correctly', async ({ page }) => {
       await numericBadgeStory.goto(page, 'Content');
-      const badges = page.locator('[data-slot="numeric-badge"]');
+      const badges = page.getByTestId('numeric-badge');
       await expect(badges).toHaveCount(10);
       const badgeHeights = await badges.evaluateAll(elements =>
         elements.map(element => element.getBoundingClientRect().height).sort((a, b) => a - b),

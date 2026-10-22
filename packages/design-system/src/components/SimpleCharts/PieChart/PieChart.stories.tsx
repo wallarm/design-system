@@ -160,7 +160,7 @@ export const Default: StoryFn<typeof meta> = () => {
             </Tooltip>
           </ChartActions>
         </ChartHeader>
-        <PieChart data={visibleRows} total={visibleTotal}>
+        <PieChart data-testid='pie-chart' data={visibleRows} total={visibleTotal}>
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue formatHoveredValue={d => formatValue(d.value)}>
@@ -245,7 +245,12 @@ export const Selectable: StoryFn<typeof meta> = () => {
             )}
           </ChartActions>
         </ChartHeader>
-        <PieChart data={baseRows} total={total} selectedNames={selectedNames}>
+        <PieChart
+          data-testid='pie-chart'
+          data={baseRows}
+          total={total}
+          selectedNames={selectedNames}
+        >
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
@@ -379,7 +384,7 @@ export const Loading: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Top 5 Endpoints</ChartTitle>
       </ChartHeader>
-      <PieChartSkeleton rows={5} />
+      <PieChartSkeleton data-testid='pie-chart-skeleton' rows={5} />
     </Chart>
   </div>
 );
@@ -396,7 +401,7 @@ export const SingleSlice: StoryFn<typeof meta> = () => {
         <ChartHeader>
           <ChartTitle>Top 5 Endpoints</ChartTitle>
         </ChartHeader>
-        <PieChart data={data}>
+        <PieChart data-testid='pie-chart' data={data}>
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>23</PieChartCenterValue>
@@ -438,7 +443,7 @@ export const TwoSlices: StoryFn<typeof meta> = () => {
         <ChartHeader>
           <ChartTitle>Response status — values only</ChartTitle>
         </ChartHeader>
-        <PieChart data={data} total={100}>
+        <PieChart data-testid='pie-chart' data={data} total={100}>
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>100</PieChartCenterValue>
@@ -533,7 +538,7 @@ export const ZeroTotal: StoryFn<typeof meta> = () => {
         <ChartHeader>
           <ChartTitle>Top 5 Endpoints (no traffic)</ChartTitle>
         </ChartHeader>
-        <PieChart data={data}>
+        <PieChart data-testid='pie-chart' data={data}>
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>0</PieChartCenterValue>

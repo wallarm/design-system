@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', [
@@ -16,6 +16,11 @@ const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', 
   'Loading',
   'Empty',
 ] as const);
+
+const LEGEND_ITEM = 'line-chart--legend-item';
+const LINE = 'line-chart--line';
+const byKey = (page: Page, testId: string, key: string) =>
+  page.getByTestId(testId).and(page.locator(`[data-key="${key}"]`));
 
 // Force `prefers-reduced-motion: reduce` for every test in this file. Recharts
 // runs `<Line>` with `isAnimationActive='auto'`, which honours the media query
@@ -79,18 +84,18 @@ test.describe('LineChart', () => {
 
     test('Hovered (legend → line dim)', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
-      await page.locator('[data-slot=line-chart-legend-item][data-key="errors"]').hover();
+      await byKey(page, LEGEND_ITEM, 'errors').hover();
       await expect(page).toHaveScreenshot();
     });
 
     test('Filterable - Isolated', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
       // First click on the Filterable story isolates the clicked series.
-      await page.locator('[data-slot=line-chart-legend-item][data-key="errors"]').click();
+      await byKey(page, LEGEND_ITEM, 'errors').click();
       // Move the cursor away so the hover state doesn't leak into the screenshot.
-      await page.locator('[data-slot=chart-title]').hover();
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
-      await expect(page.locator('[data-slot=line-chart-line][data-key="errors"]')).toHaveCount(1);
+      await page.getByTestId('chart--title').hover();
+      await expect(page.getByTestId(LINE)).toHaveCount(1);
+      await expect(byKey(page, LINE, 'errors')).toHaveCount(1);
       await expect(page).toHaveScreenshot();
     });
 
@@ -98,11 +103,11 @@ test.describe('LineChart', () => {
       await lineChartStory.goto(page, 'Filterable');
       // Click to isolate `requests`, then click `latency` to add it to the
       // visible set — leaving `errors` as the only hidden series.
-      await page.locator('[data-slot=line-chart-legend-item][data-key="requests"]').click();
-      await page.locator('[data-slot=line-chart-legend-item][data-key="latency"]').click();
-      await page.locator('[data-slot=chart-title]').hover();
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(2);
-      await expect(page.locator('[data-slot=line-chart-line][data-key="errors"]')).toHaveCount(0);
+      await byKey(page, LEGEND_ITEM, 'requests').click();
+      await byKey(page, LEGEND_ITEM, 'latency').click();
+      await page.getByTestId('chart--title').hover();
+      await expect(page.getByTestId(LINE)).toHaveCount(2);
+      await expect(byKey(page, LINE, 'errors')).toHaveCount(0);
       await expect(page).toHaveScreenshot();
     });
   });
@@ -110,43 +115,43 @@ test.describe('LineChart', () => {
   test.describe('Interactions', () => {
     test('Should isolate the matching line when a legend row is clicked', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
-      const row = page.locator('[data-slot=line-chart-legend-item][data-key="errors"]');
-      const line = page.locator('[data-slot=line-chart-line][data-key="errors"]');
+      const row = byKey(page, LEGEND_ITEM, 'errors');
+      const line = byKey(page, LINE, 'errors');
       await expect(row).toHaveAttribute('aria-current', 'true');
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(3);
+      await expect(page.getByTestId(LINE)).toHaveCount(3);
 
       await row.click();
 
       await expect(row).toHaveAttribute('aria-current', 'true');
       await expect(line).toHaveCount(1);
       // Siblings are hidden — only the clicked series remains.
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
+      await expect(page.getByTestId(LINE)).toHaveCount(1);
     });
 
     test('Should isolate the matching line when Enter is pressed on a focused legend row', async ({
       page,
     }) => {
       await lineChartStory.goto(page, 'Filterable');
-      const row = page.locator('[data-slot=line-chart-legend-item][data-key="errors"]');
-      const line = page.locator('[data-slot=line-chart-line][data-key="errors"]');
+      const row = byKey(page, LEGEND_ITEM, 'errors');
+      const line = byKey(page, LINE, 'errors');
       await row.focus();
       await page.keyboard.press('Enter');
       await expect(row).toHaveAttribute('aria-current', 'true');
       await expect(line).toHaveCount(1);
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
+      await expect(page.getByTestId(LINE)).toHaveCount(1);
     });
 
     test('Should isolate the matching line when Space is pressed on a focused legend row', async ({
       page,
     }) => {
       await lineChartStory.goto(page, 'Filterable');
-      const row = page.locator('[data-slot=line-chart-legend-item][data-key="latency"]');
-      const line = page.locator('[data-slot=line-chart-line][data-key="latency"]');
+      const row = byKey(page, LEGEND_ITEM, 'latency');
+      const line = byKey(page, LINE, 'latency');
       await row.focus();
       await page.keyboard.press(' ');
       await expect(row).toHaveAttribute('aria-current', 'true');
       await expect(line).toHaveCount(1);
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
+      await expect(page.getByTestId(LINE)).toHaveCount(1);
     });
 
     test('Should sync data-active from a hovered legend row to the matching line', async ({
@@ -154,40 +159,38 @@ test.describe('LineChart', () => {
     }) => {
       await lineChartStory.goto(page, 'Default Multi');
       const targetKey = 'errors';
-      const row = page.locator(`[data-slot=line-chart-legend-item][data-key="${targetKey}"]`);
+      const row = byKey(page, LEGEND_ITEM, targetKey);
       await row.hover();
 
-      const activeLine = page.locator(
-        `[data-slot=line-chart-line][data-key="${targetKey}"][data-active="true"]`,
-      );
+      const activeLine = byKey(page, LINE, targetKey).and(page.locator('[data-active="true"]'));
       await expect(activeLine).toHaveCount(1);
 
       // Sibling lines omit `data-active` entirely (the component only sets it
       // on the active line), so attribute-presence is the assertion.
-      const inactiveLines = page.locator('[data-slot=line-chart-line]:not([data-active="true"])');
+      const inactiveLines = page.getByTestId(LINE).and(page.locator(':not([data-active="true"])'));
       await expect(inactiveLines).toHaveCount(2);
     });
 
     test('Should reset data-active on the line when leaving a legend row', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
       const targetKey = 'errors';
-      const row = page.locator(`[data-slot=line-chart-legend-item][data-key="${targetKey}"]`);
-      const line = page.locator(`[data-slot=line-chart-line][data-key="${targetKey}"]`);
+      const row = byKey(page, LEGEND_ITEM, targetKey);
+      const line = byKey(page, LINE, targetKey);
       await row.hover();
       await expect(line).toHaveAttribute('data-active', 'true');
 
-      await page.locator('[data-slot=chart-title]').hover();
+      await page.getByTestId('chart--title').hover();
       await expect(line).not.toHaveAttribute('data-active', 'true');
     });
 
     test('Should lock the hover popover Y across peaks and valleys', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
 
-      const body = page.locator('[data-slot=line-chart-body]');
+      const body = page.getByTestId('line-chart--body');
       const bodyBox = await body.boundingBox();
       if (!bodyBox) throw new Error('chart body has no bounding box');
 
-      const popover = page.locator('[data-slot=chart-hover-card]');
+      const popover = page.getByTestId('line-chart--hover-popover');
 
       // Sample three cursor positions across the plot — the popover Y must not
       // jump even though the cursor crosses peaks and valleys in the data.
@@ -218,11 +221,11 @@ test.describe('LineChart', () => {
       // plot, so waiting on it is a reliable readiness signal.
       await page.locator('.recharts-curve').first().waitFor({ state: 'attached' });
 
-      const body = page.locator('[data-slot=line-chart-body]');
+      const body = page.getByTestId('line-chart--body');
       const bodyBox = await body.boundingBox();
       if (!bodyBox) throw new Error('chart body has no bounding box');
 
-      const popover = page.locator('[data-slot=line-chart-zoom-cursor-popover]');
+      const popover = page.getByTestId('line-chart--zoom-popover');
 
       // Press near the left edge at plot-middle Y, then sweep across the plot
       // with three different cursor Ys (upper band → middle → lower band). The
@@ -281,7 +284,7 @@ test.describe('LineChart', () => {
       });
 
       try {
-        const body = page.locator('[data-slot=line-chart-body]');
+        const body = page.getByTestId('line-chart--body');
         const bodyBox = await body.boundingBox();
         if (!bodyBox) throw new Error('chart body has no bounding box');
 
@@ -290,7 +293,7 @@ test.describe('LineChart', () => {
         await page.mouse.move(bodyBox.x + bodyBox.width * 0.7, bodyBox.y + bodyBox.height * 0.5);
         await page.mouse.up();
 
-        const popover = page.locator('[data-slot=line-chart-zoom-cursor-popover]');
+        const popover = page.getByTestId('line-chart--zoom-popover');
         await expect(popover).toHaveAttribute('data-zoom-state', 'pending');
 
         const surface = page.locator('.recharts-surface');
@@ -345,32 +348,32 @@ test.describe('LineChart', () => {
   test.describe('Accessibility', () => {
     test('Should mark the chart body as decorative with aria-hidden', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
-      const body = page.locator('[data-slot=line-chart-body]');
+      const body = page.getByTestId('line-chart--body');
       await expect(body).toHaveAttribute('aria-hidden', 'true');
     });
 
     test('Should expose the hover popover with role=tooltip', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
 
-      const body = page.locator('[data-slot=line-chart-body]');
+      const body = page.getByTestId('line-chart--body');
       const bodyBox = await body.boundingBox();
       if (!bodyBox) throw new Error('chart body has no bounding box');
 
       await page.mouse.move(bodyBox.x + bodyBox.width / 2, bodyBox.y + bodyBox.height / 2);
-      const popover = page.locator('[data-slot=chart-hover-card]');
+      const popover = page.getByTestId('line-chart--hover-popover');
       await expect(popover).toBeVisible();
       await expect(popover).toHaveAttribute('role', 'tooltip');
     });
 
     test('Should expose interactive legend rows with role=button', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
-      const rows = page.locator('[data-slot=line-chart-legend-item][role="button"]');
+      const rows = page.getByTestId(LEGEND_ITEM).and(page.locator('[role="button"]'));
       await expect(rows).toHaveCount(3);
     });
 
     test('Should reach the first legend row via forward Tab', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
-      const row = page.locator('[data-slot=line-chart-legend-item]').first();
+      const row = page.getByTestId(LEGEND_ITEM).first();
       // Don't hardcode the Tab count: preceding tab stops include Storybook
       // chrome and the chart's clear-filter button (mounted only when a row is
       // hidden). Tab forward up to 6 times — that's enough to reach the first

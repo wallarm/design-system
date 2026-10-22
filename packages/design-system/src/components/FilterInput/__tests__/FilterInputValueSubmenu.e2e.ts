@@ -7,7 +7,7 @@ const story = createStoryHelper('patterns-filterinput-filterinput', [
 
 /** Field → operator (`is any of` = IN, multi-select) → value menu. */
 const openValueMenu = async (page: Page) => {
-  const field = page.locator('[data-slot="filter-input"]');
+  const field = page.getByTestId('filter-input');
   await field.click();
   await page.getByRole('menuitem', { name: /^Attack type$/ }).click();
   await page.getByRole('menuitem', { name: /^is any of IN$/ }).click();
@@ -72,8 +72,10 @@ test.describe('Component: FilterInput', () => {
       await page.locator('body').click({ position: { x: 4, y: 4 } });
 
       // The committed chip collapses all selected leaves to the parent label…
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection');
+      const chip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveText(
+        'SQL injection',
+      );
     });
 
     test('selecting a single leaf shows that leaf label, not the category', async ({ page }) => {
@@ -86,8 +88,10 @@ test.describe('Component: FilterInput', () => {
 
       // A partial selection is never collapsed to the category: the single
       // selected leaf renders as its own label.
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('Union-based SQLi');
+      const chip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveText(
+        'Union-based SQLi',
+      );
     });
 
     test('a partially-selected category enumerates its leaves (no count)', async ({ page }) => {
@@ -104,8 +108,8 @@ test.describe('Component: FilterInput', () => {
 
       // The chip lists the selected sub-type labels, comma-separated, in config
       // order — no "(2)" count.
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText(
+      const chip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveText(
         'Code execution via SQLi, Union-based SQLi',
       );
     });
@@ -115,7 +119,7 @@ test.describe('Component: FilterInput', () => {
     test('closes the open submenu with ArrowLeft', async ({ page }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
-      const input = page.locator('[data-slot="filter-input"] input');
+      const input = page.getByTestId('filter-input').locator('input');
 
       // Hovering the parent opens its submenu.
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
@@ -159,9 +163,9 @@ test.describe('Component: FilterInput', () => {
       await page.getByRole('menuitem', { name: /^Union-based SQLi$/ }).click();
       await page.locator('body').click({ position: { x: 4, y: 4 } });
 
-      const field = page.locator('[data-slot="filter-input"]');
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText(
+      const field = page.getByTestId('filter-input');
+      const chip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveText(
         'Code execution via SQLi, Union-based SQLi',
       );
       await expect(field).toHaveScreenshot('nested-group-chip-partial-list.png');

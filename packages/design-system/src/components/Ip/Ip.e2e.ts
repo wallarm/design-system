@@ -22,7 +22,7 @@ test.describe('Ip Component', () => {
 
     const popover = page.locator('[data-scope="popover"][data-part="content"]');
     await expect(popover).toBeVisible();
-    await expect(popover.locator('[data-slot="ip-address"]')).toHaveCount(EXPECTED_LIST_LENGTH);
+    await expect(popover.getByTestId('ip--address')).toHaveCount(EXPECTED_LIST_LENGTH);
 
     await expect(page).toHaveScreenshot();
   });

@@ -18,7 +18,7 @@ test.describe('Component: FilterInput', () => {
   test.describe('Visual', () => {
     test('Should render status code mask menu correctly', async ({ page }) => {
       await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
 
       await field.click();
       // Pick the Status code field from the field menu, then the "is" operator,
@@ -35,8 +35,8 @@ test.describe('Component: FilterInput', () => {
   test.describe('Interactions', () => {
     test('Should focus the input when the field is clicked', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Preset Value');
-      const field = page.locator('[data-slot="filter-input"]');
-      // The [data-slot="filter-input"] wrapper delegates clicks to the inner
+      const field = page.getByTestId('filter-input');
+      // The field wrapper delegates clicks to the inner
       // combobox input — that is what receives focus, not the wrapper itself.
       const input = field.locator('input');
 
@@ -46,14 +46,14 @@ test.describe('Component: FilterInput', () => {
 
     test('Should display preset chips', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Preset Value');
-      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+      const chips = page.getByTestId('filter-input--condition-chip');
 
       await expect(chips).toHaveCount(1);
     });
 
     test('Should display multiple preset chips', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Multi Condition Preset');
-      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+      const chips = page.getByTestId('filter-input--condition-chip');
 
       const count = await chips.count();
       expect(count).toBeGreaterThan(1);
@@ -63,10 +63,10 @@ test.describe('Component: FilterInput', () => {
       await filterFieldStory.goto(page, 'Error With Value');
 
       // aria-invalid lives on the inner combobox input, not the wrapper.
-      const input = page.locator('[data-slot="filter-input"] input');
+      const input = page.getByTestId('filter-input').locator('input');
       await expect(input).toHaveAttribute('aria-invalid', 'true');
 
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      const chip = page.getByTestId('filter-input--condition-chip').first();
       await expect(chip).toBeVisible();
     });
 
@@ -75,7 +75,7 @@ test.describe('Component: FilterInput', () => {
       page,
     }) => {
       await filterFieldStory.goto(page, 'Paired Field');
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
       await field.click();
 
       await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
@@ -83,24 +83,28 @@ test.describe('Component: FilterInput', () => {
       await page.getByRole('menuitem', { name: /^header$/ }).click();
 
       // The building chip now shows the paired attribute and the ; separator.
-      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
-      await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      const buildingChip = page
+        .getByTestId('filter-input--condition-chip')
+        .and(page.locator('[data-building]'));
+      await expect(
+        buildingChip.getByTestId('filter-input--condition-chip--separator'),
+      ).toBeVisible();
       await expect(buildingChip).toContainText('Value');
     });
 
     test('Should render a preset paired condition as one chip', async ({ page }) => {
       await filterFieldStory.goto(page, 'Paired Field Preset');
-      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
-      await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
+      const chip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(chip.getByTestId('filter-input--condition-chip--separator')).toBeVisible();
+      await expect(chip.getByTestId('filter-input--condition-chip--attribute')).toHaveCount(2);
+      await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveCount(2);
     });
   });
 
   test.describe('Accessibility', () => {
     test('Should focus the input via Tab key', async ({ page }) => {
       await filterFieldStory.goto(page, 'Default');
-      const input = page.locator('[data-slot="filter-input"] input');
+      const input = page.getByTestId('filter-input').locator('input');
 
       await page.keyboard.press('Tab');
       await expect(input).toBeFocused();
@@ -108,14 +112,14 @@ test.describe('Component: FilterInput', () => {
 
     test('Should have aria-invalid when error is true', async ({ page }) => {
       await filterFieldStory.goto(page, 'Error Empty');
-      const input = page.locator('[data-slot="filter-input"] input');
+      const input = page.getByTestId('filter-input').locator('input');
 
       await expect(input).toHaveAttribute('aria-invalid', 'true');
     });
 
     test('Should expose the combobox role on the input', async ({ page }) => {
       await filterFieldStory.goto(page, 'Default');
-      const input = page.locator('[data-slot="filter-input"] input');
+      const input = page.getByTestId('filter-input').locator('input');
 
       await expect(input).toHaveAttribute('role', 'combobox');
     });
@@ -148,7 +152,9 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
       await page.getByRole('menuitem', { name: /^1XX$/ }).click();
       await page.getByRole('menuitem', { name: /^3XX$/ }).click();
 
-      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
+      const buildingChip = page
+        .getByTestId('filter-input--condition-chip')
+        .and(page.locator('[data-building]'));
       await expect(buildingChip).toContainText('1XX, 3XX');
     }
 
@@ -165,12 +171,12 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
       // ACTIONS_PADDING (64px) action-button zone, above the chip row. This
       // is unambiguously empty inner-content area; the wrapper/inner onClick
       // delegators both route to handleAreaClick from here.
-      const wrapper = page.locator('[data-slot="filter-input"]');
+      const wrapper = page.getByTestId('filter-input');
       const box = await wrapper.boundingBox();
       expect(box).toBeTruthy();
       await page.mouse.click(box!.x + box!.width / 2, box!.y + 4);
 
-      const conditionChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      const conditionChip = page.getByTestId('filter-input--condition-chip').first();
       await expect(conditionChip).not.toHaveAttribute('data-building', '');
       await expect(conditionChip).toContainText('1XX, 3XX');
     });
@@ -189,7 +195,7 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
       // outside the field's bounding box for all reasonable viewports.
       await page.mouse.click(2, 2);
 
-      const conditionChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      const conditionChip = page.getByTestId('filter-input--condition-chip').first();
       await expect(conditionChip).not.toHaveAttribute('data-building', '');
       await expect(conditionChip).toContainText('1XX, 3XX');
     });
@@ -203,9 +209,8 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
   test.describe('Interactions', () => {
     type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
 
-    const getField = (page: E2EPage) => page.locator('[data-slot="filter-input"]');
-    const getChip = (page: E2EPage) =>
-      page.locator('[data-slot="filter-input-condition-chip"]').first();
+    const getField = (page: E2EPage) => page.getByTestId('filter-input');
+    const getChip = (page: E2EPage) => page.getByTestId('filter-input--condition-chip').first();
 
     // Build the base triplet "Context Param is <key>", leaving the paired Value
     // operator menu open (the paired Value part always follows the key).
@@ -268,7 +273,7 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
 
       // The paired "Value" label (second attribute segment) is clickable while
       // the pair is incomplete — it resumes editing at the missing value.
-      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      await chip.getByTestId('filter-input--condition-chip--attribute').nth(1).click();
       await page.getByRole('combobox', { name: 'Filter value' }).fill('Mozilla');
       await page.keyboard.press('Enter');
       await page.mouse.click(2, 2);
@@ -305,7 +310,7 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       // operator menu (operator choices render as menuitems; the value flow has
       // no menuitems since the paired field is freeform). The "is =" and
       // "is not !=" paired operators confirm it is the operator menu, not the value step.
-      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      await chip.getByTestId('filter-input--condition-chip--attribute').nth(1).click();
       await expect(page.getByRole('menuitem', { name: /^is =$/ })).toBeVisible();
       await expect(page.getByRole('menuitem', { name: /^is not !=$/ })).toBeVisible();
     });
@@ -330,12 +335,12 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       // Click the PAIR operator segment → the pair operator menu ("like ~" is a
       // paired-only operator the "=" base field lacks, proving it is the pair
       // operator menu and not a resume into the value step).
-      await chip.locator('[data-slot="segment-operator"]').nth(1).click();
+      await chip.getByTestId('filter-input--condition-chip--operator').nth(1).click();
       await expect(page.getByRole('menuitem', { name: /^like ~$/ })).toBeVisible();
 
       // Click the BASE value segment → the key-options menu (targeted), not a resume.
       await page.mouse.click(2, 2);
-      await chip.locator('[data-slot="segment-value"]').nth(0).click();
+      await chip.getByTestId('filter-input--condition-chip--value').nth(0).click();
       await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
     });
 
@@ -360,7 +365,7 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       // height (an empty segment otherwise collapses to a 0×0 box and clicks fall
       // through to the chip / × button).
       await chip.hover();
-      const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
+      const pairValue = chip.getByTestId('filter-input--condition-chip--value').nth(1);
       const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
       expect(box.width).toBeGreaterThanOrEqual(3);
@@ -370,8 +375,8 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       // click by coordinate as a user would). It must resume the chip for value
       // entry, not hit the × button behind it → the chip survives with its input.
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
-      await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
+      await expect(page.getByTestId('filter-input--condition-chip')).toHaveCount(1);
+      await expect(page.getByTestId('filter-input').locator('input')).toHaveCount(1);
     });
 
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps
@@ -385,10 +390,10 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(chip).toContainText('authorization');
 
       // First value slot = the parameter key. Re-pick a different key.
-      await chip.locator('[data-slot="segment-value"]').first().click();
+      await chip.getByTestId('filter-input--condition-chip--value').first().click();
       await page.getByRole('menuitem', { name: /^cookie$/ }).click();
 
-      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+      await expect(page.getByTestId('filter-input--condition-chip')).toHaveCount(1);
       await expect(chip).toContainText('cookie');
       await expect(chip).toContainText('authorization');
     });
@@ -404,7 +409,7 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(page.getByRole('alert')).toHaveCount(0);
 
       // Second operator segment = the paired Value operator.
-      await chip.locator('[data-slot="segment-operator"]').nth(1).click();
+      await chip.getByTestId('filter-input--condition-chip--operator').nth(1).click();
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
       await page.mouse.click(2, 2);
 
@@ -431,9 +436,8 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
 test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
   test.describe('Interactions', () => {
     type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
-    const getField = (page: E2EPage) => page.locator('[data-slot="filter-input"]');
-    const getChip = (page: E2EPage) =>
-      page.locator('[data-slot="filter-input-condition-chip"]').first();
+    const getField = (page: E2EPage) => page.getByTestId('filter-input');
+    const getChip = (page: E2EPage) => page.getByTestId('filter-input--condition-chip').first();
 
     test('Should not delete the chip when clicking the empty value to fill it', async ({
       page,
@@ -459,12 +463,12 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
       // value entry, not hit the × behind it → the chip survives and the value
       // input opens.
       await chip.hover();
-      const value = chip.locator('[data-slot="segment-value"]');
+      const value = chip.getByTestId('filter-input--condition-chip--value');
       const vbox = (await value.boundingBox())!;
       expect(vbox.width).toBeGreaterThanOrEqual(3);
       expect(vbox.height).toBeGreaterThanOrEqual(12);
       await page.mouse.click(vbox.x + vbox.width / 2, vbox.y + vbox.height / 2);
-      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+      await expect(page.getByTestId('filter-input--condition-chip')).toHaveCount(1);
       await expect(page.getByRole('combobox', { name: 'Filter value' })).toBeVisible();
     });
   });
@@ -478,11 +482,11 @@ test.describe('Component: FilterInput — WDS-156 remove button beside a sibling
   test.describe('Interactions', () => {
     test('reveals and removes the left chip via its × when a sibling follows', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Multi Condition Preset');
-      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+      const chips = page.getByTestId('filter-input--condition-chip');
       await expect(chips).toHaveCount(2);
 
       const leftChip = chips.first();
-      const remove = leftChip.locator('[data-slot="filter-input-chip-delete"]');
+      const remove = leftChip.getByTestId('filter-input--condition-chip--remove-button');
 
       // Hovering the left chip reveals its × even though a gap + connector sit
       // to its right; the button is really hoverable (opacity 1, clickable).
@@ -500,14 +504,14 @@ test.describe('Component: FilterInput — WDS-156 remove button beside a sibling
   test.describe('Visual', () => {
     test('renders the left chip × on hover above the connector gap', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Multi Condition Preset');
-      const field = page.locator('[data-slot="filter-input"]');
-      const leftChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      const field = page.getByTestId('filter-input');
+      const leftChip = page.getByTestId('filter-input--condition-chip').first();
 
       // Hover the chip body (not the × directly): the × is hidden until the chip
       // is hovered, so a direct hover would fail the actionability check. This
       // reveals the × above the connector gap for the snapshot.
       await leftChip.hover();
-      await expect(leftChip.locator('[data-slot="filter-input-chip-delete"]')).toHaveCSS(
+      await expect(leftChip.getByTestId('filter-input--condition-chip--remove-button')).toHaveCSS(
         'opacity',
         '1',
       );

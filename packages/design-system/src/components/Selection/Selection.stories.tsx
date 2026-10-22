@@ -96,7 +96,13 @@ export const Default: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={12}>
         {clusters.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>
@@ -125,7 +131,13 @@ export const WithSelectAll: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={16}>
         <HStack gap={8} align='center'>
           <SelectionAll />
@@ -160,7 +172,13 @@ export const Grid: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <div className='grid grid-cols-3 gap-12'>
         {clusters.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>
@@ -184,7 +202,13 @@ export const WithDisabled: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={8}>
         <HStack gap={8} align='center'>
           <SelectionAll />
@@ -219,7 +243,13 @@ export const RangeSelection: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={12}>
         <span className='sb-annotation'>hold shift and click another checkbox</span>
         {clusters.map(c => (
@@ -246,7 +276,13 @@ export const BulkActions: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={12}>
         {clusters.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>
@@ -294,7 +330,13 @@ export const EmptyAndPartial: StoryFn<typeof meta> = () => {
         </Button>
       </HStack>
 
-      <Selection items={items} getItemId={c => c.id} value={selected} onChange={setSelected}>
+      <Selection
+        data-testid='selection'
+        items={items}
+        getItemId={c => c.id}
+        value={selected}
+        onChange={setSelected}
+      >
         <VStack gap={12}>
           {items.length === 0 ? (
             <Text size='sm' color='secondary'>
@@ -327,7 +369,13 @@ export const WithoutBulkBar: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={clusters}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={16}>
         <Text size='sm' color='secondary'>
           Selected: {selected.length}
@@ -354,7 +402,7 @@ const CompoundToolbar = ({ onDeleteSelected }: { onDeleteSelected: (ids: string[
 
   return (
     <SelectionBulkBar placement='absolute' data-testid='selection-bulk-bar'>
-      <BulkBarSummary>
+      <BulkBarSummary data-testid='bulk-summary'>
         <BulkBarSummaryCount count={selectedIds.size} data-testid='bulk-count' />
         <HStack gap={6}>
           <BulkBarSummarySelectAll
@@ -403,7 +451,13 @@ export const CompoundBulkBar: StoryFn<typeof meta> = () => {
   };
 
   return (
-    <Selection items={items} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection
+      data-testid='selection'
+      items={items}
+      getItemId={c => c.id}
+      value={selected}
+      onChange={setSelected}
+    >
       <VStack gap={12}>
         {items.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>

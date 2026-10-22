@@ -38,7 +38,7 @@ export default meta;
  * off the bottom of the last one.
  */
 export const Basic: StoryFn<typeof meta> = () => (
-  <Timeline>
+  <Timeline data-testid='timeline'>
     <TimelineItem>
       <TimelineConnector>
         <TimelineIndicator>1</TimelineIndicator>

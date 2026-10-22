@@ -8,8 +8,9 @@ const bulkBarStory = createStoryHelper('data-display-selection', [
 ] as const);
 
 // `role="checkbox"` lives on ark-ui's hidden input; the label is the click target.
-const getCheckboxes = (page: Page) => page.locator('[data-slot="selection-item"]').locator('label');
-const getBulkBarBySlot = (page: Page) => page.locator('[data-slot="selection-bulk-bar"]');
+const getCheckboxes = (page: Page) => page.getByTestId('selection--item').locator('label');
+// Default / Bulk Actions stories: the bar derives its id from the `selection` root.
+const getDerivedBulkBar = (page: Page) => page.getByTestId('selection--bulk-bar');
 const getBulkBar = (page: Page) => page.getByTestId('selection-bulk-bar');
 const getCount = (page: Page) => page.getByTestId('bulk-count');
 const getSelectAll = (page: Page) => page.getByTestId('bulk-select-all');
@@ -33,7 +34,7 @@ test.describe('Component: SelectionBulkBar', () => {
     test('Should render Default correctly', async ({ page }) => {
       await bulkBarStory.goto(page, 'Default');
       await getCheckboxes(page).first().click();
-      const bar = getBulkBarBySlot(page);
+      const bar = getDerivedBulkBar(page);
       await waitForBarStable(bar);
       await expect(bar).toHaveScreenshot('default.png');
     });
@@ -41,7 +42,7 @@ test.describe('Component: SelectionBulkBar', () => {
     test('Should render Bulk Actions correctly', async ({ page }) => {
       await bulkBarStory.goto(page, 'Bulk Actions');
       await getCheckboxes(page).first().click();
-      const bar = getBulkBarBySlot(page);
+      const bar = getDerivedBulkBar(page);
       await waitForBarStable(bar);
       await expect(bar).toHaveScreenshot('bulk-actions.png');
     });
@@ -135,7 +136,7 @@ test.describe('Component: SelectionBulkBar', () => {
     }) => {
       await getCheckboxes(page).first().click();
 
-      const summary = getBulkBar(page).locator('[data-slot="bulk-bar-summary"]');
+      const summary = getBulkBar(page).getByTestId('bulk-summary');
       await expect(summary).toBeVisible();
       await expect(summary).toContainText('Select all');
       await expect(summary).toContainText('Clear');

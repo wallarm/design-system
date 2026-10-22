@@ -236,14 +236,15 @@ test.describe('Component: Drawer', () => {
       const countVisibleTags = () =>
         page
           .getByRole('dialog')
-          .locator('[data-slot="overflow-list"] [data-slot="tag"]')
+          .getByTestId('tags-overflow-list')
+          .getByTestId('tag')
           .filter({ hasNotText: /^\+\d+$/ })
           .count();
 
       const before = await countVisibleTags();
       expect(before).toBeGreaterThan(0);
 
-      const handle = dialog.locator('[data-slot="resize-handle"]');
+      const handle = page.getByTestId('drawer--resize-handle');
       const box = await handle.boundingBox();
       if (!box) throw new Error('Resize handle not found');
 

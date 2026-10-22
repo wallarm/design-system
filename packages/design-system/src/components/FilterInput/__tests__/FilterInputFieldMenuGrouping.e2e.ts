@@ -17,14 +17,14 @@ const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
 const gotoFieldMenu = async (page: Page, storyName: Parameters<typeof fieldMenuStory.goto>[1]) => {
   await fieldMenuStory.goto(page, storyName);
   await page.getByTestId('field-menu-trigger').click();
-  await expect(page.locator('[data-slot="filter-input-field-menu"]')).toBeVisible();
+  await expect(page.getByTestId('field-menu')).toBeVisible();
 };
 
 test.describe('Component: FilterInput', () => {
   test.describe('Visual', () => {
     test('Should render the grouped field menu correctly', async ({ page }) => {
       await gotoFieldMenu(page, 'With Groups');
-      const menu = page.locator('[data-slot="filter-input-field-menu"]');
+      const menu = page.getByTestId('field-menu');
       await expect(menu).toHaveScreenshot('field-menu-grouped.png');
     });
   });
@@ -57,7 +57,7 @@ test.describe('Component: FilterInput', () => {
 
     test('Should select a field when grouped', async ({ page }) => {
       await filterInputStory.goto(page, 'With Field Groups');
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
       await field.click();
       await page.getByRole('menuitem', { name: /^Host$/ }).click();
       // Operators render as "<label> <symbol>", e.g. the `=` operator is "is =".
@@ -70,7 +70,7 @@ test.describe('Component: FilterInput', () => {
 
     test('Should hide groups with no matching field when filtering', async ({ page }) => {
       await filterInputStory.goto(page, 'With Field Groups');
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
       const input = field.locator('input');
       await field.click();
       await input.fill('host');
@@ -102,7 +102,7 @@ test.describe('Component: FilterInput', () => {
   test.describe('Accessibility', () => {
     test('Should be navigable across group boundaries via the keyboard', async ({ page }) => {
       await filterInputStory.goto(page, 'With Field Groups');
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
       const input = field.locator('input');
       await field.click();
       await expect(page.getByRole('menuitem', { name: /^Host$/ })).toBeVisible();
@@ -121,8 +121,10 @@ test.describe('Component: FilterInput', () => {
       // Enter selected the highlighted later-group field → the building chip's
       // attribute is "Host", not "Attack type". A nav regression that stopped
       // inside group 1 would surface a different attribute here and fail.
-      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(buildingChip.locator('[data-slot="segment-attribute"]')).toHaveText('Host');
+      const buildingChip = page.getByTestId('filter-input--condition-chip').first();
+      await expect(buildingChip.getByTestId('filter-input--condition-chip--attribute')).toHaveText(
+        'Host',
+      );
 
       // Drive the operator step; Host is a plain string field with no options,
       // so committing "is =" opens the freeform value combobox (mirrors the

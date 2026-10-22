@@ -28,13 +28,13 @@ test.describe('BarList', () => {
 
     test('Hovered', async ({ page }) => {
       await barListStory.goto(page, 'Default');
-      await page.locator('[data-slot=bar-list-item]').first().hover();
+      await page.getByTestId('bar-list--item').first().hover();
       await expect(page).toHaveScreenshot();
     });
 
     test('Selected', async ({ page }) => {
       await barListStory.goto(page, 'Selectable');
-      await page.locator('[data-slot=bar-list-item]').nth(2).click();
+      await page.getByTestId('bar-list--item').nth(2).click();
       await expect(page).toHaveScreenshot();
     });
 
@@ -90,7 +90,7 @@ test.describe('BarList', () => {
   test.describe('Interactions', () => {
     test('Should mark a row as selected when clicked', async ({ page }) => {
       await barListStory.goto(page, 'Selectable');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await expect(row).not.toHaveAttribute('aria-current', 'true');
       await row.click();
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -98,7 +98,7 @@ test.describe('BarList', () => {
 
     test('Should mark a row as selected when Enter is pressed', async ({ page }) => {
       await barListStory.goto(page, 'Selectable');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await row.focus();
       await page.keyboard.press('Enter');
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -106,7 +106,7 @@ test.describe('BarList', () => {
 
     test('Should mark a row as selected when Space is pressed', async ({ page }) => {
       await barListStory.goto(page, 'Selectable');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await row.focus();
       await page.keyboard.press(' ');
       await expect(row).toHaveAttribute('aria-current', 'true');
@@ -117,10 +117,10 @@ test.describe('BarList', () => {
       await page.waitForTimeout(BAR_TRANSITION_MS);
 
       // Third row value=612, sum(baseRows)=3274 → ≈18.7% → '19%' with digits=0.
-      const row = page.locator('[data-slot=bar-list-item]').nth(2);
+      const row = page.getByTestId('bar-list--item').nth(2);
       await row.click();
 
-      const bar = row.locator('[data-slot=bar-list-bar]');
+      const bar = row.getByTestId('bar-list--bar');
       const barBox = await bar.boundingBox();
       const rowBox = await row.boundingBox();
       if (!barBox || !rowBox) throw new Error('Missing bounding box');
@@ -130,12 +130,12 @@ test.describe('BarList', () => {
       expect(barBox.width).toBeGreaterThan(expected - 4);
       expect(barBox.width).toBeLessThan(expected + 4);
 
-      await expect(row.locator('[data-slot=bar-list-percent]')).toHaveText('19%');
+      await expect(row.getByTestId('bar-list--percent')).toHaveText('19%');
     });
 
     test('Should change the row background on hover', async ({ page }) => {
       await barListStory.goto(page, 'Default');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
 
       const before = await row.evaluate(el => getComputedStyle(el).backgroundColor);
       await row.hover();
@@ -147,8 +147,8 @@ test.describe('BarList', () => {
       await barListStory.goto(page, 'Overflow');
       await page.waitForTimeout(BAR_TRANSITION_MS);
 
-      const row = page.locator('[data-slot=bar-list-item]').first();
-      const bar = row.locator('[data-slot=bar-list-bar]');
+      const row = page.getByTestId('bar-list--item').first();
+      const bar = row.getByTestId('bar-list--bar');
       const barBox = await bar.boundingBox();
       const rowBox = await row.boundingBox();
       if (!barBox || !rowBox) throw new Error('Missing bounding box');
@@ -156,32 +156,32 @@ test.describe('BarList', () => {
       const trackWidth = rowBox.width - 16;
       expect(barBox.width).toBeGreaterThan(trackWidth - 2);
       expect(barBox.width).toBeLessThan(trackWidth + 2);
-      await expect(row.locator('[data-slot=bar-list-percent]')).toHaveText('100%');
+      await expect(row.getByTestId('bar-list--percent')).toHaveText('100%');
     });
 
     test('Should render an empty bar and 0% label for a zero value', async ({ page }) => {
       await barListStory.goto(page, 'Overflow');
       await page.waitForTimeout(BAR_TRANSITION_MS);
 
-      const zeroRow = page.locator('[data-slot=bar-list-item]').nth(2);
-      const bar = zeroRow.locator('[data-slot=bar-list-bar]');
+      const zeroRow = page.getByTestId('bar-list--item').nth(2);
+      const bar = zeroRow.getByTestId('bar-list--bar');
       const barBox = await bar.boundingBox();
       expect(barBox?.width ?? 0).toBeLessThan(1);
-      await expect(zeroRow.locator('[data-slot=bar-list-percent]')).toHaveText('0%');
+      await expect(zeroRow.getByTestId('bar-list--percent')).toHaveText('0%');
     });
 
     test('Should render every row at 0% when max is invalid', async ({ page }) => {
       await barListStory.goto(page, 'Invalid Max');
       await page.waitForTimeout(BAR_TRANSITION_MS);
 
-      const percents = page.locator('[data-slot=bar-list-percent]');
+      const percents = page.getByTestId('bar-list--percent');
       const percentCount = await percents.count();
       expect(percentCount).toBeGreaterThan(0);
       for (let i = 0; i < percentCount; i++) {
         await expect(percents.nth(i)).toHaveText('0%');
       }
 
-      const bars = page.locator('[data-slot=bar-list-bar]');
+      const bars = page.getByTestId('bar-list--bar');
       const barCount = await bars.count();
       for (let i = 0; i < barCount; i++) {
         const box = await bars.nth(i).boundingBox();
@@ -191,7 +191,7 @@ test.describe('BarList', () => {
 
     test('Should format the percent with the configured digits', async ({ page }) => {
       await barListStory.goto(page, 'Percent Digits');
-      const firstPercent = page.locator('[data-slot=bar-list-percent]').first();
+      const firstPercent = page.getByTestId('bar-list--percent').first();
       await expect(firstPercent).toHaveText(/^\d+\.\d%$/);
     });
 
@@ -199,10 +199,10 @@ test.describe('BarList', () => {
       page,
     }) => {
       await barListStory.goto(page, 'Percent Variants');
-      // Split is the default variant and the first chart in PercentVariants.
-      const splitChart = page.locator('[data-slot=chart]').first();
-      const firstPercent = splitChart.locator('[data-slot=bar-list-percent]').first();
-      const symbol = firstPercent.locator('[data-slot=bar-list-percent-symbol]');
+      // Split is the default variant and the first BarList in PercentVariants.
+      const splitList = page.getByTestId('bar-list-split');
+      const firstPercent = splitList.getByTestId('bar-list-split--percent').first();
+      const symbol = firstPercent.getByTestId('bar-list-split--percent-symbol');
 
       const valueColor = await firstPercent.evaluate(el => getComputedStyle(el).color);
       const symbolColor = await symbol.evaluate(el => getComputedStyle(el).color);
@@ -211,7 +211,7 @@ test.describe('BarList', () => {
 
     test('Should not set role=button or tabIndex on a non-interactive row', async ({ page }) => {
       await barListStory.goto(page, 'Colored');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await expect(row).not.toHaveAttribute('role', 'button');
       await expect(row).not.toHaveAttribute('tabindex', '0');
     });
@@ -222,7 +222,7 @@ test.describe('BarList', () => {
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
 
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await expect(row).toBeFocused();
       const boxShadow = await row.evaluate(el => getComputedStyle(el).boxShadow);
       expect(boxShadow).not.toBe('none');
@@ -230,7 +230,7 @@ test.describe('BarList', () => {
 
     test('Should not show the focus ring on mouse click', async ({ page }) => {
       await barListStory.goto(page, 'Selectable');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await row.click();
 
       const boxShadow = await row.evaluate(el => getComputedStyle(el).boxShadow);
@@ -250,22 +250,22 @@ test.describe('BarList', () => {
       // First tab lands on Settings action; second tab lands on the first row.
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
-      const row = page.locator('[data-slot=bar-list-item]').first();
+      const row = page.getByTestId('bar-list--item').first();
       await expect(row).toBeFocused();
     });
 
     test('Should mark the bar as decorative with aria-hidden', async ({ page }) => {
       await barListStory.goto(page, 'Default');
-      const bar = page.locator('[data-slot=bar-list-bar]').first();
+      const bar = page.getByTestId('bar-list--bar').first();
       await expect(bar).toHaveAttribute('aria-hidden', 'true');
     });
 
     test('Should announce the skeleton loading state', async ({ page }) => {
       await barListStory.goto(page, 'Loading');
-      const skeleton = page.locator('[data-slot=bar-list-skeleton]');
+      const skeleton = page.getByTestId('bar-list-skeleton');
       await expect(skeleton).toHaveAttribute('aria-busy', 'true');
       await expect(skeleton).toHaveAttribute('aria-live', 'polite');
-      await expect(page.locator('[data-slot=bar-list-skeleton-row]')).toHaveCount(5);
+      await expect(page.getByTestId('bar-list-skeleton--skeleton-row')).toHaveCount(5);
     });
   });
 });

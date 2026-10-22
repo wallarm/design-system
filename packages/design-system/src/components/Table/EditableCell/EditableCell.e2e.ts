@@ -10,7 +10,7 @@ test.describe('Component: EditableCell', () => {
     test('Should edit a text cell in place and commit on Enter', async ({ page }) => {
       await story.goto(page, 'Inline Cell Editing');
 
-      const cell = page.locator('[data-slot="editable-text-cell"]').first();
+      const cell = page.getByTestId('editable-text-cell').first();
       await cell.click();
 
       const input = cell.locator('input');
@@ -26,7 +26,7 @@ test.describe('Component: EditableCell', () => {
     test('Should revert a text edit on Escape', async ({ page }) => {
       await story.goto(page, 'Inline Cell Editing');
 
-      const cell = page.locator('[data-slot="editable-text-cell"]').first();
+      const cell = page.getByTestId('editable-text-cell').first();
       const original = (await cell.innerText()).trim();
 
       await cell.click();
@@ -39,7 +39,7 @@ test.describe('Component: EditableCell', () => {
     test('Should open a select cell and commit the picked option', async ({ page }) => {
       await story.goto(page, 'Inline Cell Editing');
 
-      const cell = page.locator('[data-slot="editable-select-cell"]').first();
+      const cell = page.getByTestId('editable-select-cell').first().getByRole('combobox');
       await cell.click();
 
       await page.getByRole('option', { name: 'Monitoring' }).click();
@@ -59,7 +59,7 @@ test.describe('Component: EditableCell', () => {
     test('Should expose the idle text cell as a focusable button', async ({ page }) => {
       await story.goto(page, 'Inline Cell Editing');
 
-      const cell = page.locator('[data-slot="editable-text-cell"]').first();
+      const cell = page.getByTestId('editable-text-cell').first();
       await expect(cell).toHaveRole('button');
 
       await cell.focus();

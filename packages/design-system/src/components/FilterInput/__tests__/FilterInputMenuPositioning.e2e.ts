@@ -12,10 +12,10 @@ test.describe('Component: FilterInput - Menu Positioning', () => {
     }) => {
       await filterInputStory.goto(page, 'With Multi Condition Preset');
 
-      const field = page.locator('[data-slot="filter-input"]');
+      const field = page.getByTestId('filter-input');
       const input = field.locator('input[type="text"]');
-      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
-      const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+      const chips = page.getByTestId('filter-input--condition-chip');
+      const fieldMenu = page.getByTestId('filter-input--field-menu');
 
       await expect(chips).toHaveCount(2);
 

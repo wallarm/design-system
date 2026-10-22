@@ -88,13 +88,19 @@ test.describe('Component: TimeInput', () => {
 
     test('Should not render a clear button in read-only mode', async ({ page }) => {
       await timeInputStory.goto(page, 'Read Only');
-      const clearButton = page.locator('[data-slot="time-input"] button[type="button"]');
-      await expect(clearButton).toHaveCount(0);
+      for (const testId of [
+        'time-input-read-only',
+        'time-input-read-only-12h',
+        'time-input-read-only-24h',
+      ]) {
+        await expect(page.getByTestId(testId)).toBeVisible();
+        await expect(page.getByTestId(testId).locator('button[type="button"]')).toHaveCount(0);
+      }
     });
 
     test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await timeInputStory.goto(page, 'Read Only');
-      const hourSegment = page.locator('[data-slot="time-input"] [data-segment="hour"]').first();
+      const hourSegment = page.getByTestId('time-input-read-only').locator('[data-segment="hour"]');
 
       await expect(hourSegment).toHaveAttribute('aria-hidden', 'true');
       await expect(hourSegment).not.toHaveAttribute('tabindex', /.*/);

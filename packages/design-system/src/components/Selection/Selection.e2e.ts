@@ -13,9 +13,9 @@ const selectionStory = createStoryHelper('data-display-selection', [
 ] as const);
 
 // `role="checkbox"` lives on ark-ui's hidden input; click targets the visible label.
-const getCheckboxes = (page: Page) => page.locator('[data-slot="selection-item"]').locator('label');
-const getSelectAll = (page: Page) => page.locator('[data-slot="selection-all"]');
-const getBulkBar = (page: Page) => page.locator('[data-slot="selection-bulk-bar"]');
+const getCheckboxes = (page: Page) => page.getByTestId('selection--item').locator('label');
+const getSelectAll = (page: Page) => page.getByTestId('selection--all');
+const getBulkBar = (page: Page) => page.getByTestId('selection--bulk-bar');
 
 // Visual screenshot tests are added after baselines exist.
 // Generate baselines by including [update-screenshots] in a commit on main.
@@ -63,7 +63,7 @@ test.describe('Component: Selection', () => {
 
     test('Should not toggle disabled items', async ({ page }) => {
       await selectionStory.goto(page, 'With Disabled');
-      const lockedCheckbox = page.locator('[data-slot="selection-item"]').last().locator('label');
+      const lockedCheckbox = getCheckboxes(page).last();
       await expect(lockedCheckbox).toHaveAttribute('data-disabled', '');
     });
   });

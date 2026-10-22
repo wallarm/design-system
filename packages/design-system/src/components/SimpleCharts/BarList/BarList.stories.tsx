@@ -140,7 +140,7 @@ export const Default: StoryFn<typeof meta> = () => {
             </Tooltip>
           </ChartActions>
         </ChartHeader>
-        <BarList max={chartSum(rows)}>
+        <BarList data-testid='bar-list' max={chartSum(rows)}>
           {rows.map(row => (
             <Tooltip key={row.name}>
               <TooltipTrigger asChild>
@@ -176,7 +176,7 @@ export const Colored: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Top 5 Endpoints</ChartTitle>
       </ChartHeader>
-      <BarList max={chartMax(baseRows)}>
+      <BarList data-testid='bar-list' max={chartMax(baseRows)}>
         {baseRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar color={row.color} />
@@ -275,7 +275,7 @@ export const Selectable: StoryFn<typeof meta> = () => {
             )}
           </ChartActions>
         </ChartHeader>
-        <BarList max={chartSum(baseRows)}>
+        <BarList data-testid='bar-list' max={chartSum(baseRows)}>
           {baseRows.map(row => (
             <Tooltip key={row.name}>
               <TooltipTrigger asChild>
@@ -466,7 +466,7 @@ export const Loading: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Top 5 Endpoints</ChartTitle>
       </ChartHeader>
-      <BarListSkeleton rows={5} />
+      <BarListSkeleton data-testid='bar-list-skeleton' rows={5} />
     </Chart>
   </div>
 );
@@ -487,7 +487,7 @@ export const Overflow: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Overflow & zero</ChartTitle>
       </ChartHeader>
-      <BarList max={100}>
+      <BarList data-testid='bar-list' max={100}>
         {overflowRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar />
@@ -513,7 +513,7 @@ export const InvalidMax: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Invalid max</ChartTitle>
       </ChartHeader>
-      <BarList max={0}>
+      <BarList data-testid='bar-list' max={0}>
         {baseRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar />
@@ -539,7 +539,7 @@ export const PercentDigits: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Decimal precision</ChartTitle>
       </ChartHeader>
-      <BarList max={chartSum(baseRows)}>
+      <BarList data-testid='bar-list' max={chartSum(baseRows)}>
         {baseRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar />
@@ -565,7 +565,7 @@ export const PercentVariants: StoryFn<typeof meta> = () => (
       <ChartHeader>
         <ChartTitle>Split — value primary, % secondary (default)</ChartTitle>
       </ChartHeader>
-      <BarList max={chartSum(baseRows)}>
+      <BarList data-testid='bar-list-split' max={chartSum(baseRows)}>
         {baseRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar />

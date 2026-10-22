@@ -75,7 +75,7 @@ test.describe('Component: DateRangeInput', () => {
 
     test('Should render separator as text arrow between fields', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Filled');
-      const separator = page.locator('[data-slot="date-range-separator"]').first();
+      const separator = page.getByTestId('date-range-input-filled--input-group--separator');
 
       await expect(separator).toHaveText('→');
     });
@@ -96,15 +96,17 @@ test.describe('Component: DateRangeInput', () => {
       await dateRangeInputStory.goto(page, 'Read Only');
       // The clear button is the only click-path to setValue(null) — verifying
       // it's absent guarantees the value can't be wiped by a user click.
-      const clearButton = page.locator('[data-slot="date-range-input"] button[type="button"]');
-      await expect(clearButton).toHaveCount(0);
+      for (const testId of ['date-range-input-read-only', 'date-range-input-read-only-datetime']) {
+        await expect(page.getByTestId(testId)).toBeVisible();
+        await expect(page.getByTestId(testId).locator('button[type="button"]')).toHaveCount(0);
+      }
     });
 
     test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Read Only');
       const daySegment = page
-        .locator('[data-slot="date-range-input"] [data-field-type="start"] [data-segment="day"]')
-        .first();
+        .getByTestId('date-range-input-read-only')
+        .locator('[data-field-type="start"] [data-segment="day"]');
 
       await expect(daySegment).toHaveAttribute('aria-hidden', 'true');
       await expect(daySegment).not.toHaveAttribute('tabindex', /.*/);

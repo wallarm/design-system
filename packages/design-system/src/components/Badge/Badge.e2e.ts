@@ -15,8 +15,7 @@ const badgeStory = createStoryHelper('status-indication-badge', [
   'Content Variants',
 ] as const);
 
-const getBadges = (page: Parameters<typeof badgeStory.goto>[0]) =>
-  page.locator('[data-slot="badge"]');
+const getBadges = (page: Parameters<typeof badgeStory.goto>[0]) => page.getByTestId('badge');
 
 test.describe('Badge Component', () => {
   test.describe('Screenshots', () => {

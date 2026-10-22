@@ -773,7 +773,7 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
       <AttributeValue>
         <AttributeActions data-testid='attr-badge'>
           <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
-            <Badge color='red' variant='dotted'>
+            <Badge data-testid='attr-badge-value' color='red' variant='dotted'>
               Blocked
             </Badge>
           </AttributeActionsTarget>
@@ -852,7 +852,11 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
             <OverflowList
               className='gap-4'
               items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
-              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              itemRenderer={item => (
+                <Tag key={item} data-testid='attr-tag'>
+                  {item}
+                </Tag>
+              )}
             />
           </AttributeActionsTarget>
           {renderActionsItems()}

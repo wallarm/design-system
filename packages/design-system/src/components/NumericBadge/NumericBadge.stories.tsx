@@ -106,15 +106,29 @@ export const Content: StoryFn<typeof meta> = () => (
     {(['default', 'small'] as const).map(size => (
       <HStack key={size} gap={12} align='center'>
         <span className='sb-annotation w-96 text-right'>{size}</span>
-        <NumericBadge size={size}>1</NumericBadge>
-        <NumericBadge size={size}>99</NumericBadge>
-        <NumericBadge size={size} color='danger' aria-label='Needs attention'>
+        <NumericBadge data-testid='numeric-badge' size={size}>
+          1
+        </NumericBadge>
+        <NumericBadge data-testid='numeric-badge' size={size}>
+          99
+        </NumericBadge>
+        <NumericBadge
+          data-testid='numeric-badge'
+          size={size}
+          color='danger'
+          aria-label='Needs attention'
+        >
           !
         </NumericBadge>
-        <NumericBadge size={size} color='info' aria-label='Unknown'>
+        <NumericBadge data-testid='numeric-badge' size={size} color='info' aria-label='Unknown'>
           ?
         </NumericBadge>
-        <NumericBadge size={size} color='success' aria-label='Completed'>
+        <NumericBadge
+          data-testid='numeric-badge'
+          size={size}
+          color='success'
+          aria-label='Completed'
+        >
           <Check />
         </NumericBadge>
       </HStack>

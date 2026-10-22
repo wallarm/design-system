@@ -800,7 +800,12 @@ export const ShowMore: StoryFn<typeof meta> = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '500px' }}>
     <div>
       <p className='sb-annotation mb-8'>12 lines, clipped at 7 — 5 hidden</p>
-      <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
+      <CodeSnippetRoot
+        code={showMoreCode}
+        language='text'
+        maxLines={7}
+        data-testid='show-more-clipped'
+      >
         <CodeSnippetContent>
           <CodeSnippetCode />
         </CodeSnippetContent>
@@ -808,7 +813,12 @@ export const ShowMore: StoryFn<typeof meta> = () => (
     </div>
     <div>
       <p className='sb-annotation mb-8'>9 lines, clipped at 7 — 2 hidden, no button</p>
-      <CodeSnippetRoot code={showMoreThresholdCode} language='text' maxLines={7}>
+      <CodeSnippetRoot
+        code={showMoreThresholdCode}
+        language='text'
+        maxLines={7}
+        data-testid='show-more-threshold'
+      >
         <CodeSnippetContent>
           <CodeSnippetCode />
         </CodeSnippetContent>
