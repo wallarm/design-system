@@ -13,6 +13,7 @@
  * @param {string[]} params.gitAssets - Files to commit on release (package.json, CHANGELOG.md)
  * @param {string} params.releaseMessage - Git commit message template
  * @param {string | false} [params.successComment] - GitHub PR comment on successful release
+ * @param {import('semantic-release').PluginSpec[]} [params.extraPrepare] - Plugins run on main right before `@semantic-release/git`
  * @returns {import('semantic-release').Options}
  */
 export function defineConfig({
@@ -22,6 +23,7 @@ export function defineConfig({
   gitAssets,
   releaseMessage,
   successComment = false,
+  extraPrepare = [],
 }) {
   const isMainBranch = process.env.GITHUB_REF_NAME === 'main';
 
@@ -82,6 +84,7 @@ export function defineConfig({
       ['@semantic-release/npm', { pkgRoot }],
       ...(isMainBranch
         ? [
+            ...extraPrepare,
             [
               '@semantic-release/git',
               { assets: gitAssets, message: releaseMessage },

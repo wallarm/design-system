@@ -691,9 +691,12 @@ jobs:
           fi
 
           # 2) Recover tags published to npm but missing from git
-          for PKG in "@wallarm-org/design-system" "@wallarm-org/mcp"; do
-            TAG_PREFIX="v"
-            [ "$PKG" = "@wallarm-org/mcp" ] && TAG_PREFIX="mcp-v"
+          for PKG in "@wallarm-org/design-system" "@wallarm-org/mcp" "@wallarm-org/migrator"; do
+            case "$PKG" in
+              @wallarm-org/mcp) TAG_PREFIX="mcp-v";;
+              @wallarm-org/migrator) TAG_PREFIX="migrator-v";;
+              *) TAG_PREFIX="v";;
+            esac
 
             NPM_VERSIONS=$(npm view "$PKG" versions --json 2>/dev/null \
               | jq -r 'if type == "array" then .[] else . end' \
@@ -724,7 +727,43 @@ jobs:
             git push origin refs/notes/semantic-release 2>/dev/null || true
           fi
 
+      # Saved so "Check migrator release" can tell whether the design-system
+      # release stamped packages/migrator/versions.json
+      - name: Save pre-release HEAD
+        id: pre-release
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Release design-system
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Not check-mcp's HEAD~1 message check: that misses cancelled runs and the
+      # release after an [update-screenshots] bot commit
+      - name: Check migrator release
+        id: check-migrator
+        env:
+          PRE_RELEASE_SHA: ${{ steps.pre-release.outputs.sha }}
+        run: |
+          SHOULD_RELEASE=false
+          LAST=$(git describe --tags --abbrev=0 --match 'migrator-v*' --exclude '*-*' 2>/dev/null || true)
+          if ! git diff --quiet "$PRE_RELEASE_SHA" HEAD -- packages/migrator/versions.json; then
+            echo "versions.json stamped by the design-system release"
+            SHOULD_RELEASE=true
+          elif [ -z "$LAST" ]; then
+            echo "No stable migrator tag yet"
+            SHOULD_RELEASE=true
+          elif [ -n "$(git diff --name-only "$LAST"..HEAD -- packages/migrator)" ]; then
+            echo "packages/migrator changed since $LAST"
+            SHOULD_RELEASE=true
+          fi
+          echo "should_release=$SHOULD_RELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Release migrator
+        if: steps.check-migrator.outputs.should_release == 'true'
+        working-directory: packages/migrator
         run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
