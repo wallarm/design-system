@@ -230,6 +230,12 @@ The two that bite most often while implementing: **element-specific prop types**
 
 ---
 
+# Breaking Changes
+
+A breaking change (`feat!:` / `BREAKING CHANGE:`) must add a migration file in `packages/migrator/src/migrations/` (register it in `index.ts`, add tests) — the `require-migration` PR check fails otherwise. Changes needing nothing from consumers still ship a report-only migration. See `packages/migrator/README.md`.
+
+---
+
 # Checklist Before Completing
 
 - [ ] Component follows the file structure pattern

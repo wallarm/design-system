@@ -12,7 +12,7 @@ This project follows [Semantic Versioning 2.0.0](https://semver.org/) (SemVer) f
 
 ### NPM Packages
 
-`@wallarm-org/design-system` and `@wallarm-org/mcp` are published to the NPM registry and follow this versioning scheme:
+`@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` are published to the NPM registry and follow this versioning scheme:
 
 - **Major version (X.0.0)**: Breaking changes
 - **Minor version (0.X.0)**: New features, backward compatible
@@ -101,7 +101,7 @@ Releases are driven entirely by `semantic-release` reading the commit history â€
 3. When merged, the `release` job in `.github/workflows/main.yml` runs `semantic-release`, which:
    - Analyzes every commit since the last release
    - Determines the version bump (`patch`/`minor`/`major`) from commit types
-   - Publishes `@wallarm-org/design-system` (and, when its files changed, `@wallarm-org/mcp`) to npm with the `latest` tag
+   - Publishes `@wallarm-org/design-system` (and, when their files changed, `@wallarm-org/mcp` and `@wallarm-org/migrator`) to npm with the `latest` tag
    - Creates a GitHub release with an auto-generated changelog
    - Creates a git tag for the release
 

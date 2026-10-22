@@ -49,6 +49,8 @@ Validates that PR titles follow conventional commit format. Lives in its own wor
 **Requirements**: Conventional commit format
 **Tools**: `thehanimo/pr-title-checker`
 
+The same workflow has a second job, `require-migration`: a PR whose title has `!` or whose body has a `BREAKING CHANGE:` line must add a new file under `packages/migrator/src/migrations/` (besides `index.ts`), otherwise it fails.
+
 ### 2. Setup (`setup`)
 
 Manages dependencies and caching for optimal performance.
@@ -142,7 +144,7 @@ Production deployment to GitHub Pages.
 
 ### 9. Release (`release`)
 
-Runs `semantic-release` for `@wallarm-org/design-system` and, conditionally, `@wallarm-org/mcp` — analyzes commits since the last release, publishes to npm with `NPM_TOKEN`, creates a GitHub release, and (on `feature/*`/`feat/*`/`fix/*` branches) publishes an RC-tagged prerelease. See [RELEASE.md](./RELEASE.md) for the full branch strategy.
+Runs `semantic-release` for `@wallarm-org/design-system` and, conditionally, `@wallarm-org/mcp` and `@wallarm-org/migrator` — analyzes commits since the last release, publishes to npm with `NPM_TOKEN`, creates a GitHub release, and (on `feature/*`/`feat/*`/`fix/*` branches) publishes an RC-tagged prerelease. The "Release migrator" step runs after design-system when the design-system release stamped `packages/migrator/versions.json` or `packages/migrator` changed since the last stable `migrator-v*` tag. See [RELEASE.md](./RELEASE.md) for the full branch strategy.
 
 ## 🔧 Configuration Files
 

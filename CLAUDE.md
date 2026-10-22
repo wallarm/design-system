@@ -52,6 +52,8 @@ This project **enforces** [Conventional Commits](https://www.conventionalcommits
 
 **Breaking changes**: Add `!` after type (`feat!:`) or include `BREAKING CHANGE:` in body (triggers major version bump)
 
+**Breaking changes must ship a migration** in `packages/migrator/src/migrations/` (enforced by the `require-migration` job in `pr-title.yml`). Changes that need nothing from consumers still ship a report-only migration.
+
 **Interactive commits**: Use `pnpm commit` for guided commit creation
 
 **Validation**: All commits are validated by commitlint. Invalid commits will be rejected.
@@ -180,7 +182,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 
 ### Pipeline Jobs
 
-`check-pr-title` lives in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else below is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch:
+`check-pr-title` and `require-migration` live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else below is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch:
 
 1. **setup** - Manages dependencies, caching, and screenshot update detection
 2. **quality** - Parallel lint, typecheck, and unit test execution
@@ -190,7 +192,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 6. **e2e-update-screenshots** - Auto-updates visual snapshots on main branch (sharded)
 7. **commit-screenshots** - Commits updated screenshots back to the branch
 8. **deploy-storybook** - Deploys the Storybook static artifact to GitHub Pages
-9. **release** - Runs `semantic-release` to publish `@wallarm-org/design-system`/`@wallarm-org/mcp` to npm (see [VERSIONING.md](./VERSIONING.md))
+9. **release** - Runs `semantic-release` to publish `@wallarm-org/design-system`/`@wallarm-org/mcp`/`@wallarm-org/migrator` to npm (see [VERSIONING.md](./VERSIONING.md))
 10. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
 
 Full detail: [CI_PLAN.md](./CI_PLAN.md).
