@@ -425,3 +425,18 @@ Runs after Task 7.
 - [ ] **Step 4: Run** tests — expected: PASS. Then `pnpm turbo run build --filter=@wallarm-org/docs...` — expected: success; `doc_build/foundations/tokens.md` contains `| Token | Value |` and no `TokenTable`.
 - [ ] **Step 5: Manual check** in `preview` at `/design-system/foundations/tokens`: copying a name and a value works; color swatches change when dark mode is toggled.
 - [ ] **Step 6: Commit** `feat(docs): copyable tokens with color swatches`
+
+---
+
+### Task 13: Section order and the duplicate "AI" label (user request, 2026-10-22)
+
+Runs after Task 12.
+
+**Files:**
+- Modify: `apps/docs/docs/_meta.json` (order: get-started, ai, guides, foundations, components), `apps/docs/docs/_nav.json` (order: Get Started, AI, Guides, Foundations, Components, Storybook)
+- Modify: `apps/docs/scripts/render.ts`: the generated component category label for `AI` becomes `AI Assistant` in both `_meta.json` section headers and `components/index.mdx`. Its position in the category order is unchanged.
+- Test: `apps/docs/scripts/__tests__/render.test.ts`: `labels the AI component category "AI Assistant"`.
+
+- [ ] **Step 1:** Write the failing test and run `pnpm --filter @wallarm-org/docs test:run` (expected FAIL), then implement and re-run (expected PASS).
+- [ ] **Step 2: Run** `pnpm turbo run build --filter=@wallarm-org/docs...` (expected success). In `preview`, the sidebar order is Get Started, AI, Guides, Foundations, Components; the nav order matches; no duplicate "AI" header.
+- [ ] **Step 3: Commit** `feat(docs): put AI and Guides after Get Started`
