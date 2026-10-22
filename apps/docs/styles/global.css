@@ -55,3 +55,21 @@ html.rp-dark {
 .sb-annotation-alt {
     color: var(--color-text-secondary-alt);
 }
+
+/* Home hero: solid brand actions with DS radius/padding (Rspress ships a gradient, and gives the
+   big button no horizontal padding), and a flat page background instead of the lavender wash. */
+:root,
+html.rp-dark {
+    --rp-home-hero-title-bg: var(--rp-c-brand);
+    --rp-home-background-bg: none;
+}
+
+.rp-button--big {
+    border-radius: var(--radius-8);
+    padding: 0 var(--spacing-24);
+}
+
+.rp-button--brand:hover {
+    opacity: 1;
+    background: var(--rp-c-brand-dark);
+}

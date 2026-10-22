@@ -13,6 +13,7 @@ import { Toaster } from '@wallarm-org/design-system/Toast';
 import { NavBrand } from './NavBrand';
 
 export * from '@rspress/core/theme-original';
+export { HomeHero } from './HomeHero';
 
 // Keeps the DS theme (<html data-theme>) in step with the Rspress appearance toggle.
 function ThemeSync() {
@@ -42,7 +43,5 @@ export function Root({ children }: RootProps) {
 }
 
 export function Layout(props: Parameters<typeof OriginalLayout>[0]) {
-  return (
-    <OriginalLayout {...props} navTitle={<NavBrand />} beforeHero={<NavBrand size='hero' />} />
-  );
+  return <OriginalLayout {...props} navTitle={<NavBrand />} />;
 }

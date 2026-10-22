@@ -11,11 +11,11 @@ export function NavBrand({ size = 'nav' }: NavBrandProps) {
   const hero = size === 'hero';
   const content = (
     <>
-      <Logo type='icon' size={hero ? '2xl' : 'xl'} aria-label='Wallarm' />
+      <Logo type='icon' size={hero ? '2xl' : 'xl'} aria-hidden='true' />
       <span
         className={
           hero
-            ? 'text-[2.5rem] leading-[1.1] font-semibold text-text-primary'
+            ? 'text-4xl font-semibold text-text-primary'
             : 'text-base font-semibold text-text-primary'
         }
       >
@@ -23,11 +23,9 @@ export function NavBrand({ size = 'nav' }: NavBrandProps) {
       </span>
     </>
   );
-  const row = hero ? 'flex items-center gap-[16px]' : 'flex items-center gap-[8px]';
+  const row = hero ? 'flex items-center justify-center gap-16' : 'flex items-center gap-8';
   return hero ? (
-    <div className='mx-auto max-w-[72rem] px-10 pt-[5rem] -mb-[5.5rem] max-[1000px]:pt-[2rem] max-[1000px]:-mb-[1rem]'>
-      <div className={row}>{content}</div>
-    </div>
+    <h1 className={row}>{content}</h1>
   ) : (
     <div className='rp-nav__title'>
       <Link href={withBase('/')} className={`rp-nav__title__link ${row}`}>
