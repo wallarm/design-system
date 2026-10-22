@@ -72,6 +72,13 @@ describe('renderComponentPage', () => {
     expect(page).toContain('Note: a \\{b\\}');
   });
 
+  it('falls back to a generated description', () => {
+    const page = renderComponentPage({ ...button, description: '' }, opts) ?? '';
+    expect(page).toContain(
+      `description: "${button.name}: live examples, usage and props for the ${button.name} component."`,
+    );
+  });
+
   it('skips components without examples', () => {
     expect(renderComponentPage(empty, opts)).toBeNull();
   });

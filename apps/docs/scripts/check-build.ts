@@ -24,6 +24,13 @@ expect(
   read('llms.txt').includes('https://wallarm.github.io/design-system/'),
   'llms.txt lacks the production site URL',
 );
+const fallbackLinkLines = read('llms.txt')
+  .split('\n')
+  .filter(line => line.trimEnd().endsWith(': Source · Storybook'));
+expect(
+  fallbackLinkLines.length === 0,
+  `llms.txt has ${fallbackLinkLines.length} page(s) described by their links line, e.g. ${fallbackLinkLines[0]}`,
+);
 read('llms-full.txt');
 
 read('components/button.html');

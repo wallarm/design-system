@@ -129,7 +129,7 @@ export function renderComponentPage(
   const out: string[] = [];
 
   out.push(
-    `---\ntitle: ${JSON.stringify(c.name)}\ndescription: ${JSON.stringify(c.description ?? '')}\n---`,
+    `---\ntitle: ${JSON.stringify(c.name)}\ndescription: ${JSON.stringify(c.description || `${c.name}: live examples, usage and props for the ${c.name} component.`)}\n---`,
   );
   out.push(`# ${c.name}`);
   if (c.description) out.push(escapeMdx(c.description));
@@ -211,7 +211,10 @@ export const titleCase = (kebab: string): string =>
     .join(' ');
 
 export function renderTokensPage(tokens: TokenCategory[]): string {
-  const out = ['# Tokens'];
+  const out = [
+    '---\ntitle: "Tokens"\ndescription: "Wallarm design system tokens: color palettes, semantic light and dark colors, spacing, typography, radius, shadow, blur, focus and icon sizes, with their values."\n---',
+    '# Tokens',
+  ];
   for (const cat of tokens) {
     out.push(`## ${titleCase(cat.name)}`);
     if (cat.name.includes('syntax')) out.push('Code-managed mapping — do not override.');
@@ -221,10 +224,12 @@ export function renderTokensPage(tokens: TokenCategory[]): string {
     const json = JSON.stringify(cat.tokens.map(({ name, value }) => ({ name, value })))
       .replace(/\u2028/g, '\\u2028')
       .replace(/\u2029/g, '\\u2029');
-    out.push(`<TokenTable tokens={${json}}>\n\n${table}\n\n</TokenTable>`);
+    out.push(
+      `<TokenTable tokens={${json}}>\n\n${table}\n\n</TokenTable>`,
+    );
   }
   return `${out.join('\n\n')}\n`;
 }
 
 export const renderChangelogPage = (changelogMd: string): string =>
-  `---\ntitle: "Changelog"\n---\n\n# Changelog\n\n${changelogMd}`;
+  `---\ntitle: "Changelog"\ndescription: "Release notes for every @wallarm-org/design-system version."\n---\n\n# Changelog\n\n${changelogMd}`;
