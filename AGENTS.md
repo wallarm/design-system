@@ -64,6 +64,7 @@ This project uses specialized Claude Code agents for domain-specific tasks. Agen
 |---------|-------------|
 | `/new-component` | Scaffold a new design system component |
 | `/review-pr` | Review a pull request for quality and compliance |
+| `/new-migration` | Write the `@wallarm-org/migrator` migration for a breaking change |
 | `/filter-field-design` | Filter System design reference |
 
 ## Ralph (Autonomous Agent Loop)

@@ -53,6 +53,8 @@ Renovate repository config (or a shared preset in the GitLab Renovate runner rep
 
 ## Adding a migration
 
+In Claude Code, run `/new-migration`: it walks through finding the breaking changes, deriving the mapping and writing the tests.
+
 Every breaking-change PR to the design-system must add a migration (enforced by `require-migration` in `.github/workflows/pr-title.yml`). A breaking change that needs nothing from consumers ships a report-only migration.
 
 1. Create `src/migrations/<id>.ts` exporting `migration: Migration` (`{ id, title, transform(file, ctx) }`). Use `ctx.report(node, message)` for cases that need a manual change, and the JSX helpers in `src/lib/jsx.ts`.

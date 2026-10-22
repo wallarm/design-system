@@ -36,7 +36,7 @@ jobs:
         run: |
           if [[ "$TITLE" =~ ^[a-z]+(\(.+\))?!: ]] || grep -qE '^BREAKING CHANGES?:' <<< "$BODY"; then
             if [ -z "$(git diff --name-only --diff-filter=A "$BASE...$HEAD" -- ':(glob)packages/migrator/src/migrations/*.ts' ':!packages/migrator/src/migrations/index.ts')" ]; then
-              echo "::error::Breaking change without a migration — see docs/superpowers/specs/2026-10-22-migrator-design.md §8"
+              echo "::error::Breaking change without a migration — run /new-migration in Claude Code; see docs/superpowers/specs/2026-10-22-migrator-design.md §8"
               exit 1
             fi
           fi

@@ -52,7 +52,7 @@ This project **enforces** [Conventional Commits](https://www.conventionalcommits
 
 **Breaking changes**: Add `!` after type (`feat!:`) or include `BREAKING CHANGE:` in body (triggers major version bump)
 
-**Breaking changes must ship a migration** in `packages/migrator/src/migrations/` (enforced by the `require-migration` job in `pr-title.yml`). Changes that need nothing from consumers still ship a report-only migration.
+**Breaking changes must ship a migration** in `packages/migrator/src/migrations/` — write it with `/new-migration` (enforced by the `require-migration` job in `pr-title.yml`). Changes that need nothing from consumers still ship a report-only migration.
 
 **Interactive commits**: Use `pnpm commit` for guided commit creation
 

@@ -232,7 +232,7 @@ The two that bite most often while implementing: **element-specific prop types**
 
 # Breaking Changes
 
-A breaking change (`feat!:` / `BREAKING CHANGE:`) must add a migration file in `packages/migrator/src/migrations/` (register it in `index.ts`, add tests) — the `require-migration` PR check fails otherwise. Changes needing nothing from consumers still ship a report-only migration. See `packages/migrator/README.md`.
+For every breaking change (`feat!:` / `BREAKING CHANGE:`), run the `/new-migration` skill before finishing: consumers upgrade via Renovate + `@wallarm-org/migrator`, and the `require-migration` PR check fails without a migration.
 
 ---
 
@@ -250,3 +250,4 @@ A breaking change (`feat!:` / `BREAKING CHANGE:`) must add a migration file in `
 - [ ] No `any` types used
 - [ ] Accessibility requirements are met
 - [ ] Analytics-readiness: `docs/metrics/new-component-checklist.md` satisfied (element-specific typing, `{...rest}` to the real node, event composition, no analytics-specific props); any wrapper-level/gap recorded in the component folder
+- [ ] Breaking change? Migration written via /new-migration (packages/migrator/src/migrations/)
