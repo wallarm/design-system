@@ -2,6 +2,27 @@
 
 Codemod CLI that migrates consumer apps across `@wallarm-org/design-system` breaking changes. Renovate runs it after a design-system upgrade; it can also be run by hand.
 
+## How an upgrade reaches your app
+
+1. The design-system releases a new version. Breaking changes always come in a major, and every breaking change ships a migration.
+2. Renovate opens one MR in your repo with the version bump, the lockfile, and the source rewrites made by the migrator. It applies every migration between the version you were on and the new one, so skipping several majors is fine.
+3. Whatever the migrator can rewrite safely is already done in the MR. Whatever it can't — a value computed at runtime, a spread that may override the prop — it leaves for you, marked in the code and listed in `wds-migration.md`. It never guesses: after the MR your app renders the same as before the upgrade.
+4. Your CI fails while any manual step is left, so the MR can't be merged half-migrated.
+
+## Fixing manual steps
+
+Each spot that needs you gets a marker right after the component name, saying which migration left it and what to do:
+
+```tsx
+// In the MR
+<Avatar /* @wds-migration(avatar-size-rename): Avatar size was renamed (xs -> md, sm -> lg; new sm is 20px): non-static value, review manually */ size={big ? 'sm' : 'xs'} />
+
+// After you fix it (old sm is the new lg, old xs is the new md)
+<Avatar size={big ? 'lg' : 'md'} />
+```
+
+`wds-migration.md` (one per package in a monorepo) lists the same spots with file and line, plus files that could not be parsed. Fix every marker, delete the comment and the report, push — CI goes green.
+
 ## Usage
 
 ```bash

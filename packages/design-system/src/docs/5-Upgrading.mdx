@@ -1,0 +1,22 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+import MigratorReadme from '../../../migrator/README.md?raw';
+import versions from '../../../migrator/versions.json';
+
+<Meta title="Documentation/Upgrading" />
+
+<Markdown>{MigratorReadme}</Markdown>
+
+## Available migrations
+
+Applied automatically for the design-system versions in your upgrade range.
+
+<table>
+  <thead>
+    <tr><th>Design-system version</th><th>Migration</th></tr>
+  </thead>
+  <tbody>
+    {Object.entries(versions.migrations).map(([id, version]) => (
+      <tr key={id}><td>{version}</td><td><code>{id}</code></td></tr>
+    ))}
+  </tbody>
+</table>
