@@ -1,5 +1,5 @@
 import { describe, expect, it, rs } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Tree } from './Tree';
 import { TreeItem } from './TreeItem';
@@ -148,15 +148,14 @@ describe('data-testid', () => {
       </Tree>,
     );
 
-    const root = container.querySelector('[data-slot="tree"]');
-    expect(root).not.toHaveAttribute('data-testid');
+    expect(container.querySelector('[data-testid]')).toBeNull();
   });
 });
 
 describe('Expand/collapse', () => {
   it('shows content when defaultOpen is true', () => {
     render(
-      <Tree>
+      <Tree data-testid='tree'>
         <TreeItem collapsible defaultOpen>
           <TreeItemHeader>Branch</TreeItemHeader>
           <TreeItemContent>
@@ -167,13 +166,12 @@ describe('Expand/collapse', () => {
     );
 
     expect(screen.getByText('Content')).toBeInTheDocument();
-    const content = screen.getByText('Content').closest('[data-slot="tree-item-content"]');
-    expect(content).toHaveAttribute('data-state', 'open');
+    expect(screen.getByTestId('tree--content')).toHaveAttribute('data-state', 'open');
   });
 
   it('hides content when defaultOpen is false', () => {
-    const { container } = render(
-      <Tree>
+    render(
+      <Tree data-testid='tree'>
         <TreeItem collapsible defaultOpen={false}>
           <TreeItemHeader>Branch</TreeItemHeader>
           <TreeItemContent>
@@ -183,13 +181,12 @@ describe('Expand/collapse', () => {
       </Tree>,
     );
 
-    const content = container.querySelector('[data-slot="tree-item-content"]');
-    expect(content).toHaveAttribute('data-state', 'closed');
+    expect(screen.getByTestId('tree--content')).toHaveAttribute('data-state', 'closed');
   });
 
   it('toggles on header click', async () => {
-    const { container } = render(
-      <Tree>
+    render(
+      <Tree data-testid='tree'>
         <TreeItem collapsible>
           <TreeItemHeader>Branch</TreeItemHeader>
           <TreeItemContent>
@@ -199,8 +196,8 @@ describe('Expand/collapse', () => {
       </Tree>,
     );
 
-    const trigger = container.querySelector('[data-slot="tree-item-header"] button') as HTMLElement;
-    const content = container.querySelector('[data-slot="tree-item-content"]') as HTMLElement;
+    const trigger = within(screen.getByTestId('tree--header')).getByRole('button');
+    const content = screen.getByTestId('tree--content');
 
     expect(content).toHaveAttribute('data-state', 'open');
     await userEvent.click(trigger);
@@ -209,8 +206,8 @@ describe('Expand/collapse', () => {
 
   it('calls onOpenChange when toggled', async () => {
     const onOpenChange = rs.fn();
-    const { container } = render(
-      <Tree>
+    render(
+      <Tree data-testid='tree'>
         <TreeItem collapsible onOpenChange={onOpenChange}>
           <TreeItemHeader>Branch</TreeItemHeader>
           <TreeItemContent>
@@ -220,7 +217,7 @@ describe('Expand/collapse', () => {
       </Tree>,
     );
 
-    const trigger = container.querySelector('[data-slot="tree-item-header"] button') as HTMLElement;
+    const trigger = within(screen.getByTestId('tree--header')).getByRole('button');
     await userEvent.click(trigger);
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
@@ -229,7 +226,7 @@ describe('Expand/collapse', () => {
 describe('Action slot', () => {
   it('renders action in collapsible headers', () => {
     render(
-      <Tree>
+      <Tree data-testid='tree'>
         <TreeItem collapsible>
           <TreeItemHeader action={<button type='button'>Copy</button>}>Branch</TreeItemHeader>
           <TreeItemContent>
@@ -244,14 +241,13 @@ describe('Action slot', () => {
 
   it('renders action in non-collapsible headers', () => {
     render(
-      <Tree>
+      <Tree data-testid='tree'>
         <TreeItem>
           <TreeItemHeader action={<span>Action</span>}>Leaf</TreeItemHeader>
         </TreeItem>
       </Tree>,
     );
 
-    const actionSlot = screen.getByText('Action').closest('[data-slot="tree-item-action"]');
-    expect(actionSlot).toBeInTheDocument();
+    expect(screen.getByTestId('tree--action')).toHaveTextContent('Action');
   });
 });

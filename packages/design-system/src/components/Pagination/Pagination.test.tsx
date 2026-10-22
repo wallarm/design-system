@@ -68,8 +68,8 @@ describe('Pagination root', () => {
 
 describe('Pagination size context', () => {
   it('propagates the default medium size to items and ellipsis', () => {
-    const { container } = render(
-      <Pagination count={500} pageSize={10} page={1}>
+    render(
+      <Pagination count={500} pageSize={10} page={1} data-testid='pg'>
         <ul>
           <PaginationItem value={1}>1</PaginationItem>
           <PaginationEllipsis index={0} />
@@ -77,14 +77,12 @@ describe('Pagination size context', () => {
       </Pagination>,
     );
     expect(screen.getByRole('button', { name: 'page 1' }).className).toContain('size-32');
-    expect(container.querySelector('[data-slot="pagination-ellipsis"]')?.className).toContain(
-      'size-32',
-    );
+    expect(screen.getByTestId('pg--ellipsis').className).toContain('size-32');
   });
 
   it('propagates the small size to items and ellipsis', () => {
-    const { container } = render(
-      <Pagination count={500} pageSize={10} page={1} size='small'>
+    render(
+      <Pagination count={500} pageSize={10} page={1} size='small' data-testid='pg'>
         <ul>
           <PaginationItem value={1}>1</PaginationItem>
           <PaginationEllipsis index={0} />
@@ -92,9 +90,7 @@ describe('Pagination size context', () => {
       </Pagination>,
     );
     expect(screen.getByRole('button', { name: 'page 1' }).className).toContain('size-24');
-    expect(container.querySelector('[data-slot="pagination-ellipsis"]')?.className).toContain(
-      'size-24',
-    );
+    expect(screen.getByTestId('pg--ellipsis').className).toContain('size-24');
   });
 
   it('maps size to the matching Button height on prev/next', () => {
@@ -179,17 +175,16 @@ describe('PaginationItem', () => {
 
 describe('PaginationEllipsis', () => {
   it('renders a non-interactive, aria-hidden indicator', () => {
-    const { container } = render(
-      <Pagination count={500} pageSize={10}>
+    render(
+      <Pagination count={500} pageSize={10} data-testid='pg'>
         <ul>
           <PaginationEllipsis index={0} />
         </ul>
       </Pagination>,
     );
-    const el = container.querySelector('[data-slot="pagination-ellipsis"]');
-    expect(el).not.toBeNull();
+    const el = screen.getByTestId('pg--ellipsis');
     expect(el).toHaveAttribute('aria-hidden', 'true');
-    expect(el?.tagName).toBe('DIV');
+    expect(el.tagName).toBe('DIV');
     // not exposed as an interactive element
     expect(screen.queryByRole('button')).toBeNull();
   });
@@ -198,7 +193,14 @@ describe('PaginationEllipsis', () => {
 describe('PaginationList', () => {
   it('auto-renders boundary pages, sibling pages and a single ellipsis', () => {
     render(
-      <Pagination count={200} pageSize={10} page={1} siblingCount={1} boundaryCount={1}>
+      <Pagination
+        count={200}
+        pageSize={10}
+        page={1}
+        siblingCount={1}
+        boundaryCount={1}
+        data-testid='pg'
+      >
         <PaginationList />
       </Pagination>,
     );
@@ -212,12 +214,12 @@ describe('PaginationList', () => {
     expect(screen.getByRole('button', { name: 'last page, page 20' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'page 10' })).toBeNull();
     // exactly one ellipsis between sibling group and the trailing boundary
-    expect(list.querySelectorAll('[data-slot="pagination-ellipsis"]')).toHaveLength(1);
+    expect(within(list).getAllByTestId('pg--ellipsis')).toHaveLength(1);
   });
 
   it('wraps every page entry in its own <li>', () => {
     render(
-      <Pagination count={200} pageSize={10} page={1}>
+      <Pagination count={200} pageSize={10} page={1} data-testid='pg'>
         <PaginationList />
       </Pagination>,
     );
@@ -225,24 +227,31 @@ describe('PaginationList', () => {
     const items = within(list).getAllByRole('listitem');
     // one <li> per rendered page button + one per ellipsis
     const buttons = within(list).getAllByRole('button');
-    const ellipses = list.querySelectorAll('[data-slot="pagination-ellipsis"]');
+    const ellipses = within(list).getAllByTestId('pg--ellipsis');
     expect(items).toHaveLength(buttons.length + ellipses.length);
   });
 
   it('renders two ellipses when the active page is in the middle', () => {
     render(
-      <Pagination count={500} pageSize={10} page={25} siblingCount={1} boundaryCount={1}>
+      <Pagination
+        count={500}
+        pageSize={10}
+        page={25}
+        siblingCount={1}
+        boundaryCount={1}
+        data-testid='pg'
+      >
         <PaginationList />
       </Pagination>,
     );
     const list = screen.getByRole('list');
-    expect(list.querySelectorAll('[data-slot="pagination-ellipsis"]')).toHaveLength(2);
+    expect(within(list).getAllByTestId('pg--ellipsis')).toHaveLength(2);
     expect(screen.getByRole('button', { name: 'page 25' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('uses the render-prop override to render custom page entries', () => {
     render(
-      <Pagination count={200} pageSize={10} page={1}>
+      <Pagination count={200} pageSize={10} page={1} data-testid='pg'>
         <PaginationList>
           {(pageItem, index) =>
             pageItem.type === 'ellipsis' ? (
@@ -259,7 +268,7 @@ describe('PaginationList', () => {
     expect(screen.getByTestId('custom-ellipsis-5')).toHaveTextContent('gap');
     // ...and the default PaginationItem buttons are NOT rendered
     expect(screen.queryByRole('button')).toBeNull();
-    expect(document.querySelector('[data-slot="pagination-item"]')).toBeNull();
+    expect(screen.queryByTestId('pg--item')).toBeNull();
   });
 });
 

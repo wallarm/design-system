@@ -138,11 +138,7 @@ describe('Avatar plate', () => {
       </NavRail>,
     );
 
-    const plate = screen
-      .getByTestId('item-user')
-      .querySelector('[data-slot="nav-rail-item-avatar"]');
-    expect(plate).not.toBeNull();
-    expect(plate?.querySelector('svg')).not.toBeNull();
+    expect(screen.getByTestId('item-user--avatar').querySelector('svg')).not.toBeNull();
   });
 
   it('fills the plate with the photo when avatarSrc is set', () => {
@@ -157,9 +153,7 @@ describe('Avatar plate', () => {
       </NavRail>,
     );
 
-    const img = screen
-      .getByTestId('item-user')
-      .querySelector('[data-slot="nav-rail-item-avatar"] img');
+    const img = screen.getByTestId('item-user--avatar--image');
     expect(img).toHaveAttribute('src', '/me.png');
     expect(img).toHaveAttribute('alt', '');
   });
@@ -176,11 +170,7 @@ describe('Avatar plate', () => {
       </NavRail>,
     );
 
-    const plate = screen
-      .getByTestId('item-user')
-      .querySelector('[data-slot="nav-rail-item-avatar"]');
-    const img = plate?.querySelector('img');
-    if (!img) throw new Error('expected the photo element');
+    const img = screen.getByTestId('item-user--avatar--image');
     // Load first: while loading, the fallback is already visible, which would make the test vacuous.
     fireEvent.load(img);
     await waitFor(() => expect(img).toHaveAttribute('data-state', 'visible'));
@@ -188,9 +178,9 @@ describe('Avatar plate', () => {
 
     // Ark keeps the <img> mounted and hides it; the icon fallback shows instead.
     await waitFor(() => expect(img).toHaveAttribute('data-state', 'hidden'));
-    const fallback = plate?.querySelector('[data-slot="avatar-fallback"]');
+    const fallback = screen.getByTestId('item-user--avatar--fallback');
     expect(fallback).toHaveAttribute('data-state', 'visible');
-    expect(fallback?.querySelector('svg')).not.toBeNull();
+    expect(fallback.querySelector('svg')).not.toBeNull();
   });
 
   it('forwards the item icon to the plate fallback', () => {
@@ -200,13 +190,11 @@ describe('Avatar plate', () => {
         <NavRailItem icon={Custom} label='Meow Meow' avatar data-testid='item-user' />
       </NavRail>,
     );
-    const fallback = screen
-      .getByTestId('item-user')
-      .querySelector('[data-slot="nav-rail-item-avatar"] [data-slot="avatar-fallback"]');
+    const fallback = screen.getByTestId('item-user--avatar--fallback');
     expect(fallback).toContainElement(screen.getByTestId('item-icon'));
   });
 
-  it('adds no test ids of its own inside the rail cascade', () => {
+  it('derives unique plate test ids from the item', () => {
     const { container } = render(
       <NavRail data-testid='rail'>
         <NavRailItem
@@ -221,9 +209,9 @@ describe('Avatar plate', () => {
       el.getAttribute('data-testid'),
     );
     expect(new Set(ids).size).toBe(ids.length);
-    expect(
-      screen.getByTestId('item-user').querySelector('[data-slot="nav-rail-item-avatar"]'),
-    ).not.toHaveAttribute('data-testid');
+    expect(screen.getByTestId('item-user')).toContainElement(
+      screen.getByTestId('item-user--avatar'),
+    );
   });
 
   it('renders no plate by default', () => {
@@ -233,9 +221,7 @@ describe('Avatar plate', () => {
       </NavRail>,
     );
 
-    expect(
-      screen.getByTestId('item-activity').querySelector('[data-slot="nav-rail-item-avatar"]'),
-    ).toBeNull();
+    expect(screen.queryByTestId('item-activity--avatar')).toBeNull();
   });
 });
 
@@ -266,9 +252,10 @@ describe('Branded frame style', () => {
     expect(item).not.toHaveClass('branded:text-text-brand');
     expect(item).toHaveClass('branded:hover:overlay-states-brand-hover');
     // The fallback is the plate, so it carries the brand tint, stroke and icon colour.
-    expect(
-      item.querySelector('[data-slot="nav-rail-item-avatar"] [data-slot="avatar-fallback"]'),
-    ).toHaveClass('branded:text-icon-brand', 'branded:border-border-brand');
+    expect(screen.getByTestId('item-user--avatar--fallback')).toHaveClass(
+      'branded:text-icon-brand',
+      'branded:border-border-brand',
+    );
   });
 });
 
@@ -351,12 +338,12 @@ describe('Accessible names', () => {
 
 describe('Compact skeleton', () => {
   it('sizes each bar 4px inside the 62x42 compact item', () => {
-    const { container } = render(
-      <NavRail mode='compact'>
+    render(
+      <NavRail mode='compact' data-testid='rail'>
         <NavRailSkeleton count={2} />
       </NavRail>,
     );
-    const bars = container.querySelector('[data-slot="nav-rail-skeleton"]')?.children ?? [];
+    const bars = screen.getByTestId('rail--skeleton').children;
     expect(bars).toHaveLength(2);
     for (const bar of bars) {
       expect(bar).toHaveStyle({ '--skeleton-width': '54px', '--skeleton-height': '38px' });

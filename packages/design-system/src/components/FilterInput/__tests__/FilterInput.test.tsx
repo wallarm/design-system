@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { FilterInput } from '../FilterInput';
 import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
@@ -15,6 +15,9 @@ import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
  */
 const findMenuitem = (name: RegExp | string) =>
   screen.findByRole('menuitem', { name }, { timeout: 10000 });
+
+const CHIP = 'fi--condition-chip';
+const segment = (name: 'attribute' | 'operator' | 'value' | 'separator') => `${CHIP}--${name}`;
 
 const sampleFields = [
   {
@@ -146,8 +149,8 @@ describe('FilterInput', () => {
 
   describe('error state', () => {
     it('applies error border when error is true', () => {
-      const { container } = render(<FilterInput fields={sampleFields} error={true} />);
-      const field = container.querySelector('[data-slot="filter-input"]');
+      render(<FilterInput data-testid='fi' fields={sampleFields} error={true} />);
+      const field = screen.getByTestId('fi');
       expect(field).toHaveClass('border-border-strong-danger');
     });
 
@@ -158,8 +161,8 @@ describe('FilterInput', () => {
     });
 
     it('applies normal styling when error is false', () => {
-      const { container } = render(<FilterInput fields={sampleFields} error={false} />);
-      const field = container.querySelector('[data-slot="filter-input"]');
+      render(<FilterInput data-testid='fi' fields={sampleFields} error={false} />);
+      const field = screen.getByTestId('fi');
       expect(field).toHaveClass('border-border-primary');
       expect(field).not.toHaveClass('border-border-strong-danger');
     });
@@ -174,8 +177,8 @@ describe('FilterInput', () => {
     // default, that fixed height/padding was silently leaking onto the outer wrapper (Textarea
     // was updated in the same PR to explicitly override it; FilterInputField was not).
     it('does not inherit the Input size variant fixed height/padding on the outer wrapper', () => {
-      const { container } = render(<FilterInput fields={sampleFields} />);
-      const field = container.querySelector('[data-slot="filter-input"]');
+      render(<FilterInput data-testid='fi' fields={sampleFields} />);
+      const field = screen.getByTestId('fi');
       expect(field).toHaveClass('min-h-40');
       expect(field).not.toHaveClass('h-36');
       expect(field).not.toHaveClass('py-8');
@@ -217,9 +220,9 @@ describe('FilterInput', () => {
         value: 'active',
       };
 
-      const { container } = render(<FilterInput fields={sampleFields} value={condition} />);
+      render(<FilterInput data-testid='fi' fields={sampleFields} value={condition} />);
 
-      const filterInput = container.querySelector('[data-slot="filter-input"]')!;
+      const filterInput = screen.getByTestId('fi');
       const wrapper = filterInput.querySelector('.cursor-text')!;
       expect(wrapper).toBeTruthy();
       expect(wrapper.classList.contains('cursor-text')).toBe(true);
@@ -327,7 +330,7 @@ describe('FilterInput', () => {
         operator: '=',
         value: 'active',
       };
-      const { container } = render(<FilterInput fields={sampleFields} value={condition} />);
+      render(<FilterInput data-testid='fi' fields={sampleFields} value={condition} />);
 
       const input = screen.getByRole('combobox');
       await user.click(input);
@@ -337,7 +340,7 @@ describe('FilterInput', () => {
       // The chip must be gone AND the field menu must already be open so
       // ArrowDown highlights the first item on a single keypress.
       await waitFor(() => {
-        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+        expect(screen.queryByTestId(CHIP)).toBeNull();
       });
       expect(await findMenuitem('Status')).toBeInTheDocument();
     });
@@ -592,7 +595,7 @@ describe('FilterInput', () => {
 
     it('preserves the chosen operator when switching to a type-compatible filter', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={fields} />);
+      render(<FilterInput data-testid='fi' fields={fields} />);
 
       await startBuildingThroughOperator(user);
 
@@ -601,14 +604,14 @@ describe('FilterInput', () => {
       await user.click(await screen.findByRole('button', { name: /Edit filter attribute/i }));
       await user.click(await findMenuitem('Role'));
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Role');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('attribute')).textContent).toBe('Role');
+      expect(within(chip).getByTestId(segment('operator')).textContent).toBe('is');
     });
 
     it('drops an incompatible operator when switching to a different type filter', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={fields} />);
+      render(<FilterInput data-testid='fi' fields={fields} />);
 
       // Start building with Status / "in" — `in` is not allowed for date fields,
       // so switching to Created at must drop the operator.
@@ -620,15 +623,15 @@ describe('FilterInput', () => {
       await user.click(await screen.findByRole('button', { name: /Edit filter attribute/i }));
       await user.click(await findMenuitem('Created at'));
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Created at');
-      expect(chip.querySelector('[data-slot="segment-operator"]')).toBeNull();
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('attribute')).textContent).toBe('Created at');
+      expect(within(chip).queryByTestId(segment('operator'))).toBeNull();
     });
 
     it('escape from inline-edit on a building chip keeps the building state intact', async () => {
       const user = userEvent.setup();
       const onChange = rs.fn();
-      const { container } = render(<FilterInput fields={fields} onChange={onChange} />);
+      render(<FilterInput data-testid='fi' fields={fields} onChange={onChange} />);
 
       await startBuildingThroughOperator(user);
 
@@ -638,10 +641,10 @@ describe('FilterInput', () => {
       // Building chip survives — attribute + operator still visible inside
       // the chip itself (menu menuitems may also contain "Status", so scope
       // the assertion to the chip).
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      const chip = screen.getByTestId(CHIP);
       expect(chip).toBeInTheDocument();
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+      expect(within(chip).getByTestId(segment('attribute')).textContent).toBe('Status');
+      expect(within(chip).getByTestId(segment('operator')).textContent).toBe('is');
       expect(onChange).not.toHaveBeenCalled();
     });
   });
@@ -663,9 +666,9 @@ describe('FilterInput', () => {
     it('does not commit an incomplete building chip on blur', async () => {
       const user = userEvent.setup();
       const onChange = rs.fn();
-      const { container } = render(
+      render(
         <div>
-          <FilterInput fields={fields} onChange={onChange} />
+          <FilterInput data-testid='fi' fields={fields} onChange={onChange} />
           <button type='button'>outside</button>
         </div>,
       );
@@ -683,12 +686,12 @@ describe('FilterInput', () => {
       // waitFor — the blur path runs through useBlurCommit + resetState
       // asynchronously; under jsdom load the chip rerender lands a tick later.
       await waitFor(() => {
-        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        const chip = screen.queryByTestId(CHIP);
         expect(chip).not.toBeNull();
-        expect(chip!.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-        expect(chip!.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+        expect(within(chip!).getByTestId(segment('attribute')).textContent).toBe('Status');
+        expect(within(chip!).getByTestId(segment('operator')).textContent).toBe('is');
         // Chip is still in `building` state — no value segment.
-        expect(chip!.querySelector('[data-slot="segment-value"]')).toBeNull();
+        expect(within(chip!).queryByTestId(segment('value'))).toBeNull();
       });
       expect(onChange).not.toHaveBeenCalled();
     });
@@ -746,17 +749,18 @@ describe('FilterInput', () => {
     it('renders a value placeholder for no-value operator chips', () => {
       // Pre-committed no-value chip (consumer-provided value) — chip must
       // visually show three segments with the value slot filled by "—".
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: 'is_null', value: null }}
         />,
       );
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is not set');
-      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('—');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('attribute')).textContent).toBe('Status');
+      expect(within(chip).getByTestId(segment('operator')).textContent).toBe('is not set');
+      expect(within(chip).getByTestId(segment('value')).textContent).toBe('—');
     });
   });
 
@@ -800,8 +804,9 @@ describe('FilterInput', () => {
 
     it('cascades from value inline-edit to operator on empty Backspace and clears the value', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -810,18 +815,19 @@ describe('FilterInput', () => {
       await user.click(screen.getByRole('button', { name: /Edit filter value/i }));
       clearSegment('Filter value');
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      const chip = screen.getByTestId(CHIP);
       // Operator is now in inline-edit (its <input> is rendered).
-      expect(chip.querySelector('[data-slot="segment-operator"] input')).not.toBeNull();
+      expect(within(chip).getByTestId(segment('operator')).querySelector('input')).not.toBeNull();
       // Value segment is gone — the chip data was cleared on cascade so it
       // does not re-render its previous committed text.
-      expect(chip.querySelector('[data-slot="segment-value"]')).toBeNull();
+      expect(within(chip).queryByTestId(segment('value'))).toBeNull();
     });
 
     it('removes the chip when the cascade reaches an empty attribute', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -832,7 +838,7 @@ describe('FilterInput', () => {
       clearSegment('Filter operator');
       clearSegment('Filter attribute');
 
-      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+      expect(screen.queryByTestId(CHIP)).toBeNull();
     });
 
     it('preserves the value when the cascade walks from operator inline-edit to attribute', async () => {
@@ -840,8 +846,9 @@ describe('FilterInput', () => {
       // user did not touch the value, so it stays committed (renders as a
       // sole-value chip in this in-between state).
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -850,19 +857,20 @@ describe('FilterInput', () => {
       await user.click(screen.getByRole('button', { name: /Edit filter operator/i }));
       clearSegment('Filter operator');
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      const chip = screen.getByTestId(CHIP);
       // Attribute is now in inline-edit (its <input> is rendered).
-      expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+      expect(within(chip).getByTestId(segment('attribute')).querySelector('input')).not.toBeNull();
       // Operator is gone — its data was cleared on cascade.
-      expect(chip.querySelector('[data-slot="segment-operator"]')).toBeNull();
+      expect(within(chip).queryByTestId(segment('operator'))).toBeNull();
       // Value survives — the user did not delete it.
-      expect(chip.querySelector('[data-slot="segment-value"]')?.textContent).toBe('Active');
+      expect(within(chip).queryByTestId(segment('value'))?.textContent).toBe('Active');
     });
 
     it('does not remove the chip when Backspace empties attribute while operator and value are still present', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -872,7 +880,7 @@ describe('FilterInput', () => {
       clearSegment('Filter attribute');
 
       // Operator/value still committed — cascade off attribute is suppressed.
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      const chip = screen.queryByTestId(CHIP);
       expect(chip).not.toBeNull();
     });
 
@@ -904,7 +912,7 @@ describe('FilterInput', () => {
 
     it('steps back from the value menu into operator inline-edit when main-input Backspace fires on empty input', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={fields} />);
+      render(<FilterInput data-testid='fi' fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Status'));
@@ -915,13 +923,13 @@ describe('FilterInput', () => {
       // unmounted. Re-query so we drive a node still in the React tree.
       pressBackspaceOn(screen.getByRole('combobox'));
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-operator"] input')).not.toBeNull();
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('operator')).querySelector('input')).not.toBeNull();
     });
 
     it('steps back from the operator menu into attribute inline-edit when main-input Backspace fires on empty input', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={fields} />);
+      render(<FilterInput data-testid='fi' fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Status'));
@@ -931,14 +939,16 @@ describe('FilterInput', () => {
       // waitFor — the cascade triggers a chain of state updates and React
       // renders that don't all flush synchronously under jsdom load.
       await waitFor(() => {
-        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-        expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+        const chip = screen.getByTestId(CHIP);
+        expect(
+          within(chip).getByTestId(segment('attribute')).querySelector('input'),
+        ).not.toBeNull();
       });
     });
 
     it('removes the building chip when the attribute is wiped via the step-back-into-edit cascade', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={fields} />);
+      render(<FilterInput data-testid='fi' fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Status'));
@@ -952,7 +962,7 @@ describe('FilterInput', () => {
       clearSegment('Filter attribute');
 
       await waitFor(() => {
-        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+        expect(screen.queryByTestId(CHIP)).toBeNull();
       });
     });
   });
@@ -986,8 +996,9 @@ describe('FilterInput', () => {
 
     it('selects highlighted field after emptying the attribute segment', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -1002,14 +1013,15 @@ describe('FilterInput', () => {
       // committed via Enter rather than just staying on the original value.
       await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Role');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('attribute')).textContent).toBe('Role');
     });
 
     it('selects highlighted operator after emptying the operator segment', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -1024,14 +1036,15 @@ describe('FilterInput', () => {
       // would have left the original `=` (`is`) in place.
       await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is not');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('operator')).textContent).toBe('is not');
     });
 
     it('selects highlighted value after emptying the value segment', async () => {
       const user = userEvent.setup();
-      const { container } = render(
+      render(
         <FilterInput
+          data-testid='fi'
           fields={fields}
           value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
         />,
@@ -1046,8 +1059,8 @@ describe('FilterInput', () => {
       // original `active` (`Active`) untouched.
       await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('Pending');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getByTestId(segment('value')).textContent).toBe('Pending');
     });
   });
 
@@ -1244,7 +1257,7 @@ describe('FilterInput', () => {
 
     it('reveals the second triplet as one building chip after the first value', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={pairedFields} />);
+      const { container } = render(<FilterInput data-testid='fi' fields={pairedFields} />);
 
       const input = screen.getByRole('combobox');
       await user.click(input);
@@ -1258,17 +1271,17 @@ describe('FilterInput', () => {
       // chip now shows the first value, the paired attribute, and a ; separator —
       // not a separate second chip.
       await waitFor(() => {
-        const chip = container.querySelector('[data-building]');
+        const chip = container.querySelector<HTMLElement>('[data-building]');
         expect(chip).not.toBeNull();
-        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+        expect(within(chip!).queryByTestId(segment('separator'))).not.toBeNull();
       });
-      const buildingChip = container.querySelector('[data-building]')!;
+      const buildingChip = container.querySelector<HTMLElement>('[data-building]')!;
       expect(
-        [...buildingChip.querySelectorAll('[data-slot="segment-attribute"]')].map(
-          n => n.textContent,
-        ),
+        within(buildingChip)
+          .getAllByTestId(segment('attribute'))
+          .map(n => n.textContent),
       ).toEqual(['Context Param', 'Value']);
-      expect(buildingChip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
+      expect(within(buildingChip).getByTestId(segment('value')).textContent).toBe('xxx');
       // The operator menu for the paired field is open (side 1 in progress).
       expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
     });
@@ -1301,15 +1314,19 @@ describe('FilterInput', () => {
         value: 'xxx',
         pair: { operator: '=', value: 'yyy' },
       };
-      const { container } = render(<FilterInput fields={pairedFields} value={condition} />);
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      render(<FilterInput data-testid='fi' fields={pairedFields} value={condition} />);
+      const chip = screen.getByTestId(CHIP);
       expect(
-        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+        within(chip)
+          .getAllByTestId(segment('attribute'))
+          .map(n => n.textContent),
       ).toEqual(['Context Param', 'Value']);
       expect(
-        [...chip.querySelectorAll('[data-slot="segment-value"]')].map(n => n.textContent),
+        within(chip)
+          .getAllByTestId(segment('value'))
+          .map(n => n.textContent),
       ).toEqual(['xxx', 'yyy']);
-      expect(chip.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+      expect(within(chip).queryByTestId(segment('separator'))).not.toBeNull();
     });
 
     it('completes a paired chip when the Value operator is "is set" (no second value)', async () => {
@@ -1330,7 +1347,7 @@ describe('FilterInput', () => {
           },
         },
       ];
-      const { container } = render(<FilterInput fields={setValueFields} onChange={onChange} />);
+      render(<FilterInput data-testid='fi' fields={setValueFields} onChange={onChange} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Context Param'));
@@ -1341,13 +1358,15 @@ describe('FilterInput', () => {
 
       // One committed chip carrying both triplets; the second has no value segment.
       await waitFor(() => {
-        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        const chip = screen.queryByTestId(CHIP);
         expect(chip).not.toBeNull();
-        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+        expect(within(chip!).queryByTestId(segment('separator'))).not.toBeNull();
       });
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      const chip = screen.getByTestId(CHIP);
       expect(
-        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+        within(chip)
+          .getAllByTestId(segment('attribute'))
+          .map(n => n.textContent),
       ).toEqual(['Context Param', 'Value']);
       // Emits one paired condition: ctx_param = xxx AND ctx_value is_not_null
       // ("is set" maps to is_not_null).
@@ -1363,26 +1382,26 @@ describe('FilterInput', () => {
 
     it('reopens the operator menu in place for an attribute-only chip without removing it (AS-1179)', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={pairedFields} />);
+      const { container } = render(<FilterInput data-testid='fi' fields={pairedFields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Context Param'));
       // Operator menu is open; force-commit before choosing one → attribute-only chip.
       fireEvent.click(container.querySelector('[data-filter-input-inner]')!);
       await waitFor(() => {
-        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+        expect(screen.queryByTestId(CHIP)).not.toBeNull();
       });
 
       // Re-clicking "continues" the condition: the operator dropdown reopens and
       // the chip is edited in place — it must NOT be deleted.
-      await user.click(container.querySelector('[data-slot="segment-attribute"]')!);
+      await user.click(screen.getByTestId(segment('attribute')));
       expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+      expect(screen.queryByTestId(CHIP)).not.toBeNull();
     });
 
     it('resumes the value menu when an incomplete base chip is re-clicked (AS-1179)', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={pairedFields} />);
+      const { container } = render(<FilterInput data-testid='fi' fields={pairedFields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Context Param'));
@@ -1391,19 +1410,19 @@ describe('FilterInput', () => {
       // Leave the base value empty, then force-commit with an area click.
       fireEvent.click(container.querySelector('[data-filter-input-inner]')!);
       await waitFor(() => {
-        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+        expect(screen.queryByTestId(CHIP)).not.toBeNull();
       });
 
       // Re-clicking the incomplete chip must reopen the base VALUE menu (xxx),
       // not the operator/field menu.
-      await user.click(container.querySelector('[data-slot="segment-operator"]')!);
+      await user.click(screen.getByTestId(segment('operator')));
       expect(await findMenuitem(/^xxx$/)).toBeInTheDocument();
       expect(screen.queryByRole('menuitem', { name: 'Context Param' })).toBeNull();
     });
 
     it('keeps the base triplet when force-committed mid-pair and stays editable (AS-1179)', async () => {
       const user = userEvent.setup();
-      const { container } = render(<FilterInput fields={pairedFields} />);
+      const { container } = render(<FilterInput data-testid='fi' fields={pairedFields} />);
 
       await user.click(screen.getByRole('combobox'));
       await user.click(await findMenuitem('Context Param'));
@@ -1418,21 +1437,23 @@ describe('FilterInput', () => {
       // The base triplet must survive (not collapse to a broken `ctx_value`
       // standalone chip): one chip carrying both attributes and the base value.
       await waitFor(() => {
-        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        const chip = screen.queryByTestId(CHIP);
         expect(chip).not.toBeNull();
         expect(
-          [...chip!.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+          within(chip!)
+            .getAllByTestId(segment('attribute'))
+            .map(n => n.textContent),
         ).toEqual(['Context Param', 'Value']);
       });
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
+      const chip = screen.getByTestId(CHIP);
+      expect(within(chip).getAllByTestId(segment('value'))[0]!.textContent).toBe('xxx');
 
       // Re-clicking the paired operator targets the OPERATOR (AS-1192): a
       // targeted click edits the segment it lands on, exactly like a single
       // chip, so the operator menu opens rather than resuming into the value
       // step. (The paired "Value" label is the affordance for the zero-width
       // empty value.)
-      const operators = chip.querySelectorAll('[data-slot="segment-operator"]');
+      const operators = within(chip).getAllByTestId(segment('operator'));
       await user.click(operators[operators.length - 1]!);
       expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
     });

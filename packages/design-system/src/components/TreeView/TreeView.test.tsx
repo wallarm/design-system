@@ -130,7 +130,7 @@ describe('data-testid', () => {
       </TreeView>,
     );
 
-    expect(container.querySelector('[data-slot="tree-view"]')).not.toHaveAttribute('data-testid');
+    expect(container.querySelector('[data-testid]')).toBeNull();
   });
 });
 
@@ -160,8 +160,8 @@ describe('Analytics-readiness', () => {
 
 describe('Expand / collapse', () => {
   it('hides the group when closed', () => {
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem defaultOpen={false}>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -169,15 +169,12 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
-      'data-state',
-      'closed',
-    );
+    expect(screen.getByTestId('tv--group')).toHaveAttribute('data-state', 'closed');
   });
 
   it('toggles open state when the toggle is clicked', async () => {
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem defaultOpen={false}>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -185,8 +182,8 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
-    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+    const toggle = screen.getByTestId('tv--toggle');
+    const group = screen.getByTestId('tv--group');
 
     expect(group).toHaveAttribute('data-state', 'closed');
     await userEvent.click(toggle);
@@ -195,8 +192,8 @@ describe('Expand / collapse', () => {
 
   it('calls onOpenChange when toggled', async () => {
     const onOpenChange = rs.fn();
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem defaultOpen={false} onOpenChange={onOpenChange}>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -204,14 +201,14 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    const toggle = screen.getByTestId('tv--toggle');
     await userEvent.click(toggle);
     expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
   it('respects controlled open state', () => {
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem open>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -219,10 +216,7 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
-      'data-state',
-      'open',
-    );
+    expect(screen.getByTestId('tv--group')).toHaveAttribute('data-state', 'open');
   });
 });
 
@@ -277,8 +271,8 @@ describe('Selection', () => {
 
   it('does not select the row when the toggle is clicked', async () => {
     const onSelectionChange = rs.fn();
-    const { container } = render(
-      <TreeView selectable onSelectionChange={onSelectionChange}>
+    render(
+      <TreeView data-testid='tv' selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>
           Branch
           <TreeViewItem id='child'>Child</TreeViewItem>
@@ -286,7 +280,7 @@ describe('Selection', () => {
       </TreeView>,
     );
 
-    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    const toggle = screen.getByTestId('tv--toggle');
     await userEvent.click(toggle);
 
     expect(onSelectionChange).not.toHaveBeenCalled();
@@ -312,8 +306,8 @@ describe('Disabled', () => {
   });
 
   it('does not toggle a disabled branch and disables its toggle button', async () => {
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem defaultOpen={false} disabled>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -321,8 +315,8 @@ describe('Disabled', () => {
       </TreeView>,
     );
 
-    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLButtonElement;
-    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+    const toggle = screen.getByTestId('tv--toggle');
+    const group = screen.getByTestId('tv--group');
 
     expect(toggle).toBeDisabled();
     await userEvent.click(toggle);
@@ -332,8 +326,8 @@ describe('Disabled', () => {
 
 describe('Keyboard', () => {
   it('toggles a branch with ArrowRight / ArrowLeft', async () => {
-    const { container } = render(
-      <TreeView>
+    render(
+      <TreeView data-testid='tv'>
         <TreeViewItem defaultOpen={false}>
           Branch
           <TreeViewItem>Child</TreeViewItem>
@@ -342,7 +336,7 @@ describe('Keyboard', () => {
     );
 
     const branch = screen.getByText('Branch').closest('[role="treeitem"]') as HTMLElement;
-    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+    const group = screen.getByTestId('tv--group');
 
     branch.focus();
     await userEvent.keyboard('{ArrowRight}');

@@ -107,9 +107,7 @@ describe('FileUpload — rejections', () => {
     const { container } = render(<Uploader maxFiles={3} accept='.wasm' />);
     pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
     await waitFor(() => expect(screen.getAllByTestId('fu--item')).toHaveLength(2));
-    const replaceInputs = container.querySelectorAll<HTMLInputElement>(
-      '[data-slot="file-upload-item-replace-input"]',
-    );
+    const replaceInputs = screen.getAllByTestId('fu--item-replace-input');
     fireEvent.change(replaceInputs[0] as HTMLInputElement, {
       target: { files: [makeFile('evil.txt')] },
     });

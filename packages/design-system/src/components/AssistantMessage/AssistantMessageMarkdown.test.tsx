@@ -161,7 +161,7 @@ describe('AssistantMessageMarkdown — streaming snapshots', () => {
         </AssistantMessage>,
       );
       const clone = content().cloneNode(true) as HTMLElement;
-      for (const code of clone.querySelectorAll('code, pre, [data-slot=code-snippet-code]'))
+      for (const code of clone.querySelectorAll('code, pre, [data-testid="m--code-block"]'))
         code.remove();
       expect(clone.textContent, `prefix ${n}`).not.toMatch(/\*\*|`|\||\[[ x]\]/);
       for (const el of content().querySelectorAll('h1, h2, h3, h4, h5, h6, p, blockquote'))

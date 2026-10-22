@@ -45,7 +45,7 @@ describe('Chat', () => {
 
   it('renders an aria-hidden chat-palette background by default', () => {
     render(<Chat data-testid='chat' />);
-    const bg = screen.getByTestId('chat').firstElementChild;
+    const bg = screen.getByTestId('chat--background');
     expect(bg).toHaveAttribute('data-slot', 'chat-background');
     expect(bg).toHaveAttribute('aria-hidden', 'true');
     expect(bg).toHaveClass('opacity-5');
@@ -55,10 +55,10 @@ describe('Chat', () => {
 
   it('uses 12% opacity for strong and renders no background for none', () => {
     const { rerender } = render(<Chat data-testid='chat' background='strong' />);
-    expect(screen.getByTestId('chat').firstElementChild).toHaveClass('opacity-12');
+    expect(screen.getByTestId('chat--background')).toHaveClass('opacity-12');
 
     rerender(<Chat data-testid='chat' background='none' />);
-    expect(screen.getByTestId('chat').firstElementChild).toBeNull();
+    expect(screen.queryByTestId('chat--background')).toBeNull();
   });
 
   it('shows "Ask Wally" when the title has no children', () => {
@@ -260,10 +260,10 @@ describe('Chat', () => {
 
 describe('ChatTrigger', () => {
   it('names the button and the tooltip "Ask Wally" by default, or by label', async () => {
-    const { rerender } = render(<ChatTrigger />);
+    const { rerender } = render(<ChatTrigger data-testid='trigger' />);
     const button = screen.getByRole('button', { name: 'Ask Wally' });
     expect(button).toHaveAttribute('data-slot', 'chat-trigger');
-    expect(button.querySelector('[data-slot="wally-icon"]')).not.toBeNull();
+    expect(button).toContainElement(screen.getByTestId('trigger--icon'));
 
     await userEvent.hover(button);
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Ask Wally');

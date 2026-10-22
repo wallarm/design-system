@@ -192,7 +192,7 @@ describe('FilterCascade with typed, lazy items', () => {
     await userEvent.hover(await screen.findByText('Bravo'));
 
     expect(loadChildren).toHaveBeenCalledWith(expect.objectContaining({ uid: 'bravo' }), ['bravo']);
-    expect(document.querySelector('[data-slot=filter-cascade-level-loading]')).not.toBeNull();
+    expect(screen.getByTestId('scope--level-loading')).toBeInTheDocument();
     resolve();
     expect(await screen.findByText('Bravo checkout')).toBeInTheDocument();
     expect(screen.getByText('Applications')).toBeInTheDocument();
@@ -260,7 +260,7 @@ describe('FilterCascade search', () => {
     await open();
     await userEvent.type(await screen.findByRole('textbox', { name: 'Search Scope' }), 'golf');
 
-    const match = screen.getByText('Golf checkout').closest('[data-slot=filter-cascade-item]');
+    const match = screen.getByText('Golf checkout').closest('[data-testid=scope--item]');
     // The second line is where the match sits; the search list has no groups.
     expect(match).toHaveTextContent('Golf checkoutGolf');
     expect(screen.queryByText('Deployments')).not.toBeInTheDocument();
@@ -289,7 +289,7 @@ describe('FilterCascade search', () => {
     await open();
     await userEvent.type(await screen.findByRole('textbox', { name: 'Search Scope' }), 'cha');
     await userEvent.keyboard('{ArrowDown}');
-    expect(screen.getByText('Charlie').closest('[data-slot=filter-cascade-item]')).toHaveAttribute(
+    expect(screen.getByText('Charlie').closest('[data-testid=scope--item]')).toHaveAttribute(
       'data-highlighted',
     );
   });

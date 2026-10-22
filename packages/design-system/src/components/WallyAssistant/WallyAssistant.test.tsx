@@ -52,16 +52,12 @@ describe('WallyAssistant', () => {
       expect(screen.getByTestId('wally--suggestion-2')).toHaveTextContent(
         'Create a mitigation rule',
       );
-      expect(screen.getByTestId('wally').querySelector('[data-slot=chat-background]')).toHaveClass(
-        'opacity-12',
-      );
+      expect(screen.getByTestId('wally--background')).toHaveClass('opacity-12');
     });
 
     it('uses the subtle background once there are messages', () => {
       panel({ ...CONVERSATION });
-      expect(screen.getByTestId('wally').querySelector('[data-slot=chat-background]')).toHaveClass(
-        'opacity-5',
-      );
+      expect(screen.getByTestId('wally--background')).toHaveClass('opacity-5');
     });
 
     it('a pill calls onSuggestionSelect(item)', async () => {

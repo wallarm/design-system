@@ -27,12 +27,10 @@ afterEach(() => {
 const lastFiles = (spy: ReturnType<typeof rs.fn>) => spy.mock.lastCall?.[0] as File[] | undefined;
 
 const names = () => screen.getAllByTestId('fu--item-name').map(n => n.textContent);
-const replaceInput = (container: HTMLElement, index: number) =>
-  container.querySelectorAll<HTMLInputElement>('[data-slot="file-upload-item-replace-input"]')[
-    index
-  ] as HTMLInputElement;
-const replaceWith = (container: HTMLElement, index: number, file: File) =>
-  fireEvent.change(replaceInput(container, index), { target: { files: [file] } });
+const replaceWith = (index: number, file: File) =>
+  fireEvent.change(screen.getAllByTestId('fu--item-replace-input')[index] as HTMLInputElement, {
+    target: { files: [file] },
+  });
 
 describe('FileUpload — initial files go with the form', () => {
   it.each(['defaultValue', 'value'] as const)(
@@ -92,7 +90,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
     pick(container, a, b);
     await waitFor(() => expect(names()).toEqual(['a.wasm', 'b.wasm']));
     const edited = makeFile('a.wasm', 3, 'application/wasm', 2_000);
-    replaceWith(container, 0, edited);
+    replaceWith(0, edited);
     await waitFor(() => expect(lastFiles(onValueChange)?.[0]).toBe(edited));
     expect(lastFiles(onValueChange)?.[1]).toBe(b);
     await waitFor(() => expect(hiddenInput(container).files?.[0]).toBe(edited));
@@ -108,7 +106,7 @@ describe('FileUpload — multi-mode Replace with a copy of another listed file',
     pick(container, a, b);
     await waitFor(() => expect(names()).toEqual(['a.wasm', 'b.wasm']));
     const copyOfB = makeFile('b.wasm');
-    replaceWith(container, 0, copyOfB);
+    replaceWith(0, copyOfB);
     expect(await screen.findByTestId('fu--rejections')).toHaveTextContent('b.wasm — Already added');
     expect(names()).toEqual(['a.wasm', 'b.wasm']);
     expect(onFileReject).toHaveBeenLastCalledWith([{ file: copyOfB, errors: ['FILE_EXISTS'] }]);

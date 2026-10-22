@@ -205,8 +205,9 @@ describe.skip('FilterInputOperatorMenu', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      const { container } = render(
+      render(
         <FilterInputOperatorMenu
+          data-testid='operator-menu'
           fieldType='string'
           onSelect={rs.fn()}
           open={true}
@@ -214,16 +215,21 @@ describe.skip('FilterInputOperatorMenu', () => {
         />,
       );
 
-      const menu = container.querySelector('[data-slot="filter-operator-menu"]');
+      const menu = screen.getByTestId('operator-menu');
       expect(menu).toHaveClass('custom-class');
     });
 
     it('has correct base styling', () => {
-      const { container } = render(
-        <FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />,
+      render(
+        <FilterInputOperatorMenu
+          data-testid='operator-menu'
+          fieldType='string'
+          onSelect={rs.fn()}
+          open={true}
+        />,
       );
 
-      const menu = container.querySelector('[data-slot="filter-operator-menu"]');
+      const menu = screen.getByTestId('operator-menu');
       expect(menu).toHaveClass('w-64', 'bg-white', 'rounded-xl');
     });
   });

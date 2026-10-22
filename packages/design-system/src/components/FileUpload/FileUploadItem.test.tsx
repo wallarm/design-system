@@ -183,9 +183,7 @@ describe('FileUpload — row actions', () => {
     const { container } = render(<Uploader maxFiles={3} accept='.wasm' />);
     pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
     await waitForRows(2);
-    const replaceInputs = container.querySelectorAll<HTMLInputElement>(
-      '[data-slot="file-upload-item-replace-input"]',
-    );
+    const replaceInputs = screen.getAllByTestId('fu--item-replace-input');
     fireEvent.change(replaceInputs[0] as HTMLInputElement, {
       target: { files: [makeFile('c.wasm')] },
     });
@@ -199,9 +197,7 @@ describe('FileUpload — row actions', () => {
     );
     pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
     await waitForRows(2);
-    const replaceInputs = container.querySelectorAll<HTMLInputElement>(
-      '[data-slot="file-upload-item-replace-input"]',
-    );
+    const replaceInputs = screen.getAllByTestId('fu--item-replace-input');
     fireEvent.change(replaceInputs[0] as HTMLInputElement, {
       target: { files: [makeFile('evil.txt')] },
     });

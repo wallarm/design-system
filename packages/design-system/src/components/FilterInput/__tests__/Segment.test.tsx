@@ -10,8 +10,12 @@ describe('Segment', () => {
     });
 
     it('applies correct styling', () => {
-      const { container } = render(<Segment variant='attribute'>Test</Segment>);
-      const p = container.querySelector('[data-slot="segment-attribute"] p');
+      render(
+        <Segment data-testid='segment' variant='attribute'>
+          Test
+        </Segment>,
+      );
+      const p = screen.getByTestId('segment').querySelector('p');
       expect(p).toHaveClass('text-sm', 'font-normal', 'text-text-primary');
     });
   });
@@ -23,8 +27,12 @@ describe('Segment', () => {
     });
 
     it('applies correct styling', () => {
-      const { container } = render(<Segment variant='operator'>contains</Segment>);
-      const p = container.querySelector('[data-slot="segment-operator"] p');
+      render(
+        <Segment data-testid='segment' variant='operator'>
+          contains
+        </Segment>,
+      );
+      const p = screen.getByTestId('segment').querySelector('p');
       expect(p).toHaveClass('text-sm', 'font-normal', 'text-text-secondary');
     });
   });
@@ -36,19 +44,23 @@ describe('Segment', () => {
     });
 
     it('applies correct styling', () => {
-      const { container } = render(<Segment variant='value'>United States</Segment>);
-      const p = container.querySelector('[data-slot="segment-value"] p');
+      render(
+        <Segment data-testid='segment' variant='value'>
+          United States
+        </Segment>,
+      );
+      const p = screen.getByTestId('segment').querySelector('p');
       expect(p).toHaveClass('text-sm', 'font-medium', 'text-text-info');
     });
   });
 
   it('applies custom className', () => {
-    const { container } = render(
-      <Segment variant='attribute' className='custom-class'>
+    render(
+      <Segment data-testid='segment' variant='attribute' className='custom-class'>
         Test
       </Segment>,
     );
-    const segment = container.querySelector('[data-slot="segment-attribute"]');
+    const segment = screen.getByTestId('segment');
     expect(segment).toHaveClass('custom-class');
   });
 

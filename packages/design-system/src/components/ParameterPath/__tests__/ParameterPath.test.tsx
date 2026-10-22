@@ -55,14 +55,10 @@ describe('ParameterPath', () => {
   });
 
   it('shows zap icon on highlighted segment when attack=true', () => {
-    const { container } = render(
-      <ParameterPath segments={['JSON', 'nginx_config']} attack data-testid='pp' />,
-    );
-    expect(
-      container.querySelector(
-        '[data-slot="parameter-path-segment"][data-variant="highlighted"] svg',
-      ),
-    ).toBeTruthy();
+    render(<ParameterPath segments={['JSON', 'nginx_config']} attack data-testid='pp' />);
+    const highlighted = screen.getByTestId('pp--segment-1');
+    expect(highlighted).toHaveAttribute('data-variant', 'highlighted');
+    expect(highlighted.querySelector('svg')).toBeTruthy();
   });
 
   it('skips encoding when not provided', () => {
@@ -239,7 +235,7 @@ describe('ParameterPath expandable', () => {
 
 describe('ParameterPath copy', () => {
   it('overrides clipboard text with formatAsFilter on copy event', () => {
-    const { container } = render(
+    render(
       <ParameterPath
         method='POST'
         segments={['JSON', 'nginx_config']}
@@ -252,7 +248,7 @@ describe('ParameterPath copy', () => {
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
 
-    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+    screen.getByTestId('pp').dispatchEvent(event);
 
     expect(setData).toHaveBeenCalledWith(
       'text/plain',
@@ -263,7 +259,7 @@ describe('ParameterPath copy', () => {
 
   it('uses custom copyFormat callback when provided', () => {
     const copyFormat = rs.fn(() => 'CUSTOM');
-    const { container } = render(
+    render(
       <ParameterPath
         method='GET'
         segments={['query', 'filter']}
@@ -274,7 +270,7 @@ describe('ParameterPath copy', () => {
     const setData = rs.fn();
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
-    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+    screen.getByTestId('pp').dispatchEvent(event);
 
     expect(copyFormat).toHaveBeenCalledWith({
       method: 'GET',
@@ -286,13 +282,11 @@ describe('ParameterPath copy', () => {
 
   it('falls through to native copy when copyFormat returns an empty string', () => {
     const copyFormat = rs.fn(() => '');
-    const { container } = render(
-      <ParameterPath segments={['a']} copyFormat={copyFormat} data-testid='pp' />,
-    );
+    render(<ParameterPath segments={['a']} copyFormat={copyFormat} data-testid='pp' />);
     const setData = rs.fn();
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
-    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+    screen.getByTestId('pp').dispatchEvent(event);
 
     expect(copyFormat).toHaveBeenCalled();
     expect(setData).not.toHaveBeenCalled();
@@ -308,17 +302,15 @@ describe('ParameterPath edge cases', () => {
   });
 
   it('does not render zap when attack=true but there are no segments', () => {
-    const { container } = render(<ParameterPath segments={[]} attack data-testid='pp' />);
-    expect(container.querySelector('[data-slot="parameter-path-segment"] svg')).toBeNull();
+    render(<ParameterPath segments={[]} attack data-testid='pp' />);
+    expect(screen.queryAllByTestId(/^pp--segment/)).toHaveLength(0);
   });
 
   it('renders single segment as highlighted with attack zap', () => {
-    const { container } = render(
-      <ParameterPath method='GET' segments={['only']} attack data-testid='pp' />,
-    );
-    const seg = container.querySelector('[data-slot="parameter-path-segment"]');
+    render(<ParameterPath method='GET' segments={['only']} attack data-testid='pp' />);
+    const seg = screen.getByTestId('pp--segment-0');
     expect(seg).toHaveAttribute('data-variant', 'highlighted');
-    expect(seg?.querySelector('svg')).toBeTruthy();
+    expect(seg.querySelector('svg')).toBeTruthy();
   });
 
   it('cascades data-testid to method, encoding, and ellipsis sub-components', () => {

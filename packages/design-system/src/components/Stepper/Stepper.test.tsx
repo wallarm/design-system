@@ -169,7 +169,7 @@ describe('Stepper', () => {
       expect(screen.getByTestId(`ps--item-${i}--separator`)).toBeInTheDocument();
     }
     expect(screen.queryByTestId('ps--item-3--separator')).toBeNull();
-    expect(document.querySelectorAll('[data-slot="stepper-separator"]')).toHaveLength(3);
+    expect(document.querySelectorAll('[data-testid$="--separator"]')).toHaveLength(3);
   });
 
   it('gives every indicator status its own padding, the upcoming one net of its border', () => {

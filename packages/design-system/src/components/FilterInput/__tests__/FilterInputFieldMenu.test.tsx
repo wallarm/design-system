@@ -288,8 +288,9 @@ describe.skip('FilterInputFieldMenu', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      const { container } = render(
+      render(
         <FilterInputFieldMenu
+          data-testid='field-menu'
           fields={mockFields}
           onSelect={rs.fn()}
           open={true}
@@ -297,16 +298,21 @@ describe.skip('FilterInputFieldMenu', () => {
         />,
       );
 
-      const menu = container.querySelector('[data-slot="filter-input-field-menu"]');
+      const menu = screen.getByTestId('field-menu');
       expect(menu).toHaveClass('custom-class');
     });
 
     it('has correct base styling', () => {
-      const { container } = render(
-        <FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />,
+      render(
+        <FilterInputFieldMenu
+          data-testid='field-menu'
+          fields={mockFields}
+          onSelect={rs.fn()}
+          open={true}
+        />,
       );
 
-      const menu = container.querySelector('[data-slot="filter-input-field-menu"]');
+      const menu = screen.getByTestId('field-menu');
       expect(menu).toHaveClass('w-80', 'bg-white', 'rounded-xl');
     });
   });

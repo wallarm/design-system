@@ -3,6 +3,7 @@ import { createRef } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { TestIdProvider } from '../../../utils/testId';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
 import { FilterInputChip, FilterInputConnectorChip } from '../FilterInputField';
@@ -51,7 +52,9 @@ const mockContextValue: FilterInputContextValue = {
 };
 
 const FilterInputWrapper = ({ children }: { children: ReactNode }) => (
-  <FilterInputProvider value={mockContextValue}>{children}</FilterInputProvider>
+  <FilterInputProvider value={mockContextValue}>
+    <TestIdProvider value='fi'>{children}</TestIdProvider>
+  </FilterInputProvider>
 );
 
 describe('FilterInputChip', () => {
@@ -70,9 +73,9 @@ describe('FilterInputChip', () => {
   });
 
   it('applies custom className', () => {
-    const { container } = render(<FilterInputChip attribute='Test' className='custom-class' />);
+    render(<FilterInputChip data-testid='chip' attribute='Test' className='custom-class' />);
 
-    const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+    const chip = screen.queryByTestId('chip');
     expect(chip).toHaveClass('custom-class');
   });
 
@@ -107,9 +110,9 @@ describe('FilterInputChip', () => {
   it('does not show delete button when onRemove is not provided', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(<FilterInputChip attribute='Test' />);
+    render(<FilterInputChip data-testid='chip' attribute='Test' />);
 
-    const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+    const chip = screen.queryByTestId('chip');
     await user.hover(chip!);
 
     const deleteButton = screen.queryByRole('button', { name: /remove filter/i });
@@ -118,26 +121,33 @@ describe('FilterInputChip', () => {
 
   describe('error state', () => {
     it('applies error styling when error is true', () => {
-      const { container } = render(<FilterInputChip attribute='Test' error={true} />);
+      render(<FilterInputChip data-testid='chip' attribute='Test' error={true} />);
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      const chip = screen.queryByTestId('chip');
       expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');
     });
 
     it('applies normal styling when error is false', () => {
-      const { container } = render(<FilterInputChip attribute='Test' error={false} />);
+      render(<FilterInputChip data-testid='chip' attribute='Test' error={false} />);
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      const chip = screen.queryByTestId('chip');
       expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
     });
 
     // An errored chip is red when idle, but while the user is editing it (fixing
     // it) the red is suppressed so editing reads cleanly (AS-1179).
     it('suppresses error styling while the chip is being edited', () => {
-      const { container, rerender } = render(
-        <FilterInputChip chipId='chip-0' attribute='Status' operator='is' value='' error='value' />,
+      const { rerender } = render(
+        <FilterInputChip
+          data-testid='chip'
+          chipId='chip-0'
+          attribute='Status'
+          operator='is'
+          value=''
+          error='value'
+        />,
       );
-      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
+      const chip = () => screen.queryByTestId('chip');
       expect(chip()).toHaveClass('border-border-danger');
 
       rerender(
@@ -151,6 +161,7 @@ describe('FilterInputChip', () => {
           onSegmentEditBlur={() => {}}
         >
           <FilterInputChip
+            data-testid='chip'
             chipId='chip-0'
             attribute='Status'
             operator='is'
@@ -189,11 +200,10 @@ describe('FilterInputConnectorChip', () => {
   });
 
   it('applies normal styling', () => {
-    const { container } = render(
-      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={rs.fn()} />,
-      { wrapper: FilterInputWrapper },
-    );
-    const chip = container.querySelector('[data-slot="filter-input-connector-chip"]');
+    render(<FilterInputConnectorChip variant='and' chipId='c-1' onChange={rs.fn()} />, {
+      wrapper: FilterInputWrapper,
+    });
+    const chip = screen.queryByTestId('fi--connector-chip');
     expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
   });
 });
@@ -218,8 +228,8 @@ describe('FilterInputChip building mode', () => {
   });
 
   it('does not have hover/remove functionality', () => {
-    const { container } = render(<FilterInputChip building attribute='Test' />);
-    const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+    render(<FilterInputChip data-testid='chip' building attribute='Test' />);
+    const chip = screen.queryByTestId('chip');
     fireEvent.mouseEnter(chip!);
 
     const deleteButton = screen.queryByRole('button', { name: /remove filter/i });
@@ -244,16 +254,21 @@ describe('FilterInputChip building mode', () => {
     });
 
     it('lifts the cap on a standalone chip and caps a paired chip at 500px (AS-1064)', () => {
-      const { container, rerender } = render(
-        <FilterInputChip attribute='Context Param' operator='is' value='header' />,
+      const { rerender } = render(
+        <FilterInputChip
+          data-testid='chip'
+          attribute='Context Param'
+          operator='is'
+          value='header'
+        />,
       );
-      const chip = () =>
-        container.querySelector('[data-slot="filter-input-condition-chip"]') as HTMLElement | null;
+      const chip = () => screen.queryByTestId('chip');
       // Standalone: the chip grows (the value segment carries the 500px cap).
       expect(chip()?.style.maxWidth).toBe('none');
 
       rerender(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='header'
@@ -265,8 +280,9 @@ describe('FilterInputChip building mode', () => {
     });
 
     it('caps the base value in a paired chip so a long key cannot hog the row (AS-1179)', () => {
-      const { container } = render(
+      render(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='averylongcontextparameterkey'
@@ -275,7 +291,7 @@ describe('FilterInputChip building mode', () => {
       );
       // The first value segment is the base "key"; it is capped at 90px max and sizes
       // to content, shrinking when space is tight so all segments remain visible.
-      const baseValue = container.querySelector('[data-slot="segment-value"]');
+      const baseValue = screen.getAllByTestId('chip--value')[0];
       expect(baseValue?.className).toContain('max-w-[90px]');
       expect(baseValue?.className).toContain('shrink');
     });
@@ -283,8 +299,9 @@ describe('FilterInputChip building mode', () => {
     it('makes the fixed "Value" label clickable and resumes at the first missing pair segment (AS-1179/AS-1192)', async () => {
       const user = userEvent.setup();
       const onPairSegmentClick = rs.fn();
-      const { container, rerender } = render(
+      const { rerender } = render(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='header'
@@ -295,7 +312,7 @@ describe('FilterInputChip building mode', () => {
       // Second attribute segment = the paired "Value" label. With its operator/
       // value segments empty (unclickable), it must itself be interactive so the
       // user can resume the second part.
-      const pairAttr = () => container.querySelectorAll('[data-slot="segment-attribute"]')[1]!;
+      const pairAttr = () => screen.getAllByTestId('chip--attribute')[1]!;
       expect(pairAttr()).toHaveAttribute('role', 'button');
       // No pair operator yet → resume at the operator, not the value (AS-1192).
       await user.click(pairAttr());
@@ -304,6 +321,7 @@ describe('FilterInputChip building mode', () => {
       // Operator chosen but value still missing → resume at the value (AS-1179).
       rerender(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='header'
@@ -317,6 +335,7 @@ describe('FilterInputChip building mode', () => {
       // A complete pair keeps the label non-interactive.
       rerender(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='header'
@@ -328,15 +347,16 @@ describe('FilterInputChip building mode', () => {
     });
 
     it('renders the whole chip as errored when only the paired triplet errors (AS-1179)', () => {
-      const { container } = render(
+      render(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='xxx'
           pair={{ attribute: 'Value', operator: 'is', value: '', error: 'value' }}
         />,
       );
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      const chip = screen.queryByTestId('chip');
       // Container reflects the pair error even though the base triplet is valid.
       expect(chip?.className).toContain('border-border-danger');
     });
@@ -347,8 +367,9 @@ describe('FilterInputChip building mode', () => {
       // A placeholder value segment must render and be clickable to resume entry.
       const user = userEvent.setup();
       const onSegmentClick = rs.fn();
-      const { container } = render(
+      render(
         <FilterInputChip
+          data-testid='chip'
           attribute='Application ID'
           operator='is'
           value=''
@@ -356,7 +377,7 @@ describe('FilterInputChip building mode', () => {
           onSegmentClick={onSegmentClick}
         />,
       );
-      const valueSeg = container.querySelector('[data-slot="segment-value"]');
+      const valueSeg = screen.queryByTestId('chip--value');
       expect(valueSeg).not.toBeNull();
       expect(valueSeg).toHaveAttribute('role', 'button');
       await user.click(valueSeg!);
@@ -364,15 +385,16 @@ describe('FilterInputChip building mode', () => {
     });
 
     it('renders the separator as aria-hidden and non-interactive', () => {
-      const { container } = render(
+      render(
         <FilterInputChip
+          data-testid='chip'
           attribute='Context Param'
           operator='is'
           value='xxx'
           pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
         />,
       );
-      const separator = container.querySelector('[data-slot="segment-separator"]');
+      const separator = screen.queryByTestId('chip--separator');
       expect(separator).toBeInTheDocument();
       expect(separator).toHaveAttribute('aria-hidden');
     });

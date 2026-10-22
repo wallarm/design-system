@@ -683,8 +683,7 @@ describe('Groups, hint and width', () => {
     render(<Harness />);
     await userEvent.click(trigger());
     const option = await screen.findByTestId('option-lua');
-    const hint = option.querySelector('[data-slot="select-option-hint"]');
-    expect(hint).toHaveTextContent('12');
+    expect(within(option).getByTestId('type-filter--option-hint')).toHaveTextContent('12');
   });
 
   it('pins the menu width while a query is active and releases it when cleared', async () => {
@@ -876,19 +875,17 @@ describe('Menu layout', () => {
     await userEvent.click(trigger());
     const input = within(await screen.findByTestId('type-filter--search')).getByRole('combobox');
     await userEvent.type(input, 'zzz');
-    const emptyState = screen
-      .getByTestId('type-filter--empty')
-      .querySelector('[data-slot="empty-state"]');
-    expect(emptyState?.className).toContain('w-full');
-    expect(emptyState?.className).toContain('max-w-240');
-    expect(emptyState?.className).not.toContain('w-[240px]');
+    const emptyState = within(screen.getByTestId('type-filter--empty')).getByRole('status');
+    expect(emptyState.className).toContain('w-full');
+    expect(emptyState.className).toContain('max-w-240');
+    expect(emptyState.className).not.toContain('w-[240px]');
   });
 
   it('tightens the gap under the search to Figma’s 4px + row gap', async () => {
     render(<Harness items={many} />);
     await userEvent.click(trigger());
     const search = await screen.findByTestId('type-filter--search');
-    expect(search.closest('[data-slot="filter-dropdown-search"]')?.className).toContain('-mb-3');
+    expect(search.closest('.-mb-3')).not.toBeNull();
   });
 });
 

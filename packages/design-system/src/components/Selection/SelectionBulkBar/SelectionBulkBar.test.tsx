@@ -48,7 +48,7 @@ const AnalyticsToolbar = () => {
 
   return (
     <SelectionBulkBar placement='absolute'>
-      <BulkBarSummary>
+      <BulkBarSummary data-testid='bulk-summary'>
         <BulkBarSummaryCount count={selectedIds.size} />
         <HStack gap={6}>
           <BulkBarSummarySelectAll
@@ -151,8 +151,8 @@ describe('Analytics composition', () => {
     const selectAll = screen.getByTestId('bulk-select-all');
     const action = screen.getByTestId('bulk-delete');
 
-    const summary = selectAll.closest('[data-slot="bulk-bar-summary"]');
-    expect(summary).not.toBeNull();
+    const summary = screen.getByTestId('bulk-summary');
+    expect(summary).toContainElement(selectAll);
     expect(summary).not.toContainElement(action);
   });
 
