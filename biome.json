@@ -16,6 +16,7 @@
       "**/.storybook/**/*",
       "*.json",
       "!**/dist",
+      "!**/__fixtures__",
       "!**/node_modules",
       "!**/storybook-static",
       "!**/*.gen.ts",
