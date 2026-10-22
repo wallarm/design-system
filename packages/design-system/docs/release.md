@@ -1,27 +1,27 @@
-# Release Process
+# Release
 
-> This file previously described a Changesets-based, manually-triggerable release
-> flow (`pnpm changeset`, a `workflow_dispatch` "release type" input, dev/alpha/beta/rc
-> branch tags, `.changeset/config.json`). None of that exists in this repo — it was
-> never implemented, or was replaced without this doc being updated. The real process
-> is documented once, at the monorepo root, to avoid this drifting again:
+`@wallarm-org/design-system` is released automatically by `semantic-release` from [Conventional Commits](https://www.conventionalcommits.org/) and follows [SemVer](https://semver.org/).
 
-- **[../../../RELEASE.md](../../../RELEASE.md)** — full release workflow, branch strategy, RC versions, screenshot updates
-- **[../../../VERSIONING.md](../../../VERSIONING.md)** — SemVer policy, Conventional Commits, commit-type-to-bump mapping
-- **[../../../.github/workflows/main.yml](../../../.github/workflows/main.yml)** — the CI/CD pipeline that runs the release
+## Stable versions
 
-## Quick summary (design-system specifics)
+Every merge to `main` with a `feat`, `fix`, `perf`, `revert` or breaking-change commit publishes a new version under the `latest` tag:
 
-`@wallarm-org/design-system` is released by `semantic-release`, driven entirely by
-Conventional Commits — there is no manual changeset or version-bump step:
+```bash
+npm install @wallarm-org/design-system@latest
+```
 
-- Push to a `feature/*`, `feat/*` or `fix/*` branch → an RC version is published automatically,
-  e.g. `1.0.0-rc.my-branch.1` under the npm dist-tag `rc-my-branch`
-- Merge to `main` → the `release` job in `.github/workflows/main.yml` runs
-  `semantic-release`, which determines the version bump from commit types and
-  publishes to npm with the `latest` tag, plus a GitHub release
+Release notes: [CHANGELOG.md](https://github.com/wallarm/design-system/blob/main/packages/design-system/CHANGELOG.md) and [GitHub Releases](https://github.com/wallarm/design-system/releases). Breaking (major) releases ship a migration for [`@wallarm-org/migrator`](https://github.com/wallarm/design-system/blob/main/packages/migrator/README.md).
 
-Required secret: `NPM_TOKEN` (see [RELEASE.md](../../../RELEASE.md) for setup).
+## Release candidates
 
-`@wallarm-org/playground` (the app under `apps/playground`) is `"private": true` and
-is never published.
+Pushes to `feature/*`, `feat/*` and `fix/*` branches publish RC versions like `1.1.0-rc-feature-button.1` (the branch name with `/` and `_` replaced by `-`). Install them by exact version:
+
+```bash
+npm view @wallarm-org/design-system versions --json | tail
+npm install @wallarm-org/design-system@1.1.0-rc-feature-button.1
+```
+
+## More
+
+- [RELEASE.md](https://github.com/wallarm/design-system/blob/main/RELEASE.md) — full release process, RC format, CI requirements
+- [VERSIONING.md](https://github.com/wallarm/design-system/blob/main/VERSIONING.md) — SemVer policy and commit format
