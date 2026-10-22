@@ -30,8 +30,7 @@ export const parseExamples = (
 
   for (const storiesPath of findStoryFiles(project, dir)) {
     const sourceFile =
-      project.getSourceFile(storiesPath) ??
-      storiesProject.addSourceFileAtPathIfExists(storiesPath);
+      project.getSourceFile(storiesPath) ?? storiesProject.addSourceFileAtPathIfExists(storiesPath);
     if (!sourceFile) continue;
 
     const descriptions = collectDescriptions(sourceFile);
