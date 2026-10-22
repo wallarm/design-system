@@ -30,6 +30,31 @@ describe('stripJsx', () => {
   });
 });
 
+describe('stripJsx bounds', () => {
+  it('keeps inline code with a tag', () => {
+    const src = 'Pass `<Button>` and `</Button>` here.';
+    expect(stripJsx(src)).toBe(src);
+  });
+
+  it('does not swallow prose after an unclosed inline `<Button`', () => {
+    const src = 'Use `<Button` for actions.\n\nSecond paragraph.\n\nWhen a > b holds.';
+    expect(stripJsx(src)).toBe(src);
+  });
+
+  it('ignores > inside a quoted attribute', () => {
+    expect(stripJsx("x <Badge text='a > b' /> y")).toBe('x  y');
+  });
+
+  it('keeps an unterminated tag as text', () => {
+    const src = 'before <Foo bar={1 and never closed';
+    expect(stripJsx(src)).toBe(src);
+  });
+
+  it('keeps children between tags', () => {
+    expect(stripJsx('<Tabs>inner text</Tabs>')).toBe('inner text');
+  });
+});
+
 describe('stripPageContent', () => {
   it('keeps heading offsets pointing at the same text', () => {
     const content = "<StoryPreview name='A'>\nUsage\nbody <Explorer name='B' />\nProps\nrest";

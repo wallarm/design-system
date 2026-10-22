@@ -1,31 +1,62 @@
 import type { RspressPlugin } from '@rspress/core';
 
-/** Remove JSX component tags (`<Name ...>`, `<Name ... />`, `</Name>`) and their attributes. */
+/**
+ * Remove every capitalised JSX tag (`<Name ...>`, `<Name ... />`, `</Name>`) together with its
+ * attributes, not just StoryPreview/Explorer/TokenTable: any component's attributes are index
+ * noise. Children between an opening and closing tag are kept as text.
+ *
+ * Inline code spans (`` `<Button>` ``) are left untouched. A tag scan that reaches a blank line
+ * outside quotes and braces is abandoned and the text kept as-is, so a stray `<Name` in prose
+ * can never swallow the paragraphs up to some later `>`.
+ */
 export function stripJsx(content: string): string {
-  const withoutClosing = content.replace(/<\/[A-Z][\w.]*\s*>/g, '');
   let out = '';
   let i = 0;
-  while (i < withoutClosing.length) {
-    if (withoutClosing[i] !== '<' || !/[A-Z]/.test(withoutClosing[i + 1] ?? '')) {
-      out += withoutClosing[i++];
+  while (i < content.length) {
+    const c = content[i];
+    if (c === '`') {
+      const end = content.indexOf('`', i + 1);
+      const stop = end === -1 ? i + 1 : end + 1;
+      out += content.slice(i, stop);
+      i = stop;
+      continue;
+    }
+    if (c !== '<') {
+      out += c;
+      i++;
+      continue;
+    }
+    const closing = /^<\/[A-Z][\w.]*\s*>/.exec(content.slice(i, i + 200));
+    if (closing) {
+      i += closing[0].length;
+      continue;
+    }
+    if (!/[A-Z]/.test(content[i + 1] ?? '')) {
+      out += c;
+      i++;
       continue;
     }
     // Scan to the tag's closing `>`, ignoring any inside `{...}` or quotes.
     let depth = 0;
     let quote = '';
     let j = i + 1;
-    for (; j < withoutClosing.length; j++) {
-      const ch = withoutClosing[j];
+    for (; j < content.length; j++) {
+      const ch = content[j];
       if (quote) {
         if (ch === quote) quote = '';
       } else if (ch === "'" || ch === '"' || ch === '`') quote = ch;
       else if (ch === '{') depth++;
       else if (ch === '}') depth--;
       else if (ch === '>' && depth === 0) break;
+      else if (ch === '\n' && content[j + 1] === '\n' && depth <= 0) {
+        j = content.length;
+        break;
+      }
     }
-    if (j >= withoutClosing.length) {
-      // Unterminated: keep as text rather than swallow the rest of the page.
-      out += withoutClosing[i++];
+    if (j >= content.length) {
+      // Unterminated or runaway: keep the `<` as text and carry on after it.
+      out += c;
+      i++;
     } else i = j + 1;
   }
   return out;
