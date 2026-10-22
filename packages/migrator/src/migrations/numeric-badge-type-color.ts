@@ -1,4 +1,10 @@
-import { findComponentElements, getAttribute, hasSpread, readStaticString } from '../lib/jsx';
+import {
+  findComponentElements,
+  getAttribute,
+  hasSpread,
+  readStaticString,
+  replaceStaticString,
+} from '../lib/jsx';
 import type { Migration } from '../lib/types';
 
 const MAP: Record<string, [type: string, color: string]> = {
@@ -36,11 +42,9 @@ export const migration: Migration = {
         continue;
       }
       const [type, color] = MAP[value] as [string, string];
-      const text = typeAttr.getText();
-      const q = text.match(/['"`]/)?.[0] ?? "'";
-      typeAttr.replaceWithText(
-        `${text.replace(`${q}${value}${q}`, `${q}${type}${q}`)} color=${q}${color}${q}`,
-      );
+      const q = typeAttr.getText().match(/['"]/)?.[0] ?? "'";
+      replaceStaticString(typeAttr, type);
+      typeAttr.replaceWithText(`${typeAttr.getText()} color=${q}${color}${q}`);
     }
   },
 };

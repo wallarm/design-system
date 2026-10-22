@@ -36,6 +36,12 @@ describe('numeric-badge-type-color', () => {
     );
   });
 
+  it('template-literal type gets a quoted color', () => {
+    expect(run('<NumericBadge type={`brand`} />').code).toBe(
+      `${IMPORT}<NumericBadge type={\`solid\`} color='brand' />`,
+    );
+  });
+
   it('no type: unchanged, no report', () => {
     const r = run('<NumericBadge>3</NumericBadge>');
     expect(r.code).toBe(`${IMPORT}<NumericBadge>3</NumericBadge>`);
