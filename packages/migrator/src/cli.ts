@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import pkg from '../package.json';
 import { listCandidateFiles } from './lib/files';
 import { REPORT_FILE, renderReport } from './lib/report';
 import { runMigrations } from './lib/runner';
@@ -50,6 +49,8 @@ export async function main(
   argv: string[],
   cwd: string,
   versions: VersionsFile,
+  // Passed in (read at runtime by index.ts): a bundled package.json import would freeze the pre-release version.
+  version: string,
   // biome-ignore lint/suspicious/noConsole: CLI output
   io: IO = { log: console.log, error: console.error },
 ): Promise<number> {
@@ -71,7 +72,7 @@ export async function main(
       return 0;
     }
     if (values.version) {
-      io.log(pkg.version);
+      io.log(version);
       return 0;
     }
     if (values.from === undefined) throw new UsageError('--from is required');

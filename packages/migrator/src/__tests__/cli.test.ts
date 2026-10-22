@@ -11,7 +11,7 @@ let dir: string;
 let out: string[];
 let err: string[];
 const io = { log: (s: string) => out.push(s), error: (s: string) => err.push(s) };
-const run = (...args: string[]) => main(args, dir, versions, io);
+const run = (...args: string[]) => main(args, dir, versions, pkg.version, io);
 const read = (f: string) => fs.readFileSync(path.join(dir, f), 'utf8');
 const write = (f: string, c: string) => {
   fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true });
@@ -122,5 +122,10 @@ describe('main', () => {
     out = [];
     expect(await run('--version')).toBe(0);
     expect(out.join('\n')).toContain(pkg.version);
+  });
+
+  it('--version prints the version passed at runtime', async () => {
+    expect(await main(['--version'], dir, versions, '9.9.9', io)).toBe(0);
+    expect(out).toEqual(['9.9.9']);
   });
 });
