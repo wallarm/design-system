@@ -1,8 +1,8 @@
 import './reactAriaPolyfill';
 
 import { useLayoutEffect } from 'react';
-import { BrowserOnly, useDark } from '@rspress/core/runtime';
-import type { RootProps } from '@rspress/core/theme';
+import { BrowserOnly, useDark, usePage } from '@rspress/core/runtime';
+import { EditLink as OriginalEditLink, type RootProps } from '@rspress/core/theme-original';
 import { DateFormatProvider } from '@wallarm-org/design-system/DateFormatProvider';
 import { ThemeProvider, useTheme } from '@wallarm-org/design-system/ThemeProvider';
 import { Toaster } from '@wallarm-org/design-system/Toast';
@@ -15,6 +15,15 @@ function ThemeSync() {
   const { setTheme } = useTheme();
   useLayoutEffect(() => setTheme(dark ? 'dark' : 'light'), [dark, setTheme]);
   return null;
+}
+
+// Generated pages have no source file under apps/docs/docs to edit; component pages link Source.
+const GENERATED = ['/foundations/tokens', '/get-started/changelog'];
+
+export function EditLink(props: Parameters<typeof OriginalEditLink>[0]) {
+  const { routePath } = usePage().page;
+  if (routePath.startsWith('/components/') || GENERATED.includes(routePath)) return null;
+  return <OriginalEditLink {...props} />;
 }
 
 export function Root({ children }: RootProps) {

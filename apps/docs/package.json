@@ -12,8 +12,8 @@
   "author": "Wallarm",
   "type": "module",
   "scripts": {
-    "dev": "rspress dev",
-    "build": "rspress build",
+    "dev": "tsx scripts/generate.ts && rspress dev",
+    "build": "tsx scripts/generate.ts && rspress build",
     "preview": "rspress preview",
     "lint": "biome check",
     "test": "rstest watch",

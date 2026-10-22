@@ -31,13 +31,18 @@ export default defineConfig({
     llmsUI: { viewOptions: ['markdownLink', 'chatgpt', 'claude'] },
   },
   // Rspress skips its own pluginReact because the shared config already has one (with React Compiler).
-  builderConfig: mergeRsbuildConfig(rsbuildConfig, {
-    // Not Rspress `head`: its tuple form can't carry inline script content.
-    html: { tags: [{ tag: 'script', children: THEME_SCRIPT, head: true, append: false }] },
-    tools: {
-      postcss: { postcssOptions: { plugins: postcssConfig.plugins } },
-      // Resolve DS imports to packages/design-system/src.
-      rspack: { resolve: { conditionNames: ['development', '...'] } },
+  // Only the shared plugins: its CircularDependencyRspackPlugin(failOnError) trips on existing
+  // cycles in DS source (Table, FilterInput), which the site bundles from src.
+  builderConfig: mergeRsbuildConfig(
+    { plugins: rsbuildConfig.plugins },
+    {
+      // Not Rspress `head`: its tuple form can't carry inline script content.
+      html: { tags: [{ tag: 'script', children: THEME_SCRIPT, head: true, append: false }] },
+      tools: {
+        postcss: { postcssOptions: { plugins: postcssConfig.plugins } },
+        // Resolve DS imports to packages/design-system/src.
+        rspack: { resolve: { conditionNames: ['development', '...'] } },
+      },
     },
-  }),
+  ),
 });

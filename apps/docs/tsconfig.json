@@ -5,5 +5,5 @@
     "customConditions": ["development"],
     "allowJs": true
   },
-  "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx"]
+  "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx", "scripts"]
 }
