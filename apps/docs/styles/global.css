@@ -97,3 +97,19 @@ html.rp-dark {
 [data-slot='search-sections'] {
     display: none;
 }
+
+/* Home blur background (theme/HomeHero.tsx): the pastel palette is light-only, so dim it in dark
+   mode; the frame's white fill is made transparent so the page background shows through. */
+[data-slot='home-blur'] .lg-frame {
+    background: transparent;
+}
+
+html.rp-dark [data-slot='home-blur'] {
+    opacity: 0.12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-slot='home-blur'] .lg-blob {
+        animation: none !important;
+    }
+}
