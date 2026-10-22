@@ -89,7 +89,7 @@ Rspress' dark mode toggles a class on `<html>`. The site's theme switch must als
 - Analytics — how consumer `data-*` / `aria-*` / `id` / `ref` / handlers reach the real interactive node (source `docs/metrics/contract.md`, consumer-facing parts only).
 
 **Foundations** **(call)**
-- Tokens — generated from `components.json` tokens / `src/theme/*.css`. Excludes nothing, but `--color-syntax-*` mappings are shown read-only (code-managed).
+- Tokens — generated from `components.json` tokens / `src/theme/*.css`. Each row offers copy-to-clipboard for the variable name and its value, and color tokens show a swatch painted with `var(<token>)` so it reflects the active theme **(user, 2026-10-22)**. The `.md`/llms output stays a plain Markdown table. Excludes nothing, but `--color-syntax-*` mappings are shown read-only (code-managed).
 - Icons — searchable gallery generated from `src/icons/index.ts`, plus import/size/color usage.
 
 **Components** — one page per component folder (~114), grouped by the existing Storybook categories (fix the "Data display"/"Data Display" duplicate).

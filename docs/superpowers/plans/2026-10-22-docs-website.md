@@ -395,3 +395,33 @@ Runs after Task 6, before Task 7.
 - [ ] **Step 3: Implement** with the ts-morph AST.
 - [ ] **Step 4: Run** the same command — expected: PASS. Then `pnpm --filter @wallarm-org/design-system generate-metadata` and `jq '[.components[].examples[] | select(.code | test("sb-annotation"))] | length' packages/design-system/dist/metadata/components.json` — expected: `0`, or only non-children cases, listed in the report.
 - [ ] **Step 5: Commit** `feat(metadata): omit storybook annotation labels from example code`
+
+---
+
+### Task 12: Interactive tokens table (user request, 2026-10-22)
+
+Runs after Task 7.
+
+**Files:**
+- Create: `apps/docs/theme/components/TokenTable.tsx` (named + default export; registered in `markdown.globalComponents`)
+- Modify: `apps/docs/scripts/render.ts` (`renderTokensPage`), `apps/docs/scripts/generate.ts` (write `docs/foundations/tokens.mdx` instead of `tokens.md`; update `apps/docs/.gitignore`), `apps/docs/rspress.config.ts`
+- Test: `apps/docs/scripts/__tests__/render.test.ts`, `apps/docs/theme/components/__tests__/TokenTable.test.tsx`
+
+**Interfaces:**
+- `TokenTable({ tokens, children }: { tokens: { name: string; value: string }[]; children: ReactNode })`:
+  - In SSG_MD it returns `<>{children}</>`. `children` is the Markdown table the generator emits, so `.md`/llms and search keep plain text.
+  - Otherwise it renders a table with columns Token | Value | Preview. Token and Value each get a copy-to-clipboard affordance. Use the DS `Copyable` / click-to-copy component if its API fits (check `packages/design-system/src/components/Copyable/index.ts` and its stories), else DS `Button` + `navigator.clipboard.writeText`. Copy text: the name is copied as-is (`--color-bg-page-bg`), the value verbatim.
+  - Preview shows a swatch only for color tokens: `isColorToken(name, value)` is true when `name` starts with `--color-` or `value` matches `/^(#|rgb|hsl|oklch|oklab|lab|lch|color-mix\()/i`. The swatch is a small bordered square with inline `style={{ background: `var(${name})` }}` (site code; it follows the active theme).
+- `isColorToken(name: string, value: string): boolean` is exported from `TokenTable.tsx` for tests.
+- `renderTokensPage(tokens)` now emits, per category, `## <name>`, the syntax note where applicable, then `<TokenTable tokens={<JSON.stringify(tokens)>}>` + a blank line + the existing Markdown table + a blank line + `</TokenTable>`. Token JSON must be MDX-safe: `JSON.stringify` output inside `{…}` is a valid JS expression, and `<`/`{` inside strings are fine within an expression, but escape U+2028/U+2029.
+
+- [ ] **Step 1: Write failing tests:**
+  - `isColorToken`: `('--color-bg-page-bg','#fff')` → true; `('--spacing-8','8px')` → false; `('--shadow-sm','0 1px 2px rgb(0 0 0 / 5%)')` → false (name isn't `--color-` and the value doesn't start with a color function); `('--x','oklch(0.7 0.1 200)')` → true.
+  - `TokenTable renders only markdown in md output` (mock `@rspress/core/runtime`, `rs.stubEnv('SSG_MD','true')`) → only the children text.
+  - `TokenTable renders swatch for color tokens`: rendering with `[{name:'--color-a', value:'#000'}, {name:'--spacing-8', value:'8px'}]` gives exactly one element with inline background `var(--color-a)`.
+  - `renderTokensPage wraps tables in TokenTable`: the output contains `<TokenTable tokens={[` and still contains `| Token | Value |`.
+- [ ] **Step 2: Run** `pnpm --filter @wallarm-org/docs test:run` — expected: FAIL.
+- [ ] **Step 3: Implement.**
+- [ ] **Step 4: Run** tests — expected: PASS. Then `pnpm turbo run build --filter=@wallarm-org/docs...` — expected: success; `doc_build/foundations/tokens.md` contains `| Token | Value |` and no `TokenTable`.
+- [ ] **Step 5: Manual check** in `preview` at `/design-system/foundations/tokens`: copying a name and a value works; color swatches change when dark mode is toggled.
+- [ ] **Step 6: Commit** `feat(docs): copyable tokens with color swatches`
