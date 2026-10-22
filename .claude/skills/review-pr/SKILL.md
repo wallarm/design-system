@@ -87,7 +87,7 @@ Provide a structured review with:
 
 Run quality checks:
 ```bash
-pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.app.json --noEmit  # `pnpm typecheck` currently checks nothing
+pnpm --filter @wallarm-org/design-system typecheck
 pnpm lint
 pnpm test:run
 ```

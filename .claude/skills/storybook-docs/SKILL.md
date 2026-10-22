@@ -381,7 +381,7 @@ Then check the things that actually go wrong: every story has a description; the
 description doesn't restate the story name; nothing contradicts the props table
 just below; no sentence spills past the budget. `pnpm lint:fix` and
 `pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.storybook.json --noEmit`
-after **every** file, not per batch — `pnpm typecheck` does not reach story files, and
+after **every** file, not per batch (faster than the full `typecheck`, which also covers app, figma and e2e) —
 a broken story file only shows up as `Unable to index …` in Storybook's output.
 
 **Two things to look at rather than read**, both covered above: are the annotation

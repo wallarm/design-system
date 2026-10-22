@@ -132,6 +132,6 @@ export { {ComponentName}, type {ComponentName}Props } from './components/{Compon
 2. Implement the actual styling and behavior
 3. If the component is interactive, satisfy the analytics-readiness contract: element-specific typing on each target, `{...rest}` pass-through to the real node, event composition, no analytics-specific props. Walk [`docs/metrics/new-component-checklist.md`](../../../docs/metrics/new-component-checklist.md) and, if the component is wrapper-level or has a closed-target gap, record it in the component folder (test comments or an `ANALYTICS_GAPS.md`).
 4. Add proper Storybook stories showing all variants (and, for interactive components, a story that shows where `data-analytics-id` goes)
-5. Run `pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.app.json --noEmit` to verify no type errors (`pnpm typecheck` currently checks nothing)
+5. Run `pnpm --filter @wallarm-org/design-system typecheck` to verify no type errors
 6. Run `pnpm lint` to verify linting passes
 7. Suggest writing tests (unit and/or E2E) based on component complexity — for interactive components, include the metrics tests from [`docs/metrics/testing-examples.md`](../../../docs/metrics/testing-examples.md)
