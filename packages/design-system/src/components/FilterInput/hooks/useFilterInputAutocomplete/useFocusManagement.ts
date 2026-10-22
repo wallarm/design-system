@@ -98,6 +98,14 @@ export const useFocusManagement = ({
         if ((editingSegment != null || !focusStaysInside) && blurCommitRef.current?.()) {
           setIsFocused(false);
           related?.focus();
+          // Focus left the component: the commit chain's resetState(continueBuilding)
+          // reopened the field menu and refocused our input (body = stayed inside).
+          // Honor the outside click like the freeform path below (AS-882) —
+          // otherwise the field menu pops open and focus ping-pongs across rAFs.
+          if (!focusStaysInside) {
+            setMenuState('closed');
+            if (document.activeElement === inputRef.current) inputRef.current?.blur();
+          }
           return;
         }
         // Focus stayed inside with nothing to commit (e.g. a building

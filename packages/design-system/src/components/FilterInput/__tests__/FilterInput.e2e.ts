@@ -220,6 +220,13 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
       await page.getByRole('menuitem', { name: new RegExp(`^${key}$`) }).click();
+      // zag fires onSelect in a microtask and stashAndAdvance isn't flushed
+      // synchronously, so the paired half ("<key> ; Value") renders after the
+      // click resolves. Wait for the paired label so callers never measure or
+      // hit the narrower pre-transition chip.
+      await expect(
+        getChip(page).getByTestId('filter-input--condition-chip--attribute').nth(1),
+      ).toBeVisible();
     }
 
     // Build a complete chip "Context Param is <key> ; Value is <value>".

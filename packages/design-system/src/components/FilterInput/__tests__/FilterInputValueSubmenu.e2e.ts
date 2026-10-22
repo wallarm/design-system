@@ -168,6 +168,9 @@ test.describe('Component: FilterInput', () => {
       await expect(chip.getByTestId('filter-input--condition-chip--value')).toHaveText(
         'Code execution via SQLi, Union-based SQLi',
       );
+      // Outside click closes every menu and leaves the field unfocused (resting border).
+      await expect(page.getByRole('menu')).toHaveCount(0);
+      await expect(field.getByRole('combobox')).not.toBeFocused();
       await expect(field).toHaveScreenshot('nested-group-chip-partial-list.png');
     });
   });
