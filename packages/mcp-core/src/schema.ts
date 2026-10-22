@@ -30,6 +30,10 @@ export const exampleMetadataSchema = z.object({
   name: z.string(),
   code: z.string(),
   description: z.string().optional(),
+  /** Relative to packages/design-system/src/components, posix. */
+  storyFile: z.string().optional(),
+  /** `meta.title` of the story file. */
+  storyTitle: z.string().optional(),
 });
 
 export type ExampleMetadata = z.infer<typeof exampleMetadataSchema>;
