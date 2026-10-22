@@ -15,6 +15,7 @@
     "dev": "tsx scripts/generate.ts && rspress dev",
     "build": "tsx scripts/generate.ts && rspress build",
     "preview": "rspress preview",
+    "preview:local": "DOCS_SITE_ORIGIN=http://localhost:4173 pnpm run build && rspress preview --port 4173",
     "lint": "biome check",
     "test": "rstest watch",
     "test:run": "rstest run",

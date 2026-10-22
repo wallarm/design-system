@@ -9,24 +9,32 @@ AI assistant, or let it fetch the documentation itself.
 
 ## llms.txt
 
-- [`llms.txt`](https://wallarm.github.io/design-system/llms.txt): an index of every page, with
+- <a href="/design-system/llms.txt"><code>llms.txt</code></a>: an index of every page, with
   its title, description and a link to its Markdown version. Give it to an assistant that can
   follow links.
-- [`llms-full.txt`](https://wallarm.github.io/design-system/llms-full.txt): the whole site in one
+- <a href="/design-system/llms-full.txt"><code>llms-full.txt</code></a>: the whole site in one
   Markdown file. Paste or attach it when the assistant cannot fetch links.
 
 ## Markdown pages
 
 Every page has a Markdown twin at the same path with a `.md` extension. For example, the Button
 page is at
-[`https://wallarm.github.io/design-system/components/button.md`](https://wallarm.github.io/design-system/components/button.md).
+<a href="/design-system/components/button.md"><code>https://wallarm.github.io/design-system/components/button.md</code></a>.
 
 At the top of each page, the copy button copies the page as Markdown, and its menu opens the
 Markdown link or starts a ChatGPT or Claude conversation about the page.
 
 ## components.json
 
-[`components.json`](https://wallarm.github.io/design-system/components.json) is the metadata the
+<a href="/design-system/components.json"><code>components.json</code></a> is the metadata the
 [MCP server](/ai/mcp) serves, as one JSON file: every component with its props, variants,
 sub-components and import path, plus the design tokens. It describes the version this site was built from; the copy inside
 your installed package, `@wallarm-org/design-system/metadata`, matches the version you use.
+
+## Check it locally
+
+`llms.txt`, `llms-full.txt`, the `.md` pages and `components.json` exist only in a production
+build, not in `rspress dev`. To see them with local URLs, run `pnpm --filter @wallarm-org/docs
+preview:local`. It builds the site with `DOCS_SITE_ORIGIN=http://localhost:4173` and serves it at
+`http://localhost:4173/design-system/`. A plain `build` keeps the production origin,
+`https://wallarm.github.io`.

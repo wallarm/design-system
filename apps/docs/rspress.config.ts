@@ -10,7 +10,8 @@ const dir = import.meta.dirname;
 export default defineConfig({
   root: 'docs',
   base: '/design-system/',
-  siteOrigin: 'https://wallarm.github.io',
+  // Only affects absolute URLs in llms.txt / llms-full.txt. `preview:local` overrides it.
+  siteOrigin: process.env.DOCS_SITE_ORIGIN ?? 'https://wallarm.github.io',
   title: 'Wallarm Design System',
   description: 'React components, tokens and AI tooling for Wallarm products',
   llms: true,
