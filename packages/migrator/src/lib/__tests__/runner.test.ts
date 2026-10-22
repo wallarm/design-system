@@ -153,6 +153,24 @@ describe('migrateSource markers', () => {
     );
   });
 
+  it('a marker on an inner element in an attribute does not suppress the outer one', () => {
+    const everyAvatar = {
+      id: 'x',
+      title: 'x',
+      transform: (f: SourceFile, ctx: MigrationContext) => {
+        for (const el of f.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement))
+          ctx.report(el, 'm');
+      },
+    };
+    const inner = `<Avatar ${mark('x', 'm')} />`;
+    const r = migrateSource({
+      text: src(`<Avatar icon={${inner}} />`),
+      fileName: 'a.tsx',
+      migrations: [everyAvatar],
+    });
+    expect(r.code).toBe(src(`<Avatar ${mark('x', 'm')} icon={${inner}} />`));
+  });
+
   it('sanitizes */ and newlines in messages', () => {
     const r = migrateSource({
       text: src('<Avatar />'),

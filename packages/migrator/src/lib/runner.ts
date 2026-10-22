@@ -29,6 +29,12 @@ function markerTarget(node: Node): JsxElementLike | undefined {
       );
 }
 
+/** Text between the tag name and the first attribute (or tag end): where markers live. */
+function markerRegion(el: JsxElementLike): string {
+  const end = el.getAttributes()[0]?.getStart() ?? el.getEnd();
+  return el.getSourceFile().getFullText().slice(el.getTagNameNode().getEnd(), end);
+}
+
 /**
  * Applies migrations to one file's text, no fs. Each report also gets an in-code
  * `@wds-migration(<id>): <message>` comment marker right after the element's tag name,
@@ -67,7 +73,7 @@ function applyMigrations(
       report: (node, message) => {
         manual.push({ line: node.getStartLineNumber(), migrationId: migration.id, message });
         const el = markerTarget(node);
-        if (el && !pending.has(el) && !el.getText().includes(token)) pending.set(el, message);
+        if (el && !pending.has(el) && !markerRegion(el).includes(token)) pending.set(el, message);
       },
     });
     // Positions are read after the transform's edits; insert from the end so earlier ones stay valid.

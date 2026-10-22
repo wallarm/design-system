@@ -12,10 +12,16 @@ for (const id of fs.readdirSync(root)) {
     const migration = migrations.find(m => m.id === id);
     it('is a registered migration', () => expect(migration).toBeDefined());
     if (!migration) return;
-    const cases = fs
-      .readdirSync(path.join(root, id))
-      .filter(f => f.endsWith('.input.tsx'))
-      .map(f => f.replace('.input.tsx', ''));
+    const files = fs.readdirSync(path.join(root, id));
+    const names = (kind: string) =>
+      files.filter(f => f.endsWith(`.${kind}.tsx`)).map(f => f.slice(0, -`.${kind}.tsx`.length));
+    const cases = names('input');
+
+    it('has only paired <case>.input.tsx / <case>.output.tsx files', () => {
+      expect(cases.length).toBeGreaterThan(0);
+      expect(files.filter(f => !/\.(input|output)\.tsx$/.test(f))).toEqual([]);
+      expect(names('output').sort()).toEqual([...cases].sort());
+    });
 
     for (const name of cases) {
       it(name, () => {
