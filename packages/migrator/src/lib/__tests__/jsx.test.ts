@@ -41,6 +41,11 @@ describe('findComponentElements', () => {
     expect(findComponentElements(f, 'Avatar')).toHaveLength(1);
   });
 
+  it('supports namespace imports from the component subpath', () => {
+    const f = createTestFile(`import * as Av from '${DS}/Avatar'; const x = <Av.Avatar />;`);
+    expect(findComponentElements(f, 'Avatar')).toHaveLength(1);
+  });
+
   it('ignores local components', () => {
     const f = createTestFile(
       `import { Avatar } from './Avatar'; import { Button } from '${DS}'; const x = <Avatar />;`,

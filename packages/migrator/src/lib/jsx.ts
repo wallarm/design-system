@@ -36,7 +36,7 @@ function localTagNames(file: SourceFile, component: string): Set<string> {
       }
     }
     const ns = decl.getNamespaceImport();
-    if (ns && spec === DS_PACKAGE) names.add(`${ns.getText()}.${component}`);
+    if (ns) names.add(`${ns.getText()}.${component}`);
   }
   return names;
 }
