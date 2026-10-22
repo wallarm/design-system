@@ -68,8 +68,13 @@ export const dropEdgeGridLines = ({
   let cachedAxis: YAxis | null = null;
 
   return (props: GridLineTypeFunctionProps): ReactElement<SVGElement> => {
-    const { offset, x1, x2, y1, y2, key, index: _index, yAxis, ...rest } = props;
-    const line = asSvgElement(createElement('line', { ...rest, x1, x2, y1, y2 }));
+    const { offset, x1, x2, y1, y2, key, yAxis, stroke, strokeDasharray } = props;
+    // `props` also carries every `<CartesianGrid>` prop and recharts' layout state
+    // (`xAxis`, `horizontalPoints`, …) — spreading it would put them on the DOM `<line>`.
+    // Forward only what `LineChartGrid` styles the line with, as recharts' own line does.
+    const line = asSvgElement(
+      createElement('line', { x1, x2, y1, y2, stroke, strokeDasharray, fill: 'none' }),
+    );
 
     if (typeof y1 !== 'number' || !yAxis) return line;
     if (cachedAxis !== yAxis) {
