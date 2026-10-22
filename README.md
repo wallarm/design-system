@@ -18,9 +18,6 @@ pnpm dev
 
 # Start Storybook
 pnpm storybook
-
-# Start Design System dev server
-pnpm design-system:dev
 ```
 
 ### Build
@@ -61,14 +58,18 @@ pnpm e2e:docker:update -- packages/design-system/src/components/Example/Example.
 ## 📁 Project Structure
 
 ```
-wallarm-design-system/
+design-system/
 ├── apps/
 │   └── playground/          # Playground application (Rsbuild + React)
 ├── packages/
 │   ├── design-system/       # Core design system library
+│   ├── mcp/                 # MCP server for AI assistants
+│   ├── mcp-core/            # Shared MCP metadata types and schemas
+│   ├── migrator/            # Migration CLI for consumer upgrades
 │   └── configs/             # Shared configurations
-│       ├── eslint-config/   # ESLint configuration
+│       ├── biome-config/    # Biome lint/format configuration
 │       ├── playwright-config/ # Playwright test configuration
+│       ├── publishing/      # Shared semantic-release configuration
 │       ├── rsbuild-config/  # Rsbuild bundler configuration
 │       ├── tailwind-config/ # Tailwind CSS configuration
 │       ├── typescript-config/ # TypeScript configuration
@@ -89,7 +90,11 @@ wallarm-design-system/
 **Packages:**
 
 - `@wallarm-org/design-system` - Core design system library with React components and Storybook documentation
-- `@wallarm-org/eslint-config` - Shared ESLint configurations
+- `@wallarm-org/mcp` - MCP server that gives AI assistants component metadata, props, variants, and design tokens
+- `@wallarm-org/mcp-core` - Shared types and Zod schemas for MCP metadata (bundled into `@wallarm-org/mcp`, not published)
+- `@wallarm-org/migrator` - Codemod CLI that migrates consumer apps across design-system breaking changes
+- `@wallarm-org/biome-config` - Shared Biome lint/format configuration
+- `@wallarm-org/publish-scripts` - Shared semantic-release configuration
 - `@wallarm-org/typescript-config` - Shared TypeScript configurations
 - `@wallarm-org/playwright-config` - Shared Playwright test configurations
 - `@wallarm-org/rstest-config` - Shared Rstest test configurations
@@ -116,22 +121,21 @@ wallarm-design-system/
 - **Storybook v10** - Component documentation and development
 - **Rstest** - Rspack-based unit testing framework
 - **Playwright** - Cross-browser E2E testing
-- **ESLint + Prettier** - Code quality and formatting
+- **Biome** - Linting and formatting
 - **Husky** - Git hooks for code quality
 - **Figma Code Connect** - Design-to-code synchronization
 
 ### CI/CD
 
 - **GitHub Actions** - Automated CI/CD pipelines
-- **Docker** - Multi-stage `Dockerfile`s for manual/local builds and Docker Compose dev setup (not built or published by CI)
-- **Docker Compose** - Local development environment
+- **Docker** - `Dockerfile`s and `docker-compose.local.yml` for manual/local use (not built or published by CI)
 - **GitHub Pages** - Static hosting for Storybook documentation
 
 ## 🤖 AI Automation
 
-The project features an advanced AI agent system for development automation:
+Specialized agents and slash-command skills are described in [CLAUDE.md → Agent System](./CLAUDE.md#-agent-system).
 
-### Commands
+### Commit triggers
 
 ```bash
 # Update screenshots via commit
@@ -139,19 +143,14 @@ git commit -m "fix: button styles [update-screenshots]"
 
 # Skip E2E tests via commit
 git commit -m "docs: update readme [skip-e2e]"
-
-# AI assistants available via triggers:
-/design-system component Card    # Design System component
-/test e2e checkout               # E2E tests
-/ci workflow deploy              # CI/CD workflow
 ```
 
 ## 📚 Documentation
 
-- **[CLAUDE.md](./CLAUDE.md)** - AI assistant instructions
-- **[AGENTS.md](./AGENTS.md)** - Agent system and routing
+- **[CLAUDE.md](./CLAUDE.md)** - AI assistant instructions and agent routing (`AGENTS.md` is a symlink to it)
 - **[.claude/agents/](./.claude/agents/)** - Specialized AI agents
-- **[VERSIONING.md](./VERSIONING.md)** - Versioning strategy and release process
+- **[RELEASE.md](./RELEASE.md)** - Release process (stable, RC, screenshots)
+- **[VERSIONING.md](./VERSIONING.md)** - SemVer and commit format
 
 ## 🔧 Useful Commands
 
@@ -160,7 +159,6 @@ git commit -m "docs: update readme [skip-e2e]"
 ```bash
 pnpm dev              # Start all applications
 pnpm storybook        # Design system Storybook
-pnpm design-system:dev # Design system dev server
 ```
 
 ### Testing
@@ -184,9 +182,9 @@ pnpm storybook        # Run Storybook development server
 ### Code Quality
 
 ```bash
-pnpm lint             # ESLint check
-pnpm lint:fix         # ESLint auto-fix
-pnpm format           # Prettier formatting
+pnpm lint             # Biome check
+pnpm lint:fix         # Biome check --fix
+pnpm format           # Biome format
 pnpm typecheck        # TypeScript type checking
 ```
 
@@ -208,6 +206,8 @@ branch strategy (RC versions on `feature/*`/`feat/*`/`fix/*`, production release
 
 ### Local Development
 
+Docker E2E runs against Storybook on the host (`host.docker.internal:6006`), so start `pnpm storybook` first.
+
 ```bash
 # E2E tests in Docker
 pnpm e2e:docker
@@ -216,12 +216,11 @@ pnpm e2e:docker
 pnpm e2e:docker:update
 ```
 
-### Production
+### Docker images (manual, not used by CI)
+
+`docker-compose.local.yml` services are all behind profiles and are started by the `e2e:docker` scripts above. The `Dockerfile`s are not maintained and are out of date with the workspace (e.g. they still copy the removed `eslint-config` package), so these builds currently fail:
 
 ```bash
-# Using docker-compose for local development
-docker-compose -f docker-compose.local.yml up
-
 # Build individual images
 docker build -f packages/design-system/Dockerfile -t wallarm-design-system .
 docker build -f apps/playground/Dockerfile -t wallarm-playground .
@@ -229,44 +228,14 @@ docker build -f apps/playground/Dockerfile -t wallarm-playground .
 
 ## 🚦 CI/CD Pipeline
 
-Comprehensive GitHub Actions pipeline with multiple stages:
-
-### Pipeline Jobs
-
-`check-pr-title` runs in a separate workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml)), triggered on pull request open/edit. Everything else runs in [`main.yml`](./.github/workflows/main.yml), triggered on push to any branch:
-
-1. **setup** - Node.js/pnpm setup, dependency caching, screenshot update detection
-2. **quality** - Parallel lint, typecheck, and unit tests
-3. **build** - Builds all packages and Storybook static output, uploads as GitHub Actions artifacts (no Docker image is built or pushed)
-4. **e2e** - Cross-browser testing (Chromium), sharded 3-way, run inside the public `mcr.microsoft.com/playwright` container
-5. **unit-test-report** / **e2e-report** - Publish JUnit test results
-6. **e2e-update-screenshots** - Sharded visual baseline regeneration, triggered by `[update-screenshots]` or manual dispatch
-7. **commit-screenshots** - Commits updated screenshots back to the branch
-8. **deploy-storybook** - Deploys the Storybook static artifact to GitHub Pages
-9. **release** - Runs `semantic-release` for `@wallarm-org/design-system` and (conditionally) `@wallarm-org/mcp`, publishing to npm
-
-### Features
-
-- **Parallel Execution** - Quality checks and E2E tests run in parallel
-- **Sharded Testing** - E2E tests split into 3 shards for faster execution
-- **Smart Caching** - Dependencies cached across all workflow runs
-- **Auto Screenshot Updates** - Commit with `[update-screenshots]` to update visual snapshots
-- **E2E Skip Trigger** - Commit with `[skip-e2e]` to skip E2E tests when needed
-- **E2E Optimization** - Skips E2E tests for bot screenshot commits and when no E2E-relevant files changed (`E2E_PATHS` in `main.yml`: src, configs, dependency versions)
-- **Deployment**: Storybook documentation published to GitHub Pages at `https://wallarm.github.io/wallarm-design-system/`. There is no Docker image build/push step in CI today — the `Dockerfile`s under `packages/design-system/` and `apps/playground/` are for manual/local use only (see [🐳 Docker](#-docker) below).
-
-### Environment
-
-- **Node.js**: v24+
-- **pnpm**: v10.33.2
-- **Playwright**: v1.63.0
+GitHub Actions runs lint, typecheck, unit tests, build, and sharded E2E on every push; `main` also deploys Storybook to [GitHub Pages](https://wallarm.github.io/design-system/). semantic-release publishes to npm (stable from `main`, RCs from `feature/*`/`feat/*`/`fix/*`). Jobs and triggers: [CLAUDE.md → Pipeline Jobs](./CLAUDE.md#pipeline-jobs); secrets: [RELEASE.md → Requirements](./RELEASE.md#requirements).
 
 ## 🤝 Contributing
 
 1. Clone the repository
 2. Install dependencies: `pnpm install`
 3. Create feature branch: `git checkout -b feature/amazing-feature`
-4. Follow code conventions (ESLint + Prettier)
+4. Follow code conventions (Biome: `pnpm lint`)
 5. Add tests for new functionality
 6. Create Pull Request
 

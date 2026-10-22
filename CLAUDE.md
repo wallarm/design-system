@@ -28,7 +28,6 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 2. **Component Tests**: Required for all UI components
 3. **E2E Tests**: Required for critical user flows
 4. **Visual Tests**: Screenshot tests for UI components
-5. **Coverage**: Maintain >80% code coverage
 
 ### Commit Conventions
 
@@ -60,18 +59,34 @@ This project **enforces** [Conventional Commits](https://www.conventionalcommits
 
 Special triggers:
 
-- `[update-screenshots]` - Triggers automatic screenshot updates in CI/CD pipeline on main branch
+- `[update-screenshots]` - Regenerates visual baselines in CI and commits them back to the branch (works on any branch)
 - `[skip-e2e]` - Skips E2E tests execution when included in commit message
 
 ## 🤖 Agent System
 
-For complex domain-specific tasks, use specialized agents through routing in [AGENTS.md](./AGENTS.md):
+> `AGENTS.md` is a symlink to this file — edit `CLAUDE.md` only.
 
-- **Design System Agent** (`/design-system`) - Component development, Storybook
-- **Test Agent** (`/test`) - Testing strategies, coverage
-- **CI/CD Agent** (`/ci`) - Pipeline optimization, deployment
+For complex domain-specific tasks, use the specialized agents defined in [`.claude/agents/`](./.claude/agents/):
 
-**Detailed agent instructions are in [.claude/agents/](./.claude/agents/) directory.**
+| Agent | Use for | File |
+|-------|---------|------|
+| `component-architect` | Designing a new compound component: API, sub-component tree, context, primitives, a11y model | [`component-architect.md`](./.claude/agents/component-architect.md) |
+| `design-system` | Creating/modifying components, variants, Storybook stories, Tailwind/CVA styling, tokens | [`design-system.md`](./.claude/agents/design-system.md) |
+| `test` | Rstest unit/component tests and Playwright E2E (visual, interaction, a11y) per `docs/e2e-test-rules.md` | [`test.md`](./.claude/agents/test.md) |
+| `ci` | GitHub Actions failures, build/test time, semantic-release, sharded E2E, deployment | [`ci.md`](./.claude/agents/ci.md) |
+
+New compound component workflow: `component-architect` → `design-system` → `test`.
+
+### Skills (Slash Commands)
+
+| Command | Description |
+|---------|-------------|
+| `/new-component` | Scaffold a new design system component |
+| `/review-pr` | Review a pull request for quality and compliance |
+| `/new-migration` | Write the `@wallarm-org/migrator` migration for a breaking change |
+| `/metrics-audit` | Audit a component against the analytics-readiness contract |
+| `/storybook-docs` | Write or level up a component's Storybook Overview page |
+| `/vestige-audit` | Remove docs/configs/scripts the branch made obsolete — required before `gh pr create` (enforced by a hook in `.claude/settings.json`) |
 
 ## 🔧 Key Configuration Files
 
@@ -80,8 +95,8 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 - `.github/workflows/main.yml` - Main CI/CD pipeline
 - `.github/pr-title-checker-config.json` - PR title validation config
 - `docker-compose.local.yml` - Local Docker setup
-- `packages/*/Dockerfile` - Service Docker configurations
-- `mcp.json` - MCP agent configuration
+- `packages/design-system/Dockerfile`, `apps/playground/Dockerfile` - Docker images for manual/local use (not built by CI)
+- `.mcp.json` - MCP server configuration
 
 ### Environment Variables
 
@@ -103,8 +118,8 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 1. Use code splitting and lazy loading
 2. Optimize bundle sizes
 3. Implement proper caching strategies
-4. Use React.memo for expensive components
-5. Virtualize long lists
+4. Virtualize long lists
+5. Don't hand-memoize (`React.memo`, `useMemo`, `useCallback`) — React Compiler does it
 
 ### Security
 
@@ -154,59 +169,34 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 7. ✅ Wait for the E2E job's Storybook readiness check (an HTTP polling loop, not a Docker `services:` health check) before assuming the container is ready
 8. ✅ Run quality checks (lint, typecheck, test) in parallel
 
-## 📈 Performance & Quality Goals
-
-### Performance Metrics
-
-- Bundle size < 200KB gzipped
-- First Contentful Paint < 1.5s
-- Time to Interactive < 3s
-- Test execution < 5 minutes
-- CI/CD pipeline < 10 minutes
-
-### Code Quality Metrics
-
-- TypeScript coverage: 100%
-- Test coverage: >80%
-- Zero ESLint errors
-- Zero TypeScript errors
-- Accessibility score: >90
-
 ## 📚 Documentation References
 
 - **[README.md](./README.md)** - Project overview and quick start
 - **[.github/workflows/main.yml](./.github/workflows/main.yml)** - CI/CD pipeline implementation
 
-## 🚦 CI/CD Pipeline Structure
+## 🚦 CI/CD Pipeline
 
 ### Pipeline Jobs
 
-`check-pr-title` and `require-migration` live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else below is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch:
+`check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
-1. **setup** - Manages dependencies, caching, and screenshot update detection
-2. **quality** - Parallel lint, typecheck, and unit test execution
-3. **build** - Builds all packages and the Storybook static site, uploaded as GitHub Actions artifacts — **no Docker image is built or pushed here**
-4. **e2e** - Sharded testing (3 shards) for Storybook components, run inside the public `mcr.microsoft.com/playwright` container
-5. **unit-test-report** / **e2e-report** - Publish JUnit test results
-6. **e2e-update-screenshots** - Auto-updates visual snapshots on main branch (sharded)
-7. **commit-screenshots** - Commits updated screenshots back to the branch
-8. **deploy-storybook** - Deploys the Storybook static artifact to GitHub Pages
-9. **release** - Runs `semantic-release` to publish `@wallarm-org/design-system`/`@wallarm-org/mcp`/`@wallarm-org/migrator` to npm (see [VERSIONING.md](./VERSIONING.md))
+1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
+2. **quality** - Lint (Biome), typecheck and Rstest unit tests in parallel
+3. **build** - Builds all packages and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
+4. **e2e** - 3 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/iframe.html`
+5. **unit-test-report** / **e2e-report** - Publish JUnit results
+6. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
+7. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run
+8. **deploy-storybook** - On `main`: deploys the `storybook-static` artifact to GitHub Pages (https://wallarm.github.io/design-system/)
+9. **release** - `semantic-release` for `@wallarm-org/design-system`, and when needed `@wallarm-org/mcp` / `@wallarm-org/migrator` — stable on `main`, RC on `feature/*` / `feat/*` / `fix/*` (see [RELEASE.md](./RELEASE.md))
 10. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
 
-Secrets and branch rules: [VERSIONING.md](./VERSIONING.md#cicd-integration).
+Secrets and branch rules: [RELEASE.md → Requirements](./RELEASE.md#requirements).
 
-### CI/CD Features
+### Commit triggers
 
-- **Sharded Testing**: 3 parallel E2E test shards for faster execution
-- **Smart Caching**: Dependencies cached with `pnpm-lock.yaml` hash
-- **Container-based E2E**: E2E tests run inside the public Playwright container image (not a project-built Storybook image) for consistent browser binaries
-- **Readiness Check**: An HTTP polling loop waits for the Storybook static server to respond — there is no Docker `services:` health check in this pipeline
-- **Artifact Upload**: Test results and reports preserved
-- **Concurrency Control**: Cancel in-progress runs on new pushes
-- **E2E Skip Optimization**: Skips E2E for bot screenshot commits and when no E2E-relevant path changed — `src`, Storybook/Playwright/build configs, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` (list: `E2E_PATHS` in `main.yml`; range: branch vs `main` merge-base, or last commit on `main`)
-- **E2E Skip Trigger**: Manual E2E skip with `[skip-e2e]` commit message trigger
-- **GitHub Pages Deployment**: Automatic Storybook deployment on main branch (static artifact, not a Docker image)
+- `[update-screenshots]` in the head commit message regenerates baselines and commits them back to the branch.
+- `[skip-e2e]` in the commit message skips E2E. E2E is also skipped automatically when no path in `E2E_PATHS` (`main.yml`) changed.
 
 ## 🎉 Success Criteria
 
@@ -215,7 +205,6 @@ You are successful when:
 1. Code quality is maintained or improved
 2. All CI/CD checks pass (PR title, quality, build, E2E)
 3. Documentation is up-to-date
-4. CI/CD pipelines complete within 10 minutes
-5. User requirements are met accurately
-6. Best practices are followed consistently
-7. Storybook successfully built and deployed to GitHub Pages
+4. User requirements are met accurately
+5. Best practices are followed consistently
+6. Storybook successfully built and deployed to GitHub Pages
