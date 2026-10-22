@@ -1,0 +1,58 @@
+---
+description: Upgrade to v1.0.0, where Table moves to TanStack Table v9.
+---
+
+# Migrating to v1
+
+v1.0.0 moves **Table** to TanStack Table v9. There is no codemod: the changes are in types and
+table-instance APIs that a codemod cannot rewrite safely.
+
+## `DSTableFeatures`
+
+TanStack Table v9 types are parameterized by the table's feature set. The design system exports
+its feature set as `DSTableFeatures`; pass it wherever you name TanStack types:
+
+```tsx
+import type { Row } from '@tanstack/react-table';
+import type { DSTableFeatures } from '@wallarm-org/design-system/Table';
+
+interface Host {
+  id: string;
+  name: string;
+}
+
+type HostRow = Row<DSTableFeatures, Host>; // was Row<Host>
+```
+
+## `ColumnMeta` generics
+
+If you augment TanStack's `ColumnMeta`, it now takes the features as its first type parameter:
+
+```ts
+import type { RowData, TableFeatures } from '@tanstack/react-table';
+
+declare module '@tanstack/react-table' {
+  // was: interface ColumnMeta<TData extends RowData, TValue>
+  interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue> {
+    // your fields
+  }
+}
+```
+
+## `table.getState()` is removed
+
+Read state from `table.state` instead:
+
+```ts
+const { sorting } = table.state; // was table.getState().sorting
+```
+
+## Column pinning
+
+`onColumnPinningChange` now always receives a `right` array, empty when nothing is pinned right:
+`{ left: ['name'], right: [] }`. Update code that checks for a missing `right`.
+
+## Sorting
+
+The sort order of text columns may differ from earlier versions. Check views and tests that rely
+on an exact order of sorted text.

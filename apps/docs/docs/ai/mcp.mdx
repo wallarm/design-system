@@ -1,0 +1,89 @@
+---
+description: Connect Claude Code, Cursor or VS Code to the design-system MCP server for component and token metadata.
+---
+
+# MCP server
+
+`@wallarm-org/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server that
+gives AI coding assistants the design system's component and token metadata: props, variants,
+sub-components, import paths and token values. With it, an assistant looks components up instead
+of guessing their API.
+
+The server runs locally over stdio and reads the metadata shipped with the installed
+`@wallarm-org/design-system` package, so the answers match the version your project uses.
+
+:::warning Requirement
+Run the assistant in a project that has `@wallarm-org/design-system` installed: the server looks
+for it in `node_modules`, walking up from the working directory. Elsewhere, pass the metadata file
+explicitly with `--metadata-path <path-to>/components.json`.
+:::
+
+## Set up
+
+Every client uses the same server key, `@wallarm-org/mcp`, and the same command,
+`npx -y @wallarm-org/mcp`.
+
+### Claude Code
+
+```bash
+claude mcp add @wallarm-org/mcp -- npx -y @wallarm-org/mcp
+```
+
+### Cursor
+
+[Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=@wallarm-org/mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkB3YWxsYXJtLW9yZy9tY3AiXX0=),
+or add the server to `.cursor/mcp.json` in the project:
+
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "@wallarm-org/mcp": {
+      "command": "npx",
+      "args": ["-y", "@wallarm-org/mcp"]
+    }
+  }
+}
+```
+
+### VS Code
+
+Add the server to `.vscode/mcp.json` in the project. VS Code uses a `servers` key:
+
+```json title=".vscode/mcp.json"
+{
+  "servers": {
+    "@wallarm-org/mcp": {
+      "command": "npx",
+      "args": ["-y", "@wallarm-org/mcp"]
+    }
+  }
+}
+```
+
+### Other clients
+
+Any MCP client with stdio transport works: register the command `npx` with the arguments
+`["-y", "@wallarm-org/mcp"]`.
+
+## Tools
+
+| Tool | Input | Returns |
+| --- | --- | --- |
+| `search_component` | `{ query: string }` | Components matching a name, description, prop or variant, sorted by relevance (top 10), with import paths. |
+| `get_component` | `{ name: string }` | One component in full: props, variants, sub-components and import path. The name is case-insensitive; unknown names get suggestions. |
+| `search_token` | `{ query: string }` | Tokens matching a name (`spacing-8`), value (`#ff6633`) or category, sorted by relevance (top 20). |
+| `get_token_category` | `{ name: string }` | Every token in a category, such as `spacing`, `colors-primary` or `shadow`. Unknown names list the available categories. |
+
+## Resources
+
+| URI | Content |
+| --- | --- |
+| `ds://components` | All components with their import paths, as a Markdown table. |
+| `ds://tokens` | All design tokens, grouped by category. |
+| `ds://components/{name}` | The full metadata of one component. |
+
+## Without MCP
+
+The same metadata is published as JSON at
+[`components.json`](https://wallarm.github.io/design-system/components.json), and every page of
+this site is available as Markdown; see [llms.txt](/ai/llms).

@@ -1,0 +1,97 @@
+---
+description: Upgrade across breaking design-system releases with the @wallarm-org/migrator codemod CLI.
+---
+
+import { PackageManagerTabs } from '@rspress/core/theme';
+
+# Migration guides
+
+Every major release of `@wallarm-org/design-system` has a guide:
+
+- [v3.0.0](/get-started/migrations/v3): Avatar sizes and the user-item composition.
+- [v2.0.0](/get-started/migrations/v2): NumericBadge `type` splits into `type` and `color`.
+- [v1.0.0](/get-started/migrations/v1): Table moves to TanStack Table v9.
+
+Most breaking changes come with a codemod in [`@wallarm-org/migrator`](https://www.npmjs.com/package/@wallarm-org/migrator).
+Renovate can run it after a design-system upgrade, and you can run it by hand.
+
+## Run it by hand
+
+After upgrading, run the migrator from the package directory with the version you upgraded from:
+
+<PackageManagerTabs command='@wallarm-org/migrator --from 2.9.0' dlx />
+
+## Usage
+
+```bash
+migrator --from <version> [--to <version>] [--dry-run] [paths...]
+```
+
+- `--from` (required): the exact stable design-system version you are migrating from. A
+  prerelease `--from` is rejected: pass the stable version your code matches.
+- `--to`: the target version (default: the installed `@wallarm-org/design-system`).
+- `--dry-run`: print the changes, write nothing.
+- `--help`, `--version`.
+
+Without paths, tracked files under the current directory are scanned. The exit code is `0` for
+completed runs (even with manual items) and `1` for usage or version errors.
+
+When something needs a manual change, or a file could not be parsed, the migrator writes
+`wds-migration.md` (its heading contains `@wds-migration`), and each manual spot also gets an
+in-code marker right after the tag name:
+
+```tsx
+<Avatar /* @wds-migration(avatar-size-rename): … */ size={s} />
+```
+
+Fix each marker, then delete the report.
+
+## Consumer setup
+
+### Renovate
+
+Add a package rule to the repository config (or to a shared preset):
+
+```json title="renovate.json"
+{
+  "packageRules": [
+    {
+      "matchPackageNames": ["@wallarm-org/design-system"],
+      "minimumReleaseAge": "1 hour",
+      "prBodyNotes": ["⚠️ The design-system migrator may have left manual steps: search this MR for `wds-migration` comments and the `wds-migration.md` report, fix them, then delete the report."],
+      "postUpgradeTasks": {
+        "commands": ["npx --yes @wallarm-org/migrator@latest --from {{{currentVersion}}} --to {{{newVersion}}}"],
+        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "**/wds-migration.md"],
+        "workingDirTemplate": "{{{packageFileDir}}}",
+        "installTools": { "node": {} }
+      }
+    }
+  ]
+}
+```
+
+- `workingDirTemplate` runs the migrator from each upgraded `package.json`'s directory, so each
+  package runs with its own `--from` and only touches files under it. From the repo root, one
+  package's `--from` would rewrite every package (for example, turn an already-migrated `sm` into
+  `lg`). In a monorepo each package gets its own `wds-migration.md`, hence the recursive filter.
+- `currentVersion` is the **locked** version when a lockfile exists (Renovate has no separate
+  `lockedVersion` template), so commit your lockfile.
+- `installTools.node` is needed on the default slim Renovate image (`binarySource=install`),
+  where `npx` isn't on `PATH`. The `-full` image already has it. With `binarySource=global` the
+  runner image has to provide node and npm.
+- On a self-hosted runner, allow the command in the admin config:
+  `allowedCommands: ["^npx --yes @wallarm-org/migrator@latest --from \\d+\\.\\d+\\.\\d+\\S* --to \\d+\\.\\d+\\.\\d+\\S*$"]`.
+- `prBodyNotes` deliberately avoids the literal `@wds-migration`, so the tracked Renovate config
+  does not trip the CI check below.
+
+### CI check
+
+Add one job that fails while manual steps remain:
+
+```sh
+if git grep -n '@wds-migration'; then echo 'Design-system migration left manual steps: fix the @wds-migration markers and delete wds-migration.md'; exit 1; fi
+```
+
+Both the in-code markers and the report heading contain `@wds-migration`, so the job fails (and
+prints the hits) until every marker is fixed and `wds-migration.md` is deleted. It works under
+`set -e`.

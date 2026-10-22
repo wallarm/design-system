@@ -1,0 +1,7 @@
+[
+  { "type": "dir-section-header", "name": "get-started", "label": "Get Started" },
+  { "type": "dir-section-header", "name": "foundations", "label": "Foundations" },
+  { "type": "dir-section-header", "name": "components", "label": "Components" },
+  { "type": "dir-section-header", "name": "ai", "label": "AI" },
+  { "type": "dir-section-header", "name": "guides", "label": "Guides" }
+]

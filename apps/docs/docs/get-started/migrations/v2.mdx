@@ -1,0 +1,51 @@
+---
+description: Upgrade to v2.0.0, where NumericBadge type splits into type and color.
+---
+
+# Migrating to v2
+
+v2.0.0 changes one component: **NumericBadge**.
+
+**Codemod:** `numeric-badge-type-color`, run by `migrator --from 1.x.y` (see [Migration guides](/get-started/migrations/)).
+
+## `type` splits into `type` and `color`
+
+`type` used to mix emphasis and meaning. It now sets emphasis only, and the new `color` prop sets
+meaning:
+
+- `type`: `solid | secondary | outline`
+- `color`: `neutral | neutral-alt | brand | danger | success | info`
+
+| Old `type` | New `type` | New `color` |
+| --- | --- | --- |
+| `primary` | `secondary` | `neutral` |
+| `primary-alt` | `secondary` | `neutral-alt` |
+| `brand` | `solid` | `brand` |
+| `destructive` | `solid` | `danger` |
+| `outline` | `outline` | `neutral` |
+| `info` | `secondary` | `info` |
+
+```tsx
+// Before
+<NumericBadge type='destructive'>3</NumericBadge>
+
+// After
+<NumericBadge type='solid' color='danger'>3</NumericBadge>
+```
+
+The codemod rewrites static `type` values and adds the matching `color`. It marks for review a
+non-static `type`, a `type` that spread props may set or override, and an old `type` value on a
+badge that already has a `color`.
+
+## New defaults
+
+- `type` defaults to `secondary` (it was `primary`). A badge without `type` keeps the same look,
+  since old `primary` maps to `secondary` + `neutral`.
+- `color` defaults to `brand` for `type='solid'` and to `neutral` otherwise.
+
+## Other changes
+
+- The badge renders a `data-color` attribute with its color.
+- A badge with `onClick` is now keyboard-accessible: it gets `role="button"` and `tabIndex={0}`.
+  Update tests that look for it by a different role.
+- `className` is now merged with the badge's own classes instead of replacing them.

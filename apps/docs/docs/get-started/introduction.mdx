@@ -1,0 +1,39 @@
+---
+description: What the Wallarm Design System is, what it is built on and where to find it.
+---
+
+# Introduction
+
+Wallarm Design System is the React component library behind Wallarm products. It ships
+accessible, ready-to-use components, the design tokens they are styled with, and tooling
+that helps people and AI assistants use both correctly.
+
+## What it is built on
+
+- **React 19** and **TypeScript**: every component is typed, and refs are passed as plain props.
+- **Tailwind CSS v4** for styling; colors, spacing, radius and typography are
+  [design tokens](/foundations/tokens) exposed as CSS variables.
+- **Ark UI** for accessible behavior: focus management, keyboard support and ARIA wiring.
+- **TanStack Table** and **TanStack Virtual** for data tables and long lists.
+- **DnD Kit** for drag and drop.
+
+## Where to find it
+
+- **npm**: [`@wallarm-org/design-system`](https://www.npmjs.com/package/@wallarm-org/design-system)
+- **Source**: [github.com/wallarm/design-system](https://github.com/wallarm/design-system)
+- **Storybook**: [wallarm.github.io/design-system/storybook](https://wallarm.github.io/design-system/storybook/),
+  the interactive playground with every story and its controls.
+
+## Before you start
+
+The library has required peer dependencies: `react` and `react-dom` (^19.0.0),
+`tailwindcss` (^4.0.0), `tw-animate-css` (^1.0.0) and `@internationalized/date` (^3.12.0).
+[Installation](/get-started/installation) walks through them and the CSS setup.
+
+## Next steps
+
+- [Installation](/get-started/installation): add the package, its peers and the theme.
+- [Theming](/get-started/theming): light and dark themes, frame style and token overrides.
+- [Routing](/get-started/routing): wire navigation components to your router.
+- [Components](/components/): the component catalog.
+- [MCP server](/ai/mcp): give your coding assistant the component and token metadata.

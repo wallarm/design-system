@@ -1,0 +1,134 @@
+---
+description: Attach your analytics attributes and handlers to design-system components; they land on the real interactive element.
+---
+
+# Analytics
+
+The design system does not ship an analytics SDK, provider or analytics-specific props. Instead,
+every interactive component forwards the attributes and handlers you pass to the **real
+interactive DOM element**: the button, link or input the user actually clicks. Your analytics
+library finds them there, typically with a document-level click listener and
+`event.target.closest('[data-analytics-id]')`.
+
+The canonical attributes are `data-analytics-id` and `data-analytics-props`, but the rule covers
+any `data-*`, `aria-*`, `id`, `ref` and event handler.
+
+## Attributes land on the click target
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+
+export const DeleteHostButton = () => (
+  <Button
+    variant='primary'
+    color='destructive'
+    data-analytics-id='HOST_DELETE_SUBMIT'
+    data-analytics-props='{"feature":"host","mode":"delete","count":3}'
+  >
+    Delete
+  </Button>
+);
+```
+
+`data-analytics-props` is forwarded byte-for-byte: the design system never parses, normalizes or
+reserializes it. Its format is up to you and your analytics library.
+
+Attributes survive rerenders, open and close transitions, variant changes and controlled or
+uncontrolled state changes. Your own event handlers run alongside the component's internal ones;
+they are never silently replaced.
+
+## asChild
+
+With `asChild`, the attributes reach the element you render:
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+
+export const DocsButton = () => (
+  <Button asChild>
+    <a href='/docs' data-analytics-id='DOCS_NAV'>
+      Docs
+    </a>
+  </Button>
+);
+```
+
+## Components with several click targets
+
+When a component has more than one interactive part, each part is an exported sub-component, and
+you put the attributes on the part itself, not on a wrapper around the whole component:
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@wallarm-org/design-system/Dialog';
+
+export const DeleteRuleDialog = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button data-analytics-id='RULE_DELETE_OPEN'>Delete rule</Button>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Delete rule?</DialogTitle>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant='ghost' color='neutral' data-analytics-id='RULE_DELETE_CANCEL'>
+            Cancel
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
+```
+
+Don't wrap a component in `<div data-analytics-id>` when the click target is inside it: the
+attribute ends up on an element nobody clicks.
+
+A few internal targets cannot be reached this way yet, such as parts of the table. Their component
+folder documents the gap and the callback to track instead (for example
+[`Table/ANALYTICS_GAPS.md`](https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/Table/ANALYTICS_GAPS.md)).
+Interactions without a DOM click, such as sorting or resizing, are reported through typed
+callbacks (`onSortingChange` on `Table`, `onResizeEnd` on `DrawerResizeHandle`, …) that you track from your
+own code.
+
+## Clickable containers
+
+Some components delegate clicks from a container: a `Card` with `onClick` is clickable on its whole
+surface. Native interactive descendants (`<button>`, `<a href>`, `<input>`, …) don't trigger the
+card's click. A descendant that handles its own click but is not a native interactive element opts
+out with the `data-ds-suppress-parent-click` attribute on its own DOM node. `InlineCodeSnippet`
+(click to copy, rendered as `<code>`) already does this, so copying the address below does not
+open the card:
+
+```tsx
+import { Card, CardContent } from '@wallarm-org/design-system/Card';
+import { InlineCodeSnippet } from '@wallarm-org/design-system/CodeSnippet';
+
+export const NodeCard = ({ onOpen }: { onOpen: () => void }) => (
+  <Card onClick={onOpen} data-analytics-id='NODE_CARD_OPEN'>
+    <CardContent>
+      node-1 <InlineCodeSnippet code='10.0.0.12' data-analytics-id='NODE_IP_COPY' />
+    </CardContent>
+  </Card>
+);
+```
+
+Give your own non-native clickable elements inside such a container the same attribute.
+
+Don't use `event.stopPropagation()` for this: a blanket stop in a click handler also blocks the
+document-level listener your analytics library relies on.
+
+## Coexistence with `data-slot` and `data-testid`
+
+`data-slot` (CSS hooks), `data-testid` ([test ids](/guides/testing)) and your `data-*` attributes
+live side by side on the same element without colliding.

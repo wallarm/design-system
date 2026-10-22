@@ -1,0 +1,136 @@
+---
+description: Install the design system and its peer dependencies, then set up Tailwind, the theme CSS and ThemeProvider.
+---
+
+import { PackageManagerTabs } from '@rspress/core/theme';
+
+# Installation
+
+## 1. Install the library
+
+<PackageManagerTabs
+  command={{
+    npm: 'npm install @wallarm-org/design-system',
+    yarn: 'yarn add @wallarm-org/design-system',
+    pnpm: 'pnpm add @wallarm-org/design-system',
+  }}
+/>
+
+## 2. Install the peer dependencies
+
+All of them are required:
+
+<PackageManagerTabs
+  command={{
+    npm: 'npm install react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0',
+    yarn: 'yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0',
+    pnpm: 'pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0',
+  }}
+/>
+
+- `react` and `react-dom`: the components are written for React 19.
+- `tailwindcss`: the styling system; your build compiles the component classes.
+- `tw-animate-css`: enter and exit animations.
+- `@internationalized/date`: date values for the calendar and date inputs.
+
+## 3. Add the Tailwind PostCSS plugin
+
+Tailwind v4 compiles through its PostCSS plugin. Install it:
+
+<PackageManagerTabs
+  command={{
+    npm: 'npm install -D @tailwindcss/postcss',
+    yarn: 'yarn add -D @tailwindcss/postcss',
+    pnpm: 'pnpm add -D @tailwindcss/postcss',
+  }}
+/>
+
+and register it in `postcss.config.mjs` at the project root:
+
+```js title="postcss.config.mjs"
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};
+```
+
+## 4. Import the styles
+
+Create the CSS entry of your app:
+
+```css title="App.css"
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@wallarm-org/design-system/theme';
+```
+
+The theme declares the tokens, the Geist fonts and the `@source` paths that let Tailwind find
+the classes used inside the components, so no extra content configuration is needed.
+
+## 5. Wrap the app in ThemeProvider
+
+```tsx title="App.tsx"
+import { Button } from '@wallarm-org/design-system/Button';
+import { ThemeProvider } from '@wallarm-org/design-system/ThemeProvider';
+import './App.css';
+
+export const App = () => {
+  return (
+    <ThemeProvider defaultTheme='light' storageKey='wallarm-theme'>
+      <Button variant='primary' color='brand'>
+        Hello, world!
+      </Button>
+    </ThemeProvider>
+  );
+};
+```
+
+`ThemeProvider` writes the theme as `data-theme` on `<html>` and remembers the user's choice
+in `localStorage`. All props are optional:
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `defaultTheme` | `'light'` | Theme until the user picks one: `'light'` or `'dark'`. |
+| `storageKey` | `'wasd-theme'` | `localStorage` key for the theme. |
+| `defaultFrameStyle` | `'neutral'` | Frame style until the user picks one: `'neutral'` or `'branded'`. |
+| `frameStyleStorageKey` | `'wasd-frame-style'` | `localStorage` key for the frame style. |
+
+The **frame style** is the AppShell look next to light and dark: the neutral gray surround or
+the warm branded one. Read and change both with `useTheme()`; see [Theming](/get-started/theming).
+
+:::warning Micro-frontends
+Keep `defaultTheme` and `defaultFrameStyle` identical in the host and every micro-frontend. Each
+`ThemeProvider` writes `<html>` when it mounts, so a different default flips the whole console
+when that product opens.
+:::
+
+## Tree-shaking
+
+Import each component from its own entry point:
+
+```tsx
+// Good: only Button is bundled
+import { Button } from '@wallarm-org/design-system/Button';
+
+// Avoid: pulls in the whole library
+import { Button } from '@wallarm-org/design-system';
+```
+
+Icons have their own entry, `@wallarm-org/design-system/icons`; see [Icons](/foundations/icons).
+
+## Troubleshooting
+
+**Styles are not applied.** Check that `@wallarm-org/design-system/theme` is imported after
+`tailwindcss` and `tw-animate-css`, that the PostCSS plugin is registered, and that the app is
+wrapped in `ThemeProvider`.
+
+**TypeScript import errors.** Use TypeScript 5.0 or newer with a `moduleResolution` that reads
+package `exports` (`bundler` or `nodenext`), add `"skipLibCheck": true` to `tsconfig.json`, and
+restart the TypeScript server in your editor.
+
+**React version conflict.** Make sure the app uses React 19, then delete `node_modules` and the
+lock file and reinstall.
+
+**Fonts do not load.** The Geist fonts are bundled with `@wallarm-org/design-system/theme`.
+Check that the theme is imported and look for the font requests in the browser's Network tab.

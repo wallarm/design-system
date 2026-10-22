@@ -1,0 +1,95 @@
+---
+description: Light and dark themes, the frame style, and overriding design tokens with CSS variables.
+---
+
+# Theming
+
+Theming is driven by two attributes on `<html>`, both written by `ThemeProvider`:
+
+- `data-theme`: `light` or `dark`;
+- `data-frame-style`: `neutral` or `branded`, the AppShell surround inside the theme.
+
+Every component reads its colors from [design tokens](/foundations/tokens), and the theme CSS
+swaps the token values under these attributes. Components never need a theme prop.
+
+## ThemeProvider and useTheme
+
+Wrap the app once (see [Installation](/get-started/installation) for the props), then read and
+change the theme anywhere below it with `useTheme()`:
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+import { useTheme } from '@wallarm-org/design-system/ThemeProvider';
+
+export const ThemeToggle = () => {
+  const { theme, setTheme } = useTheme();
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+
+  const handleClick = () => setTheme(nextTheme);
+
+  return (
+    <Button variant='outline' color='neutral' onClick={handleClick}>
+      Switch to {nextTheme}
+    </Button>
+  );
+};
+```
+
+`setTheme` updates `data-theme` and stores the choice in `localStorage` under `storageKey`.
+The types are exported as `Theme` (`'light' | 'dark'`) and `FrameStyle` (`'neutral' | 'branded'`).
+
+## Frame style
+
+The frame style is the AppShell look next to light and dark: `neutral` (default) is the gray
+surround, `branded` the warm one. It is set and read the same way:
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+import { useTheme } from '@wallarm-org/design-system/ThemeProvider';
+
+export const FrameStyleToggle = () => {
+  const { frameStyle, setFrameStyle } = useTheme();
+  const nextStyle = frameStyle === 'branded' ? 'neutral' : 'branded';
+
+  const handleClick = () => setFrameStyle(nextStyle);
+
+  return (
+    <Button variant='outline' color='neutral' onClick={handleClick}>
+      Use {nextStyle} frame
+    </Button>
+  );
+};
+```
+
+Because the value lives on `<html>`, micro-frontends rendered in the same document follow it
+without any wiring.
+
+:::warning Micro-frontend defaults
+Keep `defaultTheme` and `defaultFrameStyle` identical in the host and every micro-frontend. Each
+`ThemeProvider` writes `<html>` when it mounts, so a micro-frontend with a different default
+flips the whole console when it opens.
+:::
+
+## Overriding tokens
+
+Tokens are plain CSS variables, so you can override them in your own CSS after the theme import.
+Light values live on `:root` and dark values under `[data-theme='dark']`; override both when the
+value differs per theme:
+
+```css title="App.css"
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@wallarm-org/design-system/theme';
+
+:root {
+  --color-text-brand: var(--color-w-orange-700);
+}
+
+[data-theme='dark'] {
+  --color-text-brand: var(--color-w-orange-400);
+}
+```
+
+Override semantic tokens (`--color-text-*`, `--color-bg-*`, `--color-border-*`) rather than
+palette tokens: components use the semantic layer, and a palette change ripples into every
+semantic token that points at it. The full list is on the [Tokens](/foundations/tokens) page.
