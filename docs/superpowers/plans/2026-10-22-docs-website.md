@@ -501,3 +501,27 @@ Runs together with Task 14 (same dispatch, separate commit).
 - [ ] **Step 2: Run** `pnpm --filter @wallarm-org/docs typecheck` and `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success.
 - [ ] **Step 3: Manual check** in `preview`: the navbar and the home hero show the logo and "Design System", clicking it goes to `/design-system/`, and both themes look right. Take screenshots if the browser tools allow.
 - [ ] **Step 4: Commit** `feat(docs): Wallarm logo in the navbar`
+
+---
+
+### Task 16: Local vs production link origins (user request, 2026-10-22)
+
+Runs after Tasks 14+15.
+
+**Files:**
+- Modify: `apps/docs/rspress.config.ts`: `siteOrigin: process.env.DOCS_SITE_ORIGIN ?? 'https://wallarm.github.io'`.
+- Modify: `apps/docs/package.json`: add `"preview:local": "DOCS_SITE_ORIGIN=http://localhost:4173 pnpm run build && rspress preview --port 4173"`. Use the cross-platform form the repo already uses for env vars if one exists; otherwise this POSIX form is fine (CI is Linux, devs are on macOS).
+- Modify: the hand-written pages that link to static outputs. Grep `apps/docs/docs` for `https://wallarm.github.io/design-system/` links to `llms.txt`, `llms-full.txt`, `*.md`, `components.json`.
+  - Clickable links become base-relative JSX anchors: `<a href="/design-system/llms.txt">llms.txt</a>`. The Rspress dead-link check only inspects Markdown links, so JSX anchors are allowed.
+  - URLs inside code blocks and config snippets (meant to be pasted into an agent) stay absolute production URLs.
+  - Links to other routes stay normal Markdown links.
+- Modify: `apps/docs/scripts/render.ts`. Generated pages contain no static-file links today; if any exist, apply the same rule.
+- Document `preview:local` in `apps/docs/docs/ai/llms.mdx` (one short "Check it locally" note) and in the Contributing/README if one exists for apps/docs.
+
+- [ ] **Step 1:** Implement.
+- [ ] **Step 2: Run** `pnpm --filter @wallarm-org/docs preview:local` (stop it after checking). Verify:
+  - `curl -s http://localhost:4173/design-system/llms.txt | head` shows `http://localhost:4173/design-system/...` URLs;
+  - `curl -sf http://localhost:4173/design-system/components/button.md` succeeds;
+  - the AI → llms.txt page's links resolve locally.
+- [ ] **Step 3: Run** the plain `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success, and `doc_build/llms.txt` contains `https://wallarm.github.io/design-system/`. This is the production default; Task 9's check depends on it.
+- [ ] **Step 4: Commit** `feat(docs): local preview with local link origins`
