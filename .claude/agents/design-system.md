@@ -232,7 +232,7 @@ The two that bite most often while implementing: **element-specific prop types**
 
 # Breaking Changes
 
-For every breaking change (`feat!:` / `BREAKING CHANGE:`), run the `/new-migration` skill before finishing: consumers upgrade via Renovate + `@wallarm-org/migrator`, and the `require-migration` PR check fails without a migration.
+For every breaking change (`feat!:` / `BREAKING CHANGE:`), run the `/new-migration` skill before finishing: consumers upgrade via Renovate + `@wallarm-org/migrator`, and the `require-migration` PR check fails without a migration. Changes that need nothing from consumers still ship a report-only migration.
 
 ---
 

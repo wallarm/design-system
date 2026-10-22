@@ -10,19 +10,21 @@ Background (don't duplicate it here): [`packages/migrator/README.md`](../../../p
 /new-migration [ref]
 ```
 
-- No `ref` — migrate the current branch: `git diff main...HEAD -- packages/design-system/src`.
-- `ref` — a commit SHA or range, to migrate an older change: `git show <sha> -- packages/design-system/src` (or `git diff <a>..<b> -- …`). Read old files with `git show <base>:<path>`; never check the old commit out.
+- No `ref` — migrate the current branch: `git diff main...HEAD -- packages/design-system/src packages/design-system/package.json`.
+- `ref` — a commit SHA or range, to migrate an older change: `git show <sha> -- packages/design-system/src packages/design-system/package.json` (or `git diff <a>..<b> -- …`).
+- `<base>` below = the code before the change: `<sha>~1` for a single SHA, `<a>` for a range, `$(git merge-base main HEAD)` for the current branch. Read old files with `git show <base>:<path>`; never check the old commit out.
 
 ## Instructions
 
 ### 1. Find the breaking changes
 
-In `packages/design-system/src/components/**`, look for:
+In `packages/design-system/src/**` (components, hooks, utils, theme/CSS tokens) and `packages/design-system/package.json`, look for:
 
 - removed / renamed props, sub-components or exports (`index.ts`, `src/index.ts`);
 - removed / renamed CVA variant keys or values in `classes.ts` — diff the old vs new `cva(...)` blocks, **including `compoundVariants` and any new `cva` the classes moved into** (a value can disappear from the root block and reappear in a layer block, e.g. `avatarPlateVariants`);
 - changed `defaultVariants` and changed destructuring defaults in the component (`size = 'lg'`);
-- changed public types (`*Props`, exported unions).
+- changed public types (`*Props`, exported unions), hook/util signatures, renamed or removed theme tokens / CSS variables;
+- `package.json`: `engines` (Node), `peerDependencies` (React etc.), `exports` (removed subpaths).
 
 Also read the `BREAKING CHANGE:` lines of the commits (`git log --format=%B main..HEAD`) / PR body and the `!` in the title. Write the list of changes down before writing code.
 
@@ -30,6 +32,11 @@ Also read the `BREAKING CHANGE:` lines of the commits (`git log --format=%B main
 
 - **Mechanical** → codemod: value rename, prop rename, prop split into two props, component/export rename.
 - **Behavioural, ambiguous, or visual with no prop to change** → report-only migration: the transform only calls `ctx.report(el, …)` on each usage, with a message saying what to check.
+- **No JSX usage** (hook/util signature, token/CSS rename, removed subpath, Node/peer requirement) → still a report-only migration (every breaking change ships one). There is no element to mark, so report on imports: walk `file.getImportDeclarations()`, keep those whose `getModuleSpecifierValue()` is `@wallarm-org/design-system` or `…/<subpath>`, and
+  - for a symbol: `ctx.report(spec, …)` on each `decl.getNamedImports()` entry with `spec.getName() === 'useFoo'`, and on `decl.getNamespaceImport()` (can't tell which members are used);
+  - for a repo-wide requirement (Node, peers): report **once per file, on the first DS import declaration** — transforms run per file with no run-level hook, a report needs a node, and every scanned file has a DS import.
+
+  Reports on non-JSX nodes get **no in-code marker** (the runner only marks JSX elements); they land in `wds-migration.md` with file:line, which still trips the consumer's `@wds-migration` CI gate. Their fixture output equals the input, so assert the reports inline (step 6).
 
 One migration per logical breaking change. Id = kebab `<component>-<change>` (e.g. `avatar-size-rename`, `numeric-badge-type-color`); file name = id.
 
@@ -38,7 +45,7 @@ One migration per logical breaking change. Id = kebab `<component>-<change>` (e.
 After migration the consumer must render the same as before the upgrade; opting into the new look is their call.
 
 - **Derive every value mapping from the old vs new CVA classes** (`git show <base>:packages/design-system/src/components/<C>/classes.ts`), never from the names. Match on the classes that define the value (dimensions, colors), wherever they live now. Example: NumericBadge `type='destructive'` was `bg-bg-fill-danger text-text-primary-alt`; the new compound variant with those classes is `type='solid' color='danger'` — that's how the `type`→`type`+`color` table was built.
-- Classes that changed for **every** value (a redesign of the whole component) aren't something a mapping can preserve; ignore them when matching, mention them in the PR, not in the codemod.
+- Classes that **no new value reproduces** (e.g. Avatar's fallback text became a fixed `text-xs`, so old `xs`'s `text-2xs` is gone) can't be preserved by any mapping: match on the defining classes (dimensions, radius, colors) and mention the rest in the PR, not in the codemod.
 - **Default changed?** On usages that omit the prop, insert the old value explicitly — unless the old default and the new default render the same. Prove that from the classes (Avatar: old default `sm` = `size-32 rounded-12`, new default `lg` = `size-32 rounded-12` → absent `size` stays absent).
 - A mapping that isn't 1:1, or depends on runtime data → report, don't guess.
 
@@ -49,6 +56,12 @@ Create `packages/migrator/src/migrations/<id>.ts` exporting `migration: Migratio
 - `findComponentElements(file, 'Component')` — usages imported from `@wallarm-org/design-system` or `@wallarm-org/design-system/<Component>`, incl. aliased and namespace imports; a same-named local component is never matched;
 - `getAttribute(el, name)`, `readStaticString(attr)` (string / `{'x'}` / `` {`x`} `` literal, else `undefined`), `replaceStaticString(attr, value)` (keeps the quote style);
 - `hasSpread(el)`, `hasSpreadAfter(el, attr)`.
+
+Edits with no helper yet (plain ts-morph 28):
+
+- **Insert the old default**: `el.insertAttribute(0, { name: 'size', initializer: "'sm'" })` — at the front, so a later spread still wins; if `hasSpread(el)`, also report (the spread may already set it).
+- **Rename a prop**: `attr.setName('newName')` (keeps the value).
+- **Rename a component/export**: on each matching `decl.getNamedImports()` entry, `spec.setName('NewName')`; without an alias also rename the JSX tags (`findComponentElements`, then `el.getTagNameNode().replaceWithText(…)`, and the closing tag), or `spec.setName('NewName').setAlias('OldName')` to keep local usages valid.
 
 Rules:
 
@@ -78,13 +91,13 @@ pnpm biome check packages/migrator
 pnpm --filter @wallarm-org/migrator build
 ```
 
-Then smoke the built CLI in a scratch git repo (a file that imports the component, `git init && git add .`):
+Then smoke the built CLI from a scratch dir (in the scratchpad, not the repo: `wds-migration.md` is written to the cwd) holding a file that imports the component; explicit paths need no git:
 
 ```bash
-node <repo>/packages/migrator/dist/index.js --from <old> --to <new>-rc.1 <file>
+node <repo>/packages/migrator/dist/index.js --from <last-stable> --to <new>-rc.1 <file>
 ```
 
-Prerelease `--to` so the pending migration runs; check the rewritten file and `wds-migration.md`.
+`--from` must be the last stable version (a prerelease `--from` is rejected); prerelease `--to` so the pending migration runs. Check the rewritten file and `wds-migration.md`.
 
 ### 8. PR
 
@@ -93,7 +106,8 @@ Prerelease `--to` so the pending migration runs; check the rewritten file and `w
 
 ## Checklist
 
-- [ ] Every breaking change listed (props, exports, CVA values incl. `compoundVariants` and moved blocks, defaults, types, `BREAKING CHANGE:` lines)
+- [ ] Every breaking change listed (props, exports, CVA values incl. `compoundVariants` and moved blocks, defaults, types, hooks/utils/tokens, `package.json` engines/peers/exports, `BREAKING CHANGE:` lines)
+- [ ] No-JSX changes still get a report-only migration (reports on DS imports)
 - [ ] Each classified: codemod or report-only; one migration per change; id = file name = `<component>-<change>`
 - [ ] Mappings derived from old vs new CVA classes, not names; non-1:1 or runtime-dependent → reported
 - [ ] Changed default handled: old value inserted on usages without the prop, or proven identical from classes
