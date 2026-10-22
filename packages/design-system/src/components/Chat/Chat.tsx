@@ -35,6 +35,7 @@ export const Chat: FC<ChatProps> = ({
       <div
         aria-hidden
         data-slot='chat-background'
+        data-testid={testId && `${testId}--background`}
         className={chatBackgroundVariants({ background })}
       >
         <BlurBackground palette='chat' className='size-full [--lg-frame-bg:transparent]' />

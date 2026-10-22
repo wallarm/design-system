@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent, Ref } from 'react';
 import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import { type TestableProps, TestIdProvider, useTestId } from '../../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../Tooltip';
 import type { ChipErrorSegment, FilterInputChipData } from '../../types';
 import { ChipSearchInput } from './ChipSearchInput';
@@ -16,7 +17,9 @@ export type ChipSegment = SegmentVariant;
 /** Editable segments of the paired (second) triplet. The paired attribute is fixed. */
 export type PairSegment = Extract<SegmentVariant, 'operator' | 'value'>;
 
-export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface FilterInputChipProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
+    TestableProps {
   ref?: Ref<HTMLDivElement>;
   chipId?: string;
   attribute: string;
@@ -68,8 +71,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   onPairSegmentClick,
   className,
   style,
+  'data-testid': testIdProp,
   ...props
 }) => {
+  const testId = useTestId('condition-chip', testIdProp);
   const interactive = !disabled;
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -177,113 +182,118 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       )}
       style={pair ? { maxWidth: valueMaxWidth, ...style } : { maxWidth: 'none', ...style }}
       data-slot='filter-input-condition-chip'
+      data-testid={testId}
       {...(building && { 'data-building': '' })}
       {...props}
     >
-      {/* Dark tooltip mirrors the field-menu popover's description; disabled while
+      <TestIdProvider value={testId}>
+        {/* Dark tooltip mirrors the field-menu popover's description; disabled while
           the attribute segment is inline-editing so the input isn't obscured. */}
-      {attributeDescription ? (
-        <Tooltip disabled={baseActiveSegment === SEGMENT_VARIANT.attribute}>
-          <TooltipTrigger asChild>{attributeSegment}</TooltipTrigger>
-          <TooltipContent>{attributeDescription}</TooltipContent>
-        </Tooltip>
-      ) : (
-        attributeSegment
-      )}
-      {(operator || baseActiveSegment === SEGMENT_VARIANT.operator) && (
-        <Segment
-          variant={SEGMENT_VARIANT.operator}
-          className='shrink-0'
-          onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.operator, e) : undefined}
-          onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
-          {...segmentEditProps(SEGMENT_VARIANT.operator)}
-        >
-          {operator ?? ''}
-        </Segment>
-      )}
-      {(value ||
-        baseActiveSegment === SEGMENT_VARIANT.value ||
-        (!pair && effectiveError === SEGMENT_VARIANT.value)) && (
-        <Segment
-          variant={SEGMENT_VARIANT.value}
-          // Empty required value → clickable placeholder; paired key → capped.
-          className={
-            !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink' : 'shrink-0'
-          }
-          // Field-owned cap on the applied value: the inner truncate ellipsizes
-          // at this width; ignored for the empty hit target and paired chips (AS-1064).
-          {...(valueMaxWidth && value && !pair && { style: { maxWidth: valueMaxWidth } })}
-          error={
-            baseActiveSegment !== SEGMENT_VARIANT.value &&
-            (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)
-          }
-          valueParts={valueParts}
-          valueSeparator={valueSeparator}
-          errorValueIndices={errorValueIndices}
-          caretMode={caretMode}
-          valueMaxWidth={valueMaxWidth}
-          onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
-          onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
-          {...segmentEditProps(SEGMENT_VARIANT.value)}
-        >
-          {value ?? ''}
-        </Segment>
-      )}
-
-      {pair && (
-        <>
-          <PairSeparator />
-          {/* When the pair is incomplete its segments are zero-width, so the label
-              is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
+        {attributeDescription ? (
+          <Tooltip disabled={baseActiveSegment === SEGMENT_VARIANT.attribute}>
+            <TooltipTrigger asChild data-testid={testId && `${testId}--attribute`}>
+              {attributeSegment}
+            </TooltipTrigger>
+            <TooltipContent>{attributeDescription}</TooltipContent>
+          </Tooltip>
+        ) : (
+          attributeSegment
+        )}
+        {(operator || baseActiveSegment === SEGMENT_VARIANT.operator) && (
           <Segment
-            variant={SEGMENT_VARIANT.attribute}
-            className='min-w-0 max-w-[120px] shrink'
-            onClick={
-              interactive && pair.error
-                ? e =>
-                    handlePairSegmentClick(
-                      pair.operator ? SEGMENT_VARIANT.value : SEGMENT_VARIANT.operator,
-                      e,
-                    )
-                : undefined
-            }
+            variant={SEGMENT_VARIANT.operator}
+            className='shrink-0'
+            onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.operator, e) : undefined}
+            onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
+            {...segmentEditProps(SEGMENT_VARIANT.operator)}
           >
-            {pair.attribute}
+            {operator ?? ''}
           </Segment>
-          {(pair.operator || pairActiveSegment === SEGMENT_VARIANT.operator) && (
+        )}
+        {(value ||
+          baseActiveSegment === SEGMENT_VARIANT.value ||
+          (!pair && effectiveError === SEGMENT_VARIANT.value)) && (
+          <Segment
+            variant={SEGMENT_VARIANT.value}
+            // Empty required value → clickable placeholder; paired key → capped.
+            className={
+              !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink' : 'shrink-0'
+            }
+            // Field-owned cap on the applied value: the inner truncate ellipsizes
+            // at this width; ignored for the empty hit target and paired chips (AS-1064).
+            {...(valueMaxWidth && value && !pair && { style: { maxWidth: valueMaxWidth } })}
+            error={
+              baseActiveSegment !== SEGMENT_VARIANT.value &&
+              (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)
+            }
+            valueParts={valueParts}
+            valueSeparator={valueSeparator}
+            errorValueIndices={errorValueIndices}
+            caretMode={caretMode}
+            valueMaxWidth={valueMaxWidth}
+            onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
+            onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
+            {...segmentEditProps(SEGMENT_VARIANT.value)}
+          >
+            {value ?? ''}
+          </Segment>
+        )}
+
+        {pair && (
+          <>
+            <PairSeparator />
+            {/* When the pair is incomplete its segments are zero-width, so the label
+              is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
             <Segment
-              variant={SEGMENT_VARIANT.operator}
-              className='shrink-0'
-              onClick={interactive ? e => handlePairSegmentClick('operator', e) : undefined}
-              {...segmentEditProps(SEGMENT_VARIANT.operator, 1)}
-            >
-              {pair.operator ?? ''}
-            </Segment>
-          )}
-          {(pair.value != null || pairActiveSegment === SEGMENT_VARIANT.value) && (
-            <Segment
-              variant={SEGMENT_VARIANT.value}
-              // Empty required value → clickable placeholder (see emptyValueHitTarget).
-              className={pair.value ? 'shrink' : emptyValueHitTarget}
-              error={
-                pairActiveSegment !== SEGMENT_VARIANT.value &&
-                (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
+              variant={SEGMENT_VARIANT.attribute}
+              className='min-w-0 max-w-[120px] shrink'
+              onClick={
+                interactive && pair.error
+                  ? e =>
+                      handlePairSegmentClick(
+                        pair.operator ? SEGMENT_VARIANT.value : SEGMENT_VARIANT.operator,
+                        e,
+                      )
+                  : undefined
               }
-              caretMode={caretMode}
-              valueMaxWidth={valueMaxWidth}
-              onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
-              {...segmentEditProps(SEGMENT_VARIANT.value, 1)}
             >
-              {pair.value ?? ''}
+              {pair.attribute}
             </Segment>
-          )}
-        </>
-      )}
+            {(pair.operator || pairActiveSegment === SEGMENT_VARIANT.operator) && (
+              <Segment
+                variant={SEGMENT_VARIANT.operator}
+                className='shrink-0'
+                onClick={interactive ? e => handlePairSegmentClick('operator', e) : undefined}
+                {...segmentEditProps(SEGMENT_VARIANT.operator, 1)}
+              >
+                {pair.operator ?? ''}
+              </Segment>
+            )}
+            {(pair.value != null || pairActiveSegment === SEGMENT_VARIANT.value) && (
+              <Segment
+                variant={SEGMENT_VARIANT.value}
+                // Empty required value → clickable placeholder (see emptyValueHitTarget).
+                className={pair.value ? 'shrink' : emptyValueHitTarget}
+                error={
+                  pairActiveSegment !== SEGMENT_VARIANT.value &&
+                  (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
+                }
+                caretMode={caretMode}
+                valueMaxWidth={valueMaxWidth}
+                onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
+                {...segmentEditProps(SEGMENT_VARIANT.value, 1)}
+              >
+                {pair.value ?? ''}
+              </Segment>
+            )}
+          </>
+        )}
 
-      {/* Hide trailing search input during inline-edit — focus is in the segment. */}
-      {building && !isEditingThisChip && <ChipSearchInput />}
+        {/* Hide trailing search input during inline-edit — focus is in the segment. */}
+        {building && !isEditingThisChip && <ChipSearchInput />}
 
-      {onRemove && !disabled && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
+        {onRemove && !disabled && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
+      </TestIdProvider>
     </div>
   );
 };

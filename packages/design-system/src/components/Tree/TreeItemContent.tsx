@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Collapse } from '../../utils/Collapse';
+import { useTestId } from '../../utils/testId';
 import { useTreeItemContext } from './TreeItemContext';
 
 export interface TreeItemContentProps extends HTMLAttributes<HTMLDivElement> {
@@ -14,17 +15,31 @@ export const TreeItemContent: FC<TreeItemContentProps> = ({
   ...props
 }) => {
   const { collapsible, open } = useTreeItemContext();
+  const testId = useTestId('content');
 
   if (!collapsible) {
     return (
-      <div ref={ref} data-slot='tree-item-content' className={className} {...props}>
+      <div
+        ref={ref}
+        data-slot='tree-item-content'
+        data-testid={testId}
+        className={className}
+        {...props}
+      >
         {children}
       </div>
     );
   }
 
   return (
-    <Collapse ref={ref} open={open} data-slot='tree-item-content' className={className} {...props}>
+    <Collapse
+      ref={ref}
+      open={open}
+      data-slot='tree-item-content'
+      data-testid={testId}
+      className={className}
+      {...props}
+    >
       {children}
     </Collapse>
   );

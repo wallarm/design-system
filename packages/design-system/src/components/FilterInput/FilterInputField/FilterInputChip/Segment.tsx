@@ -1,6 +1,7 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, Ref } from 'react';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import { useTestId } from '../../../../utils/testId';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
 import { applyEditCaret } from './applyEditCaret';
 import { editingValueMinWidth, segmentContainer, segmentTextVariants } from './classes';
@@ -53,6 +54,7 @@ export const Segment: FC<SegmentProps> = ({
   valueMaxWidth,
   ...props
 }) => {
+  const testId = useTestId(variant);
   const textRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLSpanElement>(null);
@@ -128,6 +130,7 @@ export const Segment: FC<SegmentProps> = ({
         valueSeparator={valueSeparator}
         errorValueIndices={errorValueIndices!}
         className={className}
+        data-testid={testId}
         {...props}
       />
     );
@@ -138,6 +141,7 @@ export const Segment: FC<SegmentProps> = ({
       ref={ref}
       className={cn(segmentContainer, className)}
       data-slot={`segment-${variant}`}
+      data-testid={testId}
       {...(isInteractive && { role: 'button', 'aria-label': `Edit filter ${variant}` })}
       {...props}
     >

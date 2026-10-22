@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
+import { TestIdProvider, useTestId } from '../../../utils/testId';
 import { inputVariants } from '../../Input/classes';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useFilterInputContext } from '../FilterInputContext';
@@ -47,6 +48,9 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onRemoveEditingChip,
     menuRef,
   } = useFilterInputContext();
+
+  // ScrollArea resets the cascade for its children — re-establish it for the chips.
+  const testId = useTestId();
 
   const hasContent = chips.length > 0 || buildingChipData != null;
 
@@ -151,34 +155,38 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                 if (t.closest('[data-building]')) onAreaClick();
               }}
             >
-              <ChipsWithGaps
-                chips={chipsBefore}
-                hideTrailingGap={hideTrailingGap}
-                {...chipsGapProps}
-              />
-
-              {buildingChipData ? (
-                <FilterInputChip
-                  ref={buildingChipRef}
-                  building
-                  attribute={buildingChipData.attribute}
-                  operator={buildingChipData.operator}
-                  value={buildingChipData.value}
-                  pair={buildingChipData.pair}
-                  onSegmentClick={onBuildingChipClick}
-                  className='mx-4'
+              <TestIdProvider value={testId}>
+                <ChipsWithGaps
+                  chips={chipsBefore}
+                  hideTrailingGap={hideTrailingGap}
+                  {...chipsGapProps}
                 />
-              ) : (
-                <FilterInputSearch hasContent={hasContent} />
-              )}
 
-              <ChipsWithGaps
-                chips={chipsAfter}
-                hideLeadingGap={hideLeadingGap}
-                {...chipsGapProps}
-              />
+                {buildingChipData ? (
+                  <FilterInputChip
+                    ref={buildingChipRef}
+                    building
+                    attribute={buildingChipData.attribute}
+                    operator={buildingChipData.operator}
+                    value={buildingChipData.value}
+                    pair={buildingChipData.pair}
+                    onSegmentClick={onBuildingChipClick}
+                    className='mx-4'
+                  />
+                ) : (
+                  <FilterInputSearch hasContent={hasContent} />
+                )}
 
-              {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
+                <ChipsWithGaps
+                  chips={chipsAfter}
+                  hideLeadingGap={hideLeadingGap}
+                  {...chipsGapProps}
+                />
+
+                {chipsAfter.length > 0 && (
+                  <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />
+                )}
+              </TestIdProvider>
             </div>
           </ScrollAreaViewport>
           {!isExpanded && <ScrollAreaScrollbar orientation='vertical' />}

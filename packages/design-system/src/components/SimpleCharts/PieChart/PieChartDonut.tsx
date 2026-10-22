@@ -54,6 +54,7 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
   ...props
 }) => {
   const testId = useTestId('donut');
+  const sliceTestId = useTestId('slice');
   const dataCtx = useContext(PieChartDataContext);
   const { activeName } = useContext(PieChartActiveContext);
   const { selectedSet } = useContext(PieChartSelectionContext);
@@ -122,12 +123,13 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
           stroke='none'
           className={cn('outline-none transition-opacity duration-150 ease-out', datum?.className)}
           data-slot='pie-chart-slice'
+          data-testid={sliceTestId}
           data-name={name}
           data-active={isActive ? 'true' : undefined}
         />
       );
     },
-    [isValidTotal, activeName, inactiveOpacity, selectedSet],
+    [isValidTotal, activeName, inactiveOpacity, selectedSet, sliceTestId],
   );
 
   const pieData = isValidTotal ? dataCtx.data : PLACEHOLDER_DATA;

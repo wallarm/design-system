@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { useTreeItemContext } from './TreeItemContext';
 import { TreeItemIcon } from './TreeItemIcon';
 
@@ -19,12 +20,15 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
   ...props
 }) => {
   const { collapsible, open, toggle } = useTreeItemContext();
+  const testId = useTestId('header');
+  const actionTestId = useTestId('action');
 
   if (collapsible) {
     return (
       <div
         ref={ref}
         data-slot='tree-item-header'
+        data-testid={testId}
         data-state={open ? 'open' : 'closed'}
         className={cn(
           'group/trigger relative pt-2 pb-4 flex min-w-0 w-full items-center',
@@ -44,7 +48,11 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
           <div className='min-w-0 flex-1'>{children}</div>
         </button>
         {action && (
-          <div className='relative ml-2 shrink-0' data-slot='tree-item-action'>
+          <div
+            className='relative ml-2 shrink-0'
+            data-slot='tree-item-action'
+            data-testid={actionTestId}
+          >
             {action}
           </div>
         )}
@@ -56,13 +64,14 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
     <div
       ref={ref}
       data-slot='tree-item-header'
+      data-testid={testId}
       className={cn('group relative pt-2 pb-4 flex w-full items-start justify-between', className)}
       {...props}
     >
       <TreeItemIcon icon={icon} />
       <div className='min-w-0 flex-1'>{children}</div>
       {action && (
-        <div className='ml-2 shrink-0' data-slot='tree-item-action'>
+        <div className='ml-2 shrink-0' data-slot='tree-item-action' data-testid={actionTestId}>
           {action}
         </div>
       )}

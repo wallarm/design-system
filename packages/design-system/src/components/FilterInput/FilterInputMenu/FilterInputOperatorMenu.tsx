@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import { type FC, Fragment, useMemo } from 'react';
 import { cn } from '../../../utils/cn';
+import { type TestableProps, useTestId } from '../../../utils/testId';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,7 +45,7 @@ const filterOperatorGroups = (
 /** Field types where operator symbols are hidden (per Figma spec) */
 const HIDE_SYMBOLS_FOR: ReadonlySet<FieldType> = new Set(['boolean']);
 
-export interface FilterInputOperatorMenuProps {
+export interface FilterInputOperatorMenuProps extends TestableProps {
   /**
    * The field type to determine which operators to show
    */
@@ -103,7 +104,9 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
   filterText = '',
   menuRef,
   className,
+  'data-testid': testIdProp,
 }) => {
+  const testId = useTestId('operator-menu', testIdProp);
   const query = filterText.toLowerCase();
 
   const operatorGroups = useMemo(() => {
@@ -151,6 +154,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
 
   return (
     <DropdownMenu
+      data-testid={testId}
       open={open}
       onOpenChange={onOpenChange}
       onRequestDismiss={keepOpenOnMenuHandoff}
@@ -163,6 +167,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
         ref={menuRef}
         className={cn('w-256 max-h-[430px]', className)}
         data-filter-input-menu='true'
+        data-testid={testId}
       >
         {filteredGroups.length > 0 ? (
           filteredGroups.map((group, groupIdx) => (

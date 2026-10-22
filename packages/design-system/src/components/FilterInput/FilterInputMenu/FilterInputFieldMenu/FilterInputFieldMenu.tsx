@@ -1,5 +1,6 @@
 import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import { type TestableProps, useTestId } from '../../../../utils/testId';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
@@ -17,7 +18,7 @@ import {
   SuggestionsSection,
 } from './FieldMenuSections';
 
-export interface FilterInputFieldMenuProps {
+export interface FilterInputFieldMenuProps extends TestableProps {
   fields: FieldMetadata[];
   /** Text from the input to filter displayed fields */
   filterText?: string;
@@ -55,7 +56,9 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   inputRef,
   menuRef,
   className,
+  'data-testid': testIdProp,
 }) => {
+  const testId = useTestId('field-menu', testIdProp);
   const limitedRecentConditions = useMemo(() => recentConditions.slice(0, 3), [recentConditions]);
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
@@ -139,6 +142,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   return (
     <>
       <DropdownMenu
+        data-testid={testId}
         open={open && hasResults}
         onOpenChange={onOpenChange}
         onRequestDismiss={keepOpenOnMenuHandoff}
@@ -151,6 +155,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
           ref={menuRef}
           className={cn('w-[300px] max-h-[430px]', className)}
           data-slot='filter-input-field-menu'
+          data-testid={testId}
           data-filter-input-menu='true'
         >
           {!filterText && showRecent && (

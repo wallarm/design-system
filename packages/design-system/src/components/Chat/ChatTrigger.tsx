@@ -45,7 +45,7 @@ export const ChatTrigger: FC<ChatTriggerProps> = ({
           data-slot='chat-trigger'
           data-testid={testId}
         >
-          <WallyIcon size='md' />
+          <WallyIcon size='md' data-testid={testId && `${testId}--icon`} />
         </Button>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

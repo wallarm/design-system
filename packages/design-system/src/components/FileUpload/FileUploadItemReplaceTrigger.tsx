@@ -31,6 +31,7 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
   const item = useRequiredFileUploadItemContext('FileUploadItemReplaceTrigger');
   const inputRef = useRef<HTMLInputElement>(null);
   const testId = useTestId('item-replace-trigger', testIdProp);
+  const inputTestId = useTestId('item-replace-input');
 
   if (!root || root.readOnly || item.loading) return null;
   const current = item.file;
@@ -99,6 +100,7 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
           tabIndex={-1}
           aria-hidden
           data-slot='file-upload-item-replace-input'
+          data-testid={inputTestId}
           onChange={handleReplace}
         />
       )}

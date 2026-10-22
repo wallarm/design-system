@@ -1,5 +1,6 @@
 import { type FC, useContext, useEffect } from 'react';
 import { Area } from 'recharts';
+import { useTestId } from '../../../utils/testId';
 import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';
 import { warnLineChartLine } from '../LineChart/lib/warn';
 import { AreaChartVariantContext } from './AreaChartContext';
@@ -34,6 +35,7 @@ export const AreaChartArea: FC<AreaChartAreaProps> = ({
   const dataCtx = useContext(LineChartDataContext);
   const { activeKey } = useContext(LineChartActiveContext);
   const variant = useContext(AreaChartVariantContext);
+  const testId = useTestId('area');
 
   const series = dataCtx?.seriesByKey.get(seriesKey);
   const isHidden = dataCtx?.hiddenSet.has(seriesKey) ?? false;
@@ -74,6 +76,7 @@ export const AreaChartArea: FC<AreaChartAreaProps> = ({
       stackId={variant === 'stacked' ? 'area-stack' : undefined}
       isAnimationActive={false}
       data-slot='area-chart-area'
+      data-testid={testId}
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
     />

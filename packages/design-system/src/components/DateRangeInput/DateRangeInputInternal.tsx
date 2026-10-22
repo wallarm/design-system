@@ -1,5 +1,6 @@
 import { type FC, type FocusEvent, useCallback, useState } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { InputGroup, InputGroupAddon } from '../InputGroup';
 import { TemporalClear, TemporalPlaceholder } from '../TemporalCore';
 import { useDateRangeContext } from './DateRangeContext';
@@ -29,6 +30,7 @@ export const DateRangeInputInternal: FC = () => {
     size,
   } = useDateRangeContext();
 
+  const testId = useTestId('input-group');
   const [startHasValue, setStartHasValue] = useState(false);
   const [endHasValue, setEndHasValue] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -57,7 +59,7 @@ export const DateRangeInputInternal: FC = () => {
       onFocusCapture={handleFocusCapture}
       onBlurCapture={handleBlurCapture}
     >
-      <InputGroup size={size}>
+      <InputGroup size={size} data-testid={testId}>
         {IconComponent && (
           <InputGroupAddon>
             <IconComponent />

@@ -61,6 +61,8 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 }) => {
   const depth = useTreeDepth();
   const testId = useTestId('item');
+  const toggleTestId = useTestId('toggle');
+  const groupTestId = useTestId('group');
   const { selectable, selectedIds, toggleSelect } = useTreeViewContext();
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -200,6 +202,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
             <button
               type='button'
               data-slot='tree-view-toggle'
+              data-testid={toggleTestId}
               aria-label={isOpen ? 'Collapse' : 'Expand'}
               disabled={disabled}
               className='flex shrink-0 cursor-pointer items-center justify-center text-text-secondary disabled:cursor-not-allowed'
@@ -217,7 +220,13 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
       </div>
 
       {isBranch && (
-        <Collapse open={isOpen} inertWhenClosed role='group' data-slot='tree-view-group'>
+        <Collapse
+          open={isOpen}
+          inertWhenClosed
+          role='group'
+          data-slot='tree-view-group'
+          data-testid={groupTestId}
+        >
           <TreeDepthProvider
             value={{ depth: depth + 1, indent: TREE_VIEW_INDENT_STEP, gap: undefined }}
           >

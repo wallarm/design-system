@@ -104,16 +104,24 @@ export const FilterCascadeLevel: FC<FilterCascadeLevelProps> = ({
 FilterCascadeLevel.displayName = 'FilterCascadeLevel';
 
 /** Three option outlines: what a lazy level shows while its options load. */
-const LevelLoading: FC = () => (
-  <div aria-busy data-slot='filter-cascade-level-loading' className='flex flex-col gap-1'>
-    {[64, 48, 56].map(width => (
-      <div key={width} className='flex items-center gap-8 px-8 py-8'>
-        <Skeleton width='16px' height='16px' rounded='full' />
-        <Skeleton width={`${width}%`} height='12px' rounded={4} />
-      </div>
-    ))}
-  </div>
-);
+const LevelLoading: FC = () => {
+  const testId = useTestId('level-loading');
+  return (
+    <div
+      aria-busy
+      data-slot='filter-cascade-level-loading'
+      data-testid={testId}
+      className='flex flex-col gap-1'
+    >
+      {[64, 48, 56].map(width => (
+        <div key={width} className='flex items-center gap-8 px-8 py-8'>
+          <Skeleton width='16px' height='16px' rounded='full' />
+          <Skeleton width={`${width}%`} height='12px' rounded={4} />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export interface FilterCascadeItemsProps {
   /** Which of the level's options to render; all of them by default. */

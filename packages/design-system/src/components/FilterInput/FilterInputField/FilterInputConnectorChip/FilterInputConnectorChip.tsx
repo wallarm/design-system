@@ -2,6 +2,7 @@ import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import { cn } from '../../../../utils/cn';
+import { useTestId } from '../../../../utils/testId';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,7 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
   onChange,
   className,
 }) => {
+  const testId = useTestId('connector-chip');
   const { menuOpen, closeAutocompleteMenu } = useFilterInputContext();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -57,11 +59,12 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
 
   return (
     <DropdownMenu
+      data-testid={testId}
       positioning={positioning}
       open={open && !menuOpen}
       onOpenChange={handleOpenChange}
     >
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild data-testid={testId}>
         <button
           ref={triggerRef}
           type='button'

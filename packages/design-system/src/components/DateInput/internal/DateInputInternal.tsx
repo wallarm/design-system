@@ -5,6 +5,7 @@ import type { DateFieldState, TimeFieldState } from '@react-stately/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
 import type { SvgIconProps } from '../../../icons';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import { InputGroup, InputGroupAddon } from '../../InputGroup';
 import {
   TemporalClear,
@@ -68,6 +69,7 @@ export const DateInputInternal: FC<DateInputInternalProps> = ({
   ref,
   ...props
 }) => {
+  const testId = useTestId('input-group');
   const dropdownRef = useRef<TimeDropdownHandle>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -132,7 +134,7 @@ export const DateInputInternal: FC<DateInputInternalProps> = ({
     state.value !== null && hasTimeSegments ? (state.value as TimeValue) : null;
 
   return (
-    <InputGroup size={size}>
+    <InputGroup size={size} data-testid={testId}>
       {IconComponent && (
         <InputGroupAddon>
           <IconComponent />

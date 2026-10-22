@@ -28,6 +28,7 @@ export const BarListPercent: FC<BarListPercentProps> = ({
   ...props
 }) => {
   const testId = useTestId('percent');
+  const symbolTestId = useTestId('percent-symbol');
   const itemCtx = useContext(BarListItemContext);
   const percent = (itemCtx?.ratio ?? 0) * 100;
 
@@ -44,6 +45,7 @@ export const BarListPercent: FC<BarListPercentProps> = ({
           {percent.toFixed(digits)}
           <span
             data-slot='bar-list-percent-symbol'
+            data-testid={symbolTestId}
             className={barListPercentSymbolVariants({ variant })}
           >
             %

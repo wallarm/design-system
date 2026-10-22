@@ -1,6 +1,7 @@
 import { type FC, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ReferenceArea, usePlotArea } from 'recharts';
+import { useTestId } from '../../../utils/testId';
 import { formatChartDateTime } from '../lib/timeFormatters';
 import { lineChartZoomCursorPopoverClasses } from './classes';
 import { useZoomPendingListeners } from './hooks/useZoomPendingListeners';
@@ -61,6 +62,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   const dataCtx = useContext(LineChartDataContext);
   const zoomCtx = useContext(LineChartZoomContext);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const testId = useTestId('zoom-popover');
   const plotArea = usePlotArea();
   const rootRef = zoomCtx?.rootRef;
 
@@ -193,6 +195,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
       <div
         ref={popoverRef}
         data-slot='line-chart-zoom-cursor-popover'
+        data-testid={testId}
         data-zoom-state={isPending ? 'pending' : 'dragging'}
         className={lineChartZoomCursorPopoverClasses}
         style={{

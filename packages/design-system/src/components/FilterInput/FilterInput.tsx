@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { cn } from '../../utils/cn';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { FilterInputProvider, useFilterInputContextValue } from './FilterInputContext';
 import { FilterInputErrors, parseFilterInputErrors } from './FilterInputErrors';
 import { FilterInputField } from './FilterInputField';
@@ -14,7 +15,8 @@ import { applyKnownFieldHelpers } from './lib/applyKnownFieldHelpers';
 import type { ExprNode, FieldGroup, FieldMetadata } from './types';
 
 export interface FilterInputProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>,
+    TestableProps {
   /**
    * Filter-field configurations driving the autocomplete. A few names are
    * **reserved** and auto-wired with design-system helpers — DS-supplied
@@ -70,6 +72,7 @@ export const FilterInput: FC<FilterInputProps> = ({
   onErrorsChange,
   showKeyboardHint = false,
   className,
+  'data-testid': testId,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -188,11 +191,13 @@ export const FilterInput: FC<FilterInputProps> = ({
       onPaste={handlePaste}
       {...(allSelected && { 'data-selected-all': '' })}
     >
-      <FilterInputProvider value={contextValue}>
-        <FilterInputField {...props} />
-      </FilterInputProvider>
+      <TestIdProvider value={testId}>
+        <FilterInputProvider value={contextValue}>
+          <FilterInputField {...props} data-testid={testId} />
+        </FilterInputProvider>
 
-      <FilterInputMenu fields={fields} fieldGroups={fieldGroups} autocomplete={autocomplete} />
+        <FilterInputMenu fields={fields} fieldGroups={fieldGroups} autocomplete={autocomplete} />
+      </TestIdProvider>
 
       <FilterInputErrors errors={errors} />
     </div>

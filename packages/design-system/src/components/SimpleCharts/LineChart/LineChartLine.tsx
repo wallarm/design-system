@@ -1,6 +1,7 @@
 import { type FC, type MouseEvent, useContext, useEffect } from 'react';
 import { Line } from 'recharts';
 import type { CurveMouseEventHandler } from 'recharts/types/shape/Curve';
+import { useTestId } from '../../../utils/testId';
 import {
   LINE_DASH_DASHARRAY,
   LINE_INACTIVE_OPACITY,
@@ -50,6 +51,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
 }) => {
   const dataCtx = useContext(LineChartDataContext);
   const { activeKey } = useContext(LineChartActiveContext);
+  const testId = useTestId('line');
 
   const series = dataCtx?.seriesByKey.get(seriesKey);
   const isHidden = dataCtx?.hiddenSet.has(seriesKey) ?? false;
@@ -91,6 +93,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
       onMouseEnter={wrap(onMouseEnter)}
       onMouseLeave={wrap(onMouseLeave)}
       data-slot='line-chart-line'
+      data-testid={testId}
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
     />

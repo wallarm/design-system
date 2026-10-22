@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useSelectContext } from '@ark-ui/react/select';
+import { useTestId } from '../../../utils/testId';
 import { Tag, TagClose, type TagProps } from '../../Tag';
 import type { SelectDataItem } from '../types';
 
@@ -31,6 +32,9 @@ export const SelectInputItemRenderer: FC<SelectInputItemRendererProps> = ({
   size = 'default',
 }) => {
   const { value, setValue } = useSelectContext();
+  const testId = useTestId('tag');
+  // Derived from the Select (not the tag) to keep the pre-existing `{select}--close`.
+  const closeTestId = useTestId('close');
 
   const handleRemove = () => {
     const nextValue = value.filter(v => v !== item.value);
@@ -41,12 +45,12 @@ export const SelectInputItemRenderer: FC<SelectInputItemRendererProps> = ({
   const Icon = item.icon;
 
   return (
-    <Tag size={TAG_SIZE_BY_SELECT_SIZE[size]}>
+    <Tag size={TAG_SIZE_BY_SELECT_SIZE[size]} data-testid={testId}>
       {Icon && <Icon />}
 
       {item.label}
 
-      <TagClose onClick={handleRemove} />
+      <TagClose onClick={handleRemove} data-testid={closeTestId} />
     </Tag>
   );
 };

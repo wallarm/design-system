@@ -1,5 +1,6 @@
 import { type FC, type ReactNode, useEffect } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { Checkbox, CheckboxIndicator } from '../Checkbox';
 import { selectionItemVariants } from './classes';
 import { useSelectionContext } from './useSelectionContext';
@@ -21,6 +22,7 @@ export const SelectionItem: FC<SelectionItemProps> = ({
 }) => {
   const { isSelected, toggleItem, registerDisabled } = useSelectionContext();
   const selected = isSelected(itemId);
+  const testId = useTestId('item');
 
   useEffect(() => {
     return registerDisabled(itemId, disabled);
@@ -43,6 +45,7 @@ export const SelectionItem: FC<SelectionItemProps> = ({
   return (
     <div
       data-slot='selection-item'
+      data-testid={testId}
       data-selected={selected || undefined}
       className={cn(selectionItemVariants(), className)}
       onClickCapture={handleClickCapture}

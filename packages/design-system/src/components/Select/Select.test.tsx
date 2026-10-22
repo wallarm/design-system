@@ -249,6 +249,16 @@ describe('Size variants', () => {
     expect(tag?.className).toContain('h-24');
   });
 
+  it('SelectInput tag close keeps the `{select}--close` test id', () => {
+    render(
+      <Select collection={collection} multiple defaultValue={['react']} data-testid='select'>
+        <SelectInput data-testid='trigger' />
+      </Select>,
+    );
+    expect(screen.getAllByTestId('select--close').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('select--tag--close')).toBeNull();
+  });
+
   it('SelectInput renders the inline-edit (28px) height', () => {
     render(
       <Select collection={collection} multiple data-testid='select'>

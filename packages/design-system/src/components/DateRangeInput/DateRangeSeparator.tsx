@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 /**
  * Visual separator between start and end date fields in a date range input.
@@ -14,9 +15,12 @@ import { cn } from '../../utils/cn';
  * </DateRangeProvider>
  */
 export const DateRangeSeparator: FC = () => {
+  const testId = useTestId('separator');
+
   return (
     <span
       data-slot='date-range-separator'
+      data-testid={testId}
       className={cn('text-sm text-text-secondary select-none')}
       aria-hidden='true'
     >
