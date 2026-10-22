@@ -1,0 +1,93 @@
+# Builds the docs site and Storybook from a stable release tag and deploys
+# both to GitHub Pages. Dispatched by main.yml's `release` job after a stable
+# design-system release; run manually to redeploy or roll back:
+#   gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z
+# Always dispatch with `--ref main` (the github-pages environment allows only
+# main); `inputs.tag` selects the code. This file runs from main against older
+# tags, so keep its steps compatible with every deployable tag.
+name: Deploy Site
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Stable design-system release tag (vX.Y.Z)
+        required: true
+        type: string
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  HUSKY: "0"
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.33.2"
+
+jobs:
+  deploy:
+    name: Deploy docs and Storybook
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          # Tag history for the docs' "new" badges
+          fetch-depth: 0
+
+      - name: Check tag is deployable
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && test -f apps/docs/scripts/check-build.ts \
+            || { echo "::error::$TAG is not a stable tag with the docs site"; exit 1; }
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build docs site
+        run: pnpm turbo run build --filter=@wallarm-org/docs...
+
+      - name: Check docs build output
+        run: pnpm --filter @wallarm-org/docs check:build
+
+      - name: Build Storybook
+        run: pnpm --filter @wallarm-org/design-system build-storybook
+
+      - name: Assemble site
+        run: |
+          mkdir -p site/storybook
+          cp -r apps/docs/doc_build/* site/
+          cp -r packages/design-system/storybook-static/* site/storybook/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

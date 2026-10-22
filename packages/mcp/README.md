@@ -2,6 +2,8 @@
 
 MCP (Model Context Protocol) server for Wallarm Design System. Provides component metadata, props, variants, design tokens, and search capabilities to AI assistants via stdio transport.
 
+Full guide: [wallarm.github.io/design-system/ai/mcp](https://wallarm.github.io/design-system/ai/mcp).
+
 ## 🚀 Quick Start
 
 ### Using npx (recommended)
@@ -11,9 +13,9 @@ Add the server to your AI assistant's MCP configuration:
 ```json
 {
   "mcpServers": {
-    "wallarm-ds": {
+    "@wallarm-org/mcp": {
       "command": "npx",
-      "args": ["@wallarm-org/mcp"]
+      "args": ["-y", "@wallarm-org/mcp"]
     }
   }
 }
@@ -26,7 +28,7 @@ For local development or custom setups:
 ```json
 {
   "mcpServers": {
-    "wallarm-ds": {
+    "@wallarm-org/mcp": {
       "command": "node",
       "args": [
         "./packages/mcp/dist/index.js",

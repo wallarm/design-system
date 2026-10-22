@@ -72,13 +72,13 @@ dependent — `showToolbar` was gated on `NODE_ENV`, which is exactly what diffe
 between local and deployed.
 
 To check a production build, build it and serve it under the deployed path,
-because `assetPrefix` is `/design-system/` in production and serving from the
+because `assetPrefix` is `/design-system/storybook/` in production and serving from the
 root breaks every asset:
 
 ```bash
 pnpm --filter=@wallarm-org/design-system build-storybook
-# symlink storybook-static as design-system/ inside a scratch dir, serve that dir,
-# then load http://localhost:PORT/design-system/?path=/docs/...
+# symlink storybook-static as design-system/storybook/ inside a scratch dir, serve that dir,
+# then load http://localhost:PORT/design-system/storybook/?path=/docs/...
 ```
 
 Add the static server as a temporary `.claude/launch.json` entry and restore the

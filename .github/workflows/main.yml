@@ -16,6 +16,7 @@ permissions:
   checks: write
   id-token: write
   issues: write
+  actions: write
 
 env:
   HUSKY: "0"
@@ -231,7 +232,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build all packages
-        run: pnpm build
+        run: pnpm build --filter='!@wallarm-org/docs'
 
       - name: Build Storybook
         run: pnpm --filter=@wallarm-org/design-system build-storybook
@@ -309,22 +310,22 @@ jobs:
 
       - name: Serve Storybook & Run E2E tests
         run: |
-          # Set up directory structure for serving with /design-system/ base path
-          mkdir -p storybook-serve/design-system
-          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
+          # Set up directory structure for serving with /design-system/storybook/ base path
+          mkdir -p storybook-serve/design-system/storybook
+          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/storybook/
 
           # Start HTTP server for Storybook
           pnpm exec http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/iframe.html; do sleep 1; done'
+          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/storybook/iframe.html; do sleep 1; done'
 
           # Run E2E tests
           cd packages/design-system
           pnpm exec playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --project=chromium
         env:
           CI: true
-          STORYBOOK_URL: http://localhost:6006/design-system
+          STORYBOOK_URL: http://localhost:6006/design-system/storybook
 
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4
@@ -444,15 +445,15 @@ jobs:
 
       - name: Update screenshots
         run: |
-          # Set up directory structure for serving with /design-system/ base path
-          mkdir -p storybook-serve/design-system
-          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
+          # Set up directory structure for serving with /design-system/storybook/ base path
+          mkdir -p storybook-serve/design-system/storybook
+          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/storybook/
 
           # Start HTTP server for Storybook
           pnpm exec http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/iframe.html; do sleep 1; done'
+          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/storybook/iframe.html; do sleep 1; done'
 
           # Unset CI to allow snapshot creation
           unset CI
@@ -463,7 +464,7 @@ jobs:
             --project=chromium \
             --update-snapshots || true
         env:
-          STORYBOOK_URL: http://localhost:6006/design-system
+          STORYBOOK_URL: http://localhost:6006/design-system/storybook
 
       - name: Stage changed screenshots
         id: changed-screenshots
@@ -586,45 +587,6 @@ jobs:
           # baselines just committed, instead of the update job's --update-snapshots
           # run whose exit code is deliberately ignored.
           gh workflow run main.yml --ref "${{ github.ref_name }}"
-
-  # ========================================
-  # Deploy Storybook to GitHub Pages
-  # ========================================
-  deploy-storybook:
-    name: Deploy Storybook
-    runs-on: ubuntu-latest
-    needs: [setup, build, e2e]
-    if: |
-      always() &&
-      needs.build.result == 'success' &&
-      (needs.e2e.result == 'success' || needs.e2e.result == 'skipped') &&
-      needs.setup.outputs.should-update-screenshots != 'true' &&
-      github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download Storybook artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: storybook-static
-          path: ./storybook-static
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./storybook-static
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
   # ========================================
   # Release
@@ -761,6 +723,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Must run before the migrator/mcp releases: their commits move HEAD off the v* tag
+      - name: Deploy site for stable release
+        if: github.ref_name == 'main'
+        continue-on-error: true   # design-system is already on npm; never block migrator/mcp
+        env:
+          PRE_RELEASE_SHA: ${{ steps.pre-release.outputs.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git tag --points-at HEAD | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)
+          if [ -n "$TAG" ] && [ "$(git rev-parse HEAD)" != "$PRE_RELEASE_SHA" ]; then
+            gh workflow run deploy-site.yml --ref main -f tag="$TAG" \
+              || echo "::warning::site deploy dispatch failed; run: gh workflow run deploy-site.yml --ref main -f tag=$TAG"
+          else
+            echo "No stable design-system release in this run; skipping site deploy"
+          fi
 
       # Not check-mcp's HEAD~1 message check: that misses cancelled runs and the
       # release after an [update-screenshots] bot commit
