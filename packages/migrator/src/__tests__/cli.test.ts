@@ -39,7 +39,8 @@ describe('main', () => {
     expect(await run('--from', '2.9.0')).toBe(0);
     expect(read('src/a.tsx')).toContain("size='md'");
     expect(read('wds-migration.md')).toContain('src/b.tsx');
-    expect(out.join('\n')).toMatch(/1 files? changed, 1 manual items?/);
+    expect(read('src/b.tsx')).toContain('<Avatar /* @wds-migration(avatar-size-rename): ');
+    expect(out.join('\n')).toMatch(/2 files changed, 1 manual item\b/);
   });
 
   it('--to equal to --from changes nothing', async () => {

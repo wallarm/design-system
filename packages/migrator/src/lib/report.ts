@@ -10,7 +10,7 @@ export function renderReport(args: {
   skipped: SkippedFile[];
 }): string {
   const lines = [
-    '# Design-system migration: manual steps',
+    '# Design-system migration: manual steps (@wds-migration)',
     '',
     `The automatic migration from ${args.from} to ${args.to} left these items for you:`,
     '',
