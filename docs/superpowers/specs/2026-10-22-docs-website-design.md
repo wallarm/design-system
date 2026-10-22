@@ -142,7 +142,7 @@ Modelled on Chakra: a live preview of a representative story next to a list of p
 ## 8. CI changes
 - `build` job: build docs after DS build (docs needs `components.json`); upload docs output as an artifact. Add docs outputs to `turbo.json` and docs paths to Biome `files.includes`.
 - `deploy-storybook` is replaced by a separate `deploy-site.yml` workflow (`workflow_dispatch` with a `tag` input, `concurrency: pages` without cancel-in-progress). The `release` job dispatches it only when it created a stable `v*` tag on main; it rebuilds docs + Storybook from that tag. A separate workflow is needed because `main.yml` cancels in-progress runs on every push, which could otherwise drop a deploy for a release that already shipped. **(call, 2026-10-22)**
-- Docs are built and smoke-checked in their own `docs` job on every push, parallel to E2E. **(call)**
+- Docs are built and smoke-checked only in `deploy-site.yml`, from the release tag, after a production release on `main` — never on feature branches or plain pushes; npm releases never wait on docs **(user, 2026-10-22)**.
 - "Edit on GitHub" is hidden on generated pages (component pages, tokens, changelog); component pages link Source instead. **(call)**
 - Storybook build switches `assetPrefix` to `/design-system/storybook/`.
 - Keep pipeline under the 10-minute goal; docs build runs in parallel with E2E where possible.
