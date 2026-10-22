@@ -670,7 +670,7 @@ What carries over from Tree:
 
 The line is drawn per step, as Timeline does. TreeView is the wrong model too: it is built for selection and keyboard tree navigation, not a read-only log.
 
-Marking Tree `@deprecated` or deleting `TreeBase` (dead code) needs your confirmation first.
+Marking Tree `@deprecated` needs your confirmation first. (Update: the dead `TreeBase` has since been removed, with the `tree-base-removed` migration.)
 
 ---
 
@@ -1140,14 +1140,14 @@ Subpath exports (`@wallarm-org/design-system/Chat` and the rest) work automatica
 - **Still out of scope after v2 §14:** branches, sources, attachments, edit, regenerate, read-aloud and loading older history. They can arrive later as minor releases, via `custom` parts and slots.
 - **Superseded Figma variants:** the braille spinner (206:2480), the 20px icon frames (74:1451…), the reasoning dot bullets (31:483), and the Brain + label + trailing-chevron header (91:1030).
 - **Brand and theme work:** new WallyIcon variants for the drawer trigger, and retuning BlurBackground's blob colors to Figma chat-bg.
-- **Tree / TreeBase:** deprecating or deleting either one needs your confirmation.
+- **Tree:** deprecating it needs your confirmation (`TreeBase` has been removed).
 - **Generic DS gaps:** an IconButton-with-tooltip or DropdownMenuSwitchItem.
 
 ---
 
 ## 12. Open questions
 
-1. Tree: mark `Tree` `@deprecated` and delete the dead `TreeBase`?
+1. Tree: mark `Tree` `@deprecated`? (`TreeBase` is already removed — `tree-base-removed` migration.)
 2. Send when the input is empty: the spec disables it, but Figma draws it enabled.
 3. UserMessage:
    - Is a "Show less" control needed after expanding?
