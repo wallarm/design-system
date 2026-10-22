@@ -138,12 +138,49 @@ pnpm semantic-release
 
 ### Required Secrets
 
-- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish
+- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish)
+- `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by repository rulesets that `GITHUB_TOKEN` cannot bypass (see Branch Rules), so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
+- `FIGMA_ACCESS_TOKEN`: Figma personal access token (scopes: File content read, Code Connect write), used by `publish-code-connect`
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions
+
+### Branch Rules
+
+`main` has two repository rulesets (Settings → Rules → Rulesets; they live in GitHub, not in this repo):
+
+- **`main: only admins merge`** — restricts updates, deletion and force pushes. Repo admins (exempt) and deploy keys bypass it.
+- **`main: required checks`** — requires the `Require migration for breaking changes` check (`require-migration` in `pr-title.yml`). Only deploy keys bypass it, so `release` and `commit-screenshots` keep pushing; admins merging a PR are blocked while the check fails. A separate ruleset is needed because admins are exempt from the first one.
+
+To recreate the second ruleset:
+
+```bash
+gh api repos/wallarm/design-system/rulesets --method POST --input - <<'EOF'
+{
+  "name": "main: required checks",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "bypass_actors": [{ "actor_type": "DeployKey", "bypass_mode": "always" }],
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          { "context": "Require migration for breaking changes", "integration_id": 15368 }
+        ]
+      }
+    }
+  ]
+}
+EOF
+```
+
+`integration_id` 15368 is GitHub Actions. The check only runs on `pull_request`, so a direct (non-PR) push to `main` by anyone but a deploy key is rejected by this ruleset.
 
 ### Workflow
 
-Everything — quality checks, build, E2E, screenshot updates, Storybook deployment, and the release itself — runs as jobs inside the single [`main.yml`](./.github/workflows/main.yml) workflow, triggered on push to any branch. PR title validation is a separate workflow, [`pr-title.yml`](./.github/workflows/pr-title.yml). See [CI_PLAN.md](./CI_PLAN.md) for the full job list.
+Everything — quality checks, build, E2E, screenshot updates, Storybook deployment, and the release itself — runs as jobs inside the single [`main.yml`](./.github/workflows/main.yml) workflow, triggered on push to any branch. PR title validation is a separate workflow, [`pr-title.yml`](./.github/workflows/pr-title.yml). The full job list is in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
 
 ## Best Practices
 
@@ -176,7 +213,7 @@ If a merge to `main` doesn't trigger a version bump:
 
 If publishing fails:
 
-- Verify `NPM_TOKEN` is valid and has publish rights for `@wallarm-org/design-system` / `@wallarm-org/mcp`
+- Verify `NPM_TOKEN` is valid and has publish rights for `@wallarm-org/design-system` / `@wallarm-org/mcp` / `@wallarm-org/migrator`
 - Check npm registry status
 - Ensure `package.json` has correct `publishConfig`
 - Review the `release` job's logs in GitHub Actions for the detailed semantic-release error

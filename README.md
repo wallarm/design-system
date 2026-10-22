@@ -151,7 +151,6 @@ git commit -m "docs: update readme [skip-e2e]"
 - **[CLAUDE.md](./CLAUDE.md)** - AI assistant instructions
 - **[AGENTS.md](./AGENTS.md)** - Agent system and routing
 - **[.claude/agents/](./.claude/agents/)** - Specialized AI agents
-- **[CI_PLAN.md](./CI_PLAN.md)** - CI/CD infrastructure plan
 - **[VERSIONING.md](./VERSIONING.md)** - Versioning strategy and release process
 
 ## 🔧 Useful Commands

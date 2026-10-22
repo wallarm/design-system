@@ -8,7 +8,7 @@
 
 - **[../../../RELEASE.md](../../../RELEASE.md)** — full release workflow, branch strategy, RC versions, screenshot updates
 - **[../../../VERSIONING.md](../../../VERSIONING.md)** — SemVer policy, Conventional Commits, commit-type-to-bump mapping
-- **[../../../CI_PLAN.md](../../../CI_PLAN.md)** — the CI/CD pipeline that runs the release
+- **[../../../.github/workflows/main.yml](../../../.github/workflows/main.yml)** — the CI/CD pipeline that runs the release
 
 ## Quick summary (design-system specifics)
 

@@ -175,7 +175,6 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 ## 📚 Documentation References
 
 - **[README.md](./README.md)** - Project overview and quick start
-- **[CI_PLAN.md](./CI_PLAN.md)** - CI/CD pipeline documentation
 - **[.github/workflows/main.yml](./.github/workflows/main.yml)** - CI/CD pipeline implementation
 
 ## 🚦 CI/CD Pipeline Structure
@@ -195,7 +194,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 9. **release** - Runs `semantic-release` to publish `@wallarm-org/design-system`/`@wallarm-org/mcp`/`@wallarm-org/migrator` to npm (see [VERSIONING.md](./VERSIONING.md))
 10. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
 
-Full detail: [CI_PLAN.md](./CI_PLAN.md).
+Secrets and branch rules: [VERSIONING.md](./VERSIONING.md#cicd-integration).
 
 ### CI/CD Features
 
