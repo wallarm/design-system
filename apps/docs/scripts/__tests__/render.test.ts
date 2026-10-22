@@ -6,6 +6,7 @@ import {
   renderComponentsMeta,
   renderPropsTable,
   renderTokensPage,
+  titleCase,
   toStoryId,
 } from '../render';
 
@@ -175,5 +176,23 @@ describe('renderTokensPage', () => {
     expect(out).toContain('<TokenTable tokens={[');
     expect(out).toContain('| Token | Value |');
     expect(out).toContain('</TokenTable>');
+  });
+});
+
+describe('titleCase', () => {
+  it('capitalizes kebab words', () => {
+    expect(titleCase('colors-primary')).toBe('Colors Primary');
+    expect(titleCase('semantic-dark')).toBe('Semantic Dark');
+    expect(titleCase('shadow')).toBe('Shadow');
+  });
+});
+
+describe('renderTokensPage headings', () => {
+  it('renderTokensPage uses title-case headings', () => {
+    const out = renderTokensPage([
+      { name: 'colors-primary', tokens: [{ name: '--color-a', value: '#fff' }] },
+    ]);
+    expect(out).toContain('## Colors Primary');
+    expect(out).not.toContain('## colors-primary');
   });
 });

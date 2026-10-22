@@ -195,10 +195,16 @@ export function renderComponentsMeta(
   return `${JSON.stringify(groups, null, 2)}\n`;
 }
 
+export const titleCase = (kebab: string): string =>
+  kebab
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
 export function renderTokensPage(tokens: TokenCategory[]): string {
   const out = ['# Tokens'];
   for (const cat of tokens) {
-    out.push(`## ${cat.name}`);
+    out.push(`## ${titleCase(cat.name)}`);
     if (cat.name.includes('syntax')) out.push('Code-managed mapping — do not override.');
     const rows = cat.tokens.map(t => `| ${escapeCell(t.name)} | ${escapeCell(t.value)} |`);
     const table = ['| Token | Value |', '| --- | --- |', ...rows].join('\n');
