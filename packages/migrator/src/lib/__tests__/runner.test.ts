@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
+import type { SourceFile } from 'ts-morph';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { migrations } from '../../migrations';
 import { renderReport } from '../report';
 import { runMigrations } from '../runner';
+import type { MigrationContext } from '../types';
 
 const IMP = "import { Avatar } from '@wallarm-org/design-system';\n";
 let cwd: string;
@@ -42,6 +44,49 @@ describe('runMigrations', () => {
     expect(r.skipped).toHaveLength(1);
     expect(r.skipped[0]?.file).toBe('c.tsx');
     expect(JSON.stringify(r)).not.toContain('d.tsx');
+  });
+});
+
+describe('runMigrations isolation', () => {
+  it('isolates a throwing transform and keeps other results', () => {
+    fs.writeFileSync(path.join(cwd, 'bad.tsx'), `${IMP}const a = 1;\n`);
+    fs.writeFileSync(path.join(cwd, 'good.tsx'), `${IMP}const a = <Avatar size='xs' />;\n`);
+    const boom = {
+      id: 'boom',
+      title: 'boom',
+      transform: (f: SourceFile, ctx: MigrationContext) => {
+        if (f.getFilePath().endsWith('bad.tsx')) {
+          ctx.report(f, 'half-done');
+          throw new Error('kaboom');
+        }
+      },
+    };
+    const r = runMigrations({
+      files: ['bad.tsx', 'good.tsx'].map(f => path.join(cwd, f)),
+      cwd,
+      migrations: [boom, ...migrations],
+    });
+    expect(r.skipped).toEqual([{ file: 'bad.tsx', error: 'kaboom' }]);
+    expect(r.manual).toHaveLength(0);
+    expect(r.changed.map(c => c.file)).toEqual(['good.tsx']);
+  });
+
+  it('skips unreadable files and continues', () => {
+    fs.writeFileSync(path.join(cwd, 'ok.tsx'), `${IMP}const a = <Avatar size='xs' />;\n`);
+    const r = runMigrations({
+      files: [path.join(cwd, 'missing.tsx'), path.join(cwd, 'ok.tsx')],
+      cwd,
+      migrations,
+    });
+    expect(r.skipped[0]?.file).toBe('missing.tsx');
+    expect(r.changed).toHaveLength(1);
+  });
+
+  it('reports subdirectory paths relative to cwd', () => {
+    fs.mkdirSync(path.join(cwd, 'src'));
+    fs.writeFileSync(path.join(cwd, 'src/x.tsx'), `${IMP}const a = <Avatar size='xs' />;\n`);
+    const r = runMigrations({ files: [path.join(cwd, 'src/x.tsx')], cwd, migrations });
+    expect(r.changed[0]?.file).toBe('src/x.tsx');
   });
 });
 

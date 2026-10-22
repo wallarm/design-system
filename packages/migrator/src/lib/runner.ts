@@ -1,3 +1,4 @@
+import type { SourceFile } from 'ts-morph';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createProject, DS_PACKAGE } from './jsx';
@@ -28,31 +29,39 @@ export function runMigrations(args: {
   const project = createProject();
 
   for (const abs of args.files) {
-    const before = fs.readFileSync(abs, 'utf8');
-    if (!before.includes(DS_PACKAGE)) continue;
-
     const file = path.relative(args.cwd, abs).split(path.sep).join('/');
-    const sourceFile = project.createSourceFile(file, before, { overwrite: true });
+    let sourceFile: SourceFile | undefined;
+    try {
+      const before = fs.readFileSync(abs, 'utf8');
+      if (!before.includes(DS_PACKAGE)) continue;
 
-    if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0) {
-      result.skipped.push({ file, error: 'syntax error, file left untouched' });
-      continue;
+      sourceFile = project.createSourceFile(file, before, { overwrite: true });
+      if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0) {
+        result.skipped.push({ file, error: 'syntax error, file left untouched' });
+        continue;
+      }
+
+      const manual: ManualItem[] = [];
+      for (const migration of args.migrations) {
+        migration.transform(sourceFile, {
+          report: (node, message) =>
+            manual.push({
+              file,
+              line: node.getStartLineNumber(),
+              migrationId: migration.id,
+              message,
+            }),
+        });
+      }
+
+      const after = sourceFile.getFullText();
+      result.manual.push(...manual);
+      if (after !== before) result.changed.push({ file, before, after });
+    } catch (e) {
+      result.skipped.push({ file, error: e instanceof Error ? e.message : String(e) });
+    } finally {
+      sourceFile?.forget();
     }
-
-    for (const migration of args.migrations) {
-      migration.transform(sourceFile, {
-        report: (node, message) =>
-          result.manual.push({
-            file,
-            line: node.getStartLineNumber(),
-            migrationId: migration.id,
-            message,
-          }),
-      });
-    }
-
-    const after = sourceFile.getFullText();
-    if (after !== before) result.changed.push({ file, before, after });
   }
   return result;
 }
