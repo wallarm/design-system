@@ -525,3 +525,38 @@ Runs after Tasks 14+15.
   - the AI → llms.txt page's links resolve locally.
 - [ ] **Step 3: Run** the plain `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success, and `doc_build/llms.txt` contains `https://wallarm.github.io/design-system/`. This is the production default; Task 9's check depends on it.
 - [ ] **Step 4: Commit** `feat(docs): local preview with local link origins`
+
+---
+
+### Task 17: Heavy pages — lazy previews and `!autodocs` stories (user request, 2026-10-22)
+
+Runs after Task 8. One dispatch, two commits.
+
+**Part A — lazy previews (site).**
+- Modify: `apps/docs/theme/components/StoryPreview.tsx`, `apps/docs/theme/components/Explorer.tsx`. Create `apps/docs/theme/components/useInView.ts`.
+- `useInView(ref: RefObject<Element | null>, rootMargin = '600px'): boolean`:
+  - one `IntersectionObserver`;
+  - returns `true` once the element first intersects, then stays `true` (no unmount when scrolled away — simplest; it avoids remounting stories and losing their state);
+  - disconnects after the first hit and on unmount;
+  - if `IntersectionObserver` is missing, returns `true`.
+- `Live` (StoryPreview) and the Explorer preview call `load()` and mount the story only after `useInView` is true. Before that they render the existing Skeleton placeholder at a fixed min height (200px), so scroll position stays stable. `useStory` must not start loading before then: pass the load gate into it, or render the `useStory` consumer only when in view.
+- Tests (jsdom, mock `IntersectionObserver`):
+  - `does not load the story until in view` — `load` not called before the observer callback fires with `isIntersecting: true`, called once after;
+  - `useInView falls back to true without IntersectionObserver`.
+
+**Part B — `!autodocs` stories render as code + Storybook link.**
+- Modify:
+  - `packages/mcp-core/src/schema.ts` — `exampleMetadataSchema` gets `tags: z.array(z.string()).optional()`;
+  - `packages/design-system/scripts/metadata/parse-examples.ts` / `story-source.ts` — read story-level tags from `Story.tags = [...]` assignments and object-literal `tags` on StoryObj; string literals only;
+  - `apps/docs/scripts/render.ts`.
+- `renderComponentPage`: an example whose `tags` include `!autodocs` renders its description, then the fenced code block (no `StoryPreview`, no `load`), then `[Open in Storybook](https://wallarm.github.io/design-system/storybook/?path=/story/<toStoryId(storyTitle)>--<kebab(exportName)>)` (e.g. `InfiniteScrollWindow` → `infinite-scroll-window`). If the first example is `!autodocs`, the page preview uses the first example that isn't; if none qualifies, there is no top preview. The Explorer likewise uses the first non-`!autodocs` example.
+- Modify: `packages/design-system/src/components/Table/Table.stories.tsx`. Add `X.tags = ['!autodocs'];` to every story that uses `virtualized='window'`, infinite or bidirectional infinite scroll (`InfiniteScroll*`, `BidirectionalInfiniteScroll*`), or large virtualized data (`Virtualization`, `ScrollToRow`, `FullFeatured`, `RowReorderingVirtualized`, `StickyGroupParentVirtualized`). Find them by grep and list the final set in the report. Storybook then drops them from the Table Overview page; they stay as individual stories in the sidebar. E2E tests use story IDs and are unaffected; confirm that no `*.e2e.ts` targets the docs page.
+- Tests:
+  - metadata: `reads story-level tags` (fixture `export const A = () => <div/>; A.tags = ['!autodocs'];` → `tags: ['!autodocs']`);
+  - render: `renders !autodocs examples as code with a Storybook link` (no `<StoryPreview` for that example; link ends `--infinite-scroll-window)`);
+  - `skips !autodocs for the top preview and explorer`.
+
+- [ ] **Step 1:** Part A with TDD; run `pnpm --filter @wallarm-org/docs test:run` (RED → GREEN). Commit `perf(docs): mount story previews when they scroll into view`.
+- [ ] **Step 2:** Part B with TDD; run `pnpm --filter @wallarm-org/design-system exec rstest run scripts/metadata`, `pnpm --filter @wallarm-org/mcp test:run` and docs `test:run` (RED → GREEN); `generate-metadata`; `pnpm --filter @wallarm-org/design-system build-storybook` (expected: success).
+- [ ] **Step 3: Run** `pnpm turbo run build --filter=@wallarm-org/docs...`, then in `preview` open `/design-system/components/table`. Expected: the page scrolls smoothly top to bottom with no hang. Measure with the Playwright MCP — e.g. time to load plus scroll to bottom, and the long-task count via `PerformanceObserver` — before (on the previous commit, if practical) and after, and report the numbers. `!autodocs` examples show code + an "Open in Storybook" link.
+- [ ] **Step 4: Commit** `perf(table): keep heavy stories off the docs pages`.
