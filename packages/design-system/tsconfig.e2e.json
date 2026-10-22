@@ -8,11 +8,26 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "**/*.e2e.*",
-    "src/components/**/*.ts",
-    "src/components/**/*.tsx",
-    "src/utils/**/*.ts",
+    "**/*.e2e.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "playwright.config.ts",
     "playwright.config.docker.ts"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.stories.*",
+    "**/*.figma.*",
+    "**/__tests__/**",
+    "**/stories/**",
+    "**/story-content/**",
+    "**/mocks.ts",
+    "**/mocks.tsx",
+    "**/mocks/**",
+    "src/testUtils",
+    "node_modules",
+    "dist",
+    "storybook-static"
   ]
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@wallarm-org/typescript-config/storybook.json",
-  "include": [".storybook/**/*", "**/*.stories.*"],
-  "exclude": ["node_modules", "dist", "storybook-static"]
+  "include": [".storybook/**/*", "**/*.stories.*", "src/**/*.d.ts"],
+  "exclude": ["**/*.test.*", "src/testUtils", "node_modules", "dist", "storybook-static"]
 }

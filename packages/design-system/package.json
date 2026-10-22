@@ -75,7 +75,7 @@
     "publish:local": "pnpm build && yalc publish --push",
     "lint": "biome check",
     "lint:fix": "biome check --fix",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.figma.json",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit --composite false --incremental false && tsc -p tsconfig.storybook.json --noEmit --composite false --incremental false && tsc -p tsconfig.figma.json --noEmit --composite false --incremental false && tsc -p tsconfig.e2e.json --noEmit --composite false --incremental false",
     "test": "rstest watch",
     "test:coverage": "rstest run --coverage",
     "test:run": "rstest run",
