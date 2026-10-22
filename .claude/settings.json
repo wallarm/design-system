@@ -1,41 +1,15 @@
 {
+  "permissions": {
+    "deny": ["Bash(git push --force*)", "Bash(git push -f*)"]
+  },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash(git commit*)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Reminder: Use conventional commit format (type(scope): subject). Run pnpm commit for guided creation.'"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(git push --force*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'BLOCKED: Force push is not allowed. Use regular push or create a new commit.' && exit 1"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write(packages/design-system/src/components/**/*.tsx)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Component file created/modified. Remember to: 1) Export from index.ts 2) Add Storybook stories 3) Consider tests'"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(packages/design-system/src/components/**/*.tsx)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Component modified. Consider updating: 1) Storybook stories 2) Tests 3) Exports if props changed'"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/require-vestige-audit.sh"
           }
         ]
       }
