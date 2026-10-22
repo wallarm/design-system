@@ -13,6 +13,7 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    # minor/patch go into one grouped PR; majors stay ungrouped, so each gets its own PR
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -30,3 +31,4 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+        update-types: [minor, patch]
