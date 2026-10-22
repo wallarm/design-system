@@ -1,0 +1,5 @@
+doc_build
+docs/components/
+docs/foundations/tokens.md
+docs/get-started/changelog.md
+docs/public/components.json

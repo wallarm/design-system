@@ -1,0 +1,57 @@
+@import '../../../packages/design-system/.storybook/fonts/kalam.css';
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@wallarm-org/design-system/theme';
+
+/* Rspress chrome on DS tokens. Rspress declares its vars under :where(), so :root wins; the DS
+   tokens themselves flip on <html data-theme>, which themeScript/ThemeSync keep in step with the
+   Rspress appearance toggle. */
+:root {
+    --rp-c-brand: var(--color-w-orange-600);
+    --rp-c-brand-light: var(--color-w-orange-500);
+    --rp-c-brand-lighter: var(--color-w-orange-200);
+    --rp-c-brand-dark: var(--color-w-orange-700);
+    --rp-c-brand-darker: var(--color-w-orange-800);
+    --rp-c-brand-tint: var(--color-bg-light-brand);
+
+    --rp-c-bg: var(--color-bg-page-bg);
+    --rp-c-bg-soft: var(--color-bg-light-primary);
+    --rp-c-bg-mute: var(--color-bg-primary);
+    --rp-c-bg-alt: var(--color-bg-page-bg);
+    --rp-c-divider: var(--color-border-primary);
+    --rp-c-divider-light: var(--color-border-primary-light);
+    --rp-c-text-0: var(--color-text-primary);
+    --rp-c-text-1: var(--color-text-primary);
+    --rp-c-text-2: var(--color-text-secondary);
+    --rp-c-text-3: var(--color-text-tertiary);
+    --rp-c-text-4: var(--color-text-hint);
+    --rp-c-text-code: var(--color-text-primary);
+    --rp-c-text-code-bg: var(--color-bg-light-primary);
+    --rp-c-text-code-border: var(--color-border-primary-light);
+    --rp-c-link: var(--color-text-link-default);
+
+    --rp-font-family-base: var(--font-sans);
+    --rp-font-family-mono: var(--font-mono);
+}
+
+html.rp-dark {
+    --rp-c-brand-tint: --alpha(var(--color-w-orange-500) / 16%);
+    --rp-c-bg-soft: var(--color-bg-surface-2);
+    --rp-c-bg-mute: var(--color-bg-surface-3);
+    --rp-c-text-code-bg: var(--color-bg-surface-2);
+}
+
+/* Story annotations — copied from packages/design-system/.storybook/preview.css (see the rationale
+   there): handwritten Kalam labels that name a group of examples. */
+.sb-annotation {
+    color: var(--color-text-secondary);
+    font-family: 'Kalam', 'Segoe Script', 'Bradley Hand', cursive;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.6;
+    text-transform: lowercase;
+}
+
+.sb-annotation-alt {
+    color: var(--color-text-secondary-alt);
+}

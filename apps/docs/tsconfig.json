@@ -1,0 +1,9 @@
+{
+  "extends": "@wallarm-org/typescript-config/react-app.json",
+  "compilerOptions": {
+    "types": ["node", "@rstest/core/globals"],
+    "customConditions": ["development"],
+    "allowJs": true
+  },
+  "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx"]
+}

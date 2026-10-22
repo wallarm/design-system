@@ -190,6 +190,7 @@ jobs:
           name: unit-test-results-${{ strategy.job-index }}
           path: |
             packages/*/test-results/junit.xml
+            apps/*/test-results/junit.xml
           if-no-files-found: ignore
 
   # ========================================
@@ -221,6 +222,7 @@ jobs:
             node_modules
             packages/*/node_modules
             packages/configs/*/node_modules
+            apps/*/node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
