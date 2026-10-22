@@ -49,7 +49,7 @@ Validates that PR titles follow conventional commit format. Lives in its own wor
 **Requirements**: Conventional commit format
 **Tools**: `thehanimo/pr-title-checker`
 
-The same workflow has a second job, `require-migration`: a PR whose title has `!` or whose body has a `BREAKING CHANGE:` line must add a new file under `packages/migrator/src/migrations/` (besides `index.ts`), otherwise it fails.
+The same workflow has a second job, `require-migration`: a PR whose title has `!` or whose body has a `BREAKING CHANGE:` line must add a new file under `packages/migrator/src/migrations/` (besides `index.ts`), otherwise it fails. It blocks merging through the `main: required checks` ruleset (see [Branch Rules](#branch-rules)).
 
 ### 2. Setup (`setup`)
 
@@ -236,10 +236,45 @@ Required GitHub Secrets:
 
 - `GITHUB_TOKEN`: Auto-provided by GitHub Actions
 - `FIGMA_ACCESS_TOKEN`: Figma personal access token (scopes: File content read, Code Connect write) used by `publish-code-connect`
-- `NPM_TOKEN`: Required by the `release` job to publish `@wallarm-org/design-system` and `@wallarm-org/mcp` to npm
+- `NPM_TOKEN`: Required by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` to npm (it must be allowed to create new packages under `@wallarm-org` for a package's first publish)
 - `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by a repository ruleset (restrict updates, deletion, force push) that only repo admins and deploy keys bypass — `GITHUB_TOKEN` cannot bypass it — so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
 
 There is no container registry push in this pipeline, so no registry credential is needed.
+
+### Branch Rules
+
+`main` has two repository rulesets (Settings → Rules → Rulesets; they live in GitHub, not in this repo):
+
+- **`main: only admins merge`** — restricts updates, deletion and force pushes. Repo admins (exempt) and deploy keys bypass it.
+- **`main: required checks`** — requires the `Require migration for breaking changes` check (`require-migration` in `pr-title.yml`). Only deploy keys bypass it, so `release` and `commit-screenshots` keep pushing; admins merging a PR are blocked while the check fails. A separate ruleset is needed because admins are exempt from the first one.
+
+To recreate the second ruleset:
+
+```bash
+gh api repos/wallarm/design-system/rulesets --method POST --input - <<'EOF'
+{
+  "name": "main: required checks",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "bypass_actors": [{ "actor_type": "DeployKey", "bypass_mode": "always" }],
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          { "context": "Require migration for breaking changes", "integration_id": 15368 }
+        ]
+      }
+    }
+  ]
+}
+EOF
+```
+
+`integration_id` 15368 is GitHub Actions. The check only runs on `pull_request`, so a direct (non-PR) push to `main` by anyone but a deploy key is rejected by this ruleset.
 
 ### Security Scanning
 
