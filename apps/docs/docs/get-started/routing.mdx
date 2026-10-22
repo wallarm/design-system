@@ -1,0 +1,271 @@
+---
+description: Connect links, navigation and RemoteShell to TanStack Router, React Router or Next.js.
+---
+
+# Routing
+
+The design system does not depend on a router. Navigation components either render your
+router's link element through `asChild`, or hand you a callback to navigate with.
+
+## asChild
+
+With `asChild`, a component does not render its own element. It merges its classes, attributes,
+ref and event handlers into its only child, so your router's link becomes the real DOM node:
+you get client-side navigation, a real `href`, middle-click and "open in new tab", with the
+design-system look.
+
+These components support `asChild` for routing:
+
+| Component | Renders by default |
+| --- | --- |
+| `Link` | `<a>` |
+| `Button` | `<button>` |
+| `NavPanelItem`, `NavPanelGroupItem` | `<a>` |
+| `NavRailItem` | `<a>` |
+| `TopHeaderLogo` | `<a>` |
+| `Card` | `<div>` |
+| `TabsTrigger` | `<button>` |
+
+### TanStack Router
+
+```tsx
+import { Link as RouterLink } from '@tanstack/react-router';
+import { Link } from '@wallarm-org/design-system/Link';
+
+export const DocsLink = () => (
+  <Link asChild>
+    <RouterLink to='/docs'>Documentation</RouterLink>
+  </Link>
+);
+```
+
+### React Router
+
+`NavLink` knows whether it matches the current URL, so pass that to `active`:
+
+```tsx
+import { NavLink, useMatch } from 'react-router';
+import { NavPanelItem } from '@wallarm-org/design-system/NavPanel';
+
+export const RulesItem = () => {
+  const match = useMatch('/rules/*');
+
+  return (
+    <NavPanelItem asChild active={!!match}>
+      <NavLink to='/rules'>Rules</NavLink>
+    </NavPanelItem>
+  );
+};
+```
+
+### Next.js
+
+```tsx
+import NextLink from 'next/link';
+import { Button } from '@wallarm-org/design-system/Button';
+
+export const CreateRuleButton = () => (
+  <Button asChild variant='primary' color='brand'>
+    <NextLink href='/rules/new'>Create rule</NextLink>
+  </Button>
+);
+```
+
+### Navigation rail, header logo, cards and tabs
+
+`NavRailItem` keeps rendering its icon and label inside the child, so the child link needs no
+content of its own:
+
+```tsx
+import { Link as RouterLink } from '@tanstack/react-router';
+import { Home } from '@wallarm-org/design-system/icons';
+import { NavRailItem } from '@wallarm-org/design-system/NavRail';
+import { TopHeaderLogo } from '@wallarm-org/design-system/TopHeader';
+
+export const HomeRailItem = ({ active }: { active: boolean }) => (
+  <NavRailItem asChild icon={Home} label='Home' active={active}>
+    <RouterLink to='/' />
+  </NavRailItem>
+);
+
+export const Logo = () => (
+  <TopHeaderLogo asChild>
+    <RouterLink to='/'>Wallarm</RouterLink>
+  </TopHeaderLogo>
+);
+```
+
+A card that is a link, and tabs that are routes (the active tab comes from the URL):
+
+```tsx
+import { Link as RouterLink, useRouterState } from '@tanstack/react-router';
+import { Card, CardContent, CardHeader, CardTitle } from '@wallarm-org/design-system/Card';
+import { Tabs, TabsList, TabsTrigger } from '@wallarm-org/design-system/Tabs';
+
+export const NodeCard = () => (
+  <Card asChild>
+    <RouterLink to='/nodes/node-1'>
+      <CardHeader>
+        <CardTitle>node-1</CardTitle>
+      </CardHeader>
+      <CardContent>Filtering node in eu-1</CardContent>
+    </RouterLink>
+  </Card>
+);
+
+export const NodeTabs = () => {
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const activeTab = pathname.endsWith('/metrics') ? 'metrics' : 'overview';
+
+  return (
+    <Tabs value={activeTab}>
+      <TabsList>
+        <TabsTrigger value='overview' asChild>
+          <RouterLink to='/nodes/node-1/overview'>Overview</RouterLink>
+        </TabsTrigger>
+        <TabsTrigger value='metrics' asChild>
+          <RouterLink to='/nodes/node-1/metrics'>Metrics</RouterLink>
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+  );
+};
+```
+
+## Breadcrumbs
+
+`BreadcrumbsItem` renders an `<a>` when it has an `href` and is not the current page, and a
+`<button>` otherwise. It has no `asChild`; to navigate with the router, keep the `href` (for
+middle-click and "open in new tab") and intercept the plain click:
+
+```tsx
+import type { MouseEvent } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { Breadcrumbs, BreadcrumbsItem } from '@wallarm-org/design-system/Breadcrumbs';
+
+export const NodeBreadcrumbs = () => {
+  const navigate = useNavigate();
+
+  const handleNodesClick = (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    event.preventDefault();
+    navigate({ to: '/nodes' });
+  };
+
+  return (
+    <Breadcrumbs>
+      <BreadcrumbsItem href='/nodes' onClick={handleNodesClick}>
+        Nodes
+      </BreadcrumbsItem>
+      <BreadcrumbsItem>node-1</BreadcrumbsItem>
+    </Breadcrumbs>
+  );
+};
+```
+
+With React Router the handler is the same, with `navigate('/nodes')` from `useNavigate()`.
+
+## RemoteShell
+
+`RemoteShell` builds its navigation panel and breadcrumbs from a `config`, so there is no link
+element to pass through `asChild`. Instead it takes three props:
+
+- `pathname`: the current path. When set, it is the single source of truth for the active item,
+  drill level and breadcrumbs.
+- `onNavigate`: called with the target path when the user clicks the shell's navigation.
+- `basePath`: a URL prefix stripped before matching and prepended when navigating (e.g. `'/edge'`).
+
+When a router owns the URL, pass **both** `pathname` and `onNavigate`. Router navigations
+(`navigate`, links in page content, memory history) do not fire `popstate`, so a shell reading
+`window.location` alone can keep highlighting the previous item. A controlled `pathname` without
+`onNavigate` logs a dev warning.
+
+### TanStack Router
+
+TanStack Router's `location.pathname` is **router-relative**: when the router is created with
+`basepath`, the prefix is not part of it, and `navigate({ to })` adds it again. Pick the wiring
+by who owns the prefix.
+
+**Router with `basepath`** (the usual remote setup, `createRouter({ basepath })`): omit
+`basePath` on the shell, so both directions are router-relative.
+
+```tsx
+import type { ReactNode } from 'react';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
+import {
+  type NavConfig,
+  RemoteShell,
+  RemoteShellBreadcrumb,
+  RemoteShellContent,
+  RemoteShellPanel,
+} from '@wallarm-org/design-system/RemoteShell';
+
+export const Shell = ({ navConfig, children }: { navConfig: NavConfig; children: ReactNode }) => {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: state => state.location.pathname }); // '/uid/overview'
+
+  const handleNavigate = (to: string) => navigate({ to });
+
+  return (
+    <RemoteShell config={navConfig} pathname={pathname} onNavigate={handleNavigate}>
+      <RemoteShellPanel resizable />
+      <RemoteShellBreadcrumb />
+      <RemoteShellContent>{children}</RemoteShellContent>
+    </RemoteShell>
+  );
+};
+```
+
+**Router with `basepath`, shell keeps `basePath`**: strip the prefix in `onNavigate`, otherwise
+the router adds it twice (`/deployments/deployments/…`).
+
+```tsx
+const handleNavigate = (to: string) => navigate({ to: to.slice(basePath.length) || '/' });
+
+<RemoteShell config={navConfig} basePath={basePath} pathname={pathname} onNavigate={handleNavigate}>
+  …
+</RemoteShell>
+```
+
+**Router without `basepath`** (routes include the product prefix): `location.pathname` is the full
+path, so pass `basePath={basePath}` and `onNavigate={to => navigate({ to })}` as is.
+
+### React Router
+
+React Router's `useLocation().pathname` already excludes the router's `basename`, the same as the
+router-relative TanStack case: omit `basePath` on the shell when the router has a `basename`, and
+pass it when the routes include the product prefix.
+
+```tsx
+import type { ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import {
+  type NavConfig,
+  RemoteShell,
+  RemoteShellBreadcrumb,
+  RemoteShellContent,
+  RemoteShellPanel,
+} from '@wallarm-org/design-system/RemoteShell';
+
+export const Shell = ({ navConfig, children }: { navConfig: NavConfig; children: ReactNode }) => {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const handleNavigate = (to: string) => navigate(to);
+
+  return (
+    <RemoteShell config={navConfig} pathname={pathname} onNavigate={handleNavigate}>
+      <RemoteShellPanel resizable />
+      <RemoteShellBreadcrumb />
+      <RemoteShellContent>{children}</RemoteShellContent>
+    </RemoteShell>
+  );
+};
+```
+
+`pathname` is accepted with or without the `basePath` prefix: the prefix is stripped only when the
+path equals `basePath` or continues it with `/` (`/edge-nodes` is not under `/edge`).
+
+:::info Limitation
+RemoteShell's navigation items render `<a>` elements without an `href` and navigate through
+`onNavigate`. Middle-click and "open in new tab" do not work on them.
+:::

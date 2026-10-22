@@ -18,7 +18,7 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 - **Monorepo Tool**: Turborepo
 - **CI/CD**: GitHub Actions with sharded testing
 - **Containerization**: Docker with multi-stage builds — for manual/local use only (`packages/design-system/Dockerfile`, `apps/playground/Dockerfile`, `docker-compose.local.yml`); CI never builds or pushes these images
-- **Deployment**: Storybook is built as a static site and deployed to GitHub Pages — there is no container registry in the pipeline
+- **Deployment**: after each stable release, `deploy-site.yml` builds the docs site and Storybook from the release tag and deploys both to GitHub Pages (docs at `/design-system/`, Storybook at `/design-system/storybook/`) — there is no container registry in the pipeline
 
 ## 📋 Development Guidelines
 
@@ -178,16 +178,16 @@ New compound component workflow: `component-architect` → `design-system` → `
 
 ### Pipeline Jobs
 
-`check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
+`check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). The GitHub Pages deploy is a third workflow, [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` (see item 8). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
 2. **quality** - Lint (Biome), typecheck and Rstest unit tests (3 shards) in parallel
-3. **build** - Builds all packages and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
-4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/iframe.html`
+3. **build** - Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
+4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
 5. **unit-test-report** / **e2e-report** - Publish JUnit results
 6. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
 7. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run
-8. **deploy-storybook** - On `main`: deploys the `storybook-static` artifact to GitHub Pages (https://wallarm.github.io/design-system/)
+8. **deploy-site.yml** (separate workflow) - After a stable design-system release on `main`, `release` dispatches it with the `vX.Y.Z` tag; it builds the docs site and Storybook from that tag and deploys both to GitHub Pages (docs: https://wallarm.github.io/design-system/, Storybook: https://wallarm.github.io/design-system/storybook/). Redeploy or roll back with `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`
 9. **release** - `semantic-release` for `@wallarm-org/design-system`, and when needed `@wallarm-org/mcp` / `@wallarm-org/migrator` — stable on `main`, RC on `feature/*` / `feat/*` / `fix/*` (see [RELEASE.md](./RELEASE.md))
 10. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
 
@@ -207,4 +207,4 @@ You are successful when:
 3. Documentation is up-to-date
 4. User requirements are met accurately
 5. Best practices are followed consistently
-6. Storybook successfully built and deployed to GitHub Pages
+6. Docs site and Storybook successfully built and deployed to GitHub Pages

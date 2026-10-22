@@ -1,0 +1,52 @@
+{
+  "name": "@wallarm-org/docs",
+  "version": "0.0.0",
+  "description": "Public documentation site for the Wallarm design system",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "apps/docs"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx scripts/generate.ts && rspress dev",
+    "build": "tsx scripts/generate.ts && rspress build",
+    "preview": "rspress preview",
+    "preview:local": "DOCS_OUT_DIR=doc_build_local DOCS_SITE_ORIGIN=http://localhost:4173 pnpm run build && DOCS_OUT_DIR=doc_build_local rspress preview --port 4173",
+    "lint": "biome check",
+    "test": "rstest watch",
+    "test:run": "rstest run",
+    "check:build": "tsx scripts/check-build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rspress/core": "2.0.23",
+    "@tanstack/react-router": "1.170.41",
+    "@wallarm-org/design-system": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "storybook": "catalog:",
+    "storybook-react-rsbuild": "3.6.0",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "catalog:",
+    "@rstest/core": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@wallarm-org/mcp-core": "workspace:*",
+    "@wallarm-org/rsbuild-config": "workspace:*",
+    "@wallarm-org/rstest-config": "workspace:*",
+    "@wallarm-org/tailwind-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "jsdom": "catalog:",
+    "tsx": "4.23.15",
+    "typescript": "catalog:"
+  }
+}

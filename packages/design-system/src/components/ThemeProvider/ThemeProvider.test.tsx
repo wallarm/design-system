@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { ThemeProvider } from './ThemeProvider';
 import { useTheme } from './useTheme';
 
@@ -125,5 +126,21 @@ describe('ThemeProvider frame style', () => {
 
     expect(localStorage.getItem('custom-frame-style')).toBe('branded');
     expect(localStorage.getItem('wasd-frame-style')).toBeNull();
+  });
+
+  it('renders on the server without localStorage', () => {
+    rs.stubGlobal('localStorage', undefined);
+
+    try {
+      const html = renderToString(
+        <ThemeProvider defaultTheme='dark'>
+          <span>x</span>
+        </ThemeProvider>,
+      );
+
+      expect(html).toContain('x');
+    } finally {
+      rs.stubGlobal('localStorage', createMemoryStorage());
+    }
   });
 });

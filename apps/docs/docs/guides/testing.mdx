@@ -1,0 +1,115 @@
+---
+description: Target design-system components in Playwright and Testing Library with cascading data-testid values.
+---
+
+# Testing
+
+Compound components such as `Alert`, `Dialog` or `Card` render several DOM elements. To give
+tests stable selectors for all of them, pass one `data-testid` to the root component: it
+cascades to every sub-component through React context.
+
+## How the cascade works
+
+Each sub-component derives its test id from the root's: `{base}--{slot}`, with a double dash.
+The slot is the sub-component's name without the parent prefix, in kebab-case: `AlertClose` is
+`close`, `DialogHeader` is `header`, `DialogFooterControls` is `footer-controls`.
+
+```tsx
+import { Button } from '@wallarm-org/design-system/Button';
+import {
+  Alert,
+  AlertClose,
+  AlertContent,
+  AlertControls,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+} from '@wallarm-org/design-system/Alert';
+
+export const LoginError = ({ onClose }: { onClose: () => void }) => (
+  <Alert data-testid='login-error'>
+    <AlertIcon />
+    <AlertContent>
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>Invalid credentials</AlertDescription>
+      <AlertControls>
+        <Button>Retry</Button>
+      </AlertControls>
+    </AlertContent>
+    <AlertClose onClick={onClose} />
+  </Alert>
+);
+```
+
+renders:
+
+```html
+<div data-testid="login-error" role="alert">
+  <div data-testid="login-error--icon">…</div>
+  <div data-testid="login-error--content">
+    <span data-testid="login-error--title">Error</span>
+    <span data-testid="login-error--description">Invalid credentials</span>
+    <div data-testid="login-error--controls">…</div>
+  </div>
+  <button data-testid="login-error--close">…</button>
+</div>
+```
+
+In Playwright:
+
+```ts
+import { expect, test } from '@playwright/test';
+
+test('login error can be dismissed', async ({ page }) => {
+  await expect(page.getByTestId('login-error')).toBeVisible();
+  await expect(page.getByTestId('login-error--title')).toHaveText('Error');
+
+  await page.getByTestId('login-error--controls').getByRole('button').click();
+  await page.getByTestId('login-error--close').click();
+});
+```
+
+Testing Library's `screen.getByTestId('login-error--close')` works the same way.
+
+Without a `data-testid` on the root, no derived ids are rendered, so production HTML stays clean.
+Leaf components such as `Button` or `Badge` take `data-testid` like any other attribute.
+
+## Exceptions
+
+| Component | Where the test id comes from |
+| --- | --- |
+| Toast | The toast's `id`: `useToast().create({ id: 'save-success', title: 'Saved' })` renders `data-testid="save-success"`, and its parts derive from it. |
+| Tour | `data-testid` on `Tour`. Tour has no DOM root of its own, so the id is applied to its popup parts through the cascade. |
+
+## Your own compound components
+
+Use the same helpers to make your components cascade, from
+`@wallarm-org/design-system/utils/testId`:
+
+```tsx
+import type { ReactNode } from 'react';
+import { type TestableProps, TestIdProvider, useTestId } from '@wallarm-org/design-system/utils/testId';
+
+interface PanelProps extends TestableProps {
+  children: ReactNode;
+}
+
+export const Panel = ({ 'data-testid': testId, children }: PanelProps) => (
+  <section data-testid={testId}>
+    <TestIdProvider value={testId}>{children}</TestIdProvider>
+  </section>
+);
+
+export const PanelTitle = ({ children }: { children: ReactNode }) => {
+  const testId = useTestId('title'); // 'settings--title' under <Panel data-testid='settings'>
+  return <h2 data-testid={testId}>{children}</h2>;
+};
+```
+
+`useTestId(slot)` returns `{base}--{slot}`, or `undefined` outside a provider or when the root has
+no test id.
+
+## `data-testid` and `data-slot`
+
+Components also render `data-slot` attributes. They exist for CSS selectors and can change with
+the markup, so don't use them in tests. Both attributes coexist on the same elements.

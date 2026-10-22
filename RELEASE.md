@@ -133,7 +133,7 @@ When the PR is merged to `main`, the `release` job in `.github/workflows/main.ym
 4. Publishes to npm with `latest` tag
 5. Creates a GitHub release
 
-Storybook is deployed to GitHub Pages by the separate `deploy-storybook` job.
+After a stable design-system release, the `release` job dispatches the separate [`deploy-site.yml`](./.github/workflows/deploy-site.yml) workflow with the new `vX.Y.Z` tag. It builds the docs site and Storybook from that tag and deploys both to GitHub Pages (docs at `/design-system/`, Storybook at `/design-system/storybook/`). The dispatch never blocks the npm releases. To redeploy, roll back or recover from a failed deploy, run `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z` (the tag must contain any fix).
 
 ## What Happens Automatically
 
@@ -148,12 +148,12 @@ Storybook is deployed to GitHub Pages by the separate `deploy-storybook` job.
 ### On merge to `main`:
 
 1. **Quality Checks** - Runs lint, typecheck, and tests
-2. **Build** - Builds all packages and Storybook
+2. **Build** - Builds all packages (except the docs site) and Storybook
 3. **Version Analysis** - Determines version from commits
 4. **Changelog Update** - Updates `CHANGELOG.md` (only on `main`)
 5. **NPM Publish** - Publishes with `latest` tag
 6. **GitHub Release** - Creates release with notes
-7. **Storybook Deploy** - Deploys to GitHub Pages
+7. **Site Deploy** - On a stable design-system release, dispatches `deploy-site.yml`, which deploys the docs site and Storybook to GitHub Pages
 
 `@wallarm-org/mcp` and `@wallarm-org/migrator` are released by the same job only when needed: mcp when `packages/mcp`/`packages/mcp-core` changed or the branch has a breaking change; migrator when `packages/migrator` changed since its last stable tag or the design-system release stamped `packages/migrator/versions.json`. See the job list in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
 
@@ -221,7 +221,7 @@ EOF
 
 ### Workflow
 
-Everything — quality checks, build, E2E, screenshot updates, Storybook deployment, and the release itself — runs as jobs inside the single [`main.yml`](./.github/workflows/main.yml) workflow, triggered on push to any branch. PR title validation is a separate workflow, [`pr-title.yml`](./.github/workflows/pr-title.yml). The full job list is in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
+Quality checks, build, E2E, screenshot updates, and the release itself run as jobs inside [`main.yml`](./.github/workflows/main.yml), triggered on push to any branch. PR title validation is a separate workflow, [`pr-title.yml`](./.github/workflows/pr-title.yml). The GitHub Pages deploy (docs site and Storybook) is [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` after a stable release. The full job list is in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
 
 ### Naming Conventions
 

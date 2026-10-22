@@ -19,10 +19,12 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({
   frameStyleStorageKey = 'wasd-frame-style',
   ...props
 }) => {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-  );
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof localStorage === 'undefined') return defaultTheme;
+    return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+  });
   const [frameStyle, setFrameStyle] = useState<FrameStyle>(() => {
+    if (typeof localStorage === 'undefined') return defaultFrameStyle;
     const stored = localStorage.getItem(frameStyleStorageKey);
     return stored === 'neutral' || stored === 'branded' ? stored : defaultFrameStyle;
   });

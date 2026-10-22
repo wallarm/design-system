@@ -1,0 +1,69 @@
+---
+description: Upgrade to v3.0.0, where Avatar sizes are renamed and Avatar gains a user-item composition.
+---
+
+# Migrating to v3
+
+v3.0.0 changes one component: **Avatar**.
+
+**Codemod:** `avatar-size-rename`, run by `migrator --from 2.x.y` (see [Migration guides](/get-started/migrations/)).
+
+## Avatar sizes are renamed
+
+The sizes now follow the pixel scale, and a new, smaller `sm` takes the old name:
+
+| Before | After | Size |
+| --- | --- | --- |
+| — | `sm` (new) | 20px |
+| `xs` | `md` | 24px |
+| `sm` | `lg` | 32px |
+
+The default size and the default look are unchanged.
+
+```tsx
+// Before
+<Avatar size='xs' />
+<Avatar size='sm' />
+
+// After
+<Avatar size='md' />
+<Avatar size='lg' />
+```
+
+The codemod rewrites static `size` values on `Avatar`. It marks for review a non-static `size`
+(`size={size}`), and a `size` that spread props may set or override. Check those by hand: an old
+`sm` must become `lg`, since `sm` is now the 20px size.
+
+## User item: AvatarContent, AvatarName, AvatarDescription
+
+Avatar can now show a name and a description next to the picture:
+
+```tsx
+import {
+  Avatar,
+  AvatarContent,
+  AvatarDescription,
+  AvatarFallback,
+  AvatarImage,
+  AvatarName,
+} from '@wallarm-org/design-system/Avatar';
+
+export const UserItem = () => (
+  <Avatar size='sm'>
+    <AvatarImage src='/avatars/jane.png' />
+    <AvatarFallback name='Jane Doe' />
+    <AvatarContent>
+      <AvatarName>Jane Doe</AvatarName>
+      <AvatarDescription>jane@example.com</AvatarDescription>
+    </AvatarContent>
+  </Avatar>
+);
+```
+
+`AvatarName` and `AvatarDescription` truncate and show the full text in a tooltip.
+
+## `role='img'` with AvatarContent
+
+Avatar no longer sets `role='img'` on its root when it contains `AvatarContent`: the name is
+visible text, and an image role would hide it from assistive technology. An avatar without
+`AvatarContent` keeps `role='img'`. Update tests that query such an avatar by `getByRole('img')`.

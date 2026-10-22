@@ -1,6 +1,7 @@
 import path from 'path';
-import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
+import { type Node, Project, type SourceFile, SyntaxKind } from 'ts-morph';
 import type { ExampleMetadata } from '@wallarm-org/mcp-core';
+import { findStoryFiles, readStoryTitle, toCopyableCode } from './story-source.js';
 
 // Stories are read syntactically, so they get their own type-checker-free project:
 // adding them to the caller's tsconfig project invalidates its program, and the
@@ -11,7 +12,7 @@ const storiesProject = new Project();
  * Parse usage examples from Storybook stories.
  *
  * Strategy:
- * 1. Find {Name}.stories.tsx in the component directory
+ * 1. Find every *.stories.tsx under the component directory ({Name}.stories.tsx first)
  * 2. For each named export (excluding default):
  *    - StoryFn: extract the initializer (arrow/function expression) text
  *    - StoryObj: reconstruct minimal JSX from args
@@ -22,50 +23,106 @@ export const parseExamples = (
   componentDir: string,
   componentName: string,
 ): ExampleMetadata[] => {
-  const storiesPath = path.join(componentDir, `${componentName}.stories.tsx`);
-  const sourceFile =
-    project.getSourceFile(storiesPath) ?? storiesProject.addSourceFileAtPathIfExists(storiesPath);
-  if (!sourceFile) return [];
-
-  const descriptions = collectDescriptions(sourceFile);
+  const dir = path.resolve(componentDir);
+  const componentsRoot = path.dirname(dir);
+  const srcDir = path.dirname(componentsRoot);
   const examples: ExampleMetadata[] = [];
 
-  for (const varStatement of sourceFile.getVariableStatements()) {
-    if (!varStatement.hasExportKeyword()) continue;
+  for (const storiesPath of findStoryFiles(project, dir)) {
+    const sourceFile =
+      project.getSourceFile(storiesPath) ?? storiesProject.addSourceFileAtPathIfExists(storiesPath);
+    if (!sourceFile) continue;
 
-    for (const decl of varStatement.getDeclarations()) {
-      const name = decl.getName();
-      // Skip default meta export (handled as `export default meta` usually, but just in case)
-      if (name === 'meta' || name === 'default') continue;
+    const descriptions = collectDescriptions(sourceFile);
+    const assignedTags = collectAssignedTags(sourceFile);
+    const storyFile = path.relative(componentsRoot, storiesPath).split(path.sep).join('/');
+    const storyTitle = readStoryTitle(sourceFile);
 
-      const initializer = decl.getInitializer();
-      if (!initializer) continue;
+    for (const varStatement of sourceFile.getVariableStatements()) {
+      if (!varStatement.hasExportKeyword()) continue;
 
-      const kind = initializer.getKind();
-      let code: string;
+      for (const decl of varStatement.getDeclarations()) {
+        const name = decl.getName();
+        // Skip default meta export (handled as `export default meta` usually, but just in case)
+        if (name === 'meta' || name === 'default') continue;
 
-      if (kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.FunctionExpression) {
-        // StoryFn pattern — extract the function source
-        code = initializer.getText();
-      } else if (kind === SyntaxKind.ObjectLiteralExpression) {
-        // StoryObj pattern — reconstruct JSX from args
-        code = reconstructJsxFromStoryObj(initializer.getText(), componentName);
-      } else {
-        continue;
+        const initializer = decl.getInitializer();
+        if (!initializer) continue;
+
+        const kind = initializer.getKind();
+        let code: string;
+
+        if (kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.FunctionExpression) {
+          // StoryFn pattern — extract the function source
+          code = initializer.getText();
+        } else if (kind === SyntaxKind.ObjectLiteralExpression) {
+          // StoryObj pattern — reconstruct JSX from args
+          code = reconstructJsxFromStoryObj(initializer.getText(), componentName);
+        } else {
+          continue;
+        }
+
+        const example: ExampleMetadata = {
+          name,
+          code: toCopyableCode(sourceFile, name, code, srcDir),
+          storyFile,
+        };
+        if (storyTitle) example.storyTitle = storyTitle;
+
+        const tags =
+          assignedTags.get(name) ??
+          (initializer.isKind(SyntaxKind.ObjectLiteralExpression)
+            ? readStringArray(
+                initializer
+                  .getProperty('tags')
+                  ?.asKind(SyntaxKind.PropertyAssignment)
+                  ?.getInitializer(),
+              )
+            : undefined);
+        if (tags) example.tags = tags;
+
+        const description = descriptions.get(name);
+        if (description) {
+          example.description = description;
+        }
+
+        examples.push(example);
       }
-
-      const example: ExampleMetadata = { name, code };
-
-      const description = descriptions.get(name);
-      if (description) {
-        example.description = description;
-      }
-
-      examples.push(example);
     }
   }
 
   return examples;
+};
+
+/** `['a', 'b']` → `['a', 'b']`; undefined unless every element is a string literal. */
+const readStringArray = (node: Node | undefined): string[] | undefined => {
+  if (!node?.isKind(SyntaxKind.ArrayLiteralExpression)) return undefined;
+  const out: string[] = [];
+  for (const el of node.getElements()) {
+    if (
+      !el.isKind(SyntaxKind.StringLiteral) &&
+      !el.isKind(SyntaxKind.NoSubstitutionTemplateLiteral)
+    ) {
+      return undefined;
+    }
+    out.push(el.getLiteralText());
+  }
+  return out;
+};
+
+/** Post-export `Story.tags = ['!autodocs']` assignments. */
+const collectAssignedTags = (sourceFile: SourceFile): Map<string, string[]> => {
+  const tags = new Map<string, string[]>();
+  for (const statement of sourceFile.getStatements()) {
+    const expr = statement.asKind(SyntaxKind.ExpressionStatement)?.getExpression();
+    const binary = expr?.asKind(SyntaxKind.BinaryExpression);
+    if (binary?.getOperatorToken().getKind() !== SyntaxKind.EqualsToken) continue;
+    const left = binary.getLeft().asKind(SyntaxKind.PropertyAccessExpression);
+    if (left?.getName() !== 'tags') continue;
+    const value = readStringArray(binary.getRight());
+    if (value) tags.set(left.getExpression().getText(), value);
+  }
+  return tags;
 };
 
 /**

@@ -6,7 +6,8 @@ Modern React component library for building user interfaces.
 
 All documentation is available in:
 
-- [Storybook](https://wallarm.github.io/design-system/) - Interactive component examples
+- [Docs site](https://wallarm.github.io/design-system/) - Guides, component docs and API reference
+- [Storybook](https://wallarm.github.io/design-system/storybook/) - Interactive component examples
 - [Installation Guide](docs/installation.md) - Setup instructions
 - [Getting Started](docs/getting-started.md) - Introduction and overview
 
@@ -116,7 +117,8 @@ The command writes the component files, `src/icons/index.ts`, the gallery catego
 
 ## 📖 Resources
 
-- [Storybook](https://wallarm.github.io/design-system/) - Interactive examples
+- [Docs site](https://wallarm.github.io/design-system/) - Guides and component docs
+- [Storybook](https://wallarm.github.io/design-system/storybook/) - Interactive examples
 - [NPM](https://www.npmjs.com/package/@wallarm-org/design-system) - NPM package
 - [GitHub](https://github.com/wallarm/design-system) - Source code
 

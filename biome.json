@@ -9,6 +9,7 @@
       "**/packages/**/*.tsx",
       "**/packages/**/*.js",
       "**/packages/**/*.jsx",
+      "**/apps/docs/**/*.{ts,tsx}",
       "**/*.d.ts",
       "**/*.css",
       "!**/src/theme/**/*.css",
@@ -23,7 +24,10 @@
       "!**/CodeEditor/engine/languages/http/parser.ts",
       "!**/CodeEditor/engine/languages/http/parser.terms.ts",
       "!**/playwright-report",
-      "!**/coverage"
+      "!**/coverage",
+      "!**/doc_build",
+      "!**/doc_build_local",
+      "!**/.rspress"
     ]
   }
 }

@@ -143,6 +143,70 @@ export const HasNeither: StoryFn = () => null;
     });
   });
 
+  describe('multiple story files (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile('/src/components/Foo/index.ts', "export { Foo } from './Foo';");
+    fixtureProject.createSourceFile('/src/components/Foo/Foo.ts', 'export const Foo = 1;');
+    fixtureProject.createSourceFile(
+      '/src/components/Foo/stories/Extra.stories.tsx',
+      `import { Foo } from '../Foo';
+const meta = { title: 'Patterns/Foo/Extra' };
+export default meta;
+export const Second = () => <Foo />;
+export const Third = () => <Foo />;`,
+    );
+    fixtureProject.createSourceFile(
+      '/src/components/Foo/Foo.stories.tsx',
+      `import { Foo } from './Foo';
+const meta = { title: 'Components/Foo' };
+export default meta;
+export const First = () => <Foo />;`,
+    );
+
+    for (const dir of ['/src/components/Foo', '/src/components/Foo/']) {
+      it(`sets storyFile/storyTitle and orders main file first (${dir})`, () => {
+        const examples = parseExamples(fixtureProject, dir, 'Foo');
+        expect(examples.map(e => [e.name, e.storyFile, e.storyTitle])).toEqual([
+          ['First', 'Foo/Foo.stories.tsx', 'Components/Foo'],
+          ['Second', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
+          ['Third', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
+        ]);
+        expect(examples[1]!.code).toContain("from '@wallarm-org/design-system/Foo'");
+      });
+    }
+  });
+
+  describe('story tags (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile(
+      '/src/components/Tag/Tag.stories.tsx',
+      `const meta = { title: 'Components/Tag' };
+export default meta;
+const dynamic = ['x'];
+export const A = () => <div/>;
+A.tags = ['!autodocs'];
+export const B = { tags: ['!autodocs', 'b'], args: {} };
+export const C = () => <div/>;
+export const D = () => <div/>;
+D.tags = dynamic;`,
+    );
+    const examples = parseExamples(fixtureProject, '/src/components/Tag', 'Tag');
+    const byName = (name: string) => examples.find(e => e.name === name)!;
+
+    it('reads story-level tags', () => {
+      expect(byName('A').tags).toEqual(['!autodocs']);
+    });
+
+    it('reads object-literal tags on a StoryObj', () => {
+      expect(byName('B').tags).toEqual(['!autodocs', 'b']);
+    });
+
+    it('leaves tags unset without string-literal tags', () => {
+      expect(byName('C').tags).toBeUndefined();
+      expect(byName('D').tags).toBeUndefined();
+    });
+  });
+
   describe('Alert (WithCloseButton uses useState)', () => {
     const examples = parseExamples(project, path.join(componentsDir, 'Alert'), 'Alert');
 

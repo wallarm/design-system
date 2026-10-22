@@ -16,13 +16,14 @@ The canonical job list is [`CLAUDE.md` → Pipeline Jobs](../../CLAUDE.md#pipeli
 
 `check-pr-title` and `require-migration` live in their own workflow, `.github/workflows/pr-title.yml`, triggered on `pull_request` — they are **not** part of `main.yml` and do not gate any job below.
 
-The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 11 jobs:
+The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 10 jobs:
 
 ```
 setup → quality (lint | typecheck | test ×3) → build → e2e (4 shards) → unit-test-report / e2e-report
                                                   → e2e-update-screenshots (4 shards) → commit-screenshots
                                                   → release (stable on main, RC on feature/*, feat/*, fix/*)
-main only:                                        → deploy-storybook, publish-code-connect
+main only:                                        → publish-code-connect
+                                                  → release dispatches deploy-site.yml (stable release only)
 ```
 
 ## Jobs
@@ -31,16 +32,17 @@ main only:                                        → deploy-storybook, publish-
 |-----|---------|---------|
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
 | `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards), all parallel | Always |
-| `build` | Builds all packages + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
+| `build` | Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
 | `e2e` | Sharded Playwright tests (4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
 | `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
 | `e2e-update-screenshots` | Auto-update visual snapshots (4 shards) | Any branch, `[update-screenshots]` in head commit |
 | `commit-screenshots` | Commits updated screenshots back to the branch | After e2e-update-screenshots |
-| `deploy-storybook` | Deploy the Storybook static artifact to GitHub Pages | main branch |
 | `release` | Runs `semantic-release` for design-system, mcp, and migrator, publishes to npm | Stable on main, RC on `feature/*`/`feat/*`/`fix/*` |
 | `publish-code-connect` | Publishes Figma Code Connect templates (`FIGMA_ACCESS_TOKEN`) | main branch, only when a stable release is due |
 
-Separately (PRs only, `pr-title.yml`): `check-pr-title` validates conventional-commit-format PR titles; `require-migration` fails a breaking-change PR that adds no file under `packages/migrator/src/migrations/`.
+Separately, `deploy-site.yml` (`workflow_dispatch`, input `tag`) builds the docs site and Storybook from a stable `vX.Y.Z` tag and deploys both to GitHub Pages (Storybook under `/design-system/storybook/`); `release` dispatches it after a stable design-system release on main, and `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z` redeploys or rolls back.
+
+Also separately (PRs only, `pr-title.yml`): `check-pr-title` validates conventional-commit-format PR titles; `require-migration` fails a breaking-change PR that adds no file under `packages/migrator/src/migrations/`.
 
 ## Special Triggers
 
@@ -75,7 +77,7 @@ PLAYWRIGHT_VERSION: "1.63.0"
 
 - **Not used by CI.** `packages/design-system/Dockerfile` and `apps/playground/Dockerfile` are multi-stage builds for manual/local use only (see root `README.md`) — no job in `main.yml` runs `docker build`, `docker push`, or references a container registry.
 - E2E tests run inside the public `mcr.microsoft.com/playwright` image (pre-installed browsers), not a project-built image.
-- Readiness check before running E2E: a `curl` retry loop polling `http://localhost:6006/design-system/iframe.html` (timeout 60s) until the `http-server`-served Storybook static build responds — this is an HTTP polling loop, not a GitHub Actions `services:`-based Docker health check.
+- Readiness check before running E2E: a `curl` retry loop polling `http://localhost:6006/design-system/storybook/iframe.html` (timeout 60s) until the `http-server`-served Storybook static build responds — this is an HTTP polling loop, not a GitHub Actions `services:`-based Docker health check.
 
 ## Artifacts
 

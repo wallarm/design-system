@@ -27,8 +27,8 @@ const waitForBarStable = async (bar: Locator) => {
 test.describe('Component: SelectionBulkBar', () => {
   // Baselines live next to this file under `*-snapshots/`. Reference
   // visuals are taken from the deployed Storybook
-  // (https://wallarm.github.io/design-system/) — generate by running the
-  // Docker e2e with `STORYBOOK_URL=https://wallarm.github.io/design-system`
+  // (https://wallarm.github.io/design-system/storybook/) — generate by running the
+  // Docker e2e with `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`
   // and `--update`.
   test.describe('Visual', () => {
     test('Should render Default correctly', async ({ page }) => {

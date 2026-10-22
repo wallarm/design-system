@@ -129,7 +129,7 @@ design-system/
 
 - **GitHub Actions** - Automated CI/CD pipelines
 - **Docker** - `Dockerfile`s and `docker-compose.local.yml` for manual/local use (not built or published by CI)
-- **GitHub Pages** - Static hosting for Storybook documentation
+- **GitHub Pages** - Static hosting for the docs site and Storybook
 
 ## 🤖 AI Automation
 
@@ -228,7 +228,7 @@ docker build -f apps/playground/Dockerfile -t wallarm-playground .
 
 ## 🚦 CI/CD Pipeline
 
-GitHub Actions runs lint, typecheck, unit tests, build, and sharded E2E on every push; `main` also deploys Storybook to [GitHub Pages](https://wallarm.github.io/design-system/). semantic-release publishes to npm (stable from `main`, RCs from `feature/*`/`feat/*`/`fix/*`). Jobs and triggers: [CLAUDE.md → Pipeline Jobs](./CLAUDE.md#pipeline-jobs); secrets: [RELEASE.md → Requirements](./RELEASE.md#requirements).
+GitHub Actions runs lint, typecheck, unit tests, build, and sharded E2E on every push; each stable release on `main` deploys the [docs site](https://wallarm.github.io/design-system/) and [Storybook](https://wallarm.github.io/design-system/storybook/) to GitHub Pages via `deploy-site.yml`. semantic-release publishes to npm (stable from `main`, RCs from `feature/*`/`feat/*`/`fix/*`). Jobs and triggers: [CLAUDE.md → Pipeline Jobs](./CLAUDE.md#pipeline-jobs); secrets: [RELEASE.md → Requirements](./RELEASE.md#requirements).
 
 ## 🤝 Contributing
 

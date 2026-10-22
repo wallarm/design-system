@@ -964,6 +964,7 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
     </>
   );
 };
+RowSelectionWindowScroll.tags = ['!autodocs'];
 
 /**
  * `getSubRows` turns flat data into groups — each group row counts its children and collapses
@@ -1226,6 +1227,7 @@ export const Virtualization: StoryFn<typeof meta> = () => {
     />
   );
 };
+Virtualization.tags = ['!autodocs'];
 
 /**
  * `virtualized='window'` measures against the page's own scroll instead, for a table that is
@@ -1249,6 +1251,7 @@ export const WindowVirtualization: StoryFn<typeof meta> = () => {
     />
   );
 };
+WindowVirtualization.tags = ['!autodocs'];
 
 /**
  * The imperative escape hatch: `scrollToRow(id, { align })` off the ref, returning false for
@@ -1305,6 +1308,7 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+ScrollToRow.tags = ['!autodocs'];
 
 /**
  * `onEndReached` with `isLoading` — the house default for a long collection, where rows arrive
@@ -1332,6 +1336,7 @@ export const InfiniteScroll: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+InfiniteScroll.tags = ['!autodocs'];
 
 /**
  * The same fetch-on-approach against the page's scroll, where the trigger has to account for
@@ -1358,6 +1363,7 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+InfiniteScrollWindow.tags = ['!autodocs'];
 
 /**
  * Both ends at once: `onStartReached` prepends, and the scroll position is compensated so the
@@ -1400,6 +1406,7 @@ export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+BidirectionalInfiniteScroll.tags = ['!autodocs'];
 
 // Same dataset/anchor as BidirectionalInfiniteScroll, but the document itself
 // scrolls — the regression mode for prepend compensation, where unrelated page
@@ -1444,6 +1451,7 @@ export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+BidirectionalInfiniteScrollWindow.tags = ['!autodocs'];
 
 /**
  * `virtualized='window'` in an app shell that scrolls a content pane instead of the document: the
@@ -1481,6 +1489,7 @@ export const InfiniteScrollWindowInPane: StoryFn<typeof meta> = () => {
     </div>
   );
 };
+InfiniteScrollWindowInPane.tags = ['!autodocs'];
 
 /**
  * A share-link landing in a pane host: the window-mode table opens scrolled to its anchor row,
@@ -1508,6 +1517,7 @@ export const InfiniteScrollWindowInPaneAnchored: StoryFn<typeof meta> = () => {
     </div>
   );
 };
+InfiniteScrollWindowInPaneAnchored.tags = ['!autodocs'];
 
 /**
  * A pane host that mounts the table before its data: rows arrive after a delay. Neither edge may
@@ -1558,6 +1568,7 @@ export const InfiniteScrollWindowInPaneLateRows: StoryFn<typeof meta> = () => {
     </div>
   );
 };
+InfiniteScrollWindowInPaneLateRows.tags = ['!autodocs'];
 
 /**
  * A share-link landing in a pane that starts hidden (a closed tab or drawer): the anchor waits
@@ -1594,6 +1605,7 @@ export const InfiniteScrollWindowInHiddenPaneAnchored: StoryFn<typeof meta> = ()
     </VStack>
   );
 };
+InfiniteScrollWindowInHiddenPaneAnchored.tags = ['!autodocs'];
 
 /**
  * A window-mode table mounting into a pane the user already scrolled (content above it): the pane
@@ -1629,6 +1641,7 @@ export const InfiniteScrollWindowInScrolledPane: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+InfiniteScrollWindowInScrolledPane.tags = ['!autodocs'];
 
 /**
  * A column can explain itself: `description` renders as a second line under the title, or as a
@@ -2014,6 +2027,7 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
     </Table>
   );
 };
+FullFeatured.tags = ['!autodocs'];
 
 // ---------------------------------------------------------------------------
 // Inline cell editing (WDS-157)
@@ -2328,6 +2342,7 @@ export const RowReorderingVirtualized: StoryFn<typeof meta> = () => {
     />
   );
 };
+RowReorderingVirtualized.tags = ['!autodocs'];
 
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
@@ -2484,3 +2499,4 @@ export const StickyGroupParentVirtualized: StoryFn<typeof meta> = () => {
     />
   );
 };
+StickyGroupParentVirtualized.tags = ['!autodocs'];

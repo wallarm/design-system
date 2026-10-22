@@ -1,0 +1,45 @@
+---
+description: Import icons from the icons entry point, size them and give meaningful icons a title.
+---
+
+# Icons
+
+Icons are React components exported from their own entry point:
+
+```tsx
+import { Search, TriangleAlert } from '@wallarm-org/design-system/icons';
+
+export const IconExamples = () => (
+  <>
+    <Search size='md' />
+    <TriangleAlert size='lg' title='Warning' />
+  </>
+);
+```
+
+## Size
+
+`size` takes `inherit` (the default) or a step from the icon scale: `xs`, `sm`, `md`, `lg`, `xl`,
+`2xl`. With `inherit`, the icon follows the font size of its parent, so it lines up with the text
+around it.
+
+## Accessibility
+
+Without `title`, an icon is decorative: it gets `aria-hidden` and assistive technology skips it.
+That is right when a text label sits next to it. When the icon is the only thing that carries
+meaning, pass `title`: the icon gets `role='img'` and the title becomes its accessible name.
+
+For an icon-only button, put the label on the button instead (`aria-label`), so the name sits on
+the element that is clicked.
+
+## Gallery
+
+<StoryPreview load={() => import('../../../../packages/design-system/src/icons/module/Icons.stories.tsx')} name='AllIcons' hideCode>
+
+```tsx
+import { Search } from '@wallarm-org/design-system/icons';
+
+<Search size='md' />;
+```
+
+</StoryPreview>

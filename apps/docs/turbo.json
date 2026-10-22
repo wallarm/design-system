@@ -1,0 +1,7 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": { "outputs": ["doc_build/**"] },
+    "test:run": { "inputs": ["$TURBO_DEFAULT$"] }
+  }
+}

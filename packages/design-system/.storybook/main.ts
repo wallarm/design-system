@@ -30,7 +30,7 @@ const config: StorybookConfig = {
   `,
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {
-      config.output.assetPrefix = '/design-system/';
+      config.output.assetPrefix = '/design-system/storybook/';
     }
 
     return config;
