@@ -1,6 +1,7 @@
 import type { ReactNode, Ref } from 'react';
-import type { Row, RowData, TableFeatures } from '@tanstack/react-table';
+import type { Column, Row, RowData, TableFeatures } from '@tanstack/react-table';
 import type { TestableProps } from '../../utils/testId';
+import type { DSTableFeatures } from './lib/dsTableFeatures';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue> {
@@ -151,7 +152,11 @@ export interface TableColumnMeta<T = unknown> {
 
 /** Shared column properties */
 export interface TableColumnBase<T, V> {
-  header?: string | ((ctx: { column: { id: string } }) => ReactNode);
+  header?:
+    | string
+    | ((ctx: {
+        column: Column<DSTableFeatures, T extends RowData ? T : never, unknown>;
+      }) => ReactNode);
   cell?: (ctx: TableCellContext<T, V>) => ReactNode;
   size?: number;
   minSize?: number;
