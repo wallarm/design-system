@@ -686,3 +686,22 @@ Runs after Task 20.
 - [ ] **Step 1:** TDD for `stripJsx`. Cases: a `<StoryPreview load={() => import('…')} name='Basic'>` opening tag is removed; `</StoryPreview>` is removed; plain prose is kept; a `<TokenTable tokens={[…]}>` with a long JSON attribute is removed. Run `pnpm --filter @wallarm-org/docs test:run` (RED, then GREEN).
 - [ ] **Step 2:** Wire it up. Run the turbo build, then in `preview` search for "button", "dialog" and "token". Hits show headings and prose only. Save screenshot `search-results-clean.png`.
 - [ ] **Step 3: Commit** `fix(docs): keep component markup out of the search index`
+
+---
+
+### Task 22: v4 migration guide and sync with the Storybook upgrade guide (found 2026-10-22, after rebasing onto v4.0.0)
+
+Runs after the rebase onto `origin/main`.
+
+**Files:**
+- Create: `apps/docs/docs/get-started/migrations/v4.mdx`
+- Modify: `apps/docs/docs/get-started/migrations/_meta.json` → `["index","v4","v3","v2","v1"]`
+- Modify: `apps/docs/docs/get-started/migrations/index.mdx`, only if it disagrees with the migrator README or the new Storybook upgrade guide.
+
+**Content:**
+- `v4.mdx` covers v4.0.0: `refactor(tree)!: remove unused TreeBase` (`e5412603`). Describe what was removed and what to use instead, taken from that commit, `packages/migrator/src/migrations/tree-base-removed.ts`, and its fixtures. State whether the codemod rewrites the code or only reports it. Mention `79fb604b` (forwardRef → ref prop) only if it changes the consumer API, for example ref typing. Check the commit.
+- Compare the site's migration index with the upgrade guide added to Storybook in `e8b027c3` (find it under `packages/design-system/src/docs/` or `docs/`). Keep the facts consistent and link the two. Don't duplicate long text.
+
+- [ ] **Step 1:** Write the pages. Every code snippet uses names exported in v4.
+- [ ] **Step 2: Run** `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success, dead-link check passes.
+- [ ] **Step 3: Commit** `docs(site): v4 migration guide`
