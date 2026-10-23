@@ -355,7 +355,7 @@ jobs:
           path: unit-test-artifacts
 
       - name: Publish unit test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         with:
           name: Unit Test Results
           path: "unit-test-artifacts/**/junit.xml"
@@ -382,7 +382,7 @@ jobs:
           merge-multiple: false
 
       - name: Publish E2E test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         with:
           name: E2E Test Results
           path: "e2e-artifacts/**/junit.xml"
