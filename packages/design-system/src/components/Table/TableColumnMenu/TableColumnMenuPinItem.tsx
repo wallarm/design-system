@@ -4,7 +4,7 @@ import { Pin, PinOff } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
-import { useTableColumnMenuContext } from './TableColumnMenu';
+import { useTableColumnMenuContext } from './TableColumnMenuContext';
 
 export type TableColumnMenuPinItemProps = DropdownMenuItemProps;
 

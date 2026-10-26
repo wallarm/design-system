@@ -1,11 +1,4 @@
-import {
-  type ButtonHTMLAttributes,
-  createContext,
-  type ReactNode,
-  useContext,
-  useId,
-  useState,
-} from 'react';
+import { type ButtonHTMLAttributes, type ReactNode, useId, useState } from 'react';
 
 import type { Column, RowData } from '@tanstack/react-table';
 
@@ -24,24 +17,13 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { type DSTableFeatures, SORT_LABELS, useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
+import { TableColumnMenuContext, useTableColumnMenuContext } from './TableColumnMenuContext';
 import { TableColumnMenuHideItem } from './TableColumnMenuHideItem';
 import { TableColumnMenuMoveLeftItem } from './TableColumnMenuMoveLeftItem';
 import { TableColumnMenuMoveRightItem } from './TableColumnMenuMoveRightItem';
 import { TableColumnMenuPinItem } from './TableColumnMenuPinItem';
 
-interface TableColumnMenuContextValue {
-  column: Column<DSTableFeatures, RowData>;
-}
-
-const TableColumnMenuContext = createContext<TableColumnMenuContextValue | null>(null);
-
-export const useTableColumnMenuContext = (): TableColumnMenuContextValue => {
-  const ctx = useContext(TableColumnMenuContext);
-  if (!ctx) {
-    throw new Error('TableColumnMenu item components must be rendered inside <TableColumnMenu>');
-  }
-  return ctx;
-};
+export { useTableColumnMenuContext } from './TableColumnMenuContext';
 
 export interface TableColumnMenuProps<T extends RowData = Record<string, unknown>>
   extends

@@ -4,7 +4,7 @@ import { Check } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { SORT_LABELS, useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
-import { useTableColumnMenuContext } from './TableColumnMenu';
+import { useTableColumnMenuContext } from './TableColumnMenuContext';
 
 export interface TableColumnMenuSortItemProps extends DropdownMenuItemProps {
   /** Direction this item commits when selected. */

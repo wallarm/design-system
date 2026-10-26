@@ -276,6 +276,8 @@ Compound components cascade `data-testid` to their sub-components. The root take
 
 ## Step 6: Create Barrel Export
 
+Within a component, import shared helpers, constants, and context hooks from their defining modules. Importing them through a barrel that also exports their callers can create dependency cycles. Keep context definitions separate from the components that render their consumers, and preserve the barrel exports for public consumers.
+
 ```ts
 // index.ts (simple component)
 export { ComponentName, type ComponentNameProps } from './ComponentName';
