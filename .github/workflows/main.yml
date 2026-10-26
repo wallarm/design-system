@@ -185,7 +185,7 @@ jobs:
 
       - name: Upload unit test results
         if: always() && matrix.check == 'test'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-test-results-${{ strategy.job-index }}
           path: |
@@ -237,14 +237,14 @@ jobs:
         run: pnpm --filter=@wallarm-org/design-system build-storybook
 
       - name: Upload Storybook artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: storybook-static
           path: packages/design-system/storybook-static
           retention-days: 7
 
       - name: Upload built packages artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: built-packages
           path: |
@@ -327,7 +327,7 @@ jobs:
           STORYBOOK_URL: http://localhost:6006/design-system/storybook
 
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: e2e-results-shard-${{ matrix.shard }}
@@ -515,7 +515,7 @@ jobs:
           exit "$failed"
 
       - name: Upload updated screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots-shard-${{ matrix.shard }}
           path: ${{ steps.changed-screenshots.outputs.dir }}
