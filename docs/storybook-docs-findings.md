@@ -1158,7 +1158,7 @@ Not findings — decisions worth remembering so they are not rediscovered.
   WCAG 1.4.3 AA needs 4.5:1. The active badge digit (`text-text-brand` on
   `bg-states-brand-active`, 12px) is lower still, about 3.1:1, though it is `aria-hidden`
   and sits next to the label. Dark mode (w-orange-300 on #0d1123, about 10:1) passes, as do
-  danger (#e7000b, about 4.77:1) and secondary (#62748e, about 4.76:1).
+  danger (#e7000b, about 4.77:1) and secondary (#45556c, about 7.58:1).
 - **Evidence** — `packages/design-system/src/components/Stepper/classes.ts`
   (`stepperTitleVariants` `active`, `stepperIndicatorVariants` `active`);
   `theme/semantic.css` (`--color-text-brand`), `theme/colors/primary.css`
