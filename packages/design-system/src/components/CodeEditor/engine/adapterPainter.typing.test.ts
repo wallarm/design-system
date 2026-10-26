@@ -17,12 +17,10 @@ const collect = (set: DecorationSet): PaintedRange[] => {
 /** Every non-space run is a keyword; spaces are plain. */
 const wordTokens = (code: string): HighlightResult => ({
   tokens: code.split('\n').map(line =>
-    (line.match(/\s+|\S+/g) ?? []).map(
-      (content): Token => ({
-        content,
-        type: /\s/.test(content) ? 'plain' : 'keyword',
-      }),
-    ),
+    (line.match(/\s+|\S+/g) ?? []).map((content): Token => ({
+      content,
+      type: /\s/.test(content) ? 'plain' : 'keyword',
+    })),
   ),
 });
 

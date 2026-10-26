@@ -11,10 +11,7 @@ export {
   TableColumnMenuMoveRightItem,
   type TableColumnMenuMoveRightItemProps,
 } from './TableColumnMenuMoveRightItem';
-export {
-  TableColumnMenuPinItem,
-  type TableColumnMenuPinItemProps,
-} from './TableColumnMenuPinItem';
+export { TableColumnMenuPinItem, type TableColumnMenuPinItemProps } from './TableColumnMenuPinItem';
 export {
   TableColumnMenuSortItem,
   type TableColumnMenuSortItemProps,

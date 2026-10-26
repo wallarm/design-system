@@ -4,8 +4,10 @@ import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
-export interface BannerCloseProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+export interface BannerCloseProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children'
+> {
   ref?: Ref<HTMLButtonElement>;
   /** Callback when the close button is clicked */
   onClick?: () => void;

@@ -12,8 +12,7 @@ export interface CopyFormatData {
 // Do not place ParameterPath inside a `user-select: none` ancestor or copy
 // silently falls back to the empty browser default.
 export interface ParameterPathProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onCopy'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onCopy'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   method?: HttpMethodName;
   segments: string[];

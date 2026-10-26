@@ -9,7 +9,8 @@ import {
 } from './TableSettingsMenuContentContext';
 
 export interface TableSettingsMenuResetProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
     TestableProps {}
 
 export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({

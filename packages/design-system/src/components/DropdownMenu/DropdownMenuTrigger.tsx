@@ -4,7 +4,8 @@ import { Menu, useMenuContext } from '@ark-ui/react/menu';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   children: ReactNode;
   asChild?: boolean;

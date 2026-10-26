@@ -94,7 +94,7 @@ html.rp-dark {
 
 /* Section shortcuts (theme/SearchSections.tsx) only belong to the empty search dialog. */
 .rp-search-panel__modal:has(.rp-search-panel__input:not(:placeholder-shown))
-[data-slot='search-sections'] {
+    [data-slot='search-sections'] {
     display: none;
 }
 

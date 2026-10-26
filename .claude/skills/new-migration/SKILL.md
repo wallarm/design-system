@@ -87,7 +87,8 @@ The design-system release stamps the new id with its major automatically. Until 
 ```bash
 pnpm --filter @wallarm-org/migrator test:run
 pnpm --filter @wallarm-org/migrator typecheck
-pnpm biome check packages/migrator
+pnpm exec oxlint packages/migrator
+pnpm exec oxfmt --check packages/migrator
 pnpm --filter @wallarm-org/migrator build
 ```
 
@@ -115,5 +116,5 @@ node <repo>/packages/migrator/dist/index.js --from <last-stable> --to <new>-rc.1
 - [ ] Registered last in `src/migrations/index.ts`
 - [ ] `versions.json` untouched
 - [ ] Fixtures for every rewrite and report (with markers); aliased, subpath, namespace import and local same-named component covered
-- [ ] `test:run`, `typecheck`, `biome check`, `build` pass; CLI smoke with `--to <new>-rc.1` done
+- [ ] `test:run`, `typecheck`, `oxlint` and `oxfmt --check`, `build` pass; CLI smoke with `--to <new>-rc.1` done
 - [ ] PR is breaking (`!` or `BREAKING CHANGE:`) and contains the migration

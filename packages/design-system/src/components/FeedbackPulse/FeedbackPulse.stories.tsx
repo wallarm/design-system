@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { Button } from '../Button';
 import { FeedbackPulse } from './FeedbackPulse';
 

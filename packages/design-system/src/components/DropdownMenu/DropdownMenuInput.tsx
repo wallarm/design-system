@@ -3,8 +3,10 @@ import { Search } from '../../icons';
 import { Input } from '../Input';
 import { InputGroup, InputGroupAddon } from '../InputGroup';
 
-interface DropdownMenuInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+interface DropdownMenuInputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'size'
+> {
   ref?: Ref<HTMLInputElement>;
 }
 

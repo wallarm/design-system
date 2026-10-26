@@ -94,8 +94,10 @@ const selectInputVariants = cva(
   },
 );
 
-interface SelectInputBaseProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
+interface SelectInputBaseProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'children' | 'color'
+> {
   'data-testid'?: string;
   size?: 'small' | 'medium' | 'default' | 'inline-edit';
 }

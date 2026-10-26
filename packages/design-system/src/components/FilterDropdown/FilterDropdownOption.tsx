@@ -7,8 +7,10 @@ import { SelectOptionIndicator } from '../Select/SelectOptionIndicator';
 import { SelectOptionText } from '../Select/SelectOptionText';
 import { FilterDropdownAliasContext, useFilterDropdownContext } from './FilterDropdownContext';
 
-export interface FilterDropdownOptionProps<T extends CollectionItem = CollectionItem>
-  extends Omit<ComponentProps<typeof SelectOption>, 'item' | 'children'> {
+export interface FilterDropdownOptionProps<T extends CollectionItem = CollectionItem> extends Omit<
+  ComponentProps<typeof SelectOption>,
+  'item' | 'children'
+> {
   ref?: Ref<HTMLDivElement>;
   item: T;
   /** Secondary text at the right end of the row, such as a count. */

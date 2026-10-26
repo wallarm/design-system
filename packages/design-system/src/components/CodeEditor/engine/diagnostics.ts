@@ -327,7 +327,7 @@ const lintSource =
         syntax => (isCurrent() ? [...syntax, ...external] : superseded()),
         (error: unknown) => {
           if (!isCurrent()) return superseded();
-          // biome-ignore lint/suspicious/noConsole: a parser that fails to load must not hide consumer diagnostics
+          // oxlint-disable-next-line no-console -- a parser that fails to load must not hide consumer diagnostics
           console.error('[CodeEditor] failed to load the JavaScript syntax checker', error);
           return external;
         },
@@ -338,7 +338,7 @@ const lintSource =
         syntax => (isCurrent() ? [...syntax, ...external] : superseded()),
         (error: unknown) => {
           if (!isCurrent()) return superseded();
-          // biome-ignore lint/suspicious/noConsole: a parser that fails to load must not hide consumer diagnostics
+          // oxlint-disable-next-line no-console -- a parser that fails to load must not hide consumer diagnostics
           console.error('[CodeEditor] failed to load the Lua syntax checker', error);
           return external;
         },
@@ -371,7 +371,7 @@ const lintSource =
           : superseded(),
       (error: unknown) => {
         if (!isCurrent()) return superseded();
-        // biome-ignore lint/suspicious/noConsole: a failing schema must not hide syntax/consumer diagnostics
+        // oxlint-disable-next-line no-console -- a failing schema must not hide syntax/consumer diagnostics
         console.error('[CodeEditor] JSON Schema validation failed', error);
         return external;
       },

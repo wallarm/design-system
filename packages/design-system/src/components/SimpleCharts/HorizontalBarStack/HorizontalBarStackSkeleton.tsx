@@ -10,8 +10,7 @@ import {
 } from './classes';
 
 export interface HorizontalBarStackSkeletonProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Number of legend placeholder pills. Defaults to `3`. */
   legendItems?: number;

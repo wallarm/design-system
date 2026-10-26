@@ -3,7 +3,8 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 import { SearchInput } from '../SearchInput';
 
 export interface SelectSearchInputProps
-  extends Omit<
+  extends
+    Omit<
       InputHTMLAttributes<HTMLInputElement>,
       'children' | 'onChange' | 'color' | 'size' | 'type' | 'value'
     >,

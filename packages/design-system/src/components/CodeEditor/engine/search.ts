@@ -3,8 +3,8 @@ import { getSearchQuery, gotoLine, search, searchKeymap } from '@codemirror/sear
 import { EditorState, type Extension, Facet } from '@codemirror/state';
 import { EditorView, keymap, type Panel, type ViewUpdate } from '@codemirror/view';
 import type { PortalRegistry } from '../lib/portalRegistry';
-import { SearchPanel } from './SearchPanel';
 import { countMatches } from './searchMatches';
+import { SearchPanel } from './SearchPanel';
 
 /**
  * `true` once a search extension is configured. `api.openSearch` checks it so

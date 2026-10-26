@@ -4,7 +4,8 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 import { linkVariants } from '../Link';
 
 export interface BulkBarSummaryClearProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
     TestableProps {
   children?: ReactNode;
   ref?: Ref<HTMLButtonElement>;

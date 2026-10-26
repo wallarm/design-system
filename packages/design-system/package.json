@@ -73,8 +73,8 @@
     "compiler:audit": "tsx scripts/compiler-audit.ts",
     "generate:grammars": "lezer-generator src/components/CodeEditor/engine/languages/http/http.grammar -o src/components/CodeEditor/engine/languages/http/parser.ts --typeScript",
     "publish:local": "pnpm build && yalc publish --push",
-    "lint": "biome check",
-    "lint:fix": "biome check --fix",
+    "lint": "oxlint . && oxfmt --check .",
+    "lint:fix": "oxlint --fix . && oxfmt --write .",
     "typecheck": "tsc -p tsconfig.app.json --noEmit --composite false --incremental false && tsc -p tsconfig.storybook.json --noEmit --composite false --incremental false && tsc -p tsconfig.figma.json --noEmit --composite false --incremental false && tsc -p tsconfig.e2e.json --noEmit --composite false --incremental false",
     "test": "rstest watch",
     "test:coverage": "rstest run --coverage",
@@ -90,7 +90,9 @@
     "e2e:docker:report": "playwright show-report ./playwright-report --port=9323",
     "icons:sync": "tsx scripts/icons/sync.ts",
     "code-connect:preview": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect preview",
-    "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files"
+    "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check ."
   },
   "devDependencies": {
     "@babel/core": "7.29.7",

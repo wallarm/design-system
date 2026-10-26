@@ -1,6 +1,19 @@
 import { type MouseEvent, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
+  Chat,
+  type ChatBackground,
+  ChatBody,
+  ChatFooter,
+  ChatGreeting,
+  ChatHeader,
+  ChatHeaderActions,
+  ChatHeaderTitle,
+  ChatSuggestion,
+  ChatSuggestions,
+  ChatTrigger,
+} from '.';
+import {
   Brain,
   Database,
   Ellipsis,
@@ -52,19 +65,6 @@ import {
 import { Separator } from '../Separator';
 import { HStack } from '../Stack';
 import { UserMessage, UserMessageBubble } from '../UserMessage';
-import {
-  Chat,
-  type ChatBackground,
-  ChatBody,
-  ChatFooter,
-  ChatGreeting,
-  ChatHeader,
-  ChatHeaderActions,
-  ChatHeaderTitle,
-  ChatSuggestion,
-  ChatSuggestions,
-  ChatTrigger,
-} from '.';
 
 const DESCRIPTION = [
   'The Wally assistant panel: a header, a scrolling message log, and a footer gutter for suggestions, a docked approval card and the input.',

@@ -10,8 +10,10 @@ export interface ChatPermissionsItemCheckedChangeDetails {
   name: string;
 }
 
-export interface ChatPermissionsItemProps
-  extends Omit<SwitchProps, 'children' | 'title' | 'name' | 'onCheckedChange'> {
+export interface ChatPermissionsItemProps extends Omit<
+  SwitchProps,
+  'children' | 'title' | 'name' | 'onCheckedChange'
+> {
   ref?: Ref<HTMLLabelElement>;
   /** Machine name of the tool, e.g. `propose_add_to_denylist`; echoed back in `onCheckedChange`. */
   name: string;

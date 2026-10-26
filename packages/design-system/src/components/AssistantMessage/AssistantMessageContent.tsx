@@ -4,8 +4,7 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 import { assistantMessageContentVariants } from './classes';
 
 export interface AssistantMessageContentProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 

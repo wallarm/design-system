@@ -10,8 +10,7 @@ import { WallyIcon } from '../WallyIcon';
  * yourself, or wrap it in `<DrawerTrigger asChild>`.
  */
 export interface ChatTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Tooltip text and accessible name. */
   label?: string;

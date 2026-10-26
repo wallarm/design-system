@@ -31,7 +31,7 @@ export const Selection = <T,>({
   const disabledMapRef = useRef<Map<string, boolean>>(new Map());
   const [disabledTick, setDisabledTick] = useState(0);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: registry is ref-backed; tick is the re-evaluation trigger
+  // oxlint-disable react-hooks/exhaustive-deps -- registry is ref-backed; tick is the re-evaluation trigger
   const disabledIds = useMemo(() => {
     const set = new Set<string>();
     for (const [id, isDisabled] of disabledMapRef.current) {
@@ -39,6 +39,7 @@ export const Selection = <T,>({
     }
     return set;
   }, [disabledTick]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   const registerDisabled = useCallback<SelectionContextValue['registerDisabled']>(
     (id, disabled) => {

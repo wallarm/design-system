@@ -28,6 +28,7 @@ export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent }) =>
     <input
       ref={inputRef}
       type='text'
+      // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- Existing FilterInput popup has no stable id for aria-controls; separate accessibility follow-up.
       role='combobox'
       aria-expanded={menuOpen}
       aria-invalid={error}
