@@ -161,7 +161,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -216,7 +216,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -285,7 +285,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -420,7 +420,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -629,7 +629,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -832,7 +832,7 @@ jobs:
 
       - name: Cache node_modules
         if: steps.check.outputs.release == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
