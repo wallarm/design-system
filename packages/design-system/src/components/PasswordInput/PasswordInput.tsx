@@ -44,9 +44,9 @@ export const PasswordInput: FC<PasswordInputProps> = ({
               className='cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex'
             >
               {visible ? (
-                <EyeOff size='md' className='text-slate-500' />
+                <EyeOff size='md' className='text-icon-secondary' />
               ) : (
-                <Eye size='md' className='text-slate-500' />
+                <Eye size='md' className='text-icon-secondary' />
               )}
             </button>
           </TooltipTrigger>

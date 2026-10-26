@@ -6,7 +6,7 @@
     --color-text-primary-alt: var(--color-white);
     --color-text-primary-fixed: var(--color-slate-900);
     --color-text-primary-alt-fixed: var(--color-white);
-    --color-text-secondary: var(--color-slate-500);
+    --color-text-secondary: var(--color-slate-600);
     --color-text-secondary-alt: --alpha(var(--color-white) / 80%);
     --color-text-tertiary: var(--color-slate-300);
     --color-text-tertiary-alt: --alpha(var(--color-white) / 70%);
@@ -45,7 +45,7 @@
     --color-icon-primary-alt-fixed: var(--color-white);
     --color-icon-primary-disable: --alpha(var(--color-slate-900) / 40%);
     --color-icon-primary-alt-disable: --alpha(var(--color-white) / 40%);
-    --color-icon-secondary: var(--color-slate-500);
+    --color-icon-secondary: var(--color-slate-600);
     --color-icon-secondary-alt: --alpha(var(--color-white) / 80%);
 
     /* Brand & Semantic Icons */
