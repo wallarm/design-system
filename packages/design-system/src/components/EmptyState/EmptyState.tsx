@@ -6,7 +6,8 @@ import { emptyStateVariants } from './classes';
 import { EmptyStateProvider } from './EmptyStateContext';
 
 export interface EmptyStateProps
-  extends Omit<VariantProps<typeof emptyStateVariants>, 'type'>,
+  extends
+    Omit<VariantProps<typeof emptyStateVariants>, 'type'>,
     Omit<HTMLAttributes<HTMLDivElement>, 'type'>,
     TestableProps {
   ref?: Ref<HTMLDivElement>;

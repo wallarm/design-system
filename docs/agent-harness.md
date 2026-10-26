@@ -26,7 +26,7 @@ pnpm install           # Dependencies, Git hooks and local Codex MCP config
 pnpm agents:sync       # Refresh config after editing .mcp.json
 codex mcp list         # Check that Codex loads the server definitions
 pnpm test:harness     # MCP adapter, PR-hook and release-notes regression tests
-pnpm lint:harness     # Agent tooling lint/format checks
+pnpm lint             # Lint/format checks, agent tooling included
 ```
 
 Restart Codex after configuration changes. Project `.codex/config.toml` is loaded

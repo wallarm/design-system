@@ -7,16 +7,8 @@
       "kind": "foundation",
       "title": "Spacing",
       "description": "Use when placing components next to each other — pick layout gaps from the spacing scale instead of ad-hoc margins.",
-      "components": [
-        "Alert"
-      ],
-      "keywords": [
-        "gap",
-        "padding",
-        "margin",
-        "spacing",
-        "layout"
-      ],
+      "components": ["Alert"],
+      "keywords": ["gap", "padding", "margin", "spacing", "layout"],
       "order": 10,
       "markdown": "# Spacing\n\n## What you use\n\n`Stack` for vertical rhythm, `Flex` for horizontal rows; both take `gap` from the spacing scale.\n\n## Rules\n\n- Use `gap` on the layout component, not margins on children.\n\n## Examples\n\nA vertical form uses a stack gap.\n\n```tsx\n<Stack gap={12} />\n```\n\n## Reference\n\nSee the `spacing` token category (`get_token_category(\"spacing\")`).",
       "sections": [
@@ -47,16 +39,8 @@
       "kind": "pattern",
       "title": "Empty states",
       "description": "Use when a list, table, or search has no data to show — explain why and offer the next action.",
-      "components": [
-        "Button"
-      ],
-      "keywords": [
-        "empty",
-        "no data",
-        "no results",
-        "zero state",
-        "blank"
-      ],
+      "components": ["Button"],
+      "keywords": ["empty", "no data", "no results", "zero state", "blank"],
       "order": 80,
       "markdown": "# Empty states\n\n## When to use\n\nA collection has no items yet, or a search/filter returned nothing.\n\n## Rules\n\n- Center the empty state inside the area the data would occupy. See [Spacing](../foundations/spacing.md).\n- Never leave a blank area where data would be.\n\n## Examples\n\nA list with no items yet offers the create action.\n\n```tsx\nimport { Button, EmptyState, EmptyStateActions, EmptyStateDescription, EmptyStateTitle } from '@wallarm-org/design-system';\n\n<EmptyState>\n  <EmptyStateTitle>No rules yet</EmptyStateTitle>\n  <EmptyStateDescription>Create a rule to start filtering traffic.</EmptyStateDescription>\n  <EmptyStateActions>\n    <Button>Create rule</Button>\n  </EmptyStateActions>\n</EmptyState>;\n```\n\n## States\n\n- No data yet: offer the create action.\n- No results: offer to clear filters.\n\n## What your app owns\n\nCopy text and the action handlers.\n\n## Related\n\n- [Spacing](../foundations/spacing.md)",
       "sections": [

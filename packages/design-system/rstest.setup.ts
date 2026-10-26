@@ -16,16 +16,16 @@ afterEach(() => {
 // Element is absent under `@rstest-environment node` (SSR tests).
 if (typeof Element !== 'undefined') {
   // Mock scrollIntoView which is not implemented in jsdom
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   Element.prototype.scrollIntoView = () => {};
 
   // Mock scrollTo which jsdom omits; Zag UI's select uses it to reset the
   // content scroll position when value changes.
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   Element.prototype.scrollTo = (() => {}) as Element['scrollTo'];
 
   // Mock scrollBy which jsdom omits; the Table horizontal scroll controls call it.
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   Element.prototype.scrollBy = (() => {}) as Element['scrollBy'];
 }
 
@@ -34,11 +34,11 @@ global.IntersectionObserver = class IntersectionObserver {
   readonly root = null;
   readonly rootMargin = '0px';
   readonly thresholds: readonly number[] = [0];
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   observe() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   unobserve() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   disconnect() {}
   takeRecords(): IntersectionObserverEntry[] {
     return [];
@@ -47,11 +47,11 @@ global.IntersectionObserver = class IntersectionObserver {
 
 // Mock ResizeObserver which is not implemented in jsdom
 global.ResizeObserver = class ResizeObserver {
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   observe() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   unobserve() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  // intentional no-op mock
   disconnect() {}
 };
 
@@ -66,9 +66,9 @@ if (typeof window !== 'undefined' && !window.visualViewport) {
     pageLeft: 0,
     pageTop: 0,
     scale: 1,
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+    // intentional no-op mock
     addEventListener() {},
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+    // intentional no-op mock
     removeEventListener() {},
     dispatchEvent: () => true,
   };

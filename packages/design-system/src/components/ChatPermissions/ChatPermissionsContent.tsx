@@ -4,8 +4,10 @@ import { dropdownMenuLabelVariants } from '../DropdownMenu/classes';
 import { PopoverContent, type PopoverContentProps } from '../Popover';
 import { chatPermissionsContentVariants } from './classes';
 
-export interface ChatPermissionsContentProps
-  extends Omit<PopoverContentProps, 'minWidth' | 'maxWidth'> {
+export interface ChatPermissionsContentProps extends Omit<
+  PopoverContentProps,
+  'minWidth' | 'maxWidth'
+> {
   /** Heading above the tool rows; also names the dialog. Pass `null`, `false` or `''` to hide it. */
   label?: ReactNode;
 }

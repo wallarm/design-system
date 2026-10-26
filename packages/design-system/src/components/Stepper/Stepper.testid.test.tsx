@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+import { Stepper, StepperContent, StepperNextTrigger, StepperPrevTrigger } from '.';
 import { StepperFixture } from '../../testUtils/StepperFixture';
 import { TestIdProvider } from '../../utils/testId';
 import { Button } from '../Button';
-import { Stepper, StepperContent, StepperNextTrigger, StepperPrevTrigger } from '.';
 
 describe('Stepper — test ids', () => {
   it('cascades {id}--list, --item-{index}, --content-{index}, --prev/next-trigger and the item parts', () => {

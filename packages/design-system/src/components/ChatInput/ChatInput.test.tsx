@@ -300,7 +300,9 @@ describe('ChatInput — disclaimer, context, disabled', () => {
     const { rerender } = render(
       <Composer
         data-testid='ci'
-        context={['Attacks'].map(label => <span key={label}>{label}</span>)}
+        context={['Attacks'].map(label => (
+          <span key={label}>{label}</span>
+        ))}
       />,
     );
     expect(screen.getByTestId('ci--context')).toBeTruthy();

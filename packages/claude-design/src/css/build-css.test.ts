@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
-import postcss from 'postcss';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import postcss from 'postcss';
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens } from '../tokens/build-tokens';
 import { buildCss, definedClasses, stripTokenDeclarations } from './build-css';

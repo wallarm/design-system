@@ -186,8 +186,7 @@ export const FilterCascadeLevels: FC<FilterCascadeLevelsProps> = ({ children }) 
 FilterCascadeLevels.displayName = 'FilterCascadeLevels';
 
 export interface FilterCascadeGroupLabelProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 

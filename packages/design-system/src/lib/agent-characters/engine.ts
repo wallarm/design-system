@@ -1231,8 +1231,7 @@ export function createCharacter(svg: SVGSVGElement, c: Look, o: CharacterOptions
   const ch = new Character(svg, c, o);
   const P = c.prop && c.prop !== 'none' ? propOf(c.prop, ch.S, hexOf(c.color)) : null;
   ch.fid = P ? P.fid : null;
-  if (o.cover)
-    ch.setCover(true); // "Partial coverage": the crown is there from the first frame
+  if (o.cover) ch.setCover(true); // "Partial coverage": the crown is there from the first frame
   else {
     // the ghost's order, as the page's markup has it (a remount may find the crown's)
     const veil = svg.querySelector('[data-part~="veil"]');

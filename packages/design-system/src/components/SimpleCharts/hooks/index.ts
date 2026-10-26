@@ -1,4 +1,1 @@
-export {
-  type ChartTimeFormatters,
-  useChartTimeFormatters,
-} from './useChartTimeFormatters';
+export { type ChartTimeFormatters, useChartTimeFormatters } from './useChartTimeFormatters';

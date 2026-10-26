@@ -58,9 +58,10 @@ async function withArtboard(
   };
   const Component = window.eval(
     `${doc.querySelector('script[data-dc-script]')?.textContent}\n;Component`,
-  ) as new (
-    props: object,
-  ) => { renderVals(): Record<string, unknown>; setState(next: object): void };
+  ) as new (props: object) => {
+    renderVals(): Record<string, unknown>;
+    setState(next: object): void;
+  };
   const logic = new Component({});
   const camel = (name: string) =>
     /^(aria|data)-/.test(name)

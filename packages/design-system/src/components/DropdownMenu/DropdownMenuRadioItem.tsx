@@ -10,7 +10,8 @@ import { DropdownMenuItemIndicator } from './DropdownMenuItemIndicator';
 type DropdownMenuRadioItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
 export interface DropdownMenuRadioItemProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
     DropdownMenuRadioItemVariantsProps,
     TestableProps {
   /** Required — identifies this radio within the group */

@@ -80,5 +80,5 @@ const data = await page.evaluate(CAPTURE);
 await browser.close();
 if (errors.length) throw new Error(`page errors: ${errors.join('\n')}`);
 writeFileSync(OUT, `${JSON.stringify(data)}\n`);
-// biome-ignore lint/suspicious/noConsole: CLI output
+// oxlint-disable-next-line no-console -- CLI output
 console.log(`${path.relative(process.cwd(), OUT)} written`);

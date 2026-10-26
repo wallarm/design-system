@@ -3,8 +3,8 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
-import { CountryContext } from './CountryContext';
 import { type CountryCode, countries } from './countries';
+import { CountryContext } from './CountryContext';
 
 export const countryVariants = cva('inline-flex items-center gap-6 w-fit', {
   variants: {

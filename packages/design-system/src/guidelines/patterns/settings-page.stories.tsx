@@ -1,7 +1,7 @@
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '../../components/Avatar';
 import { Button } from '../../components/Button';
 import { Field, FieldError, FieldLabel } from '../../components/Field';

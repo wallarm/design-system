@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { AppShell, AppShellHeader, AppShellRail, AppShellRemote } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { ChatTrigger } from '../../components/Chat';

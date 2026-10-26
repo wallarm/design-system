@@ -1,5 +1,5 @@
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { ArrowUp, Settings2 } from '../../icons';
 import { Button } from '../Button';
 import {

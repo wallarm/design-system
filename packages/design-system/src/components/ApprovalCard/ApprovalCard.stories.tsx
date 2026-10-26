@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { ApprovalCard, ApprovalCardActions, ApprovalCardContent } from '.';
 import { ChevronDown } from '../../icons';
 import { Button } from '../Button';
 import { CodeSnippetCode, CodeSnippetContent, CodeSnippetRoot } from '../CodeSnippet';
@@ -9,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { SplitButton } from '../SplitButton';
-import { ApprovalCard, ApprovalCardActions, ApprovalCardContent } from '.';
 
 const DESCRIPTION = [
   'Asks the user to approve an action Wally wants to take — a tool call, a config change — before it runs.',

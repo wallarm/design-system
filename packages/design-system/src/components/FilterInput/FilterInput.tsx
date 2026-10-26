@@ -15,8 +15,7 @@ import { applyKnownFieldHelpers } from './lib/applyKnownFieldHelpers';
 import type { ExprNode, FieldGroup, FieldMetadata } from './types';
 
 export interface FilterInputProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>, TestableProps {
   /**
    * Filter-field configurations driving the autocomplete. A few names are
    * **reserved** and auto-wired with design-system helpers — DS-supplied
@@ -151,16 +150,18 @@ export const FilterInput: FC<FilterInputProps> = ({
   });
 
   // Dismiss paste error when expression changes (chip created/removed/cleared)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the chip count changes, not on every pasteError/handler change
+  // oxlint-disable react-hooks/exhaustive-deps -- runs only when the chip count changes, not on every pasteError/handler change
   useEffect(() => {
     if (pasteError) dismissPasteError();
   }, [conditions.length]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   // Re-parse input text while user edits after a failed paste
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the input text changes, not on every pasteError/handler change
+  // oxlint-disable react-hooks/exhaustive-deps -- runs only when the input text changes, not on every pasteError/handler change
   useEffect(() => {
     if (pasteError) retryParse(autocomplete.inputText);
   }, [autocomplete.inputText]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   const fieldErrors = useMemo(
     () => parseFilterInputErrors(conditions, fields),

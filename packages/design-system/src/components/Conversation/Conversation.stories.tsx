@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import {
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+} from '.';
 import { AssistantMessage, AssistantMessageContent } from '../AssistantMessage';
 import {
   Chat,
@@ -12,12 +18,6 @@ import {
 import { ChatInput, ChatInputSubmit, ChatInputTextarea } from '../ChatInput';
 import { MessageActions, MessageTimestamp } from '../MessageActions';
 import { UserMessage, UserMessageBubble } from '../UserMessage';
-import {
-  Conversation,
-  ConversationContent,
-  ConversationEmptyState,
-  ConversationScrollButton,
-} from '.';
 
 const DESCRIPTION = [
   'Stick-to-bottom for the Wally log: `Conversation` takes `ChatBody`’s place between `ChatHeader` and `ChatFooter`, and `ConversationContent` renders the built `ChatBody` (`role=log`) as the scroller.',

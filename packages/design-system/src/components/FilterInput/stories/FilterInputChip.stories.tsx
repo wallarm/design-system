@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import {
   FilterInputChip,
   type FilterInputChipProps,

@@ -8,8 +8,7 @@ import { Text } from '../Text';
 import { chatGreetingVariants } from './classes';
 
 export interface ChatGreetingProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Heading under Wally, e.g. "How can I help you today?". */
   title: ReactNode;

@@ -24,11 +24,10 @@ import type {
 } from '../model/model';
 import { MarkdownView, useChatView } from './ChatViewContext';
 
-export interface ApprovalCardViewProps
-  extends Omit<
-    ApprovalCardProps,
-    'status' | 'children' | 'caption' | 'approvedLabel' | 'rejectedLabel'
-  > {
+export interface ApprovalCardViewProps extends Omit<
+  ApprovalCardProps,
+  'status' | 'children' | 'caption' | 'approvedLabel' | 'rejectedLabel'
+> {
   approval: ChatApprovalPart;
   message?: ChatMessage;
   /** Default: the provider's onApprovalRespond. Absent → buttons disabled. */

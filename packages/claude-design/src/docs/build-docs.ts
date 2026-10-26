@@ -1,8 +1,8 @@
-import { Node, Project, type SourceFile } from 'ts-morph';
-import type { DesignSystemMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
 import { existsSync, statSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { Node, Project, type SourceFile } from 'ts-morph';
+import type { DesignSystemMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
 import { readMetaDescription } from '../../../design-system/scripts/metadata/parse-description';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { componentReadme } from './component-readme';
@@ -324,8 +324,8 @@ export const buildDocs = async ({
   const readme =
     `${brandBook.trim()}\n\n${consuming}\n\n## Not synced\n\n` +
     'This is the separate Claude Design build; the npm package still targets React 19.\n\n' +
-    omissions.map(note => `- ${note}\n`).join('') +
-    '\nGenerated component guides and types are derived from repository source and build metadata. Change them in wallarm/design-system and run /claude-design-sync there.\n';
+    `${omissions.map(note => `- ${note}\n`).join('')}\n` +
+    'Generated component guides and types are derived from repository source and build metadata. Change them in wallarm/design-system and run /claude-design-sync there.\n';
   await writeFile(path.join(outDir, 'README.md'), readme);
   return { components: guides.map(guide => guide.name), notSynced: omissions };
 };

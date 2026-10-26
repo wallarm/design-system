@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { Attribute, AttributeLabel, AttributeValue } from '../../components/Attribute';
 import { Badge, type BadgeColor } from '../../components/Badge';
 import { Button } from '../../components/Button';

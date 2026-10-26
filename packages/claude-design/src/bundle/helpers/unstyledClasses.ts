@@ -67,7 +67,7 @@ export function reportUnstyledClasses(root: Element): void {
       for (const name of Array.from(element.classList)) {
         if (reported.has(name) || styled.has(name) || MARKERS.test(name)) continue;
         reported.add(name);
-        // biome-ignore lint/suspicious/noConsole: the console is how the canvas author sees it.
+        // oxlint-disable-next-line no-console -- the console is how the canvas author sees it.
         console.warn(unstyledMessage(name, styled));
       }
   } catch {

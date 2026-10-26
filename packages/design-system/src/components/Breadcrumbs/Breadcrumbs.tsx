@@ -52,7 +52,7 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({
     if (index < childrenArray.length - 1) {
       // Keyed by position: render stays pure (React Compiler skips components
       // that mutate module state) and separators keep a stable identity.
-      // biome-ignore lint/suspicious/noArrayIndexKey: separators have no identity besides their position
+      // oxlint-disable-next-line react/no-array-index-key -- separators have no identity besides their position
       childrenWithSeparators.push(<BreadcrumbsSeparator key={`separator-${index}`} />);
     }
   });

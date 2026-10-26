@@ -11,7 +11,8 @@ import { type DSTableFeatures, getAlignClass, SORT_LABELS, useTableValue } from 
 import { useTableContext } from './TableContext';
 
 export interface TableSortTriggerProps<T extends RowData = Record<string, unknown>>
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
     TestableProps {
   /**
    * Column from the header render context — wires the trigger to TanStack's

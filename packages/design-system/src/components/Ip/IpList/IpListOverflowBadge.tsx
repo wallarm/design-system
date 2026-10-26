@@ -2,8 +2,10 @@ import type { ComponentProps, FC, Ref } from 'react';
 import { cn } from '../../../utils/cn';
 import { Badge } from '../../Badge';
 
-export interface IpListOverflowBadgeProps
-  extends Omit<ComponentProps<typeof Badge>, 'children' | 'type' | 'color' | 'size'> {
+export interface IpListOverflowBadgeProps extends Omit<
+  ComponentProps<typeof Badge>,
+  'children' | 'type' | 'color' | 'size'
+> {
   ref?: Ref<HTMLDivElement>;
   count: number;
 }

@@ -36,7 +36,7 @@ rs.mock('@rspress/core/runtime', () => ({
 }));
 
 rs.mock('@rspress/core/theme-original', () => ({
-  Link: (props: ComponentProps<'a'>) => <a {...props} />,
+  Link: ({ children, ...props }: ComponentProps<'a'>) => <a {...props}>{children}</a>,
 }));
 
 afterEach(() => {

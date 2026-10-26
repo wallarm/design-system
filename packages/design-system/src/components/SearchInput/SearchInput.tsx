@@ -9,7 +9,8 @@ import { InputGroupAddon } from '../InputGroup/InputGroupAddon';
 type SearchInputSize = 'default' | 'medium' | 'small';
 
 export interface SearchInputProps
-  extends Omit<
+  extends
+    Omit<
       InputHTMLAttributes<HTMLInputElement>,
       'size' | 'type' | 'value' | 'defaultValue' | 'onChange'
     >,

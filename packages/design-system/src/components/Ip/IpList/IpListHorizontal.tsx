@@ -48,7 +48,7 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
         className={cn('flex items-center gap-6 w-full min-w-0 max-w-full', className)}
       >
         {visibleItems.map((item, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: order-preserving prefix slice from useOverflowItems
+          // oxlint-disable-next-line react/no-array-index-key -- order-preserving prefix slice from useOverflowItems
           <Fragment key={i}>
             {i > 0 && <IpListSeparator />}
             <div className='shrink-0'>{item}</div>

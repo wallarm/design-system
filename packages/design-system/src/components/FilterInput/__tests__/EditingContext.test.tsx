@@ -12,7 +12,7 @@ const ContextInspector = () => {
   return <div data-testid='ctx'>{ctx ? 'has-context' : 'no-context'}</div>;
 };
 
-// biome-ignore lint/suspicious/noEmptyBlockStatements: test stub
+// test stub
 const noop = () => {};
 
 describe('EditingContext', () => {

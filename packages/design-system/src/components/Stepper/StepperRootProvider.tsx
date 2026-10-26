@@ -8,8 +8,7 @@ import type { StepperStatusLabels } from './types';
 import type { UseStepperReturn } from './useStepper';
 
 export interface StepperRootProviderProps
-  extends Omit<ArkSteps.RootProviderProps, 'value' | 'asChild'>,
-    TestableProps {
+  extends Omit<ArkSteps.RootProviderProps, 'value' | 'asChild'>, TestableProps {
   /** The machine from `useStepper()`, so the page can drive the steps from outside. */
   value: UseStepperReturn;
   children: ReactNode;

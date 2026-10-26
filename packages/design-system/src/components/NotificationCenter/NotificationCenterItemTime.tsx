@@ -9,8 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useNotificationCenterItemUnread } from './NotificationCenterItem';
 
 export interface NotificationCenterItemTimeProps
-  extends Omit<HTMLAttributes<HTMLTimeElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLTimeElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLTimeElement>;
   /** ISO string, Date or Unix timestamp (ms). */
   value: string | Date | number;

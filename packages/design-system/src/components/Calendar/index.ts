@@ -21,10 +21,4 @@ export { CalendarPresets, type CalendarPresetsProps } from './CalendarPresets';
 export { CalendarResetButton, type CalendarResetButtonProps } from './CalendarResetButton';
 export { CalendarTrigger, type CalendarTriggerProps } from './CalendarTrigger';
 export { DAY_NAMES, MONTH_NAMES } from './const';
-export type {
-  CalendarType,
-  DateRangePreset,
-  DateValue,
-  PresetConfig,
-  PresetValue,
-} from './types';
+export type { CalendarType, DateRangePreset, DateValue, PresetConfig, PresetValue } from './types';

@@ -3,8 +3,7 @@ import { DatePicker } from '@ark-ui/react';
 import type { TestableProps } from '../../utils/testId';
 
 export interface CalendarTriggerProps
-  extends Omit<HTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   /** Trigger element that opens the calendar popover */
   children: ReactNode;
   /** Additional props passed to the trigger wrapper */

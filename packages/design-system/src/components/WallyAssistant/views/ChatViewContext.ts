@@ -111,11 +111,10 @@ export type ChatViewHandlers = Pick<
 >;
 
 /** Internal: render-time config plus a latest-value ref for the handlers (read only in event handlers). */
-export interface ChatViewContextValue
-  extends Pick<
-    ChatViewConfig,
-    'icons' | 'formatTimestamp' | 'renderPart' | 'renderStepContent' | 'renderMessageActions'
-  > {
+export interface ChatViewContextValue extends Pick<
+  ChatViewConfig,
+  'icons' | 'formatTimestamp' | 'renderPart' | 'renderStepContent' | 'renderMessageActions'
+> {
   status: ChatStatus;
   labels: ChatLabels;
   markdown: ComponentType<ChatMarkdownProps>;

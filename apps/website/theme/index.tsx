@@ -1,5 +1,4 @@
 import './reactAriaPolyfill';
-
 import { useLayoutEffect } from 'react';
 import { BrowserOnly, useDark, usePage } from '@rspress/core/runtime';
 import {

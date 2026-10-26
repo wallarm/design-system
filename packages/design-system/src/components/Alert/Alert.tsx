@@ -25,7 +25,8 @@ const alertVariants = cva(
 );
 
 export interface AlertProps
-  extends VariantProps<typeof alertVariants>,
+  extends
+    VariantProps<typeof alertVariants>,
     Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
     TestableProps {
   ref?: Ref<HTMLDivElement>;

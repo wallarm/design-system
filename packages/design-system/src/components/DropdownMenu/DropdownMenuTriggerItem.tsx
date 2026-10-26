@@ -7,7 +7,8 @@ import { dropdownMenuItemVariants } from './classes';
 import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
 
 export interface DropdownMenuTriggerItemProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
     DropdownMenuItemVariantsProps,
     TestableProps {
   children: ReactNode;

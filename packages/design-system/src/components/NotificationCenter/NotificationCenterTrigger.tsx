@@ -8,8 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useNotificationCenterContext } from './NotificationCenter';
 
 export interface NotificationCenterTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'children'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'children'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Unread count. `0` hides the badge; above 99 the badge shows `99+`. */
   count?: number;

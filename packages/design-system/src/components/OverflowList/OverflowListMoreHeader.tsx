@@ -4,8 +4,7 @@ import { useTestId } from '../../utils/testId';
 import { Text, type TextProps } from '../Text';
 
 export interface OverflowListMoreHeaderProps
-  extends Omit<TextProps, 'size' | 'weight' | 'color'>,
-    TestableProps {
+  extends Omit<TextProps, 'size' | 'weight' | 'color'>, TestableProps {
   children: ReactNode;
 }
 

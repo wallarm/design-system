@@ -5,6 +5,7 @@ import { useTestId } from '../../../utils/testId';
 import { formatChartDateTime } from '../lib/timeFormatters';
 import { lineChartZoomCursorPopoverClasses } from './classes';
 import { useZoomPendingListeners } from './hooks/useZoomPendingListeners';
+import { formatRange } from './lib/formatRange';
 import {
   LineChartDataContext,
   LineChartZoomContext,
@@ -13,7 +14,6 @@ import {
 import { LineChartZoomPopover } from './LineChartZoomPopover';
 import { LineChartZoomPopoverConfirm } from './LineChartZoomPopoverConfirm';
 import { LineChartZoomPopoverRange } from './LineChartZoomPopoverRange';
-import { formatRange } from './lib/formatRange';
 
 // `|| String(value)` keeps the popover readable when the X axis isn't a
 // timestamp — `formatChartDateTime` returns `''` for non-numeric values.
@@ -107,7 +107,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   // null `plotArea` while re-measuring mid-drag, and without the fallback
   // the popover would drop to the cursor `clientY` for that one frame.
   const cachedGeometryRef = useRef<{ centerY: number; left: number } | null>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `scrollTick` invalidates the memo on scroll without being read directly
+  // oxlint-disable react-hooks/exhaustive-deps -- `scrollTick` invalidates the memo on scroll without being read directly
   const popoverGeometry = useMemo(() => {
     if (!isPopoverOpen) {
       cachedGeometryRef.current = null;
@@ -124,6 +124,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
     cachedGeometryRef.current = next;
     return next;
   }, [isPopoverOpen, plotArea, rootRef, scrollTick]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   // Captured once when pending begins, cleared when it ends. Combined with
   // the live left below to shift the popover by the chart's horizontal scroll

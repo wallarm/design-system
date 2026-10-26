@@ -5,8 +5,7 @@ import { SelectSearchInput, type SelectSearchInputProps } from '../Select/Select
 import { useFilterCascadeContext } from './FilterCascadeContext';
 
 export interface FilterCascadeSearchProps
-  extends Omit<SelectSearchInputProps, 'value' | 'onChange' | 'data-testid'>,
-    TestableProps {
+  extends Omit<SelectSearchInputProps, 'value' | 'onChange' | 'data-testid'>, TestableProps {
   /** Called after the query changes; the root owns the query itself. */
   onChange?: (query: string) => void;
 }

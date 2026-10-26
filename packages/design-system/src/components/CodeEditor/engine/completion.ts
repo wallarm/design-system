@@ -128,7 +128,7 @@ let reported = false;
 const reportSourceError = (error: unknown): null => {
   if (!reported) {
     reported = true;
-    // biome-ignore lint/suspicious/noConsole: surfaced once; a failing consumer source is ignored
+    // oxlint-disable-next-line no-console -- surfaced once; a failing consumer source is ignored
     console.error('[CodeEditor] a completion source failed', error);
   }
   return null;

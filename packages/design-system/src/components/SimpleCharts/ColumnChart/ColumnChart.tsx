@@ -21,8 +21,7 @@ const noop = () => undefined;
  * `xKey` / `series[].key` become compile-time-checked keys of it.
  */
 export interface ColumnChartProps<T extends LineChartDatum = LineChartDatum>
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** One entry per column (step), sorted ascending by `xKey`. */
   data: T[];

@@ -8,9 +8,7 @@ import { dropdownMenuItemVariants } from './classes';
 export type DropdownMenuItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
 export interface DropdownMenuItemProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
-    DropdownMenuItemVariantsProps,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>, DropdownMenuItemVariantsProps, TestableProps {
   inset?: boolean;
   disabled?: boolean;
   onSelect?: () => void;

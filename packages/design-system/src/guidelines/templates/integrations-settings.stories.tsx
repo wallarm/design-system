@@ -1,6 +1,6 @@
 import { type ChangeEvent, type FC, type FormEvent, type MouseEvent, useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import {
   Alert,
   AlertContent,

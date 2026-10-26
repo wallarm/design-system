@@ -3,8 +3,7 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface NotificationCenterListProps
-  extends HTMLAttributes<HTMLUListElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLUListElement>, TestableProps {
   ref?: Ref<HTMLUListElement>;
 }
 
@@ -72,8 +71,7 @@ export const NotificationCenterItem: FC<NotificationCenterItemProps> = ({
 NotificationCenterItem.displayName = 'NotificationCenterItem';
 
 export interface NotificationCenterItemDescriptionProps
-  extends HTMLAttributes<HTMLParagraphElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLParagraphElement>, TestableProps {
   ref?: Ref<HTMLParagraphElement>;
 }
 
@@ -98,8 +96,7 @@ export const NotificationCenterItemDescription: FC<NotificationCenterItemDescrip
 NotificationCenterItemDescription.displayName = 'NotificationCenterItemDescription';
 
 export interface NotificationCenterItemActionsProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 

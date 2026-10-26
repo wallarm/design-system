@@ -35,8 +35,8 @@
     "plan": "tsx src/publish-plan.ts plan",
     "check": "tsx src/publish-plan.ts check",
     "fetch": "tsx src/fetch.ts",
-    "lint": "biome check",
-    "lint:fix": "biome check --fix",
+    "lint": "oxlint . && oxfmt --check .",
+    "lint:fix": "oxlint --fix . && oxfmt --write .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepack": "tsx src/pack.ts"
   },

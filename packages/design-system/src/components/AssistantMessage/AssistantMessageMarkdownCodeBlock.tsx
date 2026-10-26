@@ -11,8 +11,7 @@ import {
 import { assistantMessageMarkdownCodeBlockVariants } from './classes';
 
 export interface AssistantMessageMarkdownCodeBlockProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   code: string;
   /** The fence info string (`yaml`, `json`, `bash`, `http`…). The app's adapter resolves aliases; unknown → plain. */

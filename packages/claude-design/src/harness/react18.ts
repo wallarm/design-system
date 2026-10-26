@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import type * as ReactDOM from 'react-dom';
-import { JSDOM } from 'jsdom';
 import type * as ReactDOMClient from 'react-dom/client';
+import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';

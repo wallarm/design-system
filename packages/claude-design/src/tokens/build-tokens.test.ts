@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
-import postcss from 'postcss';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import postcss from 'postcss';
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens, type TokenDocument } from './build-tokens';
 import { mapColorValue } from './map-value';

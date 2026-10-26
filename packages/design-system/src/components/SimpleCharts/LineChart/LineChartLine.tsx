@@ -9,8 +9,8 @@ import {
   LINE_STROKE_WIDTH,
   resolveSeriesColor,
 } from './constants';
-import { LineChartActiveContext, LineChartDataContext } from './LineChartContext';
 import { warnLineChartLine } from './lib/warn';
+import { LineChartActiveContext, LineChartDataContext } from './LineChartContext';
 
 // Strip recharts' first `(curveProps, event)` arg so the public API stays event-only.
 const wrap = (

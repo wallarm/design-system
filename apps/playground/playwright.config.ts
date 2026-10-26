@@ -1,5 +1,4 @@
 import { defineConfig } from '@playwright/test';
-
 import { baseConfig } from '@wallarm-org/playwright-config/base';
 
 export default defineConfig({

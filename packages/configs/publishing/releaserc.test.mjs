@@ -1,13 +1,15 @@
+import { generateNotes } from '@semantic-release/release-notes-generator';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { generateNotes } from '@semantic-release/release-notes-generator';
 import { defineConfig } from './releaserc.mjs';
 
 // The preset and the generator's writer are versioned separately; a mismatch
 // renders notes with headings only and no error (v0.73.0–v4.9.0 shipped empty).
 test('release notes list feat and fix commits', async () => {
   const { plugins } = defineConfig({ tagFormat: 'v${version}', pkgRoot: '.' });
-  const [, options] = plugins.find(([name]) => name === '@semantic-release/release-notes-generator');
+  const [, options] = plugins.find(
+    ([name]) => name === '@semantic-release/release-notes-generator',
+  );
 
   const notes = await generateNotes(options, {
     cwd: process.cwd(),

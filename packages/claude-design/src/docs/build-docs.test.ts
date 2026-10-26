@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, it } from '@rstest/core';
-import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { existsSync, readFileSync } from 'node:fs';
 import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { boardEntry, CANVAS_FOLDER, CANVAS_HEAD, CANVAS_SKELETON } from '../pack';
 import { SKELETON_DATA, SKELETON_FILE } from '../sampler/sampler';

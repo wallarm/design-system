@@ -192,15 +192,15 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const rel = path.relative(process.cwd(), OUT);
   if (process.argv.includes('--check')) {
     if (readFileSync(OUT, 'utf8') !== out) {
-      // biome-ignore lint/suspicious/noConsole: CLI output
+      // oxlint-disable-next-line no-console -- CLI output
       console.error(`${rel} is out of date: run pnpm agent-avatars:export`);
       process.exit(1);
     }
-    // biome-ignore lint/suspicious/noConsole: CLI output
+    // oxlint-disable-next-line no-console -- CLI output
     console.log('agent-avatars data: up to date');
   } else {
     writeFileSync(OUT, out);
-    // biome-ignore lint/suspicious/noConsole: CLI output
+    // oxlint-disable-next-line no-console -- CLI output
     console.log(`wrote ${rel}`);
   }
 }

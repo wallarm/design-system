@@ -135,7 +135,7 @@ function prepareForPublish(): void {
     }
 
     // Write cleaned package.json
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+    fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
 
     console.log('✅ package.json prepared for publishing');
   } catch (error) {

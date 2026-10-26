@@ -18,8 +18,7 @@ export type ChipSegment = SegmentVariant;
 export type PairSegment = Extract<SegmentVariant, 'operator' | 'value'>;
 
 export interface FilterInputChipProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   chipId?: string;
   attribute: string;

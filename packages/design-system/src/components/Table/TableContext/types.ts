@@ -126,7 +126,9 @@ export interface TableContextValue<T extends RowData> {
   deferColumnVisibility: boolean;
 }
 
-export interface TableProviderProps<T extends RowData>
-  extends Omit<TableProps<T>, 'children' | 'aria-label'> {
+export interface TableProviderProps<T extends RowData> extends Omit<
+  TableProps<T>,
+  'children' | 'aria-label'
+> {
   children: ReactNode;
 }

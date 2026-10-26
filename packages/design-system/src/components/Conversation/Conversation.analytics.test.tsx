@@ -32,7 +32,9 @@ const renderScrolledUp = (button: ReactNode) => {
   Object.defineProperty(log, 'scrollTop', {
     configurable: true,
     get: () => scrollTop,
-    set: () => undefined,
+    set: () => {
+      // Ignore programmatic scrolling in this test double.
+    },
   });
   scrollTop = 300;
   fireEvent.scroll(log);

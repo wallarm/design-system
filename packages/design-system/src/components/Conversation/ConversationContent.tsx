@@ -3,12 +3,12 @@ import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useTestId } from '../../utils/testId';
 import { ChatBody, type ChatBodyProps } from '../Chat/ChatBody';
-import { useConversationInternal } from './ConversationContext';
 import {
   conversationContentVariants,
   conversationEndVariants,
   conversationScrollerVariants,
 } from './classes';
+import { useConversationInternal } from './ConversationContext';
 
 /**
  * The scroller: renders the built `ChatBody` (role=log; `ref`, `className`, `aria-*`, `tabIndex`

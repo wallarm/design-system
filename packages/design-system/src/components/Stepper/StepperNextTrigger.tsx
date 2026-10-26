@@ -5,8 +5,7 @@ import { clampStep, useStepperRootContext } from './StepperContext';
 import { takeAsChildDisabled } from './takeAsChildDisabled';
 
 export interface StepperNextTriggerProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    TestableProps {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, TestableProps {
   /** Render the child (e.g. a `Button`) as the trigger instead of a plain `<button>`. */
   asChild?: boolean;
   children: ReactNode;

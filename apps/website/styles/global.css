@@ -101,7 +101,7 @@ html.rp-dark {
 
 /* Section shortcuts (theme/SearchSections.tsx) only belong to the empty search dialog. */
 .rp-search-panel__modal:has(.rp-search-panel__input:not(:placeholder-shown))
-[data-slot='search-sections'] {
+    [data-slot='search-sections'] {
     display: none;
 }
 
@@ -164,8 +164,8 @@ body .rp-sidebar-item--active:hover {
    components draw their own rings, so only Rspress's links and buttons get this one. A card's
    stretched link (TemplateGallery, SectionOverview) leaves it to the card's ring. */
 :where(.rp-link, .rp-button, .rp-sidebar-item, .rp-nav button, summary):focus-visible:not(
-    [data-card-link]
-) {
+        [data-card-link]
+    ) {
     outline: 2px solid var(--color-border-strong-brand);
     outline-offset: 2px;
     border-radius: var(--radius-6);

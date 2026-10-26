@@ -42,7 +42,7 @@ export const StepperItem: FC<StepperItemProps> = ({
   const { statusLabels } = useStepperRootContext('StepperItem');
   const inList = useContext(StepperListContext);
   if (process.env.NODE_ENV !== 'production' && !inList) {
-    // biome-ignore lint/suspicious/noConsole: dev-only authoring guard (matches Stepper root).
+    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
     console.warn(
       '[Stepper] StepperItem must be rendered inside a StepperList: an <li> outside the <ol> loses the list semantics.',
     );
@@ -53,7 +53,7 @@ export const StepperItem: FC<StepperItemProps> = ({
   const currentStep = clampStep(value, count);
   const current = index === currentStep;
   if (process.env.NODE_ENV !== 'production' && current && value !== currentStep) {
-    // biome-ignore lint/suspicious/noConsole: dev-only authoring guard (matches Stepper root).
+    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
     console.warn(
       `[Stepper] current step ${value} is out of range [0, ${count - 1}]; showing step ${currentStep}.`,
     );

@@ -1,6 +1,6 @@
-import { Node, type Project, type SourceFile } from 'ts-morph';
 import fs from 'node:fs';
 import path from 'node:path';
+import { Node, type Project, type SourceFile } from 'ts-morph';
 import { createProject, DS_PACKAGE, type JsxElementLike } from './jsx';
 import type { ManualItem, Migration } from './types';
 

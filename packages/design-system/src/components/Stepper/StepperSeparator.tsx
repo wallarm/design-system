@@ -6,8 +6,7 @@ import { stepperSeparatorLineClassNames, stepperSeparatorVariants } from './clas
 import { useStepperItemContext } from './StepperContext';
 
 export interface StepperSeparatorProps
-  extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLSpanElement>;
 }
 

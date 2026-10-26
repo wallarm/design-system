@@ -4,8 +4,7 @@ import { SelectEmptyState } from '../Select/SelectEmptyState';
 import { useFilterDropdownContext } from './FilterDropdownContext';
 
 export interface FilterDropdownEmptyProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** @default 'Nothing matches' */
   children?: ReactNode;

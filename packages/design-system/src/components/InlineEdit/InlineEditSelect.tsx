@@ -61,7 +61,7 @@ export const InlineEditSelect = ({
     const hasItems = items !== undefined;
     const hasCollection = collection !== undefined;
     if (hasItems === hasCollection) {
-      // biome-ignore lint/suspicious/noConsole: dev-only warning surface
+      // oxlint-disable-next-line no-console -- dev-only warning surface
       console.warn(
         `InlineEditSelect: provide exactly one of \`items\` or \`collection\` (got ${
           hasItems && hasCollection ? 'both' : 'neither'

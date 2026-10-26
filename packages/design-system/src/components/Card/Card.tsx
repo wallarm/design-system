@@ -10,9 +10,7 @@ const INTERACTIVE_SELECTORS = 'a[href],button,input,select,textarea,[tabindex]';
 type CardVariantProps = Omit<VariantProps<typeof cardVariants>, 'interactive' | 'disabled'>;
 
 export interface CardProps
-  extends CardVariantProps,
-    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
-    TestableProps {
+  extends CardVariantProps, Omit<HTMLAttributes<HTMLDivElement>, 'color'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   asChild?: boolean;
   disabled?: boolean;

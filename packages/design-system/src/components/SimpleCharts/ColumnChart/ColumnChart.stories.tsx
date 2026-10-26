@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Skeleton } from '../../Skeleton';
 import { Chart } from '../Chart/Chart';

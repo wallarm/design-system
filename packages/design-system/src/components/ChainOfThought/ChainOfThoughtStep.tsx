@@ -9,8 +9,8 @@ import {
   useState,
 } from 'react';
 import { ChevronDown, CircleDashed } from '../../icons';
-import { Collapse } from '../../utils/Collapse';
 import { cn } from '../../utils/cn';
+import { Collapse } from '../../utils/Collapse';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import {
   chainOfThoughtBodyVariants,
@@ -23,8 +23,7 @@ import {
 } from './classes';
 
 export interface ChainOfThoughtStepProps
-  extends Omit<HTMLAttributes<HTMLElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLElement>, 'children'>, TestableProps {
   /**
    * `...rest`, `ref`, `className` and `data-testid` land on the ROW — a `<button>` when the
    * step has children, a `<div>` otherwise.

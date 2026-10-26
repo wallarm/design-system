@@ -48,7 +48,8 @@ interface DrawerResizeHandleCoordinates {
 }
 
 export interface DrawerResizeHandleProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /**

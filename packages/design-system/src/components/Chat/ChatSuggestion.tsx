@@ -6,8 +6,7 @@ import { chatSuggestionVariants } from './classes';
 
 /** A suggested prompt pill. Sized by its `ChatSuggestions` placement (Medium when standalone). */
 export interface ChatSuggestionProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    TestableProps {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
 }
 

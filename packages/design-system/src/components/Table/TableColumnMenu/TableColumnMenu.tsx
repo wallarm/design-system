@@ -43,7 +43,8 @@ export const useTableColumnMenuContext = (): TableColumnMenuContextValue => {
 };
 
 export interface TableColumnMenuProps<T extends RowData = Record<string, unknown>>
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
     TestableProps {
   /** Column from the header render context. */
   column: Column<DSTableFeatures, T>;

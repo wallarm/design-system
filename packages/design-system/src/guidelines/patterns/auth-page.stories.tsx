@@ -1,6 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { AnimatedBackground } from '../../components/AnimatedBackground';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';

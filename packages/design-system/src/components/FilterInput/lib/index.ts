@@ -14,11 +14,7 @@ export {
   type ValueMenuRow,
   type ValueMenuSection,
 } from './buildValueMenuSections';
-export {
-  type CollapseToken,
-  collapseValueOptions,
-  collapseValues,
-} from './collapseValuesToLabels';
+export { type CollapseToken, collapseValueOptions, collapseValues } from './collapseValuesToLabels';
 export {
   chipIdToConditionIndex,
   findChipSplitIndex,

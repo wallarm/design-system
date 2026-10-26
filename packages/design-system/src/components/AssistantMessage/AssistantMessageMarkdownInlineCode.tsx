@@ -6,8 +6,7 @@ import type { AssistantMessageMarkdownVariant } from './AssistantMessageMarkdown
 import { assistantMessageMarkdownInlineCodeVariants } from './classes';
 
 export interface AssistantMessageMarkdownInlineCodeProps
-  extends Omit<InlineCodeSnippetProps, 'size' | 'asChild' | 'children'>,
-    TestableProps {
+  extends Omit<InlineCodeSnippetProps, 'size' | 'asChild' | 'children'>, TestableProps {
   /** 'chain-of-thought' mutes the colour and turns copy off (Figma 494:4292). Default 'answer'. */
   variant?: AssistantMessageMarkdownVariant;
 }

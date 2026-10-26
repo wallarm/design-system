@@ -3,8 +3,7 @@ import { Menu } from '@ark-ui/react/menu';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuRadioGroupProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>, TestableProps {
   value?: string;
   onValueChange?: (details: { value: string }) => void;
   ref?: Ref<HTMLDivElement>;

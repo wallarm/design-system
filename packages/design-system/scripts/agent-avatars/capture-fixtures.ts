@@ -189,5 +189,5 @@ writeFileSync(
     1,
   )}\n`,
 );
-// biome-ignore lint/suspicious/noConsole: CLI output
+// oxlint-disable-next-line no-console -- CLI output
 console.log(`fixtures and ${path.relative(process.cwd(), geomOut)} written`);

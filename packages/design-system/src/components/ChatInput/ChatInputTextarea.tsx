@@ -15,7 +15,8 @@ import { useChatInputContext } from './ChatInputContext';
 import { chatInputTextareaVariants } from './classes';
 
 export interface ChatInputTextareaProps
-  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'value' | 'defaultValue'>,
+  extends
+    Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'value' | 'defaultValue'>,
     TestableProps {
   ref?: Ref<HTMLTextAreaElement>;
 }

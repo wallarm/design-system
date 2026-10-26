@@ -11,8 +11,8 @@ import {
   useState,
 } from 'react';
 import { SquareMinus, SquarePlus } from '../../icons';
-import { Collapse } from '../../utils/Collapse';
 import { cn } from '../../utils/cn';
+import { Collapse } from '../../utils/Collapse';
 import { useTestId } from '../../utils/testId';
 import { TreeDepthProvider, useTreeDepth } from '../../utils/treeDepth';
 import { treeViewRowVariants } from './classes';

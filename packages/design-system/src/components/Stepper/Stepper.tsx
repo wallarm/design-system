@@ -12,7 +12,8 @@ import {
 } from './useStepper';
 
 export interface StepperProps
-  extends Omit<ArkSteps.RootProps, StepperOmittedArkProps | keyof StepperGuardProps | 'asChild'>,
+  extends
+    Omit<ArkSteps.RootProps, StepperOmittedArkProps | keyof StepperGuardProps | 'asChild'>,
     StepperGuardProps,
     TestableProps {
   /** `StepperList`, then optional `StepperContent`s and `StepperPrevTrigger` / `StepperNextTrigger`. */

@@ -8,7 +8,8 @@ import { type BannerVariant, bannerVariants } from './classes';
 export type { BannerVariant };
 
 export interface BannerProps
-  extends Omit<VariantProps<typeof bannerVariants>, 'variant'>,
+  extends
+    Omit<VariantProps<typeof bannerVariants>, 'variant'>,
     HTMLAttributes<HTMLDivElement>,
     TestableProps {
   ref?: Ref<HTMLDivElement>;
