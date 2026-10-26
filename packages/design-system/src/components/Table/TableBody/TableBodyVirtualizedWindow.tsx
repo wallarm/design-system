@@ -52,6 +52,10 @@ const observeRootOffset = (
     : observeElementOffset(instance, cb);
 
 export const TableBodyVirtualizedWindow: FC = () => {
+  'use no memo';
+  // TanStack Virtual mutates a stable instance; its getters must run on every render.
+  // https://react.dev/reference/eslint-plugin-react-hooks/lints/incompatible-library
+
   const { table, estimateRowHeight, overscan, tbodyRef, virtualizerRef } = useTableContext();
 
   const scrollRoot = useContext(WindowScrollRootContext);
@@ -68,6 +72,7 @@ export const TableBodyVirtualizedWindow: FC = () => {
     if (instance && instance.scrollElement !== scrollRoot) instance.scrollOffset = null;
   });
 
+  // oxlint-disable-next-line react/incompatible-library -- This component explicitly opts out of memoization above.
   const virtualizer = useVirtualizer<Element, Element>({
     count: table.getRowModel().rows.length,
     getScrollElement: getScrollElement as () => Element | null,

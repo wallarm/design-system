@@ -1,4 +1,4 @@
-import { createRef, type FC, type ReactNode, useState } from 'react';
+import { useLayoutEffect, createRef, type FC, type ReactNode, useState } from 'react';
 
 import { useStepsContext } from '@ark-ui/react/steps';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
@@ -722,7 +722,9 @@ describe('Stepper — hooks', () => {
     const seen: Record<number, unknown> = {};
     const Probe = () => {
       const { index, current, last, status } = useStepperItemContext();
-      seen[index] = { current, last, status };
+      useLayoutEffect(() => {
+        seen[index] = { current, last, status };
+      });
       return null;
     };
     render(
@@ -767,8 +769,12 @@ describe('Stepper — hooks', () => {
     let api: UseStepperContextReturn | undefined;
     let ark: ReturnType<typeof useStepsContext> | undefined;
     const Probe = () => {
-      api = useStepperContext();
-      ark = useStepsContext();
+      const stepper = useStepperContext();
+      const steps = useStepsContext();
+      useLayoutEffect(() => {
+        api = stepper;
+        ark = steps;
+      });
       return null;
     };
     const onStepChange = rs.fn();
@@ -791,7 +797,10 @@ describe('Stepper — hooks', () => {
   it('drops an onStepChange at count reached through the raw Ark API, and still shows a current step', async () => {
     let ark: ReturnType<typeof useStepsContext> | undefined;
     const Probe = () => {
-      ark = useStepsContext();
+      const steps = useStepsContext();
+      useLayoutEffect(() => {
+        ark = steps;
+      });
       return null;
     };
     const onStepChange = rs.fn();

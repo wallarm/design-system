@@ -61,6 +61,7 @@ const SingleDateInputInner: FC<{
 
   // Null (not undefined) keeps the DateInput controlled when empty.
   const inputValue = toReactAriaDateValue(api.value[0]);
+  // oxlint-disable-next-line react/refs -- Ark dedupes time-only edits; bumpTime explicitly renders the shared timeRef after each edit.
   const time = timeRef?.current ?? { hour: 0, minute: 0 };
   // Rebuild date + tracked time: Ark owns only the date, so the time must come
   // from timeRef; minute granularity also rejects a date-only value.

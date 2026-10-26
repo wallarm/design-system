@@ -31,7 +31,7 @@ export const useSizerWidth = ({
     const sizerWidth =
       sizerRef.current?.getBoundingClientRect().width ?? text.length * CHAR_WIDTH_PX;
     setWidth(Math.min(maxWidth, Math.max(minWidth, sizerWidth)));
-  }, [text, minWidth, maxWidth]);
+  }, [sizerRef, text, minWidth, maxWidth]);
 
   return width + WIDTH_OFFSET;
 };

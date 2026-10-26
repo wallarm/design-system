@@ -1,4 +1,12 @@
-import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLayoutEffect,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { FilterInputDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
@@ -44,7 +52,9 @@ export const useValueMenuState = ({
 }: UseValueMenuStateOptions) => {
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
   const checkedValuesRef = useRef(checkedValues);
-  checkedValuesRef.current = checkedValues;
+  useLayoutEffect(() => {
+    checkedValuesRef.current = checkedValues;
+  });
 
   // Reset checkedValues only when the editing context changes (initialValues
   // serial changes). Resetting on every open false→true transition would wipe
@@ -71,7 +81,9 @@ export const useValueMenuState = ({
   };
 
   const onCommitRef = useRef(onCommit);
-  onCommitRef.current = onCommit;
+  useLayoutEffect(() => {
+    onCommitRef.current = onCommit;
+  });
 
   // Re-entry guard: blurCommitRef is read by both handleAreaClick and
   // handleBlur in the same event sequence. Cleanup that nulls the ref runs in

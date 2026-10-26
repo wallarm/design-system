@@ -136,6 +136,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({
   // Throttled mouse move handler - memoized to prevent recreation
   const handleMouseMove = useMemo(
     () =>
+      // oxlint-disable-next-line react/refs -- throttle only calls this handler from mouse events/timers, never during construction.
       throttle((e: MouseEvent) => {
         const { startX, startWidth } = dragStateRef.current;
         // Moving left increases width, moving right decreases

@@ -48,6 +48,7 @@ export function useLayerZIndexRef<T extends HTMLElement>(ref?: Ref<T>): RefCallb
     (node: T | null) => {
       if (!node) return;
       const refCleanup = typeof ref === 'function' ? ref(node) : undefined;
+      // oxlint-disable-next-line react/immutability -- React callback refs must forward the committed node and clear it in cleanup below.
       if (ref && typeof ref !== 'function') ref.current = node;
       const stop = syncLayerZIndex(node);
       return () => {

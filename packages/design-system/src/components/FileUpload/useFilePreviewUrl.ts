@@ -10,6 +10,7 @@ export const useFilePreviewUrl = (file?: File | null): string | undefined => {
 
   useEffect(() => {
     if (!file) {
+      // oxlint-disable-next-line react/set-state-in-effect -- The effect owns an external blob URL and must clear the revoked resource on file removal.
       setUrl(undefined);
       return;
     }

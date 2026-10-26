@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useRef, useState } from 'react';
+import { type FC, useCallback, useRef, useState } from 'react';
 
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
@@ -50,9 +50,7 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
 
   // Reset local open when autocomplete opens — prevents flash during flushSync
   // close→field transitions where menuOpen briefly goes false.
-  useEffect(() => {
-    if (menuOpen) setOpen(false);
-  }, [menuOpen]);
+  if (menuOpen && open) setOpen(false);
 
   const positioning = useFilterInputPositioning({ anchorRef: triggerRef });
 

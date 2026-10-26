@@ -71,7 +71,8 @@ const TimestampAction: FC<{ createdAt: string }> = ({ createdAt }) => {
     <MessageTimestamp dateTime={createdAt}>
       {formatTimestamp
         ? formatTimestamp(createdAt)
-        : formatRelativeTime(new Date(createdAt), new Date(), dateFormat)}
+        : // oxlint-disable-next-line react/purity -- Relative timestamps intentionally refresh with the clock on parent updates, like FormatDateTime.
+          formatRelativeTime(new Date(createdAt), new Date(), dateFormat)}
     </MessageTimestamp>
   );
 };

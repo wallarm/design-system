@@ -73,6 +73,7 @@ export const NavPanelResizeHandle: FC = () => {
 
   const handleMouseMove = useMemo(
     () =>
+      // oxlint-disable-next-line react/refs -- throttle only calls this handler from mouse events/timers, never during construction.
       throttle((e: MouseEvent) => {
         const { startX, startWidth } = dragStateRef.current;
         const delta = e.clientX - startX;

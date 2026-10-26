@@ -212,7 +212,7 @@ export const Default: StoryFn<typeof meta> = () => {
 export const Selectable: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(['4XX']));
   const total = baseRows.reduce((sum, r) => sum + r.value, 0);
-  const selectedNames = useMemo(() => Array.from(selected), [selected]);
+  const selectedNames = Array.from(selected);
 
   const toggle = (name: string) => {
     setSelected(prev => {

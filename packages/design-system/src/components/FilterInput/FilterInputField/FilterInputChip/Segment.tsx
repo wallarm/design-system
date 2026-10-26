@@ -120,6 +120,7 @@ export const Segment: FC<SegmentProps> = ({
   const setInputRef = useCallback(
     (node: HTMLInputElement | null) => {
       inputRef.current = node;
+      // oxlint-disable-next-line react/immutability -- This React callback ref registers the mounted input; no render-time mutation occurs.
       if (segmentInputRef) segmentInputRef.current = node;
     },
     [segmentInputRef],
