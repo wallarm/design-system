@@ -146,7 +146,7 @@ const addConnectorIfNeeded = (
 
   const missing = newConditionsLength - 1 - connectors.length;
   return missing > 0
-    ? [...connectors, ...new Array<'and'>(missing).fill(DEFAULT_CONNECTOR)]
+    ? [...connectors, ...Array.from({ length: missing }, () => DEFAULT_CONNECTOR)]
     : connectors;
 };
 

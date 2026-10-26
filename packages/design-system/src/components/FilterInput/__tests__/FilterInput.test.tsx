@@ -351,7 +351,6 @@ describe('FilterInput', () => {
     // future refactor), ArrowDown on a closed menu must reopen it via
     // nextBuildingMenu so the keyboard flow never deadlocks.
     it('reopens the menu on ArrowDown when state is closed and input is empty', async () => {
-      const user = userEvent.setup();
       render(<FilterInput fields={sampleFields} />);
 
       const input = screen.getByRole('combobox');

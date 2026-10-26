@@ -113,7 +113,7 @@ export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
     <p className='sb-annotation'>wrap</p>
     <Flex {...args} wrap='wrap' gap={2} fullWidth>
-      {new Array(40).fill(null).map((_, index) => {
+      {Array.from({ length: 40 }, (_, index) => {
         const key = `${index + 1}`;
 
         return (

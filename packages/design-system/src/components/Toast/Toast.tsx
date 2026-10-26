@@ -177,7 +177,7 @@ export const Toast = ({ toast }: ToastProps) => {
               )}
             </div>
 
-            {toast.actions && toast.actions}
+            {toast.actions}
           </div>
 
           {closable && <ToastClose />}

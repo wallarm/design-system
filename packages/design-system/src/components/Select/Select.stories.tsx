@@ -95,7 +95,7 @@ const skills: SelectDataItem[] = [
   },
 ];
 
-const skillsWithoutIcons: SelectDataItem[] = skills.map(({ icon, ...skill }) => skill);
+const skillsWithoutIcons: SelectDataItem[] = skills.map(({ icon: _icon, ...skill }) => skill);
 
 /**
  * The minimum composition: a trigger, a `SelectPositioner`, and `SelectContent` holding the

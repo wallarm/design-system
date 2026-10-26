@@ -55,7 +55,7 @@ export const Vertical: StoryFn<typeof meta> = () => (
       <ScrollAreaViewport>
         <ScrollAreaContent>
           <VStack>
-            {new Array(50).fill(null).map((_, index) => {
+            {Array.from({ length: 50 }, (_, index) => {
               const value = `${index + 1}`;
 
               return (
@@ -82,7 +82,7 @@ export const Horizontal: StoryFn<typeof meta> = () => (
       <ScrollAreaViewport>
         <ScrollAreaContent>
           <HStack>
-            {new Array(50).fill(null).map((_, index) => {
+            {Array.from({ length: 50 }, (_, index) => {
               const value = `${index + 1}`;
 
               return (
