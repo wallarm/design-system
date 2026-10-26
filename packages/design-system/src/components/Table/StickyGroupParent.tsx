@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef } from 'react';
+import { useLayoutEffect, useState, type FC, useEffect, useRef } from 'react';
 
 import type { RowData } from '@tanstack/react-table';
 
@@ -47,6 +47,16 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
 
   // Measure the overlay row height for the clip wrapper
   const rowRef = useRef<HTMLTableRowElement>(null);
+  const [rowHeight, setRowHeight] = useState(40);
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const measure = () => setRowHeight(row.offsetHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [stickyRow]);
 
   // Track the sticky row's expanded state so we can adjust scroll when
   // a group is collapsed while stuck. The expand toggle inside
@@ -106,7 +116,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
       aria-hidden='true'
     >
       {stickyRow && (
-        <div className='overflow-hidden' style={{ height: rowRef.current?.offsetHeight ?? 40 }}>
+        <div className='overflow-hidden' style={{ height: rowHeight }}>
           <div style={{ transform: pushUpOffset ? `translateY(${pushUpOffset}px)` : undefined }}>
             <table
               className='pointer-events-auto table-fixed border-separate border-spacing-0'

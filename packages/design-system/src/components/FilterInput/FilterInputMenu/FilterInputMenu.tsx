@@ -120,7 +120,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
   // A selected value that the current field doesn't define (e.g. left over after
   // a field change) renders with its raw value as label. Borrow its real label
   // from the field it came from so the menu matches the chip.
-  const menuValues = useMemo<ValueOption[]>(() => {
+  const menuValues: ValueOption[] = (() => {
     const selected = [
       ...editingMultiValues,
       ...(editingSingleValue != null ? [editingSingleValue] : []),
@@ -146,7 +146,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
       }
     }
     return result;
-  }, [selectedFieldValues, editingMultiValues, editingSingleValue, fields, selectedField]);
+  })();
 
   const valueFilterText = getValueFilterText(currentTokenText, selectedOperator, menuValues);
 

@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type HTMLAttributes,
   type ReactElement,
   type Ref,
@@ -129,7 +130,9 @@ export function LineChart<T extends LineChartDatum = LineChartDatum>({
   // `onZoomChange` invalidates `dataValue` and re-renders every context
   // consumer on each parent render.
   const onZoomChangeRef = useRef(onZoomChange);
-  onZoomChangeRef.current = onZoomChange;
+  useLayoutEffect(() => {
+    onZoomChangeRef.current = onZoomChange;
+  });
   const emitZoom = useCallback((range: LineChartZoomRange | null) => {
     onZoomChangeRef.current?.(range);
   }, []);

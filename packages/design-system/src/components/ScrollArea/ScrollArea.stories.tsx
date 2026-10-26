@@ -121,6 +121,10 @@ export const Horizontal: StoryFn<typeof meta> = () => (
  *   scrollbar hidden until something else forces a remeasure.
  */
 export const Virtualized: StoryFn<typeof meta> = () => {
+  'use no memo';
+  // TanStack Virtual mutates a stable instance; its getters must run on every render.
+  // https://react.dev/reference/eslint-plugin-react-hooks/lints/incompatible-library
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: 10_000,

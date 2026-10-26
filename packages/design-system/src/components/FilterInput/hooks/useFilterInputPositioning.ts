@@ -22,7 +22,7 @@ interface UseFilterInputPositioningProps {
  */
 export const useFilterInputPositioning = (
   { anchorRef, containerRef, getAnchorBounds, gutter = 12 }: UseFilterInputPositioningProps,
-  deps: unknown[] = [],
+  [insertIndex, chipsCount, resizeTick]: [number?, number?, number?] = [],
 ) =>
   useMemo(
     () => ({
@@ -41,5 +41,6 @@ export const useFilterInputPositioning = (
         return buildAnchoredRect(anchor, containerRect);
       },
     }),
-    [anchorRef, containerRef, getAnchorBounds, gutter, ...deps],
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Layout signals intentionally invalidate positioning even when the anchor callback is stable.
+    [anchorRef, containerRef, getAnchorBounds, gutter, insertIndex, chipsCount, resizeTick],
   );

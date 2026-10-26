@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { subDays, subHours, subMinutes, subMonths, subSeconds, subYears } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 
@@ -170,9 +172,10 @@ export const NullValue: StoryFn<typeof meta> = () => (
  * A timestamp five minutes ahead reads `Just now` rather than counting forwards — the
  * component absorbs clock skew between a browser and a server instead of showing it.
  */
-export const FutureDate: StoryFn<typeof meta> = () => (
-  <FormatDateTime value={new Date(Date.now() + 5 * 60 * 1000)} format='relative' />
-);
+export const FutureDate: StoryFn<typeof meta> = () => {
+  const [value] = useState(() => new Date(Date.now() + 5 * 60 * 1000));
+  return <FormatDateTime value={value} format='relative' />;
+};
 
 /**
  * The component respects the app's date order from `DateFormatProvider`. Day-first (the

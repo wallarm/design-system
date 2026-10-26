@@ -368,6 +368,7 @@ export const RangeControlled: StoryFn<typeof meta> = () => {
  * as the shipped ones.
  */
 export const SingleCustomPresets: StoryFn<typeof meta> = () => {
+  const [presetDate] = useState(() => new Date());
   const now = today(getLocalTimeZone()) as unknown as DateValue;
 
   return (
@@ -385,9 +386,9 @@ export const SingleCustomPresets: StoryFn<typeof meta> = () => {
             label='Tomorrow'
             value={[
               createDate(
-                new Date().getFullYear(),
-                new Date().getMonth() + 1,
-                new Date().getDate() + 1,
+                presetDate.getFullYear(),
+                presetDate.getMonth() + 1,
+                presetDate.getDate() + 1,
               ),
             ]}
             shortcut='O'
@@ -396,9 +397,9 @@ export const SingleCustomPresets: StoryFn<typeof meta> = () => {
             label='Next Week'
             value={[
               createDate(
-                new Date().getFullYear(),
-                new Date().getMonth() + 1,
-                new Date().getDate() + 7,
+                presetDate.getFullYear(),
+                presetDate.getMonth() + 1,
+                presetDate.getDate() + 7,
               ),
             ]}
             shortcut='W'
@@ -406,7 +407,7 @@ export const SingleCustomPresets: StoryFn<typeof meta> = () => {
           <CalendarPresetItem
             label='Next Month'
             value={[
-              createDate(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+              createDate(presetDate.getFullYear(), presetDate.getMonth() + 2, presetDate.getDate()),
             ]}
             shortcut='M'
           />

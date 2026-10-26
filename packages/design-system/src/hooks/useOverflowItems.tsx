@@ -61,7 +61,9 @@ export function useOverflowItems<T>({
 
   // Lets a stable `recompute` reach the current items' cache entry.
   const itemsRef = useRef(items);
-  itemsRef.current = items;
+  useLayoutEffect(() => {
+    itemsRef.current = items;
+  });
 
   // Hidden measurement layer: a ref per item + a ref for the '+N' indicator.
   const measurementRefs = useRef<(HTMLElement | null)[]>([]);
@@ -143,7 +145,9 @@ export function useOverflowItems<T>({
   // Latest-ref so the observer reaches `measure` without re-subscribing on
   // every items change.
   const measureRef = useRef(measure);
-  measureRef.current = measure;
+  useLayoutEffect(() => {
+    measureRef.current = measure;
+  });
 
   // Read→write recompute for resize ticks and cached items.
   const recomputeRead = useCallback((): WritePhase => {
@@ -156,6 +160,7 @@ export function useOverflowItems<T>({
   useLayoutEffect(() => {
     if (items.length === 0) {
       cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace, lastCount: 0 };
+      // oxlint-disable-next-line react/set-state-in-effect -- This layout effect owns DOM measurement/cache state, including its empty-list reset.
       setVisibleCount(0);
       pendingMeasureRef.current = false;
       return;

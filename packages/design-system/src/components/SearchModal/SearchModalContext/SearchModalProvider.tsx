@@ -1,4 +1,12 @@
-import { type FC, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLayoutEffect,
+  type FC,
+  type ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { SearchModalContext } from './SearchModalContext';
 import type { SearchModalContextValue } from './types';
@@ -22,17 +30,23 @@ export const SearchModalProvider: FC<SearchModalProviderProps> = ({
   const listRef = useRef<HTMLDivElement>(null);
 
   const onQueryChangeRef = useRef(onQueryChange);
-  onQueryChangeRef.current = onQueryChange;
+  useLayoutEffect(() => {
+    onQueryChangeRef.current = onQueryChange;
+  });
 
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  useLayoutEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  if (open !== previousOpen) {
+    setPreviousOpen(open);
     if (open) {
       setQueryState('');
       setActiveIndex(0);
     }
-  }, [open]);
+  }
 
   const setQuery = useCallback((value: string) => {
     setQueryState(value);

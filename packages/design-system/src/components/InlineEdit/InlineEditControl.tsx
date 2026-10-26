@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type FC,
   type FocusEvent,
   type HTMLAttributes,
@@ -86,7 +87,9 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
   // without needing it in the dependency array.
   const selectOnFocusRef = useRef(selectOnFocus);
-  selectOnFocusRef.current = selectOnFocus;
+  useLayoutEffect(() => {
+    selectOnFocusRef.current = selectOnFocus;
+  });
 
   // Focus the first focusable descendant each time editing begins — unless
   // it controls an already-open listbox (see findOpenListbox above), which

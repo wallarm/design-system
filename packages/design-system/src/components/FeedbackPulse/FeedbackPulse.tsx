@@ -78,6 +78,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
 
   useEffect(() => {
     if (open) {
+      // oxlint-disable-next-line react/set-state-in-effect -- A committed reopen starts a fresh feedback session alongside Presence and focus effects.
       setPhase('rating');
       setScore(null);
       setComment('');
@@ -93,6 +94,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
 
   useEffect(() => {
     if (phase !== 'feedback') {
+      // oxlint-disable-next-line react/set-state-in-effect -- Reset the completed reveal timer when leaving feedback; the clipping transition depends on its committed phase.
       setRevealDone(false);
       return;
     }

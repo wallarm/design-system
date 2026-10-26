@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
 import { clearDragAttributes, hasDragSelection } from './lib';
@@ -49,7 +49,9 @@ export const useFilterInputSelection = ({
 
   // Clear chip selection when clicking outside the filter input.
   const allSelectedRef = useRef(false);
-  allSelectedRef.current = allSelected;
+  useLayoutEffect(() => {
+    allSelectedRef.current = allSelected;
+  });
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

@@ -1,6 +1,6 @@
 import { type FC, type ReactNode, type Ref, useRef } from 'react';
 
-import { composeRefs } from '@radix-ui/react-compose-refs';
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
 
@@ -95,10 +95,12 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
     internalRef,
   );
 
+  const finalRef = useComposedRefs(internalRef, ref);
+
   return (
     <DateRangeContext.Provider
       value={{
-        finalRef: composeRefs(internalRef, ref),
+        finalRef,
         startRef,
         endRef,
         groupProps,

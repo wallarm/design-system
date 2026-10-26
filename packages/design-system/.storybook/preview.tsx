@@ -18,6 +18,7 @@ const SingletonToaster: FC = () => {
   useEffect(() => {
     toasterMountCount++;
     if (toasterMountCount === 1) {
+      // oxlint-disable-next-line react/set-state-in-effect -- Ownership is determined only after mount so multiple docs stories share one toaster.
       setIsFirst(true);
     }
     return () => {

@@ -1,4 +1,4 @@
-import { type ReactElement, useState } from 'react';
+import { useLayoutEffect, type ReactElement, useState } from 'react';
 
 import { beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
@@ -116,7 +116,9 @@ describe('OverflowList', () => {
     let trigger: (() => void) | null = null;
     const Harness = () => {
       const [tick, setTick] = useState(0);
-      trigger = () => setTick(t => t + 1);
+      useLayoutEffect(() => {
+        trigger = () => setTick(t => t + 1);
+      });
       return (
         <OverflowList
           items={[...items, `tick-${tick}` as never].slice(0, items.length)}
@@ -145,7 +147,9 @@ describe('OverflowList', () => {
     let trigger: (() => void) | null = null;
     const Harness = () => {
       const [tick, setTick] = useState(0);
-      trigger = () => setTick(t => t + 1);
+      useLayoutEffect(() => {
+        trigger = () => setTick(t => t + 1);
+      });
       return (
         <OverflowList
           items={[...items, `tick-${tick}` as never].slice(0, items.length)}
