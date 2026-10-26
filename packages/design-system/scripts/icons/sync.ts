@@ -224,7 +224,7 @@ const fetchSvgs = async (nodeIds: string[]) => {
 
 const kebab = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
-// ponytail: Biome's restricted names are ES builtins; extend this list if an icon ever hits another one.
+// Oxlint's no-shadow-restricted-names forbids shadowing these global values.
 const RESTRICTED_NAMES = new Set([
   'Infinity',
   'NaN',
@@ -236,10 +236,10 @@ const RESTRICTED_NAMES = new Set([
   'Date',
 ]);
 
-/** Icon names like `Infinity` shadow JS globals — fine for an icon, but Biome needs telling. */
+/** Icon names like `Infinity` intentionally shadow JS globals. */
 const shadowIgnore = (name: string, indent = '') =>
   RESTRICTED_NAMES.has(name)
-    ? `${indent}// biome-ignore lint/suspicious/noShadowRestrictedNames: icon name matches Lucide convention\n`
+    ? `${indent}// oxlint-disable-next-line no-shadow-restricted-names -- icon name matches Lucide convention\n`
     : '';
 
 const iconFile = (name: string, viewBox: string, jsx: string) => `import type { FC } from 'react';
@@ -357,17 +357,21 @@ const main = async () => {
     process.exit(1);
   }
   console.log(
-    `Figma: ${components.length} components, ${targets.length} icons to sync` +
-      (newTargets.length ? `, new: ${newTargets.map(t => t.name).join(', ')}` : ', nothing new'),
+    `Figma: ${components.length} components, ${targets.length} icons to sync${
+      newTargets.length ? `, new: ${newTargets.map(t => t.name).join(', ')}` : ', nothing new'
+    }`,
   );
   if (opts['dry-run']) return;
   if (opts['code-connect']) {
     writeCodeConnect(components);
-    execFileSync(
-      'pnpm',
-      ['exec', 'biome', 'check', '--write', codeConnectPath, codeConnectTemplatePath],
-      { cwd: repoRoot, stdio: 'inherit' },
-    );
+    execFileSync('pnpm', ['exec', 'oxlint', '--fix', codeConnectTemplatePath], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    });
+    execFileSync('pnpm', ['exec', 'oxfmt', '--write', codeConnectPath, codeConnectTemplatePath], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    });
     return;
   }
 
@@ -413,18 +417,23 @@ const main = async () => {
     codeConnectTemplatePath,
     manifestPath,
   ];
-  execFileSync('pnpm', ['exec', 'biome', 'check', '--write', ...touched], {
+  execFileSync('pnpm', ['exec', 'oxlint', '--fix', ...touched], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+
+  execFileSync('pnpm', ['exec', 'oxfmt', '--write', ...touched], {
     cwd: repoRoot,
     stdio: 'inherit',
   });
 
   const changed = written.filter(f => before.get(f) !== readFileSync(f, 'utf8'));
   console.log(
-    `✓ ${written.length} generated: ${added.length} new, ${changed.length - added.length} updated, ` +
-      `${written.length - changed.length} unchanged` +
-      (Object.keys(manifest.keep).length
+    `✓ ${written.length} generated: ${added.length} new, ${changed.length - added.length} updated, ${written.length - changed.length} unchanged${
+      Object.keys(manifest.keep).length
         ? `; kept by hand: ${Object.keys(manifest.keep).join(', ')}`
-        : ''),
+        : ''
+    }`,
   );
   if (added.length && !opts.category) {
     console.log(

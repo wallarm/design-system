@@ -6,8 +6,7 @@ import { WallyIcon } from '../WallyIcon';
 import { chatGreetingVariants } from './classes';
 
 export interface ChatGreetingProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Heading under the Wally mark, e.g. "How can I help you today?". */
   title: ReactNode;

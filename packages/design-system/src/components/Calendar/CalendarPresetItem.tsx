@@ -6,7 +6,8 @@ import { useCalendarContext } from './CalendarContext';
 import type { DateRangePreset, PresetValue } from './types';
 
 export interface CalendarPresetItemProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type' | 'value'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type' | 'value'>,
     TestableProps {
   /** Display label for the preset */
   label: string;

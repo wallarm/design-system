@@ -3,8 +3,6 @@ import { useStepsContext } from '@ark-ui/react/steps';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, renderHook, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { POLICY, StepperFixture, type StepperFixtureProps } from '../../testUtils/StepperFixture';
-import { Button } from '../Button';
 import {
   Stepper,
   StepperContent,
@@ -24,6 +22,8 @@ import {
   useStepperContext,
   useStepperItemContext,
 } from '.';
+import { POLICY, StepperFixture, type StepperFixtureProps } from '../../testUtils/StepperFixture';
+import { Button } from '../Button';
 
 afterEach(() => {
   rs.restoreAllMocks();

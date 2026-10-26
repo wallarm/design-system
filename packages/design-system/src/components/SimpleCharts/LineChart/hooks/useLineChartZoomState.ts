@@ -172,7 +172,7 @@ export const useLineChartZoomState = ({
 
   // Dataset changes invalidate cached indices on `pending` and `drag`; reset
   // both so a stale range can't be committed against a refreshed dataset.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: data/xKey are triggers, not read inside
+  // data/xKey are triggers, not read inside
   useEffect(() => {
     cancelScheduledFlush();
     setZoomDrag(null);

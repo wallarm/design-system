@@ -3,7 +3,8 @@ import { Dialog } from '@ark-ui/react/dialog';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DrawerTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   children: ReactNode;
   /** Render as child component */

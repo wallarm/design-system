@@ -4,7 +4,8 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface ResizablePanelProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'onResize'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'onResize'>,
     Pick<
       PanelProps,
       | 'collapsedSize'

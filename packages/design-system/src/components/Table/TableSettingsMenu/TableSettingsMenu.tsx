@@ -63,7 +63,8 @@ const DEFAULT_HEADER_HEIGHT = 34;
 const HEADER_HEIGHT_WITH_DESCRIPTION = 50;
 
 export interface TableSettingsMenuProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
     TestableProps {
   /**
    * Forwarded to the trigger `<button>` (focus management, measurement,

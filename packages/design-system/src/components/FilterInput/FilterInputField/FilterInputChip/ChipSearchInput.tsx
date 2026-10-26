@@ -27,6 +27,7 @@ export const ChipSearchInput: FC = () => {
       <input
         ref={inputRef}
         type='text'
+        // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- Existing FilterInput popup has no stable id for aria-controls; separate accessibility follow-up.
         role='combobox'
         // Drops the input's default ~20ch min-width so it can shrink inside the chip.
         size={1}

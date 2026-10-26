@@ -2,11 +2,7 @@ import type { SchemaNode } from 'json-schema-library';
 import type { JsonSchema } from '../../types';
 
 /** Library types for the other schema modules, so this file stays the single import site. */
-export type {
-  JsonError,
-  JsonSchema as LibraryJsonSchema,
-  SchemaNode,
-} from 'json-schema-library';
+export type { JsonError, JsonSchema as LibraryJsonSchema, SchemaNode } from 'json-schema-library';
 
 type SchemaLibrary = typeof import('json-schema-library');
 

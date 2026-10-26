@@ -15,8 +15,7 @@ import { POPOVER_MAX_HEIGHT, POPOVER_MAX_WIDTH, POPOVER_MIN_WIDTH } from './cons
 import type { PopoverSizeDimension } from './types';
 
 export interface PopoverContentProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'style'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'style'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
   minHeight?: PopoverSizeDimension;

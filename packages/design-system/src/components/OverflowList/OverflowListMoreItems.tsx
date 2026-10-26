@@ -5,8 +5,7 @@ import { overflowListMoreItemVariants } from './classes';
 import { useOverflowListContext } from './OverflowListContext';
 
 export interface OverflowListMoreItemsProps<T>
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, TestableProps {
   /** `all` lists every item (visible ones first); `hidden` only the folded ones. */
   show?: 'all' | 'hidden';
   /** Fade the items that are already visible in the row. Only with `show='all'`. */
@@ -49,7 +48,7 @@ export const OverflowListMoreItems = <T,>({
           if (show === 'hidden' && !isHidden) return null;
           return (
             <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: items carry no identity; the source index is stable for a given list
+              // oxlint-disable-next-line react/no-array-index-key -- items carry no identity; the source index is stable for a given list
               key={index}
               data-slot='overflow-list-more-item'
               data-testid={itemTestId}

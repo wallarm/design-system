@@ -30,7 +30,7 @@ export const BarList: FC<BarListProps> = ({
 
   useEffect(() => {
     if (!isValidMax && process.env.NODE_ENV !== 'production') {
-      // biome-ignore lint/suspicious/noConsole: dev-only warning about invalid `max`
+      // oxlint-disable-next-line no-console -- dev-only warning about invalid `max`
       console.warn(
         `[BarList] \`max\` must be a finite positive number. Received: ${String(max)}. ` +
           'Every row will render empty with a 0% label.',

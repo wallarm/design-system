@@ -1,6 +1,5 @@
 import { mergeRsbuildConfig } from '@rsbuild/core';
 import { TanStackRouterRspack } from '@tanstack/router-plugin/rspack';
-
 import { rsbuildConfig } from '@wallarm-org/rsbuild-config/rsbuild.config';
 
 export default mergeRsbuildConfig(rsbuildConfig, {

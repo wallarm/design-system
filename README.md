@@ -67,7 +67,7 @@ design-system/
 │   ├── mcp-core/            # Shared MCP metadata types and schemas
 │   ├── migrator/            # Migration CLI for consumer upgrades
 │   └── configs/             # Shared configurations
-│       ├── biome-config/    # Biome lint/format configuration
+│       ├── oxlint-config/   # Shared Oxlint rules
 │       ├── playwright-config/ # Playwright test configuration
 │       ├── publishing/      # Shared semantic-release configuration
 │       ├── rsbuild-config/  # Rsbuild bundler configuration
@@ -93,7 +93,7 @@ design-system/
 - `@wallarm-org/mcp` - MCP server that gives AI assistants component metadata, props, variants, and design tokens
 - `@wallarm-org/mcp-core` - Shared types and Zod schemas for MCP metadata (bundled into `@wallarm-org/mcp`, not published)
 - `@wallarm-org/migrator` - Codemod CLI that migrates consumer apps across design-system breaking changes
-- `@wallarm-org/biome-config` - Shared Biome lint/format configuration
+- `@wallarm-org/oxlint-config` - Shared Oxlint rules
 - `@wallarm-org/publish-scripts` - Shared semantic-release configuration
 - `@wallarm-org/typescript-config` - Shared TypeScript configurations
 - `@wallarm-org/playwright-config` - Shared Playwright test configurations
@@ -121,7 +121,7 @@ design-system/
 - **Storybook v10** - Component documentation and development
 - **Rstest** - Rspack-based unit testing framework
 - **Playwright** - Cross-browser E2E testing
-- **Biome** - Linting and formatting
+- **Oxlint + Oxfmt** - Linting and formatting
 - **Husky** - Git hooks for code quality
 - **Figma Code Connect** - Design-to-code synchronization
 
@@ -182,11 +182,39 @@ pnpm storybook        # Run Storybook development server
 ### Code Quality
 
 ```bash
-pnpm lint             # Biome check
-pnpm lint:fix         # Biome check --fix
-pnpm format           # Biome format
+pnpm lint             # Oxlint + Oxfmt check
+pnpm lint:fix         # Oxlint fixes + Oxfmt formatting
+pnpm format           # Oxfmt formatting
+pnpm format:check     # Check formatting without writing
 pnpm typecheck        # TypeScript type checking
 ```
+
+Oxlint rules live in `packages/configs/oxlint-config/oxlint.json`, extended by
+`.oxlintrc.json`. Oxfmt uses `.oxfmtrc.json` for formatting and import sorting
+(React → external packages → `@wallarm-org/*` → relative imports). Side-effect
+imports keep their execution order. Root commands cover all packages and tooling;
+`pnpm --filter <package> lint` checks one application or the component library.
+
+Formatting covers JavaScript/TypeScript, JSON/JSONC and CSS. Generated parsers,
+`*.gen.ts`, `__fixtures__`, theme CSS, build/report output, and prose files are
+excluded. The existing single quotes, semicolons, 100-column width, and 2-space
+indentation (4 for CSS) are retained.
+
+Migration coverage: Oxlint does not lint CSS, so the former CSS diagnostics are
+not enforced. Undeclared/redeclared names remain linted, including in TS tooling
+outside the application tsconfigs. Two valid type/value name pairs have local
+exceptions. TypeScript checking handles invalid use before declaration; the
+parser and compiler also catch duplicate parameters and invalid `super` calls.
+The former `useLiteralKeys` and
+`noUselessUndefinedInitialization` style checks are not enabled: the former needs
+type-aware linting, and the latter has no direct native equivalent. Type-aware
+Oxlint is not enabled; `pnpm typecheck` remains required. Existing warnings remain
+non-blocking, and narrowly scoped comments document pre-existing exceptions.
+
+For VS Code, install the [Oxc extension](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode),
+set `editor.defaultFormatter` to `oxc.oxc-vscode`, and enable
+`editor.codeActionsOnSave: { "source.fixAll.oxc": "explicit" }`. Disable the previous
+formatter extension for this workspace so only one formatter runs on save.
 
 ### Versioning & Release
 
@@ -235,7 +263,7 @@ GitHub Actions runs lint, typecheck, unit tests, build, and sharded E2E on every
 1. Clone the repository
 2. Install dependencies: `pnpm install`
 3. Create feature branch: `git checkout -b feature/amazing-feature`
-4. Follow code conventions (Biome: `pnpm lint`)
+4. Follow code conventions (Oxlint + Oxfmt: `pnpm lint`)
 5. Add tests for new functionality
 6. Create Pull Request
 

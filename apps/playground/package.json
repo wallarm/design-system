@@ -15,9 +15,9 @@
     "build": "rsbuild build",
     "build:doctor": "RSDOCTOR=true rsbuild build",
     "dev": "rsbuild dev --port 3000",
-    "format": "biome format --write .",
-    "lint": "biome check",
-    "lint:fix": "biome check --fix",
+    "format": "oxfmt --write .",
+    "lint": "oxlint . && oxfmt --check .",
+    "lint:fix": "oxlint --fix . && oxfmt --write .",
     "preview": "rsbuild preview",
     "typecheck": "tsc --build --noEmit",
     "test": "rstest watch",
@@ -29,7 +29,8 @@
     "e2e:failed": "playwright test --last-failed",
     "e2e:failed:headed": "playwright test --last-failed --headed",
     "e2e:report": "playwright show-report",
-    "e2e:docker:report": "playwright show-report ./playwright-report --port=9324"
+    "e2e:docker:report": "playwright show-report ./playwright-report --port=9324",
+    "format:check": "oxfmt --check ."
   },
   "dependencies": {
     "@tanstack/react-router": "1.170.41",

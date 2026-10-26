@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import {
   Activity,
   CircleCheck,
@@ -460,11 +460,10 @@ export const LongText: StoryFn = () => {
     'This is a very very very long title that will be truncated after a certain number of lines';
   const veryLongTitle = longTitle.repeat(4);
   const longDescription =
-    'This is a very long description that will be truncated after a certain number of lines. ' +
-    'Hover over the description to see the full text in a tooltip. ' +
-    'This allows for better space management while still providing access to all the information.'.repeat(
+    `This is a very long description that will be truncated after a certain number of lines. ` +
+    `Hover over the description to see the full text in a tooltip. ${'This allows for better space management while still providing access to all the information.'.repeat(
       2,
-    );
+    )}`;
 
   const simpleLong = (duration?: number) =>
     toast.create({ title: longTitle, variant: 'simple', type: 'info', duration });

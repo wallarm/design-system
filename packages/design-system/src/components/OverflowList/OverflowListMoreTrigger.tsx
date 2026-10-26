@@ -7,8 +7,7 @@ import { useOverflowListContext, useOverflowListMoreTriggerRef } from './Overflo
 import { OverflowListMoreCount } from './OverflowListMoreCount';
 
 export interface OverflowListMoreTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'value'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'value'>, TestableProps {
   /** Defaults to `+<OverflowListMoreCount /> more`. */
   children?: ReactNode;
   size?: TagProps['size'];

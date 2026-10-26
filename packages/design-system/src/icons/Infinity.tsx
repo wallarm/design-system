@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: icon name matches Lucide convention
+// oxlint-disable-next-line no-shadow-restricted-names -- icon name matches Lucide convention
 export const Infinity: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path

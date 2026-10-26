@@ -13,9 +13,9 @@ import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
 import { useDateFormat } from '../../DateFormatProvider/useDateFormat';
 import { ChartHoverCardRow } from '../internal/ChartHoverCard';
+import { formatChartDate } from '../lib/timeFormatters';
 import { LineChartHoverPopover, LineChartHoverPopoverTimestamp } from '../LineChart';
 import { LINE_CURSOR_DASHARRAY } from '../LineChart/constants';
-import { formatChartDate } from '../lib/timeFormatters';
 import {
   metricSparklineClasses,
   metricSparklinePlotClasses,
@@ -32,8 +32,7 @@ export interface MetricSparklinePoint {
 }
 
 export interface MetricSparklineProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'color'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** The trend over the period, oldest first. */
   data: MetricSparklinePoint[];

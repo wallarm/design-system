@@ -33,7 +33,8 @@ export interface FilterCascadeValueChangeDetails<T = unknown> {
 }
 
 export interface FilterCascadeProps<T = unknown>
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'children'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'children'>,
     TestableProps {
   /** Attribute name: the trigger text, its aria-label, «Clear {label}», «Search {label}». */
   label: string;

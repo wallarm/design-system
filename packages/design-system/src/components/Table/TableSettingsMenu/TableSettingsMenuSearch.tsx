@@ -4,7 +4,8 @@ import { DropdownMenuInput } from '../../DropdownMenu';
 import { useTableSettingsMenuContentContext } from './TableSettingsMenuContentContext';
 
 export interface TableSettingsMenuSearchProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'>,
+  extends
+    Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'>,
     TestableProps {}
 
 export const TableSettingsMenuSearch: FC<TableSettingsMenuSearchProps> = ({

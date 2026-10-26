@@ -27,8 +27,7 @@ import { FilterDropdownClear } from './FilterDropdownClear';
 import { useFilterDropdownContext } from './FilterDropdownContext';
 
 export interface FilterDropdownTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /**
    * Only a `<FilterDropdownClear />`, to replace the ✕ rendered in multi mode. The label is

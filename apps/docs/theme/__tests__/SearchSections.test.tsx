@@ -7,6 +7,7 @@ rs.mock('@rspress/core/runtime', () => ({
   withBase: (path: string) => `/design-system${path}`,
 }));
 rs.mock('@rspress/core/theme-original', () => ({
+  // oxlint-disable-next-line jsx-a11y/anchor-has-content -- This link test double forwards children through the props spread.
   Link: (props: Record<string, unknown>) => <a {...props} />,
   SvgWrapper: () => null,
   IconJump: {},

@@ -4,8 +4,7 @@ import { useDateRangeContext } from './DateRangeContext';
 import { DateRangeSegmentGroup } from './DateRangeSegmentGroup';
 
 export interface DateRangeStartValueProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'color'>,
-    TestableProps {}
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'color'>, TestableProps {}
 
 /**
  * Renders the start date/time input field for a date range.

@@ -8,10 +8,7 @@ export type {
 } from './LineChartContext';
 export { LineChartEmpty, type LineChartEmptyProps } from './LineChartEmpty';
 export { LineChartGrid, type LineChartGridProps } from './LineChartGrid';
-export {
-  LineChartHoverPopover,
-  type LineChartHoverPopoverProps,
-} from './LineChartHoverPopover';
+export { LineChartHoverPopover, type LineChartHoverPopoverProps } from './LineChartHoverPopover';
 export {
   LineChartHoverPopoverDot,
   type LineChartHoverPopoverDotProps,
@@ -25,10 +22,7 @@ export {
   type LineChartHoverPopoverTimestampProps,
 } from './LineChartHoverPopoverTimestamp';
 export { LineChartLegend, type LineChartLegendProps } from './LineChartLegend';
-export {
-  LineChartLegendItem,
-  type LineChartLegendItemProps,
-} from './LineChartLegendItem';
+export { LineChartLegendItem, type LineChartLegendItemProps } from './LineChartLegendItem';
 export { LineChartLine, type LineChartLineProps } from './LineChartLine';
 export {
   LineChartTooltip,
@@ -42,14 +36,8 @@ export {
   type LineChartXAxisProps,
 } from './LineChartXAxis';
 export { LineChartYAxis, type LineChartYAxisProps } from './LineChartYAxis';
-export {
-  LineChartZoomBrush,
-  type LineChartZoomBrushProps,
-} from './LineChartZoomBrush';
-export {
-  LineChartZoomPopover,
-  type LineChartZoomPopoverProps,
-} from './LineChartZoomPopover';
+export { LineChartZoomBrush, type LineChartZoomBrushProps } from './LineChartZoomBrush';
+export { LineChartZoomPopover, type LineChartZoomPopoverProps } from './LineChartZoomPopover';
 export {
   LineChartZoomPopoverConfirm,
   type LineChartZoomPopoverConfirmProps,
