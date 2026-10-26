@@ -136,6 +136,8 @@ className={cn(componentVariants({ size }), className)}
 
 **Keep render pure** — the library is compiled by React Compiler: no reading or writing `ref.current` during render, no mutating props, state or module variables. Check for compiler bailouts with `pnpm --filter @wallarm-org/design-system compiler:audit`.
 
+**Verify lint findings before changing behavior** — establish the component's contract and reproduce suspected bugs with a focused test. Preserve intentional behavior when a diagnostic does not apply: use a local exception that explains why, rather than disabling the rule globally. For example, `useControlled` freezes its mode at mount; its immutable mode ref is covered by contract tests. Publish mutable callback refs after commit so an abandoned render cannot change live callbacks.
+
 **Make interactive targets analytics-ready** — consumer `data-*` / `aria-*` / event props must reach the real interactive DOM node. Use the element-specific attribute type (`ButtonHTMLAttributes<HTMLButtonElement>`, etc.) and spread `...props` onto that node. See the [metrics contract](https://github.com/wallarm/design-system/blob/main/docs/metrics/contract.md) and the [new-component checklist](https://github.com/wallarm/design-system/blob/main/docs/metrics/new-component-checklist.md).
 
 ## Step 2: Move Shared Variants to `classes.ts` (when shared)
