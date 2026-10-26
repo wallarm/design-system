@@ -33,6 +33,7 @@ export const ChatSuggestions: FC<ChatSuggestionsProps> = ({
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The group names suggested actions; their buttons own focus and activation.
       role='group'
       aria-label={hasLabel ? undefined : 'Suggestions'}
       aria-labelledby={hasLabel ? labelId : undefined}

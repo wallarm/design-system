@@ -40,6 +40,7 @@ export const StepperContent: FC<StepperContentProps> = ({
       index={index}
       {...ARK_CONTENT_ARIA_RESET}
       // A step body is not a tab panel: there are no tabs.
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Ark owns visibility and trigger labelling for this step body; it is a group of content, not a form fieldset.
       role='group'
       {...rest}
       ref={ref}

@@ -129,6 +129,7 @@ describe('InlineEditControl', () => {
           <button type='button' aria-controls='my-listbox' data-testid='trigger'>
             Open
           </button>
+          {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The fixture reproduces an already-open ARIA listbox whose focus must supersede its trigger. */}
           <div role='listbox' id='my-listbox' tabIndex={0} data-testid='listbox' />
         </InlineEditControl>
       </InlineEdit>,
@@ -197,7 +198,12 @@ describe('submit-mode override', () => {
       const [on, setOn] = useState(true);
       return (
         <InlineEdit defaultValue='v' defaultEdit submitMode='both'>
-          <button type='button' data-testid='toggle' onClick={() => setOn(false)} />
+          <button
+            type='button'
+            aria-label='Remove editor'
+            data-testid='toggle'
+            onClick={() => setOn(false)}
+          />
           <InlineEditControl>
             {on ? <RegisteringEditor mode='none' /> : <ModeProbe />}
           </InlineEditControl>

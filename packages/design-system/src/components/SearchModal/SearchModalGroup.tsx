@@ -22,6 +22,7 @@ export const SearchModalGroup: FC<SearchModalGroupProps> = ({
       ref={ref}
       data-slot='search-modal-group'
       data-testid={testId}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This groups custom listbox options; optgroup requires a native select.
       role='group'
       className={cn('[&:not(:first-child)]:mt-4', className)}
     >

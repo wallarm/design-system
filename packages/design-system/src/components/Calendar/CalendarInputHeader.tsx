@@ -67,6 +67,7 @@ const SingleDateInputInner: FC<{
   const dateTimeValue = inputValue ? toReactAriaDateValue(withTime(inputValue, time)) : null;
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- DateInput segments own focus; the wrapper only keeps their arrow keys from also navigating the calendar grid.
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
       {showTime ? (
         <DateInput
@@ -144,6 +145,7 @@ const RangeDateInputInner: FC<{
   const endValue = toReactAriaDateValue(api.value[1]);
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- DateInput segments own focus; the wrapper only keeps their arrow keys from also navigating the calendar grid.
     <div className='relative flex flex-1 items-center gap-4' onKeyDown={e => e.stopPropagation()}>
       <DateInput
         value={startValue}

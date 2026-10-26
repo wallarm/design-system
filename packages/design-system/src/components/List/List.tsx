@@ -34,6 +34,7 @@ export const List: FC<ListProps> = ({
       ref={ref as Ref<HTMLOListElement & HTMLUListElement>}
       data-slot='list'
       data-testid={testId}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Comp already renders ol/ul; explicit list preserves Safari accessibility when CSS removes list markers.
       role='list'
       className={cn(listVariants({ spacing, marker }), className)}
     >

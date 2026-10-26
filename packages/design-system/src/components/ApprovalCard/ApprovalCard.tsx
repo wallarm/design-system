@@ -81,7 +81,9 @@ export const ApprovalCard: FC<ApprovalCardProps> = ({
   }, [status]);
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- The group observes descendant focus to restore it after actions unmount; action buttons own all interaction.
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This names an approval action/status group, not a fieldset of form fields.
       role='group'
       aria-labelledby={labelledBy}
       {...props}
@@ -120,6 +122,7 @@ export const ApprovalCard: FC<ApprovalCardProps> = ({
           </Part>
         )}
         {/* Always mounted so screen readers pick up the change when the label is inserted. */}
+        {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The live region contains a block status row that receives restored focus; output only accepts phrasing content. */}
         <div role='status'>
           {status !== 'pending' && (
             <Part

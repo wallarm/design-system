@@ -186,10 +186,12 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
   return (
     <ArkUiPortal>
       <ArkUiPresence present={open} asChild>
+        {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Hover only pauses the dismissal timer; the dialog action buttons and radio group own focus and keyboard interaction. */}
         <div
           ref={setCardRef}
           data-slot='feedback-pulse'
           data-testid={testId}
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This nonmodal surface preserves background focus, controlled presence and its public div ref.
           role='dialog'
           aria-label={question}
           className={feedbackPulseVariants()}
@@ -269,6 +271,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                         size='small'
                         fullWidth
                         active={score === n}
+                        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- ToggleButton is the rich radio target in an existing roving-focus radiogroup with arrow-key selection.
                         role='radio'
                         aria-checked={score === n}
                         aria-label={String(n)}

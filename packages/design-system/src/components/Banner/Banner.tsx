@@ -47,6 +47,7 @@ export const Banner: FC<BannerProps> = ({
         <div
           {...props}
           ref={ref}
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This live announcement contains block message content and controls; output only accepts phrasing content.
           role='status'
           data-slot='banner'
           data-testid={testId}

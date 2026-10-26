@@ -18,6 +18,7 @@ export const LineChartZoomPopover: FC<LineChartZoomPopoverProps> = ({
       {...props}
       ref={ref}
       data-slot='line-chart-zoom-popover'
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This nonmodal popup preserves brush focus, controlled presence and its public div ref.
       role='dialog'
       // Non-modal: focus stays on the brush traveller / surrounding page; the
       // popover is a transient affordance, not a focus trap.

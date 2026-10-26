@@ -6,12 +6,9 @@ interface MenuEmptyStateProps {
 }
 
 export const MenuEmptyState: FC<MenuEmptyStateProps> = ({ label = 'No results' }) => (
-  <div
-    className='flex items-center justify-center pt-2 pb-4 text-sm text-text-secondary'
-    role='status'
-  >
+  <output className='flex items-center justify-center pt-2 pb-4 text-sm text-text-secondary'>
     {label}
-  </div>
+  </output>
 );
 
 MenuEmptyState.displayName = 'MenuEmptyState';

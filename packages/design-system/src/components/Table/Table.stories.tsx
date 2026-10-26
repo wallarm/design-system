@@ -686,7 +686,9 @@ export const NoResults: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Drag a header edge to resize. `columnSizing` is state like everything else, so a width can
+ * Drag a header edge or focus its separator and use Left/Right to resize in 10px steps.
+ * Home uses the minimum; End uses an explicit maximum.
+ * `columnSizing` is state like everything else, so a width can
  * be remembered between visits.
  */
 export const ColumnResizing: StoryFn<typeof meta> = () => {

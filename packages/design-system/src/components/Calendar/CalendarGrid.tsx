@@ -95,7 +95,9 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                           (monthOffset > 0 && isBeforeTargetMonth);
 
                         if (shouldHide) {
-                          return <td key={day.toString()} className='h-40 w-40' />;
+                          return (
+                            <td key={day.toString()} className='h-40 w-40' aria-hidden='true' />
+                          );
                         }
                       }
 

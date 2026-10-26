@@ -157,6 +157,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   };
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Editors own focus; this wrapper coordinates their bubbled commit/cancel keys and focus leaving the edit session.
     <div
       {...props}
       ref={combinedRef}

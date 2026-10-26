@@ -202,6 +202,7 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
       onMouseDown={e => e.preventDefault()}
       onMouseMove={handleMouseMove}
       onKeyDown={handleKeyDown}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The custom listbox preserves date-segment focus and rich option content.
       role='listbox'
       aria-label='Time selection'
       ref={listRef}
@@ -230,6 +231,7 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
                   )}
                   onClick={() => handleSelect(option)}
                   onMouseDown={e => e.preventDefault()} // Prevent blur
+                  // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Button activation serves this rich listbox option; native option requires a select.
                   role='option'
                   aria-selected={isCurrentValue}
                 >

@@ -52,6 +52,7 @@ export const ChartDelta: FC<ChartDeltaProps> = ({
       // Badge renders a generic <div>; without a role its aria-label is ignored —
       // role='img' makes "up 10" the computed accessible name. The arrow icon is
       // decorative (aria-hidden); direction + magnitude live in the label.
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Badge combines an arrow and text into one named graphic; an img cannot contain that rendered content.
       role='img'
       aria-label={`${direction} ${formatNumber(abs)}`}
     >

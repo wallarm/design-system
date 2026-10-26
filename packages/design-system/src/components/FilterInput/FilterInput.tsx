@@ -177,6 +177,7 @@ export const FilterInput: FC<FilterInputProps> = ({
   }, [errors, onErrorsChange]);
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- The wrapper handles bubbled input/chip keys and clipboard selection; its children own the normal tab stops.
     <div
       ref={containerRef}
       className={cn('group/filter-input relative flex w-full flex-col gap-4', className)}

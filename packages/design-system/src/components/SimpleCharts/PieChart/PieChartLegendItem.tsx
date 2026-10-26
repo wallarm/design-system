@@ -139,6 +139,7 @@ export const PieChartLegendItem: FC<PieChartLegendItemProps> = ({
 
   return (
     <PieChartItemContext.Provider value={itemValue}>
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Clickable rows have button role, tabIndex and Enter/Space; static rows only synchronize hover. */}
       <div
         {...props}
         ref={ref}

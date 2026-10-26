@@ -119,7 +119,9 @@ export const SearchPanel: FC<SearchPanelProps> = ({
   const canSearch = query.valid;
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Inputs/buttons own focus; the landmark only handles their bubbled CodeMirror shortcuts.
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Keep the explicit landmark supported by current accessibility tooling and CodeMirror panel consumers.
       role='search'
       aria-label='Find and replace'
       data-slot='code-editor-search'

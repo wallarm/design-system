@@ -30,6 +30,7 @@ export const NavPanelGroupContent: FC<NavPanelGroupContentProps> = ({
       {...props}
       ref={ref}
       id={contentId}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This ARIA group identifies nested navigation items; form fieldset semantics do not describe the hierarchy.
       role='group'
       data-slot='nav-panel-group-content'
       className={cn(
