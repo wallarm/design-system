@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check PR title format
-        uses: thehanimo/pr-title-checker@v1.4.1
+        uses: thehanimo/pr-title-checker@v2.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           configuration_path: .github/pr-title-checker-config.json
