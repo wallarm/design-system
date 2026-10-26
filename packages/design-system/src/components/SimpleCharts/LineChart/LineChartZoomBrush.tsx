@@ -195,6 +195,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   // the mouse button is still held, or clicking it would re-trigger a drag.
   const popoverContent =
     range && popoverPosition ? (
+      // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- This portal wrapper only blocks pointer bubbling into chart dragging; its confirm button owns keyboard activation.
       <div
         ref={popoverRef}
         data-slot='line-chart-zoom-cursor-popover'

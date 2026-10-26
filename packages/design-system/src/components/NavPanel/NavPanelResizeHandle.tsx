@@ -1,5 +1,6 @@
 import {
   type FC,
+  type KeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   useEffect,
   useMemo,
@@ -27,6 +28,7 @@ const resizeHandleVariants = cva(
     'before:rounded-full',
     'before:bg-bg-fill-brand',
     'before:transition-opacity before:duration-150',
+    'focus-visible:before:opacity-100',
   ),
   {
     variants: {
@@ -101,9 +103,22 @@ export const NavPanelResizeHandle: FC = () => {
 
   const barIsVisible = isHovered || isDragging;
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    let next: number;
+    if (event.key === 'ArrowLeft') next = width - 10;
+    else if (event.key === 'ArrowRight') next = width + 10;
+    else if (event.key === 'Home') next = minWidth;
+    else if (event.key === 'End') next = maxWidth;
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+    setWidth(Math.min(maxWidth, Math.max(minWidth, next)));
+  };
+
   return (
     <div
       role='separator'
+      aria-label='Resize navigation panel'
       tabIndex={0}
       aria-orientation='vertical'
       aria-valuenow={width}
@@ -114,6 +129,7 @@ export const NavPanelResizeHandle: FC = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onMouseDown={handleMouseDown}
+      onKeyDown={handleKeyDown}
     />
   );
 };

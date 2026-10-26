@@ -282,6 +282,39 @@ describe('Table reactivity under the React Compiler', () => {
     expect(handle).not.toHaveAttribute('data-resizing');
   });
 
+  it('resizes a column by keyboard, preserving its bounds and reactive width announcement', async () => {
+    const user = userEvent.setup();
+    const sizingColumns = [
+      columnHelper.accessor('name', { header: 'Name', size: 180, minSize: 120, maxSize: 240 }),
+      columnHelper.accessor('score', { header: 'Score' }),
+    ];
+    const Harness = () => {
+      const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+      return (
+        <Table
+          data={data}
+          columns={sizingColumns}
+          columnSizing={columnSizing}
+          onColumnSizingChange={setColumnSizing}
+          data-testid='tbl'
+        />
+      );
+    };
+    render(<Harness />);
+    const header = getHeader('Name');
+    const handle = within(header).getByRole('separator', { name: 'Resize Name column' });
+    handle.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(header).toHaveStyle({ width: '190px' });
+    expect(handle).toHaveAttribute('aria-valuenow', '190');
+    await user.keyboard('{ArrowLeft}');
+    expect(header).toHaveStyle({ width: '180px' });
+    await user.keyboard('{Home}{ArrowLeft}');
+    expect(header).toHaveStyle({ width: '120px' });
+    await user.keyboard('{End}{ArrowRight}');
+    expect(header).toHaveStyle({ width: '240px' });
+  });
+
   it('pins and unpins a column from its header menu', async () => {
     const user = userEvent.setup();
     const Harness: FC = () => {

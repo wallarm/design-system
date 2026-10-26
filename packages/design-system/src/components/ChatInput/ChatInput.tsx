@@ -97,7 +97,6 @@ export const ChatInput: FC<ChatInputProps> = ({
       {...rest}
       ref={ref}
       onSubmit={handleSubmit}
-      aria-disabled={disabled || undefined}
       data-slot='chat-input'
       data-testid={testId}
       className={cn(chatInputVariants(), className)}

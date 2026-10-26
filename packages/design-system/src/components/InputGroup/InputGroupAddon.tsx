@@ -78,6 +78,7 @@ export const InputGroupAddon: FC<
   };
 
   return (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- Clicking decoration only focuses the input; Tab reaches that input and nested buttons keep their own focus.
     <div
       {...props}
       role='group'

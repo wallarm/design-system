@@ -24,6 +24,7 @@ const MAX_WIDTH = 256;
 export interface NavPanelProps extends HTMLAttributes<HTMLElement>, TestableProps {
   ref?: Ref<HTMLElement>;
   children?: ReactNode;
+  /** Enables a resize separator: drag, Left/Right in 10px steps, Home/End for bounds. */
   resizable?: boolean;
 }
 
