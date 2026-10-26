@@ -2,7 +2,7 @@ import { type MouseEvent, useCallback } from 'react';
 
 import type { RowData } from '@tanstack/react-table';
 
-import { useTableContext } from '../TableContext';
+import { useTableContext } from '../TableContext/useTableContext';
 
 /**
  * Encapsulates master cell click logic for a body cell.
