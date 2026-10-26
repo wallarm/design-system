@@ -206,7 +206,7 @@ export const Scrollable: Story = () => (
   <div className='w-400'>
     <Tabs defaultValue='1'>
       <TabsList>
-        {new Array(20).fill(null).map((_, index) => {
+        {Array.from({ length: 20 }, (_, index) => {
           const key = index + 1;
           return (
             <TabsTrigger key={key} value={String(key)}>
@@ -216,7 +216,7 @@ export const Scrollable: Story = () => (
         })}
       </TabsList>
 
-      {new Array(20).fill(null).map((_, index) => {
+      {Array.from({ length: 20 }, (_, index) => {
         const key = index + 1;
         return (
           <TabsContent key={key} value={String(key)}>

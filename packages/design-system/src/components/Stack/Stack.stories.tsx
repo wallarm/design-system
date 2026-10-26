@@ -135,7 +135,7 @@ export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column'>
     <p className='sb-annotation'>wrap</p>
     <HStack {...args} gap={2} wrap='wrap'>
-      {new Array(40).fill(null).map((_, index) => {
+      {Array.from({ length: 40 }, (_, index) => {
         const key = `${index + 1}`;
 
         return <Box key={key}>{key}</Box>;

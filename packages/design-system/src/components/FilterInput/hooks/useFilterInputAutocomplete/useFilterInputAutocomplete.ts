@@ -63,7 +63,6 @@ export const useFilterInputAutocomplete = ({
     setBuildingSide,
     buildingBase,
     setBuildingBase,
-    insertIndex,
     setInsertIndex,
     insertAfterConnector,
     setInsertAfterConnector,

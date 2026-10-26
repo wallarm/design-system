@@ -19,7 +19,7 @@ export interface AreaChartAreaProps {
   seriesKey: string;
   /** Recharts curve type. Defaults to `'monotone'`. */
   curve?: 'linear' | 'monotone';
-  /** Force-disable the recharts mount animation. */
+  /** Accepted for compatibility; mount animation is always disabled. */
   disableAnimation?: boolean;
   /** Recharts pass-through — when `true`, the area bridges `null`/`undefined` gaps. */
   connectNulls?: boolean;
@@ -30,7 +30,6 @@ export interface AreaChartAreaProps {
 export const AreaChartArea: FC<AreaChartAreaProps> = ({
   seriesKey,
   curve = 'monotone',
-  disableAnimation = false,
   connectNulls = false,
   strokeWidth = AREA_STROKE_WIDTH,
 }) => {

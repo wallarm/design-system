@@ -129,7 +129,7 @@ const collectAssignedTags = (sourceFile: SourceFile): Map<string, string[]> => {
 
 /**
  * Collect descriptions from two sources:
- * 1. JSDoc on VariableStatement: `/** Basic uncontrolled dialog *​/`
+ * 1. Leading JSDoc on the story VariableStatement.
  * 2. Post-export: `StoryName.parameters = { docs: { description: { story: '...' } } }`
  */
 const collectDescriptions = (sourceFile: SourceFile): Map<string, string> => {

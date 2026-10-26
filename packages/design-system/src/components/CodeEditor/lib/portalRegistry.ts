@@ -27,7 +27,9 @@ export const createPortalRegistry = (): PortalRegistry => {
 
   const emit = (next: readonly PortalEntry[]) => {
     entries = next;
-    for (const listener of [...listeners]) listener();
+    // Subscription changes during a notification apply to the next emission.
+    const currentListeners = [...listeners];
+    for (const listener of currentListeners) listener();
   };
 
   return {

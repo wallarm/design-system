@@ -57,7 +57,7 @@ const walk = (
   parent: SvgNode | null = null,
 ) => {
   visit(node, parent);
-  for (const child of [...node.children]) walk(child, visit, node);
+  for (const child of node.children) walk(child, visit, node);
 };
 
 const clone = (node: SvgNode): SvgNode => ({

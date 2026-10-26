@@ -23,7 +23,7 @@ describe('metadata validation', () => {
   });
 
   it('rejects missing version', () => {
-    const { version, ...noVersion } = raw;
+    const { version: _version, ...noVersion } = raw;
     const result = designSystemMetadataSchema.safeParse(noVersion);
     expect(result.success).toBe(false);
   });
