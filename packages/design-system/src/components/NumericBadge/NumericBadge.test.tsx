@@ -186,6 +186,7 @@ describe('NumericBadge interactions', () => {
     const onClick = rs.fn();
     render(
       <NumericBadge asChild>
+        {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- NumericBadge asChild supplies button semantics and keyboard handling; this test proves the span receives them. */}
         <span onClick={onClick}>5</span>
       </NumericBadge>,
     );

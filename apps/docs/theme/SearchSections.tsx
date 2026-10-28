@@ -44,13 +44,14 @@ export function SearchSections({ onNavigate }: SearchSectionsProps) {
             <li
               key={link}
               className={`rp-suggest-item ${index === current ? 'rp-suggest-item--current' : ''}`}
-              onMouseEnter={() => setCurrent(index)}
             >
               <Link
                 href={external ? link : withBase(link)}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
                 onClick={onNavigate}
+                onMouseEnter={() => setCurrent(index)}
+                onFocus={() => setCurrent(index)}
                 className='rp-suggest-item__link'
               >
                 <div className='rp-suggest-item__container'>

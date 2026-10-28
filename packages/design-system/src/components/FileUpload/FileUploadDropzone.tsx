@@ -59,6 +59,7 @@ export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({
       ref={ref}
       disableClick={blocked}
       // Keep the button role while blocked (Ark switches to "application" with disableClick).
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Ark manages dropzone keyboard activation and drag/drop on its div; preserving that target avoids nested button content.
       role='button'
       aria-disabled={blocked || undefined}
       data-disabled={blocked ? '' : undefined}

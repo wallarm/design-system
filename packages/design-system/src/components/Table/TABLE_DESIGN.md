@@ -68,7 +68,7 @@ Table (root)
                     │   │       ├── TableSortHandler / consumer TableSortTrigger
                     │   │       ├── TableColumnMenu (⋯) — Move left/right, Sort, Pin, Hide
                     │   │       ├── TableScrollHandlerSlot — master column, on horizontal overflow
-                    │   │       └── TableResizeHandler — edge drag
+                    │   │       └── TableResizeHandler — edge drag / keyboard resize
                     │   └── TableBody — or TableBodyVirtualizedContainer / ...Window
                     │       ├── TableRow — data, group and full-width rows
                     │       │   ├── TableBodyCell — <td>, master cell actions (meta.renderMenuAction)
@@ -165,6 +165,8 @@ Enabled by passing `onRowSelectionChange` — the checkbox column is then added 
 ### Column Resizing
 
 Enabled by passing `onColumnSizingChange`. Sizes apply live while dragging (`columnResizeMode: 'onChange'`, not configurable).
+
+Resize handles are focusable separators. Left/Right arrows change the width by 10px; Home uses `minSize`, and End uses `maxSize` when a finite maximum is configured. Keyboard resizing calls the same `onColumnSizingChange` callback as dragging.
 
 | Prop | Type | Description |
 |------|------|-------------|
@@ -339,6 +341,7 @@ All interactive states work in two modes (via `useTableState`; pinning via `useC
 ### 5. Column Resizing
 - Drag handle on the right edge of the column header (not on the last column)
 - Sizes apply live while dragging
+- Focused handles support Left/Right arrows (10px), Home (minimum), and End (configured maximum)
 - Minimum / maximum width via `minSize` / `maxSize` (default `minSize` is 96px)
 - `meta.resizeType`: `'resize'` (default) adapts content, `'cut'` truncates it
 

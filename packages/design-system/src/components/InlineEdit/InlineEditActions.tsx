@@ -12,6 +12,7 @@ export interface InlineEditActionsProps {
 }
 
 export const InlineEditActions: FC<InlineEditActionsProps> = ({ onSubmit, onCancel }) => (
+  // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Save and Cancel buttons own activation; the wrapper only prevents their keys from also submitting the parent editor.
   <div
     className='absolute top-full right-0 z-10 mt-4 flex'
     data-slot='inline-edit-actions'

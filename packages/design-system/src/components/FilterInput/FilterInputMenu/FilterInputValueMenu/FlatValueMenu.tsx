@@ -102,13 +102,12 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         data-filter-input-menu='true'
       >
         {loading ? (
-          <div
+          <output
             className='flex items-center justify-center pt-2 pb-4 text-text-secondary'
-            role='status'
             aria-live='polite'
           >
             <Loader size='sm' />
-          </div>
+          </output>
         ) : displayValues.length > 0 ? (
           <DropdownMenuGroup className='flex flex-col gap-1'>
             {displayValues.map(option => (

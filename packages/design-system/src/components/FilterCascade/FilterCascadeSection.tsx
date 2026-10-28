@@ -30,6 +30,7 @@ export const FilterCascadeSection: FC<FilterCascadeSectionProps> = ({
   const testId = useTestId('section', testIdProp);
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This ARIA menu group contains menuitemcheckbox actions; a form fieldset would misrepresent the composite menu.
       role='group'
       {...props}
       data-slot='filter-cascade-section'

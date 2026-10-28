@@ -64,6 +64,7 @@ export const BarListItem: FC<BarListItemProps> = ({
 
   return (
     <BarListItemContext.Provider value={itemValue}>
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Clickable rows have button role, tabIndex and Enter/Space; static rows remain unfocusable. */}
       <div
         {...props}
         ref={ref}

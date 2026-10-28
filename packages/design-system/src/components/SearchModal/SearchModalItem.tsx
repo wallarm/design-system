@@ -77,6 +77,7 @@ export const SearchModalItem: FC<SearchModalItemProps> = ({
       data-slot='search-modal-item'
       data-testid={testId}
       data-search-item=''
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Search owns navigation; these rich button/link options are not native select options.
       role='option'
       aria-selected={active}
       disabled={disabled}

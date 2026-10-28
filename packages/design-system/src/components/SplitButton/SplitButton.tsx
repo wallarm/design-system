@@ -19,6 +19,7 @@ export const SplitButton: FC<SplitButtonProps> = ({
     <div
       {...props}
       ref={ref}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The group joins an action and its menu trigger, not form fields.
       role='group'
       data-slot='split-button'
       data-testid={testId}

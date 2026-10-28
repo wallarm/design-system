@@ -174,6 +174,7 @@ export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
   };
 
   return (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Segments own focus; focus and captured ArrowDown already open the dropdown, while wrapper clicks are a pointer convenience.
     <div
       {...consumerWrapperRest}
       className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12', consumerClassName)}

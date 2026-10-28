@@ -115,6 +115,7 @@ export const InputGroup: FC<InputGroupProps> = ({
       data-slot='input-group'
       data-testid={testId}
       data-size={size}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- One input and its adornments form an ARIA group, not a fieldset of fields.
       role='group'
       className={cn(inputGroupVariants({ size }), className)}
       {...props}

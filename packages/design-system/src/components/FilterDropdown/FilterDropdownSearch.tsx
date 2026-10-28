@@ -44,6 +44,7 @@ export const FilterDropdownSearch: FC<FilterDropdownSearchProps> = ({
       <SelectSearchInput
         // Zag's initial focus takes [data-autofocus] first: the menu opens with the caret here.
         data-autofocus=''
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- SelectSearchInput already renders a native input and forwards this combobox role to it.
         role='combobox'
         aria-autocomplete='list'
         aria-expanded={select.open}

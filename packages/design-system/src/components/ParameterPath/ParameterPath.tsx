@@ -93,6 +93,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   return (
     <Tooltip disabled={!isTruncated || isExpanded}>
       <TooltipTrigger asChild>
+        {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Only expandable truncated paths get handlers, button role and tabIndex; Enter/Space use the same expansion state. */}
         <div
           {...rest}
           data-testid={testId}

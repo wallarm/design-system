@@ -95,6 +95,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
       onSegmentEditKeyDown={handleSegmentEditKeyDown}
       onSegmentEditBlur={handleSegmentEditBlur}
     >
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Border clicks delegate to the existing input; the input and segment controls own keyboard focus and activation. */}
       <div
         className={cn(
           // inputVariants is borrowed for its border/focus-ring look only — its `size`
@@ -130,6 +131,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         >
           {/* Inline style overrides h-full in ScrollAreaViewport (className is stripped). */}
           <ScrollAreaViewport style={{ height: 'auto', maxHeight: 'inherit' }}>
+            {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Empty-space clicks delegate to the input; keyboard users enter through the input and the existing gap buttons. */}
             <div
               ref={innerRef}
               data-filter-input-inner=''

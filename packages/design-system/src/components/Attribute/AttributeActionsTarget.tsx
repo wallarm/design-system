@@ -87,6 +87,9 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   return (
     <DropdownMenuTrigger asChild>
       <div
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- A native button cannot contain the independently interactive children this target supports.
+        role='button'
+        tabIndex={0}
         {...props}
         ref={ref}
         data-testid={testId}

@@ -61,6 +61,7 @@ export const EditableTextCell: FC<EditableTextCellProps> = ({
   };
 
   return (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Idle uses button role and Enter/Space; editing delegates focus to the input.
     <div
       {...rest}
       ref={ref}
@@ -86,6 +87,7 @@ export const EditableTextCell: FC<EditableTextCellProps> = ({
     >
       {isEditing ? (
         <input
+          // oxlint-disable-next-line jsx-a11y/no-autofocus -- The input mounts only after click/Enter/Space starts editing; this focus transfer is user-initiated.
           autoFocus
           aria-label={ariaLabel}
           value={draft}

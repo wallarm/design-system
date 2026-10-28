@@ -26,6 +26,7 @@ export const SearchModalBody: FC<SearchModalBodyProps> = ({
       ref={mergeRefs(listRef, ref)}
       data-slot='search-modal-body'
       data-testid={testId}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The search input drives this rich listbox; native select has a different focus model.
       role='listbox'
       className={cn(searchModalBodyVariants(), className)}
     >

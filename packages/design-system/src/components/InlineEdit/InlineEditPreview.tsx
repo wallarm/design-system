@@ -127,6 +127,7 @@ export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
   };
 
   const target = (
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Activatable previews have button role, tabIndex and Enter/Space; readonly previews stay text.
     <div
       {...props}
       ref={ref}

@@ -31,6 +31,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
         <div
           {...props}
           ref={ref}
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This live announcement contains composed block content and actions; output only accepts phrasing content.
           role='status'
           data-slot='empty-state'
           data-testid={testId}

@@ -309,6 +309,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
             const selected = selectedSet.has(seg.key);
             const dimmed = !selected && !active && selectedSet.size > 0;
             const item = (
+              // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Interactive rows have button role, tabIndex and Enter/Space; other rows only synchronize hover.
               <div
                 key={seg.key}
                 data-slot='horizontal-bar-stack-legend-item'

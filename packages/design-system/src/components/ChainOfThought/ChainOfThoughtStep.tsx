@@ -27,7 +27,7 @@ export interface ChainOfThoughtStepProps
   extends Omit<HTMLAttributes<HTMLElement>, 'children'>, TestableProps {
   /**
    * `...rest`, `ref`, `className` and `data-testid` land on the ROW — a `<button>` when the
-   * step has children, a `<div>` otherwise.
+   * step has children or an `onClick` action, a `<div>` otherwise.
    */
   ref?: Ref<HTMLElement>;
   /** Row text: 'Searched for ABC', 'Working...', 'Thought for 5s', 'Worked for 3m 45s'. */
@@ -90,10 +90,11 @@ export const ChainOfThoughtStep: FC<ChainOfThoughtStepProps> = ({
   const isOpen = open ?? internalOpen;
   const collapsible = children != null && children !== false;
   const hasIcon = icon !== null;
+  const interactive = collapsible || typeof onClick === 'function';
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     onClick?.(event);
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || !collapsible) return;
     if (open === undefined) setInternalOpen(!isOpen);
     onOpenChange?.(!isOpen);
   };
@@ -152,7 +153,7 @@ export const ChainOfThoughtStep: FC<ChainOfThoughtStepProps> = ({
     ref: ref as Ref<HTMLButtonElement & HTMLDivElement>,
     'data-slot': 'chain-of-thought-step-row',
     'data-testid': testId,
-    className: cn(chainOfThoughtRowVariants({ interactive: collapsible }), className),
+    className: cn(chainOfThoughtRowVariants({ interactive }), className),
   };
 
   return (
@@ -163,20 +164,18 @@ export const ChainOfThoughtStep: FC<ChainOfThoughtStepProps> = ({
       data-state={collapsible && isOpen ? 'open' : 'closed'}
       className={chainOfThoughtStepVariants({ simple: !hasIcon, entered })}
     >
-      {collapsible ? (
+      {interactive ? (
         <button
           {...rowProps}
           type='button'
-          aria-expanded={isOpen}
-          aria-controls={contentId}
+          aria-expanded={collapsible ? isOpen : undefined}
+          aria-controls={collapsible ? contentId : undefined}
           onClick={handleClick}
         >
           {rowContent}
         </button>
       ) : (
-        <div {...rowProps} onClick={onClick}>
-          {rowContent}
-        </div>
+        <div {...rowProps}>{rowContent}</div>
       )}
       {showTypeIcon && (
         <span

@@ -41,6 +41,7 @@ describe('ApprovalCard — analytics (docs/metrics/contract.md)', () => {
   });
 
   it('lets consumers override the default group semantics', () => {
+    // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- The fixture tests consumer role forwarding through ApprovalCard rather than a native section.
     render(<ApprovalCard data-testid='ac' role='region' aria-label='Approval' />);
     expect(screen.getByTestId('ac')).toHaveAttribute('role', 'region');
     expect(screen.getByRole('region', { name: 'Approval' })).toBe(screen.getByTestId('ac'));

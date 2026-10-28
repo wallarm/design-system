@@ -28,6 +28,7 @@ export const AssistantMessageLoader: FC<AssistantMessageLoaderProps> = ({
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- This live progress announcement preserves the public div ref and is not a form calculation output.
       role='status'
       {...props}
       ref={ref}

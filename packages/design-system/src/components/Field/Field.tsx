@@ -53,6 +53,7 @@ export const Field: FC<FieldProps> = ({
     <TestIdProvider value={testId}>
       <Comp
         {...props}
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Comp already selects Ark Fieldset for checkbox groups; single fields use Ark Field with its label/error wiring.
         role='group'
         data-testid={testId}
         data-slot='field'
