@@ -27,7 +27,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/ColumnChart',
+  title: 'Data Display/SimpleCharts/Vertical Stacked Columns Chart',
   component: ColumnChart,
   subcomponents: { ColumnChartBody, ColumnChartStack, ColumnChartXAxis },
   parameters: {
@@ -170,6 +170,72 @@ export const AdaptiveWidth: StoryFn<typeof meta> = () => {
           </ColumnChart>
         </Chart>
       </div>
+    </div>
+  );
+};
+
+/**
+ * The plot follows the card height: set a height on `<Chart>` and the columns stretch or
+ * shrink with it. The card goes down to 128px — header, legend and a 72px plot.
+ */
+export const CardHeight: StoryFn<typeof meta> = () => {
+  const { formatDate, formatDateWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='flex w-800 flex-col gap-16'>
+      <Chart className='h-128'>
+        <ChartHeader>
+          <ChartTitle>128px card</ChartTitle>
+        </ChartHeader>
+        <ColumnChart
+          data={findings}
+          series={verdicts}
+          xKey='timestamp'
+          data-testid='column-chart-min'
+        >
+          <LineChartLegend>
+            {verdicts.map(s => (
+              <LineChartLegendItem key={s.key} seriesKey={s.key}>
+                <LineChartHoverPopoverDot color={s.color} />
+                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+              </LineChartLegendItem>
+            ))}
+          </LineChartLegend>
+          <ColumnChartBody>
+            <LineChartGrid />
+            <ColumnChartXAxis tickFormatter={formatDate} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <ColumnChartStack />
+            <LineChartTooltip xTickFormatter={formatDateWithTimezone} />
+          </ColumnChartBody>
+        </ColumnChart>
+      </Chart>
+      <Chart className='h-320'>
+        <ChartHeader>
+          <ChartTitle>320px card</ChartTitle>
+        </ChartHeader>
+        <ColumnChart
+          data={findings}
+          series={verdicts}
+          xKey='timestamp'
+          data-testid='column-chart-tall'
+        >
+          <LineChartLegend>
+            {verdicts.map(s => (
+              <LineChartLegendItem key={s.key} seriesKey={s.key}>
+                <LineChartHoverPopoverDot color={s.color} />
+                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+              </LineChartLegendItem>
+            ))}
+          </LineChartLegend>
+          <ColumnChartBody>
+            <LineChartGrid />
+            <ColumnChartXAxis tickFormatter={formatDate} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <ColumnChartStack />
+            <LineChartTooltip xTickFormatter={formatDateWithTimezone} />
+          </ColumnChartBody>
+        </ColumnChart>
+      </Chart>
     </div>
   );
 };

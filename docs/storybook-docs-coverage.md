@@ -89,7 +89,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ☐ | Data Display/SimpleCharts/AreaChart | 7 | 7 | `components/SimpleCharts/AreaChart/AreaChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
-| ☐ | Data Display/SimpleCharts/ColumnChart | 5 | 5 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
+| ☐ | Data Display/SimpleCharts/Vertical Stacked Columns Chart | 6 | 6 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Metric | 4 | 4 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
