@@ -99,7 +99,7 @@ popover — date and the value row. Pointer leave hides both. No click, no selec
   `Metric`, so it derives `--sparkline` from the surrounding provider (`Chart`) or takes its own
   `data-testid`; its popover is `{sparkline id}--popover`.
 - **Card height is `Chart`'s, on purpose** — the Figma `Metric and sparkline` card is 140px, ours
-  keeps `Chart`'s `min-h-196` like every card in the family; the sparkline stays pinned to the bottom
+  keeps `Chart`'s `min-h-196` like the other cards (only the column chart card goes lower, to 128px); the sparkline stays pinned to the bottom
   and the extra height sits above it.
 - **Sparkline colour vs delta sentiment** — independent props, like `sentiment` vs `trend`: set both.
 - **Sparkline Y domain is the data's own min..max**, mapped to 4px…40px of the 48px plot (top

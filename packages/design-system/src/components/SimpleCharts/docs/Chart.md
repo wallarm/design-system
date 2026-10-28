@@ -27,7 +27,7 @@ Compound component:
 `Chart` is a **block-level** element by default:
 
 - width: `w-full` (fills the parent's content area).
-- min-height: `196px` (Figma spec).
+- min-height: `196px` (Figma spec); `128px` when the card holds a `ColumnChart` (WDS-194).
 
 Consumers customise size through `className`, not dedicated props. This keeps the API small and lets Tailwind utilities compose naturally (`w-[640px]`, `h-320`, `max-w-lg`, `aspect-[16/9]`, …). If you need something rigid, prefer a wrapper:
 
