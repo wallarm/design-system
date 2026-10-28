@@ -1,13 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const columnChartStory = createStoryHelper('data-display-simplecharts-columnchart', [
-  'Default',
-  'Adaptive Width',
-  'Clickable Legend',
-  'Loading',
-  'Empty',
-] as const);
+const columnChartStory = createStoryHelper(
+  'data-display-simplecharts-vertical-stacked-columns-chart',
+  ['Default', 'Adaptive Width', 'Card Height', 'Clickable Legend', 'Loading', 'Empty'] as const,
+);
 
 const getParts = (page: Page, key: string, testId = 'column-chart') =>
   page.getByTestId(`${testId}--part`).and(page.locator(`[data-key="${key}"]`));
@@ -54,6 +51,11 @@ test.describe('Component: ColumnChart', () => {
 
     test('Should render adaptive column widths correctly', async ({ page }) => {
       await columnChartStory.goto(page, 'Adaptive Width');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render plot following the card height correctly', async ({ page }) => {
+      await columnChartStory.goto(page, 'Card Height');
       await expect(page).toHaveScreenshot();
     });
 

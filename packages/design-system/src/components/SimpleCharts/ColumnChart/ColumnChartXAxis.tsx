@@ -37,6 +37,9 @@ export const ColumnChartXAxis: FC<ColumnChartXAxisProps> = ({
       // Figma's 16px label band (`12612-31838`: grid 148 + labels 16) instead of recharts' 30px.
       height={LINE_X_LABEL_HEIGHT}
       tickLine={false}
+      // The hidden tick line still offsets the label by its 6px length, which pushes the label
+      // out of the 16px band onto the card border. Without it the label keeps Figma's 4px below.
+      tickSize={0}
       axisLine={AXIS_LINE_PROPS}
       tick={renderTick}
       tickFormatter={tickFormatter as TickFormatter | undefined}

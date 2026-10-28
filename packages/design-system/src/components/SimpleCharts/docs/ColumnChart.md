@@ -2,7 +2,7 @@
 
 ## Overview
 
-`ColumnChart` draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
+`ColumnChart` — *Vertical stacked columns chart* in Figma and Storybook (`Data Display/SimpleCharts/Vertical Stacked Columns Chart`) — draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
 
 It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` model — so the legend, grid, Y axis and hover popover are the `LineChart` slots, unchanged. It adds only what columns need: its own root, body, the stack, and an X axis that centres every label under its column.
 
@@ -41,7 +41,7 @@ It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` 
 ```
 
 - `ColumnChart<T>` — root. `data`, `series`, `xKey`, generic over the datum like `LineChart<T>`. Provides the `LineChart` data + active-series contexts; renders `<div data-slot='column-chart'>`, a vertical flex — JSX order places the legend.
-- `ColumnChartBody` — recharts' `<ResponsiveContainer>` + `<ComposedChart>`. Default `height` 164px (Figma card 220 = header 32 + legend 24 + plot 164). `aria-hidden`.
+- `ColumnChartBody` — recharts' `<ResponsiveContainer>` + `<ComposedChart>`. Without `height` the plot starts at 164px (Figma card 220 = header 32 + legend 24 + plot 164) and follows the card: give `<Chart>` a height and the plot stretches or shrinks with it. A fixed `height` opts out. `aria-hidden`.
 - `ColumnChartStack` — every `series` entry as one stacked column per datum. No props; mount once.
 - `ColumnChartXAxis` — `tickFormatter`, `interval` (default `'preserveStartEnd'`), `minTickGap`. Labels centred under their columns.
 - Reused unchanged: `LineChartLegend` / `LineChartLegendItem` (legend + hover fade), `LineChartGrid`, `LineChartYAxis`, `LineChartTooltip` (ruler + popover), `LineChartHoverPopoverDot`, `LineChartEmpty` (empty / loading frame).
@@ -64,6 +64,8 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 - **Clickable legend** — pass `onClick` to `LineChartLegendItem`: it becomes `role='button'`, tabbable, Enter / Space click. What a click does is the consumer's (the Agentic Overview opens the verdict's list); the chart has no filter state.
 - **Empty / Loading** — no chart-specific frame: compose `LineChartEmpty` (with a message, or bare under skeleton legend items) in place of `ColumnChart`, as the stories do.
 
+- **Card height** — the card is 220px by default and goes down to 128px (Figma, WDS-194): `<Chart>` lowers its 196px floor to 128px when it holds a `column-chart`. At 128px the plot keeps 70px (grid 54 + labels 16) with a one-line legend; a legend that wraps takes its second line from the plot.
+
 ## Interactions
 
 - Column hover comes from recharts' tooltip, driven by the pointer anywhere over the step's band — not only over the drawn parts.
@@ -71,11 +73,12 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 
 ## Edge cases & unclear states
 
+- **Filling the card** — the body is a `flex-1` item with a 164px basis and the recharts container is absolutely positioned over it. A `100%` container height does not resolve inside the content-sized flex column, and a fixed one cannot follow the card.
 - **Column width** — `resolveColumnWidth(band)`, `band = plot width / data.length`: the band minus a fixed 22px gap, clamped to 16–32px, rounded to whole pixels, and always at least 1px under the step — recharts ignores a `barSize` that fills the band and draws 90% of it. The 22px is measured from Figma (7 steps on a 54px band → 32px, 9 steps on 42px → "20px adjusted width"); it is not a token. The width is computed from `usePlotArea()`, so the first frame — before recharts measures — uses recharts' default width.
 - **1px gap between parts** — cut from the *bottom* of every part that sits on another, so the column top and the baseline stay on their true values. A part under ~1px tall disappears into the gap.
 - **Top radius** — 4px on the whole column via recharts' `BarStack` clip-path, so it lands on whichever part is topmost for that column, including when the upper categories are 0.
 - **Why `ComposedChart`** — recharts picks the tooltip cursor by chart type: a band-wide rectangle for `BarChart`, a line for everything else. The ruler is a line, and `ComposedChart` keeps the bars on a band scale, so the `LineChartTooltip` cursor sits on the column centre.
-- **X labels** — a 16px label band (Figma), not recharts' default 30px, so the plot keeps its 148px. Every label is centred under its column (unlike `LineChartXAxis`, which anchors the edge labels to the plot edges). With many steps recharts drops colliding middle labels; `interval={0}` forces all of them.
+- **X labels** — a 16px label band (Figma), not recharts' default 30px, so the plot keeps its 148px. `tickSize={0}`: recharts offsets a label by the tick line's length even with `tickLine={false}`, and those 6px pushed the label onto the card border; without them the label keeps Figma's 4px below. Every label is centred under its column (unlike `LineChartXAxis`, which anchors the edge labels to the plot edges). With many steps recharts drops colliding middle labels; `interval={0}` forces all of them.
 
 ## Accessibility notes
 
