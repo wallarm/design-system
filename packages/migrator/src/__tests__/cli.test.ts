@@ -1,8 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
+
 import pkg from '../../package.json';
 import versions from '../../versions.json';
 import { main } from '../cli';

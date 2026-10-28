@@ -1,4 +1,5 @@
 import { type FC, useState } from 'react';
+
 import { CodeSnippetHeader } from '../../CodeSnippet/CodeSnippetHeader';
 import { CodeSnippetTab } from '../../CodeSnippet/CodeSnippetTab';
 import { CodeSnippetTabs } from '../../CodeSnippet/CodeSnippetTabs';

@@ -8,7 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
+
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { CopyableProvider } from './CopyableContext';

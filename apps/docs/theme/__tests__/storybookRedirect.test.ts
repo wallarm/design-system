@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { storybookRedirectTarget } from '../storybookRedirect';
 
 const base = '/design-system/';

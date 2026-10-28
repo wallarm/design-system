@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -17,7 +18,7 @@ export const AppShellRemote: FC<AppShellRemoteProps> = ({ ref, className, childr
       data-slot='app-shell-remote'
       data-testid={testId}
       className={cn(
-        '[grid-area:remote] relative overflow-auto overscroll-none rounded-tl-12 border-t border-l border-border-primary-light bg-bg-page-bg',
+        'relative overflow-auto overscroll-none rounded-tl-12 border-t border-l border-border-primary-light bg-bg-page-bg [grid-area:remote]',
         // With an open AppShellAside after it, the canvas no longer runs to the window edge, so
         // it becomes a card: rounded top corners and its own right border.
         'has-[~[data-slot=app-shell-aside][data-state=open]]:rounded-tr-12 has-[~[data-slot=app-shell-aside][data-state=open]]:border-r',

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Flex } from '../Flex';
 import { HStack } from './HStack';
 import { Stack } from './Stack';
@@ -178,7 +180,7 @@ export const FlexBehavior: StoryFn<typeof meta> = ({ ...args }) => (
 
     <Flex direction='column'>
       <p className='sb-annotation'>flexShrink false</p>
-      <div className='w-48 overflow-hidden border border-gray-300 rounded'>
+      <div className='w-48 overflow-hidden rounded border border-gray-300'>
         <HStack {...args} gap={4} flexShrink={false}>
           <Box>A</Box>
           <Box>B</Box>

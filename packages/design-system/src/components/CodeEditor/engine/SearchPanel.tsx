@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FC, type KeyboardEvent, useCallback } from 'react';
+
 import {
   closeSearchPanel,
   findNext,
@@ -9,6 +10,7 @@ import {
   setSearchQuery,
 } from '@codemirror/search';
 import { EditorView, runScopeHandlers } from '@codemirror/view';
+
 import { ChevronDown } from '../../../icons/ChevronDown';
 import { ChevronUp } from '../../../icons/ChevronUp';
 import { X } from '../../../icons/X';
@@ -122,7 +124,7 @@ export const SearchPanel: FC<SearchPanelProps> = ({
       aria-label='Find and replace'
       data-slot='code-editor-search'
       data-testid={slot('search')}
-      className='flex flex-col border-b border-border-primary-light code-snippet-bg font-sans'
+      className='flex flex-col border-b border-border-primary-light font-sans code-snippet-bg'
       onKeyDown={handlePanelKeyDown}
     >
       <div className={rowClassName}>
@@ -144,7 +146,7 @@ export const SearchPanel: FC<SearchPanelProps> = ({
         <span
           aria-hidden='true'
           className={cn(
-            'min-w-72 text-xs text-text-secondary whitespace-nowrap',
+            'min-w-72 text-xs whitespace-nowrap text-text-secondary',
             !canSearch && 'invisible',
           )}
           data-testid={slot('search-count')}

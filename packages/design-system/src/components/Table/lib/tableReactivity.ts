@@ -1,5 +1,7 @@
 import { type CSSProperties, useCallback, useSyncExternalStore } from 'react';
+
 import type { Column, RowData } from '@tanstack/react-table';
+
 import { useTableContext } from '../TableContext/useTableContext';
 import type { DSTableFeatures } from './dsTableFeatures';
 import { isLastPinnedLeft } from './isLastPinnedLeft';

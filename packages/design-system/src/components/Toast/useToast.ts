@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { type ToastCreateOptions, toaster } from './Toaster';
 
 export type CreateToastOptions = ToastCreateOptions;

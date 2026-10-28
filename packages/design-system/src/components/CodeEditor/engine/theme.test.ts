@@ -1,6 +1,7 @@
 import { EditorSelection, EditorState, type EditorStateConfig } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { editorTheme, maxHeightTheme } from './theme';
 
 const mountedViews: EditorView[] = [];

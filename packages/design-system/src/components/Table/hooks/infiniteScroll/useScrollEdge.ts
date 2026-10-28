@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from 'react';
+
 import { getScrollMetrics, SCROLL_EDGE_COOLDOWN_MS, type ScrollRoot } from '../../lib';
 
 type ScrollMode = 'container' | 'window';

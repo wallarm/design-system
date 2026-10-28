@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { applyAcceptChar, SEGMENT_TO_MENU } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';

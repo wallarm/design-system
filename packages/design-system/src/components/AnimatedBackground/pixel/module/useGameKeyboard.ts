@@ -1,5 +1,5 @@
-import type { MutableRefObject, RefObject } from 'react';
-import { useCallback, useEffect } from 'react';
+import { type MutableRefObject, type RefObject, useCallback, useEffect } from 'react';
+
 import type { SweepEngine } from './index';
 
 export const useGameKeyboard = (

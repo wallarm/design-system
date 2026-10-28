@@ -1,8 +1,10 @@
 import { createRef, type FC, type ReactNode, useState } from 'react';
+
 import { useStepsContext } from '@ark-ui/react/steps';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, renderHook, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import {
   Stepper,
   StepperContent,

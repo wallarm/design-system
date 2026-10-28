@@ -1,4 +1,5 @@
 import type { ColumnDef, RowData } from '@tanstack/react-table';
+
 import { ChevronDown, ChevronRight } from '../../../icons';
 import { ToggleButton } from '../../ToggleButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';

@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { resolveTheme, THEME_SCRIPT } from '../themeScript';
 
 describe('resolveTheme', () => {

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode } from 'react';
+
 import { cn } from '../../../utils/cn';
 
 export type CodeContentProps = HTMLAttributes<HTMLPreElement> & {
@@ -10,7 +11,7 @@ export type CodeContentProps = HTMLAttributes<HTMLPreElement> & {
 export const CodeContent: FC<CodeContentProps> = ({ wrapLines, className, children, ...props }) => (
   <pre
     data-slot='code-snippet-code'
-    className={cn('flex-1 min-w-0', wrapLines && 'whitespace-pre-wrap break-all', className)}
+    className={cn('min-w-0 flex-1', wrapLines && 'break-all whitespace-pre-wrap', className)}
     {...props}
   >
     <code>{children}</code>

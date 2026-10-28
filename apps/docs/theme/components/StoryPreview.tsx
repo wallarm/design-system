@@ -1,4 +1,5 @@
 import { type ReactNode, useRef, useState } from 'react';
+
 import { BrowserOnly } from '@rspress/core/runtime';
 import {
   Alert,
@@ -12,6 +13,7 @@ import {
   SegmentedControlItem,
 } from '@wallarm-org/design-system/SegmentedControl';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
+
 import { useInView } from './useInView';
 import { type StoryLoader, useStory } from './useStory';
 

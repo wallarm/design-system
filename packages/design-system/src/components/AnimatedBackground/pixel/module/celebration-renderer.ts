@@ -1,5 +1,10 @@
-import type { CelState } from './celebration';
-import { cannonLiftOffset, computeHeadlineY, headlineAlpha, headlineRise } from './celebration';
+import {
+  type CelState,
+  cannonLiftOffset,
+  computeHeadlineY,
+  headlineAlpha,
+  headlineRise,
+} from './celebration';
 import type { GameEngineHost } from './game-logic';
 import type { GameRenderCtx } from './game-renderer';
 import { easeOut } from './math';

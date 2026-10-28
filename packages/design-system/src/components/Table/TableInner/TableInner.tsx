@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import type { TestableProps } from '../../../utils/testId';
 import { TableActionBarAnchor, TableActionBarProvider } from '../TableActionBar';
 import { TableScrollHandlerProvider } from '../TableScrollHandlerContext';

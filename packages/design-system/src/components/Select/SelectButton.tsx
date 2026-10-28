@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
+
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { SelectArrow } from './SelectArrow';

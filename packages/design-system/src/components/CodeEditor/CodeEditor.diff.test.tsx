@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
+
 import { CodeEditorContent, CodeEditorRoot } from './index';
 
 describe('CodeEditor — diff mode (original)', () => {

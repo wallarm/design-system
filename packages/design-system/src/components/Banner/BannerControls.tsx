@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -21,7 +22,7 @@ export const BannerControls: FC<BannerControlsProps> = ({ ref, className, childr
       ref={ref}
       data-slot='banner-controls'
       data-testid={testId}
-      className={cn('flex items-center gap-8 shrink-0', className)}
+      className={cn('flex shrink-0 items-center gap-8', className)}
     >
       {children}
     </div>

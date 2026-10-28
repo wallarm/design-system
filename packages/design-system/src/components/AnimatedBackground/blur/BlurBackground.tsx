@@ -1,4 +1,5 @@
 import type { CSSProperties, FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 
 interface BlobSpec {
@@ -176,7 +177,7 @@ export const BlurBackground: FC<BlurBackgroundProps> = ({
       className={cn('lg-frame relative', className)}
       style={style}
     >
-      <div aria-hidden='true' className='absolute inset-0 pointer-events-none'>
+      <div aria-hidden='true' className='pointer-events-none absolute inset-0'>
         {meshContent}
       </div>
 

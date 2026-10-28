@@ -1,4 +1,5 @@
 import { createContext, type FC, type ReactNode, useContext } from 'react';
+
 import type { PaginationSize } from './types';
 
 interface PaginationSizeContextValue {

@@ -29,7 +29,7 @@ export const sanitizeContentAttributes = (
   for (const [key, value] of Object.entries(attrs)) {
     if (RESERVED.has(key.toLowerCase())) {
       if (process.env.NODE_ENV !== 'production') {
-        // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Slider/BarList).
+        // dev-only authoring guard (matches Slider/BarList).
         console.warn(
           `[CodeEditor] "${key}" is managed by the editor and cannot be set on CodeEditorContent; the value "${value}" was ignored.`,
         );

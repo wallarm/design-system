@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Copy, Filter } from '../../icons';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
@@ -120,7 +122,7 @@ export const WithDescription: StoryFn<AttributeProps> = () => (
  * and reads correctly on either side of the label text.
  */
 export const WithInfo: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
+  <div className='flex w-[400px] flex-col gap-16'>
     <Attribute>
       <AttributeLabel>
         Request ID
@@ -170,7 +172,7 @@ export const WithLink: StoryFn<AttributeProps> = () => (
  * state and can carry the link out to the fix.
  */
 export const Empty: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
+  <div className='flex w-[400px] flex-col gap-16'>
     <Attribute>
       <AttributeLabel>
         Region
@@ -214,7 +216,7 @@ export const Empty: StoryFn<AttributeProps> = () => (
  * out before its data lands; it wins over `isEmpty`.
  */
 export const Loading: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
+  <div className='flex w-[400px] flex-col gap-16'>
     <Attribute loading>
       <AttributeLabel>Created at</AttributeLabel>
       <AttributeValue />
@@ -232,7 +234,7 @@ export const Loading: StoryFn<AttributeProps> = () => (
  * each formatting the data itself rather than receiving a pre-built string.
  */
 export const Composition: StoryFn<AttributeProps> = () => (
-  <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
+  <div className='grid w-[874px] grid-cols-2 gap-x-8 gap-y-16'>
     <Attribute>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
@@ -363,7 +365,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
  * a hover surface and the menu carries the actions that belong to that one value.
  */
 export const WithActions: StoryFn<AttributeProps> = () => (
-  <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
+  <div className='grid w-[874px] grid-cols-2 gap-x-8 gap-y-16'>
     <Attribute>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
@@ -576,7 +578,7 @@ export const Horizontal: StoryFn<AttributeProps> = () => (
  * width, 100px unless you widen it, and the value once its own content overruns.
  */
 export const HorizontalTruncation: StoryFn<AttributeProps> = () => (
-  <div className='w-[500px] flex flex-col gap-8'>
+  <div className='flex w-[500px] flex-col gap-8'>
     <Attribute orientation='horizontal'>
       <AttributeLabel width={256}>Short</AttributeLabel>
       <AttributeValue>
@@ -607,7 +609,7 @@ export const HorizontalTruncation: StoryFn<AttributeProps> = () => (
  * `IpList type='horizontal'` needs its row to span both columns.
  */
 export const HorizontalComposition: StoryFn<AttributeProps> = () => (
-  <div className='grid grid-cols-2 gap-x-8 gap-y-6 w-[874px]'>
+  <div className='grid w-[874px] grid-cols-2 gap-x-8 gap-y-6'>
     <Attribute orientation='horizontal'>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
@@ -698,7 +700,7 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
  * single-line row it stands in for.
  */
 export const HorizontalLoading: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>
+  <div className='flex w-[400px] flex-col gap-8'>
     <Attribute orientation='horizontal' loading>
       <AttributeLabel>Created at</AttributeLabel>
       <AttributeValue />
@@ -715,7 +717,7 @@ export const HorizontalLoading: StoryFn<AttributeProps> = () => (
  * descriptions have somewhere to sit.
  */
 export const HorizontalEmpty: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>
+  <div className='flex w-[400px] flex-col gap-8'>
     <Attribute orientation='horizontal'>
       <AttributeLabel width={160}>
         Region
@@ -871,7 +873,7 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
  * button, still does its own job, and the menu opens from the space around it.
  */
 export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(false)}</div>
+  <div className='flex w-[400px] flex-col gap-8'>{renderActionsAttributes(false)}</div>
 );
 HorizontalWithActions.storyName = 'Horizontal With Actions (default — copy on text, menu outside)';
 
@@ -880,7 +882,7 @@ HorizontalWithActions.storyName = 'Horizontal With Actions (default — copy on 
  * opens the menu — for values with nothing worth clicking of their own.
  */
 export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(true)}</div>
+  <div className='flex w-[400px] flex-col gap-8'>{renderActionsAttributes(true)}</div>
 );
 HorizontalWithActionsMenuOnly.storyName =
   'Horizontal With Actions (disableNestedInteractive — menu only)';
@@ -940,8 +942,8 @@ function AttributeMixedExample({ orientation }: { orientation?: AttributeProps['
     <div
       className={
         orientation === 'horizontal'
-          ? 'w-[420px] flex flex-col gap-8'
-          : 'w-[420px] flex flex-col gap-16'
+          ? 'flex w-[420px] flex-col gap-8'
+          : 'flex w-[420px] flex-col gap-16'
       }
     >
       <Attribute orientation={orientation} data-testid='attr-plain'>

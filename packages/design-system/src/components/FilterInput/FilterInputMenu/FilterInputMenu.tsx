@@ -1,4 +1,5 @@
 import { type FC, type RefObject, useMemo } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import {
   canBorrowCrossFieldLabel,
@@ -13,8 +14,7 @@ import type { FieldGroup, FieldMetadata, FilterOperator, MenuState } from '../ty
 import { FilterInputDateValueMenu } from './FilterInputDateValueMenu';
 import { FilterInputFieldMenu } from './FilterInputFieldMenu';
 import { FilterInputOperatorMenu } from './FilterInputOperatorMenu';
-import type { ValueOption } from './FilterInputValueMenu';
-import { FilterInputValueMenu } from './FilterInputValueMenu';
+import { type ValueOption, FilterInputValueMenu } from './FilterInputValueMenu';
 
 export interface FilterInputAutocompleteState {
   inputText: string;

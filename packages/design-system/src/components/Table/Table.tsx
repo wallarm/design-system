@@ -1,5 +1,7 @@
 import type { ComponentType } from 'react';
+
 import type { RowData } from '@tanstack/react-table';
+
 import { TestIdProvider } from '../../utils/testId';
 import { containsDirectChild } from './lib';
 import { TableProvider } from './TableContext';

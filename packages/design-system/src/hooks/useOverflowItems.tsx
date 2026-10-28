@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { calculateVisibleCount } from './useOverflowItems.helpers';
 import { observeOverflowResize } from './useOverflowItems.observer';
 import { scheduleOverflowMeasurement, type WritePhase } from './useOverflowItems.scheduler';
@@ -216,7 +217,7 @@ export function useOverflowItems<T>({
     return (
       <div
         ref={measurementLayerRef}
-        className='absolute invisible pointer-events-none'
+        className='pointer-events-none invisible absolute'
         aria-hidden='true'
       >
         {items.map((item, index) => {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+
 import type { ValueOption } from './FilterInputValueMenu';
 
 type ConditionValue = string | number | boolean;

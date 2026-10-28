@@ -1,5 +1,7 @@
 import type { FC, Ref, SVGProps } from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { CirclePaths } from './CirclePaths';
 import { wallyIconVariants } from './classes';

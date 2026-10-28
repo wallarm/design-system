@@ -1,6 +1,8 @@
 import { type FC, type ReactNode, type Ref, useCallback, useMemo, useState } from 'react';
+
 import { useFieldContext } from '@ark-ui/react/field';
 import { Slider as ArkSlider } from '@ark-ui/react/slider';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { sliderVariants } from './classes';

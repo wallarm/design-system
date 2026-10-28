@@ -1,8 +1,10 @@
 import { type FC, type Ref, useCallback, useRef, useState } from 'react';
+
 import { CalendarDateTime, getLocalTimeZone, now } from '@internationalized/date';
 import type { TimeValue } from '@react-aria/datepicker';
 import type { DateFieldState, TimeFieldState } from '@react-stately/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
+
 import type { SvgIconProps } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
@@ -142,7 +144,7 @@ export const DateInputInternal: FC<DateInputInternalProps> = ({
       )}
 
       <div
-        className={cn('relative flex-1 h-full', !IconComponent && 'pl-12')}
+        className={cn('relative h-full flex-1', !IconComponent && 'pl-12')}
         onKeyDownCapture={handleKeyDownCapture}
       >
         {showPlaceholder && placeholder && (

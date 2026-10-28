@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { Project } from 'ts-morph';
+
 import { findStoryFiles, readStoryTitle, toCopyableCode } from '../story-source.js';
 
 const SRC = '/src';

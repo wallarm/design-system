@@ -1,4 +1,5 @@
 import type { FC, MouseEvent } from 'react';
+
 import { X } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';

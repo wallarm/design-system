@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { ScrollArea } from './ScrollArea';
 import { ScrollAreaContent } from './ScrollAreaContent';
 import { ScrollAreaCorner } from './ScrollAreaCorner';

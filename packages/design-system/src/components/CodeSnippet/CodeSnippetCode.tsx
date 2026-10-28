@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, FoldSummary, TokenizedCodeLine } from './internal';

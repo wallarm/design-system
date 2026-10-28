@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAppShellAppeared } from './AppShellContext';
@@ -19,7 +20,7 @@ export const AppShellHeader: FC<AppShellHeaderProps> = ({ ref, className, childr
       data-slot='app-shell-header'
       data-testid={testId}
       className={cn(
-        '[grid-area:header] transition-opacity duration-500 ease-in-out',
+        'transition-opacity duration-500 ease-in-out [grid-area:header]',
         !appeared && 'opacity-0',
         className,
       )}

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { Badge, type BadgeProps } from '../Badge';
 import { getResponseCodeCategory, RESPONSE_CODE_COLOR } from './constants';
 

@@ -1,5 +1,7 @@
 import { type ReactNode, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Check, FilterX, Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Button } from '../../Button';
@@ -560,7 +562,7 @@ export const PercentDigits: StoryFn<typeof meta> = () => (
  * Figma default, `muted` sets both back, `inherit` leaves them to the row.
  */
 export const PercentVariants: StoryFn<typeof meta> = () => (
-  <div className='flex flex-col gap-16 w-400'>
+  <div className='flex w-400 flex-col gap-16'>
     <Chart>
       <ChartHeader>
         <ChartTitle>Split — value primary, % secondary (default)</ChartTitle>

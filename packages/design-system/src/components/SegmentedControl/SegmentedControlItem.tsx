@@ -1,5 +1,7 @@
 import type { FC, KeyboardEvent, LabelHTMLAttributes, PropsWithChildren, Ref } from 'react';
+
 import { SegmentGroup } from '@ark-ui/react/segment-group';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { segmentedControlItemClassNamesBase } from './classes';
@@ -66,7 +68,7 @@ export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProp
     >
       {children}
 
-      <SegmentGroup.ItemControl className='absolute inset-0 opacity-0 pointer-events-none' />
+      <SegmentGroup.ItemControl className='pointer-events-none absolute inset-0 opacity-0' />
       <SegmentGroup.ItemHiddenInput className='absolute inset-0 opacity-0' tabIndex={-1} />
     </SegmentGroup.Item>
   );

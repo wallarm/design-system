@@ -1,6 +1,7 @@
-import type { FC } from 'react';
-import { useContext } from 'react';
+import { type FC, useContext } from 'react';
+
 import { Switch as ArkUiSwitch, useSwitchContext } from '@ark-ui/react/switch';
+
 import { Check, X } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -16,9 +17,9 @@ export const SwitchControl: FC = () => {
     <ArkUiSwitch.Control
       data-testid={testId}
       className={cn(
-        'relative flex items-center self-start my-2',
-        'w-34 h-20',
-        'rounded-8 overflow-hidden overlay transition-all data-focus-visible:ring-3',
+        'relative my-2 flex items-center self-start',
+        'h-20 w-34',
+        'overlay overflow-hidden rounded-8 transition-all data-focus-visible:ring-3',
         'bg-component-switcher-bg',
         '[&[data-hover]:not([data-active]):not([data-state=checked])]:overlay-states-primary-hover',
         '[&[data-active]:not([data-state=checked])]:overlay-states-primary-pressed',
@@ -30,15 +31,15 @@ export const SwitchControl: FC = () => {
       )}
     >
       {a11yMode && !isChecked && (
-        <X className='absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 text-icon-secondary pointer-events-none z-0' />
+        <X className='pointer-events-none absolute top-1/2 right-2 z-0 h-10 w-10 -translate-y-1/2 text-icon-secondary' />
       )}
       {a11yMode && isChecked && (
-        <Check className='absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 text-white pointer-events-none z-0' />
+        <Check className='pointer-events-none absolute top-1/2 left-2 z-0 h-10 w-10 -translate-y-1/2 text-white' />
       )}
       <ArkUiSwitch.Thumb
         className={cn(
-          'w-16 h-12',
-          'bg-icon-primary-alt rounded-4 shadow-sm transition-all relative z-[9]',
+          'h-12 w-16',
+          'relative z-[9] rounded-4 bg-icon-primary-alt shadow-sm transition-all',
           'translate-x-4',
           'data-[state=checked]:translate-x-14',
         )}

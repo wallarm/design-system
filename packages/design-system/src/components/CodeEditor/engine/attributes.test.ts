@@ -1,6 +1,7 @@
 import { StateEffect } from '@codemirror/state';
 import { lineNumbers } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
 afterEach(() => {

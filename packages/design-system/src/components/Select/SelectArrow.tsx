@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+
 import { ChevronDown } from '../../icons';
 import { cn } from '../../utils/cn';
 

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { OctagonAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -17,7 +18,7 @@ export const FieldError: FC<FieldErrorProps> = ({ children, ...props }) => {
       data-slot='field-error'
       className={cn('flex gap-4 text-text-danger')}
     >
-      <OctagonAlert size='md' className='self-start my-2' />
+      <OctagonAlert size='md' className='my-2 self-start' />
 
       <Text size='sm' color='danger'>
         {children}

@@ -1,6 +1,7 @@
 import { SearchQuery } from '@codemirror/search';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from '@rstest/core';
+
 import { countMatches, MATCH_COUNT_LIMIT, matchCountMessage } from './searchMatches';
 
 describe('countMatches', () => {

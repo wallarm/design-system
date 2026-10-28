@@ -7,7 +7,9 @@ import {
   useMemo,
   useRef,
 } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { AppShellAmbient } from './AppShellAmbient';
@@ -79,12 +81,12 @@ export const AppShell: FC<AppShellProps> = ({
           data-slot='app-shell'
           data-testid={testId}
           className={cn(
-            'relative isolate grid h-screen overscroll-none [grid-template-areas:"header_header""rail_remote"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] bg-component-app-shell-bg',
+            'relative isolate grid h-screen [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] overscroll-none bg-component-app-shell-bg [grid-template-areas:"header_header""rail_remote"]',
             // The panel's width, read by AppShellAside too; override it on the shell's className.
             '[--app-shell-aside-width:--spacing(480)]',
             // Only a composed AppShellAside adds the third area, an empty 0px track and the edge
             // clip, so a shell without one keeps the grid above exactly.
-            'has-[>[data-slot=app-shell-aside]]:[grid-template-areas:"header_header_header""rail_remote_aside"] has-[>[data-slot=app-shell-aside]]:[grid-template-columns:auto_1fr_0px] has-[>[data-slot=app-shell-aside]]:overflow-x-clip',
+            'has-[>[data-slot=app-shell-aside]]:[grid-template-columns:auto_1fr_0px] has-[>[data-slot=app-shell-aside]]:overflow-x-clip has-[>[data-slot=app-shell-aside]]:[grid-template-areas:"header_header_header""rail_remote_aside"]',
             // Open, the track widens to the panel's margin box (its width plus the spacing-8
             // margins either side) and slides between the two.
             'has-[>[data-slot=app-shell-aside][data-state=open]]:[grid-template-columns:auto_1fr_calc(var(--app-shell-aside-width)+var(--spacing-8)*2)]',

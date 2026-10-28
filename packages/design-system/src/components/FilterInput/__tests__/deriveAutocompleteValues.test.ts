@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { deriveAutocompleteValues } from '../hooks/useFilterInputAutocomplete/lib';
 import type { Condition, FieldMetadata } from '../types';
 

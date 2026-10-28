@@ -1,5 +1,7 @@
 import { type FC, type ReactNode, useMemo, useRef } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
+
 import { useTableContext } from '../TableContext';
 import { TableActionBarAnchorRefContext } from './TableActionBarAnchorRefContext';
 

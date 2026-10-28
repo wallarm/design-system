@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { AccordionContext, type AccordionContextValue } from './AccordionContext';
 
 export const useAccordionContext = (): AccordionContextValue => {

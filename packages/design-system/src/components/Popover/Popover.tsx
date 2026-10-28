@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react';
+
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface PopoverProps extends TestableProps {

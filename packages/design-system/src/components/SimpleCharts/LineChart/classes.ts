@@ -38,8 +38,8 @@ export const lineChartZoomCursorPopoverClasses = ['fixed z-30 pointer-events-non
 export const lineChartLegendVariants = cva('flex', {
   variants: {
     orientation: {
-      horizontal: 'flex-row flex-wrap items-center gap-6 pl-12 py-2 [&:last-child]:pb-8',
-      vertical: 'flex-col gap-6 px-12 py-2 max-w-160',
+      horizontal: 'flex-row flex-wrap items-center gap-6 py-2 pl-12 [&:last-child]:pb-8',
+      vertical: 'max-w-160 flex-col gap-6 px-12 py-2',
     },
     align: {
       start: '',

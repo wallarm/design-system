@@ -1,5 +1,6 @@
 import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { ArrowUp, Settings2 } from '../../icons';
 import { Button } from '../Button';
 import {
@@ -145,7 +146,7 @@ export const WithFooter: StoryFn<typeof meta> = args => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className='w-304 h-290 overscroll-none'>
+              <DropdownMenuContent className='h-290 w-304 overscroll-none'>
                 <DropdownMenuLabel className='sticky top-0 z-50 bg-bg-surface-2'>
                   Always allowed in this conversation
                 </DropdownMenuLabel>

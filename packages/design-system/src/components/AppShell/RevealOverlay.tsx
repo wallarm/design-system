@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 import { EMPHASIZED_DECEL, MORPH_MS } from './constants';
 import type { RevealPhase } from './useShellAnimation';
@@ -21,7 +22,7 @@ export const RevealOverlay: FC<RevealOverlayProps> = ({ phase, targetRect, onTra
   return (
     <div
       className={cn(
-        'bg-bg-page-bg pointer-events-none z-50 absolute right-0 bottom-0',
+        'pointer-events-none absolute right-0 bottom-0 z-50 bg-bg-page-bg',
         isRevealing && 'rounded-tl-12',
       )}
       style={{

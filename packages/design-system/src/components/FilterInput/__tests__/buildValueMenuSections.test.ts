@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { buildValueMenuSections } from '../lib/buildValueMenuSections';
 import type { FieldValueOption } from '../types';
 

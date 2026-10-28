@@ -1,7 +1,9 @@
 import { useState } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import {
   BulkBarSummary,
   BulkBarSummaryClear,

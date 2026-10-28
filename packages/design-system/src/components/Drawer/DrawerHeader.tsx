@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DrawerClose } from './DrawerClose';
@@ -41,16 +42,16 @@ export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
       data-testid={testId}
       data-slot='drawer-header'
       className={cn(
-        'relative shrink-0 w-full',
+        'relative w-full shrink-0',
         'bg-bg-surface-2',
         'flex items-start justify-between gap-12',
-        'pt-16 pb-12 pl-24 pr-16',
+        'pt-16 pr-16 pb-12 pl-24',
         'rounded-t-12',
         'outline-none',
       )}
     >
       {(title || description) && (
-        <div className='flex flex-1 flex-col gap-0 min-w-0'>
+        <div className='flex min-w-0 flex-1 flex-col gap-0'>
           {title}
           {description}
         </div>

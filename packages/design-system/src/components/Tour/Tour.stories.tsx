@@ -1,5 +1,7 @@
 import { useRef } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Info } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
@@ -227,7 +229,7 @@ export const Placement: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <div className='grid grid-cols-3 gap-8 max-w-[50vw] mx-auto'>
+        <div className='mx-auto grid max-w-[50vw] grid-cols-3 gap-8'>
           {PLACEMENTS.map(p => (
             <Button key={p} ref={refs[p]} variant='outline' color='neutral' size='medium'>
               {p}

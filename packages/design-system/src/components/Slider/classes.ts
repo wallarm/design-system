@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -14,12 +15,12 @@ export const sliderVariants = cva(
     // The root IS the layout row: inline `SliderInput`(s) flank a flex-growing
     // `SliderControl`, 8px gap (Figma `spacing-8`). With a single control child the
     // gap is inert.
-    'relative flex w-full touch-none select-none items-center gap-8',
+    'relative flex w-full touch-none items-center gap-8 select-none',
     // Reserve room below the track for the tick-label band when <SliderMarks> renders
     // (overlaid absolutely). Replaces the old JS-driven `pb-28`.
     '[&:has([data-slot=slider-marker-group])]:pb-28',
     // Disabled — whole control dimmed + non-interactive (requirements §5)
-    'data-disabled:opacity-50 data-disabled:cursor-not-allowed',
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
   ),
   {
     variants: {},
@@ -37,7 +38,7 @@ export const sliderVariants = cva(
 export const sliderControlClassNames = cn(
   'relative flex w-full grow items-center',
   // Vertical room so the 16px thumb sits centred on the 4px track + a clickable band
-  'py-8 cursor-pointer',
+  'cursor-pointer py-8',
   'data-dragging:cursor-grabbing',
   'data-disabled:cursor-not-allowed',
 );
@@ -87,7 +88,7 @@ export const sliderMarkerClassNames = cn(
   '!pointer-events-auto cursor-pointer',
   // Label colour by state (Figma `_tick`): selected (Ark `at-value`, the tick
   // equal to the current value) → primary; hover → brand and wins when both.
-  'data-[state=at-value]:text-text-primary hover:text-text-brand',
+  'hover:text-text-brand data-[state=at-value]:text-text-primary',
   // Disabled — root handles the 50% opacity; just drop the affordance.
   'data-disabled:pointer-events-none data-disabled:cursor-not-allowed',
 );
@@ -107,7 +108,7 @@ export const sliderThumbClassNames = cn(
   // pressed border thickens smoothly.
   'transition-[scale,box-shadow,border-color,border-width] duration-150',
   // ≥44px touch target around the 12×16 visual (spec §7 / WCAG 2.5.8)
-  "before:absolute before:left-1/2 before:top-1/2 before:size-44 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
+  "before:absolute before:top-1/2 before:left-1/2 before:size-44 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
   // Hover + keyboard focus share ONE emphasised visual (requirements §5, decision #1
   // — focus reuses Hover, no distinct ring). Enlarge + lift.
   'not-data-disabled:hover:scale-110 not-data-disabled:hover:shadow-md',

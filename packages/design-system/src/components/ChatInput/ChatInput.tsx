@@ -1,5 +1,13 @@
-import type { FC, FormEvent, FormHTMLAttributes, ReactNode, Ref } from 'react';
-import { Children, useId } from 'react';
+import {
+  type FC,
+  type FormEvent,
+  type FormHTMLAttributes,
+  type ReactNode,
+  type Ref,
+  Children,
+  useId,
+} from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { ChatInputContext } from './ChatInputContext';

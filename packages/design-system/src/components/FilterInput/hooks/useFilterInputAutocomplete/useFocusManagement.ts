@@ -1,5 +1,5 @@
-import type { FocusEvent, RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { type FocusEvent, type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+
 import {
   applyEditCaret,
   type ChipSegment,

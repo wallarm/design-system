@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { TableSettingsMenu } from './TableSettingsMenu';
 import { useTableSettingsMenuContext } from './TableSettingsMenuContext';
 

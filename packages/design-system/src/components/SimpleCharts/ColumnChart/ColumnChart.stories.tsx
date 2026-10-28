@@ -1,6 +1,8 @@
 import type { MouseEvent } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Skeleton } from '../../Skeleton';
 import { Chart } from '../Chart/Chart';
@@ -99,8 +101,8 @@ export const Default: StoryFn<typeof meta> = () => {
             {verdicts.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
-                <span className='text-xs font-mono font-medium text-text-primary'>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs font-medium text-text-primary'>
                   {formatFullNumber(findingsTotals[s.key] ?? 0)}
                 </span>
               </LineChartLegendItem>
@@ -196,7 +198,7 @@ export const CardHeight: StoryFn<typeof meta> = () => {
             {verdicts.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -223,7 +225,7 @@ export const CardHeight: StoryFn<typeof meta> = () => {
             {verdicts.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -263,8 +265,8 @@ export const ClickableLegend: StoryFn<typeof meta> = () => {
             {verdicts.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key} onClick={handleLegendClick}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
-                <span className='text-xs font-mono font-medium text-text-primary'>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs font-medium text-text-primary'>
                   {formatFullNumber(findingsTotals[s.key] ?? 0)}
                 </span>
               </LineChartLegendItem>

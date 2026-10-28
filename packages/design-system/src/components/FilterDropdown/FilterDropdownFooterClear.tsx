@@ -1,4 +1,5 @@
 import type { FC, KeyboardEvent, MouseEvent } from 'react';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { useFilterDropdownContext } from './FilterDropdownContext';

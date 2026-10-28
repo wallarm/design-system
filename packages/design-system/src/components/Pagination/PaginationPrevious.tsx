@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
+
 import { ArrowLeft } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';

@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react/radio-group';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -9,9 +11,9 @@ const radioGroupVariants = cva('', {
     variant: {
       default: cn('[&_[data-part=item][data-disabled]]:opacity-50'),
       card: cn(
-        '[&_[data-part=item]]:py-12 [&_[data-part=item]]:pl-12 [&_[data-part=item]]:pr-16',
+        '[&_[data-part=item]]:py-12 [&_[data-part=item]]:pr-16 [&_[data-part=item]]:pl-12',
         '[&_[data-part=item]]:rounded-8 [&_[data-part=item]]:border [&_[data-part=item]]:bg-bg-surface-2',
-        '[&_[data-part=item]]:transition-colors [&_[data-part=item]]:overlay',
+        '[&_[data-part=item]]:overlay [&_[data-part=item]]:transition-colors',
 
         // State ---- unchecked
         '[&_[data-part=item][data-state=unchecked]]:border-border-primary',

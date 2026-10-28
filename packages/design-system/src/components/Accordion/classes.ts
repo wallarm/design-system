@@ -1,7 +1,8 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
-export const accordionRootVariants = cva('flex flex-col w-full');
+export const accordionRootVariants = cva('flex w-full flex-col');
 
 export const accordionItemVariants = cva('w-full', {
   variants: {
@@ -11,7 +12,7 @@ export const accordionItemVariants = cva('w-full', {
       section: cn(
         'grid grid-cols-[minmax(0,1fr)_auto] items-center',
         'border-b-1 border-border-primary last:border-b-0',
-        'pl-16 pr-8 py-8',
+        'py-8 pr-8 pl-16',
       ),
     },
   },
@@ -20,13 +21,13 @@ export const accordionItemVariants = cva('w-full', {
 
 export const accordionTriggerVariants = cva(
   cn(
-    'group/accordion-trigger flex items-center w-full cursor-pointer min-w-0',
+    'group/accordion-trigger flex w-full min-w-0 cursor-pointer items-center',
     'transition-[background-color,opacity] duration-150 ease-out motion-reduce:transition-none',
     'rounded-12 bg-transparent',
     'hover:bg-states-primary-hover',
     'active:bg-states-primary-pressed',
-    'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-    'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent',
+    'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
+    'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent',
     'font-sans text-text-primary',
   ),
   {
@@ -48,10 +49,10 @@ export const accordionTriggerVariants = cva(
 );
 
 export const accordionActionsVariants = cva(
-  cn('flex items-center gap-4 col-start-2 row-start-1 pl-8 shrink-0'),
+  cn('col-start-2 row-start-1 flex shrink-0 items-center gap-4 pl-8'),
 );
 
-export const accordionTriggerTitleVariants = cva('block flex-1 min-w-0 truncate text-left', {
+export const accordionTriggerTitleVariants = cva('block min-w-0 flex-1 truncate text-left', {
   variants: {
     variant: {
       primary: '',
@@ -64,8 +65,8 @@ export const accordionTriggerTitleVariants = cva('block flex-1 min-w-0 truncate 
 
 export const accordionIndicatorVariants = cva(
   cn(
-    'inline-flex items-center justify-center shrink-0',
-    'rounded-8 size-24',
+    'inline-flex shrink-0 items-center justify-center',
+    'size-24 rounded-8',
     'transition-transform duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
   ),
   {

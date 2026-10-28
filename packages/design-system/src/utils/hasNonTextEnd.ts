@@ -1,4 +1,5 @@
 import { Children, isValidElement, type PropsWithChildren } from 'react';
+
 import { Text } from '../components/Text';
 
 export const hasNonTextEnd = (children: PropsWithChildren['children']): boolean => {

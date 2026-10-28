@@ -1,4 +1,5 @@
 import { type Ref, useImperativeHandle } from 'react';
+
 import { useTableContext } from './TableContext';
 import type { TableHandle, TableScrollToRowOptions } from './types';
 

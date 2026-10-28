@@ -1,5 +1,7 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { DatePicker, Portal } from '@ark-ui/react';
+
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 
@@ -24,7 +26,7 @@ export const CalendarContent: FC<CalendarContentProps> = ({ ref, children, class
         <DatePicker.Content
           ref={contentRef}
           className={cn(
-            'flex bg-bg-surface-2 rounded-12 shadow-md',
+            'flex rounded-12 bg-bg-surface-2 shadow-md',
             'border border-border-primary-light',
             // Leveling: layer-aware so a calendar opened inside a nested
             // drawer/dialog stacks above that dialog's positioner — zag sets

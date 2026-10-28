@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { WALLY_ANSWER } from '../mocks';
 import { decodeEntities, isClosedFence, lexMarkdown, safeHref } from './markdown';
 

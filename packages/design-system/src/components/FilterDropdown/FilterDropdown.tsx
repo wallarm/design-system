@@ -1,10 +1,12 @@
 import { type ReactNode, useMemo, useRef, useState } from 'react';
+
 import {
   type CollectionItem,
   createListCollection,
   type ListCollection,
 } from '@ark-ui/react/collection';
 import type { SelectHighlightChangeDetails, SelectValueChangeDetails } from '@ark-ui/react/select';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { Select, type SelectProps } from '../Select/Select';

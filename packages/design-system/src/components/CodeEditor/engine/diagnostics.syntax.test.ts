@@ -1,6 +1,7 @@
 import { syntaxTree } from '@codemirror/language';
 import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { afterEach, beforeAll, describe, expect, it, rs } from '@rstest/core';
+
 import {
   activeDiagnostics,
   destroyLintedViews,

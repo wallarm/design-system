@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -11,7 +12,7 @@ export const SelectHeader: FC<SelectHeaderProps> = props => {
     <div
       {...props}
       data-testid={testId}
-      className={cn('bg-component-outline-button-bg pt-8 px-8 shrink-0')}
+      className={cn('shrink-0 bg-component-outline-button-bg px-8 pt-8')}
     />
   );
 };

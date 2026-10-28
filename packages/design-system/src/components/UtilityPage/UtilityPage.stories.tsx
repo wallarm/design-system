@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ArrowRight } from '../../icons';
 import { Button } from '../Button';
 import { UtilityPage, type UtilityPageProps } from './UtilityPage';

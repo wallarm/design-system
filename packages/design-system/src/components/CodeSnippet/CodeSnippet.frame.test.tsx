@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { copyText } from '../../utils/copyText';
 import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetCode } from './CodeSnippetCode';

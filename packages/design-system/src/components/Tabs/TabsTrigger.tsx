@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, FocusEvent, ReactNode } from 'react';
+
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { tabsTriggerVariants } from './classes';

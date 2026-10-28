@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import { Bell, ChevronUpDown } from '../../../icons';
 import { Button } from '../../Button';
 import { Code } from '../../Code';
@@ -19,11 +20,11 @@ export const HeaderActions = ({ assistantToggle }: HeaderActionsProps) => (
 
     <TopHeaderSeparator />
 
-    <Button variant='ghost' size='small' color='neutral' className='py-4 rounded-6'>
+    <Button variant='ghost' size='small' color='neutral' className='rounded-6 py-4'>
       <Text size='xs' weight='medium'>
         Tenant Name
       </Text>
-      <span className='text-text-tertiary mx-[-2px]'>•</span>
+      <span className='mx-[-2px] text-text-tertiary'>•</span>
       <Code size='s' color='secondary'>
         12345
       </Code>

@@ -1,7 +1,9 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { Earth, Info } from '../../icons';
 import {
   Select,

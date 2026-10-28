@@ -1,5 +1,7 @@
 import type { FC, PropsWithChildren } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { cn } from '../../utils/cn';
 import { VStack } from '../Stack';
 import { Flex } from './Flex';
@@ -7,7 +9,7 @@ import { Flex } from './Flex';
 const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
   <div
     className={cn(
-      'flex h-40 py-4 px-8 items-center justify-center rounded-6 border border-border-info bg-bg-light-info font-mono text-xs text-text-info',
+      'flex h-40 items-center justify-center rounded-6 border border-border-info bg-bg-light-info px-8 py-4 font-mono text-xs text-text-info',
       className,
     )}
   >
@@ -51,27 +53,27 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
     <VStack>
       <p className='sb-annotation'>row — default</p>
       <Flex {...args} direction='row' gap={2}>
-        <Box className='h-32 py-2 px-4 text-sm'>1</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>2</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>3</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>1</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>2</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>3</Box>
       </Flex>
     </VStack>
 
     <VStack>
       <p className='sb-annotation'>column</p>
       <Flex {...args} direction='column' gap={2}>
-        <Box className='h-32 py-2 px-4 text-sm'>1</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>2</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>3</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>1</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>2</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>3</Box>
       </Flex>
     </VStack>
 
     <VStack>
       <p className='sb-annotation'>row-reverse</p>
       <Flex {...args} direction='row-reverse' gap={2}>
-        <Box className='h-32 py-2 px-4 text-sm'>1</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>2</Box>
-        <Box className='h-32 py-2 px-4 text-sm'>3</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>1</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>2</Box>
+        <Box className='h-32 px-4 py-2 text-sm'>3</Box>
       </Flex>
     </VStack>
   </Flex>

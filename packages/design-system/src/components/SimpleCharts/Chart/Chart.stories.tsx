@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { FilterX, Settings } from '../../../icons';
 import { Button } from '../../Button';
 import { Chart } from './Chart';
@@ -85,7 +86,7 @@ export const WithAlwaysVisibleActions: StoryFn<typeof meta> = () => (
  * when a dashboard slot demands a particular size.
  */
 export const CustomSize: StoryFn<typeof meta> = () => (
-  <Chart className='w-640 h-320'>
+  <Chart className='h-320 w-640'>
     <ChartHeader>
       <ChartTitle>Custom 640 × 320</ChartTitle>
     </ChartHeader>

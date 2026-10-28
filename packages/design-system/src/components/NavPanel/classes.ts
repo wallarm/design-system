@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const navPanelItemVariants = cva(
-  'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-10 p-8 text-sm text-text-primary transition-colors outline-none',
+  'overlay flex h-32 w-full shrink-0 cursor-pointer items-center gap-8 rounded-10 p-8 text-sm text-text-primary transition-colors outline-none',
   {
     variants: {
       active: {
@@ -15,7 +15,7 @@ export const navPanelItemVariants = cva(
 );
 
 export const navPanelGroupItemVariants = cva(
-  'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-10 py-8 pr-8 text-sm text-text-primary transition-colors outline-none',
+  'overlay flex h-32 w-full shrink-0 cursor-pointer items-center gap-8 rounded-10 py-8 pr-8 text-sm text-text-primary transition-colors outline-none',
   {
     variants: {
       active: {

@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+
 import type { ChipSegment } from '../../../FilterInputField/FilterInputChip';
 import type {
   Condition,

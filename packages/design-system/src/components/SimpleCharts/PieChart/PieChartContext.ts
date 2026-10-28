@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+
 import { makeIsHoverSyncTarget } from '../lib/hoverSync';
 import type { ChartColor } from '../types';
 

@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
-import { createContext } from 'react';
+import { type CSSProperties, type ReactNode, createContext } from 'react';
+
 import type { SyntaxAdapter, Token } from './adapters/types';
 import type { DisplayItem, FoldRegion } from './lib/foldUtils';
 

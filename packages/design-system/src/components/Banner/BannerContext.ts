@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import type { BannerVariant } from './classes';
 
 const BannerVariantContext = createContext<BannerVariant>('primary');

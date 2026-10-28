@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { bulkBarSurfaceClasses } from '../BulkBar/classes';
 
@@ -20,8 +21,8 @@ export const selectionBulkBarVariants = cva(
       placement: {
         // Anchored to the nearest positioned ancestor — useful for embedding
         // inside a Drawer or any other relatively positioned container.
-        absolute: 'absolute bottom-12 left-1/2 -translate-x-1/2 max-w-[calc(100%-48px)]',
-        floating: 'fixed bottom-32 left-1/2 -translate-x-1/2 max-w-[calc(100vw-32px)]',
+        absolute: 'absolute bottom-12 left-1/2 max-w-[calc(100%-48px)] -translate-x-1/2',
+        floating: 'fixed bottom-32 left-1/2 max-w-[calc(100vw-32px)] -translate-x-1/2',
       },
     },
     defaultVariants: {

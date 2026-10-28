@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { useSelectContext } from '@ark-ui/react/select';
+
 import { useTestId } from '../../../utils/testId';
 import { Tag, TagClose, type TagProps } from '../../Tag';
 import type { SelectDataItem } from '../types';

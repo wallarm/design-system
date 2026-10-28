@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { CodeSnippetActions, CodeSnippetFullscreenButton, CodeSnippetHeader } from '../CodeSnippet';
 import type { FoldRegion } from '../CodeSnippet/lib/foldUtils';

@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Tour } from './Tour';
 import { TourClose } from './TourClose';

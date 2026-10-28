@@ -1,7 +1,9 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Button } from '../Button';
 import { MessageAction, MessageActions } from '../MessageActions';

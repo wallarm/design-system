@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Button } from '../Button';
 import {
   OverflowTooltip,
@@ -35,7 +37,7 @@ export default meta;
  */
 export const AutoDetection: StoryFn<OverflowTooltipProps> = () => {
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>short — no tooltip</p>
         <OverflowTooltip>
@@ -75,7 +77,7 @@ export const MultiLineAutoDetection: StoryFn<OverflowTooltipProps> = () => {
     'This is a very long text that demonstrates multi-line truncation. It keeps going and going to show how the component handles text that exceeds multiple lines. The tooltip will appear when you hover over the truncated content. And it continues even more to ensure we have enough content for demonstration purposes.';
 
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>line-clamp-2</p>
         <OverflowTooltip>
@@ -115,13 +117,13 @@ export const MultiLineAutoDetection: StoryFn<OverflowTooltipProps> = () => {
  */
 export const NestedElements: StoryFn<OverflowTooltipProps> = () => {
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>one level deep</p>
         <OverflowTooltip>
           <OverflowTooltipTrigger>
             <div className='border p-4'>
-              <h3 className='font-bold mb-2'>Card Title</h3>
+              <h3 className='mb-2 font-bold'>Card Title</h3>
               <p className='truncate'>
                 This is a nested element with truncate that will be automatically detected for
                 overflow
@@ -139,7 +141,7 @@ export const NestedElements: StoryFn<OverflowTooltipProps> = () => {
         <OverflowTooltip>
           <OverflowTooltipTrigger>
             <div className='border p-4'>
-              <h3 className='font-bold mb-2 truncate'>
+              <h3 className='mb-2 truncate font-bold'>
                 This is a very long title that might be truncated
               </h3>
               <p className='line-clamp-2'>
@@ -169,7 +171,7 @@ export const NestedElements: StoryFn<OverflowTooltipProps> = () => {
  */
 export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>rich content</p>
         <OverflowTooltip>
@@ -180,8 +182,8 @@ export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
           </OverflowTooltipTrigger>
           <OverflowTooltipContent>
             <div className='flex flex-col gap-2'>
-              <div className='font-medium text-sm'>API Endpoint</div>
-              <code className='rounded-6 bg-component-kbi-tooltip-bg px-4 py-2 font-mono text-text-primary-alt text-xs'>
+              <div className='text-sm font-medium'>API Endpoint</div>
+              <code className='rounded-6 bg-component-kbi-tooltip-bg px-4 py-2 font-mono text-xs text-text-primary-alt'>
                 /api/v1/users/1234567890/sessions/abc-def-ghi-jkl-mno/tokens/refresh
               </code>
               <div className='text-xs text-text-secondary'>
@@ -224,12 +226,12 @@ export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
  */
 export const ForceTooltip: StoryFn<OverflowTooltipProps> = () => {
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>forced, nothing truncated</p>
         <OverflowTooltip forceTooltip>
           <OverflowTooltipTrigger>
-            <div className='truncate w-fit'>Short text</div>
+            <div className='w-fit truncate'>Short text</div>
           </OverflowTooltipTrigger>
           <OverflowTooltipContent>
             This tooltip is forced to show even though the text isn't truncated
@@ -267,7 +269,7 @@ export const DifferentSides: StoryFn<OverflowTooltipProps> = () => {
   const text = 'This is a text that will be truncated and show tooltips on different sides';
 
   return (
-    <div className='font-sans flex flex-col gap-32 w-300 py-32'>
+    <div className='flex w-300 flex-col gap-32 py-32 font-sans'>
       <div>
         <p className='sb-annotation mb-8'>top — the default</p>
         <OverflowTooltip positioning={{ placement: 'top' }}>
@@ -319,7 +321,7 @@ export const DynamicContent: StoryFn<OverflowTooltipProps> = () => {
   const [text, setText] = useState('Click the button to change this text');
 
   return (
-    <div className='font-sans flex flex-col gap-16 w-300'>
+    <div className='flex w-300 flex-col gap-16 font-sans'>
       <div>
         <OverflowTooltip>
           <OverflowTooltipTrigger>

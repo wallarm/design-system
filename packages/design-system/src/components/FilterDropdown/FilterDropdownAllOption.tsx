@@ -1,4 +1,5 @@
 import type { ComponentProps, FC, ReactNode, Ref } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { SelectOption } from '../Select/SelectOption';
 import { SelectOptionIndicator } from '../Select/SelectOptionIndicator';

@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { CodeSnippetContext, type CodeSnippetContextValue } from '../CodeSnippetContext';
 
 export const useCodeSnippet = <TLanguage extends string = string>() => {

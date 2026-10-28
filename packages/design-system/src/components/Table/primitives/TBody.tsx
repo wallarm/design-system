@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef, FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 
 export const TBody: FC<ComponentPropsWithRef<'tbody'>> = ({ ref, className, ...props }) => (

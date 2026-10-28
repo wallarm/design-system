@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { Avatar, AvatarContent, AvatarFallback, AvatarImage, AvatarName } from '.';
 
 describe('Avatar — accessibility', () => {

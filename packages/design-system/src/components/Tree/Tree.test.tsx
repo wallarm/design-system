@@ -1,6 +1,7 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { Tree } from './Tree';
 import { TreeItem } from './TreeItem';
 import { TreeItemContent } from './TreeItemContent';

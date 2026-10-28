@@ -1,6 +1,7 @@
 import { insertNewlineAndIndent, undo } from '@codemirror/commands';
 import { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import {
   engineOptions,
   mountEngine,

@@ -1,5 +1,4 @@
-import type { GameEngineHost } from './game-logic';
-import { SPAWN_EDGE } from './game-logic';
+import { type GameEngineHost, SPAWN_EDGE } from './game-logic';
 import { clamp01, easeIn, easeOut } from './math';
 
 /* ------------------------------------------------------------------ */

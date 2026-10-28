@@ -1,4 +1,5 @@
 import type { ComponentProps, FC } from 'react';
+
 import { SelectGroup } from '../Select/SelectGroup';
 
 export type FilterDropdownGroupProps = ComponentProps<typeof SelectGroup>;

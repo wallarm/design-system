@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+
 import { LogOut, PanelLeftDashed, PencilRuler, Settings, UserRound } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import {
@@ -86,7 +87,7 @@ export const AccountDropdown = ({
         <NavRailItem icon={UserRound} label={USER_NAME} avatar />
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-256'>
-        <div className='rounded-6 border border-border-primary-light bg-states-primary-hover px-8 py-8 mb-4'>
+        <div className='mb-4 rounded-6 border border-border-primary-light bg-states-primary-hover px-8 py-8'>
           <Avatar size='md'>
             <AvatarImage />
             <AvatarFallback name={USER_NAME} />

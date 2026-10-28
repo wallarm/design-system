@@ -1,4 +1,5 @@
 import { type RefObject, useLayoutEffect, useState } from 'react';
+
 import { range } from '../../utils/range';
 import { useContainerWidth } from '../Table/lib/useContainerWidth';
 import { MEASURE } from './constants';

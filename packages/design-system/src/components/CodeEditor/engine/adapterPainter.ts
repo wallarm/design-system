@@ -7,6 +7,7 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view';
+
 import type { HighlightResult, SyntaxAdapter, TokenType } from '../../CodeSnippet/adapters/types';
 import { TOKEN_CLASSES } from '../../CodeSnippet/internal/CodeToken';
 
@@ -146,7 +147,7 @@ class PainterPluginValue implements PluginValue {
   private reportError(error: unknown): void {
     if (this.errorReported) return;
     this.errorReported = true;
-    // oxlint-disable-next-line no-console -- adapter failures are otherwise invisible (colours just stop updating)
+    // adapter failures are otherwise invisible (colours just stop updating)
     console.error(
       `[CodeEditor] Syntax adapter "${this.config.adapter.name}" failed to highlight "${this.config.language}"; keeping previous colours.`,
       error,

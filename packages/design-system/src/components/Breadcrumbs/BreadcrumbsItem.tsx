@@ -6,26 +6,28 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
 const breadcrumbsItemVariants = cva(
   [
-    'flex items-center gap-4 min-h-[20px] px-4 py-0 rounded-6',
-    'text-sm whitespace-nowrap transition-colors font-sans-display',
-    'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+    'flex min-h-[20px] items-center gap-4 rounded-6 px-4 py-0',
+    'font-sans-display text-sm whitespace-nowrap transition-colors',
+    'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
     'cursor-pointer',
   ],
   {
     variants: {
       isCurrent: {
         true: [
-          'text-text-primary font-medium',
+          'font-medium text-text-primary',
           'bg-transparent hover:bg-states-primary-hover active:bg-states-primary-pressed',
         ],
         false: [
-          'text-text-secondary font-normal',
+          'font-normal text-text-secondary',
           'bg-transparent hover:bg-states-primary-hover active:bg-states-primary-pressed',
         ],
       },

@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useId } from 'react';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { Popover } from '../Popover';
 import { ChatPermissionsContext } from './ChatPermissionsContext';

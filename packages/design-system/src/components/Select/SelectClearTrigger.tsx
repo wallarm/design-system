@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { linkVariants } from '../Link';

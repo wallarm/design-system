@@ -13,7 +13,7 @@ export const userMessageBubbleVariants = cva(
   },
 );
 
-export const userMessageTextVariants = cva('whitespace-pre-wrap break-words outline-none', {
+export const userMessageTextVariants = cva('break-words whitespace-pre-wrap outline-none', {
   variants: {
     // 11 lines × 20px. A height cap, not line-clamp: Figma cuts the text with no ellipsis.
     clamped: { true: 'max-h-220 overflow-hidden' },
@@ -33,5 +33,5 @@ export const userMessageFadeVariants = cva(
 );
 
 export const userMessageShowMoreVariants = cva(
-  'pointer-events-auto absolute top-8 left-16 cursor-pointer rounded-4 text-xs text-text-secondary outline-none transition-colors hover:text-text-primary focus-visible:ring-3 focus-visible:ring-focus-primary',
+  'pointer-events-auto absolute top-8 left-16 cursor-pointer rounded-4 text-xs text-text-secondary transition-colors outline-none hover:text-text-primary focus-visible:ring-3 focus-visible:ring-focus-primary',
 );

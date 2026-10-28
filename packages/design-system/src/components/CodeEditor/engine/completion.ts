@@ -9,6 +9,7 @@ import {
 } from '@codemirror/autocomplete';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+
 import { cn } from '../../../utils/cn';
 import { dropdownMenuItemVariants } from '../../DropdownMenu/classes';
 import { httpCompletions } from '../lib/httpCompletions';
@@ -128,7 +129,7 @@ let reported = false;
 const reportSourceError = (error: unknown): null => {
   if (!reported) {
     reported = true;
-    // oxlint-disable-next-line no-console -- surfaced once; a failing consumer source is ignored
+    // surfaced once; a failing consumer source is ignored
     console.error('[CodeEditor] a completion source failed', error);
   }
   return null;

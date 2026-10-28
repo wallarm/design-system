@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -55,7 +56,7 @@ export const AppShellAside: FC<AppShellAsideProps> = ({
       className={cn(
         // Display only while open, so the browser's own [hidden] rule hides the closed
         // region even where Tailwind preflight is not loaded.
-        '[grid-area:aside] mx-8 mb-8 data-[state=open]:flex w-(--app-shell-aside-width) flex-col overflow-auto overscroll-none rounded-12 border border-border-primary-light bg-bg-page-bg pb-4',
+        'mx-8 mb-8 w-(--app-shell-aside-width) flex-col overflow-auto overscroll-none rounded-12 border border-border-primary-light bg-bg-page-bg pb-4 [grid-area:aside] data-[state=open]:flex',
         // Once closed it keeps painting while the shell's track slides shut, then display:none.
         // Needs display transitions (allow-discrete): Chromium and WebKit; Firefox hides at once.
         'transition-[display] transition-discrete duration-(--app-shell-aside-duration) ease-(--app-shell-aside-ease) motion-reduce:transition-none',

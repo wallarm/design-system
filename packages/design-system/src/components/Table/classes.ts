@@ -1,9 +1,10 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 /** Shared base styles for all table cells (head + body) */
 const tableCellBase = cn(
-  'border-b border-r border-border-primary-light last:border-r-0',
+  'border-r border-b border-border-primary-light last:border-r-0',
   'overlay overflow-visible',
   'font-sans',
 );
@@ -17,7 +18,7 @@ const pinnedLeftShadow = cn(
 export const tableHeadCellVariants = cva(
   cn(
     tableCellBase,
-    'pl-16 pr-4 py-4 text-xs font-medium text-text-secondary',
+    'py-4 pr-4 pl-16 text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
     'whitespace-nowrap outline-none',
@@ -109,7 +110,7 @@ export const tableBodyCellVariants = cva(
 );
 
 export const tableContainerVariants = cva(
-  'rounded-12 border border-border-primary-light outline-none overflow-clip',
+  'overflow-clip rounded-12 border border-border-primary-light outline-none',
   {
     variants: {
       virtualized: {
@@ -131,8 +132,8 @@ export const DROP_INDICATOR_BASE =
 
 /** Small icon button used in table header (sort, scroll, menu triggers) */
 export const tableHeaderButtonClass = cn(
-  'w-16 h-16 shrink-0 hover:text-text-primary',
-  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
-  'transition-colors cursor-pointer',
-  'inline-flex items-center justify-center bg-transparent border-0 p-0',
+  'h-16 w-16 shrink-0 hover:text-text-primary',
+  'rounded-2 focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
+  'cursor-pointer transition-colors',
+  'inline-flex items-center justify-center border-0 bg-transparent p-0',
 );

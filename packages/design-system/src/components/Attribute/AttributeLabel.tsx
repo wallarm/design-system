@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAttributeOrientation } from './AttributeOrientationContext';
@@ -43,7 +44,7 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({
       data-slot='attribute-label'
       className={cn(
         'font-sans-display text-sm font-normal text-text-secondary',
-        isHorizontal ? 'block py-4 shrink-0 truncate' : 'flex items-center gap-4 flex-wrap',
+        isHorizontal ? 'block shrink-0 truncate py-4' : 'flex flex-wrap items-center gap-4',
         className,
       )}
     >

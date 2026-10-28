@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { FilterX, ZoomOut } from '../../../icons';
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Button } from '../../Button';
@@ -61,7 +63,7 @@ const MultiLegend = ({ series = multiSeries }: { series?: LineChartSeries[] }) =
     {series.map(s => (
       <LineChartLegendItem key={s.key} seriesKey={s.key}>
         <LineChartHoverPopoverDot color={s.color} />
-        <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+        <span className='font-mono text-xs text-text-primary'>{s.label}</span>
       </LineChartLegendItem>
     ))}
   </LineChartLegend>
@@ -217,7 +219,7 @@ export const Filterable: StoryFn<typeof meta> = () => {
                 <TooltipTrigger asChild>
                   <LineChartLegendItem seriesKey={s.key} onClick={() => toggle(s.key)}>
                     <LineChartHoverPopoverDot color={s.color} />
-                    <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                    <span className='font-mono text-xs text-text-primary'>{s.label}</span>
                   </LineChartLegendItem>
                 </TooltipTrigger>
                 <TooltipContent>

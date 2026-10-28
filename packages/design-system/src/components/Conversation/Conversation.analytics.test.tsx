@@ -1,7 +1,9 @@
 import { createRef, type ReactNode } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Conversation } from './Conversation';
 import { ConversationContent } from './ConversationContent';

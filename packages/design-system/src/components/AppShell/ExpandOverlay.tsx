@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import type { AppShellExpandFrom } from './AppShell';
 import { EXPAND_BORDER_MS, HERO_EASE } from './constants';
 import type { RevealPhase } from './useShellAnimation';

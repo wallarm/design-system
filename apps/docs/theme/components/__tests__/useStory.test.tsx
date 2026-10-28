@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook, waitFor } from '@testing-library/react';
+
 import { useStory } from '../useStory';
 
 rs.mock('storybook-react-rsbuild', () => ({

@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import type { GridLineTypeFunctionProps } from 'recharts/types/cartesian/CartesianGrid';
+
 import { dropEdgeGridLines } from './dropEdgeGridLines';
 
 // Ticks 0 / 50 / 100 on a plot from y=0 (top) to y=100 (bottom).

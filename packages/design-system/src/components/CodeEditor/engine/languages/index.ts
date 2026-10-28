@@ -1,5 +1,6 @@
 import { StreamLanguage } from '@codemirror/language';
 import type { Extension } from '@codemirror/state';
+
 import type { CodeEditorLanguage } from '../../types';
 import { http } from './http';
 import { json } from './json';

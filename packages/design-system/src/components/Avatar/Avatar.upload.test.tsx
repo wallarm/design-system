@@ -1,7 +1,9 @@
 import { useState } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
 import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
 import { byTestId, makeFile, nextFrame, pick } from '../FileUpload/FileUpload.test.helpers';

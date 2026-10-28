@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { PREFIX_GUTTER_CLASS, STICK_GUTTER_CLASS } from './gutters';

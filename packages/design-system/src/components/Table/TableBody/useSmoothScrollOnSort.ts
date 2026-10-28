@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
+
 import type { ReactTable, RowData, SortingState } from '@tanstack/react-table';
+
 import type { DSTableFeatures } from '../lib';
 
 /**

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import type { Token } from '../adapters/types';
 import type { LineConfig } from '../CodeSnippetContext';
 import type { FoldRegion } from '../lib/foldUtils';

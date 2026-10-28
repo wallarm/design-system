@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react';
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+
 import { Heading } from '../../components/Heading';
 import { Input } from '../../components/Input';
 import {
@@ -169,7 +171,7 @@ export const AllIcons: Story = {
           {filteredEntries.map(({ name, category, copyText, Component }) => (
             <div
               key={`${category}-${name}`}
-              className='flex flex-col items-center justify-center p-16 border border-border-primary rounded-8 bg-component-outline-button-bg transition-colors cursor-pointer'
+              className='flex cursor-pointer flex-col items-center justify-center rounded-8 border border-border-primary bg-component-outline-button-bg p-16 transition-colors'
               onClick={() => navigator.clipboard?.writeText(copyText)}
               title={`Click to copy: ${copyText}`}
             >

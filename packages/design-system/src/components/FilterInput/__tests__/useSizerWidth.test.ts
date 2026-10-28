@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import {
   CHAR_WIDTH_PX,
   MAX_INPUT_WIDTH,

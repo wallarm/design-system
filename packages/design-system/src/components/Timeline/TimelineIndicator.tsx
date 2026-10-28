@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { NumericBadge, type NumericBadgeProps } from '../NumericBadge';
 

@@ -1,8 +1,10 @@
+import path from 'node:path';
+
 import { mergeRsbuildConfig } from '@rsbuild/core';
 import { defineConfig } from '@rspress/core';
-import path from 'node:path';
 import { rsbuildConfig } from '@wallarm-org/rsbuild-config/rsbuild.config';
 import { postcssConfig } from '@wallarm-org/tailwind-config/postcss';
+
 import { cleanSearchIndex } from './plugins/cleanSearchIndex';
 import { THEME_SCRIPT } from './theme/themeScript';
 

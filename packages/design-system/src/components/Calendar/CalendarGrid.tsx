@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { DatePicker } from '@ark-ui/react';
+
 import { cn } from '../../utils/cn';
 import { useCalendarContext } from './CalendarContext';
 import { CalendarHeader } from './CalendarHeader';
@@ -51,9 +53,9 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                     <DatePicker.TableHeader
                       key={day.short}
                       className={cn(
-                        'w-40 h-24',
-                        'font-mono font-medium text-xs leading-xs',
-                        'text-text-secondary text-center',
+                        'h-24 w-40',
+                        'font-mono text-xs leading-xs font-medium',
+                        'text-center text-text-secondary',
                       )}
                     >
                       {day.short}
@@ -93,7 +95,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                           (monthOffset > 0 && isBeforeTargetMonth);
 
                         if (shouldHide) {
-                          return <td key={day.toString()} className='w-40 h-40' />;
+                          return <td key={day.toString()} className='h-40 w-40' />;
                         }
                       }
 
@@ -114,20 +116,20 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                           >
                             <div
                               className={cn(
-                                'flex items-center justify-center relative',
-                                'w-40 h-40 p-2',
+                                'relative flex items-center justify-center',
+                                'h-40 w-40 p-2',
                               )}
                             >
                               <span
                                 className={cn(
                                   'flex items-center justify-center',
-                                  'w-36 h-36 rounded-8',
+                                  'h-36 w-36 rounded-8',
                                   'font-mono text-sm leading-sm',
                                   'text-text-secondary',
                                   (cellState.inRange || cellState.inHoveredRange) &&
                                     'bg-states-primary-pressed',
                                   cellState.selected &&
-                                    'bg-bg-fill-brand text-text-primary-alt font-medium',
+                                    'bg-bg-fill-brand font-medium text-text-primary-alt',
                                 )}
                               >
                                 {day.day}
@@ -152,20 +154,20 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                           >
                             <div
                               className={cn(
-                                'flex items-center justify-center relative',
-                                'w-40 h-40 p-2',
+                                'relative flex items-center justify-center',
+                                'h-40 w-40 p-2',
                               )}
                             >
                               <span
                                 className={cn(
                                   'flex items-center justify-center',
-                                  'w-36 h-36 rounded-8',
+                                  'h-36 w-36 rounded-8',
                                   'font-mono text-sm leading-sm',
                                   'text-text-primary',
                                   (cellState.inRange || cellState.inHoveredRange) &&
                                     'bg-states-primary-pressed',
                                   cellState.selected &&
-                                    'bg-bg-fill-brand text-text-primary-alt font-medium',
+                                    'bg-bg-fill-brand font-medium text-text-primary-alt',
                                 )}
                               >
                                 {day.day}
@@ -173,7 +175,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                               {isToday && (
                                 <span
                                   className={cn(
-                                    'absolute bottom-7 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
+                                    'absolute bottom-7 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full',
                                     'bg-bg-fill-brand',
                                     cellState.selected && 'bg-text-primary-alt',
                                   )}
@@ -192,8 +194,8 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                         >
                           <DatePicker.TableCellTrigger
                             className={cn(
-                              'flex items-center justify-center relative',
-                              'w-40 h-40 p-2',
+                              'relative flex items-center justify-center',
+                              'h-40 w-40 p-2',
                               'cursor-pointer select-none',
                               'outline-none',
                             )}
@@ -201,13 +203,13 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                             <span
                               className={cn(
                                 'flex items-center justify-center',
-                                'w-36 h-36 rounded-8',
+                                'h-36 w-36 rounded-8',
                                 'font-mono text-sm leading-sm',
                                 'transition-colors',
-                                '[[data-selected]_&]:bg-bg-fill-brand [[data-selected]_&]:text-text-primary-alt [[data-selected]_&]:font-medium',
+                                '[[data-selected]_&]:bg-bg-fill-brand [[data-selected]_&]:font-medium [[data-selected]_&]:text-text-primary-alt',
                                 '[[data-in-range]_&]:bg-states-primary-pressed',
                                 '[[data-outside-range]_&]:text-text-secondary',
-                                '[[data-disabled]_&]:cursor-not-allowed [[data-disabled]_&]:line-through [[data-disabled]_&]:text-text-secondary',
+                                '[[data-disabled]_&]:cursor-not-allowed [[data-disabled]_&]:text-text-secondary [[data-disabled]_&]:line-through',
                                 'not-[[data-selected]_&]:not-[[data-disabled]_&]:hover:bg-states-primary-hover',
                                 'not-[[data-selected]_&]:not-[[data-disabled]_&]:active:bg-states-primary-pressed',
                                 // Focus ring on the background element (matches Figma)
@@ -221,7 +223,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                             {isToday && (
                               <span
                                 className={cn(
-                                  'absolute bottom-7 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
+                                  'absolute bottom-7 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full',
                                   'bg-bg-fill-brand',
                                   '[[data-selected]_&]:bg-text-primary-alt',
                                 )}

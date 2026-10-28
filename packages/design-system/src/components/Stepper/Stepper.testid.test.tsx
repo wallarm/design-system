@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { Stepper, StepperContent, StepperNextTrigger, StepperPrevTrigger } from '.';
 import { StepperFixture } from '../../testUtils/StepperFixture';
 import { TestIdProvider } from '../../utils/testId';

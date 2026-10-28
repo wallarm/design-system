@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { valueOptionSearchText } from '../FilterInputMenu/FilterInputValueMenu/valueOptionSearchText';
 
 describe('valueOptionSearchText', () => {

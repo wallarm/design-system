@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, FC, MouseEvent } from 'react';
+
 import { isEqual } from '../../../utils/isEqual';
 import { type TestableProps, useTestId } from '../../../utils/testId';
 import { Button } from '../../Button';

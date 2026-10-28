@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -15,7 +16,7 @@ export const CodeSnippetTitle: FC<CodeSnippetTitleProps> = ({ className, ref, ..
       data-slot='code-snippet-title'
       data-testid={testId}
       className={cn(
-        'inline-flex items-center text-xs font-medium font-sans text-text-primary px-12',
+        'inline-flex items-center px-12 font-sans text-xs font-medium text-text-primary',
         className,
       )}
       {...props}

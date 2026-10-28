@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { Slider as ArkSlider, useSliderContext } from '@ark-ui/react/slider';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -98,7 +100,7 @@ export const SliderThumb: FC<SliderThumbProps> = ({
       <TooltipTrigger asChild>{thumb}</TooltipTrigger>
       {/* The DS Tooltip's built-in slide keys on data-side, but this Ark version emits
           data-placement — so add the Figma 4px slide-up here, on the live attribute. */}
-      <TooltipContent className='data-[placement=top]:slide-in-from-bottom-[4px] data-[placement=bottom]:slide-in-from-top-[4px]'>
+      <TooltipContent className='data-[placement=bottom]:slide-in-from-top-[4px] data-[placement=top]:slide-in-from-bottom-[4px]'>
         {display}
       </TooltipContent>
     </Tooltip>

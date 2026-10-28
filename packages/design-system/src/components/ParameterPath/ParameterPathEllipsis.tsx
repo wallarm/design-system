@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
