@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useLayoutEffect, useCallback, useRef, useState } from 'react';
 
 /**
  * Manages two-value selection for the "between" date operator.
@@ -7,7 +7,9 @@ import { useCallback, useRef, useState } from 'react';
 export const useDateRange = () => {
   const [fromValue, setFromValue] = useState<string | null>(null);
   const fromValueRef = useRef<string | null>(null);
-  fromValueRef.current = fromValue;
+  useLayoutEffect(() => {
+    fromValueRef.current = fromValue;
+  });
 
   /** Current selection index: 0 = selecting "from", 1 = selecting "to" */
   const currentIndex = fromValue === null ? 0 : 1;

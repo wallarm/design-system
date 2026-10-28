@@ -38,6 +38,7 @@ export const useCalendarTime = ({
   if (showTime && !isRange) {
     const current = (value ?? defaultValue)?.[0];
     if (current && 'hour' in current) {
+      // oxlint-disable-next-line react/refs -- Idempotent prop synchronization preserves the synchronous Ark date-to-time bridge; Calendar.test covers grid picks.
       timeRef.current = { hour: current.hour, minute: current.minute };
     }
   }

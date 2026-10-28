@@ -1,4 +1,6 @@
 import {
+  useState,
+  useEffect,
   type ButtonHTMLAttributes,
   type FC,
   type MouseEvent,
@@ -51,7 +53,22 @@ export const SearchModalItem: FC<SearchModalItemProps> = ({
     return items.indexOf(itemRef.current);
   }, [getItems]);
 
-  const ownIndex = getOwnIndex();
+  const [ownIndex, setOwnIndex] = useState(-1);
+  useEffect(() => {
+    // Reordering or disabling siblings can change the DOM index without changing this item.
+    const list = itemRef.current?.parentElement;
+    const updateIndex = () => setOwnIndex(getOwnIndex());
+    updateIndex();
+    if (!list) return;
+    const observer = new MutationObserver(updateIndex);
+    observer.observe(list, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['disabled'],
+    });
+    return () => observer.disconnect();
+  });
   const active = ownIndex >= 0 && ownIndex === activeIndex;
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {

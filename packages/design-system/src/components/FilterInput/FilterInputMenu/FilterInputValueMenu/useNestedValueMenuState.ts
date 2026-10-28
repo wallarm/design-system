@@ -1,4 +1,12 @@
-import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLayoutEffect,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
 
@@ -64,7 +72,9 @@ export const useNestedValueMenuState = ({
 }: UseNestedValueMenuStateOptions) => {
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
   const checkedValuesRef = useRef(checkedValues);
-  checkedValuesRef.current = checkedValues;
+  useLayoutEffect(() => {
+    checkedValuesRef.current = checkedValues;
+  });
 
   const [openParentId, setOpenParentId] = useState<string | null>(null);
 
@@ -90,7 +100,9 @@ export const useNestedValueMenuState = ({
 
   const topRows = useMemo(() => sections.flatMap(section => section.rows), [sections]);
   const topRowsRef = useRef(topRows);
-  topRowsRef.current = topRows;
+  useLayoutEffect(() => {
+    topRowsRef.current = topRows;
+  });
 
   const openParentRow = useMemo(
     () => topRows.find(row => row.id === openParentId && row.isGroup && !row.isSelectAll),
@@ -131,7 +143,9 @@ export const useNestedValueMenuState = ({
 
   // ---- commit plumbing (mirrors flat useValueMenuState) ---------------------
   const onCommitRef = useRef(onCommit);
-  onCommitRef.current = onCommit;
+  useLayoutEffect(() => {
+    onCommitRef.current = onCommit;
+  });
   const committingRef = useRef(false);
 
   const commitChecked = useCallback((): boolean => {
@@ -278,7 +292,9 @@ export const useNestedValueMenuState = ({
     inputRef,
     menuRef,
   });
-  topHighlightRef.current = top.highlightedValue;
+  useLayoutEffect(() => {
+    topHighlightRef.current = top.highlightedValue;
+  });
 
   // ---- submenu keyboard nav -------------------------------------------------
   const submenuNavItems: FilterInputDropdownItem[] = useMemo(() => {

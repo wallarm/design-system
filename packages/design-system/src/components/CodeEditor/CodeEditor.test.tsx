@@ -1,4 +1,4 @@
-import { act, createRef, StrictMode } from 'react';
+import { useLayoutEffect, act, createRef, StrictMode } from 'react';
 
 import { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
@@ -245,7 +245,10 @@ describe('CodeEditor', () => {
       const apiRef = createRef<CodeEditorApi>();
       let fromHook: CodeEditorApi | null = null;
       const Probe = () => {
-        fromHook = useCodeEditor();
+        const api = useCodeEditor();
+        useLayoutEffect(() => {
+          fromHook = api;
+        });
         return null;
       };
       render(

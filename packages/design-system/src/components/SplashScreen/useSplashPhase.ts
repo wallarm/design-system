@@ -1,4 +1,4 @@
-import { type TransitionEvent, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, type TransitionEvent, useEffect, useRef, useState } from 'react';
 
 import type { PhaseType, SplashScreenShrinkTarget } from './types';
 
@@ -19,7 +19,9 @@ export const useSplashPhase = (
   onPhaseChange?: (phase: PhaseType) => void,
 ) => {
   const shrinkTargetRef = useRef(shrinkTarget);
-  shrinkTargetRef.current = shrinkTarget;
+  useLayoutEffect(() => {
+    shrinkTargetRef.current = shrinkTarget;
+  });
 
   const [phase, setPhase] = useState<PhaseType>(() =>
     visible ? 'enter-start' : shrinkTarget ? 'settled' : 'exited',
@@ -31,6 +33,7 @@ export const useSplashPhase = (
   useEffect(() => {
     if (visible) {
       contentShownRef.current = false;
+      // oxlint-disable-next-line react/set-state-in-effect -- Enter/exit phases are coordinated with committed DOM and double-rAF animation frames, not derived visibility.
       setPhase('enter-start');
       setChildrenRevealed(false);
       return doubleRaf(() => {
@@ -59,6 +62,7 @@ export const useSplashPhase = (
     }
     // Reveal children only after shrink animation completes
     if (phase === 'settled') {
+      // oxlint-disable-next-line react/set-state-in-effect -- Reveal follows the committed settled animation phase; children must not appear during shrink.
       setChildrenRevealed(true);
     }
   }, [phase]);

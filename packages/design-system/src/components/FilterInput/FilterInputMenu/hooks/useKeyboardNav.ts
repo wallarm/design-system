@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { FilterInputDropdownItem } from '../../types';
 
@@ -66,7 +66,9 @@ export const useKeyboardNav = ({
   const activeIndexRef = useRef(-1);
 
   const pendingIdsRef = useRef(pendingIds);
-  pendingIdsRef.current = pendingIds;
+  useLayoutEffect(() => {
+    pendingIdsRef.current = pendingIds;
+  });
 
   const stateRef = useRef({
     items,
@@ -79,17 +81,19 @@ export const useKeyboardNav = ({
     inputRef,
     menuRef,
   });
-  stateRef.current = {
-    items,
-    onSelect,
-    onClose,
-    onArrowRight,
-    onArrowLeft,
-    onPendingCommit,
-    arrowRightSelectsActive,
-    inputRef,
-    menuRef,
-  };
+  useLayoutEffect(() => {
+    stateRef.current = {
+      items,
+      onSelect,
+      onClose,
+      onArrowRight,
+      onArrowLeft,
+      onPendingCommit,
+      arrowRightSelectsActive,
+      inputRef,
+      menuRef,
+    };
+  });
 
   const prevOpenRef = useRef(open);
   const prevItemsLenRef = useRef(items.length);

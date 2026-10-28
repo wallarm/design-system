@@ -1,9 +1,9 @@
 import { Children, type FC, isValidElement, type ReactNode, type Ref } from 'react';
 
 import type { Select as ArkUiSelect } from '@ark-ui/react/select';
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
 
 import { cn } from '../../utils/cn';
-import { mergeRefs } from '../../utils/mergeRefs';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { SelectContent } from '../Select/SelectContent';
 import { SelectHeader } from '../Select/SelectHeader';
@@ -49,12 +49,14 @@ export const FilterDropdownContent: FC<FilterDropdownContentProps> = ({
   // A measured width cannot be a class; it is applied only while a query is active.
   const width = isSearchActive && lockedWidth ? lockedWidth : undefined;
 
+  const finalRef = useComposedRefs(ref, contentRef);
+
   return (
     <SelectPositioner
       className={cn(filterDropdownContentClassName, className)}
       contentProps={{
         ...props,
-        ref: mergeRefs(ref, contentRef),
+        ref: finalRef,
         style: width === undefined ? style : { ...style, width },
         'data-slot': 'filter-dropdown-content',
         'data-testid': testId,

@@ -163,9 +163,11 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   const [collapsedFolds, setCollapsedFolds] = useState(() => computeCollapsedFolds(foldsProp));
 
   // Re-initialize when folds prop identity changes (e.g. tab switch)
-  useEffect(() => {
+  const [previousFolds, setPreviousFolds] = useState(foldsProp);
+  if (foldsProp !== previousFolds) {
+    setPreviousFolds(foldsProp);
     setCollapsedFolds(computeCollapsedFolds(foldsProp));
-  }, [foldsProp, computeCollapsedFolds]);
+  }
 
   const toggleFold = useCallback((foldId: string) => {
     setCollapsedFolds(prev => {

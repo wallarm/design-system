@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
+import { useLayoutEffect, type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
 
 import { cn } from '../../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../../utils/testId';
@@ -121,7 +121,9 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   // identity — zag captures it once at open, so closing over `highlightedValue`
   // directly would freeze the popover on the open-time row (see FieldMenuPopover).
   const highlightedValueRef = useRef(highlightedValue);
-  highlightedValueRef.current = highlightedValue;
+  useLayoutEffect(() => {
+    highlightedValueRef.current = highlightedValue;
+  });
   // Anchor the popover vertically to the highlighted row but horizontally to the
   // menu's edge, so the gutter is measured from the menu (a fixed 4px gap) rather
   // than from the padding-inset row.

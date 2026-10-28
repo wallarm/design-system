@@ -1,4 +1,12 @@
-import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLayoutEffect,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { AppShellExpandFrom } from './AppShell';
 import { EXPAND_BORDER_MS, EXPAND_MS, HERO_EASE, SKELETON_DELAY } from './constants';
@@ -58,7 +66,9 @@ export function useShellAnimation(
 ) {
   const { reveal, expandFrom, onRevealed, appearedProp } = options;
   const onRevealedRef = useRef(onRevealed);
-  onRevealedRef.current = onRevealed;
+  useLayoutEffect(() => {
+    onRevealedRef.current = onRevealed;
+  });
 
   const hasAnimation = Boolean(expandFrom || reveal);
   const [phase, setPhase] = useState<RevealPhase>(hasAnimation ? 'initial' : 'done');

@@ -1,4 +1,4 @@
-import { type FC, Fragment, useMemo, useRef } from 'react';
+import { useLayoutEffect, type FC, Fragment, useMemo, useRef } from 'react';
 
 import { cn } from '../../../../utils/cn';
 import {
@@ -85,7 +85,9 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   // directly would freeze the submenu on the row that opened it and every later
   // parent would render its own rows at the first one's position.
   const openParentIdRef = useRef(state.openParentId);
-  openParentIdRef.current = state.openParentId;
+  useLayoutEffect(() => {
+    openParentIdRef.current = state.openParentId;
+  });
 
   const submenuPositioning = useMemo(
     () => ({

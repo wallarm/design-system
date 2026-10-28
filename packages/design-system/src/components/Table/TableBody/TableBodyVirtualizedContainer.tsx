@@ -10,6 +10,10 @@ import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChan
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
 
 export const TableBodyVirtualizedContainer: FC = () => {
+  'use no memo';
+  // TanStack Virtual mutates a stable instance; its getters must run on every render.
+  // https://react.dev/reference/eslint-plugin-react-hooks/lints/incompatible-library
+
   const { table, estimateRowHeight, overscan, tbodyRef, virtualizerRef } = useTableContext();
 
   const getScrollElement = useCallback(
@@ -17,6 +21,7 @@ export const TableBodyVirtualizedContainer: FC = () => {
     [tbodyRef],
   );
 
+  // oxlint-disable-next-line react/incompatible-library -- This component explicitly opts out of memoization above.
   const virtualizer = useVirtualizer({
     count: table.getRowModel().rows.length,
     getScrollElement,

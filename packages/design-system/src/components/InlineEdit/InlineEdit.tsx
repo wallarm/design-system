@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type ReactElement,
   type ReactNode,
   type Ref,
@@ -108,7 +109,9 @@ export function InlineEdit<T = unknown>({
   const [autoError, setAutoError] = useState<string | undefined>(undefined);
   const [submitModeOverride, setSubmitModeOverride] = useState<SubmitModeOverride | null>(null);
   const overrideRef = useRef<SubmitModeOverride | null>(null);
-  overrideRef.current = submitModeOverride;
+  useLayoutEffect(() => {
+    overrideRef.current = submitModeOverride;
+  });
 
   const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
     const prev = overrideRef.current;
@@ -135,11 +138,17 @@ export function InlineEdit<T = unknown>({
   // Latest-ref pattern (see draftRef/overrideRef): async continuations must
   // see the consumer's current bindings, not those captured at submit time.
   const onValueCommitRef = useRef(onValueCommit);
-  onValueCommitRef.current = onValueCommit;
+  useLayoutEffect(() => {
+    onValueCommitRef.current = onValueCommit;
+  });
   const onBeforeValueCommitRef = useRef(onBeforeValueCommit);
-  onBeforeValueCommitRef.current = onBeforeValueCommit;
+  useLayoutEffect(() => {
+    onBeforeValueCommitRef.current = onBeforeValueCommit;
+  });
   const savedDurationRef = useRef(savedDuration);
-  savedDurationRef.current = savedDuration;
+  useLayoutEffect(() => {
+    savedDurationRef.current = savedDuration;
+  });
 
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);

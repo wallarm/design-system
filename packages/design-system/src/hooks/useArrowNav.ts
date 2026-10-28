@@ -21,6 +21,8 @@ export function useArrowNav(
   selector: string,
   options?: UseArrowNavOptions,
 ): void {
+  const { onArrowRight, onArrowLeft, onEnter } = options ?? {};
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -61,20 +63,20 @@ export function useArrowNav(
         if (target && getItems().includes(target)) {
           event.preventDefault();
           target.click();
-          options?.onEnter?.();
+          onEnter?.();
         }
         return;
       }
 
-      if (key === 'ArrowRight' && options?.onArrowRight) {
+      if (key === 'ArrowRight' && onArrowRight) {
         event.preventDefault();
-        options.onArrowRight();
+        onArrowRight();
         return;
       }
 
-      if (key === 'ArrowLeft' && options?.onArrowLeft) {
+      if (key === 'ArrowLeft' && onArrowLeft) {
         event.preventDefault();
-        options.onArrowLeft();
+        onArrowLeft();
         return;
       }
 
@@ -123,5 +125,5 @@ export function useArrowNav(
       observer.disconnect();
       container.removeEventListener('keydown', handleKeyDown);
     };
-  }, [containerRef, selector, options?.onArrowRight, options?.onArrowLeft, options?.onEnter]);
+  }, [containerRef, selector, onArrowRight, onArrowLeft, onEnter]);
 }

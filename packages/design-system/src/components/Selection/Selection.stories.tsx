@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
@@ -310,24 +310,24 @@ export const BulkActions: StoryFn<typeof meta> = () => {
 
 /**
  * Emptying the list strands the ids that were selected, because the component keeps them on
- * purpose — the effect here is the cleanup pattern, dropping any id the list no longer has.
+ * purpose — the data-change handler drops any id the replacement list no longer has.
  */
 export const EmptyAndPartial: StoryFn<typeof meta> = () => {
   const [items, setItems] = useState<Cluster[]>(clusters);
-  const [selected, setSelected] = useState<string[]>(['1', 'ghost']);
+  const [selected, setSelected] = useState<string[]>(['1']);
 
-  // Demonstrate cleanup pattern: drop ids that no longer exist in items.
-  useEffect(() => {
-    setSelected(prev => prev.filter(id => items.some(c => c.id === id)));
-  }, [items]);
+  const replaceItems = (next: Cluster[]) => {
+    setItems(next);
+    setSelected(prev => prev.filter(id => next.some(c => c.id === id)));
+  };
 
   return (
     <VStack gap={16}>
       <HStack gap={8}>
-        <Button onClick={() => setItems([])} variant='outline'>
+        <Button onClick={() => replaceItems([])} variant='outline'>
           Clear items
         </Button>
-        <Button onClick={() => setItems(clusters)} variant='outline'>
+        <Button onClick={() => replaceItems(clusters)} variant='outline'>
           Restore items
         </Button>
       </HStack>
