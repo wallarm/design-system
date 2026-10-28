@@ -20,12 +20,7 @@ export const IpAddress: FC<IpAddressProps> = ({ className, children }) => {
   return (
     <OverflowTooltip>
       <OverflowTooltipTrigger asChild>
-        <Code
-          size='m'
-          data-slot='ip-address'
-          data-testid={testId}
-          className={cn('truncate', className)}
-        >
+        <Code size='m' data-slot='ip-address' data-testid={testId} className={cn('truncate')}>
           {children}
         </Code>
       </OverflowTooltipTrigger>

@@ -24,11 +24,8 @@ export const CountryName: FC<CountryNameProps> = ({ className, ...props }) => {
           data-testid={testId}
           lineClamp={1}
           truncate
-          asChild
         >
-          <span {...props} className={className}>
-            {countryData?.name ?? code}
-          </span>
+          {countryData?.name ?? code}
         </Text>
       </OverflowTooltipTrigger>
       <OverflowTooltipContent>{countryData?.name ?? code}</OverflowTooltipContent>
