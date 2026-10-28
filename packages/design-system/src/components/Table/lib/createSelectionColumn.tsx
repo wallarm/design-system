@@ -10,7 +10,7 @@ import type {
 
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
-import { useTableContext } from '../TableContext';
+import { useTableContext } from '../TableContext/useTableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
 import type { DSTableFeatures } from './dsTableFeatures';
 import { useTableValue } from './tableReactivity';
