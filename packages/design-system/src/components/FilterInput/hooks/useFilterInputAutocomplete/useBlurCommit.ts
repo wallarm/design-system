@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { type RefObject, useCallback, useLayoutEffect, useRef } from 'react';
+
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isBuildingComplete, isNoValueOperator } from '../../lib';
 import type { ChipErrorSegment, FieldMetadata, FilterOperator, UpsertCondition } from '../../types';

@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { ChevronDown } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTreeItemContext } from './TreeItemContext';
@@ -17,7 +18,7 @@ export const TreeItemIcon: FC<TreeItemIconProps> = ({ icon }) => {
   if (!collapsible && icon) {
     return (
       <div
-        className='absolute top-0 -translate-x-1/2 flex items-center justify-center bg-bg-page-bg p-2 text-text-secondary'
+        className='absolute top-0 flex -translate-x-1/2 items-center justify-center bg-bg-page-bg p-2 text-text-secondary'
         style={{ left: ICON_LEFT }}
         data-slot='tree-item-icon'
       >
@@ -28,17 +29,17 @@ export const TreeItemIcon: FC<TreeItemIconProps> = ({ icon }) => {
 
   return (
     <div
-      className='absolute top-0 -translate-x-1/2 flex items-center justify-center bg-bg-page-bg p-2'
+      className='absolute top-0 flex -translate-x-1/2 items-center justify-center bg-bg-page-bg p-2'
       style={{ left: ICON_LEFT }}
       data-slot='tree-item-icon'
     >
       {icon && (
-        <span className='inline-flex group-hover/trigger:hidden text-text-secondary'>{icon}</span>
+        <span className='inline-flex text-text-secondary group-hover/trigger:hidden'>{icon}</span>
       )}
 
       <span
         className={cn(
-          'inline-flex transition-transform duration-200 motion-reduce:transition-none group-data-[state=closed]/trigger:-rotate-90',
+          'inline-flex transition-transform duration-200 group-data-[state=closed]/trigger:-rotate-90 motion-reduce:transition-none',
           icon && 'hidden group-hover/trigger:inline-flex',
         )}
         data-slot='tree-item-chevron'

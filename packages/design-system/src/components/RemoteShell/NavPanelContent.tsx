@@ -1,9 +1,9 @@
 import type { FC } from 'react';
+
 import { NavPanelBack, NavPanelDivider, NavPanelHeader } from '../NavPanel';
 import { Text } from '../Text';
 import { HeaderActions } from './HeaderActions';
-import type { NavStackEntry } from './model';
-import { findDrillNode, useRemoteShellContext } from './model';
+import { type NavStackEntry, findDrillNode, useRemoteShellContext } from './model';
 import { NavItemsList } from './NavItemsList';
 
 interface NavigationSnapshot {
@@ -38,7 +38,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({
     return (
       <>
         {hasHeaderActions ? (
-          <div className='sticky top-0 z-10 flex shrink-0 items-center justify-between pt-2 pl-4 pb-4 bg-bg-page-bg'>
+          <div className='sticky top-0 z-10 flex shrink-0 items-center justify-between bg-bg-page-bg pt-2 pb-4 pl-4'>
             <Text size='sm' weight='medium'>
               {config.productLabel}
             </Text>

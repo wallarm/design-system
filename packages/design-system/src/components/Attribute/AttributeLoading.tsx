@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Skeleton } from '../Skeleton';
 import { AttributeLabel } from './AttributeLabel';
 import { useAttributeOrientation } from './AttributeOrientationContext';

@@ -2,6 +2,7 @@ import { foldable } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { EditorView, runScopeHandlers } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { getHttpFolds, HTTP_FOLD_ID } from '../../CodeSnippet/lib/httpFolds';
 import { createPortalRegistry } from '../lib/portalRegistry';

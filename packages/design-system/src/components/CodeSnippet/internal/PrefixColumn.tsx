@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import type { LineConfig } from '../CodeSnippetContext';
 import type { DisplayItem } from '../lib/foldUtils';

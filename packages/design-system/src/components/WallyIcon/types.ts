@@ -1,4 +1,5 @@
 import type { VariantProps } from 'class-variance-authority';
+
 import type { wallyIconVariants } from './classes';
 
 export type WallyIconStyle = 'simple' | 'circle';

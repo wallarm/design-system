@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { cva } from 'class-variance-authority';
+
 import { ChevronLeft, ChevronRight } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Button } from '../../Button';
@@ -62,7 +64,7 @@ const scrollGradientVariants = cva(
     // Sizing
     'w-8',
     // Colors & backgrounds
-    'from-white to-transparent bg-gradient-to-r',
+    'bg-gradient-to-r from-white to-transparent',
     // Interactions
     'pointer-events-none',
     // Z-index

@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
-import { createRef } from 'react';
+import { type ReactNode, createRef } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { TestIdProvider } from '../../../utils/testId';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';

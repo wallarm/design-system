@@ -1,8 +1,10 @@
 import type { FC, InputHTMLAttributes, Ref } from 'react';
+
 import type { HTMLProps } from '@ark-ui/react/factory';
 import { useFieldContext } from '@ark-ui/react/field';
 import { mergeProps } from '@ark-ui/react/utils';
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { inputVariants } from './classes';

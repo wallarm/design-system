@@ -67,7 +67,6 @@ design-system/
 │   ├── mcp-core/            # Shared MCP metadata types and schemas
 │   ├── migrator/            # Migration CLI for consumer upgrades
 │   └── configs/             # Shared configurations
-│       ├── oxlint-config/   # Shared Oxlint rules
 │       ├── playwright-config/ # Playwright test configuration
 │       ├── publishing/      # Shared semantic-release configuration
 │       ├── rsbuild-config/  # Rsbuild bundler configuration
@@ -93,7 +92,6 @@ design-system/
 - `@wallarm-org/mcp` - MCP server that gives AI assistants component metadata, props, variants, and design tokens
 - `@wallarm-org/mcp-core` - Shared types and Zod schemas for MCP metadata (bundled into `@wallarm-org/mcp`, not published)
 - `@wallarm-org/migrator` - Codemod CLI that migrates consumer apps across design-system breaking changes
-- `@wallarm-org/oxlint-config` - Shared Oxlint rules
 - `@wallarm-org/publish-scripts` - Shared semantic-release configuration
 - `@wallarm-org/typescript-config` - Shared TypeScript configurations
 - `@wallarm-org/playwright-config` - Shared Playwright test configurations
@@ -189,27 +187,43 @@ pnpm format:check     # Check formatting without writing
 pnpm typecheck        # TypeScript type checking
 ```
 
-Oxlint rules live in `packages/configs/oxlint-config/oxlint.json`, extended by
-`.oxlintrc.json`. Oxfmt uses `.oxfmtrc.json` for formatting and import sorting
-(React → external packages → `@wallarm-org/*` → relative imports). Side-effect
-imports keep their execution order. Root commands cover all packages and tooling;
-`pnpm --filter <package> lint` checks one application or the component library.
+Lint policy lives in `oxlint.config.mts`; there is no separate shared config package.
+It uses Oxlint's native correctness category for TypeScript, React, jsx-a11y,
+imports, Unicorn and Oxc. These checks use the standard `warn` severity, including
+experimental React Compiler diagnostics. Hooks ordering, undeclared/redeclared
+names, type-only imports and duplicate imports are errors; import cycles are
+warnings. This replaces the hand-maintained Biome rule mapping with upstream
+categories, so the warning set intentionally changes. Warnings do not fail CI;
+`pnpm typecheck` is still required.
 
-Formatting covers JavaScript/TypeScript, JSON/JSONC and CSS. Generated parsers,
-`*.gen.ts`, `__fixtures__`, theme CSS, build/report output, and prose files are
-excluded. The existing single quotes, semicolons, 100-column width, and 2-space
-indentation (4 for CSS) are retained.
+Tailwind uses [`eslint-plugin-better-tailwindcss`](https://github.com/schoero/eslint-plugin-better-tailwindcss)'s
+published **correctness-warn** preset, loaded directly by Oxlint. It checks
+unknown, conflicting and dynamically concatenated classes against the real v4
+stylesheet and design tokens. Only known unlayered CSS classes, Rspress's `rp-`
+namespace, and arbitrary class names in forwarding tests are exempted from the
+unknown-class check. Existing component violations remain warnings during the
+tooling migration; runtime and UI corrections are deferred to separate changes.
+The plugin is pinned because Oxlint's JavaScript plugin API is still experimental;
+no ESLint runner is needed.
 
-Migration coverage: Oxlint does not lint CSS, so the former CSS diagnostics are
-not enforced. Undeclared/redeclared names remain linted, including in TS tooling
-outside the application tsconfigs. Two valid type/value name pairs have local
-exceptions. TypeScript checking handles invalid use before declaration; the
-parser and compiler also catch duplicate parameters and invalid `super` calls.
-The former `useLiteralKeys` and
-`noUselessUndefinedInitialization` style checks are not enabled: the former needs
-type-aware linting, and the latter has no direct native equivalent. Type-aware
-Oxlint is not enabled; `pnpm typecheck` remains required. Existing warnings remain
-non-blocking, and narrowly scoped comments document pre-existing exceptions.
+`.oxfmtrc.json` keeps single quotes, semicolons, a 100-column width and 2-space
+indentation (4 for CSS). Oxfmt places `react` and its subpath imports first
+(including type imports), then uses standard import groups separated by blank
+lines. It also owns package.json field ordering and theme-aware Tailwind class
+ordering in JSX,
+`cn`, `clsx`, `cva` and `twMerge`. Side-effect imports keep their execution order.
+Long class lists can use arrays passed to `cn`; the formatter does not split
+string contents automatically. The Tailwind line-wrapping rule is intentionally
+not enabled: it conflicts with Oxfmt indentation even with loose wrapping and
+preserved whitespace. Tailwind stylistic rules are not enabled, so two
+tools never compete over class order.
+
+Root commands cover all packages and tooling; `pnpm --filter <package> lint`
+checks one application or the component library. Formatting covers
+JavaScript/TypeScript, JSON/JSONC and CSS. Generated parsers, `*.gen.ts`,
+`__fixtures__`, theme CSS, build/report output and prose files are excluded.
+Oxlint does not lint CSS or run type-aware rules. Narrow source comments retain
+intentional exceptions; Storybook render callbacks are exempt from hooks ordering.
 
 For VS Code, install the [Oxc extension](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode),
 set `editor.defaultFormatter` to `oxc.oxc-vscode`, and enable

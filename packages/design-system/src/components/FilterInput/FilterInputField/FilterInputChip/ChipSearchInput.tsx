@@ -1,5 +1,5 @@
-import type { FC } from 'react';
-import { useContext, useRef } from 'react';
+import { type FC, useContext, useRef } from 'react';
+
 import { cn } from '../../../../utils/cn';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
 import { segmentTextVariants } from './classes';
@@ -40,7 +40,7 @@ export const ChipSearchInput: FC = () => {
         onKeyDown={onInputKeyDown}
         onClick={onInputClick}
         style={{ width: `${inputWidth}px` }}
-        className='h-22 min-w-0 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0'
+        className='h-22 min-w-0 border-none bg-transparent p-0 text-sm shadow-none ring-0 outline-none'
       />
       <span
         ref={sizerRef}

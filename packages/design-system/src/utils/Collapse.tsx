@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from './cn';
 
 export interface CollapseProps extends HTMLAttributes<HTMLDivElement> {

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Collapse } from '../../utils/Collapse';
 import { useTestId } from '../../utils/testId';
 import { useTreeItemContext } from './TreeItemContext';

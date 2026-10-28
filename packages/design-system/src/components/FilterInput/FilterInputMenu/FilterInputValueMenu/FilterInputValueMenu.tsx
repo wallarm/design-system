@@ -1,4 +1,5 @@
 import type { FC, RefObject } from 'react';
+
 import type { BadgeColor } from '../../../Badge';
 import { isValueGroup } from '../../lib';
 import { FlatValueMenu } from './FlatValueMenu';

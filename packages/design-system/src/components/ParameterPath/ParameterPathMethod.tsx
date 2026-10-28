@@ -1,8 +1,8 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import type { HttpMethodName } from '../HttpMethod';
-import { HttpMethod } from '../HttpMethod';
+import { type HttpMethodName, HttpMethod } from '../HttpMethod';
 
 interface ParameterPathMethodProps extends HTMLAttributes<HTMLSpanElement> {
   method: HttpMethodName;

@@ -1,13 +1,15 @@
 import type { FC, ReactNode } from 'react';
+
 import { useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+
 import { useTestId } from '../../utils/testId';
 
 const tourBodyVariants = cva('flex flex-col gap-2 py-12 outline-none', {
   variants: {
     type: {
       dialog: 'w-full px-24',
-      tooltip: 'pl-16 pr-48',
+      tooltip: 'pr-48 pl-16',
     },
   },
 });

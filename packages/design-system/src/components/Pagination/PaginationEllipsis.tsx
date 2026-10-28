@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
+
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';

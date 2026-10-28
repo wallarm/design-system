@@ -1,6 +1,8 @@
 import { createContext, useContext } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { act, cleanup, render, screen } from '@testing-library/react';
+
 import { PortalOutlet } from './PortalOutlet';
 import { createPortalRegistry, type PortalRegistry } from './portalRegistry';
 

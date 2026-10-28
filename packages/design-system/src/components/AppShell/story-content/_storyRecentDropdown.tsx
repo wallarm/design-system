@@ -30,7 +30,7 @@ export const RecentDropdown = () => (
       <NavRailItem icon={History} label='Recent' />
     </DropdownMenuTrigger>
 
-    <DropdownMenuContent className='w-304 h-290 overscroll-none'>
+    <DropdownMenuContent className='h-290 w-304 overscroll-none'>
       <DropdownMenuLabel className='sticky top-0 z-10 bg-bg-surface-2'>Recent</DropdownMenuLabel>
 
       {RECENT_ITEMS.map(item => (

@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { InlineEdit } from './InlineEdit';
 import { InlineEditPreviewIcon } from './InlineEditPreviewIcon';
 

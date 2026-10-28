@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Drawer, type DrawerProps } from '../Drawer';
 import { DIALOG_SIZES, DIALOG_WIDTH_CONSTRAINTS } from './constants';
 

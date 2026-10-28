@@ -1,7 +1,9 @@
 import { StrictMode } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { InlineEdit } from './InlineEdit';
 import { useInlineEdit } from './InlineEditContext';
 import { InlineEditPreview } from './InlineEditPreview';

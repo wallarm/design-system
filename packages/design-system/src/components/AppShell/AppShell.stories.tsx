@@ -1,4 +1,5 @@
 import { type FC, useEffect, useRef, useState } from 'react';
+
 import {
   createMemoryHistory,
   createRootRoute,
@@ -12,6 +13,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Bell, Home, X } from '../../icons';
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
@@ -360,7 +362,7 @@ const RevealFlowShell = () => {
       </AppShellRail>
 
       <AppShellRemote>
-        <div className='flex gap-8 absolute top-4 right-4 z-10'>
+        <div className='absolute top-4 right-4 z-10 flex gap-8'>
           <Button variant='ghost' size='small' color='neutral' onClick={handleReplay}>
             Replay animation
           </Button>
@@ -428,7 +430,7 @@ const LoginFlowShell = () => {
       )}
 
       {!showShell && (
-        <div className='absolute inset-0 flex items-center justify-center z-10'>
+        <div className='absolute inset-0 z-10 flex items-center justify-center'>
           <SplashScreen
             visible={splashVisible}
             shrinkTarget={CARD_DIMENSIONS}
@@ -489,7 +491,7 @@ const LoginFlowShell = () => {
             </AppShellRail>
 
             <AppShellRemote>
-              <div className='flex gap-8 absolute top-4 right-4 z-10'>
+              <div className='absolute top-4 right-4 z-10 flex gap-8'>
                 <Button variant='ghost' size='small' color='neutral' onClick={handleReplay}>
                   Replay animation
                 </Button>

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { jointVariants } from './classes';

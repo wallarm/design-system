@@ -1,7 +1,9 @@
 import type { FC } from 'react';
+
 import { YAxis } from 'recharts';
 import type { TickFormatter } from 'recharts/types/cartesian/CartesianAxis';
 import type { YAxisTickContentProps } from 'recharts/types/util/types';
+
 import { LINE_Y_LABEL_WIDTH } from './constants';
 import { renderAxisTick } from './lib/renderAxisTick';
 

@@ -1,5 +1,6 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ScanLine, Shapes, Zap } from '../../icons';
 import { cn } from '../../utils/cn';
 import { Button } from '../Button';

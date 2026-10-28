@@ -1,4 +1,5 @@
 import { createContext, type RefObject } from 'react';
+
 import type { TabsSize, TabsVariant } from '../types';
 
 export interface TabsSharedContextValue {

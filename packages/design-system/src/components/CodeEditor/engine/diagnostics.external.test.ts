@@ -1,6 +1,7 @@
 import type { Diagnostic } from '@codemirror/lint';
 import { Compartment, Text } from '@codemirror/state';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import {
   activeDiagnostics,
   destroyLintedViews,

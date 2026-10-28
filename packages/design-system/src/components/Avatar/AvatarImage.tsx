@@ -1,5 +1,7 @@
 import type { FC, ImgHTMLAttributes, Ref } from 'react';
+
 import { Avatar as ArkAvatar } from '@ark-ui/react/avatar';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAvatarSize } from './AvatarContext';

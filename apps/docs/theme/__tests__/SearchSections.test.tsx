@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+
 import nav from '../../docs/_nav.json';
 import { SearchSections, SearchSectionsHost } from '../SearchSections';
 

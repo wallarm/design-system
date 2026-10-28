@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { useCodeSnippet } from '../hooks';
 import { LINE_COLOR_STYLES, SIZE_LINE_HEIGHT_CLASSES } from '../lib/lineStyles';

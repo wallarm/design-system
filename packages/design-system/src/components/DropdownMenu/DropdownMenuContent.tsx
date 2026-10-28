@@ -6,8 +6,10 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+
 import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
+
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { TestIdProvider, useTestId } from '../../utils/testId';
@@ -75,10 +77,10 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           {...props}
         >
           {inputChildren}
-          <ScrollArea className={cn('flex flex-col min-h-0')} style={{ position: 'static' }}>
+          <ScrollArea className={cn('flex min-h-0 flex-col')} style={{ position: 'static' }}>
             <ScrollAreaViewport>
               {/* !min-w-0 overrides Ark UI inline min-width:fit-content that causes horizontal scroll expansion with long content */}
-              <ScrollAreaContent className={cn('flex flex-col gap-1 !min-w-0')}>
+              <ScrollAreaContent className={cn('flex !min-w-0 flex-col gap-1')}>
                 <TestIdProvider value={cascadeBase}>{menuChildren}</TestIdProvider>
               </ScrollAreaContent>
             </ScrollAreaViewport>

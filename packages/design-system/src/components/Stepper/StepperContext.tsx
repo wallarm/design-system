@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react';
+
 import { useStepsContext } from '@ark-ui/react/steps';
+
 import type { StepperStatusLabels, StepperVisualStatus } from './types';
 
 interface StepperRootContextValue {

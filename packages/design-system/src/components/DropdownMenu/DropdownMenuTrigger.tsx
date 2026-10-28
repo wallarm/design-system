@@ -1,6 +1,14 @@
-import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
-import { cloneElement, isValidElement } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  type FC,
+  type ReactNode,
+  type Ref,
+  cloneElement,
+  isValidElement,
+} from 'react';
+
 import { Menu, useMenuContext } from '@ark-ui/react/menu';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuTriggerProps

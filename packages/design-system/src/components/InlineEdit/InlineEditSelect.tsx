@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { type ReactNode, useEffect, useMemo } from 'react';
+
 import type { ListCollection } from '@ark-ui/react/collection';
+
 import { useTestId } from '../../utils/testId';
 import { createListCollection, Select, type SelectDataItem } from '../Select';
 import { useInlineEdit, useInlineEditSubmitMode } from './InlineEditContext';
@@ -61,7 +62,7 @@ export const InlineEditSelect = ({
     const hasItems = items !== undefined;
     const hasCollection = collection !== undefined;
     if (hasItems === hasCollection) {
-      // oxlint-disable-next-line no-console -- dev-only warning surface
+      // dev-only warning surface
       console.warn(
         `InlineEditSelect: provide exactly one of \`items\` or \`collection\` (got ${
           hasItems && hasCollection ? 'both' : 'neither'

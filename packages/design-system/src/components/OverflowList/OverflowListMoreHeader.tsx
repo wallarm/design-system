@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
-import type { TestableProps } from '../../utils/testId';
-import { useTestId } from '../../utils/testId';
+
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { Text, type TextProps } from '../Text';
 
 export interface OverflowListMoreHeaderProps

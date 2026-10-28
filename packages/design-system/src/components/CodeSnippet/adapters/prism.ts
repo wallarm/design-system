@@ -1,4 +1,5 @@
 import { Prism } from 'prism-react-renderer';
+
 import type { HighlightResult, PrismLanguage, SyntaxAdapter, Token, TokenType } from './types';
 
 // Make Prism available globally so we can load additional languages

@@ -1,4 +1,5 @@
 import { type FC, useCallback, useContext, useEffect, useLayoutEffect, useRef } from 'react';
+
 import {
   elementScroll,
   observeElementOffset,
@@ -8,6 +9,7 @@ import {
   useVirtualizer,
   type Virtualizer,
 } from '@tanstack/react-virtual';
+
 import { WindowScrollRootContext } from '../hooks/useWindowScrollRoot';
 import {
   getOffsetTopInScrollRoot,

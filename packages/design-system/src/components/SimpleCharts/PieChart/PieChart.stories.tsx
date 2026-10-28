@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Check, FilterX, Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Badge, type BadgeColor } from '../../Badge';
@@ -309,7 +311,7 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => {
               <PieChartLegendItem key={row.name} name={row.name}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className='min-w-0 flex-1 truncate text-xs font-mono text-text-primary pointer-events-auto'>
+                    <span className='pointer-events-auto min-w-0 flex-1 truncate font-mono text-xs text-text-primary'>
                       {row.name}
                     </span>
                   </TooltipTrigger>
@@ -354,7 +356,7 @@ export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => {
               <PieChartLegendItem key={row.name} name={row.name}>
                 <OverflowTooltip>
                   <OverflowTooltipTrigger>
-                    <span className='min-w-0 flex-1 truncate text-xs font-mono text-text-primary pointer-events-auto'>
+                    <span className='pointer-events-auto min-w-0 flex-1 truncate font-mono text-xs text-text-primary'>
                       {row.name}
                     </span>
                   </OverflowTooltipTrigger>
@@ -683,7 +685,7 @@ export const PercentVariants: StoryFn<typeof meta> = () => {
   );
 
   return (
-    <div className='flex flex-col gap-16 w-400'>
+    <div className='flex w-400 flex-col gap-16'>
       {renderChart('split', 'Split — value primary, % secondary (default)')}
       {renderChart('muted', 'Muted — both tokens secondary')}
       {renderChart('inherit', 'Inherit — follows PieChartLegendValue color')}
@@ -734,7 +736,7 @@ export const Palette: StoryFn<typeof meta> = () => {
           <PieChartLegend>
             {data.map(row => (
               <PieChartLegendItem key={row.name} name={row.name}>
-                <span className='inline-flex items-center gap-6 text-xs font-mono text-text-primary capitalize'>
+                <span className='inline-flex items-center gap-6 font-mono text-xs text-text-primary capitalize'>
                   <span
                     aria-hidden
                     className='inline-block size-8 rounded-2'

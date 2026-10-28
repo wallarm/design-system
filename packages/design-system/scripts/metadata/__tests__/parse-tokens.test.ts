@@ -1,6 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { parseTokens } from '../parse-tokens.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

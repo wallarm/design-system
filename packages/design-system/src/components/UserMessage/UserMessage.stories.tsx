@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { UserMessage, UserMessageBubble, UserMessageShowMore } from '.';
 import { Copyable, CopyableIcon } from '../Copyable';
 import { MessageAction, MessageActions, MessageTimestamp } from '../MessageActions';

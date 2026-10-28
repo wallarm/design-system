@@ -1,5 +1,5 @@
-import type { FC, HTMLAttributes, KeyboardEvent, Ref } from 'react';
-import { useState } from 'react';
+import { type FC, type HTMLAttributes, type KeyboardEvent, type Ref, useState } from 'react';
+
 import { Pencil } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';

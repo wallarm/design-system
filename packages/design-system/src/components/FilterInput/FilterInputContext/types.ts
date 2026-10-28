@@ -1,4 +1,5 @@
 import type { ChangeEvent, KeyboardEvent, Ref, RefObject } from 'react';
+
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
 import type { FilterInputChipData } from '../types';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { areItemsShallowEqual, resolveVisibleItems } from '../OverflowList.helpers';
 
 describe('areItemsShallowEqual', () => {

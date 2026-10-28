@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { getCompiledSchema, loadSchemaLibrary, parseJson } from './loadSchema';
 
 describe('loadSchemaLibrary', () => {

@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { Chat } from '../Chat/Chat';
 import { Conversation, type ConversationProps } from './Conversation';
 import { ConversationContent } from './ConversationContent';

@@ -1,8 +1,8 @@
 {
   "name": "@wallarm-org/rsbuild-config",
   "version": "0.0.0",
-  "type": "module",
   "private": true,
+  "type": "module",
   "main": "./rsbuild.config.ts",
   "exports": {
     "./*": "./*.ts"

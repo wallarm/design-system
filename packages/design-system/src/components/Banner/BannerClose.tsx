@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, FC, Ref } from 'react';
+
 import { X } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';

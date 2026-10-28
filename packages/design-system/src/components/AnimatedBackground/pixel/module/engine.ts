@@ -20,10 +20,13 @@ import {
   parseColor,
 } from './engine-colors';
 import { buildGrid, sweepX } from './engine-grid';
-import type { GameEngineHost, GamePlugins } from './game-logic';
-import { CANNON_HALF_W, createGameLogic } from './game-logic';
-import type { GameRenderCtx, RenderPlugins } from './game-renderer';
-import { createGameRenderer } from './game-renderer';
+import {
+  type GameEngineHost,
+  type GamePlugins,
+  CANNON_HALF_W,
+  createGameLogic,
+} from './game-logic';
+import { type GameRenderCtx, type RenderPlugins, createGameRenderer } from './game-renderer';
 import type { EngineOptions, GameStats } from './types';
 
 /**

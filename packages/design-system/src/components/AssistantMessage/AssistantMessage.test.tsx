@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { TestIdProvider } from '../../utils/testId';
 import { ChainOfThought, ChainOfThoughtStep } from '../ChainOfThought';
 import { MessageAction, MessageActions } from '../MessageActions';

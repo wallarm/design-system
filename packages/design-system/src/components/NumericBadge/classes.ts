@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const numericBadgeVariants = cva(
-  'inline-flex w-max shrink-0 items-center justify-center whitespace-nowrap rounded-full font-mono font-medium transition-colors',
+  'inline-flex w-max shrink-0 items-center justify-center rounded-full font-mono font-medium whitespace-nowrap transition-colors',
   {
     variants: {
       type: {
@@ -25,7 +25,7 @@ export const numericBadgeVariants = cva(
         true: '',
       },
       clickable: {
-        true: 'cursor-pointer overlay active:outline-none active:ring-3 focus-visible:outline-none focus-visible:ring-3',
+        true: 'overlay cursor-pointer focus-visible:ring-3 focus-visible:outline-none active:ring-3 active:outline-none',
         false: '',
       },
     },
@@ -126,14 +126,14 @@ export const numericBadgeVariants = cva(
         type: 'solid',
         color: 'brand',
         className:
-          'hover:overlay-states-on-fill-hover active:overlay-states-on-fill-hover active:ring-focus-brand focus-visible:ring-focus-brand',
+          'hover:overlay-states-on-fill-hover focus-visible:ring-focus-brand active:overlay-states-on-fill-hover active:ring-focus-brand',
       },
       {
         clickable: true,
         type: 'solid',
         color: 'danger',
         className:
-          'hover:overlay-states-on-fill-hover active:overlay-states-on-fill-hover active:ring-focus-destructive focus-visible:ring-focus-destructive',
+          'hover:overlay-states-on-fill-hover focus-visible:ring-focus-destructive active:overlay-states-on-fill-hover active:ring-focus-destructive',
       },
       {
         clickable: true,
@@ -162,7 +162,7 @@ export const numericBadgeVariants = cva(
       {
         clickable: true,
         type: ['secondary', 'outline'],
-        className: 'active:ring-focus-primary focus-visible:ring-focus-primary',
+        className: 'focus-visible:ring-focus-primary active:ring-focus-primary',
       },
     ],
   },

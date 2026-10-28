@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { HStack } from '../Stack';
@@ -23,7 +25,7 @@ const controlVariants = cva('flex items-center', {
   },
 });
 
-const progressVariants = cva('font-sans font-regular text-sm leading-sm', {
+const progressVariants = cva('font-regular font-sans text-sm leading-sm', {
   variants: {
     type: {
       dialog: 'text-text-secondary',

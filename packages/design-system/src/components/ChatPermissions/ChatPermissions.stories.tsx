@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Separator } from '../Separator';
 import {
   ChatPermissions,

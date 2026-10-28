@@ -2,6 +2,7 @@ import { forceLinting, forEachDiagnostic } from '@codemirror/lint';
 import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { type Mock, rs } from '@rstest/core';
+
 import {
   type DiagnosticsConfig,
   diagnosticsExtension,

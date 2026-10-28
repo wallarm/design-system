@@ -1,4 +1,5 @@
 import { type FC, type KeyboardEvent, useEffect, useRef } from 'react';
+
 import { mergeRefs } from '../../utils/mergeRefs';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { SelectSearchInput, type SelectSearchInputProps } from '../Select/SelectSearchInput';

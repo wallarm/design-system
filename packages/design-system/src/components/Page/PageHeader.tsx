@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -17,7 +18,7 @@ export const PageHeader: FC<PageHeaderProps> = ({ ref, sticky, children, classNa
       data-testid={testId}
       data-slot='page-header'
       className={cn(
-        'flex items-center px-24 py-8 gap-12 has-[+[data-slot=page-content]]:pb-6',
+        'flex items-center gap-12 px-24 py-8 has-[+[data-slot=page-content]]:pb-6',
         sticky && 'sticky top-0 z-10 bg-bg-surface-2',
         className,
       )}

@@ -1,5 +1,6 @@
 // Only import types from highlight.js — the library is loaded lazily via dynamic import
 import type { HLJSApi } from 'highlight.js';
+
 import type {
   HighlightJsLanguage,
   HighlightResult,

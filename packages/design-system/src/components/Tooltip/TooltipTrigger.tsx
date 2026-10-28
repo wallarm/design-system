@@ -1,5 +1,7 @@
 import type { ComponentPropsWithoutRef, ComponentRef, FC, Ref } from 'react';
+
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export type TooltipTriggerProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Trigger> &

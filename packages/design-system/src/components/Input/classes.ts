@@ -1,9 +1,10 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const inputVariants = cva(
   cn(
-    'flex w-full px-12 rounded-8 border bg-component-input-bg',
+    'flex w-full rounded-8 border bg-component-input-bg px-12',
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
     // `line-height` isn't reliably inherited onto `::placeholder` across
     // browsers (Chrome resolves it to the UA-default `normal`, not the
@@ -12,7 +13,7 @@ export const inputVariants = cva(
     // to real typed text instead of sitting a couple pixels lower.
     'placeholder:text-sm',
     'shadow-xs transition-[color,border,box-shadow]',
-    'focus-visible:outline-none focus-visible:ring-3',
+    'focus-visible:ring-3 focus-visible:outline-none',
 
     'disabled:aria-disabled:cursor-not-allowed disabled:aria-disabled:opacity-50',
   ),

@@ -13,7 +13,7 @@ export type BannerVariant = 'primary' | 'secondary' | 'destructive' | 'info' | '
  * (light-mode) mapping; revisit if dark-mode behavior is ever specced.
  */
 export const bannerVariants = cva(
-  'font-sans flex w-full items-start justify-between gap-8 overflow-hidden pl-16 pr-12 py-12',
+  'flex w-full items-start justify-between gap-8 overflow-hidden py-12 pr-12 pl-16 font-sans',
   {
     variants: {
       variant: {
@@ -34,7 +34,7 @@ export const bannerVariants = cva(
 // the icon block so the banner height is identical with and without a leading
 // icon. Truncation (`truncate` for 1 line / `line-clamp-N` for more) is applied
 // by the component based on the `lineClamp` prop.
-export const bannerTitleVariants = cva('text-sm font-medium py-2 min-w-0 max-w-full', {
+export const bannerTitleVariants = cva('max-w-full min-w-0 py-2 text-sm font-medium', {
   variants: {
     variant: {
       primary: 'text-text-primary-alt',

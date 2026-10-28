@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Skeleton } from '../Skeleton';
@@ -38,7 +39,7 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
               <Td
                 key={column.id}
                 className={cn(
-                  'px-16 py-8 border-b border-r border-border-primary-light',
+                  'border-r border-b border-border-primary-light px-16 py-8',
                   position === 'end' && rowIdx === lastRowIdx && 'border-b-0',
                 )}
                 style={{ width: column.getSize() }}

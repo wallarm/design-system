@@ -1,7 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
 import { prepare, stampVersions } from '@wallarm-org/publish-scripts/stamp-migrations.mjs';
 
 const versions = { latest: '3.0.0', migrations: { a: '2.0.0', b: '3.0.0' } };

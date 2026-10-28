@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import type { PaginationPageChangeDetails, PaginationPageSizeChangeDetails } from '../types';
 
 interface ClientPagination<T> {

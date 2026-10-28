@@ -6,8 +6,10 @@ import {
   type Ref,
   useMemo,
 } from 'react';
+
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
+
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -70,7 +72,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'min-h-(--popover-min-height)',
             'max-h-[clamp(var(--popover-min-height,0px),var(--available-height),var(--popover-max-height))]',
             // Visual
-            'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary',
+            'rounded-12 border border-border-primary-light bg-bg-surface-2 p-12 text-text-primary shadow-md',
             // Leveling: layer-aware so a popover opened inside a nested
             // drawer/dialog stacks above that dialog's positioner — zag sets
             // --layer-index inline on this node when the popover opens, and
@@ -85,7 +87,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             // scroll would otherwise move the page underneath.
             'overscroll-contain',
             // Animations
-            'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
+            'origin-[--radix-tooltip-content-transform-origin] animate-in fade-in-0 zoom-in-95',
             // Animation closed
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             // Animation bottom

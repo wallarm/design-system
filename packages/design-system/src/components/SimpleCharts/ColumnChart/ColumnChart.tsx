@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactElement, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { useLineChartActiveKey } from '../LineChart/hooks/useLineChartActiveKey';

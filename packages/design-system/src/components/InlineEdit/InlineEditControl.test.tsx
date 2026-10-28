@@ -1,9 +1,11 @@
 // InlineEditControl.test.tsx
 
 import { StrictMode, useState } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { InlineEdit } from './InlineEdit';
 import {
   type InlineEditSubmitMode,

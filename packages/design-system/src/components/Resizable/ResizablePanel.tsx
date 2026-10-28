@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { Panel, type PanelProps } from 'react-resizable-panels';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 

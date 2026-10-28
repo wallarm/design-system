@@ -1,5 +1,7 @@
 import type { FC, ReactElement } from 'react';
+
 import { Portal, useTourContext } from '@ark-ui/react';
+
 import { TestIdProvider } from '../../utils/testId';
 import { TourBody } from './TourBody';
 import { TourClose } from './TourClose';

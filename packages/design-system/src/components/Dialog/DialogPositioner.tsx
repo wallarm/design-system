@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
+
 import { cn } from '../../utils/cn';
 import { type DrawerPositionerProps, drawerPositionerVariants } from '../Drawer';
 
@@ -10,7 +12,7 @@ export const DialogPositioner: FC<DialogPositionerProps> = ({ children }) => (
     className={cn(
       drawerPositionerVariants({ isResizing: false }),
       'fixed inset-0',
-      'flex flex-col justify-center items-center p-32',
+      'flex flex-col items-center justify-center p-32',
       'h-full min-h-0',
     )}
   >

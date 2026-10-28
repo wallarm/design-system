@@ -7,6 +7,7 @@ import {
 } from '@codemirror/language';
 import type { EditorState } from '@codemirror/state';
 import { type Input, parseMixed, type SyntaxNode } from '@lezer/common';
+
 import type { CodeEditorHttpContext } from '../../../types';
 import { jsonEditorLanguage } from '../json';
 import { parser } from './parser';

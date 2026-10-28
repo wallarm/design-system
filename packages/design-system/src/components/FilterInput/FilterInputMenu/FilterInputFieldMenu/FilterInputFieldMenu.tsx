@@ -1,4 +1,5 @@
 import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
+
 import { cn } from '../../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../../utils/testId';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
@@ -153,7 +154,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
       >
         <DropdownMenuContent
           ref={menuRef}
-          className={cn('w-[300px] max-h-[430px]', className)}
+          className={cn('max-h-[430px] w-[300px]', className)}
           data-slot='filter-input-field-menu'
           data-testid={testId}
           data-filter-input-menu='true'

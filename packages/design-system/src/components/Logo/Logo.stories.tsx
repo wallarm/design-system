@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { HStack, VStack } from '../Stack';
 import { Logo, type LogoProps } from './Logo';
 

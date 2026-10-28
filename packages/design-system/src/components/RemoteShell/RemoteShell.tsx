@@ -1,9 +1,19 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  type FC,
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
-import type { NavConfig, NavConfigDrill } from './model';
 import {
+  type NavConfig,
+  type NavConfigDrill,
   findFirstLinkPath,
   matchNav,
   notifyPathnameChanged,
@@ -88,7 +98,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
   const hasOnNavigate = onNavigate !== undefined;
   useEffect(() => {
     if (isControlled && !hasOnNavigate && process.env.NODE_ENV !== 'production') {
-      // oxlint-disable-next-line no-console -- dev-only misuse warning
+      // dev-only misuse warning
       console.warn(
         '[RemoteShell] `pathname` is controlled but `onNavigate` is missing: shell navigations will update `window.history` only, and the shell will keep showing the old route. Pass `onNavigate` to route them through your router.',
       );
@@ -239,7 +249,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
           data-slot='remote-shell'
           data-testid={testId}
           className={cn(
-            'grid h-full overflow-hidden overscroll-none [grid-template-areas:"panel_breadcrumb""panel_content"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr]',
+            'grid h-full [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] overflow-hidden overscroll-none [grid-template-areas:"panel_breadcrumb""panel_content"]',
             '[&:has([data-slot=page-header])_[data-slot=remote-shell-breadcrumb]]:pb-4',
             '[&:has([data-slot=remote-shell-breadcrumb])_[data-slot=page-header]]:pt-4',
             className,

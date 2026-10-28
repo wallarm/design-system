@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useFilterInputContext } from '../FilterInputContext';
 import { filterInputInputVariants } from './classes';
 

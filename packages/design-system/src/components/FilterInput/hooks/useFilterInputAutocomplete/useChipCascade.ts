@@ -1,5 +1,5 @@
-import type { MutableRefObject } from 'react';
-import { useCallback } from 'react';
+import { type MutableRefObject, useCallback } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { chipIdToConditionIndex, SEGMENT_TO_MENU } from '../../lib';
 import type {

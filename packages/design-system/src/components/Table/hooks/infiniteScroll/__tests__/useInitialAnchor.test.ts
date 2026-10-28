@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook, waitFor } from '@testing-library/react';
+
 import { useInitialAnchor } from '../useInitialAnchor';
 
 const rows = (...ids: string[]) => ids.map(id => ({ id }));

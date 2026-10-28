@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const SparkpostNeutral: FC<SvgIconProps> = props => (

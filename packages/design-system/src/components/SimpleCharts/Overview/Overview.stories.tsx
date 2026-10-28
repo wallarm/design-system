@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Badge } from '../../Badge';
 import { BarList } from '../BarList/BarList';
@@ -200,7 +201,7 @@ const MetricCard = () => (
  * `LineChart` over time, a `HorizontalBarStack` composition and a bare `Metric`.
  */
 export const Default: StoryFn<typeof meta> = () => (
-  <div className='flex flex-col gap-16 w-832'>
+  <div className='flex w-832 flex-col gap-16'>
     <div className='grid grid-cols-2 gap-16'>
       <BarChartCard />
       <PieChartCard />

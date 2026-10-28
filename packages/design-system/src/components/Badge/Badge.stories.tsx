@@ -1,5 +1,7 @@
 import { Fragment } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Check, CircleCheck, Info, PenTool, X } from '../../icons';
 import { HStack } from '../Stack';
 import { Badge } from './Badge';

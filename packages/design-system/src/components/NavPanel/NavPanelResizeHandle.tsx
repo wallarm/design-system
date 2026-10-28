@@ -6,22 +6,24 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { throttle } from '../../utils/throttle';
 import { useNavPanelInternalContext } from './NavPanelContext';
 
 const resizeHandleVariants = cva(
   cn(
-    'absolute right-0 top-0 bottom-0 z-1 w-12',
+    'absolute top-0 right-0 bottom-0 z-1 w-12',
     'translate-x-1/2',
-    'outline-none cursor-ew-resize',
+    'cursor-ew-resize outline-none',
     'flex items-center justify-center',
 
     // pseudo-element (resize bar)
     'before:content-[""]',
     'before:block',
-    'before:w-3 before:h-full',
+    'before:h-full before:w-3',
     'before:rounded-full',
     'before:bg-bg-fill-brand',
     'before:transition-opacity before:duration-150',

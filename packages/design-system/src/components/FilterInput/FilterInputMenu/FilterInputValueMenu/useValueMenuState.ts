@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { FilterInputDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import type { ValueOption } from './FilterInputValueMenu';

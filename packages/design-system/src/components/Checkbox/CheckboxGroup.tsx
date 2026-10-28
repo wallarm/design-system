@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { Checkbox as ArkUiCheckbox } from '@ark-ui/react/checkbox';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -9,9 +11,9 @@ const checkboxGroupVariants = cva('flex flex-col gap-8', {
     variant: {
       default: cn('data-disabled:[&_[data-part=root]]:opacity-50'),
       card: cn(
-        '[&_[data-part=root]]:py-12 [&_[data-part=root]]:pl-12 [&_[data-part=root]]:pr-16',
+        '[&_[data-part=root]]:py-12 [&_[data-part=root]]:pr-16 [&_[data-part=root]]:pl-12',
         '[&_[data-part=root]]:rounded-8 [&_[data-part=root]]:border [&_[data-part=root]]:bg-bg-surface-2',
-        '[&_[data-part=root]]:transition-colors [&_[data-part=root]]:overlay',
+        '[&_[data-part=root]]:overlay [&_[data-part=root]]:transition-colors',
 
         // State ---- unchecked
         '[&_[data-part=root][data-state=unchecked]]:border-border-primary',

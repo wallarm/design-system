@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+
 import { ParameterPath } from '../ParameterPath';
 import * as actualTruncation from '../useParameterPathTruncation' with { rstest: 'importActual' };
 

@@ -1,4 +1,5 @@
 import { describe, expect, it, rs } from '@rstest/core';
+
 import { adjustTextareaHeight } from './useAutoResize';
 
 function makeTextarea({

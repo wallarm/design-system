@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { selectFooterVariants } from './classes';

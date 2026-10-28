@@ -1,5 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react';
+
 import type { CollectionItem } from '@ark-ui/react/collection';
+
 import { useTestId } from '../../utils/testId';
 import { SelectGroup } from '../Select/SelectGroup';
 import { SelectGroupLabel } from '../Select/SelectGroupLabel';

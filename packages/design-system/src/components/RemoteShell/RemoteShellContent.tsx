@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Loader } from '../Loader';
@@ -25,7 +26,7 @@ export const RemoteShellContent: FC<RemoteShellContentProps> = ({
       data-slot='remote-shell-content'
       data-testid={testId}
       className={cn(
-        '[grid-area:content] min-h-0 overflow-auto overscroll-none [scrollbar-width:thin]',
+        'min-h-0 [scrollbar-width:thin] overflow-auto overscroll-none [grid-area:content]',
         isLoading && 'flex items-center justify-center',
         className,
       )}

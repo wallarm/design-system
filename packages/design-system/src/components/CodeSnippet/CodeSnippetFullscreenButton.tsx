@@ -1,4 +1,5 @@
 import type { FC, MouseEventHandler, Ref } from 'react';
+
 import { Maximize } from '../../icons/Maximize';
 import { Minimize } from '../../icons/Minimize';
 import { useTestId } from '../../utils/testId';

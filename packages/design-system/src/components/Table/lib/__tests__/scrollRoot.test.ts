@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { getScrollRoot } from '../scrollRoot';
 
 const mount = (style: Partial<CSSStyleDeclaration>, size?: { client: number; scroll: number }) => {

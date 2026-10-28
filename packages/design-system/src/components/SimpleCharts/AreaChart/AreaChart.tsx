@@ -6,7 +6,9 @@ import {
   useMemo,
   useRef,
 } from 'react';
+
 import type { SyncMethod } from 'recharts/types/synchronisation/types';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { useLineChartActiveKey } from '../LineChart/hooks/useLineChartActiveKey';

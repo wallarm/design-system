@@ -1,5 +1,7 @@
 import type { AnchorHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -26,7 +28,7 @@ export const TopHeaderLogo: FC<TopHeaderLogoProps> = ({
       data-slot='top-header-logo'
       data-testid={testId}
       className={cn(
-        'overlay inline-flex items-center gap-6 rounded-6 px-6 py-4 text-sm font-semibold outline-none transition-colors',
+        'overlay inline-flex items-center gap-6 rounded-6 px-6 py-4 text-sm font-semibold transition-colors outline-none',
         'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
         className,
       )}

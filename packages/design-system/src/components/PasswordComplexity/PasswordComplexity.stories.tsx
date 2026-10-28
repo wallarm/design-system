@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Input } from '../Input';
 import { PasswordComplexity, type PasswordComplexityItem } from './PasswordComplexity';
 import { passwordValidators } from './validators';
@@ -96,7 +98,7 @@ export const Interactive: StoryFn<typeof meta> = () => {
   ];
 
   return (
-    <div className='flex flex-col gap-16 w-[320px]'>
+    <div className='flex w-[320px] flex-col gap-16'>
       <Input
         type='password'
         placeholder='New password...'

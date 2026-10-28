@@ -2,6 +2,7 @@ import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { composeStories } from 'storybook-react-rsbuild';
+
 import * as plain from '../CodeSnippet/adapters/plain' with { rstest: 'importActual' };
 import * as stories from './CodeEditor.stories';
 

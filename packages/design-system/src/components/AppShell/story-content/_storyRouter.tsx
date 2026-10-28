@@ -1,4 +1,5 @@
 import { createContext, type FC, type ReactNode, useCallback, useContext, useState } from 'react';
+
 import {
   createMemoryHistory,
   createRootRoute,
@@ -8,6 +9,7 @@ import {
   useNavigate,
   useRouterState,
 } from '@tanstack/react-router';
+
 import { deriveProduct, type Product, productLandingPath } from './_storyLib';
 
 // Story-only harness: every story gets its own TanStack Router on a memory history,

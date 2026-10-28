@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { checkFile, formatFileSize, formatRejection, toAcceptList, toAcceptString } from './index';
 
 const LIMITS = {

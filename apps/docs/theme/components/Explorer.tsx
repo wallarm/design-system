@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+
 import { BrowserOnly } from '@rspress/core/runtime';
 import { cn } from '@wallarm-org/design-system/utils/cn';
+import { createPortal } from 'react-dom';
+
 import { collectSlots } from './collectSlots';
 import { StoryError, StoryPlaceholder } from './StoryPreview';
 import { useInView } from './useInView';

@@ -2,18 +2,13 @@
   "name": "@wallarm-org/migrator",
   "version": "0.1.0",
   "description": "Codemod CLI that migrates consumer apps across Wallarm Design System breaking changes",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
+  "license": "MIT",
+  "author": "Wallarm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wallarm/design-system.git",
     "directory": "packages/migrator"
   },
-  "license": "MIT",
-  "author": "Wallarm",
-  "type": "module",
   "bin": {
     "migrator": "./dist/index.js"
   },
@@ -21,6 +16,11 @@
     "dist",
     "versions.json"
   ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "rslib build",
     "dev": "rslib build --watch",

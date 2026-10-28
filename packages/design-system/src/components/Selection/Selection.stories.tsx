@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { Copy, Folder, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import {

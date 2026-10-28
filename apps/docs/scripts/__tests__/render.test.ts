@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import type { ComponentMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
+
 import {
   renderChangelogPage,
   renderComponentPage,

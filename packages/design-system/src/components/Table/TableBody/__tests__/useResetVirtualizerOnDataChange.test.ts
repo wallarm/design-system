@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import { useResetVirtualizerOnDataChange } from '../useResetVirtualizerOnDataChange';
 
 const makeTable = (ids: string[]) =>

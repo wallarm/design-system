@@ -1,13 +1,16 @@
-import type {
-  FC,
-  FocusEvent,
-  HTMLAttributes,
-  KeyboardEvent,
-  MouseEvent,
-  ReactNode,
-  Ref,
+import {
+  type FC,
+  type FocusEvent,
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useEffect,
+  useMemo,
 } from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+
 import { useControlled } from '../../../hooks';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
@@ -180,7 +183,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
 
   useEffect(() => {
     if (hasDuplicateNames && process.env.NODE_ENV !== 'production') {
-      // oxlint-disable-next-line no-console -- dev-only misuse warning, stripped in production
+      // dev-only misuse warning, stripped in production
       console.warn(
         '[HorizontalBarStack] `data` contains duplicate `name` values. Names are used as the React key ' +
           'and the `data-name` hook — duplicates cause key collisions and ambiguous selectors. Provide unique names.',

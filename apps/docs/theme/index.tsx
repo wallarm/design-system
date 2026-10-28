@@ -1,5 +1,6 @@
 import './reactAriaPolyfill';
 import { useLayoutEffect } from 'react';
+
 import { BrowserOnly, useDark, usePage } from '@rspress/core/runtime';
 import {
   EditLink as OriginalEditLink,
@@ -10,6 +11,7 @@ import {
 import { DateFormatProvider } from '@wallarm-org/design-system/DateFormatProvider';
 import { ThemeProvider, useTheme } from '@wallarm-org/design-system/ThemeProvider';
 import { Toaster } from '@wallarm-org/design-system/Toast';
+
 import { NavBrand } from './NavBrand';
 import { SearchSectionsHost } from './SearchSections';
 

@@ -1,4 +1,5 @@
 import type { FC, Ref, TimeHTMLAttributes } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { messageTimestampVariants } from './classes';

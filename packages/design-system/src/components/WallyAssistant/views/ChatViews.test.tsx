@@ -1,8 +1,10 @@
 import type { ReactElement, ReactNode } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import { Activity, Brain, CircleDashed, Search, Wrench } from '../../../icons';
 import { copyText } from '../../../utils/copyText';
 import { TestIdProvider } from '../../../utils/testId';

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import { type DesignSystemMetadata, designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 
 /**

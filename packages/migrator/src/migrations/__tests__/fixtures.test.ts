@@ -1,6 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { migrateSource } from '../../lib/runner';
 import { migrations } from '../index';
 

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -14,7 +15,7 @@ export const CodeSnippetHeader: FC<CodeSnippetHeaderProps> = ({ className, ref, 
       ref={ref}
       data-slot='code-snippet-header'
       data-testid={testId}
-      className={cn('flex h-32 relative border-b border-border-primary-light', className)}
+      className={cn('relative flex h-32 border-b border-border-primary-light', className)}
       {...props}
     />
   );

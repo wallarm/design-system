@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { AnimatedBackground } from '../AnimatedBackground';
@@ -28,9 +29,9 @@ export const UtilityPage: FC<UtilityPageProps> = ({
     className={cn('min-h-screen w-full bg-component-app-shell-bg', className)}
   >
     <div className='flex w-[482px] flex-col items-center gap-32 rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80'>
-      <Logo type='full' size='md' className='self-start mb-32' />
+      <Logo type='full' size='md' className='mb-32 self-start' />
 
-      <div className='w-full flex flex-col items-start'>
+      <div className='flex w-full flex-col items-start'>
         <h1 className='font-mono text-6xl leading-7xl font-medium text-text-primary'>{title}</h1>
 
         <div className='flex flex-col items-start'>
@@ -39,7 +40,7 @@ export const UtilityPage: FC<UtilityPageProps> = ({
         </div>
       </div>
 
-      {children && <div className='w-full flex flex-col gap-8'>{children}</div>}
+      {children && <div className='flex w-full flex-col gap-8'>{children}</div>}
     </div>
   </AnimatedBackground>
 );

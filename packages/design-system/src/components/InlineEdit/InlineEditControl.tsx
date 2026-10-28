@@ -1,13 +1,16 @@
-import type {
-  FC,
-  FocusEvent,
-  HTMLAttributes,
-  KeyboardEvent,
-  MutableRefObject,
-  ReactNode,
-  Ref,
+import {
+  type FC,
+  type FocusEvent,
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type MutableRefObject,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useEffect,
+  useRef,
 } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { InlineEditActions } from './InlineEditActions';
@@ -162,7 +165,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       className={cn(
-        'w-full min-w-0 relative',
+        'relative w-full min-w-0',
         // The -7px left offset that matches InlineEditPreview's hit target
         // comes from AttributeValue (InlineEdit is only ever hosted inside
         // it — see AttributeValue's InlineEdit hosting seam), not from this

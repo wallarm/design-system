@@ -1,6 +1,8 @@
 import { act } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { FeedbackPulseProgress } from './FeedbackPulseProgress';
 
 // rs fake timers mock requestAnimationFrame + performance.now (Sinon-backed).

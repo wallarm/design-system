@@ -1,6 +1,8 @@
 import { type FC, type RefObject, useCallback, useReducer } from 'react';
+
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
+
 import { cn } from '../../utils/cn';
 import { DateInput } from '../DateInput';
 import { useCalendarContext } from './CalendarContext';
@@ -151,7 +153,7 @@ const RangeDateInputInner: FC<{
         showIcon={false}
       />
       <span
-        className='flex items-center justify-center shrink-0 basis-20 font-sans text-sm leading-sm text-text-secondary'
+        className='flex shrink-0 basis-20 items-center justify-center font-sans text-sm leading-sm text-text-secondary'
         aria-hidden='true'
       >
         →
@@ -177,7 +179,7 @@ export const CalendarInputHeader: FC<CalendarInputHeaderProps> = ({ className })
   const { isRange, readonly, showTime, timeRef, commitValue } = useCalendarContext();
 
   return (
-    <div className={cn('flex flex-1 items-center', 'pt-20 pb-4 px-20', className)}>
+    <div className={cn('flex flex-1 items-center', 'px-20 pt-20 pb-4', className)}>
       <DatePicker.Context>
         {api =>
           isRange ? (

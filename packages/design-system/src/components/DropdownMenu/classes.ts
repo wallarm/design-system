@@ -1,9 +1,10 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const dropdownMenuClassNames = cn(
   // Dimensions
-  'flex flex-col gap-1 min-w-128',
+  'flex min-w-128 flex-col gap-1',
   // Leveling: the content's computed z-index is what zag's popper mirrors
   // into the positioner's --z-index, so the layer-aware value must live
   // here, not on the positioner. Zag's dismissable layer stack sets
@@ -20,13 +21,13 @@ export const dropdownMenuClassNames = cn(
   // chaining when the menu is scrolled to its end — applied to the content and
   // to the inner ScrollArea viewport (the actual scroller), since either can be
   // the overflow container depending on content height.
-  'overflow-y-auto overflow-x-hidden outline-none overscroll-none [&_[data-part=viewport]]:overscroll-none',
+  'overflow-x-hidden overflow-y-auto overscroll-none outline-none [&_[data-part=viewport]]:overscroll-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',
   // Animation opened
   'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
   // Animation closed
-  'data-[state=closed]:animate-out data-[state=closed]:fade-out-0  data-[state=closed]:zoom-out-95',
+  'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
   // Animation sides
   'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
 );
@@ -36,7 +37,7 @@ export const dropdownMenuItemVariants = cva(
     // Base
     'flex items-center gap-8 rounded-6 px-8 py-6 text-sm',
     // Misc
-    'relative cursor-pointer select-none outline-none transition-colors',
+    'relative cursor-pointer transition-colors outline-none select-none',
     // States
     'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     // Icons

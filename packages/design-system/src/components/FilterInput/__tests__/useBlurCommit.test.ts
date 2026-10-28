@@ -1,6 +1,8 @@
 import { useRef } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import type { BuildingBase } from '../hooks/useFilterInputAutocomplete/useAutocompleteState';
 import { useBlurCommit } from '../hooks/useFilterInputAutocomplete/useBlurCommit';
 import type { FieldMetadata, FilterOperator } from '../types';

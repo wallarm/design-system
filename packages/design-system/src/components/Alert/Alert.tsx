@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import type { AlertColor } from './AlertIcon';
 import { ALERT_MAX_WIDTH, ALERT_MIN_WIDTH } from './const';
@@ -7,15 +9,15 @@ import { ALERT_MAX_WIDTH, ALERT_MIN_WIDTH } from './const';
 export type { AlertColor };
 
 const alertVariants = cva(
-  ['font-sans flex items-start gap-8', 'rounded-12 border-1', 'pl-16 pr-12 py-12'],
+  ['flex items-start gap-8 font-sans', 'rounded-12 border-1', 'py-12 pr-12 pl-16'],
   {
     variants: {
       color: {
-        primary: 'bg-bg-surface-2 border-border-primary',
-        destructive: 'bg-bg-light-danger border-border-danger',
-        info: 'bg-bg-light-info border-border-info',
-        warning: 'bg-bg-light-warning border-border-warning',
-        success: 'bg-bg-light-success border-border-success',
+        primary: 'border-border-primary bg-bg-surface-2',
+        destructive: 'border-border-danger bg-bg-light-danger',
+        info: 'border-border-info bg-bg-light-info',
+        warning: 'border-border-warning bg-bg-light-warning',
+        success: 'border-border-success bg-bg-light-success',
       },
     },
     defaultVariants: {

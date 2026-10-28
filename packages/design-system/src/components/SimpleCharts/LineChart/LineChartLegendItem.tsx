@@ -9,6 +9,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { lineChartLegendItemVariants } from './classes';

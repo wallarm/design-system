@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import type { Token } from '../adapters/types';
 import { MIN_HIDDEN_LINES_THRESHOLD } from '../CodeSnippetContext';
 import { LINE_COLOR_STYLES, LINE_TEXT_STYLE_CLASSES } from './lineStyles';

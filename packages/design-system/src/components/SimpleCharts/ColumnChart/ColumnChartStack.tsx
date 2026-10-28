@@ -1,5 +1,7 @@
 import { type FC, useContext } from 'react';
+
 import { Bar, type BarShapeProps, BarStack, usePlotArea } from 'recharts';
+
 import { useTestId } from '../../../utils/testId';
 import { CHART_PALETTE_FILL, resolveChartColor } from '../lib/chartPalette';
 import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';

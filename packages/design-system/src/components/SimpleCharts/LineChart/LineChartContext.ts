@@ -1,5 +1,7 @@
 import { createContext, type RefObject } from 'react';
+
 import type { SyncMethod } from 'recharts/types/synchronisation/types';
+
 import { makeIsHoverSyncTarget } from '../lib/hoverSync';
 import type { ChartColor } from '../types';
 

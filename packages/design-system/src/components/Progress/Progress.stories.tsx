@@ -1,8 +1,8 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { VStack } from '../Stack';
 import { ProgressColorEnum } from './constants';
-import type { ProgressProps } from './Progress';
-import { Progress } from './Progress';
+import { type ProgressProps, Progress } from './Progress';
 
 const DESCRIPTION = [
   'A linear bar for an operation you can measure, or a long or multi-step one where watching it advance is the reassurance — a short in-context wait is a `Loader`, and a page loading a known layout is `Skeleton`.',

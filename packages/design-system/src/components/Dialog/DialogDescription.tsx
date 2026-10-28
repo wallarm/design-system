@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { DrawerDescription, type DrawerDescriptionProps } from '../Drawer';
 
 type DialogDescriptionProps = DrawerDescriptionProps;

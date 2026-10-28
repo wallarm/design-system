@@ -1,9 +1,22 @@
 import { createElement } from 'react';
+
 import { foldService } from '@codemirror/language';
-import type { EditorState, Extension, Range, SelectionRange, Transaction } from '@codemirror/state';
-import { EditorSelection, Facet, Prec, StateEffect, StateField } from '@codemirror/state';
-import type { BlockInfo, DecorationSet, ViewUpdate } from '@codemirror/view';
 import {
+  type EditorState,
+  type Extension,
+  type Range,
+  type SelectionRange,
+  type Transaction,
+  EditorSelection,
+  Facet,
+  Prec,
+  StateEffect,
+  StateField,
+} from '@codemirror/state';
+import {
+  type BlockInfo,
+  type DecorationSet,
+  type ViewUpdate,
   Decoration,
   EditorView,
   GutterMarker,
@@ -12,10 +25,14 @@ import {
   ViewPlugin,
   WidgetType,
 } from '@codemirror/view';
+
 import { FoldSummary } from '../../CodeSnippet/internal/FoldSummary';
 import { FoldToggle } from '../../CodeSnippet/internal/FoldToggle';
-import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
-import { getFoldSummaryLabel, validateFolds } from '../../CodeSnippet/lib/foldUtils';
+import {
+  type FoldRegion,
+  getFoldSummaryLabel,
+  validateFolds,
+} from '../../CodeSnippet/lib/foldUtils';
 import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorFolds } from '../types';
 

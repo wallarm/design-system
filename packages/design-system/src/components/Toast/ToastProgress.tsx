@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useRef, useState } from 'react';
+
 import { cn } from '../../utils/cn';
 
 interface ToastProgressProps {
@@ -42,7 +43,7 @@ export const ToastProgress: FC<ToastProgressProps> = ({ duration }) => {
   return (
     <div
       ref={containerRef}
-      className={cn('absolute inset-0 rounded-16 overflow-hidden pointer-events-none')}
+      className={cn('pointer-events-none absolute inset-0 overflow-hidden rounded-16')}
     >
       <div
         className='h-full bg-states-primary-alt-default-alt transition-none'

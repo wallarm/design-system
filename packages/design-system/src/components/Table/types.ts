@@ -1,5 +1,7 @@
 import type { ReactNode, Ref } from 'react';
+
 import type { Column, Row, RowData, TableFeatures } from '@tanstack/react-table';
+
 import type { TestableProps } from '../../utils/testId';
 import type { DSTableFeatures } from './lib/dsTableFeatures';
 

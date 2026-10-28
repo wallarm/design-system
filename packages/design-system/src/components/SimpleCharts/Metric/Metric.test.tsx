@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
+
 import { Chart } from '../Chart';
 import { Metric } from './Metric';
 import { MetricCaption } from './MetricCaption';

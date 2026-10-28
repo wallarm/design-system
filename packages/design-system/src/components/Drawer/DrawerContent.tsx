@@ -1,5 +1,7 @@
 import { type CSSProperties, type FC, type ReactNode, type Ref, useContext } from 'react';
+
 import { Dialog } from '@ark-ui/react/dialog';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { drawerContentVariants } from './classes';

@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
+
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { TabsSharedContextProvider } from './TabsSharedContext';
