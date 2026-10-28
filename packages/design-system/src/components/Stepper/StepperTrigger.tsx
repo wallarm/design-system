@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { Steps as ArkSteps } from '@ark-ui/react/steps';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { stepperTriggerVariants } from './classes';
@@ -31,7 +33,7 @@ export const StepperTrigger: FC<StepperTriggerProps> = ({
   const { current, status, statusLabel } = useStepperItemContext();
   const testId = useTestId('trigger', testIdProp);
   if (process.env.NODE_ENV !== 'production' && rest.id !== undefined) {
-    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
+    // dev-only authoring guard (matches Stepper root).
     console.warn(
       `[Stepper] id="${rest.id}" on StepperTrigger: set trigger ids with the root \`ids.triggerId\` prop, or StepperContent's aria-labelledby points at nothing.`,
     );

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { ChevronRight } from '../../../../icons/ChevronRight';
 import { Badge } from '../../../Badge';
 import { Checkmark } from '../../../Checkmark';
@@ -54,18 +55,18 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
 
     {/* Checkbox for multi-select, checkmark for single-select */}
     {multiSelect ? (
-      <div className='flex shrink-0 items-start justify-end ml-auto'>
+      <div className='ml-auto flex shrink-0 items-start justify-end'>
         <Checkmark checkedState={isChecked} />
       </div>
     ) : isChecked ? (
-      <div className='flex shrink-0 items-start justify-end ml-auto'>
+      <div className='ml-auto flex shrink-0 items-start justify-end'>
         <Checkmark checkedState={true} />
       </div>
     ) : null}
 
     {/* Submenu arrow */}
     {option.hasSubmenu && !multiSelect && (
-      <div className='flex items-center text-text-secondary ml-auto'>
+      <div className='ml-auto flex items-center text-text-secondary'>
         <ChevronRight />
       </div>
     )}

@@ -1,4 +1,5 @@
 import type { ComponentProps, FC } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { Badge } from '../Badge';
 

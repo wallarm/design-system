@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+
 import type { FrontMatterMeta, SidebarData } from '@rspress/core';
 import {
   isEqualPath,
@@ -13,6 +14,7 @@ import { Link } from '@rspress/core/theme-original';
 import { Badge } from '@wallarm-org/design-system/Badge';
 import { Card } from '@wallarm-org/design-system/Card';
 import { cn } from '@wallarm-org/design-system/utils/cn';
+
 import { CARD, STRETCHED } from './TemplateGallery';
 
 export interface OverviewCard {

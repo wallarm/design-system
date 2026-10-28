@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cn } from '../../utils/cn';
 
 type KbdGroupProps = HTMLAttributes<HTMLDivElement>;

@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { ImageCropper as ArkImageCropper } from '@ark-ui/react/image-cropper';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { useImageCropperInternal, useImageCropperPartId } from './ImageCropperProvider';
@@ -44,7 +46,7 @@ export const ImageCropperSelection: FC<ImageCropperSelectionProps> = ({
       data-slot='image-cropper-selection'
       data-testid={testId}
       className={cn(
-        'outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-focus-primary',
+        'outline-none focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:ring-inset',
         className,
       )}
     />

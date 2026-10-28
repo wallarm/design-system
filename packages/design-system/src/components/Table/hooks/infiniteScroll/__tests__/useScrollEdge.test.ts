@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import { useScrollEdge } from '../useScrollEdge';
 
 interface FakeEl {

@@ -1,7 +1,9 @@
-import { describe, expect, it } from '@rstest/core';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
+
 import {
   type AssetEntry,
   CANVAS_SAMPLER,

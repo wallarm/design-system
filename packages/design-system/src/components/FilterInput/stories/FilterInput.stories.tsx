@@ -1,6 +1,8 @@
 import type React from 'react';
 import { useState } from 'react';
+
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+
 import { FilterInput } from '../FilterInput';
 import {
   createStatusCodeInputFilter,

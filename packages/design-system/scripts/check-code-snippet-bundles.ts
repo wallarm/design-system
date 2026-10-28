@@ -1,10 +1,11 @@
-import { type Rspack, rspack } from '@rsbuild/core';
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+
+import { type Rspack, rspack } from '@rsbuild/core';
 
 // Exercise published ESM and its export map, not TS source or a hand-written barrel.
 // Run after `pnpm build`. All async output counts: remote prefetchers may fetch it.

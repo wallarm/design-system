@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import type { LineConfig } from '../CodeSnippetContext';
 import type { DisplayItem } from '../lib/foldUtils';
@@ -17,7 +18,7 @@ export const ColorStickColumn: FC<{
           return (
             <span
               key={`fold-${item.fold.id}`}
-              className={cn(lineHeightClass, 'border-l-2 pl-12 border-transparent')}
+              className={cn(lineHeightClass, 'border-l-2 border-transparent pl-12')}
             />
           );
         }

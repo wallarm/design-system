@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import { useInView } from '../useInView';
 
 afterEach(() => {

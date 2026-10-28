@@ -1,4 +1,5 @@
 import type { FC, MouseEventHandler, Ref } from 'react';
+
 import { ChevronDown } from '../../icons/ChevronDown';
 import { ChevronUp } from '../../icons/ChevronUp';
 import { useTestId } from '../../utils/testId';

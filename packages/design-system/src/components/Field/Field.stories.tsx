@@ -1,5 +1,6 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Info } from '../../icons';
 import { Button } from '../Button';
 import { Checkbox, CheckboxDescription, CheckboxIndicator, CheckboxLabel } from '../Checkbox';

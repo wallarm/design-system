@@ -1,5 +1,7 @@
 import { memo, type ReactNode, type Ref, useCallback } from 'react';
+
 import type { Row, RowData } from '@tanstack/react-table';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DROP_INDICATOR_BASE } from './classes';
@@ -178,9 +180,9 @@ const TableRowInner = <T extends RowData>({
                 <Td
                   key={cell.id}
                   className={cn(
-                    'border-b border-border-primary-light bg-bg-surface-2 overlay',
+                    'overlay border-b border-border-primary-light bg-bg-surface-2',
                     'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-                    'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
+                    'group-has-[[data-state=open]]/row:overlay-states-primary-hover group-data-[preview-active]/row:overlay-states-primary-hover',
                     isLastRow && 'border-b-0',
                   )}
                   style={{ width: cell.column.getSize() }}

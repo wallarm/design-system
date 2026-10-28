@@ -1,4 +1,5 @@
 import type { FC, PropsWithChildren } from 'react';
+
 import { AccordionContext, type AccordionVariant } from './AccordionContext';
 
 interface AccordionContextProviderProps extends PropsWithChildren {

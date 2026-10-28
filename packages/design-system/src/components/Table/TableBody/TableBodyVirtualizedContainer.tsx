@@ -1,5 +1,7 @@
 import { type FC, useCallback, useEffect } from 'react';
+
 import { useVirtualizer } from '@tanstack/react-virtual';
+
 import { getRowKey, TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { measureRowElement } from './lib/measureRowElement';

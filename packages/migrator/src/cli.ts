@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+
 import { listCandidateFiles } from './lib/files';
 import { REPORT_FILE, renderReport } from './lib/report';
 import { runMigrations } from './lib/runner';
@@ -51,7 +52,7 @@ export async function main(
   versions: VersionsFile,
   // Passed in (read at runtime by index.ts): a bundled package.json import would freeze the pre-release version.
   version: string,
-  // oxlint-disable-next-line no-console -- CLI output
+  // CLI output
   io: IO = { log: console.log, error: console.error },
 ): Promise<number> {
   try {

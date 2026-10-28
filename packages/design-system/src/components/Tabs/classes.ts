@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const tabsTriggerVariants = cva(
@@ -12,9 +13,9 @@ export const tabsTriggerVariants = cva(
     'border-b-1 border-transparent',
 
     // Behavior
-    'transition-all cursor-pointer',
+    'cursor-pointer transition-all',
     // Typography
-    'text-text-secondary font-medium font-sans whitespace-nowrap',
+    'font-sans font-medium whitespace-nowrap text-text-secondary',
 
     // States ---- selected
     'not-data-disabled:data-selected:text-text-primary',
@@ -27,11 +28,11 @@ export const tabsTriggerVariants = cva(
     'not-data-disabled:not-data-selected:active:text-text-secondary',
 
     // States ---- focused
-    'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:bg-states-primary-hover',
-    'data-[focus=true]:outline-none data-[focus=true]:bg-bg-primary data-[focus=true]:text-text-primary',
+    'focus-visible:bg-states-primary-hover focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
+    'data-[focus=true]:bg-bg-primary data-[focus=true]:text-text-primary data-[focus=true]:outline-none',
 
     // States ---- disabled
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'disabled:cursor-not-allowed disabled:opacity-50',
   ),
   {
     variants: {
@@ -40,7 +41,7 @@ export const tabsTriggerVariants = cva(
           // Sizing
           'h-32',
           // Spacing
-          'px-8 py-6 mt-4 mb-6 gap-6',
+          'mt-4 mb-6 gap-6 px-8 py-6',
           // Typography
           'text-sm',
         ),
@@ -48,7 +49,7 @@ export const tabsTriggerVariants = cva(
           // Sizing
           'h-24',
           // Spacing
-          'px-6 py-4 mt-4 mb-4 gap-4',
+          'mt-4 mb-4 gap-4 px-6 py-4',
           // Typography
           'text-xs',
         ),

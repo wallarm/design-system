@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import {
   NAV_PANEL_BASE_PADDING,
@@ -33,7 +34,7 @@ export const NavPanelGroupContent: FC<NavPanelGroupContentProps> = ({
       data-slot='nav-panel-group-content'
       className={cn(
         'grid transition-[grid-template-rows] duration-150 ease-out',
-        expanded ? 'grid-rows-[1fr] mt-2' : 'grid-rows-[0fr]',
+        expanded ? 'mt-2 grid-rows-[1fr]' : 'grid-rows-[0fr]',
         className,
       )}
     >

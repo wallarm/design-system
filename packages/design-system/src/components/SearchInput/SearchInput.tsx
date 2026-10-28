@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FC, type InputHTMLAttributes, type Ref, useState } from 'react';
+
 import { Search, X } from '../../icons';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';

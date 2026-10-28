@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { TestIdProvider, useTestId } from '../../../utils/testId';
 import { inputVariants } from '../../Input/classes';
@@ -124,7 +125,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         {...props}
       >
         <ScrollArea
-          className='h-auto flex-1 min-w-0'
+          className='h-auto min-w-0 flex-1'
           style={{ maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined }}
         >
           {/* Inline style overrides h-full in ScrollAreaViewport (className is stripped). */}

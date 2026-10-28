@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import {
   ChevronRight,
   Clock,
@@ -77,71 +79,71 @@ const RECENT_ITEMS: (NavItem & { date: string })[] = [
   {
     id: 'recent-1',
     label: 'Attack Rechecker \u2014 Scanner',
-    icon: <History className='text-text-primary !icon-md' />,
+    icon: <History className='!icon-md text-text-primary' />,
     date: '2m ago',
   },
   {
     id: 'recent-2',
     label: 'API Discovery \u2014 API Security',
-    icon: <History className='text-text-primary !icon-md' />,
+    icon: <History className='!icon-md text-text-primary' />,
     date: '15m ago',
   },
   {
     id: 'recent-3',
     label: 'Rules \u2014 Cloud WAF',
-    icon: <History className='text-text-primary !icon-md' />,
+    icon: <History className='!icon-md text-text-primary' />,
     date: '1h ago',
   },
   {
     id: 'recent-4',
     label: 'Dashboards \u2014 Platform',
-    icon: <History className='text-text-primary !icon-md' />,
+    icon: <History className='!icon-md text-text-primary' />,
     date: '3h ago',
   },
   {
     id: 'recent-5',
     label: 'Integrations \u2014 Settings',
-    icon: <History className='text-text-primary !icon-md' />,
+    icon: <History className='!icon-md text-text-primary' />,
     date: 'Yesterday',
   },
 ];
 
 const JUMP_TO_ITEMS: NavItem[] = [
-  { id: 'nav-scanner', label: 'Scanner', icon: <Search className='text-text-primary !icon-md' /> },
+  { id: 'nav-scanner', label: 'Scanner', icon: <Search className='!icon-md text-text-primary' /> },
   {
     id: 'nav-api-security',
     label: 'API Security',
-    icon: <Shield className='text-text-primary !icon-md' />,
+    icon: <Shield className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-cloud-waf',
     label: 'Cloud WAF',
-    icon: <Globe className='text-text-primary !icon-md' />,
+    icon: <Globe className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-dashboards',
     label: 'Dashboards',
-    icon: <Layers className='text-text-primary !icon-md' />,
+    icon: <Layers className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-settings',
     label: 'Settings',
-    icon: <Settings className='text-text-primary !icon-md' />,
+    icon: <Settings className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-connectors',
     label: 'Connectors',
-    icon: <Zap className='text-text-primary !icon-md' />,
+    icon: <Zap className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-audit-log',
     label: 'Audit Log',
-    icon: <Clock className='text-text-primary !icon-md' />,
+    icon: <Clock className='!icon-md text-text-primary' />,
   },
   {
     id: 'nav-users',
     label: 'Users & Roles',
-    icon: <Users className='text-text-primary !icon-md' />,
+    icon: <Users className='!icon-md text-text-primary' />,
   },
 ];
 
@@ -149,31 +151,31 @@ const CREATE_ITEMS: NavItem[] = [
   {
     id: 'create-rule',
     label: 'Rule',
-    icon: <Shield className='text-text-primary !icon-md' />,
+    icon: <Shield className='!icon-md text-text-primary' />,
     section: 'Cloud WAF',
   },
   {
     id: 'create-trigger',
     label: 'Trigger',
-    icon: <Zap className='text-text-primary !icon-md' />,
+    icon: <Zap className='!icon-md text-text-primary' />,
     section: 'Cloud WAF',
   },
   {
     id: 'create-app',
     label: 'Application',
-    icon: <Globe className='text-text-primary !icon-md' />,
+    icon: <Globe className='!icon-md text-text-primary' />,
     section: 'Scanner',
   },
   {
     id: 'create-scope',
     label: 'Scan scope',
-    icon: <Compass className='text-text-primary !icon-md' />,
+    icon: <Compass className='!icon-md text-text-primary' />,
     section: 'Scanner',
   },
   {
     id: 'create-connector',
     label: 'Connector',
-    icon: <Zap className='text-text-primary !icon-md' />,
+    icon: <Zap className='!icon-md text-text-primary' />,
     section: 'Integrations',
   },
 ];
@@ -279,7 +281,7 @@ export const Basic: StoryFn<SearchModalProps> = () => {
                 <SearchModalItem key={item.id} onSelect={noop}>
                   {item.icon}
                   <Text size='sm'>{item.label}</Text>
-                  <ChevronRight className='text-text-tertiary ml-auto !icon-sm' />
+                  <ChevronRight className='ml-auto !icon-sm text-text-tertiary' />
                 </SearchModalItem>
               ))}
             </SearchModalGroup>
@@ -367,7 +369,7 @@ export const EmptyRecents: StoryFn<SearchModalProps> = () => {
                 <SearchModalItem key={item.id} onSelect={noop}>
                   {item.icon}
                   <Text size='sm'>{item.label}</Text>
-                  <ChevronRight className='text-text-tertiary ml-auto !icon-sm' />
+                  <ChevronRight className='ml-auto !icon-sm text-text-tertiary' />
                 </SearchModalItem>
               ))}
             </SearchModalGroup>
@@ -488,7 +490,7 @@ export const ItemsAsLinks: StoryFn<SearchModalProps> = () => {
                   <a href={`#${item.id}`}>
                     {item.icon}
                     <Text size='sm'>{item.label}</Text>
-                    <ChevronRight className='text-text-tertiary ml-auto !icon-sm' />
+                    <ChevronRight className='ml-auto !icon-sm text-text-tertiary' />
                   </a>
                 </SearchModalItem>
               ))}
@@ -703,7 +705,7 @@ export const Scrollable: StoryFn<SearchModalProps> = () => {
       Array.from({ length: 30 }, (_, i) => ({
         id: `item-${i}`,
         label: `Feature ${i + 1}`,
-        icon: <Compass className='text-text-primary !icon-md' />,
+        icon: <Compass className='!icon-md text-text-primary' />,
       })),
     [],
   );

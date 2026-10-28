@@ -3,8 +3,10 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import postcss, { type Root } from 'postcss';
+
 import type { TokenCategory } from '@wallarm-org/mcp-core';
+import postcss, { type Root } from 'postcss';
+
 import { mapColorValue, type Theme } from './map-value';
 
 export interface Token {

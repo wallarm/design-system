@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { ChevronLeft, ChevronRight } from '../../icons';
 import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';

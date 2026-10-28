@@ -1,4 +1,5 @@
 import { type ChangeEvent, type FC, type MouseEvent, useRef } from 'react';
+
 import { RefreshCcw } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';

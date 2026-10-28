@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
@@ -13,6 +12,8 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 
 const sha = (text: string) => createHash('sha256').update(text).digest('hex');
 const asset = (group: string, name: string, svg: string) => ({

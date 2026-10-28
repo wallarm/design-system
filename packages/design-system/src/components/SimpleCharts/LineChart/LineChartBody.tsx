@@ -7,8 +7,10 @@ import {
   useCallback,
   useContext,
 } from 'react';
+
 import { LineChart as RechartsLineChart, ResponsiveContainer } from 'recharts';
 import type { CategoricalChartFunc } from 'recharts/types/chart/types';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { lineChartBodyClasses, lineChartBodyZoomEnabledClasses } from './classes';

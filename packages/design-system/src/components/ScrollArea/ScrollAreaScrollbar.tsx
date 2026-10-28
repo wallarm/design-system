@@ -1,16 +1,18 @@
 import { type CSSProperties, type FC, type Ref, useMemo } from 'react';
+
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 const scrollAreaScrollbarVariants = cva(
-  'z-30 bg-transparent rounded-8 transition-opacity overflow-hidden',
+  'z-30 overflow-hidden rounded-8 bg-transparent transition-opacity',
   {
     variants: {
       orientation: {
-        vertical: 'w-4 mr-3 my-auto',
-        horizontal: 'h-4 mb-3 mx-auto',
+        vertical: 'my-auto mr-3 w-4',
+        horizontal: 'mx-auto mb-3 h-4',
       },
     },
   },

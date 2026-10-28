@@ -1,5 +1,6 @@
 import { undo } from '@codemirror/commands';
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { mountEngine, typeAt, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
 afterEach(() => {

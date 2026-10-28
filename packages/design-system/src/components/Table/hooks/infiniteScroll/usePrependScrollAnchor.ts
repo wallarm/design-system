@@ -1,4 +1,5 @@
 import { type RefObject, useLayoutEffect, useRef } from 'react';
+
 import { detectDataChange, getScrollMetrics, type ScrollRoot, scrollRootBy } from '../../lib';
 import type { TableVirtualizerInstance } from '../../TableContext/types';
 

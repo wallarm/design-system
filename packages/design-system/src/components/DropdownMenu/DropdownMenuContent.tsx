@@ -6,7 +6,9 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+
 import { Menu } from '@ark-ui/react/menu';
+
 import { Portal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
@@ -75,14 +77,14 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           {...props}
         >
           {inputChildren}
-          <ScrollArea className={cn('flex flex-col min-h-0')} style={{ position: 'static' }}>
+          <ScrollArea className={cn('flex min-h-0 flex-col')} style={{ position: 'static' }}>
             {/* data-no-autofocus: on open zag focuses the first tabbable in the content. The
                 viewport is tabbable (tabindex=0) until ScrollArea measures no overflow and drops
                 it — the browser then blurs it to <body> and keyboard nav dies. Skip it so the
                 content itself (or a DropdownMenuInput) gets focus. */}
             <ScrollAreaViewport data-no-autofocus=''>
               {/* !min-w-0 overrides Ark UI inline min-width:fit-content that causes horizontal scroll expansion with long content */}
-              <ScrollAreaContent className={cn('flex flex-col gap-1 !min-w-0')}>
+              <ScrollAreaContent className={cn('flex !min-w-0 flex-col gap-1')}>
                 <TestIdProvider value={cascadeBase}>{menuChildren}</TestIdProvider>
               </ScrollAreaContent>
             </ScrollAreaViewport>

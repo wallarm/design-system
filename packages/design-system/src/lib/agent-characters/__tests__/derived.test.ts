@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import colorsJson from '../../../../scripts/agent-avatars/data/colors.json';
 import statesJson from '../../../../scripts/agent-avatars/data/states.json';
 import { hexOf, luma, mix } from '../color';

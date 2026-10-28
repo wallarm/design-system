@@ -1,7 +1,9 @@
 import { useState } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { FilterInput } from '../FilterInput';
 import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
 

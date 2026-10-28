@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { X } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -26,7 +27,7 @@ export const TagClose: FC<TagCloseProps> = ({
       ref={ref}
       data-slot='tag-close'
       data-testid={testId}
-      className={cn('inline-flex items-center cursor-pointer focus:outline-none', className)}
+      className={cn('inline-flex cursor-pointer items-center focus:outline-none', className)}
     >
       {children ?? <X size='sm' />}
     </button>

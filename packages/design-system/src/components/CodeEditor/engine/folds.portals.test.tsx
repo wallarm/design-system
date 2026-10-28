@@ -3,6 +3,7 @@ import { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';

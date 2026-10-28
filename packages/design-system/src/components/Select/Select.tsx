@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
+
 import {
   Select as ArkUiSelect,
   type CollectionItem,
   type SelectRootProps,
 } from '@ark-ui/react/select';
+
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SelectSharedProvider } from './SelectSharedContext';
 

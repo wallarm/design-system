@@ -1,8 +1,10 @@
-import { pluginReact } from '@rsbuild/plugin-react';
-import { createRslib, type RslibConfig, type Rspack, rspack } from '@rslib/core';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+
+import { pluginReact } from '@rsbuild/plugin-react';
+import { createRslib, type RslibConfig, type Rspack, rspack } from '@rslib/core';
+
 import { DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 
 const require = createRequire(import.meta.url);

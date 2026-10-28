@@ -1,7 +1,9 @@
 import type { FC, ReactNode } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { Checkbox, CheckboxGroup, type CheckboxGroupProps, CheckboxLabel } from '../Checkbox';
 import { Field } from './Field';
 import { FieldLabel } from './FieldLabel';

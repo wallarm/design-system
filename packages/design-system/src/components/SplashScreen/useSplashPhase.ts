@@ -1,5 +1,5 @@
-import type { TransitionEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { type TransitionEvent, useEffect, useRef, useState } from 'react';
+
 import type { PhaseType, SplashScreenShrinkTarget } from './types';
 
 const doubleRaf = (callback: () => void): (() => void) => {

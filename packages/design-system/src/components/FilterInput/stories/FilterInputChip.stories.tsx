@@ -1,6 +1,8 @@
 import * as React from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import {
   FilterInputChip,
   type FilterInputChipProps,
@@ -169,7 +171,7 @@ export const InteractiveDeleteExample: StoryFn = () => {
 
   return (
     <MockFilterInputProvider>
-      <div className='flex items-center gap-4 flex-wrap'>
+      <div className='flex flex-wrap items-center gap-4'>
         {chips.map((chip, index) => (
           <React.Fragment key={chip.id}>
             {index > 0 && (
@@ -188,7 +190,7 @@ export const InteractiveDeleteExample: StoryFn = () => {
             />
           </React.Fragment>
         ))}
-        {chips.length === 0 && <p className='text-text-secondary text-sm'>All filters removed</p>}
+        {chips.length === 0 && <p className='text-sm text-text-secondary'>All filters removed</p>}
       </div>
     </MockFilterInputProvider>
   );
@@ -268,7 +270,7 @@ export const AllStatesShowcase: StoryFn = () => (
       {/* Chip variants */}
       <div>
         <p className='sb-annotation mb-2'>default</p>
-        <div className='flex items-center gap-2 flex-wrap'>
+        <div className='flex flex-wrap items-center gap-2'>
           <FilterInputChip attribute='Attribute' operator='operator' value='Value' />
           <FilterInputChip attribute='Attribute' operator='operator' value='Value' error />
           <FilterInputChip
@@ -290,7 +292,7 @@ export const AllStatesShowcase: StoryFn = () => (
       {/* Disabled chip variants */}
       <div>
         <p className='sb-annotation mb-2'>disabled</p>
-        <div className='flex items-center gap-2 flex-wrap'>
+        <div className='flex flex-wrap items-center gap-2'>
           <FilterInputChip attribute='IP Address' operator='is' value='34.74.73.20' disabled />
           <FilterInputChip
             attribute='Host'
@@ -305,7 +307,7 @@ export const AllStatesShowcase: StoryFn = () => (
       {/* Building chip variants */}
       <div>
         <p className='sb-annotation mb-2'>building</p>
-        <div className='flex items-center gap-2 flex-wrap'>
+        <div className='flex flex-wrap items-center gap-2'>
           <FilterInputChip building attribute='IP Address' />
           <FilterInputChip building attribute='IP Address' operator='is' />
           <FilterInputChip building attribute='IP Address' operator='is' value='192.168.1.1' />
@@ -315,7 +317,7 @@ export const AllStatesShowcase: StoryFn = () => (
       {/* Connector variants */}
       <div>
         <p className='sb-annotation mb-2'>connectors</p>
-        <div className='flex items-center gap-2 flex-wrap'>
+        <div className='flex flex-wrap items-center gap-2'>
           <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
           <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => undefined} />
         </div>

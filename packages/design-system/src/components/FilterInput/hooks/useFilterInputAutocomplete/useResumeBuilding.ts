@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useCallback } from 'react';
+import { type RefObject, useCallback } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { chipIdToConditionIndex, isEmptyFilterValue, isNoValueOperator } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';

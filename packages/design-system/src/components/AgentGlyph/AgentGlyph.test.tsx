@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { optPx } from '../../lib/agent-characters/geom';
 import { glyph } from '../../lib/agent-characters/glyph';

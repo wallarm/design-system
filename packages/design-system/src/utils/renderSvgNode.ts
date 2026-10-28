@@ -1,4 +1,5 @@
 import { createElement, type ReactNode } from 'react';
+
 import type { SvgNode } from '../lib/agent-characters/svg';
 
 // SVG attribute names → React props (stroke-width → strokeWidth); aria-* and data-* stay as they are. The core's

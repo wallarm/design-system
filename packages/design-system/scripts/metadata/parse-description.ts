@@ -1,5 +1,7 @@
 import path from 'path';
+
 import { type Node, Project, type SourceFile, SyntaxKind } from 'ts-morph';
+
 import { findStoryFiles, readMeta } from './story-source.js';
 
 /** Evaluates string / template / `+` / `[…].join(<literal>)` forms, following identifiers. */

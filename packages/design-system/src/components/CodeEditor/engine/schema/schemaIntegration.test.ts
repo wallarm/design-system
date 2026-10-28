@@ -1,5 +1,6 @@
 import { forceLinting } from '@codemirror/lint';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { mountEngine, unmountAllEngines } from '../../../../testUtils/codeEditorEngine';
 
 const schema = {

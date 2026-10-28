@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { locateJsonSyntaxError } from './diagnostics';
 
 describe('locateJsonSyntaxError', () => {

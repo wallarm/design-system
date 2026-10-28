@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, MouseEvent, ReactNode, Ref } from 'react';
+
 import { Steps as ArkSteps, useStepsContext } from '@ark-ui/react/steps';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { clampStep, useStepperRootContext } from './StepperContext';
 import { takeAsChildDisabled } from './takeAsChildDisabled';

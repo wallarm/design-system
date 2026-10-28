@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { ArrowDown, ArrowUp } from '../../../icons';
 import { Badge } from '../../Badge';
 import type { BadgeColor } from '../../Badge/types';

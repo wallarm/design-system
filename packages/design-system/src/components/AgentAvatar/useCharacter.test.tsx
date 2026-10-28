@@ -1,6 +1,8 @@
 import { createRef, Profiler, StrictMode } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render } from '@testing-library/react';
+
 import { getRuntime, RUNTIME_KEY } from '../../lib/agent-characters/runtime';
 import { AgentAvatar } from './AgentAvatar';
 import { AgentAvatarGroup } from './AgentAvatarGroup';

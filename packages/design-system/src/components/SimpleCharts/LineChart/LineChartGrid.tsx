@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { CartesianGrid } from 'recharts';
+
 import { LINE_GRID_DASHARRAY } from './constants';
 import { dropEdgeGridLines } from './lib/dropEdgeGridLines';
 import { tickHorizontalCoordinates } from './lib/tickHorizontalCoordinates';

@@ -11,10 +11,11 @@
  * Usage: pnpm compiler:audit [--json <out.json>]
  */
 
-import { transformAsync } from '@babel/core';
-import { globSync } from 'glob';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { transformAsync } from '@babel/core';
+import { globSync } from 'glob';
 
 interface CompilerEventDetail {
   reason?: string;

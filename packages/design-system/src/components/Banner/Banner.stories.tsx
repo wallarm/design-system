@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Megaphone } from '../../icons';
 import { Button } from '../Button';
 import { Banner, type BannerProps } from './Banner';

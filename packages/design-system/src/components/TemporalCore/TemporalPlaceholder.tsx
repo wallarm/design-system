@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 
 export interface TemporalPlaceholderProps {
@@ -15,8 +16,8 @@ export const TemporalPlaceholder: FC<TemporalPlaceholderProps> = ({ text, classN
     <span
       className={cn(
         'pointer-events-none absolute inset-0 flex items-center px-1',
-        'text-text-secondary font-sans text-sm',
-        'select-none whitespace-nowrap',
+        'font-sans text-sm text-text-secondary',
+        'whitespace-nowrap select-none',
         className,
       )}
       aria-hidden='true'

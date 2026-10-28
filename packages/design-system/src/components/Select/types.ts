@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import type { SvgIconProps } from '../../icons';
 
 export interface SelectDataItem {

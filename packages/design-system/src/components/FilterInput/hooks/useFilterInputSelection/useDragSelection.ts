@@ -1,5 +1,5 @@
-import type { MouseEvent, RefObject } from 'react';
-import { useCallback, useRef } from 'react';
+import { type MouseEvent, type RefObject, useCallback, useRef } from 'react';
+
 import { DRAG_THRESHOLD, getVisualEntries, resolveAnchorChipId, updateDragSelection } from './lib';
 
 /** Elements that should keep default behavior instead of starting a drag */

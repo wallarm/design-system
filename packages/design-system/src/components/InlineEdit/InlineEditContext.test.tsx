@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import { useInlineEdit } from './InlineEditContext';
 
 describe('useInlineEdit', () => {

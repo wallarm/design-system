@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
+
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
+
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface TooltipProps extends TestableProps {

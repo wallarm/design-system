@@ -1,10 +1,12 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';
-import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
+
+import { describe, expect, it } from '@rstest/core';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { Project } from 'ts-morph';
+
 import { INTERNAL_COMPONENTS } from '../internal.js';
 import { parseComponentDescription } from '../parse-description.js';
 import { parseExamples } from '../parse-examples.js';

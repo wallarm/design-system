@@ -20,7 +20,7 @@ export const inlineEditPreviewVariants = cva(
       // side + the 20px text-sm line-height above = 28px total).
       multiline: {
         true: 'items-start py-4',
-        false: 'items-center py-4 h-28',
+        false: 'h-28 items-center py-4',
       },
       activatable: {
         true: '',
@@ -37,14 +37,14 @@ export const inlineEditPreviewVariants = cva(
         activatable: true,
         invalid: false,
         className:
-          'cursor-pointer hover:bg-states-primary-hover active:bg-states-primary-pressed focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+          'cursor-pointer hover:bg-states-primary-hover focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none active:bg-states-primary-pressed',
       },
       // Editable with an error: hover/focus reveal the destructive text-box border + ring.
       {
         activatable: true,
         invalid: true,
         className:
-          'cursor-pointer bg-component-input-bg hover:border-border-strong-danger hover:ring-3 hover:ring-focus-destructive focus-visible:border-border-strong-danger focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-destructive',
+          'cursor-pointer bg-component-input-bg hover:border-border-strong-danger hover:ring-3 hover:ring-focus-destructive focus-visible:border-border-strong-danger focus-visible:ring-3 focus-visible:ring-focus-destructive focus-visible:outline-none',
       },
     ],
     defaultVariants: {

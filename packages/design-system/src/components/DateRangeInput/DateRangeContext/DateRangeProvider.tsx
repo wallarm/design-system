@@ -1,7 +1,9 @@
 import { type FC, type ReactNode, type Ref, useRef } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
+
 import { Calendar } from '../../../icons';
 import { useDateFormat } from '../../DateFormatProvider';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';

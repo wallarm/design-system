@@ -1,4 +1,5 @@
 import type { ComponentMetadata } from '@wallarm-org/mcp-core';
+
 import { paginate } from './format';
 import { call, exampleEntries, formatExample } from './get-component';
 import { levenshtein } from './guidelines';

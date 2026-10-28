@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 // Disclaimer sits 4px under the box (Figma 90 → 94).
@@ -40,7 +41,7 @@ export const chatInputBoxVariants = cva(
 export const chatInputTextareaVariants = cva(
   cn(
     'w-full basis-full resize-none bg-transparent text-sm text-text-primary outline-none',
-    'placeholder:text-text-secondary disabled:cursor-not-allowed [scrollbar-width:thin]',
+    '[scrollbar-width:thin] placeholder:text-text-secondary disabled:cursor-not-allowed',
   ),
 );
 

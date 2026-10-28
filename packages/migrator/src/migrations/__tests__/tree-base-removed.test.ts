@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { migration } from '../tree-base-removed';
 import { apply } from './harness';
 

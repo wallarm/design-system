@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+
 import { routePathToMdPath, withBase, withSiteOrigin } from '@rspress/core/runtime';
 import { Link } from '@rspress/core/theme-original';
 import { Badge } from '@wallarm-org/design-system/Badge';
@@ -7,6 +8,7 @@ import { ArrowRight } from '@wallarm-org/design-system/icons/ArrowRight';
 import { Maximize2 } from '@wallarm-org/design-system/icons/Maximize2';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
+
 import { FILL_APP_SHELL, FULLSCREEN_FRAME, StoryError } from './StoryPreview';
 import { parsePreviewParams, withPreviewParams } from './templatePreview';
 import type { PreviewTemplate } from './TemplatePreviewDialog';

@@ -6,8 +6,7 @@ import {
   IDLE_MARGIN_X,
   IDLE_MARGIN_Y,
 } from './constants';
-import type { Dot } from './engine-grid';
-import { sweepX } from './engine-grid';
+import { type Dot, sweepX } from './engine-grid';
 import type { EngineOptions, GameStats } from './types';
 
 // constants

@@ -1,8 +1,10 @@
 import { existsSync, statSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { Node, Project, type SourceFile } from 'ts-morph';
+
 import type { DesignSystemMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
+import { Node, Project, type SourceFile } from 'ts-morph';
+
 import { readMetaDescription } from '../../../design-system/scripts/metadata/parse-description';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { componentReadme } from './component-readme';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
-import type { JsxAttribute } from 'ts-morph';
-import { SyntaxKind } from 'ts-morph';
+import { type JsxAttribute, SyntaxKind } from 'ts-morph';
+
 import {
   createTestFile,
   findComponentElements,

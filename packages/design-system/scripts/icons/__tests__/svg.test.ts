@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { svgToIconBody } from '../svg.js';
 
 const svg = (body: string, viewBox = '0 0 24 24') =>

@@ -1,5 +1,5 @@
-import type { FC } from 'react';
-import { useRef } from 'react';
+import { type FC, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 import { Logo } from '../Logo';
 import { Progress } from '../Progress';
@@ -75,12 +75,12 @@ export const SplashScreen: FC<SplashScreenProps> = ({
           className={cn(
             'absolute h-auto w-full transition-opacity duration-300',
             // Hidden (for measurement) until shrinking phase starts
-            !isChildrenVisible && 'invisible pointer-events-none opacity-0',
+            !isChildrenVisible && 'pointer-events-none invisible opacity-0',
             // During shrinking: visible but not interactive, opacity fades in
-            phase === 'shrinking' && 'visible pointer-events-none',
+            phase === 'shrinking' && 'pointer-events-none visible',
             phase === 'shrinking' && (childrenRevealed ? 'opacity-100' : 'opacity-0'),
             // In settled: fully visible and interactive, height transitions enabled
-            phase === 'settled' && 'visible pointer-events-auto opacity-100',
+            phase === 'settled' && 'pointer-events-auto visible opacity-100',
             phase === 'settled' && 'transition-[height,opacity] duration-200',
           )}
           style={shrinkTarget ? { width: shrinkTarget.width } : undefined}

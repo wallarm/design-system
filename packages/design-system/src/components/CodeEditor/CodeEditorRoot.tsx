@@ -1,6 +1,17 @@
-import type { HTMLAttributes, ReactNode, Ref } from 'react';
-import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import {
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
+
 import { useControlled } from '../../hooks/useControlled';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
@@ -201,7 +212,7 @@ export const CodeEditorRoot = ({
     if (process.env.NODE_ENV === 'production') return;
     if (!documentIdWithoutValue || warnedDocumentId.current) return;
     warnedDocumentId.current = true;
-    // oxlint-disable-next-line no-console -- dev-only authoring guard.
+    // dev-only authoring guard.
     console.warn(
       "[CodeEditor] `documentId` requires a controlled `value`: in uncontrolled mode a new document starts from the previous document's text.",
     );
@@ -334,7 +345,7 @@ export const CodeEditorRoot = ({
             data-testid={testId}
             className={cn(
               codeSnippetRootVariants({ size }),
-              'focus-within:ring-focus-primary focus-within:ring-2',
+              'focus-within:ring-2 focus-within:ring-focus-primary',
               className,
             )}
             isFullscreen={isFullscreen}

@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import postcss from 'postcss';
+
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens } from '../tokens/build-tokens';
 import { buildCss, definedClasses, stripTokenDeclarations } from './build-css';
@@ -118,7 +120,9 @@ describe('buildCss', () => {
     const readme = readFileSync(new URL('../docs/readme-root.md', import.meta.url), 'utf8');
     const advertised = [
       // The "Here" column of the Tailwind-habit translation table.
-      ...readme.split('\n').flatMap(line => (/^\| `/.test(line) ? [line.split('|')[2] ?? ''] : [])),
+      ...readme
+        .split('\n')
+        .flatMap(line => (line.startsWith('| `') ? [line.split('|')[2] ?? ''] : [])),
       readme.split('## Layout on a canvas')[1]?.split('\n## ')[0] ?? '',
     ]
       .flatMap(text => [...text.matchAll(/`([^`]+)`/g)].map(([, code = '']) => code))

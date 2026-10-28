@@ -1,8 +1,10 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react/collection';
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Select } from './Select';
 import { SelectButton } from './SelectButton';

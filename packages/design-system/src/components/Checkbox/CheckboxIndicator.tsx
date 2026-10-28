@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { useCheckboxContext } from '@ark-ui/react/checkbox';
+
 import { useTestId } from '../../utils/testId';
 import { Checkmark } from '../Checkmark';
 

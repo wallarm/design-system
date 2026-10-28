@@ -1,5 +1,7 @@
 import type { ElementType, FC } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
@@ -15,9 +17,9 @@ const buttonVariants = cva('', {
     color: {
       brand: 'focus-visible:ring-focus-brand data-[focus=true]:ring-focus-brand',
       neutral:
-        'text-text-primary disabled:opacity-50 focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
+        'text-text-primary focus-visible:ring-focus-primary disabled:opacity-50 data-[focus=true]:ring-focus-primary',
       'neutral-alt':
-        'text-text-primary-alt disabled:opacity-50 focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
+        'text-text-primary-alt focus-visible:ring-focus-primary disabled:opacity-50 data-[focus=true]:ring-focus-primary',
       destructive: 'focus-visible:ring-focus-destructive data-[focus=true]:ring-focus-destructive',
     },
   },
@@ -27,7 +29,7 @@ const buttonVariants = cva('', {
       color: 'brand',
       variant: 'primary',
       className:
-        'bg-bg-fill-brand text-text-primary-alt overlay hover:not-disabled:overlay-states-on-fill-hover active:not-disabled:overlay-states-on-fill-pressed disabled:overlay-states-on-fill-disabled',
+        'overlay bg-bg-fill-brand text-text-primary-alt hover:not-disabled:overlay-states-on-fill-hover active:not-disabled:overlay-states-on-fill-pressed disabled:overlay-states-on-fill-disabled',
     },
     {
       color: 'brand',
@@ -49,13 +51,13 @@ const buttonVariants = cva('', {
       color: 'neutral',
       variant: 'outline',
       className:
-        'border-1 border-border-primary bg-component-outline-button-bg overlay hover:not-disabled:overlay-states-primary-hover active:not-disabled:overlay-states-primary-pressed',
+        'overlay border-1 border-border-primary bg-component-outline-button-bg hover:not-disabled:overlay-states-primary-hover active:not-disabled:overlay-states-primary-pressed',
     },
     {
       color: 'neutral',
       variant: 'ghost',
       className:
-        'bg-transparent border-1 border-transparent hover:not-disabled:bg-states-primary-hover active:not-disabled:bg-states-primary-pressed focus-visible:border-border-primary data-[focus=true]:border-border-primary data-[state=open]:bg-states-primary-hover data-[state=open]:ring-0 data-[state=open]:border-transparent',
+        'border-1 border-transparent bg-transparent hover:not-disabled:bg-states-primary-hover focus-visible:border-border-primary active:not-disabled:bg-states-primary-pressed data-[focus=true]:border-border-primary data-[state=open]:border-transparent data-[state=open]:bg-states-primary-hover data-[state=open]:ring-0',
     },
     {
       color: 'neutral',
@@ -70,13 +72,13 @@ const buttonVariants = cva('', {
       color: 'neutral-alt',
       variant: 'outline',
       className:
-        'border-1 border-border-primary bg-component-outline-button-bg overlay hover:overlay-states-primary-alt-hover active:overlay-states-primary-alt-pressed',
+        'overlay border-1 border-border-primary bg-component-outline-button-bg hover:overlay-states-primary-alt-hover active:overlay-states-primary-alt-pressed',
     },
     {
       color: 'neutral-alt',
       variant: 'ghost',
       className:
-        'bg-transparent border-1 border-transparent hover:bg-states-primary-alt-hover active:bg-states-primary-alt-pressed focus-visible:border-border-primary data-[focus=true]:border-border-primary',
+        'border-1 border-transparent bg-transparent hover:bg-states-primary-alt-hover focus-visible:border-border-primary active:bg-states-primary-alt-pressed data-[focus=true]:border-border-primary',
     },
     {
       color: 'neutral-alt',
@@ -91,13 +93,13 @@ const buttonVariants = cva('', {
       color: 'destructive',
       variant: 'primary',
       className:
-        'bg-bg-fill-danger text-text-primary-alt overlay hover:not-disabled:overlay-states-on-fill-hover active:not-disabled:overlay-states-on-fill-pressed disabled:overlay-states-on-fill-disabled',
+        'overlay bg-bg-fill-danger text-text-primary-alt hover:not-disabled:overlay-states-on-fill-hover active:not-disabled:overlay-states-on-fill-pressed disabled:overlay-states-on-fill-disabled',
     },
     {
       color: 'destructive',
       variant: 'outline',
       className:
-        'border-1 border-border-danger bg-component-outline-button-bg text-text-danger overlay hover:not-disabled:overlay-states-danger-hover active:not-disabled:overlay-states-danger-pressed disabled:opacity-50',
+        'overlay border-1 border-border-danger bg-component-outline-button-bg text-text-danger hover:not-disabled:overlay-states-danger-hover active:not-disabled:overlay-states-danger-pressed disabled:opacity-50',
     },
     {
       color: 'destructive',

@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { DatePicker } from '@ark-ui/react';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -9,9 +11,9 @@ import { cn } from '../../utils/cn';
 export const CalendarDayName: FC = () => (
   <DatePicker.TableHeader
     className={cn(
-      'w-40 h-24',
-      'font-mono font-medium text-xs leading-xs',
-      'text-text-secondary text-center',
+      'h-24 w-40',
+      'font-mono text-xs leading-xs font-medium',
+      'text-center text-text-secondary',
     )}
   />
 );

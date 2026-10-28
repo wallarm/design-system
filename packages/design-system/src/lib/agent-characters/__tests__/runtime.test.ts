@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
+
 import { getRuntime, type LiveChar, RUNTIME_KEY } from '../runtime';
 
 const fakeChar = (

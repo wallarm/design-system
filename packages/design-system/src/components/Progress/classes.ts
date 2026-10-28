@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import type { ProgressColor } from './types';
 
 const progressColorMap: Record<ProgressColor, string> = {

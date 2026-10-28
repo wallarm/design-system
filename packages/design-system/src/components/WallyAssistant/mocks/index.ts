@@ -3,6 +3,7 @@
  * Excluded from the build and the d.ts (`**\/mocks.{ts,tsx}`), like `Table/mocks.tsx`.
  */
 import { useEffect, useReducer, useRef } from 'react';
+
 import { isRunningStatus } from '../model/deriveChatState';
 import type {
   ChatApprovalPart,

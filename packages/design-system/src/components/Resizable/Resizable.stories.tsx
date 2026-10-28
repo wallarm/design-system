@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { OverflowList } from '../OverflowList';
 import { Tag } from '../Tag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';

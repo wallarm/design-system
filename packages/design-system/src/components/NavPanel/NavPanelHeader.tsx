@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
@@ -18,7 +19,7 @@ export const NavPanelHeader: FC<NavPanelHeaderProps> = ({ ref, className, childr
       data-slot='nav-panel-header'
       data-testid={testId}
       className={cn(
-        'sticky top-0 z-10 flex shrink-0 items-center px-4 pt-2 pb-6 bg-bg-page-bg',
+        'sticky top-0 z-10 flex shrink-0 items-center bg-bg-page-bg px-4 pt-2 pb-6',
         className,
       )}
     >

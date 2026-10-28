@@ -1,8 +1,10 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { describe, expect, it } from '@rstest/core';
 import { designSystemMetadataSchema, guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
+
 import { paginate, RESPONSE_LIMIT } from '../tools/format';
 import {
   componentSections,

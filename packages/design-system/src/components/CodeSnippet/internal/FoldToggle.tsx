@@ -1,4 +1,5 @@
 import type { FC, MouseEventHandler } from 'react';
+
 import { ChevronDown } from '../../../icons/ChevronDown';
 import { ChevronRight } from '../../../icons/ChevronRight';
 import { cn } from '../../../utils/cn';
@@ -26,7 +27,7 @@ export const FoldToggle: FC<{
     <button
       type='button'
       className={cn(
-        'flex items-center justify-center w-16 h-16 rounded-2 text-text-secondary hover:text-text-primary hover:bg-states-primary-hover transition-colors cursor-pointer',
+        'flex h-16 w-16 cursor-pointer items-center justify-center rounded-2 text-text-secondary transition-colors hover:bg-states-primary-hover hover:text-text-primary',
         className,
       )}
       aria-expanded={!isCollapsed}

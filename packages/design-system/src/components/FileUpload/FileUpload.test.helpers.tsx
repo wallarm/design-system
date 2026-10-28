@@ -1,6 +1,9 @@
 import type { ComponentProps } from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+
 import { createRequire } from 'node:module';
+
+import { fireEvent, screen } from '@testing-library/react';
+
 import { FileUpload } from './FileUpload';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FileUploadError } from './FileUploadError';

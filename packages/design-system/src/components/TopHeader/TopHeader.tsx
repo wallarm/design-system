@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
@@ -21,7 +22,7 @@ export const TopHeader: FC<TopHeaderProps> = ({
         ref={ref}
         data-slot='top-header'
         data-testid={testId}
-        className={cn('flex items-center justify-between pl-7 pr-12 py-6', className)}
+        className={cn('flex items-center justify-between py-6 pr-12 pl-7', className)}
       >
         {children}
       </div>

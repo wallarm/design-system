@@ -1,5 +1,7 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+
 import type { ReactTable, Row, RowData } from '@tanstack/react-table';
+
 import type { DSTableFeatures } from '../lib';
 import type { TableVirtualizerInstance } from '../TableContext/types';
 

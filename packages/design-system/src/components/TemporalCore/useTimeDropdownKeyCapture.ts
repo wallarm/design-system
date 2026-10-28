@@ -1,4 +1,5 @@
 import { type KeyboardEvent, type RefObject, useCallback } from 'react';
+
 import type { TimeDropdownHandle } from './TimeDropdown';
 
 const TIME_SEGMENT_TYPES = new Set(['hour', 'minute', 'second', 'dayPeriod']);

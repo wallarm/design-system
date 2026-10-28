@@ -1,7 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { describe, expect, it } from '@rstest/core';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC = path.resolve(__dirname, '../../../src');

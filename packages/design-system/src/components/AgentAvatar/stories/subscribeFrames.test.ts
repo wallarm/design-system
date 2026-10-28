@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { getRuntime, RUNTIME_KEY } from '../../../lib/agent-characters/runtime';
 import { subscribeFrames } from './subscribeFrames';
 

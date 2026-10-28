@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { migration } from '../numeric-badge-type-color';
 import { apply } from './harness';
 

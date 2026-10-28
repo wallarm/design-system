@@ -1,8 +1,9 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const segmentedControlVariants = cva(
-  'overflow-visible flex bg-bg-primary p-4 gap-0 items-center rounded-12',
+  'flex items-center gap-0 overflow-visible rounded-12 bg-bg-primary p-4',
   {
     variants: {
       fullWidth: {
@@ -17,15 +18,15 @@ export const segmentedControlVariants = cva(
 );
 
 export const segmentedControlIndicatorClassNames = cn(
-  'bg-bg-surface-3 rounded-8 shadow-sm w-(--width) h-(--height) top-(--top) left-(--left)',
+  'top-(--top) left-(--left) h-(--height) w-(--width) rounded-8 bg-bg-surface-3 shadow-sm',
 );
 
 export const segmentedControlItemClassNamesBase = cn(
-  'relative flex items-center justify-center gap-6 min-h-28 min-w-28 px-12 py-4',
-  'rounded-8 text-sm font-sans font-medium text-center transition-all cursor-pointer',
+  'relative flex min-h-28 min-w-28 items-center justify-center gap-6 px-12 py-4',
+  'cursor-pointer rounded-8 text-center font-sans text-sm font-medium transition-all',
   // Default state, unselected
   'bg-transparent text-text-secondary',
   // Focus state
-  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-  'data-disabled:opacity-50 data-disabled:cursor-not-allowed',
+  'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
+  'data-disabled:cursor-not-allowed data-disabled:opacity-50',
 );

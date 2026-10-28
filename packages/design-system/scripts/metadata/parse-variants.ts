@@ -1,6 +1,11 @@
-import type { CallExpression, ObjectLiteralExpression, Project, SourceFile } from 'ts-morph';
-import { SyntaxKind } from 'ts-morph';
 import type { VariantMetadata } from '@wallarm-org/mcp-core';
+import {
+  type CallExpression,
+  type ObjectLiteralExpression,
+  type Project,
+  type SourceFile,
+  SyntaxKind,
+} from 'ts-morph';
 
 /**
  * Parse CVA variants from component files using ts-morph AST.

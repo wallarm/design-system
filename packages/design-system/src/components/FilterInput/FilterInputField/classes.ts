@@ -28,13 +28,13 @@ export const ACTIONS_PADDING = BUTTON_COUNT * BUTTON_SIZE + BUTTON_GAP + ACTIONS
 
 /** Outer filter-input container (combobox wrapper) */
 export const filterInputContainerVariants = cva(
-  'relative flex box-border min-h-40 w-full overflow-hidden px-0 focus-within:outline-none focus-within:ring-3',
+  'relative box-border flex min-h-40 w-full overflow-hidden px-0 focus-within:ring-3 focus-within:outline-none',
   {
     variants: {
       error: {
         true: 'focus-within:ring-focus-destructive',
         false:
-          'focus-within:not-disabled:border-border-strong-primary focus-within:ring-focus-primary',
+          'focus-within:ring-focus-primary focus-within:not-disabled:border-border-strong-primary',
       },
       multiRow: {
         true: 'items-start',
@@ -55,7 +55,7 @@ export const filterInputInnerVariants = cva(
     variants: {
       hasContent: {
         true: 'pl-8',
-        false: 'pl-12 pr-4',
+        false: 'pr-4 pl-12',
       },
     },
     defaultVariants: {
@@ -66,7 +66,7 @@ export const filterInputInnerVariants = cva(
 
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(
-  'h-24 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0',
+  'h-24 border-none bg-transparent p-0 text-sm shadow-none ring-0 outline-none',
   {
     variants: {
       hasContent: {

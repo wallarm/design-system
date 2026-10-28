@@ -5,6 +5,7 @@ import type {
   PropMetadata,
   SubComponentMetadata,
 } from '@wallarm-org/mcp-core';
+
 import { formatPropsTable, oneLine, paginate } from './format';
 
 export function getComponent(

@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Code } from '../Code';
@@ -17,7 +18,7 @@ export const IpPort: FC<IpPortProps> = ({ children, ...props }) => {
       size='m'
       data-slot='ip-port'
       data-testid={testId}
-      className={cn('shrink ml-[-4]')}
+      className={cn('ml-[-4] shrink')}
     >
       {children}
     </Code>

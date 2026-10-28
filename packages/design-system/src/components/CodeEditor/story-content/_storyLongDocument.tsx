@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { CodeEditorContent } from '../CodeEditorContent';
 import { CodeEditorRoot } from '../CodeEditorRoot';
 import { LONG_DOCUMENT } from './_storyFixtures';

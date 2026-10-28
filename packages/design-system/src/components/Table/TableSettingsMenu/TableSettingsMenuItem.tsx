@@ -1,5 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
 import { GripVertical } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
@@ -67,17 +68,17 @@ export const TableSettingsMenuItem = ({
       style={style}
       data-testid={slotTestId}
       className={cn(
-        'relative flex items-center w-full rounded-6 pr-8 py-6',
+        'relative flex w-full items-center rounded-6 py-6 pr-8',
         grouped ? 'pl-8' : 'pl-20',
-        'hover:bg-states-primary-hover transition-colors',
-        'data-disabled:opacity-50 data-disabled:pointer-events-none',
+        'transition-colors hover:bg-states-primary-hover',
+        'data-disabled:pointer-events-none data-disabled:opacity-50',
       )}
       data-disabled={isMasterColumn || undefined}
     >
       {!grouped && (
         <span
           className={cn(
-            'absolute left-4 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-icon-secondary hover:text-icon-primary data-disabled:opacity-50 data-disabled:pointer-events-none',
+            'absolute top-1/2 left-4 -translate-y-1/2 cursor-grab text-icon-secondary hover:text-icon-primary active:cursor-grabbing data-disabled:pointer-events-none data-disabled:opacity-50',
           )}
           {...attributes}
           {...listeners}

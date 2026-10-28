@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { shade, solveField } from '../bake';
 import cases from './__fixtures__/bake-v17.json';
 

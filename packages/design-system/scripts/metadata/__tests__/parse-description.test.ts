@@ -1,6 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import path from 'path';
+
+import { describe, expect, it } from '@rstest/core';
 import { Project } from 'ts-morph';
+
 import { parseComponentDescription, readMetaDescription } from '../parse-description.js';
 
 const SRC = path.resolve(import.meta.dirname, '../../../src/components');

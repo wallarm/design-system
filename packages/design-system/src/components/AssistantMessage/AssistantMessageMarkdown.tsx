@@ -1,6 +1,8 @@
-// oxlint-disable react/no-array-index-key -- markdown blocks and spans are positional; while streaming only the tail changes
+// markdown blocks and spans are positional; while streaming only the tail changes
 import { type ComponentType, type FC, Fragment, memo, type ReactNode } from 'react';
+
 import type { MarkedToken, Token } from 'marked';
+
 import { cn } from '../../utils/cn';
 import { Checkmark } from '../Checkmark';
 import { Separator } from '../Separator';

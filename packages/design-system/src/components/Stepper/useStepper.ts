@@ -1,4 +1,5 @@
 import { type UseStepsProps, type UseStepsReturn, useSteps } from '@ark-ui/react/steps';
+
 import { STEPPER_MAX_STEPS } from './constants';
 import { clampStep } from './StepperContext';
 
@@ -26,7 +27,7 @@ export interface StepperGuardProps {
 }
 
 const warn = (message: string) =>
-  // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Slider/BarList).
+  // dev-only authoring guard (matches Slider/BarList).
   console.warn(`[Stepper] ${message}`);
 
 /**

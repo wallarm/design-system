@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
 import { Skeleton } from '../../Skeleton';
@@ -58,7 +59,7 @@ export const PieChartSkeleton: FC<PieChartSkeletonProps> = ({
             className='mask-[radial-gradient(circle,transparent_48px,#000_49px)]'
           />
         </div>
-        <div className={cn(pieChartLegendClasses, 'gap-8 pl-0 pr-12 py-12')}>
+        <div className={cn(pieChartLegendClasses, 'gap-8 py-12 pr-12 pl-0')}>
           {Array.from({ length: rows }, (_, i) => (
             <PieChartSkeletonRow key={i} />
           ))}

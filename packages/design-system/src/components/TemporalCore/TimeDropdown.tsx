@@ -9,8 +9,10 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { Time } from '@internationalized/date';
 import type { TimeValue } from '@react-aria/datepicker';
+
 import { Check } from '../../icons';
 import { cn } from '../../utils/cn';
 import { dropdownMenuClassNames, dropdownMenuItemVariants } from '../DropdownMenu';
@@ -194,7 +196,7 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
     <div
       className={cn(
         dropdownMenuClassNames,
-        'absolute left-1/2 -translate-x-1/2 top-full mt-4 z-50',
+        'absolute top-full left-1/2 z-50 mt-4 -translate-x-1/2',
         'h-240 min-w-full p-0',
       )}
       onMouseDown={e => e.preventDefault()}
@@ -234,7 +236,7 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
                   <span className='flex-1 text-left whitespace-nowrap'>
                     {formatTime(option, hourCycle)}
                   </span>
-                  <div className='size-20 flex items-center justify-center shrink-0 text-icon-primary'>
+                  <div className='flex size-20 shrink-0 items-center justify-center text-icon-primary'>
                     {isCurrentValue && <Check className='size-16' />}
                   </div>
                 </button>

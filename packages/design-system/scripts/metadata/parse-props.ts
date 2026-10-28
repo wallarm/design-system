@@ -1,5 +1,5 @@
-import { type Node, type Project, type SourceFile, SyntaxKind, type Type } from 'ts-morph';
 import type { PropMetadata } from '@wallarm-org/mcp-core';
+import { type Node, type Project, type SourceFile, SyntaxKind, type Type } from 'ts-morph';
 
 /**
  * Parse component props from TypeScript types using ts-morph.

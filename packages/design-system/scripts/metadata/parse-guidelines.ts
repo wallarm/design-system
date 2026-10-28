@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import type {
   Guideline,
   GuidelineKind,
@@ -7,6 +8,7 @@ import type {
   GuidelineStory,
   GuidelinesMetadata,
 } from '@wallarm-org/mcp-core';
+
 import { INTERNAL_COMPONENTS, type PublicApi } from './internal.js';
 import { parsePatternStories, patternStoryImports } from './parse-examples.js';
 

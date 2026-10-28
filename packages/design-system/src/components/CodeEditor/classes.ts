@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 /** `CodeEditorContent` wrapper: fills the root's flex column (fullscreen) and clips by height. */
-export const codeEditorContentVariants = cva('relative flex-1 min-h-0');
+export const codeEditorContentVariants = cva('relative min-h-0 flex-1');
 
 /** Element CodeMirror mounts into; `.cm-editor` fills it in the fullscreen column. */
 export const codeEditorHostVariants = cva('h-full [&>.cm-editor]:h-full');
@@ -45,7 +45,7 @@ export const codeEditorFallbackCodeVariants = cva('flex min-w-0 flex-1 flex-col 
 export const codeEditorFallbackLineVariants = cva('block min-h-lh leading-sm', {
   variants: {
     wrapLines: {
-      true: 'whitespace-pre-wrap break-all',
+      true: 'break-all whitespace-pre-wrap',
       false: 'whitespace-pre',
     },
   },

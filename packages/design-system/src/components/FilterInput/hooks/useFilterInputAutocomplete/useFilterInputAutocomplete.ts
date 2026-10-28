@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useCallback } from 'react';
+import { type RefObject, useCallback } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
 import { isMultiSelectOperator } from '../../lib';

@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { SHAPE_IDS } from '../data.gen';
 import type { StateId } from '../eyes';
 import { geom, optY, shapeOf } from '../geom';

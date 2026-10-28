@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex, validateValueForField } from '../../lib';
 import type {
@@ -26,7 +27,7 @@ interface ExpressionState {
 }
 
 const EMPTY_STATE: ExpressionState = { conditions: [], connectors: [] };
-const DEFAULT_CONNECTOR: 'and' = 'and';
+const DEFAULT_CONNECTOR = 'and' as const;
 
 /**
  * Re-derive each condition's `value` error from its field's allowlist.

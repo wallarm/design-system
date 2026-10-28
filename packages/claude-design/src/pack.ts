@@ -14,6 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
+
 import { CLAUDE_DESIGN, PACKAGE_DIR } from './config';
 import { SAMPLER_FILE, SKELETON_DATA, SKELETON_FILE } from './sampler/sampler';
 

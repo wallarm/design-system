@@ -1,7 +1,10 @@
 import type { ElementType, ReactNode } from 'react';
-import { describe, expect, it, rs } from '@rstest/core';
+
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+
+import { describe, expect, it, rs } from '@rstest/core';
+
 import { SAMPLER_FILE, SKELETON_FILE } from '../sampler/sampler';
 import { createReact18Window } from './react18';
 

@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+
 import type { SvgIconProps } from '../../../icons/SvgIcon';
 
 export interface NavConfigHeaderAction {

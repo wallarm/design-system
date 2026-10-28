@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, MouseEvent } from 'react';
+
 import { DatePicker } from '@ark-ui/react';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { useCalendarContext } from './CalendarContext';
@@ -62,8 +64,8 @@ export const CalendarPresetItem: FC<CalendarPresetItemProps> = ({
           }}
           className={cn(
             'flex items-center justify-between',
-            'w-full px-8 py-6 rounded-6',
-            'font-sans font-normal text-sm leading-sm text-text-primary',
+            'w-full rounded-6 px-8 py-6',
+            'font-sans text-sm leading-sm font-normal text-text-primary',
             'select-none',
             'transition-colors',
             'outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
@@ -78,9 +80,9 @@ export const CalendarPresetItem: FC<CalendarPresetItemProps> = ({
             <span
               className={cn(
                 'flex items-center justify-center',
-                'min-w-20 h-20 px-4',
-                'font-mono font-normal text-xs leading-xs',
-                'border border-component-border-hotkey rounded-4',
+                'h-20 min-w-20 px-4',
+                'font-mono text-xs leading-xs font-normal',
+                'rounded-4 border border-component-border-hotkey',
                 'bg-bg-surface-2',
               )}
             >

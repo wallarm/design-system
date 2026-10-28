@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { useCodeSnippet } from '../hooks';
 import { LINE_COLOR_STYLES, SIZE_LINE_HEIGHT_CLASSES } from '../lib/lineStyles';
@@ -12,7 +13,7 @@ export const CodeSnippetHighlights: FC = () => {
   return (
     <div
       data-slot='code-snippet-highlights'
-      className='absolute inset-0 z-0 flex flex-col py-8 pointer-events-none'
+      className='pointer-events-none absolute inset-0 z-0 flex flex-col py-8'
       aria-hidden='true'
     >
       {visibleDisplayItems.map(item => {

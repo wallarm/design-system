@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it, rstest } from '@rstest/core';
+
 import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import { hexOf, mix } from '../color';
 import { SHAPES } from '../data.gen';

@@ -1,13 +1,16 @@
-import type {
-  FC,
-  HTMLAttributes,
-  KeyboardEvent,
-  PointerEvent,
-  ReactElement,
-  ReactNode,
-  Ref,
+import {
+  type FC,
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+  Children,
+  isValidElement,
+  useRef,
 } from 'react';
-import { Children, isValidElement, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, type TooltipProps, TooltipTrigger } from '../Tooltip';

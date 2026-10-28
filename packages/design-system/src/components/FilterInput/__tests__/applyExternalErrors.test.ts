@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { applyExternalErrors } from '../hooks/useFilterInputExpression/applyExternalErrors';
 import { buildChips } from '../hooks/useFilterInputExpression/buildChips';
 import type { Condition, FieldMetadata } from '../types';

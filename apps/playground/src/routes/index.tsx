@@ -17,7 +17,7 @@ function HomePage() {
   const handleSwitchTheme = () => setTheme(nextTheme);
 
   return (
-    <div className='flex flex-col justify-center w-screen h-screen p-32'>
+    <div className='flex h-screen w-screen flex-col justify-center p-32'>
       <VStack gap={12} justify='center' align='center'>
         <Heading color='primary'>Wallarm Design System Playground</Heading>
         <Text color='secondary' align='center'>

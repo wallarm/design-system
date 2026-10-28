@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useEffect, useState } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
+
 import { CHAR_WIDTH_PX, MAX_INPUT_WIDTH, MIN_INPUT_WIDTH, WIDTH_OFFSET } from '../constants';
 
 interface UseSizerWidthOptions {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { FilterInputErrors } from '../FilterInputErrors/FilterInputErrors';
 
 describe('FilterInputErrors — AS-882 hydration shape', () => {

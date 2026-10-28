@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Stack, type StackProps } from './Stack';
 
 export type HStackProps = Omit<StackProps, 'direction'>;

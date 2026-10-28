@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { Tour as ArkUiTour } from '@ark-ui/react';
+
 import { useTestId } from '../../utils/testId';
 import { Heading } from '../Heading';
 import {

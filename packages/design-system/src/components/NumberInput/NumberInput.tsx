@@ -1,6 +1,8 @@
 import type { FC, Ref } from 'react';
+
 import { NumberInput as ArkUiNumberInput } from '@ark-ui/react/number-input';
 import type { VariantProps } from 'class-variance-authority';
+
 import { ChevronDown, ChevronUp } from '../../icons';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';

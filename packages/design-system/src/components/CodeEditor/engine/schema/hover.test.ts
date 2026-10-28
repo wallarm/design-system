@@ -1,6 +1,7 @@
 import { EditorState } from '@codemirror/state';
 import { EditorView, type Tooltip } from '@codemirror/view';
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import type { JsonSchema } from '../../types';
 import { findJsonBodyRange, http } from '../languages/http';
 import { json } from '../languages/json';

@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useMemo } from 'react';
+import { type RefObject, useMemo } from 'react';
+
 import { type AnchorBounds, buildAnchoredRect, QUERY_BAR_SELECTOR, toAnchorBounds } from '../lib';
 
 interface UseFilterInputPositioningProps {

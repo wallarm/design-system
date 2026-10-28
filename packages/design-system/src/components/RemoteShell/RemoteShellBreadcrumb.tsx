@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Breadcrumbs, BreadcrumbsItem, BreadcrumbsScopeSwitcher } from '../Breadcrumbs';
@@ -24,7 +25,7 @@ export const RemoteShellBreadcrumb: FC<RemoteShellBreadcrumbProps> = ({
       ref={ref}
       data-slot='remote-shell-breadcrumb'
       data-testid={testId}
-      className={cn('[grid-area:breadcrumb] flex items-center gap-8 px-24 py-8', className)}
+      className={cn('flex items-center gap-8 px-24 py-8 [grid-area:breadcrumb]', className)}
     >
       <Breadcrumbs data-slot='nav-breadcrumbs' className='-ml-4'>
         {breadcrumbSegments.map((segment, i) => {

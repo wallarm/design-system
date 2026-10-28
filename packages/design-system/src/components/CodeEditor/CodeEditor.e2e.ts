@@ -1,9 +1,11 @@
-import { expect, type Locator, type Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { storyNameFromExport } from 'storybook/internal/csf';
+
+import { expect, type Locator, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { storyNameFromExport } from 'storybook/internal/csf';
+
 import { CODE_EDITOR_KEYBOARD_HINT } from './lib/keyboardHint';
 
 const COMPONENT_ID = 'data-display-codeeditor';

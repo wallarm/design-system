@@ -1,5 +1,7 @@
-import { type PluginObj, types as t } from '@babel/core';
 import { resolve } from 'node:path';
+
+import { type PluginObj, types as t } from '@babel/core';
+
 import { DESIGN_SYSTEM_DIR } from '../config';
 
 export function globalImportsPlugin(filename: string, exportedNames: Set<string>): PluginObj {

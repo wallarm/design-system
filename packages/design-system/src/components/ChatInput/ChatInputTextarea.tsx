@@ -7,7 +7,9 @@ import {
   useEffect,
   useRef,
 } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { useAutoResize } from '../Textarea/useAutoResize';

@@ -1,6 +1,8 @@
 import { type FC, type PropsWithChildren, useRef } from 'react';
+
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { cn } from '../../utils/cn';
 import { HStack, VStack } from '../Stack';
 import { ScrollArea } from './ScrollArea';
@@ -38,7 +40,7 @@ export default meta;
 const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
   <div
     className={cn(
-      'flex py-4 px-8 items-center justify-center rounded-6 border border-border-info bg-bg-light-info font-mono text-xs text-text-info',
+      'flex items-center justify-center rounded-6 border border-border-info bg-bg-light-info px-8 py-4 font-mono text-xs text-text-info',
       className,
     )}
   >
@@ -48,7 +50,7 @@ const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, classNam
 
 /** The default vertical bar, inside a 320px box that gives the fifty rows something to overflow. */
 export const Vertical: StoryFn<typeof meta> = () => (
-  <div className='w-320 h-320 overflow-hidden'>
+  <div className='h-320 w-320 overflow-hidden'>
     <ScrollArea>
       <ScrollAreaViewport>
         <ScrollAreaContent>
@@ -75,7 +77,7 @@ export const Vertical: StoryFn<typeof meta> = () => (
 
 /** `orientation='horizontal'` puts the bar along the bottom edge, for a row that runs past its container rather than a column that runs below it. */
 export const Horizontal: StoryFn<typeof meta> = () => (
-  <div className='w-320 h-320 overflow-hidden'>
+  <div className='h-320 w-320 overflow-hidden'>
     <ScrollArea>
       <ScrollAreaViewport>
         <ScrollAreaContent>
@@ -128,7 +130,7 @@ export const Virtualized: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className='w-320 h-320 overflow-hidden'>
+    <div className='h-320 w-320 overflow-hidden'>
       <ScrollArea>
         <ScrollAreaViewport ref={scrollRef}>
           <ScrollAreaContent className='h-auto min-h-full'>

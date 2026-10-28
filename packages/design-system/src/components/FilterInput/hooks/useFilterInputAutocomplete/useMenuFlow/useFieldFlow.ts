@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,

@@ -1,4 +1,5 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { range } from '../../utils/range';
 import { TestIdProvider } from '../../utils/testId';
 import type { HttpMethodName } from '../HttpMethod';
@@ -104,7 +105,7 @@ export const ParameterPathRow: FC<ParameterPathRowProps> = ({
         data-slot='parameter-path-row'
         data-row={ROW.measure}
         aria-hidden='true'
-        className='flex items-center gap-0 absolute left-[-9999px] top-0 invisible pointer-events-none'
+        className='pointer-events-none invisible absolute top-0 left-[-9999px] flex items-center gap-0'
       >
         <TestIdProvider value={undefined}>{items}</TestIdProvider>
       </div>

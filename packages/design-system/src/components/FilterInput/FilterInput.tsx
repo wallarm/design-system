@@ -1,5 +1,5 @@
-import type { FC, HTMLAttributes } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { type FC, type HTMLAttributes, useCallback, useEffect, useMemo, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { FilterInputProvider, useFilterInputContextValue } from './FilterInputContext';

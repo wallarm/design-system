@@ -1,7 +1,9 @@
 import { createElement } from 'react';
+
 import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { EditorView, gutter } from '@codemirror/view';
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { createPortalRegistry, type PortalRegistry } from '../lib/portalRegistry';
 import { guttersExtension, PREFIX_GUTTER_CLASS, STICK_GUTTER_CLASS } from './gutters';

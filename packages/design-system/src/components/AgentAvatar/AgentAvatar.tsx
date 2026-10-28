@@ -1,5 +1,6 @@
 import type { FC, Ref, RefObject, SVGProps } from 'react';
 import { useContext, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
+
 import { charTree } from '../../lib/agent-characters/char';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
 import { CAST } from '../../lib/agent-characters/data.gen';

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { Building, CircleDashed, Plus } from '../../../icons';
 import { Button } from '../../Button';
 import { Code } from '../../Code';
@@ -75,7 +76,7 @@ export const StorySearchModal = () => {
           variant='ghost'
           size='small'
           color='neutral'
-          className='p-4 gap-6 rounded-6'
+          className='gap-6 rounded-6 p-4'
           data-slot='top-header-search'
         >
           <Code size='s' color='secondary'>
@@ -113,12 +114,12 @@ export const StorySearchModal = () => {
             {!lowerQuery && (
               <>
                 <SearchModalItem onSelect={() => {}}>
-                  <Building className='text-text-secondary !icon-md' />
+                  <Building className='!icon-md text-text-secondary' />
                   <Text size='sm'>Switch tenant</Text>
                 </SearchModalItem>
 
                 <SearchModalItem onSelect={() => {}}>
-                  <Plus className='text-text-secondary !icon-md' />
+                  <Plus className='!icon-md text-text-secondary' />
                   <Text size='sm'>Create...</Text>
                 </SearchModalItem>
               </>
@@ -134,7 +135,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredRecent.map(item => (
                 <SearchModalItem key={`${item.page}-${item.product}`} onSelect={() => {}}>
-                  <CircleDashed className='text-text-primary shrink-0 !icon-md' />
+                  <CircleDashed className='!icon-md shrink-0 text-text-primary' />
                   <Text size='sm' grow truncate>
                     {item.page}
                     <Text size='sm' color='secondary' inline>
@@ -161,7 +162,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredJumpTo.map(item => (
                 <SearchModalItem key={item.href} onSelect={() => {}}>
-                  <CircleDashed className='text-text-primary shrink-0 !icon-md' />
+                  <CircleDashed className='!icon-md shrink-0 text-text-primary' />
                   <Text size='sm'>{item.name}</Text>
                 </SearchModalItem>
               ))}

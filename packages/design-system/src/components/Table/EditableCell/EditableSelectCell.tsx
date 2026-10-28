@@ -1,6 +1,7 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useMemo } from 'react';
+import { type FC, type HTMLAttributes, type ReactNode, type Ref, useMemo } from 'react';
+
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+
 import { ChevronDown } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
@@ -108,7 +109,7 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
         </ArkUiSelect.Trigger>
       </ArkUiSelect.Control>
       <SelectPositioner
-        className='min-w-full max-w-full'
+        className='max-w-full min-w-full'
         style={{ width: 'calc(var(--reference-width) + 16px)' }}
       >
         <SelectContent>

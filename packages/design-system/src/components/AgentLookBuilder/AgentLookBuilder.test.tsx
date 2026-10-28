@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-v17.json';
 import { normalise } from '../../lib/agent-characters/__tests__/normaliseSvg';
 import { charTree } from '../../lib/agent-characters/char';

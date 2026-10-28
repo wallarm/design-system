@@ -1,5 +1,7 @@
 import type { ComponentPropsWithRef, FC } from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../../utils/cn';
 import { tableBodyCellVariants } from '../classes';
 

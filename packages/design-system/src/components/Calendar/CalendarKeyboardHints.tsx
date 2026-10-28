@@ -1,4 +1,5 @@
 import type { FC, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { Kbd } from '../Kbd';
 
@@ -21,15 +22,15 @@ export const CalendarKeyboardHints: FC<CalendarKeyboardHintsProps> = ({ ref, cla
         <Kbd size='small'>&darr;</Kbd>
         <Kbd size='small'>&rarr;</Kbd>
       </div>
-      <span className='font-sans font-medium text-xs text-text-secondary'>to navigate</span>
+      <span className='font-sans text-xs font-medium text-text-secondary'>to navigate</span>
     </div>
     <div className='flex items-center gap-4'>
       <Kbd size='small'>Enter</Kbd>
-      <span className='font-sans font-medium text-xs text-text-secondary'>to select</span>
+      <span className='font-sans text-xs font-medium text-text-secondary'>to select</span>
     </div>
     <div className='flex items-center gap-4'>
       <Kbd size='small'>ESC</Kbd>
-      <span className='font-sans font-medium text-xs text-text-secondary'>to close</span>
+      <span className='font-sans text-xs font-medium text-text-secondary'>to close</span>
     </div>
   </div>
 );

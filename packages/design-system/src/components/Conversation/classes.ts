@@ -8,7 +8,7 @@ export const conversationVariants = cva('relative flex min-h-0 flex-1 flex-col')
  * not clipped.
  */
 export const conversationScrollerVariants = cva(
-  '[overflow-anchor:none] outline-none focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:ring-inset',
+  'outline-none [overflow-anchor:none] focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:ring-inset',
 );
 
 /** The inner measured column: no gap — the 30px actions row spaces the messages (v1 §3.1). */

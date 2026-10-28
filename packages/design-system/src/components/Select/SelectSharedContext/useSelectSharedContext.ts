@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { SelectSharedContext, type SelectSharedContextValue } from './SelectSharedContext';
 
 export const useSelectSharedContext = (): SelectSharedContextValue => {

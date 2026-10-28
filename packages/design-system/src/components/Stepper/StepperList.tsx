@@ -1,5 +1,7 @@
 import type { FC, OlHTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Steps as ArkSteps } from '@ark-ui/react/steps';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { stepperListVariants } from './classes';

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { NavPanel, NavPanelHeader, NavPanelSkeleton } from '../NavPanel';
@@ -40,7 +41,7 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
         ref={ref}
         data-slot='remote-shell-panel'
         data-testid={testId}
-        className={cn('[grid-area:panel] min-h-0', className)}
+        className={cn('min-h-0 [grid-area:panel]', className)}
       >
         <NavPanel>
           <NavPanelHeader>{config.productLabel}</NavPanelHeader>
@@ -60,7 +61,7 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
         ref={ref}
         data-slot='remote-shell-panel'
         data-testid={testId}
-        className={cn('[grid-area:panel] min-h-0', className)}
+        className={cn('min-h-0 [grid-area:panel]', className)}
       >
         <NavPanel resizable={resizable}>
           <div className='min-h-0 flex-1 overflow-hidden'>
@@ -116,7 +117,7 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
       ref={ref}
       data-slot='remote-shell-panel'
       data-testid={testId}
-      className={cn('[grid-area:panel] min-h-0', className)}
+      className={cn('min-h-0 [grid-area:panel]', className)}
     >
       <NavPanel resizable={resizable}>
         <NavPanelContent level={drillLevel} />

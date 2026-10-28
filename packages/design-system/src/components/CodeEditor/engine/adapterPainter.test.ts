@@ -1,6 +1,7 @@
 import { EditorState, Text } from '@codemirror/state';
 import { type DecorationSet, EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { plainAdapter } from '../../CodeSnippet/adapters/plain';
 import type { HighlightResult, SyntaxAdapter, Token } from '../../CodeSnippet/adapters/types';
 import { adapterPainter, buildTokenDecorations, getPaintedDecorations } from './adapterPainter';

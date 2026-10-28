@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -34,7 +35,7 @@ export const BreadcrumbsSeparator: FC<BreadcrumbsSeparatorProps> = ({
 
   return (
     <li
-      className={cn('flex items-center justify-center w-20 h-20', className)}
+      className={cn('flex h-20 w-20 items-center justify-center', className)}
       aria-hidden='true'
       data-testid={testId}
       {...props}

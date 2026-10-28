@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { useTabsSharedContext } from '../TabsSharedContext';
 

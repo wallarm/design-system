@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Check } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { SORT_LABELS, useTableValue } from '../lib';

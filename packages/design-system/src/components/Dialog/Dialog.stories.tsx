@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
 import {
@@ -931,15 +933,15 @@ export const WithTabs: StoryFn<DialogProps> = () => {
           <DialogBody>
             <div className='pt-12'>
               <TabsContent value='tab1'>
-                <h3 className='text-lg font-medium mb-8'>General Settings</h3>
+                <h3 className='mb-8 text-lg font-medium'>General Settings</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab2'>
-                <h3 className='text-lg font-medium mb-8'>Configuration</h3>
+                <h3 className='mb-8 text-lg font-medium'>Configuration</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab3'>
-                <h3 className='text-lg font-medium mb-8'>Advanced Options</h3>
+                <h3 className='mb-8 text-lg font-medium'>Advanced Options</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
             </div>

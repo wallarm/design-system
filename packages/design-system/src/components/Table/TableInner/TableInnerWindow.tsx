@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
+
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import {

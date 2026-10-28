@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { AgentGlyph } from './AgentGlyph';
 
 describe('AgentGlyph a11y', () => {

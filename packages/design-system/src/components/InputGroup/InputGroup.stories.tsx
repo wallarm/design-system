@@ -1,5 +1,6 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ArrowUp, Info, LayoutGrid, LayoutTemplate, Search, Settings2 } from '../../icons';
 import { Button } from '../Button';
 import { Input } from '../Input';

@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Switch as ArkUiSwitch } from '@ark-ui/react/switch';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 

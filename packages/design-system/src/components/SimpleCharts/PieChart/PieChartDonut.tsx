@@ -7,7 +7,9 @@ import {
   useCallback,
   useContext,
 } from 'react';
+
 import { Pie, type PieSectorShapeProps, PieChart as RechartsPieChart, Sector } from 'recharts';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { pieChartDonutClasses } from './classes';
@@ -121,7 +123,7 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
           fill={fill}
           opacity={opacity}
           stroke='none'
-          className={cn('outline-none transition-opacity duration-150 ease-out', datum?.className)}
+          className={cn('transition-opacity duration-150 ease-out outline-none', datum?.className)}
           data-slot='pie-chart-slice'
           data-testid={sliceTestId}
           data-name={name}

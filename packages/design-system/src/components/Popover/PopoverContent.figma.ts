@@ -1,8 +1,7 @@
 // url=https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=2619-13738
 // source=https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/Popover/PopoverContent.tsx
 // component=PopoverContent
-import type { SlotResult } from 'figma';
-import figma from 'figma';
+import figma, { type SlotResult } from 'figma';
 
 // An empty slot comes back as a guid-less SLOT section that renders "Missing snippet".
 const filled = (slot?: SlotResult) => !!slot?.some(s => s.type !== 'SLOT' || s.guid);

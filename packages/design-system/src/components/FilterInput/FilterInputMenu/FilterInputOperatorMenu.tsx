@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { type FC, Fragment, useMemo } from 'react';
+import { type RefObject, type FC, Fragment, useMemo } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
 import {
@@ -165,7 +165,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
     >
       <DropdownMenuContent
         ref={menuRef}
-        className={cn('w-256 max-h-[430px]', className)}
+        className={cn('max-h-[430px] w-256', className)}
         data-filter-input-menu='true'
         data-testid={testId}
       >

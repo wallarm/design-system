@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useMemo } from 'react';
+import { type RefObject, useMemo } from 'react';
+
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
 import type { FilterInputChipData, MenuState } from '../types';
 import type { BuildingChipData, FilterInputContextValue } from './types';

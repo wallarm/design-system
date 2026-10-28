@@ -1,8 +1,9 @@
-import type { FC, ReactNode } from 'react';
-import { createRef, useState } from 'react';
+import { type FC, type ReactNode, createRef, useState } from 'react';
+
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import {
   BulkBarSummaryClear,

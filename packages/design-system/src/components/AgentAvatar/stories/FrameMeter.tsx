@@ -1,4 +1,5 @@
 import { type FC, useEffect, useState } from 'react';
+
 import { subscribeFrames } from './subscribeFrames';
 
 /** Story-only: engine frames per second and JavaScript per frame, refreshed every second. */

@@ -19,6 +19,7 @@ import {
   lineNumberMarkers,
   type ViewUpdate,
 } from '@codemirror/view';
+
 import { cn } from '../../../utils/cn';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';
 import type { PortalRegistry } from '../lib/portalRegistry';

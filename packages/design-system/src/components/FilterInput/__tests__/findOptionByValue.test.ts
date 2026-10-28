@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { findOptionByValue } from '../lib';
 import type { FieldMetadata } from '../types';
 

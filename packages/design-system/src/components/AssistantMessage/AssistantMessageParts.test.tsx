@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { TestIdProvider, useTestId } from '../../utils/testId';
 import { AssistantMessage } from './AssistantMessage';
 import { AssistantMessageError } from './AssistantMessageError';

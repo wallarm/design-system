@@ -7,6 +7,7 @@ import {
   type Ref,
   useMemo,
 } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
@@ -86,7 +87,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
       {hasGutter && (
         <div
           data-slot='code-snippet-gutter'
-          className='sticky left-0 z-20 flex shrink-0 py-8 -my-8 mr-8 code-snippet-bg [contain:paint]'
+          className='sticky left-0 z-20 -my-8 mr-8 flex shrink-0 py-8 [contain:paint] code-snippet-bg'
         >
           {hasHighlights && (
             <ColorStickColumn
@@ -108,7 +109,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
       )}
       <div
         className={cn(
-          'relative z-10 flex flex-1 min-w-0',
+          'relative z-10 flex min-w-0 flex-1',
           !useInlineGutter && 'pr-12',
           !hasGutter && !useInlineGutter && 'pl-12',
         )}
@@ -127,7 +128,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
         data-testid={testId}
         className={cn(
           'min-h-0 overscroll-none',
-          wrapLines ? 'overflow-y-auto overflow-x-hidden' : 'overflow-auto',
+          wrapLines ? 'overflow-x-hidden overflow-y-auto' : 'overflow-auto',
           className,
         )}
         {...props}

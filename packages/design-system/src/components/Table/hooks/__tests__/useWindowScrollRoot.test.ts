@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
+
 import { useWindowScrollRoot } from '../useWindowScrollRoot';
 
 const setHeights = (el: HTMLElement, client: number, scroll: number) =>

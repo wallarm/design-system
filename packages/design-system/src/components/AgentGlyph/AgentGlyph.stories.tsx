@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { defaultLook } from '../../lib/agent-characters/look';
 import { HStack, VStack } from '../Stack';

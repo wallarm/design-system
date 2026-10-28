@@ -1,12 +1,14 @@
 import type { FC, ReactNode } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../../utils/cn';
 import type { TestableProps } from '../../../utils/testId';
 import { useTableContext } from '../TableContext';
 import { useTableActionBarAnchorRef } from './TableActionBarAnchorRefContext';
 
-const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
+const tableActionBarAnchorVariants = cva(cn('relative w-full outline-none'), {
   variants: {
     virtualized: {
       container: 'h-full',

@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { useOf } from '@storybook/addon-docs/blocks';
+
 import { DocsSection } from './DocsSection';
 import { ISSUE_URL, resolveStoryFileUrl } from './sourceUrl';
 import { DOCS_LINK_CLASS_NAME } from './styles';

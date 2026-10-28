@@ -7,6 +7,7 @@ import type {
   RowSelectionState,
   Table,
 } from '@tanstack/react-table';
+
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
 import { useTableContext } from '../TableContext';

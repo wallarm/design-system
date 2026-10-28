@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 import { buildCanvasScripts, readInlineScript } from './rslib-build';
 

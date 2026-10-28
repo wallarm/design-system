@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ArrowRight, SquareArrowOutUpRight } from '../../icons';
 import { VStack } from '../Stack';
 import { Link } from './Link';

@@ -25,4 +25,4 @@ export const listVariants = cva('flex flex-col', {
 
 export const listItemVariants = cva('flex');
 
-export const listIconVariants = cva('inline-flex items-center shrink-0 mr-6 align-middle');
+export const listIconVariants = cva('mr-6 inline-flex shrink-0 items-center align-middle');

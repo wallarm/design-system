@@ -70,7 +70,7 @@ export function stripPageContent(
   content: string,
   toc: { charIndex: number }[],
 ): { content: string; charIndexes: number[] } {
-  const cuts = [...toc.map(t => t.charIndex)].sort((a, b) => a - b);
+  const cuts = toc.map(t => t.charIndex).sort((a, b) => a - b);
   const starts = [0, ...cuts];
   let out = '';
   const offsets = new Map<number, number>();

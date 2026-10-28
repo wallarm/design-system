@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import {
   Avatar,
   AvatarContent,
@@ -671,7 +673,7 @@ export const SearchableSelect: StoryFn = () => {
           data-testid='timezone-select'
         >
           <SelectInput placeholder='Choose a time zone' data-testid='timezone-input' />
-          <SelectPositioner className='min-w-full max-w-full'>
+          <SelectPositioner className='max-w-full min-w-full'>
             <SelectHeader>
               <SelectSearchInput value={searchValue} onChange={onSearchChange} />
             </SelectHeader>

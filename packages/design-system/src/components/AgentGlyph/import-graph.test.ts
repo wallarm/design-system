@@ -1,6 +1,7 @@
-import { describe, expect, it } from '@rstest/core';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
 
 // WDS-198: a glyph-only import loads no bake, worker, queue or animation code (06 §9).
 const resolve = (from: string, spec: string) => {
@@ -40,7 +41,7 @@ describe('AgentGlyph import graph', () => {
     ]) {
       const files = graph(path.resolve(__dirname, entry));
       expect(
-        files.filter(f => /agent-characters\/props\.ts$/.test(f)),
+        files.filter(f => f.endsWith('agent-characters/props.ts')),
         entry,
       ).toEqual([]);
     }

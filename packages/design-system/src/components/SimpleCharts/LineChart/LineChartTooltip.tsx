@@ -1,5 +1,7 @@
 import { type FC, type ReactNode, useContext, useMemo } from 'react';
+
 import { Tooltip, type TooltipContentProps, usePlotArea } from 'recharts';
+
 import { lineChartTooltipCenterClasses } from './classes';
 import { HOVER_POPOVER_TOP, LINE_CURSOR_DASHARRAY } from './constants';
 import {

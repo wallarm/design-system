@@ -1,5 +1,15 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, Ref } from 'react';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import {
+  type FC,
+  type FocusEvent,
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type Ref,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
+
 import { cn } from '../../../../utils/cn';
 import { useTestId } from '../../../../utils/testId';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
@@ -158,7 +168,7 @@ export const Segment: FC<SegmentProps> = ({
             {...(caretMode === 'end' && { 'data-caret-mode': 'end' })}
             className={cn(
               segmentTextVariants({ variant, error }),
-              'bg-transparent outline-none p-0 m-0',
+              'm-0 bg-transparent p-0 outline-none',
               // Value input hugs its content (measured width + WIDTH_OFFSET); `min-w-0`
               // drops the flex/intrinsic floor so a short value isn't boxed wide. An
               // empty value falls back to the sizer's MIN_INPUT_WIDTH; the idle click

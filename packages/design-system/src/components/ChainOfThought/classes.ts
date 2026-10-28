@@ -92,5 +92,5 @@ export const chainOfThoughtLineVariants = cva(
 );
 
 export const chainOfThoughtBodyVariants = cva(
-  'flex min-w-0 flex-1 flex-col gap-16 py-12 pl-6 pe-3 [&_ul]:list-disc [&_ul]:ps-18 [&_:is(h1,h2,h3,h4)]:font-medium',
+  'flex min-w-0 flex-1 flex-col gap-16 py-12 pe-3 pl-6 [&_:is(h1,h2,h3,h4)]:font-medium [&_ul]:list-disc [&_ul]:ps-18',
 );

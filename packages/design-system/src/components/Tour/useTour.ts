@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
+
 import { useTour as useArkTour } from '@ark-ui/react';
+
 import { TOUR_SPOTLIGHT_OFFSET, TOUR_SPOTLIGHT_RADIUS } from './const';
 import type {
   TourStatusChangeDetails,

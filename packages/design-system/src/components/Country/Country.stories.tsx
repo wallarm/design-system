@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { HStack, VStack } from '../Stack';
 import { Country } from './Country';
 import { CountryFlag } from './CountryFlag';

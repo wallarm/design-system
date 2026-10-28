@@ -1,5 +1,7 @@
 import { type FC, useEffect, useRef } from 'react';
+
 import type { RowData } from '@tanstack/react-table';
+
 import { cn } from '../../utils/cn';
 import { useStickyGroupParent } from './hooks';
 import {
@@ -99,7 +101,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
   // scroll which causes a brief layout reflow (the "jump" glitch).
   return (
     <div
-      className='sticky z-[21] h-0 overflow-visible pointer-events-none'
+      className='pointer-events-none sticky z-[21] h-0 overflow-visible'
       style={{ top: headerHeight }}
       aria-hidden='true'
     >
@@ -107,7 +109,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
         <div className='overflow-hidden' style={{ height: rowRef.current?.offsetHeight ?? 40 }}>
           <div style={{ transform: pushUpOffset ? `translateY(${pushUpOffset}px)` : undefined }}>
             <table
-              className='table-fixed border-separate border-spacing-0 pointer-events-auto'
+              className='pointer-events-auto table-fixed border-separate border-spacing-0'
               style={{ width: tableWidth }}
             >
               <TableColGroup tableWidth={tableWidth} />
@@ -136,9 +138,9 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
                         <Td
                           key={cell.id}
                           className={cn(
-                            'border-b border-border-primary-light bg-bg-surface-2 overlay',
+                            'overlay border-b border-border-primary-light bg-bg-surface-2',
                             'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-                            'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
+                            'group-has-[[data-state=open]]/row:overlay-states-primary-hover group-data-[preview-active]/row:overlay-states-primary-hover',
                           )}
                           style={{ width: cell.column.getSize() }}
                           aria-hidden='true'

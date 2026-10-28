@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { Textarea } from './Textarea';
 
 describe('Attribute pass-through', () => {

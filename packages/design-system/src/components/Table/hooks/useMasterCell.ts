@@ -1,6 +1,7 @@
-import type { MouseEvent } from 'react';
-import { useCallback } from 'react';
+import { type MouseEvent, useCallback } from 'react';
+
 import type { RowData } from '@tanstack/react-table';
+
 import { useTableContext } from '../TableContext';
 
 /**

@@ -1,8 +1,10 @@
-import tailwindcss from '@tailwindcss/postcss';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import tailwindcss from '@tailwindcss/postcss';
 import postcss from 'postcss';
+
 import { CLAUDE_DESIGN } from '../config';
 import { themeSelector } from '../tokens/build-tokens';
 import { canvasSafelist } from './safelist';

@@ -1,6 +1,8 @@
 import { createRef, useState } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+
 import {
   ImageCropper,
   ImageCropperContext,

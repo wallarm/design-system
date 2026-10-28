@@ -1,4 +1,5 @@
 import { type FC, useState } from 'react';
+
 import { Eye, EyeOff } from '../../icons';
 import { Input, type InputProps } from '../Input';
 import { InputGroup } from '../InputGroup/InputGroup';
@@ -41,7 +42,7 @@ export const PasswordInput: FC<PasswordInputProps> = ({
               disabled={disabled}
               aria-label={visible ? 'Hide password' : 'Show password'}
               onClick={toggle}
-              className='cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex'
+              className='flex cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'
             >
               {visible ? (
                 <EyeOff size='md' className='text-icon-secondary' />

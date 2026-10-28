@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+
 import { CLAUDE_DESIGN, PACKAGE_DIR } from '../config';
 
 /** Shipped at the project root, so its link lines match the README's load order. */

@@ -1,7 +1,14 @@
-import type { ComponentPropsWithRef, FC, ReactElement } from 'react';
-import { cloneElement, isValidElement } from 'react';
+import {
+  type ComponentPropsWithRef,
+  type FC,
+  type ReactElement,
+  cloneElement,
+  isValidElement,
+} from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { Copyable } from '../Copyable';
 
@@ -34,10 +41,10 @@ const inlineCodeSnippetVariants = cva(
   {
     variants: {
       size: {
-        sm: 'text-xs px-4 py-2',
-        md: 'text-sm px-4 py-2',
-        lg: 'text-base leading-sm px-4 py-2',
-        inherit: 'text-[1em] px-[0.25em] py-[0.125em]',
+        sm: 'px-4 py-2 text-xs',
+        md: 'px-4 py-2 text-sm',
+        lg: 'px-4 py-2 text-base leading-sm',
+        inherit: 'px-[0.25em] py-[0.125em] text-[1em]',
       },
       copyable: {
         true: 'cursor-pointer hover:bg-states-primary-hover active:bg-states-primary-pressed',

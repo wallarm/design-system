@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const resizableHandleVariants = cva(
@@ -35,13 +36,13 @@ export const resizableHandleVariants = cva(
         horizontal: cn(
           'w-px',
           'cursor-col-resize',
-          'before:w-3 before:inset-y-0',
-          'after:inset-y-0 after:-inset-x-6',
+          'before:inset-y-0 before:w-3',
+          'after:-inset-x-6 after:inset-y-0',
         ),
         vertical: cn(
           'h-px',
           'cursor-row-resize',
-          'before:h-3 before:inset-x-0',
+          'before:inset-x-0 before:h-3',
           'after:inset-x-0 after:-inset-y-6',
         ),
       },

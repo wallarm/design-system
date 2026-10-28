@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { SelectionContext, type SelectionContextValue } from './SelectionContext';
 
 export const useSelectionContext = (): SelectionContextValue => {

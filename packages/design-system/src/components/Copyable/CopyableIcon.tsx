@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Check, Copy } from '../../icons';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { useCopyable } from './CopyableContext';

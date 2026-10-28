@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 // oxlint-disable-next-line no-shadow-restricted-names -- icon name matches Lucide convention

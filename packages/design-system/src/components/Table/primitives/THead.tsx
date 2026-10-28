@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef, FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 
 export const THead: FC<ComponentPropsWithRef<'thead'>> = ({ ref, className, ...props }) => (

@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { Progress as ArkUiProgress } from '@ark-ui/react/progress';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { progressRangeVariants, progressTrackVariants } from './classes';
@@ -37,7 +39,7 @@ export const Progress: FC<ProgressProps> = ({
       max={max}
       data-slot='progress'
       data-testid={testId}
-      className={cn('flex items-center gap-8 min-w-118 w-full', className)}
+      className={cn('flex w-full min-w-118 items-center gap-8', className)}
     >
       <ArkUiProgress.Track
         data-slot='progress-track'
@@ -51,7 +53,7 @@ export const Progress: FC<ProgressProps> = ({
       {showLabel && (
         <ArkUiProgress.ValueText
           data-slot='progress-label'
-          className='text-text-secondary font-sans-display text-xs font-medium tabular-nums'
+          className='font-sans-display text-xs font-medium text-text-secondary tabular-nums'
         />
       )}
     </ArkUiProgress.Root>

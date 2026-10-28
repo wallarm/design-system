@@ -1,5 +1,13 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { Children, cloneElement, isValidElement } from 'react';
+import {
+  type FC,
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+  Children,
+  cloneElement,
+  isValidElement,
+} from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { BreadcrumbsSeparator } from './BreadcrumbsSeparator';
@@ -52,7 +60,7 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({
     if (index < childrenArray.length - 1) {
       // Keyed by position: render stays pure (React Compiler skips components
       // that mutate module state) and separators keep a stable identity.
-      // oxlint-disable-next-line react/no-array-index-key -- separators have no identity besides their position
+      // separators have no identity besides their position
       childrenWithSeparators.push(<BreadcrumbsSeparator key={`separator-${index}`} />);
     }
   });

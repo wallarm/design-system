@@ -1,7 +1,9 @@
 import { useState } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { FilterCascade, type FilterCascadeProps } from './FilterCascade';
 import { FilterCascadeClear } from './FilterCascadeClear';
 import { FilterCascadeContent } from './FilterCascadeContent';

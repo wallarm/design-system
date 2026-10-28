@@ -1,8 +1,11 @@
 import type { ElementType, ReactNode } from 'react';
-import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+
+import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { createReact18Window } from './react18';
 

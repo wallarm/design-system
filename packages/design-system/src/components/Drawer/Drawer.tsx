@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
+
 import type { DialogInteractOutsideEvent as DrawerInteractOutsideEvent } from '@ark-ui/react/dialog';
+
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DrawerProvider } from './DrawerContext';
 import type { DrawerKind } from './DrawerNestingContext';

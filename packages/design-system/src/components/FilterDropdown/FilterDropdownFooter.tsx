@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { SelectFooter, type SelectFooterProps } from '../Select/SelectFooter';
 import { useFilterDropdownContext } from './FilterDropdownContext';

@@ -1,5 +1,7 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { FilterX, RefreshCcw, ZoomOut } from '../../../icons';
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Button } from '../../Button';
@@ -129,7 +131,7 @@ export const DefaultMulti: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -153,7 +155,7 @@ const MultiLegend = ({ series = multiSeries }: { series?: LineChartSeries[] }) =
     {series.map(s => (
       <LineChartLegendItem key={s.key} seriesKey={s.key}>
         <LineChartHoverPopoverDot color={s.color} />
-        <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+        <span className='font-mono text-xs text-text-primary'>{s.label}</span>
       </LineChartLegendItem>
     ))}
   </LineChartLegend>
@@ -203,7 +205,7 @@ export const WithMetric: StoryFn<typeof meta> = () => {
 export const Curves: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
-    <div className='grid grid-cols-2 gap-16 w-1120'>
+    <div className='grid w-1120 grid-cols-2 gap-16'>
       <Chart>
         <ChartHeader>
           <ChartTitle>Linear interpolation</ChartTitle>
@@ -250,7 +252,7 @@ export const Curves: StoryFn<typeof meta> = () => {
 export const LineStyling: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
-    <div className='grid grid-cols-2 gap-16 w-1120'>
+    <div className='grid w-1120 grid-cols-2 gap-16'>
       <Chart>
         <ChartHeader>
           <ChartTitle>Solid + dashed series</ChartTitle>
@@ -297,7 +299,7 @@ export const LineStyling: StoryFn<typeof meta> = () => {
 export const EdgeCases: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
-    <div className='grid grid-cols-2 gap-16 w-1120'>
+    <div className='grid w-1120 grid-cols-2 gap-16'>
       <Chart>
         <ChartHeader>
           <ChartTitle>Sparkline — no chrome</ChartTitle>
@@ -362,7 +364,7 @@ export const CustomTooltip: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -411,7 +413,7 @@ export const CustomTooltip: StoryFn<typeof meta> = () => {
 export const LegendPlacements: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
-    <div className='grid grid-cols-2 gap-16 w-1120'>
+    <div className='grid w-1120 grid-cols-2 gap-16'>
       <Chart>
         <ChartHeader>
           <ChartTitle>Top — JSX order</ChartTitle>
@@ -421,7 +423,7 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -455,7 +457,7 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -472,7 +474,7 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
               {multiSeries.map(s => (
                 <LineChartLegendItem key={s.key} seriesKey={s.key}>
                   <LineChartHoverPopoverDot color={s.color} />
-                  <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                  <span className='font-mono text-xs text-text-primary'>{s.label}</span>
                 </LineChartLegendItem>
               ))}
             </LineChartLegend>
@@ -508,7 +510,7 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
               {multiSeries.map(s => (
                 <LineChartLegendItem key={s.key} seriesKey={s.key}>
                   <LineChartHoverPopoverDot color={s.color} />
-                  <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                  <span className='font-mono text-xs text-text-primary'>{s.label}</span>
                 </LineChartLegendItem>
               ))}
             </LineChartLegend>
@@ -578,7 +580,7 @@ export const Filterable: StoryFn<typeof meta> = () => {
                 <TooltipTrigger asChild>
                   <LineChartLegendItem seriesKey={s.key} onClick={() => toggle(s.key)}>
                     <LineChartHoverPopoverDot color={s.color} />
-                    <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                    <span className='font-mono text-xs text-text-primary'>{s.label}</span>
                   </LineChartLegendItem>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -616,7 +618,7 @@ export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   return (
-    <div className='grid grid-cols-2 gap-16 w-1120'>
+    <div className='grid w-1120 grid-cols-2 gap-16'>
       <Chart>
         <ChartHeader>
           <ChartTitle>Region A</ChartTitle>
@@ -633,7 +635,7 @@ export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -665,7 +667,7 @@ export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
             {multiSeries.map(s => (
               <LineChartLegendItem key={s.key} seriesKey={s.key}>
                 <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                <span className='font-mono text-xs text-text-primary'>{s.label}</span>
               </LineChartLegendItem>
             ))}
           </LineChartLegend>
@@ -792,7 +794,7 @@ const LoadingLegend = ({ orientation }: { orientation?: 'horizontal' | 'vertical
  * with `aria-busy` on the `Chart` left to the caller.
  */
 export const Loading: StoryFn<typeof meta> = () => (
-  <div className='grid grid-cols-2 gap-16 w-1120'>
+  <div className='grid w-1120 grid-cols-2 gap-16'>
     <Chart aria-busy='true' aria-live='polite'>
       <ChartHeader>
         <ChartTitle>No legend</ChartTitle>
@@ -822,7 +824,7 @@ export const Loading: StoryFn<typeof meta> = () => (
       </ChartHeader>
       <HStack flexGrow gap={12} align='stretch'>
         <LoadingLegend orientation='vertical' />
-        <LineChartEmpty className='flex-1 min-w-0' />
+        <LineChartEmpty className='min-w-0 flex-1' />
       </HStack>
     </Chart>
 
@@ -831,7 +833,7 @@ export const Loading: StoryFn<typeof meta> = () => (
         <ChartTitle>Right — wrapped in HStack</ChartTitle>
       </ChartHeader>
       <HStack flexGrow gap={12} align='stretch'>
-        <LineChartEmpty className='flex-1 min-w-0' />
+        <LineChartEmpty className='min-w-0 flex-1' />
         <LoadingLegend orientation='vertical' />
       </HStack>
     </Chart>
@@ -866,14 +868,14 @@ const RefreshingChart = ({
       {multiSeries.map(s => (
         <LineChartLegendItem key={s.key} seriesKey={s.key}>
           <LineChartHoverPopoverDot color={s.color} />
-          <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+          <span className='font-mono text-xs text-text-primary'>{s.label}</span>
         </LineChartLegendItem>
       ))}
     </LineChartLegend>
   );
 
   const body = loading ? (
-    <LineChartEmpty className={isSide ? 'flex-1 min-w-0' : undefined} />
+    <LineChartEmpty className={isSide ? 'min-w-0 flex-1' : undefined} />
   ) : (
     <LineChartBody>
       <LineChartGrid />
@@ -958,7 +960,7 @@ const RefreshingChart = ({
  * the swap.
  */
 export const Refreshing: StoryFn<typeof meta> = () => (
-  <div className='grid grid-cols-2 gap-16 w-1120'>
+  <div className='grid w-1120 grid-cols-2 gap-16'>
     <RefreshingChart placement='none' title='No legend' />
     <RefreshingChart placement='top' title='Top — JSX order' />
     <RefreshingChart placement='bottom' title='Bottom — JSX order' />
@@ -1019,7 +1021,7 @@ const LongTimeRangeChart = () => {
           {multiSeries.map(s => (
             <LineChartLegendItem key={s.key} seriesKey={s.key}>
               <LineChartHoverPopoverDot color={s.color} />
-              <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+              <span className='font-mono text-xs text-text-primary'>{s.label}</span>
             </LineChartLegendItem>
           ))}
         </LineChartLegend>

@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
@@ -25,7 +26,7 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
     <div
       data-slot='code-snippet-line-numbers'
       data-testid={testId}
-      className={cn('flex flex-col text-text-secondary select-none text-right', className)}
+      className={cn('flex flex-col text-right text-text-secondary select-none', className)}
       {...props}
     >
       {visibleDisplayItems.map(item => {

@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { Button } from '../Button';
 import { NumericBadge } from '../NumericBadge';
 import { Text } from '../Text';

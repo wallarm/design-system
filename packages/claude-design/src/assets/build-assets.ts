@@ -1,8 +1,11 @@
 import { type ComponentType, createElement, type SVGProps } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+
 import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import { DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 
 export async function buildAssets({ outDir }: { outDir: string }) {

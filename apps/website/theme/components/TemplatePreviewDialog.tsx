@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+
 import { useFrontmatter, usePage, withBase } from '@rspress/core/runtime';
 import { Link } from '@rspress/core/theme-original';
 import { Badge } from '@wallarm-org/design-system/Badge';
@@ -24,6 +25,7 @@ import {
 } from '@wallarm-org/design-system/SegmentedControl';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@wallarm-org/design-system/Tooltip';
 import { cn } from '@wallarm-org/design-system/utils/cn';
+
 import { FILL_APP_SHELL, FULLSCREEN_FRAME, LoadedStory } from './StoryPreview';
 import { ownsArrowKeys, storybookStoryUrl, storyLabel } from './templatePreview';
 import type { StoryLoader } from './useStory';

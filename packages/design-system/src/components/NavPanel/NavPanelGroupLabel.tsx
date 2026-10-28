@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ComponentType, FC, ReactNode, Ref } from 'react';
+
 import { ChevronRight } from '../../icons';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
@@ -37,7 +38,7 @@ export const NavPanelGroupLabel: FC<NavPanelGroupLabelProps> = ({
       onClick={toggle}
       style={{ paddingLeft: 8 + depth * indent }}
       className={cn(
-        'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-10 py-8 pr-8 text-sm text-text-primary transition-colors outline-none hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
+        'overlay flex h-32 w-full shrink-0 cursor-pointer items-center gap-8 rounded-10 py-8 pr-8 text-sm text-text-primary transition-colors outline-none hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
         className,
       )}
     >

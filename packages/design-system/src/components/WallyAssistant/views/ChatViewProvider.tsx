@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useLayoutEffect, useRef } from 'react';
+
 import { AssistantMessageMarkdown } from '../../AssistantMessage';
 import { DEFAULT_CHAT_LABELS } from '../model/labels';
 import {

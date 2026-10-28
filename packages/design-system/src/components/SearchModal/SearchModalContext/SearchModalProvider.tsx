@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { SearchModalContext } from './SearchModalContext';
 import type { SearchModalContextValue } from './types';
 

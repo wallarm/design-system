@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { toSvgString } from '../svg';
 
 describe('toSvgString', () => {

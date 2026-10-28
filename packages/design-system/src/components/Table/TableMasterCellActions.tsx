@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import { cn } from '../../utils/cn';
 
 interface TableMasterCellActionsProps {
@@ -10,11 +11,11 @@ export const TableMasterCellActions = ({ children }: TableMasterCellActionsProps
     <div
       data-master-cell-action=''
       className={cn(
-        'shrink-0 pl-4 pr-4 flex items-center gap-2',
-        'opacity-0 pointer-events-none',
-        'group-hover/row:opacity-100 group-hover/row:pointer-events-auto',
-        'group-data-[preview-active]/row:opacity-100 group-data-[preview-active]/row:pointer-events-auto',
-        'has-[[data-state=open]]:opacity-100 has-[[data-state=open]]:pointer-events-auto',
+        'flex shrink-0 items-center gap-2 pr-4 pl-4',
+        'pointer-events-none opacity-0',
+        'group-hover/row:pointer-events-auto group-hover/row:opacity-100',
+        'group-data-[preview-active]/row:pointer-events-auto group-data-[preview-active]/row:opacity-100',
+        'has-[[data-state=open]]:pointer-events-auto has-[[data-state=open]]:opacity-100',
         '[&_[data-state=open]]:overlay [&_[data-state=open]]:overlay-states-primary-hover',
       )}
     >

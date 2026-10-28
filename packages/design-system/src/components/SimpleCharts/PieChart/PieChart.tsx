@@ -1,4 +1,5 @@
 import { type FC, type HTMLAttributes, type Ref, useCallback, useEffect, useMemo } from 'react';
+
 import { useControlled } from '../../../hooks';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
@@ -82,7 +83,7 @@ export const PieChart: FC<PieChartProps> = ({
 
   useEffect(() => {
     if (hasDuplicateNames && process.env.NODE_ENV !== 'production') {
-      // oxlint-disable-next-line no-console -- dev-only warning about duplicate names
+      // dev-only warning about duplicate names
       console.warn(
         '[PieChart] `data` contains duplicate `name` values. Names are used as the join key for ' +
           'percent lookup, hover sync, and React reconciliation — duplicates will produce ' +

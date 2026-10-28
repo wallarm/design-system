@@ -9,7 +9,9 @@ import {
   useId,
   useState,
 } from 'react';
+
 import { useSliderContext } from '@ark-ui/react/slider';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Input } from '../Input';

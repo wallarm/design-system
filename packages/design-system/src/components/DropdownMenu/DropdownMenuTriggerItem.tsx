@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Menu } from '@ark-ui/react/menu';
+
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -35,7 +37,7 @@ export const DropdownMenuTriggerItem: FC<DropdownMenuTriggerItemProps> = ({
     >
       {children}
 
-      <div className='ml-auto before:content-[""] before:flex before:w-8 before:shrink-0'>
+      <div className='ml-auto before:flex before:w-8 before:shrink-0 before:content-[""]'>
         <ChevronRight />
       </div>
     </Menu.TriggerItem>

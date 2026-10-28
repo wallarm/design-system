@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import { propDef } from '../../src/lib/agent-characters/props';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

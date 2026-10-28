@@ -1,5 +1,7 @@
 import { type FC, type ReactNode, useEffect, useState } from 'react';
+
 import { useNavigate } from '@tanstack/react-router';
+
 import { Page, PageContent, PageHeader, PageTitle } from '../../Page';
 import {
   type NavConfig,

@@ -1,4 +1,5 @@
 import type { Line, Text } from '@codemirror/state';
+
 import type { CodeEditorPosition } from '../types';
 
 const clamp = (value: number, min: number, max: number): number =>

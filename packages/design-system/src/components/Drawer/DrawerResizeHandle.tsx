@@ -8,7 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { throttle } from '../../utils/throttle';
@@ -17,16 +19,16 @@ import { useDrawerContext } from './DrawerContext';
 
 const drawerResizeHandleVariants = cva(
   cn(
-    'absolute left-0 top-0 bottom-0 z-1',
+    'absolute top-0 bottom-0 left-0 z-1',
     '-translate-x-1/2',
     'w-12 py-12',
-    'outline-none cursor-col-resize',
+    'cursor-col-resize outline-none',
     'flex items-center justify-center',
 
     // pseudo-element (resize bar)
     'before:content-[""]',
     'before:block',
-    'before:w-3 before:h-full',
+    'before:h-full before:w-3',
     'before:rounded-full',
     'before:bg-bg-fill-brand',
     'before:transition-opacity before:duration-150',

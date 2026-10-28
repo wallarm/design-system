@@ -1,6 +1,8 @@
 import { type FC, type MouseEvent, useContext, useEffect } from 'react';
+
 import { Line } from 'recharts';
 import type { CurveMouseEventHandler } from 'recharts/types/shape/Curve';
+
 import { useTestId } from '../../../utils/testId';
 import {
   LINE_DASH_DASHARRAY,

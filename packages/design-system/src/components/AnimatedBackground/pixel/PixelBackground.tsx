@@ -1,5 +1,5 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useEffect, useRef } from 'react';
+import { type FC, type HTMLAttributes, type ReactNode, type Ref, useEffect, useRef } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { createSweepEngine, resolveOptions, useGame } from './module';
 
@@ -86,7 +86,7 @@ export const PixelBackground: FC<PixelBackgroundProps> = (props: PixelBackground
           }}
           aria-hidden='true'
           className={cn(
-            'h-full w-full pointer-events-none',
+            'pointer-events-none h-full w-full',
             gameActive && 'pointer-events-auto',
             className,
           )}
@@ -109,7 +109,7 @@ export const PixelBackground: FC<PixelBackgroundProps> = (props: PixelBackground
         ref={canvasRef}
         aria-hidden='true'
         className={cn(
-          'absolute inset-0 h-full w-full pointer-events-none',
+          'pointer-events-none absolute inset-0 h-full w-full',
           gameActive && 'pointer-events-auto',
         )}
         onPointerDown={onPointerDown}

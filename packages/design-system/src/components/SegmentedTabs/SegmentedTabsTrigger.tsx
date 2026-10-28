@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, ReactNode } from 'react';
+
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { segmentedControlItemClassNamesBase } from '../SegmentedControl';
@@ -60,7 +62,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
         '**:data-[slot=segmented-tabs-trigger-button]:absolute',
         '**:data-[slot=segmented-tabs-trigger-button]:right-2',
         '**:data-[slot=segmented-tabs-trigger-button]:top-1/2',
-        '**:data-[slot=segmented-tabs-trigger-button]:-translate-y-1/2 ',
+        '**:data-[slot=segmented-tabs-trigger-button]:-translate-y-1/2',
         '**:data-[slot=segmented-tabs-trigger-button]:z-1',
         '**:data-[slot=segmented-tabs-trigger-button]:overflow-visible',
         '**:data-[slot=segmented-tabs-trigger-button]:opacity-0',
@@ -86,7 +88,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
       {indicator && (
         <span
           data-slot='segmented-tabs-indicator'
-          className='absolute -right-2 -top-2 hidden size-6 rounded-2 bg-icon-brand [[data-selected]>&]:block'
+          className='absolute -top-2 -right-2 hidden size-6 rounded-2 bg-icon-brand [[data-selected]>&]:block'
           aria-hidden='true'
         />
       )}

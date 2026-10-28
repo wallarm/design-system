@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+
 import { Text } from 'recharts';
 import type { TextAnchor } from 'recharts/types/component/Text';
 import type { XAxisTickContentProps, YAxisTickContentProps } from 'recharts/types/util/types';
+
 import { LINE_AXIS_TICK_TEXT_PROPS } from '../constants';
 
 export interface AxisTickDecision {

@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
+
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { isColorToken, swatchColor, TokenTable } from '../TokenTable';
 
 rs.mock('@rspress/core/runtime', () => ({

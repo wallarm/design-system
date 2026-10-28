@@ -1,5 +1,7 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { paginationVariants } from './classes';

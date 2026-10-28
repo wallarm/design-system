@@ -1,4 +1,5 @@
 import { waitForEvent as arkWaitForEvent } from '@ark-ui/react';
+
 import type { TourStepEffectArgs, WaitForStepEventOptions } from '../types';
 import { waitForDebouncedEvent } from './waitForDebouncedEvent';
 

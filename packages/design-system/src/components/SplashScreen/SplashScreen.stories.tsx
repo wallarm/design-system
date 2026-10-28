@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
 import { Input } from '../Input';

@@ -14,19 +14,19 @@ const hiddenWhenSelected = [
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  `h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4 ${selectionHighlight}`,
+  `group/chip relative flex h-22 items-center justify-center gap-4 rounded-8 border border-solid px-5 py-0 ${selectionHighlight}`,
   {
     variants: {
       error: {
-        true: 'bg-bg-light-danger border-border-danger',
-        false: 'bg-badge-badge-bg border-border-primary',
+        true: 'border-border-danger bg-bg-light-danger',
+        false: 'border-border-primary bg-badge-badge-bg',
       },
       interactive: {
         true: 'cursor-pointer',
         false: '',
       },
       disabled: {
-        true: 'opacity-50 cursor-default',
+        true: 'cursor-default opacity-50',
         false: '',
       },
       /** Visual marker for an in-progress (not yet committed) building chip. */
@@ -84,7 +84,7 @@ export const segmentTextVariants = cva('truncate text-sm', {
  *  `pointer-events-none` while invisible stops it swallowing clicks meant for the
  *  chip/input and silently deleting the chip (AS-1179). */
 export const removeButtonVariants = cva(
-  `absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 pointer-events-none group-hover/chip:opacity-100 group-hover/chip:pointer-events-auto focus:opacity-100 focus:pointer-events-auto transition-opacity ${hiddenWhenSelected}`,
+  `pointer-events-none absolute top-[-1px] -right-[13px] bottom-[-1px] flex w-[18px] cursor-pointer items-center justify-center rounded-r-8 border border-l-0 border-solid p-0 opacity-0 transition-opacity group-hover/chip:pointer-events-auto group-hover/chip:opacity-100 focus:pointer-events-auto focus:opacity-100 ${hiddenWhenSelected}`,
   {
     variants: {
       error: {

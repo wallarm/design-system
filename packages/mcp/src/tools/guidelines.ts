@@ -1,4 +1,5 @@
 import type { Guideline, GuidelineKind, GuidelinesMetadata } from '@wallarm-org/mcp-core';
+
 import { paginate } from './format';
 
 export const ROUTING = [

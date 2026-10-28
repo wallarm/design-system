@@ -1,9 +1,10 @@
 import type { FC } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import type { SvgIconProps } from '../../icons';
-import { Activity } from '../../icons';
+
+import { type SvgIconProps, Activity } from '../../icons';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { NavRail } from './NavRail';
 import { NavRailItem } from './NavRailItem';

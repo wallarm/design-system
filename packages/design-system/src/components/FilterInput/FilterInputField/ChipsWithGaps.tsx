@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useCallback } from 'react';
+
 import { useFilterInputContext } from '../FilterInputContext';
 import { CONNECTOR_ID_PATTERN } from '../lib';
 import type { FilterInputChipData } from '../types';

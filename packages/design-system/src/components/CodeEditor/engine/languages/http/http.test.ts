@@ -2,6 +2,7 @@ import { jsonLanguage } from '@codemirror/lang-json';
 import { ensureSyntaxTree, foldable, syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from '@rstest/core';
+
 import { getHttpFolds } from '../../../../CodeSnippet/lib/httpFolds';
 import { json } from '../json';
 import { findJsonBodyRange, http } from './index';

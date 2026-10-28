@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { FilterInputContext } from './FilterInputContext';
 import type { FilterInputContextValue } from './types';
 

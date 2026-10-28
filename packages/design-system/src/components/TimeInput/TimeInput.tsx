@@ -1,8 +1,10 @@
 import { type FC, type Ref, useRef } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { type TimeValue, useTimeField } from '@react-aria/datepicker';
 import { useLocale } from '@react-aria/i18n';
 import { useTimeFieldState } from '@react-stately/datepicker';
+
 import { Clock } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';

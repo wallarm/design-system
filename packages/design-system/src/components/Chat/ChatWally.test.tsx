@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
+
 import { RUNTIME_KEY } from '../../lib/agent-characters/runtime';
 import { setAgentMotion } from '../AgentAvatar';
 import { WallySkeleton } from '../WallySkeleton';

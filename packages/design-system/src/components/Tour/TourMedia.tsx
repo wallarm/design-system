@@ -1,6 +1,8 @@
 import type { FC, ReactNode } from 'react';
+
 import { useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -41,10 +43,10 @@ export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
             loop
             muted
             playsInline
-            className='block w-full h-auto rounded-12'
+            className='block h-auto w-full rounded-12'
           />
         ) : (
-          <img src={src} alt={alt} className='block w-full h-auto' />
+          <img src={src} alt={alt} className='block h-auto w-full' />
         )
       ) : (
         children

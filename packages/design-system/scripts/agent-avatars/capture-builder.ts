@@ -8,11 +8,12 @@
  * Needs Google Chrome stable (as the handoff's scripts do).
  */
 
-import type { BrowserType } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import type { BrowserType } from '@playwright/test';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const { chromium } = createRequire(

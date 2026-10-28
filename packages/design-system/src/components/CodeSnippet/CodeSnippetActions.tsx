@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -14,7 +15,7 @@ export const CodeSnippetActions: FC<CodeSnippetActionsProps> = ({ className, ref
       ref={ref}
       data-slot='code-snippet-actions'
       data-testid={testId}
-      className={cn('flex items-center gap-4 ml-auto px-6 rounded-tr-6 code-snippet-bg', className)}
+      className={cn('ml-auto flex items-center gap-4 rounded-tr-6 px-6 code-snippet-bg', className)}
       {...props}
     />
   );

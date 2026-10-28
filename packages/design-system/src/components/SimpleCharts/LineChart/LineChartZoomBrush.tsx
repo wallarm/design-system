@@ -1,6 +1,8 @@
 import { type FC, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+
 import { createPortal } from 'react-dom';
 import { ReferenceArea, usePlotArea } from 'recharts';
+
 import { useTestId } from '../../../utils/testId';
 import { formatChartDateTime } from '../lib/timeFormatters';
 import { lineChartZoomCursorPopoverClasses } from './classes';

@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { FileUpload as ArkFileUpload } from '@ark-ui/react/file-upload';
+
 import { Share } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';

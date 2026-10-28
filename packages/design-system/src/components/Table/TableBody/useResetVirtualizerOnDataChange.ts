@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
+
 import type { RowData, Table } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
-import type { DSTableFeatures } from '../lib';
-import { detectDataChange } from '../lib';
+
+import { type DSTableFeatures, detectDataChange } from '../lib';
 
 /**
  * Reset cached measurements only on a full dataset replacement. On a prepend

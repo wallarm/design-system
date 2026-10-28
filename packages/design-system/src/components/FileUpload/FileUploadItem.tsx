@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
 } from 'react';
+
 import { File as FileIcon } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';

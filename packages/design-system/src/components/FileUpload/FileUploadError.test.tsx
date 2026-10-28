@@ -1,7 +1,9 @@
 import type { ComponentProps } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import type { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, queryByTestId, Uploader } from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';

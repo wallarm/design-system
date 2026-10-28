@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { ChartHoverCardDot, type ChartHoverCardDotProps } from '../internal/ChartHoverCard';
 
 /**

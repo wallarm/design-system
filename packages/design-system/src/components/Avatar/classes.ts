@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 // The root is the row: the plate layers (image, fallback, overlay) share grid cell 1/1 and an
@@ -23,7 +24,7 @@ export const avatarVariants = cva(
     '[&:has(>[data-slot=avatar-overlay][data-visible])>[data-slot=avatar-fallback]>*]:invisible',
     // Interactive root (as='button' / asChild → <button>).
     'enabled:cursor-pointer disabled:cursor-not-allowed',
-    'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+    'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
   ),
   {
     variants: {
@@ -64,7 +65,7 @@ export const avatarImageClassNames = cn(
 export const avatarFallbackVariants = cva(
   cn(
     'inline-flex items-center justify-center select-none data-[state=hidden]:hidden',
-    'border border-border-primary bg-states-primary-hover font-medium text-xs',
+    'border border-border-primary bg-states-primary-hover text-xs font-medium',
     'branded:border-border-brand branded:bg-states-brand-hover',
   ),
   {

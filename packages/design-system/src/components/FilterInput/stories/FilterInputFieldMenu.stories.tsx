@@ -1,5 +1,7 @@
 import { type FC, useMemo, useRef, useState } from 'react';
+
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+
 import { ChevronDown } from '../../../icons';
 import { Button } from '../../Button';
 import { FilterInputFieldMenu, type FilterInputFieldMenuProps } from '../FilterInputMenu';

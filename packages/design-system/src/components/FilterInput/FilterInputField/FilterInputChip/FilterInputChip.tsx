@@ -1,5 +1,12 @@
-import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent, Ref } from 'react';
-import { useCallback, useRef } from 'react';
+import {
+  type FC,
+  type HTMLAttributes,
+  type MouseEvent as ReactMouseEvent,
+  type Ref,
+  useCallback,
+  useRef,
+} from 'react';
+
 import { cn } from '../../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../Tooltip';
@@ -149,7 +156,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   const attributeSegment = (
     <Segment
       variant={SEGMENT_VARIANT.attribute}
-      className='min-w-0 max-w-[180px] shrink'
+      className='max-w-[180px] min-w-0 shrink'
       error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
       onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
       onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
@@ -245,7 +252,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
               is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
             <Segment
               variant={SEGMENT_VARIANT.attribute}
-              className='min-w-0 max-w-[120px] shrink'
+              className='max-w-[120px] min-w-0 shrink'
               onClick={
                 interactive && pair.error
                   ? e =>

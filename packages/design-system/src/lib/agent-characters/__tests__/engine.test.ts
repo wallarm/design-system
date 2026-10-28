@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it, rs } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runInThisContext } from 'node:vm';
 import { gunzipSync } from 'node:zlib';
+
+import { afterAll, beforeAll, describe, expect, it, rs } from '@rstest/core';
+
 import { charTree } from '../char';
 import { CAST } from '../data.gen';
 import { type Character, createCharacter } from '../engine';

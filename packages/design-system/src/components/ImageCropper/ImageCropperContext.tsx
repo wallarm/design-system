@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { type ImageCropperApi, useImageCropperInternal } from './ImageCropperProvider';
 
 export interface ImageCropperContextProps {

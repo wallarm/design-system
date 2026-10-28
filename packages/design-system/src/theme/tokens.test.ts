@@ -1,6 +1,7 @@
-import { describe, expect, it } from '@rstest/core';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
 
 // Tailwind v4 emits no CSS for a utility whose `--color-*` token does not exist, so a
 // typo or a removed token renders nothing and fails nowhere. This test is that check.

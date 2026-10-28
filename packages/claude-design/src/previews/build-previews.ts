@@ -1,7 +1,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
+
 import { Project, type SourceFile } from 'ts-morph';
+
 import { buildCanvasScripts, readInlineScript } from '../bundle/rslib-build';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 

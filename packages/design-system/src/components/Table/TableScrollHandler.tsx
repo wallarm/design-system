@@ -6,7 +6,9 @@ import {
   type ReactNode,
   useContext,
 } from 'react';
+
 import { createPortal } from 'react-dom';
+
 import { ArrowLeft, ArrowRight } from '../../icons';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';

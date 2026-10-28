@@ -1,7 +1,9 @@
-import { describe, expect, it } from '@rstest/core';
 import { mkdtemp, readdir, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { buildPreviews, previewGroups } from './build-previews';
 
 const storyNames = (code: string) =>

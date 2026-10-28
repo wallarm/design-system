@@ -1,5 +1,6 @@
 import { runScopeHandlers } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters';
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { createPortalRegistry } from '../lib/portalRegistry';

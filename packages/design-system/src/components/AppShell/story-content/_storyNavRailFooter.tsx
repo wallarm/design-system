@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Settings } from '../../../icons';
 import { NavRailFooter, NavRailItem } from '../../NavRail';
 import type { Theme } from '../../ThemeProvider';

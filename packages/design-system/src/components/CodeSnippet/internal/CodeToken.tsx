@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import type { Token, TokenType } from '../adapters/types';
 
 // Token type to Tailwind class mapping (also used by CodeEditor's adapter painter)
