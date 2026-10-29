@@ -115,6 +115,15 @@ pnpm --filter @wallarm-org/design-system icons:sync --only Bell,BellOff    # ref
 
 The command writes the component files, `src/icons/index.ts`, the gallery category (`module/const.ts`) and Code Connect (`module/Icons.figma.batch.json` + its `Icons.figma.batch.ts` template). `scripts/icons/manifest.json` maps Figma nodes to component names, and also holds excluded nodes and the `keep` list of hand-maintained icons. When a new layer's name collides with an existing icon, map it there. Brand icons without a Neutral variant in Figma get a generated `*Neutral` twin. Commit with `[update-screenshots]` so CI refreshes the icon gallery baselines.
 
+## Claude Design
+
+Choose **Wallarm Design System** in Claude Design to prototype with the generated component
+bundle, tokens, fonts and icons. See the [designer guide](../../apps/docs/docs/ai/claude-design.mdx).
+After the normal package build, run `pnpm --filter @wallarm-org/design-system build:claude-design`
+to generate the ignored `.claude-design/project/` folder. The repository's `/claude-design-sync`
+skill previews and manually publishes release changes; the first sync and remote deletions
+require confirmation. The npm package remains React 19; the separate canvas bundle uses React 18.
+
 ## 📖 Resources
 
 - [Docs site](https://wallarm.github.io/design-system/) - Guides and component docs

@@ -1,0 +1,108 @@
+---
+description: Prototype with the real Wallarm components, tokens, fonts and icons in Claude Design.
+---
+
+# Claude Design
+
+Choose **Wallarm Design System** when creating a Design canvas in Claude Design. The
+[system artifact](https://claude.ai/artifact/XyodGNRtEkFNAUfyoMD5HN) contains the components,
+light and dark tokens, Geist fonts, icons and live examples generated from this repository.
+
+Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
+prototype a rules list with a primary Create rule action, environment filter, empty state and
+dark theme.” Ask for the existing components and semantic tokens, then check the component
+guides for the intended composition.
+
+## Mount components
+
+Canvas markup uses `x-import`. The namespace is `WallarmDS`; component names are flat, such
+as `WallarmDS.DialogContent`. Wrap each artboard in `WallarmDS.Root` so themes and overlays
+stay inside it.
+
+```html
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.Button"
+    variant="primary" loading="{{loading}}">Create rule</x-import>
+</x-import>
+```
+
+```js
+function renderVals() {
+  return { loading: false };
+}
+```
+
+Use kebab-case for canvas props: `default-open`, `on-value-change`, `class-name`. Strings
+can be attributes directly. Pass booleans, numbers, collections, data and callbacks through
+holes from `renderVals()`: `loading="false"` is a string, not the boolean `false`. Combine
+example values into the canvas's one `renderVals()` function. Its code is ordinary JavaScript,
+without JSX, TypeScript or module imports.
+
+The canvas supplies React 18. Outside the canvas, the artifact loads `tokens.css`, then
+`components/bundle.css`, then `components/bundle.js` after the page's React and ReactDOM.
+The npm package continues to use React 19.
+
+## Dark artboards and overlays
+
+Set `theme="dark"` on `WallarmDS.Root` to switch the artboard's semantic tokens. Use the same
+Root for Dialog, DropdownMenu, Select and other overlay compositions so their portal content
+inherits the theme. Follow each component's guide for its required parts.
+
+For an overlay shown in a static design, use `default-open="{{shown}}"` and return
+`shown: true` from `renderVals()`. Controlled `open` values need callbacks if the prototype
+should also close. Root scopes the theme; ThemeProvider changes the whole page and should
+not be used as the canvas wrapper.
+
+The bundle also exposes components available through npm component subpaths, such as the
+Dialog family. Root and TableCells are canvas-only helpers; the package's npm exports stay
+unchanged.
+
+Icons live under `WallarmDS.Icons`, for example:
+
+```html
+<x-import component-from-global-scope="WallarmDS.Icons.Search"
+  class-name="icon-md text-icon-primary" aria-hidden="true"></x-import>
+```
+
+## Tables
+
+Pass rows and columns as values. `TableCells` supplies renderers made from existing components.
+
+```html
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.Table"
+    data="{{rows}}" columns="{{columns}}" get-row-id="{{getRowId}}"></x-import>
+</x-import>
+```
+
+```js
+function renderVals() {
+  return {
+    rows: [{ id: 'event-1', method: 'GET', ip: '192.0.2.10' }],
+    columns: [
+      { accessorKey: 'method', header: 'Method', cell: WallarmDS.TableCells.httpMethod() },
+      { accessorKey: 'ip', header: 'Source IP', cell: WallarmDS.TableCells.ip() }
+    ],
+    getRowId: function (row) { return row.id; }
+  };
+}
+```
+
+Select and FilterDropdown require a real `WallarmDS.createListCollection(...)`, not a plain
+array; their generated guides contain complete recipes. Tour needs a hook-driven controller
+and is not directly mountable with `x-import`. Toast uses the guide's `Toaster` adapter and
+creates notifications in `componentDidMount`.
+
+## Request a change
+
+Change the component, story or token in **wallarm/design-system**, then run
+`/claude-design-sync` there after the release. Describe the component, expected behavior,
+theme and relevant state when requesting a change; include the canvas or a screenshot that
+shows it. The repository is the source of truth, and the artifact is generated from it.
+
+Maintainers run the normal build, then
+`pnpm --filter @wallarm-org/design-system build:claude-design`. The manual sync skill checks
+the release tag, previews the exact changes, uploads changed assets and publishes the index
+last. The first publication and remote deletions require confirmation. This is not a CI
+auto-publish workflow. Check the generated README's **Not synced** section for the current
+build's omissions.

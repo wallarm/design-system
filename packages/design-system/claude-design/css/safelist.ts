@@ -1,0 +1,140 @@
+/** Utilities used by canvas-authored markup, in addition to scanned components. */
+export function canvasSafelist(tokenNames: Set<string>): string[] {
+  const classes = new Set([
+    'block',
+    'inline-block',
+    'inline',
+    'hidden',
+    'flex',
+    'inline-flex',
+    'grid',
+    'inline-grid',
+    'flex-row',
+    'flex-col',
+    'flex-row-reverse',
+    'flex-col-reverse',
+    'flex-wrap',
+    'flex-nowrap',
+    'flex-1',
+    'flex-auto',
+    'flex-none',
+    'grow',
+    'grow-0',
+    'shrink',
+    'shrink-0',
+    'items-start',
+    'items-center',
+    'items-end',
+    'items-stretch',
+    'items-baseline',
+    'justify-start',
+    'justify-center',
+    'justify-end',
+    'justify-between',
+    'justify-around',
+    'justify-evenly',
+    'self-start',
+    'self-center',
+    'self-end',
+    'self-stretch',
+    'place-items-center',
+    'col-span-full',
+    'row-span-full',
+    'grid-flow-row',
+    'grid-flow-col',
+    'auto-rows-auto',
+    'relative',
+    'absolute',
+    'fixed',
+    'sticky',
+    'inset-0',
+    'top-0',
+    'right-0',
+    'bottom-0',
+    'left-0',
+    'w-full',
+    'h-full',
+    'w-screen',
+    'h-screen',
+    'w-auto',
+    'h-auto',
+    'w-fit',
+    'h-fit',
+    'min-w-0',
+    'min-h-0',
+    'min-h-screen',
+    'max-w-full',
+    'max-w-none',
+    'max-w-screen',
+    'overflow-hidden',
+    'overflow-auto',
+    'overflow-x-auto',
+    'overflow-y-auto',
+    'mx-auto',
+    'ml-auto',
+    'mr-auto',
+    'mt-auto',
+    'mb-auto',
+    'font-sans',
+    'font-sans-display',
+    'font-mono',
+    'font-pixel',
+    'text-left',
+    'text-center',
+    'text-right',
+    'truncate',
+    'whitespace-nowrap',
+    'break-words',
+    'border',
+    'border-t',
+    'border-r',
+    'border-b',
+    'border-l',
+    'border-0',
+  ]);
+  for (let index = 1; index <= 12; index++) {
+    classes.add(`grid-cols-${index}`);
+    classes.add(`col-span-${index}`);
+    classes.add(`row-span-${index}`);
+  }
+  for (const property of tokenNames) {
+    const name = property.replace(/^--/, '');
+    if (name.startsWith('color-')) {
+      const color = name.slice(6);
+      // Include every semantic color even when no current component uses it.
+      for (const prefix of ['bg', 'text', 'border']) classes.add(`${prefix}-${color}`);
+    }
+    if (name.startsWith('spacing-')) {
+      const size = name.slice(8);
+      for (const prefix of [
+        'p',
+        'px',
+        'py',
+        'pt',
+        'pr',
+        'pb',
+        'pl',
+        'm',
+        'mx',
+        'my',
+        'mt',
+        'mr',
+        'mb',
+        'ml',
+        'gap',
+        'gap-x',
+        'gap-y',
+        'w',
+        'h',
+        'max-w',
+        'max-h',
+        'min-w',
+        'min-h',
+      ])
+        classes.add(`${prefix}-${size}`);
+    }
+    if (name.startsWith('radius-')) classes.add(`rounded-${name.slice(7)}`);
+    if (name.startsWith('shadow-')) classes.add(name);
+  }
+  return [...classes].sort();
+}
