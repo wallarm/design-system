@@ -1,6 +1,6 @@
 import { Children, type FC, isValidElement, type ReactElement, type ReactNode } from 'react';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
+import { Portal as ArkUiPortal } from '../../../lib/portal/Portal';
 import { useTestId } from '../../../utils/testId';
 import {
   BulkBarSummary,

@@ -93,9 +93,9 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   );
 
   return (
-    <DropdownMenuContext value={ctx}>
+    <DropdownMenuContext.Provider value={ctx}>
       <TestIdProvider value={testId}>{root}</TestIdProvider>
-    </DropdownMenuContext>
+    </DropdownMenuContext.Provider>
   );
 };
 

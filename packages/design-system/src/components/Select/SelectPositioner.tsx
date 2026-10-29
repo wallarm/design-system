@@ -1,6 +1,6 @@
 import type { FC, Ref } from 'react';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+import { Portal as ArkUiPortal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { dropdownMenuClassNames } from '../DropdownMenu';

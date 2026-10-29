@@ -8,6 +8,7 @@ export default defineConfig(
     // those only see wrappers created by the very same jsdom module instance.
     testEnvironment: { name: 'jsdom', prebundle: false },
     setupFiles: ['./rstest.setup.ts'],
+    exclude: ['claude-design/**'],
     // Interaction tests (userEvent + Ark/zag portal menus) mount the menu a frame
     // after the state transition. Under CI's parallel file load the event loop is
     // starved and that frame can exceed the query timeout, so the same tests pass

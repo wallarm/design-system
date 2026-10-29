@@ -27,7 +27,18 @@
       "!**/coverage",
       "!**/doc_build",
       "!**/doc_build_local",
-      "!**/.rspress"
+      "!**/.rspress",
+      "!**/.claude-design"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/design-system/claude-design/css/entry.css"],
+      "css": {
+        "parser": {
+          "tailwindDirectives": true
+        }
+      }
+    }
+  ]
 }

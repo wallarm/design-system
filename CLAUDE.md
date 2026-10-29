@@ -86,6 +86,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 | `/new-migration` | Write the `@wallarm-org/migrator` migration for a breaking change |
 | `/metrics-audit` | Audit a component against the analytics-readiness contract |
 | `/storybook-docs` | Write or level up a component's Storybook Overview page |
+| `/claude-design-sync` | Build and manually sync the released design system to Claude Design |
 | `/vestige-audit` | Remove docs/configs/scripts the branch made obsolete — required before `gh pr create` (enforced by a hook in `.claude/settings.json`) |
 
 ## 🔧 Key Configuration Files
@@ -182,7 +183,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
 2. **quality** - Lint (Biome), typecheck and Rstest unit tests (3 shards) in parallel
-3. **build** - Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
+3. **build** - Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`), verifies the separate Claude Design build (repeatability and React 18 harness), and builds Storybook as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
 4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
 5. **unit-test-report** / **e2e-report** - Publish JUnit results
 6. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots

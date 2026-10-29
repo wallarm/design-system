@@ -1,0 +1,25 @@
+{
+  "distChanged": [
+    "dist/components/DropdownMenu/DropdownMenu.js",
+    "dist/components/WallyAssistant/WallyAssistant.js",
+    "dist/components/WallyAssistant/views/ChatViewProvider.js",
+    "dist/components/Table/TableInner/TableInnerWindow.js",
+    "dist/components/FilterCascade/FilterCascadeContent.js",
+    "dist/components/Drawer/DrawerPortal.js",
+    "dist/components/SearchModal/SearchModalContent.js",
+    "dist/components/Tooltip/TooltipContent.js",
+    "dist/components/Calendar/CalendarContent.js",
+    "dist/components/DropdownMenu/DropdownMenuContent.js",
+    "dist/components/FeedbackPulse/FeedbackPulse.js",
+    "dist/components/Toast/Toaster.js",
+    "dist/components/Popover/PopoverContent.js",
+    "dist/components/Table/TableActionBar/TableActionBar.js",
+    "dist/components/Tour/TourInner.js",
+    "dist/components/Selection/SelectionBulkBar/SelectionBulkBar.js",
+    "dist/components/Select/SelectPositioner.js",
+    "dist/components/Drawer/DrawerPortal.d.ts"
+  ],
+  "distAdded": [
+    "dist/lib/portal/**"
+  ]
+}

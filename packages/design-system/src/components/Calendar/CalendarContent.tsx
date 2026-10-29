@@ -1,5 +1,6 @@
 import type { FC, ReactNode, Ref } from 'react';
-import { DatePicker, Portal } from '@ark-ui/react';
+import { DatePicker } from '@ark-ui/react';
+import { Portal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 

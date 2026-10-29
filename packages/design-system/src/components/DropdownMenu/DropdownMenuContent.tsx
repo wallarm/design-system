@@ -7,7 +7,7 @@ import {
   type Ref,
 } from 'react';
 import { Menu } from '@ark-ui/react/menu';
-import { Portal } from '@ark-ui/react/portal';
+import { Portal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { TestIdProvider, useTestId } from '../../utils/testId';
