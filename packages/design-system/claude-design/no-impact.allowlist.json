@@ -1,4 +1,9 @@
 {
-  "distChanged": [],
+  "distChanged": [
+    "dist/components/DropdownMenu/DropdownMenu.js",
+    "dist/components/WallyAssistant/WallyAssistant.js",
+    "dist/components/WallyAssistant/views/ChatViewProvider.js",
+    "dist/components/Table/TableInner/TableInnerWindow.js"
+  ],
   "distAdded": []
 }

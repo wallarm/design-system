@@ -318,7 +318,7 @@ export const WallyAssistant: FC<WallyAssistantProps> = ({
       onCopy={onCopy}
       onRetry={onRetry}
     >
-      <AdapterContext value={outerAdapter ?? LAZY_PRISM}>
+      <AdapterContext.Provider value={outerAdapter ?? LAZY_PRISM}>
         <Chat
           aria-label={labels.region}
           {...rest}
@@ -420,7 +420,7 @@ export const WallyAssistant: FC<WallyAssistantProps> = ({
             )}
           </ChatFooter>
         </Chat>
-      </AdapterContext>
+      </AdapterContext.Provider>
     </ChatViewProvider>
   );
 };
