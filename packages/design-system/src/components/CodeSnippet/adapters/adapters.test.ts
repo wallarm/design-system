@@ -1,7 +1,8 @@
-import { describe, expect, it, rs } from '@rstest/core';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { highlightJsAdapter } from './highlightjs';
 import { plainAdapter } from './plain';
 import { prismAdapter } from './prism';
+import type { ShikiLanguage } from './types';
 
 const LUA_CODE = 'local x = "s" -- c\nreturn 42';
 
@@ -113,6 +114,75 @@ describe('prismAdapter', () => {
 });
 
 describe('shikiAdapter', () => {
+  afterEach(() => {
+    rs.doUnmock('shiki/core');
+    rs.restoreAllMocks();
+    rs.resetModules();
+  });
+
+  const examples = {
+    javascript: 'const x = 42;',
+    typescript: 'const x: number = 42;',
+    jsx: 'const x = <div title="hello" />;',
+    tsx: 'const x: JSX.Element = <div title="hello" />;',
+    bash: 'echo "hello"',
+    shell: 'echo "hello"',
+    json: '{"hello": 42}',
+    html: '<style>p { color: red; }</style><script>const x = "hello";</script>',
+    xml: '<hello value="42" />',
+    css: 'p { color: red; }',
+    python: 'def hello():\n    return 42',
+    go: 'package main\nfunc main() { println("hello") }',
+    sql: 'SELECT * FROM users WHERE id = 42;',
+    yaml: 'hello: "world"',
+    markdown: '# Hello\n```javascript\nconst x = 42;\n```',
+    lua: LUA_CODE,
+    rust: 'fn main() { let x = 42; }',
+    java: 'public class Hello { int x = 42; }',
+    c: 'int main() { return 42; }',
+    cpp: 'int main() { return 42; }',
+    http: 'GET /hello HTTP/1.1\nContent-Type: application/json\n\n{"hello": 42}',
+  } satisfies Record<ShikiLanguage, string>;
+
+  it.each(Object.entries(examples))(
+    'preserves text and highlights supported language %s',
+    async (language, code) => {
+      const { shikiAdapter } = await import('./shiki');
+      const { tokens } = await shikiAdapter.highlight(code, language as ShikiLanguage);
+      expect(tokens.map(line => line.map(token => token.content).join('')).join('\n')).toBe(code);
+      expect(tokens.flat().some(token => token.type !== 'plain')).toBe(true);
+    },
+  );
+
+  it('advertises the tested languages, including the shell alias', async () => {
+    const { shikiAdapter } = await import('./shiki');
+    expect([...shikiAdapter.getSupportedLanguages()].sort()).toEqual(Object.keys(examples).sort());
+    expect(await shikiAdapter.highlight(examples.shell, 'shell')).toEqual(
+      await shikiAdapter.highlight(examples.bash, 'bash'),
+    );
+  });
+
+  it('preserves full-bundle tokenization, including embedded languages', async () => {
+    const { createHighlighter } = await import('shiki');
+    const { createShikiHighlighter } = await import('./createShikiHighlighter');
+    const [reference, scoped] = await Promise.all([
+      createHighlighter({ themes: ['github-light'], langs: Object.keys(examples) }),
+      createShikiHighlighter(),
+    ]);
+    try {
+      for (const lang of Object.keys(examples) as ShikiLanguage[]) {
+        const code = examples[lang];
+        const options = { lang, theme: 'github-light', includeExplanation: true } as const;
+        expect(scoped.codeToTokensBase(code, options)).toEqual(
+          reference.codeToTokensBase(code, options),
+        );
+      }
+    } finally {
+      reference.dispose();
+      scoped.dispose();
+    }
+  });
+
   it('highlights Lua with keyword, string, comment and number tokens', async () => {
     const { shikiAdapter } = await import('./shiki');
     expectLuaTokens((await shikiAdapter.highlight(LUA_CODE, 'lua')).tokens);
@@ -152,18 +222,21 @@ describe('shikiAdapter', () => {
   it('lazy-loads highlighter on first use', async () => {
     rs.resetModules();
 
-    const createHighlighter = rs.fn().mockResolvedValue({
+    const createHighlighterCore = rs.fn().mockResolvedValue({
       codeToTokensBase: () => [[{ content: 'test', explanation: [] }]],
     });
-    rs.doMock('shiki', () => ({ createHighlighter }));
+    rs.doMock('shiki/core', () => ({ createHighlighterCore }));
 
     const { shikiAdapter } = await import('./shiki');
 
-    await shikiAdapter.highlight('test', 'javascript');
-    await shikiAdapter.highlight('test2', 'typescript');
+    expect(createHighlighterCore).not.toHaveBeenCalled();
+    await Promise.all([
+      shikiAdapter.highlight('test', 'javascript'),
+      shikiAdapter.highlight('test2', 'typescript'),
+    ]);
 
     // Highlighter created only once despite two highlight calls
-    expect(createHighlighter).toHaveBeenCalledTimes(1);
+    expect(createHighlighterCore).toHaveBeenCalledTimes(1);
 
     rs.restoreAllMocks();
   });
@@ -171,8 +244,8 @@ describe('shikiAdapter', () => {
   it('falls back to plain tokens on error', async () => {
     rs.resetModules();
 
-    rs.doMock('shiki', () => ({
-      createHighlighter: rs.fn().mockRejectedValue(new Error('shiki load failed')),
+    rs.doMock('shiki/core', () => ({
+      createHighlighterCore: rs.fn().mockRejectedValue(new Error('shiki load failed')),
     }));
 
     const { shikiAdapter } = await import('./shiki');

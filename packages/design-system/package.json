@@ -79,6 +79,7 @@
     "test": "rstest watch",
     "test:coverage": "rstest run --coverage",
     "test:run": "rstest run",
+    "test:bundles": "tsx scripts/check-code-snippet-bundles.ts",
     "storybook": "storybook dev --no-open -p 6006",
     "build-storybook": "storybook build",
     "e2e": "playwright test",
