@@ -1,0 +1,542 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Components/RuleBuilder/Overview" />
+
+# RuleBuilder
+
+A complete rule authoring interface for creating Wallarm WAF rules. Combines condition tree editing, action configuration, and JSON code output into a single integrated component.
+
+## What is a Rule?
+
+A **rule** is a declarative policy that defines:
+
+1. **When** it applies (optional scope + optional conditions)
+2. **What** to do (one or more actions)
+
+Rules are the core building blocks of Wallarm WAF configuration. Examples:
+
+```json
+{
+  "meta": { "id": "block-sqli", "desc": "Block SQL injection in query params" },
+  "condition": {
+    "type": "attack_present",
+    "context": "http_request",
+    "attack": { "attack_type": "sqli" },
+    "point": "[http:query][format:form]"
+  },
+  "action": [{
+    "action_type": "add_attack",
+    "target": [{ "context": "http_request", "point": "flow" }],
+    "attack": { "attack_type": "sqli_detected", "comment": "SQL injection in query" }
+  }]
+}
+```
+
+## When to Use
+
+Use RuleBuilder when you need users to:
+
+- **Create custom WAF rules** with conditions and actions
+- **Edit existing rules** loaded from backend
+- **Design complex condition trees** (AND/OR/NOT combinations)
+- **Configure multi-action rules** (e.g., tag + suppress + alert)
+
+**Don't use** when:
+
+- User only needs to select a data point → use `PointSelector` alone
+- Rule is static and never edited → just display it as JSON/YAML
+- User prefers raw JSON → provide a code editor instead
+
+## Features
+
+- ✅ **Visual Condition Tree**: Drag-and-drop AND/OR/NOT groups with nested checks
+- ✅ **All Check Types**: Field checks, attack detection, signals, tags, sampling
+- ✅ **All Action Types**: add_attack, suppress_attack, add_tag, limits, parser control, etc.
+- ✅ **Binding Support**: Reference matched values from conditions in actions (`bind_point`, `attack_ref`, `target_ref`)
+- ✅ **Live Validation**: Real-time validation with clear error messages
+- ✅ **SDK Integration**: Uses Proton SDK for point validation (same as backend)
+- ✅ **Code Output**: Live JSON preview shows exact backend payload
+- ✅ **Section Control**: Show/hide conditions, action, or code sections as needed
+
+## Basic Usage
+
+```tsx
+import { RuleBuilder } from '@wallarm-org/design-system/RuleBuilder';
+import { newGroup, newAction } from '@wallarm-org/design-system/RuleBuilder/models';
+import { useState } from 'react';
+
+function MyComponent() {
+  const [condition, setCondition] = useState(newGroup('and')); // Empty AND group
+  const [action, setAction] = useState(newAction('add_attack'));
+  const [showProblems, setShowProblems] = useState(false);
+
+  const attackTypes = [
+    { value: 'sqli', label: 'SQL Injection', description: 'Database query manipulation' },
+    { value: 'xss', label: 'Cross-Site Scripting', description: 'Code injection in browser' },
+  ];
+
+  return (
+    <RuleBuilder
+      ruleId="my-rule-1"
+      ruleDescription="Detect and block SQL injection"
+      condition={condition}
+      action={action}
+      onConditionChange={setCondition}
+      onActionChange={setAction}
+      attackTypes={attackTypes}
+      showProblems={showProblems}
+    />
+  );
+}
+```
+
+## Props
+
+### Required
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `ruleId` | `string` | Rule ID (required, non-empty) — `meta.id` field in ruleset |
+| `condition` | `GroupCondition` | Current condition tree. Create with `newGroup('and')` for new rules |
+| `action` | `ActionDraft` | Current action configuration. Create with `newAction('add_attack')` |
+| `onConditionChange` | `(condition) => void` | Callback when condition tree changes |
+| `onActionChange` | `(action) => void` | Callback when action configuration changes |
+| `attackTypes` | `Choice[]` | Available attack types for selection: `{ value, label, description? }[]` |
+
+### Optional
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `ruleDescription` | `string` | `undefined` | Rule description (optional) — `meta.desc` field |
+| `scope` | `{ application_id?: string }` | `undefined` | Application scope (restricts rule to specific app) |
+| `showProblems` | `boolean` | `false` | Show validation errors (set `true` after first save attempt) |
+| `sections` | `RuleBuilderSection[]` | `['conditions', 'action', 'code']` | Which sections to render. Use to hide code output in tight layouts |
+| `afterConditions` | `ReactNode` | `undefined` | Content to render after conditions section (e.g., help text) |
+| `proton` | `Proton \| null` | from `useProton()` | Proton SDK instance (auto-loaded if not provided) |
+
+## Condition Types
+
+RuleBuilder supports all Proton check types:
+
+### 1. **Field Conditions**
+
+Check values at specific points using byte-level operators:
+
+- `equal`, `nequal` — Exact match (case-sensitive or insensitive)
+- `startswith`, `endswith`, `contains` — Substring match
+- `regexp`, `nregexp` — Regular expression match
+- `exists`, `absent` — Presence check (node exists or not)
+
+**Example:**
+```json
+{
+  "type": "equal",
+  "context": "http_request",
+  "point": "[http:header]['authorization']",
+  "value": "Bearer secret-token"
+}
+```
+
+### 2. **Attack Conditions**
+
+Detect attacks at specific points:
+
+```json
+{
+  "type": "attack_present",
+  "context": "http_request",
+  "attack": { "attack_type": "sqli" },
+  "point": "[http:query][format:form]"
+}
+```
+
+**Supports:**
+- Attack type filtering (`sqli`, `xss`, etc. or empty for any)
+- Source filtering (`rule`, `stamp`, `xml`, `gzip`, etc.)
+- Known attack labels (CVE, vuln, technique, payload)
+- Negation (`attack_absent` — no attack present)
+
+### 3. **Signal Conditions**
+
+Detect anomalies:
+
+- `key_duplicate` — Duplicate keys in container (e.g., two `Cookie` headers)
+- `resource_overlimit` — Resource limit exceeded (body size, depth, etc.)
+
+```json
+{
+  "type": "signal_present",
+  "context": "http_request",
+  "signal": { "signal_type": "key_duplicate" },
+  "point": "[http:header]"
+}
+```
+
+### 4. **Tag Conditions**
+
+Check for tags added by other rules:
+
+```json
+{
+  "type": "tag_present",
+  "context": "http_request",
+  "tag": { "key": "verified", "value": "true" },
+  "point": "flow"
+}
+```
+
+### 5. **Sample Conditions**
+
+Sample a percentage of flows (probabilistic sampling):
+
+```json
+{
+  "type": "sample",
+  "percent": 10
+}
+```
+
+## Action Types
+
+RuleBuilder supports all Proton action types:
+
+### Attack Actions
+
+- **`add_attack`**: Flag flow as attack with custom type
+- **`suppress_attack`**: Remove specific attacks from results
+- **`mark_attack`**: Add metadata to existing attacks (known false, CVE, etc.)
+
+### Tagging Actions
+
+- **`add_tag`**: Add key-value tag to flow or point
+
+### Limit Actions
+
+- **`processing_time_limit`**: Set max processing time
+- **`processing_space_limit`**: Set max memory usage
+- **`entry_limits`**: Set soft/hard limits on entry size
+
+### Parser Actions
+
+- **`disable_parsers`**: Disable specific parsers (e.g., `["json", "xml"]`)
+- **`allow_parsers`**: Enable only specific parsers
+- **`force_parser`**: Force a parser at a point
+
+### Rule Control Actions
+
+- **`disable_rule`**: Disable other rules by ID
+
+### Data Combination
+
+- **`combine`**: Join duplicate keys with separator (e.g., `Cookie: a=1, a=2` → `a=1,2`)
+
+## Binding (Format 0.10.1+)
+
+Bindings allow actions to reference values matched by conditions:
+
+```tsx
+// Condition: bind attack to "my_attack"
+{
+  kind: 'attack',
+  attackType: 'sqli',
+  point: '[http:query][format:form]',
+  bindAttack: 'my_attack'  // Bind name
+}
+
+// Action: suppress the bound attack
+{
+  kind: 'suppress_attack',
+  attackRef: 'my_attack',  // Reference bound attack
+  target: { whole: true, context: 'http_request', segments: [] }
+}
+```
+
+### Binding Types
+
+| Field | Check Type | Action Use | Description |
+|-------|------------|------------|-------------|
+| `bind_point` | Field checks | `target_ref` in actions | Reference matched point for action target |
+| `bind_attack` | Attack checks | `attack_ref` in suppress/mark | Reference specific attacks |
+| `point_ref` | Any | `target_ref` in actions | Alternative to `bind_point` |
+
+### Validation Rules
+
+- ✅ Bind names must be unique within a rule
+- ✅ `attack_ref` must reference a `bind_attack` from a condition
+- ✅ `target_ref` must reference a `bind_point` or `point_ref` from a condition
+- ❌ Cannot reference bindings from other rules
+
+## Validation
+
+RuleBuilder validates rules in real-time. Set `showProblems={true}` after first save attempt to display errors:
+
+```tsx
+<RuleBuilder
+  {...props}
+  showProblems={attemptedSave}  // Show errors after user tries to save
+/>
+```
+
+### Validation Types
+
+1. **Meta Validation**: Rule ID must be non-empty
+2. **Condition Validation**:
+   - Field checks must have valid point (SDK validates)
+   - Attack checks must have attack type (or empty for any)
+   - Signal checks must have signal type
+3. **Action Validation**:
+   - Action must have target (flow or specific point)
+   - Attack actions must have attack type
+   - Tag actions must have tag key
+4. **Binding Validation**:
+   - Bind names must be unique
+   - References must point to existing bindings
+
+## Code Output
+
+RuleBuilder generates a live JSON preview showing the exact Proton API payload:
+
+```json
+{
+  "meta": {
+    "id": "block-sqli",
+    "desc": "Block SQL injection in query params"
+  },
+  "scope": {
+    "application_id": "app-123"
+  },
+  "condition": {
+    "operator": "and",
+    "checks": [...]
+  },
+  "action": [...]
+}
+```
+
+Use the `sections` prop to hide code output if space is tight:
+
+```tsx
+<RuleBuilder
+  {...props}
+  sections={['conditions', 'action']}  // No code section
+/>
+```
+
+## Model Functions
+
+RuleBuilder exports factory functions for creating condition/action drafts:
+
+```ts
+import {
+  newGroup,
+  newField,
+  newAttack,
+  newSignal,
+  newTag,
+  newSample,
+  newAction,
+} from '@wallarm-org/design-system/RuleBuilder/models';
+
+// Conditions
+const andGroup = newGroup('and');
+const orGroup = newGroup('or');
+const notGroup = newGroup('not');
+const fieldCheck = newField('http_request');
+const attackCheck = newAttack('sqli', 'flow');
+const signalCheck = newSignal('key_duplicate', '[http:header]');
+const tagCheck = newTag('verified', 'true', 'flow');
+const sampleCheck = newSample(10); // 10% sampling
+
+// Actions
+const addAttack = newAction('add_attack');
+const suppressAttack = newAction('suppress_attack');
+const addTag = newAction('add_tag');
+const combineAction = newAction('combine');
+const disableRule = newAction('disable_rule');
+```
+
+## Conversion Functions
+
+Convert between UI drafts and Proton API format:
+
+```ts
+import { toProtonCondition, toProtonAction } from '@wallarm-org/design-system/RuleBuilder/models';
+
+// UI → Proton API
+const protonCondition = toProtonCondition(condition);
+const protonAction = toProtonAction(action, proton);
+
+// Generate full rule
+const rule = {
+  meta: { id: ruleId, desc: ruleDescription },
+  scope: scope?.application_id ? { application_id: scope.application_id } : undefined,
+  condition: protonCondition,
+  action: [protonAction],
+};
+```
+
+## Complex Example
+
+Rule with nested conditions and binding:
+
+```tsx
+import { newGroup, newField, newAttack, newAction } from '...';
+
+// Condition: (field check AND attack check) OR tag check
+const condition = {
+  kind: 'group',
+  operator: 'or',
+  children: [
+    {
+      kind: 'group',
+      operator: 'and',
+      children: [
+        {
+          kind: 'field',
+          context: 'http_request',
+          value: {
+            segments: [/* [http:header]['x-admin'] */],
+            condition: 'equal',
+            value: 'true',
+            ignoreCase: false,
+          },
+          bindPoint: 'admin_header',  // Bind for later use
+        },
+        {
+          kind: 'attack',
+          attackType: 'sqli',
+          point: '[http:query][format:form]',
+          bindAttack: 'sqli_attack',
+        },
+      ],
+    },
+    {
+      kind: 'tag',
+      tagKey: 'trusted',
+      tagValue: '',
+      point: 'flow',
+    },
+  ],
+};
+
+// Action: suppress bound attack at bound point
+const action = {
+  kind: 'suppress_attack',
+  attackRef: 'sqli_attack',     // Reference attack from condition
+  targetRef: 'admin_header',    // Reference point from condition
+  target: { whole: false, context: 'http_request', segments: [] },
+};
+```
+
+## Best Practices
+
+### 1. **Validate Before Save**
+
+```tsx
+const [showProblems, setShowProblems] = useState(false);
+
+const handleSave = () => {
+  setShowProblems(true);  // Show errors
+
+  // Check for problems
+  const hasErrors =
+    ruleMetaProblems(ruleId).length > 0 ||
+    conditionProblems(condition).length > 0 ||
+    actionProblems(action).length > 0;
+
+  if (!hasErrors) {
+    // Save rule
+    saveRule(toProtonRule(condition, action, proton));
+  }
+};
+```
+
+### 2. **Provide Attack Type Choices**
+
+Fetch attack types from backend for consistent labeling:
+
+```tsx
+const attackTypes = await fetchAttackTypes();
+// [{ value: 'sqli', label: 'SQL Injection', description: '...' }, ...]
+```
+
+### 3. **Load Existing Rules**
+
+Use conversion functions to load existing rules:
+
+```tsx
+import { fromProtonCondition, fromProtonAction } from '...';
+
+const loadRule = async (ruleId) => {
+  const rule = await fetchRule(ruleId);
+  setCondition(fromProtonCondition(rule.condition));
+  setAction(fromProtonAction(rule.action[0]));
+};
+```
+
+### 4. **Scope Rules to Applications**
+
+Use `scope` prop to restrict rules to specific applications:
+
+```tsx
+<RuleBuilder
+  {...props}
+  scope={{ application_id: 'app-123' }}
+/>
+```
+
+This generates:
+```json
+{
+  "scope": { "application_id": "app-123" },
+  ...
+}
+```
+
+## Keyboard Shortcuts
+
+- **Tab**: Navigate between inputs
+- **Enter**: Confirm selection
+- **Escape**: Close dialogs/menus
+- **Alt+C**: Open condition type picker
+- **Alt+A**: Open action type picker
+- **Ctrl+S**: Save (if handled by parent)
+
+## Accessibility
+
+- ✅ Full keyboard navigation
+- ✅ ARIA labels on all interactive elements
+- ✅ Screen reader support for condition tree
+- ✅ Focus management in dialogs
+- ✅ High contrast mode support
+
+## Testing
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import { RuleBuilder } from '@wallarm-org/design-system/RuleBuilder';
+import { newGroup, newAction } from '@wallarm-org/design-system/RuleBuilder/models';
+
+test('renders rule builder', () => {
+  render(
+    <RuleBuilder
+      ruleId="test-1"
+      condition={newGroup('and')}
+      action={newAction('add_attack')}
+      onConditionChange={jest.fn()}
+      onActionChange={jest.fn()}
+      attackTypes={[]}
+    />
+  );
+
+  expect(screen.getByText('Conditions')).toBeInTheDocument();
+  expect(screen.getByText('Action')).toBeInTheDocument();
+});
+```
+
+## See Also
+
+- **[PointSelector](../PointSelector/Overview)** — Point selection component (embedded in RuleBuilder)
+- **[rules-framework.md](/packages/docs/rules-framework.md)** — Proton rules specification
+- **[RuleBuilder Stories](./RuleBuilder.stories.tsx)** — Interactive examples
+- **[Model Functions](./models/conditionModel.ts)** — Factory and conversion functions
