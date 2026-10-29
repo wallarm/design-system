@@ -601,6 +601,9 @@ importers:
       '@wallarm-org/rstest-config':
         specifier: workspace:*
         version: link:../configs/rstest-config
+      '@wallarm-org/rules-lib':
+        specifier: workspace:*
+        version: link:../rules-lib
       '@wallarm-org/tailwind-config':
         specifier: workspace:*
         version: link:../configs/tailwind-config
@@ -730,6 +733,73 @@ importers:
       '@wallarm-org/typescript-config':
         specifier: workspace:*
         version: link:../configs/typescript-config
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
+  packages/rules-lib:
+    dependencies:
+      proton-new-js:
+        specifier: git+ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git#main
+        version: git+ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git#9c118023a462918f923a3a52e89b282ac39082a6
+    devDependencies:
+      '@rsbuild/core':
+        specifier: 'catalog:'
+        version: 2.2.11(core-js@3.47.0)
+      '@rsbuild/plugin-react':
+        specifier: 'catalog:'
+        version: 2.1.1(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))
+      '@rslib/core':
+        specifier: 'catalog:'
+        version: 1.0.3(core-js@3.47.0)(typescript@7.0.2)
+      '@rstest/core':
+        specifier: 'catalog:'
+        version: 0.12.3(core-js@3.47.0)(jsdom@30.1.1)
+      '@rstest/coverage-v8':
+        specifier: 'catalog:'
+        version: 0.12.3(@rstest/core@0.12.3(core-js@3.47.0)(jsdom@30.1.1))
+      '@testing-library/jest-dom':
+        specifier: 7.0.1
+        version: 7.0.1(@testing-library/dom@10.4.1)
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@testing-library/user-event':
+        specifier: 'catalog:'
+        version: 14.6.7(@testing-library/dom@10.4.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.0
+      '@types/react':
+        specifier: 19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@wallarm-org/publish-scripts':
+        specifier: workspace:*
+        version: link:../configs/publishing
+      '@wallarm-org/rsbuild-config':
+        specifier: workspace:*
+        version: link:../configs/rsbuild-config
+      '@wallarm-org/rstest-config':
+        specifier: workspace:*
+        version: link:../configs/rstest-config
+      '@wallarm-org/typescript-config':
+        specifier: workspace:*
+        version: link:../configs/typescript-config
+      jsdom:
+        specifier: 'catalog:'
+        version: 30.1.1
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -6514,6 +6584,11 @@ packages:
 
   proto-list@1.2.4:
     resolution: {integrity: sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==}
+
+  proton-new-js@git+ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git#9c118023a462918f923a3a52e89b282ac39082a6:
+    resolution: {commit: 9c118023a462918f923a3a52e89b282ac39082a6, repo: ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git, type: git}
+    version: 0.0.0
+    engines: {node: '>=20'}
 
   proxy-addr@2.0.8:
     resolution: {integrity: sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==}
@@ -14504,6 +14579,8 @@ snapshots:
   property-information@7.2.0: {}
 
   proto-list@1.2.4: {}
+
+  proton-new-js@git+ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git#9c118023a462918f923a3a52e89b282ac39082a6: {}
 
   proxy-addr@2.0.8:
     dependencies:

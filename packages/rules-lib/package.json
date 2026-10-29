@@ -1,0 +1,80 @@
+{
+  "name": "@wallarm-org/rules-lib",
+  "version": "0.1.0",
+  "description": "Proton SDK integration, point grammar types, and rule data models (components moved to @wallarm-org/design-system)",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "packages/rules-lib"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./ui": {
+      "development": "./src/ui/index.ts",
+      "types": "./dist/ui/index.d.ts",
+      "import": "./dist/ui/index.js",
+      "default": "./dist/ui/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rslib build",
+    "build:watch": "rslib build --watch",
+    "prepublishOnly": "prepare-publish",
+    "postpublish": "restore-package",
+    "publish:local": "pnpm build && yalc publish --push",
+    "lint": "biome check",
+    "lint:fix": "biome check --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "rstest watch",
+    "test:coverage": "rstest run --coverage",
+    "test:run": "rstest run"
+  },
+  "dependencies": {
+    "proton-new-js": "git+ssh://git@gl.wallarm.com/wallarm-node/proton-new-js.git#main"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "catalog:",
+    "@rsbuild/plugin-react": "catalog:",
+    "@rslib/core": "catalog:",
+    "@rstest/core": "catalog:",
+    "@rstest/coverage-v8": "catalog:",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@wallarm-org/publish-scripts": "workspace:*",
+    "@wallarm-org/rsbuild-config": "workspace:*",
+    "@wallarm-org/rstest-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsx": "4.23.15",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
