@@ -91,13 +91,14 @@ export function useTour({
   // reopens the tour before its exit transition/unmount can complete. Guard
   // with a ref so this only ever fires once, matching the documented
   // "start automatically on mount" behavior.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: tour.start intentionally excluded, see comment above
+  // oxlint-disable react-hooks/exhaustive-deps -- tour.start intentionally excluded, see comment above
   useEffect(() => {
     if (autoStart && !didAutoStartRef.current) {
       didAutoStartRef.current = true;
       tour.start();
     }
   }, [autoStart]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   // Reset tracking when tour closes
   useEffect(() => {

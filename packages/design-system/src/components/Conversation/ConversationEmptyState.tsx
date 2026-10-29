@@ -5,8 +5,7 @@ import { ChatGreeting } from '../Chat/ChatGreeting';
 import { conversationEmptyStateVariants } from './classes';
 
 export interface ConversationEmptyStateProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Greeting heading. Default 'How can I help you today?'. */
   title?: ReactNode;

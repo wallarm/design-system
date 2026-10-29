@@ -1,11 +1,5 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Activity, RefreshCcw, Trash2 } from '../../icons';
-import { Button } from '../Button';
-import { FieldDescription, FieldLabel } from '../Field';
-import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
-import { Loader } from '../Loader';
-import { HStack, VStack } from '../Stack';
 import {
   Avatar,
   AvatarContent,
@@ -16,6 +10,12 @@ import {
   AvatarOverlay,
   type AvatarProps,
 } from '.';
+import { Activity, RefreshCcw, Trash2 } from '../../icons';
+import { Button } from '../Button';
+import { FieldDescription, FieldLabel } from '../Field';
+import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
+import { Loader } from '../Loader';
+import { HStack, VStack } from '../Stack';
 
 // Deterministic "photo": no network, identical pixels in every screenshot run.
 const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(

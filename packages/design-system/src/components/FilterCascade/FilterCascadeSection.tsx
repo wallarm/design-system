@@ -45,8 +45,7 @@ export const FilterCascadeSection: FC<FilterCascadeSectionProps> = ({
 FilterCascadeSection.displayName = 'FilterCascadeSection';
 
 export interface FilterCascadeCheckboxItemProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   checked: boolean;
   onCheckedChange?: (checked: boolean) => void;

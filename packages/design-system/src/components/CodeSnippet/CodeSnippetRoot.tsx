@@ -6,6 +6,7 @@ import { copyText } from '../../utils/copyText';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
+import { codeSnippetRootVariants } from './classes';
 import {
   CodeSnippetContext,
   type CodeSnippetContextValue,
@@ -17,7 +18,6 @@ import {
   type CodeSnippetFrameContextValue,
 } from './CodeSnippetFrameContext';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
-import { codeSnippetRootVariants } from './classes';
 import { useAdapter } from './hooks';
 import { CodeSnippetFrame } from './internal/CodeSnippetFrame';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';

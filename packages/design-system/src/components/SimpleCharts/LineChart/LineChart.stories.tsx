@@ -14,6 +14,21 @@ import { useChartTimeFormatters } from '../hooks/useChartTimeFormatters';
 import { MetricDelta } from '../Metric/MetricDelta';
 import { MetricHeader } from '../Metric/MetricHeader';
 import { MetricValue } from '../Metric/MetricValue';
+import { formatRange } from './lib/formatRange';
+import {
+  customColorSeries,
+  dailyData60,
+  dashedSeries,
+  dataWithErrorGaps,
+  hourlyData24,
+  hourlyData1000,
+  hourlyDataA,
+  hourlyDataB,
+  multiSeries,
+  singlePointData,
+  singleSeries,
+  unitsByKey,
+} from './lib/sampleData';
 import { LineChart } from './LineChart';
 import { LineChartBody } from './LineChartBody';
 import type { LineChartSeries, LineChartZoomRange } from './LineChartContext';
@@ -30,21 +45,6 @@ import { LineChartTooltip } from './LineChartTooltip';
 import { LineChartXAxis } from './LineChartXAxis';
 import { LineChartYAxis } from './LineChartYAxis';
 import { LineChartZoomBrush } from './LineChartZoomBrush';
-import { formatRange } from './lib/formatRange';
-import {
-  customColorSeries,
-  dailyData60,
-  dashedSeries,
-  dataWithErrorGaps,
-  hourlyData24,
-  hourlyData1000,
-  hourlyDataA,
-  hourlyDataB,
-  multiSeries,
-  singlePointData,
-  singleSeries,
-  unitsByKey,
-} from './lib/sampleData';
 
 const formatYTick = (value: unknown) => formatFullNumber(Number(value));
 

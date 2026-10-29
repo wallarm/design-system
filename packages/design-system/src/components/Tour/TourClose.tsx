@@ -7,8 +7,7 @@ import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
 export interface TourCloseProps
-  extends Omit<ArkUiTour.CloseTriggerProps, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ArkUiTour.CloseTriggerProps, 'children' | 'color'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
 }
 

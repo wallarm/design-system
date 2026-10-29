@@ -16,8 +16,10 @@ import { Input } from '../Input';
 import { sliderInputBoxClassNames } from './classes';
 import { useSliderRootContext } from './SliderContext';
 
-export interface SliderInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'defaultValue' | 'size'> {
+export interface SliderInputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'defaultValue' | 'size'
+> {
   /** Which thumb this box is bound to (0 = single/low, 1 = high). */
   index?: number;
   /** Ref to the real `<input>` node (analytics / focus management). */

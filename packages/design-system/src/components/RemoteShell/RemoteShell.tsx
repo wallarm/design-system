@@ -88,7 +88,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
   const hasOnNavigate = onNavigate !== undefined;
   useEffect(() => {
     if (isControlled && !hasOnNavigate && process.env.NODE_ENV !== 'production') {
-      // biome-ignore lint/suspicious/noConsole: dev-only misuse warning
+      // oxlint-disable-next-line no-console -- dev-only misuse warning
       console.warn(
         '[RemoteShell] `pathname` is controlled but `onNavigate` is missing: shell navigations will update `window.history` only, and the shell will keep showing the old route. Pass `onNavigate` to route them through your router.',
       );

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import type { LineChartDatum, LineChartSeries } from '../LineChartContext';
 import { warnLineChart } from '../lib/warn';
+import type { LineChartDatum, LineChartSeries } from '../LineChartContext';
 
 const compareX = (a: unknown, b: unknown): number => {
   if (typeof a === 'number' && typeof b === 'number') return a - b;

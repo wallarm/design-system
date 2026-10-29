@@ -8,8 +8,10 @@ import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableSettingsMenuContentContext } from './TableSettingsMenuContentContext';
 
-export interface TableSettingsMenuItemProps
-  extends Omit<SwitchProps, 'checked' | 'onCheckedChange' | 'disabled' | 'children'> {
+export interface TableSettingsMenuItemProps extends Omit<
+  SwitchProps,
+  'checked' | 'onCheckedChange' | 'disabled' | 'children'
+> {
   /** Column id from the table's column definitions. */
   columnId: string;
 }

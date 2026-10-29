@@ -3,8 +3,7 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 import { useOverflowListMore } from './useOverflowListMore';
 
 export interface OverflowListMoreCountProps
-  extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'>, TestableProps {
   /** `hidden` — items folded into the overflow; `total` — every item. */
   of?: 'hidden' | 'total';
   ref?: Ref<HTMLSpanElement>;

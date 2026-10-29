@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./packages/configs/oxlint-config/oxlint.json"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/__fixtures__/**",
+    "**/storybook-static/**",
+    "**/*.gen.ts",
+    "**/CodeEditor/engine/languages/http/parser.ts",
+    "**/CodeEditor/engine/languages/http/parser.terms.ts",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/coverage/**",
+    "**/doc_build/**",
+    "**/doc_build_local/**",
+    "**/.rspress/**",
+    "**/src/theme/**/*.css"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}

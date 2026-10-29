@@ -4,8 +4,7 @@ import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testI
 import { useFileUploadRootContext } from './FileUploadContext';
 
 export interface FileUploadItemGroupProps
-  extends Omit<ComponentPropsWithoutRef<'ul'>, 'children'>,
-    TestableProps {
+  extends Omit<ComponentPropsWithoutRef<'ul'>, 'children'>, TestableProps {
   /** A function maps over the accepted files; plain children render as-is (stored files). */
   children?: ReactNode | ((file: File, index: number) => ReactNode);
   ref?: Ref<HTMLUListElement>;

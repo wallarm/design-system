@@ -192,7 +192,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
       .then(() => {
         state.fontLoaded = true;
       })
-      // biome-ignore lint/suspicious/noEmptyBlockStatements: intentionally swallow font-load failures
+      // intentionally swallow font-load failures
       .catch(() => {});
   }
 

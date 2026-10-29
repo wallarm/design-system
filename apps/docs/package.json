@@ -16,11 +16,14 @@
     "build": "tsx scripts/generate.ts && rspress build",
     "preview": "rspress preview",
     "preview:local": "DOCS_OUT_DIR=doc_build_local DOCS_SITE_ORIGIN=http://localhost:4173 pnpm run build && DOCS_OUT_DIR=doc_build_local rspress preview --port 4173",
-    "lint": "biome check",
+    "lint": "oxlint . && oxfmt --check .",
     "test": "rstest watch",
     "test:run": "rstest run",
     "check:build": "tsx scripts/check-build.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint:fix": "oxlint --fix . && oxfmt --write .",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check ."
   },
   "dependencies": {
     "@rspress/core": "2.0.23",

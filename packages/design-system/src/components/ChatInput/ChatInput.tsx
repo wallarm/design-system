@@ -14,8 +14,7 @@ import {
 const DEFAULT_DISCLAIMER = 'Wally can make mistakes; always verify.';
 
 export interface ChatInputProps
-  extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'>,
-    TestableProps {
+  extends Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'>, TestableProps {
   ref?: Ref<HTMLFormElement>;
   /** Controlled only — the app owns the draft. */
   value: string;

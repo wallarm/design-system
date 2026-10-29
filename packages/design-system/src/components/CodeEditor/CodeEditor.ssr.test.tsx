@@ -1,7 +1,7 @@
 // @rstest-environment node
 
-import { describe, expect, it } from '@rstest/core';
 import { renderToString } from 'react-dom/server';
+import { describe, expect, it } from '@rstest/core';
 import { CodeEditorContent } from './CodeEditorContent';
 import { CodeEditorRoot } from './CodeEditorRoot';
 

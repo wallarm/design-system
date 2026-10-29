@@ -63,7 +63,7 @@ only supplies them for story headings; `DocsSection` slugifies its title to matc
 through `Primary`, which drops its description — so `Basic` would silently lose
 its sentence. `<Stories includePrimary title={<span />} />` keeps every story in
 one list. The `title` must be an *element* to suppress the block's own heading; a
-fragment there trips Biome's `noUselessFragments`.
+fragment there trips Oxlint's `react/jsx-no-useless-fragment`.
 
 ## Verifying a frame change
 

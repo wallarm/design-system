@@ -389,6 +389,7 @@ describe('Consumer callbacks under the React Compiler', () => {
     const hookColumns = [
       columnHelper.accessor('name', {
         header: () => {
+          // oxlint-disable-next-line react-hooks/rules-of-hooks -- TanStack renders this anonymous consumer callback as a component; keep its compiler regression coverage.
           const [text] = useState('Hooked name');
           return <span data-testid='hook-header'>{text}</span>;
         },
@@ -426,6 +427,7 @@ describe('Consumer callbacks under the React Compiler', () => {
     const user = userEvent.setup();
     const contextColumns = [
       columnHelper.accessor('name', {
+        // oxlint-disable-next-line react-hooks/rules-of-hooks -- TanStack renders this anonymous consumer callback as a component; keep its compiler regression coverage.
         header: () => <span data-testid='ctx-header'>{useContext(Label)}</span>,
       }),
     ];
@@ -460,6 +462,7 @@ describe('Consumer callbacks under the React Compiler', () => {
         meta: {
           resizeType: 'cut',
           renderMenuAction: row => (
+            // oxlint-disable-next-line react-hooks/rules-of-hooks -- Table renders this anonymous consumer callback as a component; keep its compiler regression coverage.
             <span data-testid={`menu-action-${row.id}`}>{useContext(Label)}</span>
           ),
         },

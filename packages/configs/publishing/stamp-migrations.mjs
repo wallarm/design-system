@@ -45,6 +45,9 @@ export async function prepare(_pluginConfig, { nextRelease, logger, cwd }) {
     return;
   }
 
-  fs.writeFileSync(file, `${JSON.stringify(stampVersions({ versions, ids, nextRelease }), null, 2)}\n`);
+  fs.writeFileSync(
+    file,
+    `${JSON.stringify(stampVersions({ versions, ids, nextRelease }), null, 2)}\n`,
+  );
   logger.log(`Stamped packages/migrator/versions.json for ${nextRelease.version}`);
 }

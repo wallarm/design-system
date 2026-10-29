@@ -22,14 +22,8 @@ export { DropdownMenuItemDescription } from './DropdownMenuItemDescription';
 export { DropdownMenuItemIcon } from './DropdownMenuItemIcon';
 export { DropdownMenuItemText } from './DropdownMenuItemText';
 export { DropdownMenuLabel } from './DropdownMenuLabel';
-export {
-  DropdownMenuRadioGroup,
-  type DropdownMenuRadioGroupProps,
-} from './DropdownMenuRadioGroup';
-export {
-  DropdownMenuRadioItem,
-  type DropdownMenuRadioItemProps,
-} from './DropdownMenuRadioItem';
+export { DropdownMenuRadioGroup, type DropdownMenuRadioGroupProps } from './DropdownMenuRadioGroup';
+export { DropdownMenuRadioItem, type DropdownMenuRadioItemProps } from './DropdownMenuRadioItem';
 export { DropdownMenuSeparator } from './DropdownMenuSeparator';
 export { DropdownMenuShortcut } from './DropdownMenuShortcut';
 export { DropdownMenuTrigger, type DropdownMenuTriggerProps } from './DropdownMenuTrigger';

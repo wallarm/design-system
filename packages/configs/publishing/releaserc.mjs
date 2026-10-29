@@ -78,17 +78,12 @@ export function defineConfig({
           },
         },
       ],
-      ...(isMainBranch
-        ? [['@semantic-release/changelog', { changelogFile }]]
-        : []),
+      ...(isMainBranch ? [['@semantic-release/changelog', { changelogFile }]] : []),
       ['@semantic-release/npm', { pkgRoot }],
       ...(isMainBranch
         ? [
             ...extraPrepare,
-            [
-              '@semantic-release/git',
-              { assets: gitAssets, message: releaseMessage },
-            ],
+            ['@semantic-release/git', { assets: gitAssets, message: releaseMessage }],
           ]
         : []),
       [

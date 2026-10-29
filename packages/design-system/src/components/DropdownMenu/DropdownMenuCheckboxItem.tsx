@@ -10,7 +10,8 @@ import { DropdownMenuItemIndicator } from './DropdownMenuItemIndicator';
 type DropdownMenuCheckboxItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
 export interface DropdownMenuCheckboxItemProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
     DropdownMenuCheckboxItemVariantsProps,
     TestableProps {
   checked: boolean;

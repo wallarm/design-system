@@ -26,7 +26,7 @@ export interface StepperGuardProps {
 }
 
 const warn = (message: string) =>
-  // biome-ignore lint/suspicious/noConsole: dev-only authoring guard (matches Slider/BarList).
+  // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Slider/BarList).
   console.warn(`[Stepper] ${message}`);
 
 /**
@@ -65,7 +65,8 @@ export const useStepperGuards = ({ count, step, defaultStep, onStepChange }: Ste
 };
 
 export interface UseStepperProps
-  extends Omit<UseStepsProps, StepperOmittedArkProps | keyof StepperGuardProps>,
+  extends
+    Omit<UseStepsProps, StepperOmittedArkProps | keyof StepperGuardProps>,
     StepperGuardProps {}
 
 export type UseStepperReturn = UseStepsReturn;

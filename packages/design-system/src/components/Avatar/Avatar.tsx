@@ -22,9 +22,7 @@ type AvatarButtonAttributes = Pick<
 >;
 
 interface AvatarBaseProps
-  extends HTMLAttributes<HTMLElement>,
-    VariantProps<typeof avatarVariants>,
-    TestableProps {
+  extends HTMLAttributes<HTMLElement>, VariantProps<typeof avatarVariants>, TestableProps {
   ref?: Ref<HTMLElement>;
   onStatusChange?: (details: AvatarStatusChangeDetails) => void;
 }

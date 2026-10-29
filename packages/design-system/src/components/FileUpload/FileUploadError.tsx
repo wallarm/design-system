@@ -9,8 +9,7 @@ import { formatRejection } from './lib';
 import type { FileUploadErrorCode, FileUploadRejection } from './types';
 
 export interface FileUploadErrorProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
-    TestableProps {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, TestableProps {
   /** Override a message: called once per (file, error) pair. */
   children?: (rejection: FileUploadRejection, code: FileUploadErrorCode) => ReactNode;
   ref?: Ref<HTMLDivElement>;

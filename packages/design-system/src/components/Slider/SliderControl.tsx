@@ -26,7 +26,7 @@ export const SliderControl: FC<SliderControlProps> = ({ children, className, ref
       child => isValidElement(child) && child.type === SliderThumb,
     ).length;
     if (renderedThumbs > 0 && renderedThumbs !== thumbCount) {
-      // biome-ignore lint/suspicious/noConsole: dev-only authoring guard (matches BarList/PieChart).
+      // oxlint-disable-next-line no-console -- dev-only authoring guard (matches BarList/PieChart).
       console.warn(
         `[Slider] Rendered ${renderedThumbs} <SliderThumb> but the value has ${thumbCount} ` +
           `entr${thumbCount === 1 ? 'y' : 'ies'}. Render exactly one <SliderThumb index> per value entry.`,
