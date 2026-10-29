@@ -1,0 +1,13 @@
+@import 'tailwindcss' source(none);
+@import 'tw-animate-css';
+@import '../../src/theme/index.css';
+
+@source '../../src/**/*.{ts,tsx}';
+@source '../bundle/helpers';
+@source not '../../src/**/*.stories.{ts,tsx}';
+@source not '../../src/**/*.test.{ts,tsx}';
+@source not '../../src/**/*.e2e.{ts,tsx}';
+@source not '../../src/**/stories/**';
+@source not '../../src/**/story-content/**';
+@source not '../../src/**/__tests__/**';
+@source not '../../src/**/__fixtures__/**';

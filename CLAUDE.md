@@ -86,6 +86,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 | `/new-migration` | Write the `@wallarm-org/migrator` migration for a breaking change |
 | `/metrics-audit` | Audit a component against the analytics-readiness contract |
 | `/storybook-docs` | Write or level up a component's Storybook Overview page |
+| `/claude-design-sync` | Build and manually sync the released design system to Claude Design |
 | `/vestige-audit` | Remove docs/configs/scripts the branch made obsolete — required before `gh pr create` (enforced by a hook in `.claude/settings.json`) |
 
 ## 🔧 Key Configuration Files
