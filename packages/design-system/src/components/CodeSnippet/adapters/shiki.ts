@@ -73,12 +73,9 @@ function mapScopeToTokenType(scopes: string[] | undefined): TokenType {
 
 async function getHighlighter() {
   if (!highlighterPromise) {
-    highlighterPromise = import('shiki').then(async ({ createHighlighter }) => {
-      return createHighlighter({
-        themes: ['github-light'],
-        langs: [...SUPPORTED_LANGUAGES],
-      });
-    });
+    highlighterPromise = import('./createShikiHighlighter').then(({ createShikiHighlighter }) =>
+      createShikiHighlighter(),
+    );
   }
   return highlighterPromise;
 }

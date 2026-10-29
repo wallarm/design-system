@@ -126,15 +126,19 @@ The choice is written as `data-frame-style` on `<html>` and remembered, so micro
 
 ### Bundle Optimization
 
-The library supports tree-shaking. Import only the components you need:
+The library publishes ESM with `sideEffects: ["*.css"]`. Named imports can be
+tree-shaken from both the root and component entry points:
 
 ```tsx
-// Good - imports only Button
 import { Button } from '@wallarm-org/design-system/Button';
 
-// Bad - imports entire library
+// Also tree-shakeable for components exported from the root
 import { Button } from '@wallarm-org/design-system';
 ```
+
+Component subpaths give Module Federation a separate sharing key for each
+component family. See [JavaScript loading and sharing](./javascript-loading.md)
+for lazy syntax adapters, production bundle checks and cross-remote sharing.
 
 ## Done!
 

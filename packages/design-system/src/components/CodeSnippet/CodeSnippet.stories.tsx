@@ -518,8 +518,9 @@ export const CustomStartingLine: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Shiki, supplied through `CodeSnippetAdapterProvider` — VS Code's own grammars, and the
- * heaviest of the three adapters at roughly 200KB plus WASM.
+ * Shiki, supplied through `CodeSnippetAdapterProvider`, uses VS Code-style grammars.
+ * The adapter lazily initializes its supported languages and github-light theme with
+ * the Oniguruma WASM engine on the first highlight call.
  */
 export const JSONWithShiki: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
@@ -557,8 +558,8 @@ const users: User[] = [];
 export { fetchUser, users };`;
 
 /**
- * Prism, at roughly 15KB, is the one to reach for unless something forces otherwise;
- * this is TypeScript under it.
+ * TypeScript highlighted with Prism. Its loader emits only the Prism adapter's
+ * dependencies; unused Shiki and highlight.js loaders are discarded by the consumer.
  */
 export const TypescriptWithPrism: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
@@ -621,8 +622,8 @@ const htmlCode = `<!DOCTYPE html>
 </html>`;
 
 /**
- * highlight.js sits between the other two at roughly 30KB, with the longest language list
- * of the three.
+ * HTML highlighted with highlight.js. The adapter loads the library lazily and
+ * exposes the languages listed by its getSupportedLanguages() method.
  */
 export const HTMLWithHighlightJs: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadHighlightJsAdapter}>
