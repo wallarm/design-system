@@ -272,7 +272,7 @@ const updateState = (value: FoldsState, tr: Transaction): FoldsState => {
   // re-resolve after an edit, which could drop a region the next run brings back.
   if (validated || !isFunction) {
     const ids = new Set(regions.map(r => r.id));
-    for (const id of [...collapsed]) {
+    for (const id of collapsed) {
       if (!ids.has(id)) collapsed.delete(id);
     }
   }

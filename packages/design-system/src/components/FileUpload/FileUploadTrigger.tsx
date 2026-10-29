@@ -45,7 +45,16 @@ export const FileUploadTrigger: FC<FileUploadTriggerProps> = ({
 
   if (asChild) {
     // Button-only props must not reach the DOM.
-    const { variant, color, size, loading, fullWidth, as, ref, ...rest } = props;
+    const {
+      variant: _variant,
+      color: _color,
+      size: _size,
+      loading: _loading,
+      fullWidth: _fullWidth,
+      as: _as,
+      ref,
+      ...rest
+    } = props;
     return (
       <ArkFileUpload.Trigger {...rest} {...shared} ref={ref as Ref<HTMLButtonElement>} asChild>
         {children}

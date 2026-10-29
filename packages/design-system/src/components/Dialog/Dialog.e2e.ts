@@ -23,8 +23,6 @@ const dialogStory = createStoryHelper('overlay-dialog', [
 
 const getDialogContent = (page: Page) => page.getByTestId('dialog--content');
 const getDialogTrigger = (page: Page) => page.getByTestId('dialog--trigger');
-const getDialogCloseButton = (page: Page) =>
-  page.getByTestId('dialog--content').getByRole('button', { name: /close|cancel/i });
 
 const openDialog = async (page: Page) => {
   await getDialogTrigger(page).click();

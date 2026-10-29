@@ -92,6 +92,28 @@ describe('createPortalRegistry', () => {
     expect(listener).toHaveBeenCalledTimes(3);
   });
 
+  it('applies subscription changes during notification to the next emission', () => {
+    const registry = createPortalRegistry();
+    const removedListener = rs.fn();
+    const addedListener = rs.fn();
+    let changed = false;
+    registry.subscribe(() => {
+      if (changed) return;
+      changed = true;
+      unsubscribe();
+      registry.subscribe(addedListener);
+    });
+    const unsubscribe = registry.subscribe(removedListener);
+
+    registry.register(makeHost(), 'first');
+    expect(removedListener).toHaveBeenCalledOnce();
+    expect(addedListener).not.toHaveBeenCalled();
+
+    registry.register(makeHost(), 'second');
+    expect(removedListener).toHaveBeenCalledOnce();
+    expect(addedListener).toHaveBeenCalledOnce();
+  });
+
   it('does not reuse ids after unregister', () => {
     const registry = createPortalRegistry();
     const a = registry.register(makeHost(), 'A');

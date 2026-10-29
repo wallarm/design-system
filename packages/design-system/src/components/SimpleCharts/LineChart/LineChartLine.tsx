@@ -24,7 +24,7 @@ export interface LineChartLineProps {
   seriesKey: string;
   /** Recharts curve type. Defaults to `'monotone'`. */
   curve?: 'linear' | 'monotone';
-  /** Force-disable the recharts mount animation. */
+  /** Accepted for compatibility; mount animation is always disabled. */
   disableAnimation?: boolean;
   /** Recharts pass-through — when `true`, the line bridges `null`/`undefined` gaps. */
   connectNulls?: boolean;
@@ -44,7 +44,6 @@ export interface LineChartLineProps {
 export const LineChartLine: FC<LineChartLineProps> = ({
   seriesKey,
   curve = 'monotone',
-  disableAnimation = false,
   connectNulls = false,
   strokeWidth = LINE_STROKE_WIDTH,
   onClick,

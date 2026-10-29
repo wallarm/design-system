@@ -14,11 +14,10 @@ export const ALPHA_STEPS = 16;
 
 /** Pre-compute RGBA strings for 0-ALPHA_STEPS so the hot loop never allocates. */
 export function buildPalette(rgb: RGB): string[] {
-  const p: string[] = new Array(ALPHA_STEPS + 1);
-  for (let i = 0; i <= ALPHA_STEPS; i++) {
-    p[i] = `rgba(${rgb.r},${rgb.g},${rgb.b},${(i / ALPHA_STEPS).toFixed(3)})`;
-  }
-  return p;
+  return Array.from(
+    { length: ALPHA_STEPS + 1 },
+    (_, i) => `rgba(${rgb.r},${rgb.g},${rgb.b},${(i / ALPHA_STEPS).toFixed(3)})`,
+  );
 }
 
 /** Map a 0-1 alpha to the nearest palette index. */

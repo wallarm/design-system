@@ -8,7 +8,7 @@ import {
   hasStaticAllowlist,
   isDatePreset,
 } from '../../../lib';
-import type { Condition, FieldMetadata, FilterOperator } from '../../../types';
+import type { Condition, FieldMetadata } from '../../../types';
 
 /** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
 export const resolveFieldValue = (
