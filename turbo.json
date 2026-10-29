@@ -4,6 +4,19 @@
   "agentGuidance": false,
   "globalPassThroughEnv": ["STORYBOOK_URL"],
   "tasks": {
+    "build:claude-design": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "outputs": [
+        ".claude-design/project/**",
+        ".claude-design/summary.json",
+        ".claude-design/file-hashes.json"
+      ]
+    },
+    "test:claude-design": {
+      "dependsOn": ["build:claude-design"],
+      "cache": false
+    },
     "dev": {
       "dependsOn": ["@wallarm-org/design-system#build"],
       "cache": true,
