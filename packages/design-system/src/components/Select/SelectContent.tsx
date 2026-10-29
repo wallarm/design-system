@@ -1,5 +1,7 @@
 import { Children, type FC } from 'react';
+
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import {
@@ -25,7 +27,7 @@ export const SelectContent: FC<SelectContentProps> = ({
     <ArkUiSelect.List
       {...props}
       data-testid={testId}
-      className={cn('flex flex-col p-8 overflow-hidden outline-none')}
+      className={cn('flex flex-col overflow-hidden p-8 outline-none')}
       asChild
     >
       <ScrollArea>

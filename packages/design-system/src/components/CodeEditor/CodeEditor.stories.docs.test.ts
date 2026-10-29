@@ -1,7 +1,9 @@
-import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { CODE_EDITOR_KEYBOARD_HINT } from './lib/keyboardHint';
 
 const source = readFileSync(

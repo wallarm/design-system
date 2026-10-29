@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+
 import { baseConfig } from './base.js';
 
 export const dockerConfig = defineConfig({

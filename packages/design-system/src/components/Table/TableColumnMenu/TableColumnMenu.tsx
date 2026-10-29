@@ -6,7 +6,9 @@ import {
   useId,
   useState,
 } from 'react';
+
 import type { Column, RowData } from '@tanstack/react-table';
+
 import { Check, ChevronsDown, Ellipsis } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
@@ -93,7 +95,7 @@ export const TableColumnMenu = <T extends RowData = Record<string, unknown>>({
 
   return (
     <TableColumnMenuContext.Provider value={{ column: column as Column<DSTableFeatures, RowData> }}>
-      <span className='shrink-0 inline-flex opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
+      <span className='inline-flex shrink-0 opacity-0 transition-opacity group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100'>
         <Tooltip disabled={menuOpen} ids={{ trigger: triggerId }}>
           <DropdownMenu onOpenChange={setMenuOpen} ids={{ trigger: triggerId }}>
             <DropdownMenuTrigger asChild>

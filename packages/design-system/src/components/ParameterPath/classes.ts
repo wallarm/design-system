@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority';
 
-export const rowVariants = cva('flex items-center gap-0 min-w-0', {
+export const rowVariants = cva('flex min-w-0 items-center gap-0', {
   variants: {
     expanded: {
       // Expanded wraps (won't fit on one line); collapsed clips.
@@ -14,12 +14,12 @@ export const rowVariants = cva('flex items-center gap-0 min-w-0', {
 });
 
 export const segmentVariants = cva(
-  'flex items-center justify-center gap-2 shrink-0 text-sm leading-5 whitespace-nowrap font-sans',
+  'flex shrink-0 items-center justify-center gap-2 font-sans text-sm leading-5 whitespace-nowrap',
   {
     variants: {
       variant: {
-        default: 'text-text-secondary font-normal',
-        highlighted: 'text-text-primary font-medium',
+        default: 'font-normal text-text-secondary',
+        highlighted: 'font-medium text-text-primary',
       },
     },
     defaultVariants: {
@@ -29,16 +29,16 @@ export const segmentVariants = cva(
 );
 
 export const encodingVariants = cva([
-  'flex items-center justify-center shrink-0 gap-2',
+  'flex shrink-0 items-center justify-center gap-2',
   'h-20 rounded-8 border-1 border-dashed border-border-primary',
   'px-4',
   'font-mono text-xs leading-4 text-text-secondary',
 ]);
 
-export const jointVariants = cva('flex items-center shrink-0 p-2 text-icon-secondary');
+export const jointVariants = cva('flex shrink-0 items-center p-2 text-icon-secondary');
 
 export const ellipsisVariants = cva([
-  'flex items-center justify-center shrink-0',
-  'h-20 px-2 gap-2',
+  'flex shrink-0 items-center justify-center',
+  'h-20 gap-2 px-2',
   'text-text-secondary',
 ]);

@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
+
 import { flushSync } from 'react-dom';
+
 import { SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,

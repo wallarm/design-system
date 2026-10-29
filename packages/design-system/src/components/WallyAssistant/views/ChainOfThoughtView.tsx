@@ -1,4 +1,5 @@
 import { type FC, useState } from 'react';
+
 import { Activity, Brain } from '../../../icons';
 import { useTestId } from '../../../utils/testId';
 import {

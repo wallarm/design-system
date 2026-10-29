@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { DatePicker } from '@ark-ui/react';
 import { getLocalTimeZone, today } from '@internationalized/date';
+
 import { ArrowLeft } from '../../icons/ArrowLeft';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { CornerUpLeft } from '../../icons/CornerUpLeft';
@@ -45,7 +47,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
   const effectiveShowJumpToToday = showJumpToToday && !readonly;
 
   return (
-    <DatePicker.ViewControl className={cn('flex items-center justify-between w-280 h-36')}>
+    <DatePicker.ViewControl className={cn('flex h-36 w-280 items-center justify-between')}>
       <DatePicker.Context>
         {api => {
           const text = visibleRangeTextProp?.start ?? api.visibleRangeText.start;
@@ -109,7 +111,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
                         <TooltipContent>Jump to today</TooltipContent>
                       </Tooltip>
                       {effectiveShowArrows && (
-                        <div className='h-16 flex items-center'>
+                        <div className='flex h-16 items-center'>
                           <Separator orientation='vertical' />
                         </div>
                       )}

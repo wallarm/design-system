@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+
 import type { BannerVariant } from './Banner';
 
 const bannerStory = createStoryHelper('messaging-banner', [

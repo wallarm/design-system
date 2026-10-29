@@ -1,5 +1,7 @@
 import type { ComponentType, ReactNode } from 'react';
+
 import { flexRender, type Header, type RowData } from '@tanstack/react-table';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { HStack, VStack } from '../Stack';
@@ -123,9 +125,9 @@ export const TableHeadCell = <T extends RowData>({
       data-testid={testId}
       className={cn(
         'group',
-        hasTextDescription ? 'align-top py-8' : 'align-middle',
+        hasTextDescription ? 'py-8 align-top' : 'align-middle',
         alignClass,
-        isRightAligned && 'pl-4 pr-16',
+        isRightAligned && 'pr-16 pl-4',
         isLastColumn && hasSettingsMenu && 'pr-[44px]',
         meta?.headerClassName,
       )}

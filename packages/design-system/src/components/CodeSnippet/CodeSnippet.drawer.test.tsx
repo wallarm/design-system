@@ -1,6 +1,7 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerTitle } from '../Drawer';
 import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetCode } from './CodeSnippetCode';

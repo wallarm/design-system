@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { DrawerFooterControls, type DrawerFooterControlsProps } from '../Drawer';
 
 export type DialogFooterControlsProps = DrawerFooterControlsProps;

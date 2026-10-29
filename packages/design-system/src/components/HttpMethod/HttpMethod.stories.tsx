@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { HStack, VStack } from '../Stack';
 import { HTTP_METHODS } from './constants';
 import { HttpMethod } from './HttpMethod';

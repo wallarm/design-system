@@ -1,5 +1,6 @@
 import { getChunks, getOriginalDoc } from '@codemirror/merge';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { DIFF_INSERTED_CLASS } from './diff';

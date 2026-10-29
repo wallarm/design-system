@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef, useState } from 'react';
+
 import type { TableVirtualizerInstance } from '../../TableContext/types';
 
 interface UseInitialAnchorOptions {

@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { RadioGroup as ArkUiRadioGroup, useRadioGroupItemContext } from '@ark-ui/react/radio-group';
+
 import { Dot } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -13,15 +15,15 @@ export const RadioIndicator: FC = () => {
       data-testid={testId}
       className={cn(
         // Layout
-        'flex items-center justify-center self-start my-2',
+        'my-2 flex items-center justify-center self-start',
         // Dimensions
-        'w-16 h-16',
+        'h-16 w-16',
         // Visual
-        'rounded-full shadow-xs overlay transition-all data-focus-visible:ring-3',
+        'overlay rounded-full shadow-xs transition-all data-focus-visible:ring-3',
         // Icon
-        '[&_svg]:icon-md [&_svg]:text-icon-primary-alt [&_svg]:shrink-0 [&_svg]:pointer-events-none [&_svg]:stroke-6',
+        '[&_svg]:pointer-events-none [&_svg]:icon-md [&_svg]:shrink-0 [&_svg]:stroke-6 [&_svg]:text-icon-primary-alt',
         // States ---- unchecked
-        'bg-bg-surface-3 border border-border-primary',
+        'border border-border-primary bg-bg-surface-3',
         // States ---- unchecked hover
         '[&[data-state=unchecked][data-hover]:not([data-active])]:bg-states-primary-hover',
         // States ---- unchecked active

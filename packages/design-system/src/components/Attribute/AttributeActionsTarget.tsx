@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, KeyboardEvent, MouseEvent, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DropdownMenuTrigger } from '../DropdownMenu';
@@ -100,7 +101,7 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
           // when the surrounding column shrinks.
           '-my-4 flex w-full min-w-0 cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
           'hover:bg-states-primary-hover active:bg-states-primary-pressed',
-          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+          'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
           className,
         )}
       >

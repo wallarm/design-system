@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 // A plain container: the bar styles live on the list, so the root can also hold step bodies
@@ -17,7 +18,7 @@ export const stepperTriggerVariants = cva(
   cn(
     'grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] grid-rows-[20px] items-start gap-x-4 bg-transparent p-0 text-left',
     // Focus ring and radius follow BreadcrumbsItem, the closest text-like navigation trigger.
-    'rounded-6 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+    'rounded-6 focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
   ),
 );
 
@@ -42,7 +43,7 @@ export const stepperIndicatorVariants = cva(
 );
 
 export const stepperTitleVariants = cva(
-  'col-start-2 row-start-1 block min-w-0 max-w-320 truncate font-sans font-normal text-sm',
+  'col-start-2 row-start-1 block max-w-320 min-w-0 truncate font-sans text-sm font-normal',
   {
     variants: {
       status: {
@@ -58,7 +59,7 @@ export const stepperTitleVariants = cva(
 
 // -mt-2 pulls the second row up so a two-line step is 34px tall.
 export const stepperDescriptionVariants = cva(
-  'col-start-2 row-start-2 -mt-2 block min-w-0 max-w-320 truncate font-sans text-text-secondary text-xs',
+  'col-start-2 row-start-2 -mt-2 block max-w-320 min-w-0 truncate font-sans text-xs text-text-secondary',
 );
 
 // h-20 + items-center keeps the line on the first 20px row, even on two-line items.

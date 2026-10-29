@@ -1,5 +1,5 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useEffect } from 'react';
+import { type FC, type HTMLAttributes, type ReactNode, type Ref, useEffect } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { usePageHost } from './PageHostContext';
@@ -57,7 +57,7 @@ export const Page: FC<PageProps> = ({
           'flex flex-col',
           fixedHeight && 'h-full',
           contained &&
-            'max-h-screen max-w-screen overflow-auto overscroll-none [scrollbar-width:thin]',
+            'max-h-screen max-w-screen [scrollbar-width:thin] overflow-auto overscroll-none',
           className,
         )}
       >

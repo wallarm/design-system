@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import type { HttpMethodName } from '../HttpMethod';
 import { VStack } from '../Stack';
 import { ParameterPath } from './ParameterPath';

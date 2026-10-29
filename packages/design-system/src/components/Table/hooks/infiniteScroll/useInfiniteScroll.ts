@@ -1,5 +1,7 @@
 import type { RefObject } from 'react';
+
 import type { RowData, Table } from '@tanstack/react-table';
+
 import {
   type DSTableFeatures,
   type ScrollRoot,

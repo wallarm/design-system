@@ -1,6 +1,7 @@
-import type { ClipboardEvent, FC, KeyboardEvent } from 'react';
-import { useCallback, useRef } from 'react';
+import { type ClipboardEvent, type FC, type KeyboardEvent, useCallback, useRef } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
 import { hasTextSelection } from '../../utils/hasTextSelection';
@@ -110,7 +111,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
             // when it is a flex item. Observing a shrink-to-fit box would feed
             // the row's own content width back into the truncation decision and
             // oscillate — the "shaking" path (AS-1205).
-            'relative flex w-full items-center min-w-0',
+            'relative flex w-full min-w-0 items-center',
             interactive && 'cursor-pointer',
             className,
           )}

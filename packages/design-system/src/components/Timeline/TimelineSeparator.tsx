@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Separator, type SeparatorProps } from '../Separator';

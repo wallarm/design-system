@@ -7,8 +7,10 @@ import {
   type Ref,
   useRef,
 } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { Slot, Slottable } from '@radix-ui/react-slot';
+
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -87,7 +89,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       </span>
       {mode === 'expanded' && (
         <span
-          className={cn('truncate whitespace-nowrap transition-[opacity,width] duration-200 pl-8')}
+          className={cn('truncate pl-8 whitespace-nowrap transition-[opacity,width] duration-200')}
         >
           {label}
         </span>

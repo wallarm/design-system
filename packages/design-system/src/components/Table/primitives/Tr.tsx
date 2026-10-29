@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef, FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { tableRowVariants } from '../classes';
 

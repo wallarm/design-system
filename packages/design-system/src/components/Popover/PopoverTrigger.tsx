@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface PopoverTriggerProps

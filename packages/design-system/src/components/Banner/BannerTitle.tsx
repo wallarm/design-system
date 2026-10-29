@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
@@ -45,7 +46,7 @@ export const BannerTitle: FC<BannerTitleProps> = ({
   const clampClass = lineClamp > 1 ? `line-clamp-${lineClamp}` : 'truncate';
 
   return (
-    <div className='flex flex-wrap items-center gap-8 w-full'>
+    <div className='flex w-full flex-wrap items-center gap-8'>
       <OverflowTooltip>
         <OverflowTooltipTrigger>
           <p

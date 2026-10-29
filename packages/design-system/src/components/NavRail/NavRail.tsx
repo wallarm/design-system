@@ -1,6 +1,7 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useCallback, useRef } from 'react';
+import { type FC, type HTMLAttributes, type ReactNode, type Ref, useCallback, useRef } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { useArrowNav } from '../../hooks/useArrowNav';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';

@@ -1,5 +1,7 @@
 import type { ComponentProps, FC, ReactElement, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '../../../utils/cn';
 import { Link } from '../../Link';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
@@ -32,7 +34,7 @@ export const IpListVertical: FC<IpListVerticalProps> = ({
       data-slot='ip-list'
       data-type='vertical'
       data-testid={testId}
-      className={cn('flex flex-col min-w-0 max-w-full', className)}
+      className={cn('flex max-w-full min-w-0 flex-col', className)}
     >
       {first}
 

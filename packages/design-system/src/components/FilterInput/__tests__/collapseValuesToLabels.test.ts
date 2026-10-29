@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { collapseValues } from '../lib/collapseValuesToLabels';
 import type { FieldMetadata } from '../types';
 

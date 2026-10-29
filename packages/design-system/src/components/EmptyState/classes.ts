@@ -2,11 +2,11 @@ import { cva } from 'class-variance-authority';
 
 export type EmptyStateType = 'collection-empty' | 'no-results';
 
-export const emptyStateVariants = cva('flex flex-col items-center text-center m-[0_auto]', {
+export const emptyStateVariants = cva('m-[0_auto] flex flex-col items-center text-center', {
   variants: {
     type: {
-      'collection-empty': 'gap-16 py-24 max-w-[560px] min-w-[256px]',
-      'no-results': 'gap-8 py-8 w-[240px]',
+      'collection-empty': 'max-w-[560px] min-w-[256px] gap-16 py-24',
+      'no-results': 'w-[240px] gap-8 py-8',
     },
   },
   defaultVariants: {
@@ -35,7 +35,7 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
  * smoothing on this shape, so no `corner-shape` is needed.
  */
 export const emptyStateIllustrationVariants = cva(
-  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-[15px] p-8 text-xl text-icon-secondary',
+  'flex size-36 shrink-0 items-center justify-center rounded-[15px] empty-state-medallion p-8 text-xl text-icon-secondary',
 );
 
 export const emptyStateMessageVariants = cva('flex flex-col items-center', {

@@ -1,9 +1,11 @@
 import { createContext, type FC, type ReactNode, useContext } from 'react';
+
 import {
   Dialog,
   type DialogFocusOutsideEvent,
   type DialogInteractOutsideEvent as DrawerInteractOutsideEvent,
 } from '@ark-ui/react/dialog';
+
 import { useDrawerContext } from './DrawerContext';
 
 type LayerDismissRequest = Parameters<NonNullable<Dialog.RootProps['onRequestDismiss']>>[0];

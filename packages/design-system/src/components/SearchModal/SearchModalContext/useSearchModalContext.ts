@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { SearchModalContext } from './SearchModalContext';
 
 export const useSearchModalContext = () => {

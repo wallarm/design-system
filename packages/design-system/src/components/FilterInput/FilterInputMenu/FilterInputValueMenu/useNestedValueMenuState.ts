@@ -1,6 +1,7 @@
-import type { RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
+
 import { collapseValueOptions, collectLeaves } from '../../lib';
 import type { ValueMenuRow, ValueMenuSection } from '../../lib/buildValueMenuSections';
 import type { FieldValueOption, FilterInputDropdownItem } from '../../types';

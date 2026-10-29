@@ -1,15 +1,15 @@
 {
   "name": "@wallarm-org/docs",
   "version": "0.0.0",
-  "description": "Public documentation site for the Wallarm design system",
   "private": true,
+  "description": "Public documentation site for the Wallarm design system",
+  "license": "MIT",
+  "author": "Wallarm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wallarm/design-system.git",
     "directory": "apps/docs"
   },
-  "license": "MIT",
-  "author": "Wallarm",
   "type": "module",
   "scripts": {
     "dev": "tsx scripts/generate.ts && rspress dev",

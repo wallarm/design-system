@@ -24,9 +24,11 @@
     "lint": {
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/.oxlintrc.json",
+        "$TURBO_ROOT$/oxlint.config.mts",
         "$TURBO_ROOT$/.oxfmtrc.json",
-        "$TURBO_ROOT$/packages/configs/oxlint-config/**"
+        "$TURBO_ROOT$/packages/design-system/.storybook/**/*.css",
+        "$TURBO_ROOT$/packages/design-system/src/theme/**/*.css",
+        "$TURBO_ROOT$/apps/docs/styles/**/*.css"
       ]
     },
     "lint:fix": {
@@ -98,7 +100,12 @@
       "cache": false
     },
     "format:check": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/.oxfmtrc.json"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/.oxfmtrc.json",
+        "$TURBO_ROOT$/packages/design-system/.storybook/**/*.css",
+        "$TURBO_ROOT$/packages/design-system/src/theme/**/*.css"
+      ]
     }
   }
 }

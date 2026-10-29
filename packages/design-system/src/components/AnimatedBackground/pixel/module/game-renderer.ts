@@ -15,11 +15,11 @@ import {
   MIN_DOT_VALUE,
   NOISE_FREQ_T,
 } from './constants';
-import type { RGB } from './engine-colors';
-import { ALPHA_STEPS, alphaIdx } from './engine-colors';
+import { type RGB, ALPHA_STEPS, alphaIdx } from './engine-colors';
 import { sweepX } from './engine-grid';
-import type { GameEngineHost, GameLogic } from './game-logic';
 import {
+  type GameEngineHost,
+  type GameLogic,
   ANOMALY_R,
   ANOMALY_R_SQ,
   ARM_RISE,

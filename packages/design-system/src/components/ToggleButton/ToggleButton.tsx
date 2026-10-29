@@ -1,5 +1,7 @@
 import type { FC, MouseEvent, Ref } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { useControlled } from '../../hooks';
 import type { TestableProps } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
@@ -7,8 +9,8 @@ import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 const toggleButtonVariants = cva('disabled:opacity-50', {
   variants: {
     variant: {
-      outline: 'border-1 disabled:opacity-50 not-focus:shadow-xs',
-      ghost: 'bg-transparent border-1 border-transparent',
+      outline: 'border-1 not-focus:shadow-xs disabled:opacity-50',
+      ghost: 'border-1 border-transparent bg-transparent',
     },
     color: {
       brand: '',
@@ -26,21 +28,21 @@ const toggleButtonVariants = cva('disabled:opacity-50', {
       variant: 'outline',
       active: false,
       className:
-        'border-1 border-border-primary bg-component-outline-button-bg overlay hover:overlay-states-primary-hover active:overlay-states-primary-pressed',
+        'overlay border-1 border-border-primary bg-component-outline-button-bg hover:overlay-states-primary-hover active:overlay-states-primary-pressed',
     },
     {
       color: 'neutral',
       variant: 'outline',
       active: true,
       className:
-        'border-border-primary bg-component-outline-button-bg overlay overlay-states-primary-active text-text-primary hover:overlay-states-primary-hover active:overlay-states-primary-pressed',
+        'overlay overlay-states-primary-active border-border-primary bg-component-outline-button-bg text-text-primary hover:overlay-states-primary-hover active:overlay-states-primary-pressed',
     },
     {
       color: 'neutral',
       variant: 'ghost',
       active: false,
       className:
-        'bg-transparent border-1 border-transparent hover:bg-states-primary-hover active:bg-states-primary-pressed focus-visible:border-border-primary focus-visible:bg-component-outline-button-bg data-[focus=true]:border-border-primary data-[focus=true]:bg-component-outline-button-bg',
+        'border-1 border-transparent bg-transparent hover:bg-states-primary-hover focus-visible:border-border-primary focus-visible:bg-component-outline-button-bg active:bg-states-primary-pressed data-[focus=true]:border-border-primary data-[focus=true]:bg-component-outline-button-bg',
     },
     {
       color: 'neutral',
@@ -57,28 +59,28 @@ const toggleButtonVariants = cva('disabled:opacity-50', {
       variant: 'outline',
       active: false,
       className:
-        'border-border-primary bg-component-outline-button-bg overlay text-text-primary hover:overlay-states-primary-hover active:overlay-states-primary-pressed focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
+        'overlay border-border-primary bg-component-outline-button-bg text-text-primary hover:overlay-states-primary-hover focus-visible:ring-focus-primary active:overlay-states-primary-pressed data-[focus=true]:ring-focus-primary',
     },
     {
       color: 'brand',
       variant: 'outline',
       active: true,
       className:
-        'border-border-brand bg-component-outline-button-bg overlay overlay-states-brand-active text-text-brand hover:overlay-states-brand-hover active:overlay-states-brand-pressed focus-visible:ring-focus-brand data-[focus=true]:ring-focus-brand',
+        'overlay overlay-states-brand-active border-border-brand bg-component-outline-button-bg text-text-brand hover:overlay-states-brand-hover focus-visible:ring-focus-brand active:overlay-states-brand-pressed data-[focus=true]:ring-focus-brand',
     },
     {
       color: 'brand',
       variant: 'ghost',
       active: false,
       className:
-        'hover:bg-states-primary-hover active:bg-states-primary-pressed focus-visible:border-border-primary focus-visible:ring-focus-primary focus-visible:bg-component-outline-button-bg data-[focus=true]:border-border-primary data-[focus=true]:ring-focus-primary data-[focus=true]:bg-component-outline-button-bg',
+        'hover:bg-states-primary-hover focus-visible:border-border-primary focus-visible:bg-component-outline-button-bg focus-visible:ring-focus-primary active:bg-states-primary-pressed data-[focus=true]:border-border-primary data-[focus=true]:bg-component-outline-button-bg data-[focus=true]:ring-focus-primary',
     },
     {
       color: 'brand',
       variant: 'ghost',
       active: true,
       className:
-        'bg-states-brand-active overlay text-text-brand hover:bg-states-brand-hover active:bg-states-brand-pressed disabled:bg-states-brand-default-alt focus-visible:ring-focus-brand data-[focus=true]:ring-focus-brand',
+        'overlay bg-states-brand-active text-text-brand hover:bg-states-brand-hover focus-visible:ring-focus-brand active:bg-states-brand-pressed disabled:bg-states-brand-default-alt data-[focus=true]:ring-focus-brand',
     },
     // endregion
   ],

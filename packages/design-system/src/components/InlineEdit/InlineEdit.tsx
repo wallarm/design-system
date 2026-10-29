@@ -8,10 +8,10 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { useControlled } from '../../hooks/useControlled';
 import { cn } from '../../utils/cn';
-import type { TestableProps } from '../../utils/testId';
-import { TestIdProvider, useTestId } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import {
   type InlineEditActivationMode,
   type InlineEditContextValue,
@@ -113,7 +113,7 @@ export function InlineEdit<T = unknown>({
   const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
     const prev = overrideRef.current;
     if (process.env.NODE_ENV !== 'production' && prev && prev.mode !== mode) {
-      // oxlint-disable-next-line no-console -- dev-only warning surface
+      // dev-only warning surface
       console.warn(
         `InlineEdit: an editor registered submitMode='${mode}' while another editor's '${prev.mode}' override is active. Last registration wins.`,
       );

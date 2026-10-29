@@ -1,4 +1,5 @@
 import type { ComponentProps, FC } from 'react';
+
 import { DropdownMenu } from '../DropdownMenu';
 
 export type AttributeActionsProps = ComponentProps<typeof DropdownMenu>;

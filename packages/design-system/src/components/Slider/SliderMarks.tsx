@@ -1,5 +1,7 @@
 import { type FC, type MouseEventHandler, type Ref, useCallback, useLayoutEffect } from 'react';
+
 import { Slider as ArkSlider, useSliderContext } from '@ark-ui/react/slider';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { sliderMarkerClassNames, sliderMarkerGroupClassNames } from './classes';

@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { CodeEditorContent, CodeEditorRoot } from './index';
 
 type EngineModule = typeof import('./engine');

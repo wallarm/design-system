@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useTreeItemContext } from './TreeItemContext';
@@ -31,7 +32,7 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
         data-testid={testId}
         data-state={open ? 'open' : 'closed'}
         className={cn(
-          'group/trigger relative pt-2 pb-4 flex min-w-0 w-full items-center',
+          'group/trigger relative flex w-full min-w-0 items-center pt-2 pb-4',
           className,
         )}
         {...props}
@@ -39,8 +40,8 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
         <button
           type='button'
           className={cn(
-            'flex min-w-0 flex-1 items-center text-left cursor-pointer',
-            'before:absolute before:inset-y-0 before:left-0 before:right-0',
+            'flex min-w-0 flex-1 cursor-pointer items-center text-left',
+            'before:absolute before:inset-y-0 before:right-0 before:left-0',
           )}
           onClick={toggle}
         >
@@ -65,7 +66,7 @@ export const TreeItemHeader: FC<TreeItemHeaderProps> = ({
       ref={ref}
       data-slot='tree-item-header'
       data-testid={testId}
-      className={cn('group relative pt-2 pb-4 flex w-full items-start justify-between', className)}
+      className={cn('group relative flex w-full items-start justify-between pt-2 pb-4', className)}
       {...props}
     >
       <TreeItemIcon icon={icon} />

@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { Chart } from '../Chart';
 import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import { HorizontalBarStack } from './HorizontalBarStack';

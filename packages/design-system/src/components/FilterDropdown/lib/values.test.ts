@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { ALL_VALUE, toAliasValue, toConsumerValue, toInternalValue } from './values';
 
 describe('toInternalValue', () => {

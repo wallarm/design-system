@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { PanelRight } from '../../icons';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
 import { Button } from '../Button';
@@ -107,7 +109,7 @@ const ContentPlaceholder = ({
   height?: number;
 }) => (
   <div
-    className={`w-full rounded-12 bg-bg-surface-5 ${fillHeight ? 'flex-1 min-h-0' : ''}`}
+    className={`w-full rounded-12 bg-bg-surface-5 ${fillHeight ? 'min-h-0 flex-1' : ''}`}
     style={height ? { height: `${height}px` } : fillHeight ? undefined : { height: '200px' }}
   />
 );
@@ -884,15 +886,15 @@ export const WithTabs: StoryFn<DrawerProps> = () => {
           <DrawerBody>
             <div className='pt-12'>
               <TabsContent value='tab1'>
-                <h3 className='text-lg font-medium mb-8'>General Settings</h3>
+                <h3 className='mb-8 text-lg font-medium'>General Settings</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab2'>
-                <h3 className='text-lg font-medium mb-8'>Configuration</h3>
+                <h3 className='mb-8 text-lg font-medium'>Configuration</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab3'>
-                <h3 className='text-lg font-medium mb-8'>Advanced Options</h3>
+                <h3 className='mb-8 text-lg font-medium'>Advanced Options</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
             </div>

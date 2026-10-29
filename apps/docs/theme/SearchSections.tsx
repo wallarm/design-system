@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+
 import { withBase } from '@rspress/core/runtime';
 import { IconJump, IconTitle, Link, SvgWrapper } from '@rspress/core/theme-original';
+import { createPortal } from 'react-dom';
+
 import nav from '../docs/_nav.json';
 
 interface SearchSectionsProps {
@@ -32,7 +34,7 @@ export function SearchSections({ onNavigate }: SearchSectionsProps) {
 
   return (
     <nav aria-label='Sections' data-slot='search-sections'>
-      <h2 className='mt-16 mb-4 px-4 text-xs font-medium uppercase text-text-secondary'>
+      <h2 className='mt-16 mb-4 px-4 text-xs font-medium text-text-secondary uppercase'>
         Sections
       </h2>
       <ul ref={listRef} className='rp-search-panel__group m-0 p-0'>

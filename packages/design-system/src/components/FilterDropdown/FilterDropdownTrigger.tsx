@@ -7,7 +7,9 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';

@@ -1,7 +1,8 @@
-import type { FC } from 'react';
-import { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
+
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../../utils/cn';
 import { OverflowList } from '../../OverflowList';
 import { SelectArrow } from '../SelectArrow';
@@ -13,13 +14,13 @@ import { createSelectInputOverflowRenderer } from './SelectInputOverflowRenderer
 const selectInputVariants = cva(
   [
     // Layout & container
-    'flex items-center gap-4 w-fit pr-12 rounded-8 border bg-component-input-bg shadow-xs transition-[colors,border,box-shadow]',
+    'flex w-fit items-center gap-4 rounded-8 border bg-component-input-bg pr-12 shadow-xs transition-[colors,border,box-shadow]',
 
     // Typography
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
 
     // Focus styles for the root element
-    'focus-visible:outline-none focus-visible:ring-3',
+    'focus-visible:ring-3 focus-visible:outline-none',
 
     // Disabled state — visuals
     'data-disabled:cursor-not-allowed',
@@ -129,7 +130,7 @@ export const SelectInput: FC<SelectInputProps> = ({
         >
           {multiple && !isEmpty ? (
             <OverflowList
-              className='flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden'
+              className='flex h-full flex-1 items-center gap-4 overflow-hidden pl-6'
               items={selectedItems}
               itemRenderer={item => (
                 <SelectInputItemRenderer key={item.value} item={item} size={size} />

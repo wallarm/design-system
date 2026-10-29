@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { warnLineChart } from '../lib/warn';
 import type { LineChartDatum, LineChartSeries } from '../LineChartContext';
 

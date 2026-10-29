@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Alert } from '../../Alert/Alert';
 import { AlertContent } from '../../Alert/AlertContent';
 import { AlertIcon } from '../../Alert/AlertIcon';
@@ -21,9 +22,9 @@ export const FilterInputErrors: FC<FilterInputErrorsProps> = ({ errors }) => {
         <AlertTitle>{title}</AlertTitle>
         {/* Skip AlertDescription: it wraps in <p>, and <ul> inside <p> is
             invalid HTML and triggers a hydration error. */}
-        <ul className='list-disc ms-[21px] text-sm text-text-secondary'>
+        <ul className='ms-[21px] list-disc text-sm text-text-secondary'>
           {errors.map((err, idx) => (
-            // oxlint-disable-next-line react/no-array-index-key -- errors may repeat (same message for different chips); idx disambiguates
+            // errors may repeat (same message for different chips); idx disambiguates
             <li key={idx}>{err}</li>
           ))}
         </ul>

@@ -1,4 +1,5 @@
 import type { FC, InputHTMLAttributes, KeyboardEvent, Ref } from 'react';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { SearchInput } from '../SearchInput';
 

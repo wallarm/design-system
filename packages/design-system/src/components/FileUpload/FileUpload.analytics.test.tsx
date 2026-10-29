@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { FileUpload } from './FileUpload';
 import {

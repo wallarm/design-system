@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -13,8 +14,8 @@ export const FieldDescription: FC<FieldDescriptionProps> = props => {
       data-testid={testId}
       data-slot='field-description'
       className={cn(
-        'text-text-secondary text-sm font-normal leading-normal group-has-[[data-orientation=horizontal]]/field:text-balance',
-        'nth-last-2:-mt-1 last:mt-0 [[data-variant=legend]+&]:mb-16',
+        'text-sm leading-normal font-normal text-text-secondary group-has-[[data-orientation=horizontal]]/field:text-balance',
+        'last:mt-0 nth-last-2:-mt-1 [[data-variant=legend]+&]:mb-16',
       )}
     />
   );

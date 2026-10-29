@@ -1,14 +1,16 @@
 import type { ComponentProps, FC, MouseEvent } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
 const inputGroupAddonVariants = cva(
   cn([
     // Layout
-    'flex items-center justify-center h-full gap-2 py-8',
+    'flex h-full items-center justify-center gap-2 py-8',
     // Text
-    'text-sm font-sans',
+    'font-sans text-sm',
     // Misc
     'select-none group-data-[disabled=true]/input-group:opacity-50',
     // Icons
@@ -27,10 +29,10 @@ const inputGroupAddonVariants = cva(
       align: {
         'inline-start': 'order-first pl-12 has-[>kbd]:pl-8',
         'inline-end': 'order-last pr-12 has-[>kbd]:pr-8',
-        'block-end': 'order-last w-full px-8 pb-8 h-auto justify-start',
+        'block-end': 'order-last h-auto w-full justify-start px-8 pb-8',
       },
       variant: {
-        outline: 'px-12 bg-states-primary-default-alt border-border-primary',
+        outline: 'border-border-primary bg-states-primary-default-alt px-12',
         ghost: '[&:not(:has([data-scope=select]))+[data-slot=input]]:px-0',
       },
     },

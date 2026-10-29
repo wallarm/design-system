@@ -1,4 +1,5 @@
 import type { FC, Ref } from 'react';
+
 import { Stack, type StackProps } from './Stack';
 
 export interface VStackProps extends Omit<StackProps, 'direction'> {

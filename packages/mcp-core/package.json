@@ -1,16 +1,21 @@
 {
   "name": "@wallarm-org/mcp-core",
   "version": "0.1.0",
-  "description": "Shared types and Zod schemas for Wallarm Design System MCP metadata",
   "private": true,
+  "description": "Shared types and Zod schemas for Wallarm Design System MCP metadata",
+  "license": "MIT",
+  "author": "Wallarm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wallarm/design-system.git",
     "directory": "packages/mcp-core"
   },
-  "license": "MIT",
-  "author": "Wallarm",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "development": "./src/index.ts",
@@ -20,11 +25,6 @@
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rslib build",
     "typecheck": "tsc --noEmit"

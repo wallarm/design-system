@@ -1,7 +1,8 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
-import { Fragment, useMemo } from 'react';
+import { type FC, type HTMLAttributes, type Ref, Fragment, useMemo } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { getValidChildren } from './utils';

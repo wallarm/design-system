@@ -1,4 +1,5 @@
 import { isValidFileType } from '@zag-js/file-utils';
+
 import type { FileUploadErrorCode } from '../types';
 
 export interface FileCheckRules {

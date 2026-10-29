@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+
 import type { ContentPhase, PhaseType, SplashScreenShrinkTarget } from './types';
 
 export const SPLASH_PHASES: Record<ContentPhase, boolean> = {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { Segment } from '../FilterInputField';
 
 describe('Segment', () => {

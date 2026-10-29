@@ -1,4 +1,5 @@
 import type { HighlighterGeneric, ThemedToken } from '@shikijs/types';
+
 import type { HighlightResult, ShikiLanguage, SyntaxAdapter, Token, TokenType } from './types';
 
 // Lazy-loaded shiki highlighter instance

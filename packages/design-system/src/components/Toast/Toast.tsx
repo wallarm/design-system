@@ -1,7 +1,8 @@
-import type { ReactElement, ReactNode } from 'react';
-import { cloneElement, isValidElement } from 'react';
+import { type ReactElement, type ReactNode, cloneElement, isValidElement } from 'react';
+
 import { Toast as ArkToast } from '@ark-ui/react/toast';
 import { cva } from 'class-variance-authority';
+
 import { CircleCheck, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
@@ -13,7 +14,7 @@ import { ToastProgress } from './ToastProgress';
 import { ToastTitle } from './ToastTitle';
 
 const toastVariants = cva(
-  'group relative flex min-w-[256px] max-w-[560px] items-start gap-12 rounded-16 bg-component-toast-bg p-12 pl-16 shadow-lg transition-all',
+  'group relative flex max-w-[560px] min-w-[256px] items-start gap-12 rounded-16 bg-component-toast-bg p-12 pl-16 shadow-lg transition-all',
   {
     variants: {
       variant: {
@@ -156,7 +157,7 @@ export const Toast = ({ toast }: ToastProps) => {
       <TestIdProvider value={toast.id}>
         <div
           className={cn(
-            'flex w-full gap-8 relative z-10',
+            'relative z-10 flex w-full gap-8',
             isSimple ? 'items-center' : 'items-start',
           )}
         >
@@ -164,8 +165,8 @@ export const Toast = ({ toast }: ToastProps) => {
 
           <div
             className={cn(
-              'flex-1 flex',
-              isSimple ? 'flex-row gap-16 items-center' : 'flex-col gap-8',
+              'flex flex-1',
+              isSimple ? 'flex-row items-center gap-16' : 'flex-col gap-8',
             )}
           >
             <div className='flex-1 py-2'>

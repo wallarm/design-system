@@ -1,9 +1,11 @@
 import type { FC, Ref, TextareaHTMLAttributes } from 'react';
+
 import type { HTMLProps } from '@ark-ui/react/factory';
 import { useFieldContext } from '@ark-ui/react/field';
 import { mergeProps } from '@ark-ui/react/utils';
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import type { VariantProps } from 'class-variance-authority';
+
 import { SvgIcon } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
@@ -76,7 +78,7 @@ export const Textarea: FC<TextareaProps> = ({
 
       {!autoResize && (
         <SvgIcon
-          className='w-12 h-12 absolute bottom-0 right-0 text-icon-secondary pointer-events-none'
+          className='pointer-events-none absolute right-0 bottom-0 h-12 w-12 text-icon-secondary'
           viewBox='0 0 12 12'
         >
           <path d='M6 8L8 6M8 3L3 8' stroke='currentColor' strokeLinecap='round' />

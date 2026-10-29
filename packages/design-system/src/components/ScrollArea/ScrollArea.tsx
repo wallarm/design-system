@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 

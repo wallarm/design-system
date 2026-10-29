@@ -1,5 +1,6 @@
 import type { useSortable } from '@dnd-kit/sortable';
 import { type Cell, flexRender, type RowData } from '@tanstack/react-table';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';

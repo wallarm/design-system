@@ -1,6 +1,8 @@
 import { type FC, type ReactNode, useLayoutEffect, useRef, useState } from 'react';
+
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { useTabsSharedContext } from '../TabsSharedContext';

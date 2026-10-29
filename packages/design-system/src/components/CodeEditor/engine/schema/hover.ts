@@ -5,6 +5,7 @@ import {
   hoverTooltip,
   type Tooltip,
 } from '@codemirror/view';
+
 import type { JsonSchema } from '../../types';
 import { getJsonPointers, type JsonRegion, readRegionData } from '../languages/jsonPointers';
 import { getCompiledSchema } from './loadSchema';

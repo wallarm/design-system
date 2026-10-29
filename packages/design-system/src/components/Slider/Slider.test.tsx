@@ -1,6 +1,8 @@
 import { type ComponentProps, createRef } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';

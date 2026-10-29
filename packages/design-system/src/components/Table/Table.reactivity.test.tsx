@@ -1,8 +1,9 @@
-import type { FC, ReactNode } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { type FC, type ReactNode, createContext, useContext, useState } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { createTableColumnHelper } from './lib';
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';

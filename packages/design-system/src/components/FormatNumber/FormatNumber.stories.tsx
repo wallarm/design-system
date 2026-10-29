@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { FormatNumber } from './FormatNumber';
 
 const DESCRIPTION = [

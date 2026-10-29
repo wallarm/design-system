@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useEffect, useMemo, useState } from 'react';
+
 import { ThemeProviderContext } from './ThemeProviderContext';
 import type { FrameStyle, Theme } from './types';
 

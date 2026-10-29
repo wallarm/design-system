@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -20,7 +21,7 @@ export const PageContent: FC<PageContentProps> = ({ ref, children, className, ..
       data-testid={testId}
       data-slot='page-content'
       className={cn(
-        'flex-1 min-h-0 overflow-auto px-24 pt-8 pb-24',
+        'min-h-0 flex-1 overflow-auto px-24 pt-8 pb-24',
         '[:is([data-slot=page-header],[data-slot=page-toolbar])+&]:pt-6',
         className,
       )}

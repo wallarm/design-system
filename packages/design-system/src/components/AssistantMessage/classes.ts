@@ -4,13 +4,13 @@ import { cva } from 'class-variance-authority';
  * is 4px. The approval card stretches to the full width (the root is `items-start`). The
  * actions row is pulled 4px left so the 24px button's icon lines up with the text. */
 export const assistantMessageVariants = cva(
-  'group/message flex flex-col items-start gap-4 px-8 [&>[data-slot=chain-of-thought]]:mb-8 [&>[data-slot=approval-card]]:mb-8 [&>[data-slot=approval-card]]:self-stretch [&>[data-slot=message-actions]]:-ms-4',
+  'group/message flex flex-col items-start gap-4 px-8 [&>[data-slot=approval-card]]:mb-8 [&>[data-slot=approval-card]]:self-stretch [&>[data-slot=chain-of-thought]]:mb-8 [&>[data-slot=message-actions]]:-ms-4',
 );
 
 /** Prose for markdown blocks (`AssistantMessageMarkdown` or your renderer): paragraphs 14/24, headings 16/24
  * medium, lists 14/20 indented 21px. */
 export const assistantMessageContentVariants = cva(
-  'self-stretch break-words text-sm leading-base text-text-primary [&_:is(h1,h2,h3,h4,h5,h6)]:font-sans-display [&_:is(h1,h2,h3,h4,h5,h6)]:text-base [&_:is(h1,h2,h3,h4,h5,h6)]:font-medium [&>*+*]:mt-8 [&>:is(h1,h2,h3,h4,h5,h6)+*]:mt-4 [&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-21 [&_li]:leading-sm [&_li+li]:mt-4',
+  'self-stretch text-sm leading-base break-words text-text-primary [&_:is(h1,h2,h3,h4,h5,h6)]:font-sans-display [&_:is(h1,h2,h3,h4,h5,h6)]:text-base [&_:is(h1,h2,h3,h4,h5,h6)]:font-medium [&_:is(ul,ol)]:ps-21 [&_li]:leading-sm [&_li+li]:mt-4 [&_ol]:list-decimal [&_ul]:list-disc [&>*+*]:mt-8 [&>:is(h1,h2,h3,h4,h5,h6)+*]:mt-4',
 );
 
 /** The Figma "Working..." row (469:341): the ChainOfThought icon cell and shimmering label, without list semantics. */

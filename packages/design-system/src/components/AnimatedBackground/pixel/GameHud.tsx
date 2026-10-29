@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../../utils/cn';
 import type { GameStats } from './module';
 
@@ -33,24 +34,24 @@ export const GameHud: FC<GameHudProps> = ({
     <>
       {showCounter && (
         <div
-          className='fixed top-24 right-24 flex flex-col items-end gap-6 font-mono pointer-events-none'
+          className='pointer-events-none fixed top-24 right-24 flex flex-col items-end gap-6 font-mono'
           style={{ animation: 'hud-in 0.3s ease-out' }}
         >
           <div
             className={cn(
-              'flex flex-col border w-120 border-text-hint bg-states-primary-hover',
+              'flex w-120 flex-col border border-text-hint bg-states-primary-hover',
               armed ? '' : 'items-center justify-center',
             )}
           >
             {armed ? (
               <>
                 <div className='flex flex-col items-center gap-4 px-16 py-8'>
-                  <span className='text-base leading-xl font-bold tabular-nums text-text-success'>
+                  <span className='text-base leading-xl font-bold text-text-success tabular-nums'>
                     {stats.stopped}
                     <span className='opacity-45'> / {faced}</span>
                   </span>
                   <span
-                    className='text-xs leading-xs uppercase text-text-secondary'
+                    className='text-xs leading-xs text-text-secondary uppercase'
                     style={{ fontFeatureSettings: '"liga" 0' }}
                   >
                     HIT
@@ -60,11 +61,11 @@ export const GameHud: FC<GameHudProps> = ({
                 <div className='h-px w-full bg-border-primary' />
 
                 <div className='flex flex-col items-center gap-4 px-16 py-8'>
-                  <span className='text-base leading-xl font-bold tabular-nums text-text-success'>
+                  <span className='text-base leading-xl font-bold text-text-success tabular-nums'>
                     {accuracy}%
                   </span>
                   <span
-                    className='text-xs leading-xs uppercase text-text-secondary'
+                    className='text-xs leading-xs text-text-secondary uppercase'
                     style={{ fontFeatureSettings: '"liga" 0' }}
                   >
                     SCORE
@@ -75,14 +76,14 @@ export const GameHud: FC<GameHudProps> = ({
               <div className='flex flex-col items-center gap-4 px-16 py-8'>
                 <span
                   key={catchKey}
-                  className='text-base leading-xl font-bold tabular-nums text-text-success'
+                  className='text-base leading-xl font-bold text-text-success tabular-nums'
                   style={{ animation: 'catch-pop 0.25s ease-out' }}
                 >
                   {caught}
                   <span className='opacity-45'> / {gateTarget}</span>
                 </span>
                 <span
-                  className='text-xs leading-xs uppercase text-text-secondary'
+                  className='text-xs leading-xs text-text-secondary uppercase'
                   style={{ fontFeatureSettings: '"liga" 0' }}
                 >
                   INSERT COIN
@@ -94,7 +95,7 @@ export const GameHud: FC<GameHudProps> = ({
           {roundOver && (
             <button
               type='button'
-              className='pointer-events-auto text-2xs leading-sm font-mono uppercase underline underline-offset-4 hover:text-[var(--animated-bg-accent-dot)] text-text-secondary'
+              className='pointer-events-auto font-mono text-2xs leading-sm text-text-secondary uppercase underline underline-offset-4 hover:text-[var(--animated-bg-accent-dot)]'
               onClick={onTryAgain}
             >
               Try again
@@ -111,7 +112,7 @@ export const GameHud: FC<GameHudProps> = ({
 
       {caught > 0 && !armed && (
         <div
-          className='fixed bottom-24 left-1/2 -translate-x-1/2 text-xs pointer-events-none text-text-secondary'
+          className='pointer-events-none fixed bottom-24 left-1/2 -translate-x-1/2 text-xs text-text-secondary'
           style={{ animation: 'hud-in 0.3s ease-out' }}
         >
           {`Click the red anomalies \u2014 catch 5 to arm the cannon \u00B7 m sound ${soundOn ? 'off' : 'on'}`}

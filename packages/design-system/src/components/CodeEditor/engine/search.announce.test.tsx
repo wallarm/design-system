@@ -2,6 +2,7 @@ import { SearchQuery, setSearchQuery } from '@codemirror/search';
 import type { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
+
 import { engineOptions } from '../../../testUtils/codeEditorEngine';
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';

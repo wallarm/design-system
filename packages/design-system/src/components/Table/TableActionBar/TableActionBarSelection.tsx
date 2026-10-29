@@ -7,6 +7,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
+
 import {
   BulkBarSummary,
   BulkBarSummaryClear,

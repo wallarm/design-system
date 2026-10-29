@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Switch as ArkUiSwitch } from '@ark-ui/react/switch';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SwitchContext } from './SwitchContext';
@@ -27,7 +29,7 @@ export const Switch: FC<SwitchProps> = ({
           '[&:has([data-part=description])]:grid-cols-[40px_auto]',
           '*:data-[part=description]:col-start-2 *:data-[part=description]:col-end-3',
           '[&:not([data-disabled])]:cursor-pointer',
-          'data-disabled:opacity-50 data-disabled:pointer-events-none data-disabled:cursor-not-allowed',
+          'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50',
           className,
         )}
       >

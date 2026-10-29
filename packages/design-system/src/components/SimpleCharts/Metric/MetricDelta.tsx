@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useTestId } from '../../../utils/testId';
 import { ChartDelta, type ChartDeltaProps } from '../internal/ChartDelta';
 

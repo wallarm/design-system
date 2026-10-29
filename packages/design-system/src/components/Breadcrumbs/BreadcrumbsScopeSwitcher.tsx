@@ -1,4 +1,5 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { Check, ChevronUpDown } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -52,8 +53,8 @@ export const BreadcrumbsScopeSwitcher: FC<BreadcrumbsScopeSwitcherProps> = ({
             data-testid={testId}
             className={cn(
               'flex items-center gap-4 rounded-6 px-4 py-0 text-sm transition-colors',
-              'hover:bg-states-primary-hover active:bg-states-primary-pressed cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+              'cursor-pointer hover:bg-states-primary-hover active:bg-states-primary-pressed',
+              'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
               isCurrent ? 'font-medium text-text-primary' : 'font-normal text-text-secondary',
               className,
             )}

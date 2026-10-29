@@ -1,6 +1,15 @@
-import type { ButtonHTMLAttributes, FC, MouseEvent, ReactNode, Ref } from 'react';
-import { useCallback, useRef } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  type FC,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useRef,
+} from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useTestId } from '../../utils/testId';

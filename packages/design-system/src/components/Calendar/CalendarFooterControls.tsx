@@ -1,4 +1,5 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 
 export interface CalendarFooterControlsProps {
@@ -18,7 +19,7 @@ export const CalendarFooterControls: FC<CalendarFooterControlsProps> = ({
   children,
   className,
 }) => (
-  <div ref={ref} className={cn('flex items-center gap-10 ml-auto', className)}>
+  <div ref={ref} className={cn('ml-auto flex items-center gap-10', className)}>
     {children}
   </div>
 );

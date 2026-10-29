@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { cn } from '../../../utils/cn';
 import type { LineConfig } from '../CodeSnippetContext';
 import type { FoldRegion } from '../lib/foldUtils';
@@ -69,7 +70,7 @@ export const CodeLine: FC<CodeLineProps> = ({
           {lineNumber !== undefined && (
             <span
               className={cn(
-                'shrink-0 select-none text-right text-text-secondary px-8',
+                'shrink-0 px-8 text-right text-text-secondary select-none',
                 colorStyles?.text,
               )}
             >
@@ -78,7 +79,7 @@ export const CodeLine: FC<CodeLineProps> = ({
           )}
           {/* Fold toggle */}
           {hasFolds && (
-            <span className='shrink-0 flex items-center justify-center px-4'>
+            <span className='flex shrink-0 items-center justify-center px-4'>
               {fold && onFoldToggle ? (
                 <FoldToggle
                   fold={fold}
@@ -86,13 +87,13 @@ export const CodeLine: FC<CodeLineProps> = ({
                   onToggle={onFoldToggle}
                 />
               ) : (
-                <span className='w-16 h-16' />
+                <span className='h-16 w-16' />
               )}
             </span>
           )}
           {/* Prefix */}
           {lineConfig?.prefix !== undefined && (
-            <span className={cn('shrink-0 select-none px-8 text-center', colorStyles?.text)}>
+            <span className={cn('shrink-0 px-8 text-center select-none', colorStyles?.text)}>
               {lineConfig.prefix}
             </span>
           )}

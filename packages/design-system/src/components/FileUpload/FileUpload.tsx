@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { useFieldContext } from '@ark-ui/react/field';
 import {
   FileUpload as ArkFileUpload,
@@ -19,6 +20,7 @@ import {
   type UseFileUploadReturn,
   useFileUpload,
 } from '@ark-ui/react/file-upload';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { fileUploadVariants } from './classes';

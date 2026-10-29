@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
+
 import type { TimeValue } from '@react-aria/datepicker';
 import { format } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Calendar, ChevronDown, Clock } from '../../icons';
-import type { DateValue } from '../../index';
-import { CalendarDate, CalendarDateTime, Time } from '../../index';
+import { type DateValue, CalendarDate, CalendarDateTime, Time } from '../../index';
 import { useTestId } from '../../utils/testId';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
 import { Button } from '../Button';

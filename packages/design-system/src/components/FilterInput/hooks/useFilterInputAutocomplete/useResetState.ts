@@ -1,6 +1,7 @@
-import type { Dispatch, RefObject, SetStateAction } from 'react';
-import { useCallback } from 'react';
+import { type Dispatch, type RefObject, type SetStateAction, useCallback } from 'react';
+
 import { flushSync } from 'react-dom';
+
 import { isMenuRelated } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
 

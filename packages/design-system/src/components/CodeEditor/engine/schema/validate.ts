@@ -1,5 +1,6 @@
 import type { Diagnostic } from '@codemirror/lint';
 import type { EditorState } from '@codemirror/state';
+
 import type { JsonSchema } from '../../types';
 import { getJsonPointers, type JsonPointerEntry, type JsonRegion } from '../languages/jsonPointers';
 import { getCompiledSchema, type JsonError, parseJson } from './loadSchema';

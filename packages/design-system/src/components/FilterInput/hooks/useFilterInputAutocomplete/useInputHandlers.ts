@@ -1,5 +1,12 @@
-import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
-import { useCallback, useRef } from 'react';
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  type MutableRefObject,
+  type RefObject,
+  useCallback,
+  useRef,
+} from 'react';
+
 import {
   applyAcceptChar,
   getOperatorFromLabel,

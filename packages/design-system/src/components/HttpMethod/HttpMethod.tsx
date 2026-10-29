@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { Badge, type BadgeProps } from '../Badge';
 import { HTTP_METHOD_COLOR, OTHER_METHOD_COLOR } from './constants';
 import type { HttpMethodName } from './types';

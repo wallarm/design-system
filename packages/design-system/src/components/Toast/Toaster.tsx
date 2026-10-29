@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import {
   Toaster as ArkToaster,
   type CreateToasterReturn,
   createToaster,
 } from '@ark-ui/react/toast';
+
 import { cn } from '../../utils/cn';
 import {
   EXTENDED_TOAST_DURATION_MS,
@@ -128,21 +130,21 @@ export const Toaster: FC = () => {
           // overlays (positioners compute 50 + layer * 20) while staying below
           // tooltips. Safe to raise: zag sets pointer-events: none on the
           // region while it holds no toasts.
-          'fixed bottom-0 right-0 !z-(--toast-z-index) flex flex-col gap-12 p-24 max-w-[560px] mx-auto',
+          'fixed right-0 bottom-0 !z-(--toast-z-index) mx-auto flex max-w-[560px] flex-col gap-12 p-24',
           // Root styles with CSS variables for animations
-          '[&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale]',
+          '[&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale]',
           // Match Drawer/Dialog timings: 300ms open, 150ms close
-          '[&_[data-scope=toast][data-part=root]]:[transition-property:translate,scale,opacity,height,box-shadow] [&_[data-scope=toast][data-part=root]]:[transition-timing-function:ease] [&_[data-scope=toast][data-part=root]]:[transition-duration:300ms]',
-          '[&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-property:translate,scale,opacity] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-timing-function:ease] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-duration:150ms]',
+          '[&_[data-scope=toast][data-part=root]]:[transition-property:translate,scale,opacity,height,box-shadow] [&_[data-scope=toast][data-part=root]]:[transition-duration:300ms] [&_[data-scope=toast][data-part=root]]:[transition-timing-function:ease]',
+          '[&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-property:translate,scale,opacity] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-duration:150ms] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-timing-function:ease]',
           // Hide 4th+ children
           '[&_[data-scope=toast][data-part=root]:nth-child(n+4)]:hidden',
           // After pseudo-element base styles
-          '[&_[data-scope=toast][data-part=root]]:after:content-[""] [&_[data-scope=toast][data-part=root]]:after:absolute [&_[data-scope=toast][data-part=root]]:after:inset-0 [&_[data-scope=toast][data-part=root]]:after:rounded-[inherit] [&_[data-scope=toast][data-part=root]]:after:pointer-events-none [&_[data-scope=toast][data-part=root]]:after:z-[1] [&_[data-scope=toast][data-part=root]]:after:opacity-0 [&_[data-scope=toast][data-part=root]]:after:[transition:opacity_300ms_ease]',
+          '[&_[data-scope=toast][data-part=root]]:after:pointer-events-none [&_[data-scope=toast][data-part=root]]:after:absolute [&_[data-scope=toast][data-part=root]]:after:inset-0 [&_[data-scope=toast][data-part=root]]:after:z-[1] [&_[data-scope=toast][data-part=root]]:after:rounded-[inherit] [&_[data-scope=toast][data-part=root]]:after:opacity-0 [&_[data-scope=toast][data-part=root]]:after:content-[""] [&_[data-scope=toast][data-part=root]]:after:[transition:opacity_300ms_ease]',
           '[&_[data-scope=toast][data-part=root][data-state=closed]]:after:[transition:opacity_150ms_ease]',
           // After pseudo-element for non-first, non-stack toasts
-          '[&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:[background:--alpha(var(--color-white)/50%)] [&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:opacity-100',
+          '[&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:opacity-100 [&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:[background:--alpha(var(--color-white)/50%)]',
           // After pseudo-element for 2nd child (non-stack)
-          '[&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:[background:--alpha(var(--color-white)/20%)] [&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:opacity-100',
+          '[&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:opacity-100 [&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:[background:--alpha(var(--color-white)/20%)]',
         )}
       >
         {toast => <Toast key={toast.id} toast={toast as ToastData} />}

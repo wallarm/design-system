@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { SelectEmptyState } from '../Select/SelectEmptyState';
 import { useFilterDropdownContext } from './FilterDropdownContext';

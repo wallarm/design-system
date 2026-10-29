@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Button } from '../Button';
 import { Code } from '../Code';
 import { Alert, type AlertProps } from './Alert';
@@ -47,7 +49,7 @@ export default meta;
 
 /** The five colours with the icon each implies: neutral `primary` for a general notice, then destructive, info, warning and success for real status. */
 export const AllColors: StoryFn<AlertProps> = () => (
-  <div className='flex flex-col gap-16 w-[600px]'>
+  <div className='flex w-[600px] flex-col gap-16'>
     <Alert color='primary'>
       <AlertIcon />
       <AlertContent>
@@ -93,7 +95,7 @@ export const AllColors: StoryFn<AlertProps> = () => (
 /** A title on its own is a complete alert. Add a description only when it says something the title does not. */
 export const TitleOnly: StoryFn<AlertProps> = () => {
   return (
-    <div className='flex flex-col gap-16 w-[600px]'>
+    <div className='flex w-[600px] flex-col gap-16'>
       <Alert color='primary'>
         <AlertIcon />
         <AlertContent>
@@ -117,7 +119,7 @@ export const WithCloseButton: StoryFn<AlertProps> = () => {
   const [showWarning, setShowWarning] = useState(true);
 
   return (
-    <div className='flex flex-col gap-16 w-[600px]'>
+    <div className='flex w-[600px] flex-col gap-16'>
       {showInfo && (
         <Alert color='info'>
           <AlertIcon />
@@ -145,7 +147,7 @@ export const WithCloseButton: StoryFn<AlertProps> = () => {
 /** `AlertControls` as a direct child of `Alert` puts the actions top-right, which is what a wide alert wants. The buttons are always `secondary` and `small`, neutral or destructive to match the alert, never a solid primary. */
 export const WithControls: StoryFn<AlertProps> = () => {
   return (
-    <div className='flex flex-col gap-16 w-[600px]'>
+    <div className='flex w-[600px] flex-col gap-16'>
       <Alert color='info'>
         <AlertIcon />
         <AlertContent>
@@ -198,7 +200,7 @@ export const WithControls: StoryFn<AlertProps> = () => {
 /** The same controls nested inside `AlertContent` drop below the text instead, which is what a narrow alert wants. Placement follows the width rather than a rule. */
 export const WithBottomActions: StoryFn<AlertProps> = () => {
   return (
-    <div className='flex flex-col gap-16 w-[600px]'>
+    <div className='flex w-[600px] flex-col gap-16'>
       <Alert color='info'>
         <AlertIcon />
         <AlertContent>
@@ -333,7 +335,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
     'This is a very long description that demonstrates the text truncation feature. The description can be quite lengthy and should be limited to a maximum of 4 lines by default. When the text exceeds this limit, it will be truncated with an ellipsis. This behavior ensures that the alert remains compact and does not take up too much vertical space on the page. Additional text is added here to make sure the truncation is visible.';
 
   return (
-    <div className='flex flex-col gap-16 w-600'>
+    <div className='flex w-600 flex-col gap-16'>
       <div>
         <p className='sb-annotation mb-8'>lineClamp 4</p>
         <Alert color='info'>
@@ -372,7 +374,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
 
 /** An inline `Code` line inside the content, for the error code or the command that failed — the one piece of rich content an alert is built to carry. */
 export const WithCode: StoryFn<AlertProps> = () => (
-  <div className='flex flex-col gap-16 w-700'>
+  <div className='flex w-700 flex-col gap-16'>
     <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>

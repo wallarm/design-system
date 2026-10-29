@@ -10,6 +10,7 @@ import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { SyntaxNode } from '@lezer/common';
+
 import type { JsonSchema } from '../../types';
 import {
   ENSURE_TREE_TIMEOUT,

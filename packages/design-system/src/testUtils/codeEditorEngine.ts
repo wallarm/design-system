@@ -1,5 +1,6 @@
 import type { EditorView } from '@codemirror/view';
 import { type Mock, rs } from '@rstest/core';
+
 import { createEditor } from '../components/CodeEditor/engine';
 import type {
   EditorHandle,

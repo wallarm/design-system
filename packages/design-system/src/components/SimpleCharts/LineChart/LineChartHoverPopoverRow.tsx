@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { ChartHoverCardRow } from '../internal/ChartHoverCard';
 import type { LineChartSeries } from './LineChartContext';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { keepOpenOnMenuHandoff } from '../lib';
 
 const dismissRequest = (targetLayer: HTMLElement | undefined) => {

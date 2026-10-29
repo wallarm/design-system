@@ -1,5 +1,5 @@
-import type { RefObject } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { type RefObject, useCallback, useRef, useState } from 'react';
+
 import {
   type AnchorBounds,
   MENU_BASE_GUTTER,

@@ -1,8 +1,8 @@
-import type { FC, ReactNode } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { type FC, type ReactNode, useCallback, useEffect, useRef } from 'react';
+
 import { Dialog } from '@ark-ui/react/dialog';
-import type { TestableProps } from '../../utils/testId';
-import { TestIdProvider } from '../../utils/testId';
+
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SearchModalProvider } from './SearchModalContext';
 
 export interface SearchModalProps extends TestableProps {

@@ -18,7 +18,7 @@ export const navRailVariants = cva(
 const railGap = { expanded: 'gap-2', collapsed: 'gap-2', compact: 'gap-4' } as const;
 
 export const navRailBodyVariants = cva(
-  'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none [scrollbar-width:thin]',
+  'flex min-h-0 flex-1 [scrollbar-width:thin] flex-col overflow-y-auto overscroll-none',
   { variants: { mode: railGap }, defaultVariants: { mode: 'expanded' } },
 );
 
@@ -48,7 +48,7 @@ export const navRailItemVariants = cva(
         // Branded: only the active item turns brand; inactive items stay neutral in every state.
         // The tooltip marks its trigger data-state=open on hover, so the open state is branded
         // too, or the neutral open fill above would turn the active item gray.
-        true: 'overlay-states-primary-active branded:overlay-states-brand-active branded:data-[state=open]:overlay-states-brand-active branded:text-text-brand',
+        true: 'overlay-states-primary-active branded:overlay-states-brand-active branded:text-text-brand branded:data-[state=open]:overlay-states-brand-active',
         false:
           'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },

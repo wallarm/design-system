@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Check } from '../../icons/Check';
 import { X } from '../../icons/X';
 import { Button } from '../Button';
@@ -12,7 +13,7 @@ export interface InlineEditActionsProps {
 
 export const InlineEditActions: FC<InlineEditActionsProps> = ({ onSubmit, onCancel }) => (
   <div
-    className='absolute right-0 top-full mt-4 flex z-10'
+    className='absolute top-full right-0 z-10 mt-4 flex'
     data-slot='inline-edit-actions'
     onKeyDown={e => e.stopPropagation()}
   >

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useTestId } from '../../../../utils/testId';
 import { segmentContainer, segmentTextVariants } from './classes';
 import { PAIR_SEPARATOR_SLOT } from './segmentVariant';

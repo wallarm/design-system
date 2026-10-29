@@ -1,6 +1,8 @@
 import { createRef, type ReactNode } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { AssistantMessage } from './AssistantMessage';
 import { AssistantMessageContent } from './AssistantMessageContent';
 import {

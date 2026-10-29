@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { Tabs, TabsList } from '../Tabs';
 
@@ -28,7 +29,7 @@ export const CodeSnippetTabs: FC<CodeSnippetTabsProps> = ({
       unmountOnExit={false}
       data-testid={testId}
     >
-      <TabsList className='pl-8 pr-0 border-b-0 [&_[data-part=indicator]]:bottom-0'>
+      <TabsList className='border-b-0 pr-0 pl-8 [&_[data-part=indicator]]:bottom-0'>
         {children}
       </TabsList>
     </Tabs>

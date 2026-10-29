@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { isValid } from 'date-fns';
+
 import { cn } from '../../utils/cn';
 import {
   formatAbsoluteDate,
@@ -96,7 +98,7 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
             <Text size='sm'>
               <span
                 className={cn(
-                  'whitespace-nowrap border-b-1 border-dashed border-border-strong-primary',
+                  'border-b-1 border-dashed border-border-strong-primary whitespace-nowrap',
                 )}
               >
                 {formatRelativeTime(date, undefined, dateFormat)}

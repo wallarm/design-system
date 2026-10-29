@@ -1,9 +1,11 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
-const alertControlsVariants = cva(cn('flex items-center gap-4 shrink-0'));
+const alertControlsVariants = cva(cn('flex shrink-0 items-center gap-4'));
 
 export type AlertControlsProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'> & {
   ref?: Ref<HTMLDivElement>;

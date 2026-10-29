@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -7,7 +8,7 @@ import { cn } from '../../utils/cn';
  */
 export const filterDropdownControlVariants = cva(
   cn(
-    'inline-flex h-36 min-w-0 max-w-180 items-stretch',
+    'inline-flex h-36 max-w-180 min-w-0 items-stretch',
     'rounded-12 border-1 border-border-primary bg-component-outline-button-bg',
     'font-sans text-sm text-text-primary',
     'overlay hover:not-data-disabled:overlay-states-primary-hover',
@@ -15,7 +16,7 @@ export const filterDropdownControlVariants = cva(
     'transition-[border,box-shadow,opacity]',
     // Focus ring belongs to the pill but follows the trigger's keyboard focus.
     'has-[[data-slot=filter-dropdown-trigger]:focus-visible]:ring-3 has-[[data-slot=filter-dropdown-trigger]:focus-visible]:ring-focus-primary',
-    'data-disabled:opacity-50 data-disabled:cursor-not-allowed',
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
   ),
   {
     variants: {
@@ -74,12 +75,12 @@ export const filterDropdownClearClassName = cn(
   'inline-flex size-24 shrink-0 items-center justify-center self-center rounded-6',
   'cursor-pointer text-icon-secondary transition-colors hover:not-disabled:text-icon-primary',
   'outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-  'disabled:cursor-not-allowed [&_svg]:icon-md [&_svg]:pointer-events-none',
+  'disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:icon-md',
 );
 
 export const filterDropdownContentClassName = cn(
   // Hug the options instead of Select's 240px floor, cap at 360px.
-  'min-w-128 max-w-360',
+  'max-w-360 min-w-128',
   // A bare max-h-340 would stop the menu flipping when there is no room below; min() keeps
   // the available-height cap (TableSettingsMenu precedent).
   'max-h-[min(340px,var(--available-height))]',

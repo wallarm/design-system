@@ -1,7 +1,9 @@
 import { type FC, useRef } from 'react';
+
 import { useDateSegment } from '@react-aria/datepicker';
 import type { DateFieldState, DateSegment } from '@react-stately/datepicker';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { getMonthSegmentText } from './utils';
 
@@ -16,7 +18,7 @@ function resolveSegmentText(segment: DateSegment): string {
 }
 
 const segmentVariants = cva(
-  cn('relative outline-none text-left', 'font-sans text-sm transition-all', 'focus:outline-none'),
+  cn('relative text-left outline-none', 'font-sans text-sm transition-all', 'focus:outline-none'),
   {
     variants: {
       isPlaceholder: {
@@ -25,7 +27,7 @@ const segmentVariants = cva(
       },
       disabled: {
         true: 'cursor-not-allowed',
-        false: 'hover:bg-states-primary-default-alt cursor-text',
+        false: 'cursor-text hover:bg-states-primary-default-alt',
       },
       // Focus styling is tied to editability: editable segments get the
       // brand blue fill + alt-colour text that make keyboard focus obvious.
@@ -33,7 +35,7 @@ const segmentVariants = cva(
       // focus doesn't make the value invisible).
       type: {
         literal:
-          'text-text-primary select-none hover:bg-transparent focus:bg-transparent rounded-2',
+          'rounded-2 text-text-primary select-none hover:bg-transparent focus:bg-transparent',
         editable: 'px-1 focus:bg-bg-fill-brand focus:text-text-primary-alt',
       },
     },

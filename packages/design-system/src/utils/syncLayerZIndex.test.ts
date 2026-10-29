@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import { syncLayerZIndex } from './syncLayerZIndex';
 
 const flushMutations = () => new Promise<void>(resolve => queueMicrotask(resolve));

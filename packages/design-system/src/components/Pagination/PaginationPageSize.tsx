@@ -1,5 +1,7 @@
 import { type FC, useMemo } from 'react';
+
 import { usePaginationContext } from '@ark-ui/react/pagination';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
@@ -49,7 +51,7 @@ export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
           data-testid={testId}
         >
           <SelectButton size='medium' aria-label={label} />
-          <SelectPositioner className='min-w-0 w-88'>
+          <SelectPositioner className='w-88 min-w-0'>
             <SelectContent>
               {collection.items.map(item => (
                 <SelectOption key={item.value} item={item}>

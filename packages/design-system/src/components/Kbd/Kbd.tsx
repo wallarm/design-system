@@ -1,14 +1,16 @@
 import type { ComponentProps, FC } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 
 const kbdVariants = cva(
   cn(
-    'inline-flex items-center justify-center gap-1 w-fit',
-    'border border-component-border-hotkey rounded-4 bg-bg-surface-2',
+    'inline-flex w-fit items-center justify-center gap-1',
+    'rounded-4 border border-component-border-hotkey bg-bg-surface-2',
     'font-sans font-medium',
-    'text-text-primary  text-xs',
+    'text-xs text-text-primary',
     'pointer-events-none select-none',
   ),
   {

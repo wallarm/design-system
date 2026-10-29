@@ -1,4 +1,5 @@
 import { type FC, type HTMLAttributes, type Ref, useEffect, useMemo } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { BarListContext, type BarListContextValue } from './BarListContext';
@@ -30,7 +31,7 @@ export const BarList: FC<BarListProps> = ({
 
   useEffect(() => {
     if (!isValidMax && process.env.NODE_ENV !== 'production') {
-      // oxlint-disable-next-line no-console -- dev-only warning about invalid `max`
+      // dev-only warning about invalid `max`
       console.warn(
         `[BarList] \`max\` must be a finite positive number. Received: ${String(max)}. ` +
           'Every row will render empty with a 0% label.',

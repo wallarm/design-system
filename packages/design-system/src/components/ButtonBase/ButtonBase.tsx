@@ -1,6 +1,8 @@
 import type { ElementType, FC, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 import { isIconOnly } from '../../utils/isIconOnly';
@@ -67,7 +69,7 @@ export const ButtonBase: FC<
         <>
           <span className='items-center justify-center opacity-0'>{children}</span>
 
-          <span className='flex items-center justify-center w-full h-full absolute top-0 right-0 bottom-0 left-0'>
+          <span className='absolute top-0 right-0 bottom-0 left-0 flex h-full w-full items-center justify-center'>
             <Loader size='md' />
           </span>
         </>

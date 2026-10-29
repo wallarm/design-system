@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
-import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
-import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+
+import {
+  type ComponentMetadata,
+  type DesignSystemMetadata,
+  designSystemMetadataSchema,
+} from '@wallarm-org/mcp-core';
+import { Project } from 'ts-morph';
+
 import { parseComponentDescription } from './parse-description.js';
 import { parseExamples } from './parse-examples.js';
 import { parseComponentProps } from './parse-props.js';

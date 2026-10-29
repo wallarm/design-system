@@ -1,5 +1,7 @@
 import { type FC, type ReactNode, useEffect } from 'react';
+
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
+
 import { cn } from '../../utils/cn';
 import { ScrollArea } from '../ScrollArea/ScrollArea';
 import { ScrollAreaContent } from '../ScrollArea/ScrollAreaContent';
@@ -87,7 +89,7 @@ export const CalendarPresets: FC<CalendarPresetsProps> = ({
     <div
       className={cn(
         'flex flex-col',
-        'w-182 py-4 px-4',
+        'w-182 px-4 py-4',
         'border-r border-border-primary-light',
         className,
       )}

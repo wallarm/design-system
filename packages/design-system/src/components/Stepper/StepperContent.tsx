@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Steps as ArkSteps, useStepsContext } from '@ark-ui/react/steps';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { stepperContentVariants } from './classes';

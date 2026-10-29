@@ -25,7 +25,7 @@ export const chartEmptyClasses = [
   'text-center',
 ].join(' ');
 
-export const chartActionsVariants = cva('flex items-center gap-4 ml-auto', {
+export const chartActionsVariants = cva('ml-auto flex items-center gap-4', {
   variants: {
     alwaysVisible: {
       true: '',

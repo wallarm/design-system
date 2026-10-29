@@ -1,5 +1,5 @@
-import type { KeyboardEvent, RefObject } from 'react';
-import { useCallback } from 'react';
+import { type KeyboardEvent, type RefObject, useCallback } from 'react';
+
 import { hasDragSelection } from './lib';
 
 interface UseSelectionKeyboardOptions {

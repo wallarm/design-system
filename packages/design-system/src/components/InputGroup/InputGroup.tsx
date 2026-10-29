@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
@@ -8,7 +10,7 @@ export const inputGroupVariants = cva(
     'group/input-group',
 
     // Layout
-    'w-full flex items-center border rounded-8 bg-component-input-bg relative',
+    'relative flex w-full items-center rounded-8 border bg-component-input-bg',
 
     // Base Input override
     '**:data-[slot=input]:flex-1',
@@ -38,7 +40,7 @@ export const inputGroupVariants = cva(
     '**:data-[slot=textarea]:w-full',
 
     // Static state
-    'border border-border-primary outline-none shadow-xs transition-[color,border,box-shadow]',
+    'border border-border-primary shadow-xs transition-[color,border,box-shadow] outline-none',
     'has-[[data-slot=input]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true]):not(:focus-visible)]:hover:border-component-border-input-hover',
 
     // Focus state (input)

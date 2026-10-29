@@ -6,8 +6,10 @@ import {
   isValidElement,
   type Ref,
 } from 'react';
+
 import { Avatar as ArkAvatar } from '@ark-ui/react/avatar';
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { AvatarContent } from './AvatarContent';

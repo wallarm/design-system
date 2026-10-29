@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex, validateValueForField } from '../../lib';
 import type {

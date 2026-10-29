@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../EmptyState';
 
 export interface SelectEmptyStateProps {

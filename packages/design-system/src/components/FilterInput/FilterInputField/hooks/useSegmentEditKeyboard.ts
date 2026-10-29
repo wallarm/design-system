@@ -1,5 +1,5 @@
-import type { FocusEvent, KeyboardEvent, RefObject } from 'react';
-import { useCallback } from 'react';
+import { type FocusEvent, type KeyboardEvent, type RefObject, useCallback } from 'react';
+
 import type { BuildingChipData } from '../../FilterInputContext/types';
 import { isMenuRelated } from '../../lib';
 import type { FilterInputChipData } from '../../types';

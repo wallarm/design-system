@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Info } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';

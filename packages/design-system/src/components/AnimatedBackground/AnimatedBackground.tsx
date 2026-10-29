@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { BlurBackground, type BlurBackgroundProps } from './blur';
 import { PixelBackground, type PixelBackgroundProps } from './pixel';
 

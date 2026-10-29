@@ -1,5 +1,6 @@
 import { language as languageFacet } from '@codemirror/language';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 import { loadLanguageExtension } from './languages';
 

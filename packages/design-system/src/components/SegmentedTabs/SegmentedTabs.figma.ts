@@ -2,8 +2,7 @@
 // source=https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/SegmentedTabs/SegmentedTabs.tsx
 // component=SegmentedTabs
 
-import type { InstanceHandle, TextHandle } from 'figma';
-import figma from 'figma';
+import figma, { type InstanceHandle, type TextHandle } from 'figma';
 
 const instance = figma.selectedInstance;
 

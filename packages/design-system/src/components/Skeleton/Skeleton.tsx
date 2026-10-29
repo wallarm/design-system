@@ -1,5 +1,7 @@
 import type { CSSProperties, FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 
@@ -23,10 +25,10 @@ const skeletonVariants = cva(cn('overflow-hidden', 'animate-skeleton'), {
       32: 'rounded-32',
     },
     withDimensions: {
-      true: 'w-(--skeleton-width) h-(--skeleton-height)',
+      true: 'h-(--skeleton-height) w-(--skeleton-width)',
     },
     withChildren: {
-      true: 'select-none pointer-events-none text-transparent *:invisible',
+      true: 'pointer-events-none text-transparent select-none *:invisible',
     },
   },
   defaultVariants: {

@@ -1,7 +1,9 @@
 import type { ComponentPropsWithoutRef, ComponentRef, FC, Ref } from 'react';
+
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -9,7 +11,7 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 const tooltipContentVariants = cva(
   [
     // Base
-    'py-4 rounded-8 bg-component-tooltip-bg text-text-primary-alt text-xs font-medium',
+    'rounded-8 bg-component-tooltip-bg py-4 text-xs font-medium text-text-primary-alt',
     // Behavior: tooltips sit on a dedicated top tier above nested
     // drawer/dialog positioners (50 + layer * 20). They can't reuse the
     // layer-aware formula from DropdownMenu/Popover because zag never
@@ -18,7 +20,7 @@ const tooltipContentVariants = cva(
     // into the portal positioner's --z-index, so the value lives here.
     'z-(--tooltip-z-index) overflow-hidden',
     // Animation base
-    'animate-in fade-in-0 zoom-in-95 origin-[--transform-origin]',
+    'origin-[--transform-origin] animate-in fade-in-0 zoom-in-95',
     // Animation closed
     'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
     // Animation bottom
@@ -30,12 +32,12 @@ const tooltipContentVariants = cva(
     // Animation top
     'data-[side=top]:slide-in-from-bottom-2',
     // Kbd behavior
-    '[&>[data-slot=kbd]]:bg-component-kbi-tooltip-bg [&>[data-slot=kbd]]:border-0 [&>[data-slot=kbd]]:text-text-primary-alt',
+    '[&>[data-slot=kbd]]:border-0 [&>[data-slot=kbd]]:bg-component-kbi-tooltip-bg [&>[data-slot=kbd]]:text-text-primary-alt',
   ],
   {
     variants: {
       hasNonTextEnd: {
-        true: 'pl-8 pr-4',
+        true: 'pr-4 pl-8',
         false: 'px-8',
       },
     },

@@ -1,8 +1,9 @@
-import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { arrayMove } from '@dnd-kit/sortable';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import {
   ChevronDown,
   ChevronRight,
@@ -315,7 +316,7 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
   // it so the Storybook actions panel shows one consistent stream.
   const track = useCallback(
     (event: string, props?: Record<string, unknown>) =>
-      // oxlint-disable-next-line no-console -- demo story stand-in for an SDK call
+      // demo story stand-in for an SDK call
       console.info('[analytics]', event, props ?? {}),
     [],
   );
@@ -529,7 +530,7 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
       }}
       onMasterCellClick={rowId => track('SECURITY_TABLE_MASTER_CELL_CLICKED', { rowId })}
       renderExpandedRow={row => (
-        <div className='p-16 bg-states-primary-default-alt rounded-8'>
+        <div className='rounded-8 bg-states-primary-default-alt p-16'>
           <HStack justify='between' align='center'>
             <VStack gap={2}>
               <Text size='xs' color='secondary'>
@@ -1006,11 +1007,11 @@ export const RowExpanding: StoryFn<typeof meta> = () => {
       expanded={expanded}
       onExpandedChange={setExpanded}
       renderExpandedRow={row => (
-        <div className='p-16 bg-states-primary-default-alt rounded-8'>
+        <div className='rounded-8 bg-states-primary-default-alt p-16'>
           <Text size='sm' weight='medium'>
             Event Details
           </Text>
-          <div className='grid grid-cols-3 gap-8 mt-8'>
+          <div className='mt-8 grid grid-cols-3 gap-8'>
             <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Source IP

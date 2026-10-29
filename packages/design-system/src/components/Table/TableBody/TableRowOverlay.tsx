@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { flexRender, type Row, type RowData } from '@tanstack/react-table';
+
 import { cn } from '../../../utils/cn';
 import { type DSTableFeatures, getAlignClass, useRenderEveryTime, withTableState } from '../lib';
 import { Td, Tr } from '../primitives';
@@ -23,7 +25,7 @@ const TableRowOverlayInner = <T extends RowData>({ row }: TableRowOverlayProps<T
         style={{ tableLayout: 'fixed', cursor: 'grabbing' }}
       >
         <tbody>
-          <Tr className='pointer-events-none shadow-lg opacity-90 bg-bg-primary'>
+          <Tr className='pointer-events-none bg-bg-primary opacity-90 shadow-lg'>
             {fullWidthContent !== undefined && (
               <Td pinned={false} colSpan={row.getVisibleCells().length}>
                 {fullWidthContent}

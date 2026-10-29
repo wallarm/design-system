@@ -1,4 +1,5 @@
 import path from 'path';
+
 import { type Node, type Project, type SourceFile, SyntaxKind } from 'ts-morph';
 
 const PKG = '@wallarm-org/design-system';
