@@ -11,6 +11,29 @@ type RefComponent = ((props: Props) => ReactNode) & {
 };
 const caches = new WeakMap<ReactLike, WeakMap<RefComponent, ElementType>>();
 
+type CallbackRef = (node: unknown) => unknown;
+const hostRefs = new WeakMap<CallbackRef, CallbackRef>();
+const adaptedRefs = new WeakSet<CallbackRef>();
+function hostRef(ref: CallbackRef): CallbackRef {
+  if (adaptedRefs.has(ref)) return ref;
+  const existing = hostRefs.get(ref);
+  if (existing) return existing;
+  const cleanups: (undefined | (() => void))[] = [];
+  const callback: CallbackRef = node => {
+    if (node == null) {
+      const cleanup = cleanups.pop();
+      if (cleanup) cleanup();
+      else ref(null);
+    } else {
+      const cleanup = ref(node);
+      cleanups.push(typeof cleanup === 'function' ? (cleanup as () => void) : undefined);
+    }
+  };
+  hostRefs.set(ref, callback);
+  adaptedRefs.add(callback);
+  return callback;
+}
+
 function normalize(
   React: ReactLike,
   originalType: unknown,
@@ -52,6 +75,19 @@ function normalize(
     if (props.inert) props.inert = '';
     else delete props.inert;
   }
+  if (typeof type === 'string') {
+    for (const [source, target] of [
+      ['fill-rule', 'fillRule'],
+      ['clip-rule', 'clipRule'],
+    ] as const) {
+      if (source in props) {
+        props = { ...props, [target]: props[source] };
+        delete props[source];
+      }
+    }
+  }
+  if (typeof type === 'string' && typeof props.ref === 'function')
+    props = { ...props, ref: hostRef(props.ref as CallbackRef) };
   return { type: type as ElementType, props };
 }
 
@@ -63,7 +99,16 @@ export function createJsxRuntime(React: ReactLike) {
       key === undefined ? normalized.props : { ...normalized.props, key },
     ) as ReactElement<Props>;
   };
-  return { jsx, jsxs: jsx, jsxDEV: jsx, Fragment: React.Fragment };
+  const jsxs = (type: unknown, props: Props | null, key?: Key): ReactElement<Props> => {
+    const normalized = normalize(React, type, props ?? {});
+    const { children, ...rest } = normalized.props;
+    return React.createElement(
+      normalized.type,
+      key === undefined ? rest : { ...rest, key },
+      ...(Array.isArray(children) ? children : [children]),
+    ) as ReactElement<Props>;
+  };
+  return { jsx, jsxs, jsxDEV: jsx, Fragment: React.Fragment };
 }
 
 export function createReactModule<T extends ReactLike>(React: T): T {
@@ -78,7 +123,11 @@ export function createReactModule<T extends ReactLike>(React: T): T {
     if (normalized.type === cloned.type && typeof cloned.type !== 'string') return cloned;
     return React.createElement(normalized.type, { ...normalized.props, key: cloned.key });
   }) as typeof React.cloneElement;
-  return { ...React, cloneElement };
+  const createElement = ((type: unknown, props: Props | null, ...children: ReactNode[]) => {
+    const normalized = normalize(React, type, props ?? {});
+    return React.createElement(normalized.type, normalized.props, ...children);
+  }) as typeof React.createElement;
+  return { ...React, createElement, cloneElement };
 }
 
 /** A single declaration-level identity shared by internal imports and the public canvas global. */
