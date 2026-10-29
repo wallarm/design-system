@@ -94,7 +94,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
-    "@babel/preset-typescript": "7.29.7",
+    "@babel/preset-typescript": "8.0.7",
     "@figma/code-connect": "2.0.2",
     "@internationalized/date": "3.12.4",
     "@lezer/generator": "1.8.1",
