@@ -571,6 +571,9 @@ importers:
       '@types/babel__core':
         specifier: 7.20.5
         version: 7.20.5
+      '@types/jsdom':
+        specifier: 21.1.7
+        version: 21.1.7
       '@types/luaparse':
         specifier: 0.2.13
         version: 0.2.13
@@ -610,6 +613,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
+      esbuild:
+        specifier: 0.28.1
+        version: 0.28.1
       glob:
         specifier: 13.0.6
         version: 13.0.6
@@ -622,15 +628,24 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.3.0
+      react-compiler-runtime:
+        specifier: 1.0.0
+        version: 1.0.0(react@19.3.0)
       react-dom:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
+      react-dom18:
+        specifier: npm:react-dom@18.3.1
+        version: react-dom@18.3.1(react@19.3.0)
+      react18:
+        specifier: npm:react@18.3.1
+        version: react@18.3.1
       storybook:
         specifier: 'catalog:'
         version: 10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)
       storybook-react-rsbuild:
         specifier: 3.6.0
-        version: 3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))
+        version: 3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
@@ -3205,6 +3220,9 @@ packages:
   '@types/html-minifier-terser@7.0.2':
     resolution: {integrity: sha512-mm2HqV22l8lFQh4r2oSsOEVea+m0qqxEmwpc9kC1p/XzmjLWrReR9D/GRs8Pex2NX/imyEH9c5IU/7tMBQCHOA==}
 
+  '@types/jsdom@21.1.7':
+    resolution: {integrity: sha512-yOriVnggzrnQ3a9OKOCxaVuSug3w3/SbOj5i7VwXWZEyUNl3bLF9V3MfxGbZKuwqJOQyRfqXyROBB1CoZLFWzA==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -3248,6 +3266,9 @@ packages:
 
   '@types/tapable@2.3.0':
     resolution: {integrity: sha512-oMnbAXeVo+KUnje3hzdORXUbfnzTfqD0H92mLl19NE5hFqH9Q4ktq+xehNSxcNeeLm1COopYwa0zeP6Iz+oIXg==}
+
+  '@types/tough-cookie@4.0.5':
+    resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -6587,6 +6608,11 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
+  react-compiler-runtime@1.0.0:
+    resolution: {integrity: sha512-rRfjYv66HlG8896yPUDONgKzG5BxZD1nV9U6rkm+7VCuvQc903C4MjcoZR4zPw53IKSOX9wMQVpA1IAbRtzQ7w==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0 || ^19.0.0 || ^0.0.0-experimental
+
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
     peerDependencies:
@@ -6595,6 +6621,11 @@ packages:
   react-docgen@8.0.3:
     resolution: {integrity: sha512-aEZ9qP+/M+58x2qgfSFEWH1BxLyHe5+qkLNJOZQb5iGS017jpbRnoKhNRrXPeA6RfBrZO5wZrT9DMC1UqE1f1w==}
     engines: {node: ^20.9.0 || >=22}
+
+  react-dom@18.3.1:
+    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
+    peerDependencies:
+      react: ^18.3.1
 
   react-dom@19.3.0:
     resolution: {integrity: sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==}
@@ -6675,6 +6706,10 @@ packages:
     peerDependencies:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
+
+  react@18.3.1:
+    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
+    engines: {node: '>=0.10.0'}
 
   react@19.3.0:
     resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
@@ -6928,6 +6963,9 @@ packages:
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
+
+  scheduler@0.23.2:
+    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
@@ -10190,7 +10228,7 @@ snapshots:
     dependencies:
       react: 19.3.0
 
-  '@storybook/react-docgen-typescript-plugin@1.0.1(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))':
+  '@storybook/react-docgen-typescript-plugin@1.0.1(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))':
     dependencies:
       debug: 4.4.3
       endent: 2.1.0
@@ -10200,7 +10238,7 @@ snapshots:
       react-docgen-typescript: 2.4.0(typescript@7.0.2)
       tslib: 2.8.1
       typescript: 7.0.2
-      webpack: 5.102.1(postcss@8.5.28)
+      webpack: 5.102.1(esbuild@0.28.1)(postcss@8.5.28)
     transitivePeerDependencies:
       - supports-color
 
@@ -10622,6 +10660,12 @@ snapshots:
 
   '@types/html-minifier-terser@7.0.2': {}
 
+  '@types/jsdom@21.1.7':
+    dependencies:
+      '@types/node': 26.1.2
+      '@types/tough-cookie': 4.0.5
+      parse5: 7.3.0
+
   '@types/json-schema@7.0.15': {}
 
   '@types/luaparse@0.2.13': {}
@@ -10661,6 +10705,8 @@ snapshots:
   '@types/tapable@2.3.0':
     dependencies:
       tapable: 2.3.3
+
+  '@types/tough-cookie@4.0.5': {}
 
   '@types/unist@2.0.11': {}
 
@@ -14600,6 +14646,10 @@ snapshots:
       react-stately: 3.49.0(react@19.3.0)
       use-sync-external-store: 1.6.0(react@19.3.0)
 
+  react-compiler-runtime@1.0.0(react@19.3.0):
+    dependencies:
+      react: 19.3.0
+
   react-docgen-typescript@2.4.0(typescript@7.0.2):
     dependencies:
       typescript: 7.0.2
@@ -14618,6 +14668,12 @@ snapshots:
       strip-indent: 4.1.1
     transitivePeerDependencies:
       - supports-color
+
+  react-dom@18.3.1(react@19.3.0):
+    dependencies:
+      loose-envify: 1.4.0
+      react: 19.3.0
+      scheduler: 0.23.2
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:
@@ -14698,6 +14754,10 @@ snapshots:
       prop-types: 15.8.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
+
+  react@18.3.1:
+    dependencies:
+      loose-envify: 1.4.0
 
   react@19.3.0: {}
 
@@ -15067,6 +15127,10 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
+  scheduler@0.23.2:
+    dependencies:
+      loose-envify: 1.4.0
+
   scheduler@0.27.0: {}
 
   scheduler@0.28.0: {}
@@ -15333,12 +15397,12 @@ snapshots:
       - '@rspack/core'
       - '@typescript/native-preview'
 
-  storybook-react-rsbuild@3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28)):
+  storybook-react-rsbuild@3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28)):
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
       '@rsbuild/core': 2.2.11(core-js@3.47.0)
       '@storybook/react': 10.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)
-      '@storybook/react-docgen-typescript-plugin': 1.0.1(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))
+      '@storybook/react-docgen-typescript-plugin': 1.0.1(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
       magic-string: 1.4.2
       react: 19.3.0
       react-docgen: 8.0.3
@@ -15527,6 +15591,17 @@ snapshots:
       type-fest: 2.19.0
       unique-string: 3.0.0
 
+  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.28)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      jest-worker: 27.5.1
+      schema-utils: 4.3.3
+      terser: 5.49.2
+      webpack: 5.102.1(esbuild@0.28.1)(postcss@8.5.28)
+    optionalDependencies:
+      esbuild: 0.28.1
+      postcss: 8.5.28
+
   terser-webpack-plugin@5.6.1(esbuild@0.28.1)(webpack@5.102.1(esbuild@0.28.1)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -15537,16 +15612,6 @@ snapshots:
     optionalDependencies:
       esbuild: 0.28.1
     optional: true
-
-  terser-webpack-plugin@5.6.1(postcss@8.5.28)(webpack@5.102.1(postcss@8.5.28)):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      jest-worker: 27.5.1
-      schema-utils: 4.3.3
-      terser: 5.49.2
-      webpack: 5.102.1(postcss@8.5.28)
-    optionalDependencies:
-      postcss: 8.5.28
 
   terser-webpack-plugin@5.6.1(webpack@5.102.1):
     dependencies:
@@ -16042,7 +16107,7 @@ snapshots:
       - uglify-js
     optional: true
 
-  webpack@5.102.1(postcss@8.5.28):
+  webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.9
@@ -16066,7 +16131,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(postcss@8.5.28)(webpack@5.102.1(postcss@8.5.28))
+      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.28)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     transitivePeerDependencies:
