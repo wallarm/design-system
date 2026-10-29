@@ -114,6 +114,7 @@ async function main() {
   if (command === 'snapshot') {
     const result = await snapshot();
     await writeFile(join(snapshotDir, `${first}.json`), `${JSON.stringify(result, null, 2)}\n`);
+    process.stdout.write(`${first}: ${result.packFiles.length} packed files, ${Object.keys(result.dist).length} dist files, Button consumer ${result.fixtureBytes} bytes\n`);
   } else if (command === 'compare' && second) {
     const read = async (name: string) =>
       JSON.parse(await readFile(join(snapshotDir, `${name}.json`), 'utf8')) as PackageSnapshot;
@@ -123,6 +124,7 @@ async function main() {
     );
     const errors = compareSnapshots(base, head, allowlist);
     if (errors.length) throw new Error(errors.join('\n'));
+    process.stdout.write(`PASS: public fields unchanged; only allowlisted dist/pack changes; Button consumer ${base.fixtureBytes} → ${head.fixtureBytes} bytes\n`);
   } else throw new Error('Use snapshot <name> or compare <base> <head>');
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href)

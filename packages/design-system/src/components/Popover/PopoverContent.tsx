@@ -7,7 +7,7 @@ import {
   useMemo,
 } from 'react';
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
+import { Portal as ArkUiPortal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { type TestableProps, useTestId } from '../../utils/testId';

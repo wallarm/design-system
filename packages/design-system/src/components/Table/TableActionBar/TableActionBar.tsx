@@ -1,6 +1,6 @@
 import { Children, type FC, isValidElement, type ReactNode } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
+import { Portal as ArkUiPortal } from '../../../lib/portal/Portal';
 import { useTestId } from '../../../utils/testId';
 import { bulkBarSurfaceClasses } from '../../BulkBar/classes';
 import { HStack } from '../../Stack';

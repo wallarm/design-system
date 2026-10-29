@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ComponentRef, FC, Ref } from 'react';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
+import { Portal as ArkUiPortal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 import { type TestableProps, useTestId } from '../../utils/testId';
