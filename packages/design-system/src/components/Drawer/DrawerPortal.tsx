@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
-import { Portal, type PortalProps } from '@ark-ui/react/portal';
+import type { PortalProps } from '@ark-ui/react/portal';
+import { Portal } from '../../lib/portal/Portal';
 
 export interface DrawerPortalProps extends PortalProps {
   children: ReactNode;

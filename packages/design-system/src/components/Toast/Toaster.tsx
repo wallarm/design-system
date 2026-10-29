@@ -1,10 +1,10 @@
 import type { FC } from 'react';
-import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import {
   Toaster as ArkToaster,
   type CreateToasterReturn,
   createToaster,
 } from '@ark-ui/react/toast';
+import { Portal as ArkUiPortal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import {
   EXTENDED_TOAST_DURATION_MS,
