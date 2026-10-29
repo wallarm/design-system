@@ -24,12 +24,12 @@
   },
   "dependencies": {
     "@rspress/core": "2.0.23",
-    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-router": "1.170.45",
     "@wallarm-org/design-system": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "catalog:",
-    "storybook-react-rsbuild": "3.6.0",
+    "storybook-react-rsbuild": "3.6.1",
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:"
   },
