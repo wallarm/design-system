@@ -1,5 +1,28 @@
 # Wallarm DS in Claude Design — Implementation Plan
 
+Historical implementation plan, executed 2026-10-29. Retained as the decision record.
+The original task descriptions below are historical; current verification is recorded in the PR.
+
+Implementation decisions:
+- All public component-subpath exports join the root exports in the canvas global; internal
+  utility subpaths are outside this artifact's component API.
+- Declaration bridges handle function declarations and function-valued variables. Per-host
+  ref adapters support React 19 cleanup callbacks under React 18; no-ref child identity stays intact.
+- The bundle and all 102 previews share an Rslib IIFE build with native SWC React Compiler
+  target 18, as requested during implementation. esbuild remains only in the unchanged
+  npm consumer size fixture. The original build instructions below are superseded.
+- Generated scripts escape HTML script terminators and comment openers before embedding;
+  actual story strings exercise the inline-script guards.
+- No-impact metadata comparison ignores only its existing wall-clock `generatedAt` field.
+- Generated output uses Git commit time; the assembler stages a fresh project and preserves the
+  previous local output. Nothing under `.claude-design/` is committed or published to npm.
+- `claude-design:verify` compares every output file across two consecutive builds.
+- 104 guides cover the source component directories; every supported guide has a runnable
+  example (92 have two or three, 11 have one). Tour remains explicitly deferred.
+- Commits and sync metadata credit the actual operator, superseding the original Claude boilerplate.
+- The first artifact publication and live canvas check still require the user's confirmation.
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A second, unpublished build inside `packages/design-system` that turns the current source into a complete Claude Design "Design System" `project/` folder (React 18-compatible `bundle.js`, `bundle.css`, `tokens.json`, docs, previews, assets), plus a `/claude-design-sync` skill that publishes it — with zero change to what npm consumers get.

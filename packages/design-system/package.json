@@ -93,7 +93,8 @@
     "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files",
     "claude-design:no-impact": "tsx claude-design/no-impact.ts",
     "test:claude-design": "rstest run --config rstest.claude-design.config.ts",
-    "build:claude-design": "turbo run build --filter=@wallarm-org/design-system... && tsx claude-design/build.ts"
+    "build:claude-design": "turbo run build --filter=@wallarm-org/design-system... && tsx claude-design/build.ts",
+    "claude-design:verify": "turbo run build --filter=@wallarm-org/design-system... && tsx claude-design/verify.ts"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",

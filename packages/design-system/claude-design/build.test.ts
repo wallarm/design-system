@@ -28,7 +28,7 @@ describe('complete Claude Design project', () => {
     ]);
     expect(await readdir(join(out, 'components'))).not.toContain('lib');
   });
-  it('stays within artifact file and byte caps with stable hashes', async () => {
+  it('stays within artifact file and byte caps with a complete hash manifest', async () => {
     const files = (await readdir(out, { recursive: true, withFileTypes: true })).filter(file =>
       file.isFile(),
     );

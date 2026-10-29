@@ -1,9 +1,8 @@
-import { build, type Plugin } from 'esbuild';
 import { Project, type SourceFile } from 'ts-morph';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
-import { browserPlugins } from '../bundle/esbuild-plugins';
+import { buildCanvasScripts, readInlineScript } from '../bundle/rslib-build';
 import { PACKAGE_DIR } from '../config';
 
 const require = createRequire(import.meta.url);
@@ -22,23 +21,6 @@ const NO_CARD = new Set([
   'NavPanel',
   'SimpleCharts',
 ]);
-const storybookStub: Plugin = {
-  name: 'storybook-preview-stubs',
-  setup(builder) {
-    builder.onResolve({ filter: /^(?:storybook|@storybook)(?:\/|$)/ }, args => ({
-      path: args.path,
-      namespace: 'storybook-stub',
-    }));
-    builder.onLoad({ filter: /.*/, namespace: 'storybook-stub' }, () => ({
-      loader: 'js',
-      contents: `
-      export function fn(implementation=()=>{}) { const mock=(...args)=>implementation(...args); for(const name of ['mockName','mockReturnValue','mockResolvedValue','mockImplementation'])mock[name]=(value)=>{if(name==='mockImplementation')implementation=value;else if(name==='mockReturnValue')implementation=()=>value;else if(name==='mockResolvedValue')implementation=()=>Promise.resolve(value);return mock};return mock; }
-      export const expect=()=>{}, within=()=>({}), userEvent={}, waitFor=async fn=>fn();
-      export const useArgs=()=>[{},()=>{}], useGlobals=()=>[{},()=>{}];
-    `,
-    }));
-  },
-};
 const htmlEscape = (value: string) =>
   value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 
@@ -57,6 +39,10 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     .filter(d => d.isDirectory())
     .map(d => d.name)
     .sort();
+  const entries: Record<string, string> = {};
+  const previews: { name: string; group: string }[] = [];
+  const entryDir = resolve(PACKAGE_DIR, '.claude-design/runtime/previews');
+  await mkdir(entryDir, { recursive: true });
   for (const name of names) {
     if (NO_CARD.has(name)) continue;
     const files = findStoryFiles(project, join(componentsDir, name)).sort(
@@ -70,7 +56,7 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
       const group = readStoryTitle(source)?.split('/')[0] ?? 'Components';
       const stories = source
         .getVariableStatements()
-        .filter(v => v.isExported())
+        .filter(v => v.hasExportKeyword())
         .flatMap(v => v.getDeclarations().map(d => d.getName()));
       for (const story of stories.slice(0, 4 - selected.length))
         selected.push({ file, story, group });
@@ -99,21 +85,18 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
       }
       window.WallarmPreview={mount(node){const root=window.ReactDOM.createRoot(node);root.render(React.createElement(window.WallarmDS.Root,null,rows.map(entry=>React.createElement(Example,{key:entry.name,entry}))));return root;}};
     `;
-    const result = await build({
-      stdin: { contents: source, loader: 'jsx', resolveDir: PACKAGE_DIR },
-      bundle: true,
-      format: 'iife',
-      platform: 'browser',
-      minify: true,
-      jsx: 'automatic',
-      write: false,
-      define: { 'process.env.NODE_ENV': '"production"' },
-      supported: { 'inline-script': true },
-      loader: { '.css': 'empty' },
-      plugins: [storybookStub, ...browserPlugins({ globalExports: new Set(meta.exports) })],
-      logLevel: 'silent',
-    });
-    const code = result.outputFiles[0]!.text.replaceAll('<!--', '<\\!--');
+    const entry = join(entryDir, `${name}.tsx`);
+    await writeFile(entry, source);
+    entries[`${name}/stories`] = entry;
+    previews.push({ name, group: selected[0]!.group });
+  }
+  await buildCanvasScripts({
+    entries,
+    outDir: join(outDir, 'components'),
+    globalExports: meta.exports,
+  });
+  for (const { name, group } of previews) {
+    const code = await readInlineScript(join(outDir, 'components', name, 'stories.js'));
     if (Buffer.byteLength(code) > 512_000)
       throw new Error(
         `${name} preview exceeds 512 KB (${Buffer.byteLength(code)}); check duplicate component imports`,
@@ -124,7 +107,7 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     await writeFile(join(dir, 'stories.js'), code);
     await writeFile(
       join(dir, 'preview.html'),
-      `<!-- @dsCard group="${htmlEscape(selected[0]!.group)}" height=480 -->\n<!doctype html><html><head><meta charset="utf-8"></head><body><div id="preview"></div><script src="./stories.js"></script><script>window.WallarmPreview.mount(document.getElementById('preview'));</script></body></html>\n`,
+      `<!-- @dsCard group="${htmlEscape(group)}" height=480 -->\n<!doctype html><html><head><meta charset="utf-8"></head><body><div id="preview"></div><script src="./stories.js"></script><script>window.WallarmPreview.mount(document.getElementById('preview'));</script></body></html>\n`,
     );
     withPreview.push(name);
   }

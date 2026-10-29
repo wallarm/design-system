@@ -2,7 +2,7 @@ import type { ElementType, Key, ReactElement, ReactNode, Ref } from 'react';
 
 export type ReactLike = Pick<
   typeof import('react'),
-  'createElement' | 'cloneElement' | 'forwardRef' | 'Fragment' | 'version'
+  'createElement' | 'cloneElement' | 'forwardRef' | 'useRef' | 'Fragment' | 'version'
 >;
 type Props = Record<string, unknown>;
 type RefComponent = ((props: Props) => ReactNode) & {
@@ -12,26 +12,45 @@ type RefComponent = ((props: Props) => ReactNode) & {
 const caches = new WeakMap<ReactLike, WeakMap<RefComponent, ElementType>>();
 
 type CallbackRef = (node: unknown) => unknown;
-const hostRefs = new WeakMap<CallbackRef, CallbackRef>();
-const adaptedRefs = new WeakSet<CallbackRef>();
-function hostRef(ref: CallbackRef): CallbackRef {
-  if (adaptedRefs.has(ref)) return ref;
-  const existing = hostRefs.get(ref);
+const hostTypes = new WeakMap<ReactLike, Map<string, ElementType>>();
+
+/** Each mounted host owns its cleanup, even when siblings share the original callback. */
+function hostType(React: ReactLike, tag: string): ElementType {
+  let types = hostTypes.get(React);
+  if (!types) {
+    types = new Map();
+    hostTypes.set(React, types);
+  }
+  const existing = types.get(tag);
   if (existing) return existing;
-  const cleanups: (undefined | (() => void))[] = [];
-  const callback: CallbackRef = node => {
-    if (node == null) {
-      const cleanup = cleanups.pop();
-      if (cleanup) cleanup();
-      else ref(null);
-    } else {
-      const cleanup = ref(node);
-      cleanups.push(typeof cleanup === 'function' ? (cleanup as () => void) : undefined);
+  const Host = React.forwardRef((props: Props, ref: Ref<unknown>) => {
+    const state = React.useRef<{
+      original: Ref<unknown>;
+      callback: (node: unknown) => void;
+    } | null>(null);
+    if (!state.current || state.current.original !== ref) {
+      let cleanup: (() => void) | undefined;
+      state.current = {
+        original: ref,
+        callback: node => {
+          if (node == null && cleanup) {
+            const dispose = cleanup;
+            cleanup = undefined;
+            dispose();
+            return;
+          }
+          if (typeof ref === 'function') {
+            const result = (ref as CallbackRef)(node);
+            cleanup = typeof result === 'function' ? (result as () => void) : undefined;
+          } else if (ref) ref.current = node;
+        },
+      };
     }
-  };
-  hostRefs.set(ref, callback);
-  adaptedRefs.add(callback);
-  return callback;
+    return React.createElement(tag, { ...props, ref: state.current.callback });
+  });
+  Host.displayName = `CanvasHost(${tag})`;
+  types.set(tag, Host);
+  return Host;
 }
 
 function normalize(
@@ -86,8 +105,7 @@ function normalize(
       }
     }
   }
-  if (typeof type === 'string' && typeof props.ref === 'function')
-    props = { ...props, ref: hostRef(props.ref as CallbackRef) };
+  if (typeof type === 'string' && props.ref != null) type = hostType(React, type);
   return { type: type as ElementType, props };
 }
 

@@ -70,3 +70,39 @@ describe('complete browser bundle on real React 18', () => {
     root.unmount();
   });
 });
+
+it('forwards refs for function declarations and stack components', () => {
+  const { React, ReactDOM, window, h, mount, root } = setup();
+  window.ResizeObserver = class {
+    observe() {
+      /* no layout engine */
+    }
+    unobserve() {
+      /* no layout engine */
+    }
+    disconnect() {
+      /* no layout engine */
+    }
+  };
+  const names = ['InlineEdit', 'LineChart', 'AreaChart', 'ColumnChart', 'HStack', 'VStack'];
+  const refs = names.map(() => React.createRef<HTMLElement>());
+  mount(
+    React.createElement(
+      React.Fragment,
+      null,
+      ...names.map((name, i) =>
+        h(name, {
+          key: name,
+          ref: refs[i],
+          ...(name === 'InlineEdit'
+            ? { defaultValue: 'Name' }
+            : name.endsWith('Chart')
+              ? { data: [], series: [], xKey: 'timestamp' }
+              : {}),
+        }),
+      ),
+    ),
+  );
+  for (const ref of refs) expect(ref.current).toBeInstanceOf(window.HTMLElement);
+  ReactDOM.flushSync(() => root.unmount());
+});

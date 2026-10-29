@@ -125,3 +125,28 @@ it('normalizes source SVG attributes without React warnings', () => {
   ReactDOM.flushSync(() => root.unmount());
   errors.mockRestore();
 });
+
+it('cleans up the detached element when a callback ref is shared by keyed siblings', () => {
+  const { jsx, ReactDOM, window } = setup();
+  const calls: string[] = [];
+  const ref = (node: HTMLElement | null) => {
+    if (node) {
+      calls.push(`attach ${node.id}`);
+      return () => {
+        calls.push(`cleanup ${node.id}`);
+      };
+    }
+  };
+  const root = ReactDOM.createRoot(window.document.getElementById('app')!);
+  const render = (ids: string[]) =>
+    ReactDOM.flushSync(() =>
+      root.render(jsx('div', { children: ids.map(id => jsx('span', { id, ref }, id)) })),
+    );
+  render(['a', 'b']);
+  const survivor = window.document.getElementById('b');
+  render(['b']);
+  expect(calls).toEqual(['attach a', 'attach b', 'cleanup a']);
+  expect(window.document.getElementById('b')).toBe(survivor);
+  ReactDOM.flushSync(() => root.unmount());
+  expect(calls).toEqual(['attach a', 'attach b', 'cleanup a', 'cleanup b']);
+});
