@@ -19,6 +19,8 @@ interface DropdownMenuProps extends TestableProps {
   onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
+  /** Whether to close the menu when clicking/interacting outside (default true) */
+  closeOnInteractOutside?: boolean;
   /**
    * Called when another layer asks this menu to dismiss — e.g. a layer below it in the stack is
    * removed. Call `event.preventDefault()` to keep the menu open.
@@ -56,6 +58,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   highlightedValue,
   onHighlightChange,
   closeOnSelect,
+  closeOnInteractOutside,
   ids,
   'data-testid': testIdProp,
   ...props
@@ -80,6 +83,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
       {...(anchorPoint != null && { anchorPoint })}
       {...(highlightedValue != null && { highlightedValue })}
       {...(closeOnSelect != null && { closeOnSelect })}
+      {...(closeOnInteractOutside != null && { closeOnInteractOutside })}
       {...(onHighlightChange != null && { onHighlightChange })}
       open={open}
       defaultOpen={defaultOpen}

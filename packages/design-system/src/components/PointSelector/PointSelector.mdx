@@ -1,0 +1,527 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Components/PointSelector/Overview" />
+
+# PointSelector
+
+A guided point builder for constructing STAR (Structured Tree Address Reference) points used in Wallarm WAF rules.
+Allows users to build complex data extraction points step-by-step without writing point syntax manually.
+
+## What is a Point?
+
+A **point** is a path expression that addresses data in HTTP requests/responses, similar to XPath for XML or JSONPath for JSON, but universal across all content types. Examples:
+
+- `[http:header]['authorization']` — Authorization header
+- `[http:body][format:json]['user']['email']` — Email field in JSON body
+- `[http:query][format:form]['search']` — Search parameter in query string
+- `[http:header]['authorization'][format:auth]['bearer'][format:jwt]['payload'][encoding:base64][format:json]['sub']` — JWT sub claim
+
+Points are the foundation of Wallarm rule conditions and actions.
+
+## When to Use
+
+Use PointSelector when you need users to:
+
+- **Build data extraction points** for rule conditions (e.g., "check if JWT claim 'admin' equals true")
+- **Select value sources** for session identification (e.g., "session ID is in cookie 'JSESSIONID'")
+- **Define action targets** for rule actions (e.g., "tag attacks found in body › JSON › 'query' field")
+
+**Don't use** when:
+
+- User needs to write full rules with conditions and actions → use `RuleBuilder` (which embeds PointSelector)
+- Point is static and never changes → just display it as text
+- User is an expert who prefers raw syntax → provide a text input with validation instead
+
+## Features
+
+- ✅ **Guided Construction**: Step-by-step UI eliminates syntax errors
+- ✅ **SDK Validation**: Real-time validation by Proton SDK (WASM) — if PointSelector accepts it, Proton accepts it
+- ✅ **Canonical Form**: Points are stored in SDK-canonical form for deduplication
+- ✅ **Context-Aware**: Only shows valid options for each context (http_request, http_response, grpc, etc.)
+- ✅ **Keyboard-First**: Full keyboard navigation (number keys, arrows, Enter, Tab, Escape, Alt+C, ?)
+- ✅ **Parser Coverage**: Supports all parsers (JSON, XML, JWT, multipart, protobuf, MCP, etc.) and encoders
+- ✅ **Async Keys**: Fetch header names, JSON fields, etc. from backend asynchronously
+- ✅ **Profile Support**: `'tree'` (any point) or `'value'` (single readable node) validation
+
+## Basic Usage
+
+```tsx
+import { PointSelector } from '@wallarm-org/design-system/PointSelector';
+import { useState } from 'react';
+
+function MyComponent() {
+  const [point, setPoint] = useState({
+    segments: [],
+    condition: null,
+    value: '',
+    ignoreCase: false,
+  });
+
+  return (
+    <PointSelector
+      context="http_request"
+      value={point}
+      onChange={setPoint}
+    />
+  );
+}
+```
+
+## Props
+
+### Required
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `context` | `RuleContext` | Rule context: `'http_request'`, `'http_response'`, `'grpc_request'`, `'grpc_response'`, `'streamable_request'`, `'streamable_response'`, or custom |
+| `value` | `PointSelectorValue` | Current point: `{ segments, condition, value, ignoreCase, canonical?, canonicalVersion? }` |
+| `onChange` | `(value) => void` | Callback when point changes. Called on every segment add/remove, condition change, value edit |
+
+### Optional
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `profile` | `Profile` | `'tree'` | Validation profile: `'tree'` (any point) or `'value'` (single node with data) |
+| `keys` | `string[]` \| `(parent) => string[]` \| `(parent) => Promise<string[]>` | `undefined` | Keys provider: static list, sync function, or async function. See [Async Keys Pattern](#async-keys-pattern) |
+| `pointOnly` | `boolean` | `false` | Only step 1 (point construction), no condition/value steps. For rule action targets |
+| `title` | `string` | `'1. Where is the value?'` | Custom heading for step 1 |
+| `initialStage` | `PointSelectorStage` | `'point'` (or `'condition'` if `value.condition` is set) | Stage to open on mount: `'point'`, `'condition'`, or `'value'` |
+
+## Format Support
+
+PointSelector supports all content parsers defined in the Proton SDK:
+
+- **Common**: `json`, `xml`, `form`, `multipart`, `cookie`
+- **Authentication**: `auth`, `jwt`, `base64`
+- **Protobuf**: `proto2`, `proto3`
+- **MCP**: `mcp` (Message Control Protocol)
+
+### Special Note: `[format:mcp]`
+
+The `[format:mcp]` alias is supported by the SDK and will validate correctly if you construct it programmatically. However, it is **not shown in the UI format picker** by default, as it is primarily used for:
+
+1. **Server-generated rules** (backend creates MCP-specific points)
+2. **Advanced/internal use cases** (not typical user-authored rules)
+
+If your application needs users to build MCP points through the UI, add `mcp` to the format picker explicitly via SDK vocabulary filtering.
+
+## Validation Profiles
+
+### `profile="tree"` (Default)
+
+Accepts **any valid point expression** — containers, wildcards, alternations, single values:
+
+- ✅ `[http:body][format:json]['user']` (single value)
+- ✅ `[http:body][format:json]` (container — all JSON fields)
+- ✅ `[http:header]['*']` (wildcard — all headers)
+- ✅ `[http:body][format:json]['a'|'b']` (alternation)
+- ✅ `[http:query][**]` (recursive wildcard)
+
+**Use for:** Most rules (attack detection, policy matching, transformation rules)
+
+### `profile="value"`
+
+Requires **a single node with data** — no containers, wildcards, or alternations (except joins):
+
+- ✅ `[http:body][format:json]['sessionId']` (single readable value)
+- ✅ `[http:header]['authorization']` (single header)
+- ✅ `[http:header]['cookie'][dup,joined:', ']` (joined duplicate group)
+- ❌ `[http:body][format:json]['*']` (wildcard — matches multiple nodes)
+- ❌ `[http:query]` (container — not a single value)
+- ❌ `[http:body][format:json]` (container — addresses all JSON fields)
+
+**Use for:** Session definition rules, value extraction contexts (anything that reads exactly one value)
+
+## Async Keys Provider
+
+PointSelector supports async keys providers for fetching header names, JSON fields, or other keys from a backend. The implementation includes automatic debouncing, deduplication, and abort handling.
+
+### Basic Usage
+
+**Static array** (simplest):
+```tsx
+<PointSelector
+  context="http_request"
+  value={point}
+  onChange={setPoint}
+  keys={['authorization', 'content-type', 'cookie']}
+/>
+```
+
+**Sync function** (returns cached values):
+```tsx
+const keysProvider = (parent: string) => {
+  return getPreloadedKeys(parent); // Already in memory
+};
+
+<PointSelector keys={keysProvider} ... />
+```
+
+**Async function** (fetches from backend):
+```tsx
+const keysProvider = async (parent: string) => {
+  const response = await fetch(`/api/keys?parent=${encodeURIComponent(parent)}`);
+  return response.json();
+};
+
+<PointSelector keys={keysProvider} ... />
+```
+
+### Recommended Caching Pattern
+
+For async providers, implement caching to avoid redundant requests:
+
+```tsx
+const cache = new Map<string, string[]>();
+
+const keysProvider = async (parent: string) => {
+  // Return cached result if available (sync path)
+  if (cache.has(parent)) {
+    return cache.get(parent)!;
+  }
+
+  // Fetch from backend
+  const keys = await fetch(`/api/keys?parent=${encodeURIComponent(parent)}`)
+    .then(res => res.json());
+
+  // Cache for future calls
+  cache.set(parent, keys);
+  return keys;
+};
+
+<PointSelector
+  context="http_request"
+  value={point}
+  onChange={setPoint}
+  keys={keysProvider}
+/>
+```
+
+### How It Works
+
+1. **User builds point** to a key step (e.g., `[http:body][format:json]`)
+2. **PointSelector calls** `keysProvider("[http:body][format:json]")`
+3. **Debounce delay** (300ms default) prevents rapid-fire requests while typing
+4. **Loading state** shows "Loading keys..." status in menu
+5. **Keys arrive** and menu auto-populates with autocomplete suggestions
+6. **Results cached** per parent point (no duplicate requests)
+
+### Debounce Control
+
+Customize the debounce delay with `keysDebounceMs`:
+
+```tsx
+<PointSelector
+  keys={async (parent) => await fetchKeys(parent)}
+  keysDebounceMs={150}  // 150ms debounce (default: 300ms)
+  ...
+/>
+```
+
+**Tuning:**
+- **Lower values** (100-150ms): More responsive, but more requests during typing
+- **Higher values** (300-500ms): Fewer requests, but slower perceived UX
+- **Default** (300ms): Balanced for most use cases
+
+### Error Handling
+
+If the async provider throws or rejects, PointSelector returns an empty array and clears the loading state:
+
+```tsx
+const keysProvider = async (parent: string) => {
+  try {
+    const response = await fetch(`/api/keys?parent=${parent}`);
+    if (!response.ok) throw new Error('Failed to fetch');
+    return response.json();
+  } catch (error) {
+    console.error('Keys fetch failed:', error);
+    return []; // Fallback to empty list
+  }
+};
+```
+
+### Automatic Request Management
+
+PointSelector automatically handles:
+
+- **Deduplication**: Multiple calls with the same `parent` while a request is in flight won't trigger duplicate fetches
+- **Abort on unmount**: In-flight requests are aborted when the component unmounts
+- **Abort on parent change**: If the user backtracks (removes segments), pending requests for the old parent are canceled
+
+### Loading State
+
+While keys are loading, the menu shows a status message:
+
+```
+Loading keys...
+```
+
+Once loaded, the menu populates with autocomplete suggestions. The loading indicator disappears automatically.
+
+### Example: Real-Time Key Discovery
+
+Fetch keys dynamically based on the current point path:
+
+```tsx
+function DynamicKeysExample() {
+  const [point, setPoint] = useState({ segments: [], condition: null, value: '', ignoreCase: false });
+
+  const keysProvider = async (parent: string) => {
+    // Different endpoints for different parent points
+    if (parent === '[http:header]') {
+      return fetch('/api/headers').then(r => r.json());
+    }
+    if (parent.includes('[format:json]')) {
+      return fetch('/api/json-fields').then(r => r.json());
+    }
+    return [];
+  };
+
+  return (
+    <PointSelector
+      context="http_request"
+      value={point}
+      onChange={setPoint}
+      keys={keysProvider}
+      keysDebounceMs={200}
+    />
+  );
+}
+```
+
+### Pre-loaded Keys (Sync Alternative)
+
+If keys are already loaded in the parent component, return them synchronously:
+
+```tsx
+function PreloadedKeysExample() {
+  const [point, setPoint] = useState({ segments: [], condition: null, value: '', ignoreCase: false });
+  const allKeys = usePreloadedKeys(); // { '[http:header]': ['auth', 'cookie'], ... }
+
+  return (
+    <PointSelector
+      context="http_request"
+      value={point}
+      onChange={setPoint}
+      keys={(parent) => allKeys[parent] || []}
+    />
+  );
+}
+```
+
+No debounce or loading state — keys appear instantly.
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `1-9` | Select menu item by number |
+| `↑` / `↓` | Navigate menu items |
+| `Enter` | Confirm selection |
+| `Tab` | Move to Next button |
+| `Escape` | Close menu / cancel |
+| `Backspace` | Delete last segment (when input empty) |
+| `Alt+C` | Toggle ignore case (match step) |
+| `?` | Open keyboard shortcuts dialog |
+| `Ctrl+Enter` | Submit point (if implemented by consumer) |
+
+## Analytics Integration
+
+PointSelector uses a **wrapper-level, onChange-based** analytics pattern. See [`ANALYTICS_GAPS.md`](https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/PointSelector/ANALYTICS_GAPS.md) for details.
+
+**tl;dr:** Track interactions via `onChange` state diffs:
+
+```tsx
+<PointSelector
+  onChange={(newValue) => {
+    // Segment added?
+    if (newValue.segments.length > oldValue.segments.length) {
+      analytics.track('point_selector.segment_added', {
+        segment: newValue.segments[newValue.segments.length - 1],
+        canonical: newValue.canonical,
+      });
+    }
+
+    // Condition changed?
+    if (newValue.condition !== oldValue.condition) {
+      analytics.track('point_selector.condition_changed', {
+        from: oldValue.condition,
+        to: newValue.condition,
+      });
+    }
+
+    setOldValue(newValue); // Save for next diff
+  }}
+  data-analytics-id="POINT_BUILDER_MODAL" // Lands on root wrapper only
+/>
+```
+
+## Accessibility
+
+- ✅ **ARIA roles**: Proper `role="combobox"`, `role="menu"`, `role="menuitem"`
+- ✅ **Keyboard navigation**: Full keyboard support (see shortcuts above)
+- ✅ **Screen reader**: Announcements via `aria-live="polite"` regions
+- ✅ **Focus management**: Focus trap in menu, auto-focus after selection
+- ✅ **Contrast**: WCAG AA compliant colors
+- ✅ **Shortcuts dialog**: `?` key shows all keyboard commands
+
+## Examples
+
+See [Storybook stories](https://wallarm.github.io/design-system/storybook/?path=/story/components-pointselector) for:
+
+- **BuildFromScratch**: Empty state, step-by-step construction
+- **WithInitialValue**: Edit existing point
+- **JWTClaims**: Complex multi-parser point (JWT → base64 → JSON → claim)
+- **WithWildcards**: Recursive wildcards, alternations
+- **PointOnlyMode**: `pointOnly` prop for action targets
+- **ReferenceRulesetCoverage**: ALL constructs from reference ruleset (100+ examples)
+
+## SDK Integration
+
+PointSelector is powered by the **Proton SDK** (WebAssembly), the same validator used by Wallarm backend.
+
+### SDK Operations
+
+- **`check(point, { context, profile })`**: Validate point, get canonical form
+- **`complete(point, cursor, { context, keys })`**: Autocomplete at cursor position
+- **`next(segments, at, { context, keys })`**: What can be inserted at index `at`
+- **`render(segments)`**: Serialize segments to canonical point string
+- **`vocabulary(context)`**: Get natives, formats, encodings for context
+
+See [`point-sdk.md`](https://gl.wallarm.com/wallarm-node/node/-/blob/main/proton/docs/user/point-sdk.md) for full SDK API.
+
+## Best Practices
+
+### ✅ Do
+
+- **Store canonical form**: Save `value.canonical` (and `value.canonicalVersion`), not segments
+- **Provide keys**: Supply `keys` prop for better UX (autocomplete header/field names)
+- **Use correct profile**: `'value'` for session rules, `'tree'` for most others
+- **Re-canonicalize on SDK update**: Check `needsRecanonalization()` from `sdkBridge`
+
+### ❌ Don't
+
+- **Don't manipulate segments directly**: Let PointSelector manage them
+- **Don't build points from string concatenation**: Use SDK `render(segments)`
+- **Don't skip onChange**: Every segment change calls `onChange` — rely on it for state sync
+- **Don't use `data-slot` in tests**: Use `data-testid` (see [`test-id-pattern.md`](https://github.com/wallarm/design-system/blob/main/docs/test-id-pattern.md))
+
+## Analytics Integration
+
+PointSelector follows the **wrapper-level analytics pattern** (see [`ANALYTICS_GAPS.md`](./ANALYTICS_GAPS.md)). Track user interactions through the `onChange` callback, not through DOM element attributes.
+
+### Why Wrapper-Level?
+
+PointSelector has 50+ internal interactive elements (chips, menu items, inputs) that are **temporary and implementation-specific**. Instrumenting each element would be:
+- ❌ Brittle (breaks when UI changes)
+- ❌ Overwhelming (too many low-level events)
+- ❌ Wrong abstraction (segments are the logical unit, not DOM nodes)
+
+Instead, track **semantic changes** by diffing the `value` object.
+
+### Tracking Example
+
+```tsx
+import { PointSelector } from '@wallarm-org/design-system/PointSelector';
+import { useState } from 'react';
+
+function RuleEditor() {
+  const [point, setPoint] = useState({
+    segments: [],
+    condition: null,
+    value: '',
+    ignoreCase: false,
+  });
+
+  const handlePointChange = (newValue) => {
+    // Diff segments to track what changed
+    if (newValue.segments.length > point.segments.length) {
+      const addedSegment = newValue.segments[newValue.segments.length - 1];
+      analytics.track('point_segment_added', {
+        segment: addedSegment,
+        canonical: newValue.canonical,
+        segmentCount: newValue.segments.length,
+      });
+    } else if (newValue.segments.length < point.segments.length) {
+      analytics.track('point_segment_removed', {
+        canonical: newValue.canonical,
+        segmentCount: newValue.segments.length,
+      });
+    }
+
+    // Track condition changes
+    if (newValue.condition !== point.condition) {
+      analytics.track('point_condition_changed', {
+        condition: newValue.condition,
+        canonical: newValue.canonical,
+      });
+    }
+
+    // Track value changes (debounced in real app)
+    if (newValue.value !== point.value) {
+      analytics.track('point_value_changed', {
+        value: newValue.value,
+        condition: newValue.condition,
+        canonical: newValue.canonical,
+      });
+    }
+
+    setPoint(newValue);
+  };
+
+  return (
+    <PointSelector
+      context="http_request"
+      value={point}
+      onChange={handlePointChange}
+      data-analytics-id="rule-editor-point-selector"  // Root-level ID
+      // ❌ Don't add data-analytics-* to internal elements
+    />
+  );
+}
+```
+
+### What to Track
+
+**Recommended events:**
+- `point_segment_added` — User added a segment (which kind)
+- `point_segment_removed` — User removed a segment (backtrack)
+- `point_condition_changed` — User changed match condition
+- `point_value_changed` — User entered/changed match value
+- `point_profile_changed` — User switched validation profile
+- `point_completed` — User finished building a valid point
+
+**Context to include:**
+- `canonical` — Canonical point string (for deduplication)
+- `segmentCount` — How many segments in the point
+- `context` — Rule context (http_request, grpc_request, etc.)
+- `profile` — Validation profile (tree, value)
+- `stage` — Which stage user is on (point, condition, value)
+
+### Root-Level `data-analytics-id`
+
+Place `data-analytics-id` **only on the root** `<PointSelector>` element for page/component identification. Internal elements (chips, menu items) do not receive separate IDs — track them through `onChange` diff.
+
+```tsx
+<PointSelector
+  context="http_request"
+  value={point}
+  onChange={handlePointChange}
+  data-analytics-id="session-rule-point-selector"
+/>
+```
+
+This ID helps identify **which instance** of PointSelector triggered events in your analytics, but all interaction tracking happens through `onChange`.
+
+## Related Components
+
+- **RuleBuilder**: Full rule editor (conditions + checks + actions) — embeds PointSelector
+- **Code**: For displaying canonical points as read-only code
+- **DropdownMenu**: Underlying menu component (PointSelector uses it internally)
+
+## Links
+
+- [Point Format Specification](https://gl.wallarm.com/wallarm-node/node/-/blob/main/proton/docs/user/point-format.md) — STAR notation grammar
+- [Tree Shape Model](https://gl.wallarm.com/wallarm-node/node/-/blob/main/proton/docs/user/tree-shape.md) — What can exist under each point
+- [Point SDK API](https://gl.wallarm.com/wallarm-node/node/-/blob/main/proton/docs/user/point-sdk.md) — SDK operations and usage
+- [Reference Ruleset](https://gl.wallarm.com/wallarm-node/node/-/blob/main/proton/docs/user/reference-ruleset.md) — Every construct, once

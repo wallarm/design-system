@@ -149,6 +149,8 @@ export const EMPTY_FIELD_VALUE: PointSelectorValue = {
   condition: null,
   value: '',
   ignoreCase: false,
+  canonical: null,
+  canonicalVersion: null,
 };
 
 export const newField = (context: RuleContext = 'http_request'): FieldCondition => ({

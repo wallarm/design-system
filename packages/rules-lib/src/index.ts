@@ -95,6 +95,8 @@ export type { Ruleset, RulesetMeta } from './ruleTypes/ruleset';
 // Sample message generation
 export type { SampleToken, SampleTokenRole, SampleValue } from './sample';
 export { sampleMessage } from './sample';
+// Segment builder helpers for tests and stories
+export { ENCODINGS, FORMATS, headerSeg, keySeg, nativeSeg, seg } from './segmentHelpers';
 // UI helpers (presentation logic, not grammar)
 // Use these + SDK API for all point operations
 export * from './ui';
