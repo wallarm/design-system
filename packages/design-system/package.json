@@ -94,6 +94,7 @@
     "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@babel/core": "7.29.7",
     "@babel/preset-typescript": "7.29.7",
     "@figma/code-connect": "2.0.2",
@@ -123,8 +124,10 @@
     "@wallarm-org/publish-scripts": "workspace:*",
     "@wallarm-org/rsbuild-config": "workspace:*",
     "@wallarm-org/rstest-config": "workspace:*",
+    "@wallarm-org/rules-lib": "workspace:*",
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
+    "axe-playwright": "2.2.2",
     "babel-plugin-react-compiler": "1.0.0",
     "glob": "13.0.6",
     "jsdom": "catalog:",
