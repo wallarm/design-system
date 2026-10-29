@@ -1,5 +1,5 @@
 import type { Ref } from 'react';
-import { afterEach, describe, expect, it } from '@rstest/core';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { createReact18Window } from '../harness/react18';
 import { createJsxRuntime, createReactModule } from './react18-shim';
 
@@ -71,4 +71,57 @@ describe('React 18 JSX compatibility', () => {
     const Component = () => null;
     expect(jsx(Component, { inert: true }).props).toEqual({ inert: true });
   });
+});
+
+describe('React18 host compatibility', () => {
+  it('treats jsxs children as static siblings without key warnings', () => {
+    const { ReactDOM, window, jsxs, jsx } = setup();
+    const errors = rs.spyOn(window.console, 'error').mockImplementation(() => undefined);
+    const root = ReactDOM.createRoot(window.document.getElementById('app')!);
+    ReactDOM.flushSync(() =>
+      root.render(
+        jsxs('div', { children: [jsx('span', { children: 'a' }), jsx('span', { children: 'b' })] }),
+      ),
+    );
+    expect(errors.mock.calls).toEqual([]);
+    ReactDOM.flushSync(() => root.unmount());
+    errors.mockRestore();
+  });
+  it('runs React19 callback-ref cleanup on detach without returning it to React18', () => {
+    const { ReactDOM, window, jsx } = setup();
+    const calls: string[] = [];
+    const ref = (element: HTMLElement | null) => {
+      if (element) {
+        calls.push('attached');
+        return () => {
+          calls.push('cleaned');
+        };
+      }
+      calls.push('null');
+    };
+    const errors = rs.spyOn(window.console, 'error').mockImplementation(() => undefined);
+    const root = ReactDOM.createRoot(window.document.getElementById('app')!);
+    ReactDOM.flushSync(() => root.render(jsx('div', { ref })));
+    ReactDOM.flushSync(() => root.render(jsx('div', { ref, 'data-updated': true })));
+    expect(calls).toEqual(['attached']);
+    ReactDOM.flushSync(() => root.unmount());
+    expect(calls).toEqual(['attached', 'cleaned']);
+    expect(errors.mock.calls).toEqual([]);
+    errors.mockRestore();
+  });
+});
+
+it('normalizes source SVG attributes without React warnings', () => {
+  const { jsx, ReactDOM, window } = setup();
+  const errors = rs.spyOn(window.console, 'error').mockImplementation(() => undefined);
+  const root = ReactDOM.createRoot(window.document.getElementById('app')!);
+  ReactDOM.flushSync(() =>
+    root.render(
+      jsx('svg', { children: jsx('path', { 'fill-rule': 'evenodd', 'clip-rule': 'evenodd' }) }),
+    ),
+  );
+  expect(window.document.querySelector('path')?.getAttribute('fill-rule')).toBe('evenodd');
+  expect(errors.mock.calls).toEqual([]);
+  ReactDOM.flushSync(() => root.unmount());
+  errors.mockRestore();
 });
