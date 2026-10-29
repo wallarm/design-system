@@ -1,6 +1,15 @@
 # Wallarm DS in Claude Design — design
 
-Status: draft for approval · 2026-10-28 · branch `feat/claude-design`
+Status: approved 2026-10-28; implemented 2026-10-29 · branch `feat/claude-design`
+
+Implementation notes: the canvas entry also includes public component-subpath exports,
+which are not all present in `src/index.ts`. Declaration-level ref bridges supplement
+the JSX shim so the canvas can call components directly with React 18. Host ref
+cleanups are owned by each mounted element. At the user's request, the bundle and all
+previews use a shared Rslib IIFE build with native SWC React Compiler target 18;
+this supersedes the original esbuild proposal below. Publication and the live Claude canvas
+check remain a separate, user-confirmed step. This document records the approved design;
+see the implementation plan for completed-work notes.
 
 ## Intent
 
