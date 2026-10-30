@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noConsole: CLI script
 /**
  * Sync icon components from the WADS-Iconography Figma file.
  *

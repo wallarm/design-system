@@ -27,7 +27,8 @@
       "!**/coverage",
       "!**/doc_build",
       "!**/doc_build_local",
-      "!**/.rspress"
+      "!**/.rspress",
+      "!**/scripts/**/*"
     ]
   }
 }

@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noConsole: CLI script
 import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';

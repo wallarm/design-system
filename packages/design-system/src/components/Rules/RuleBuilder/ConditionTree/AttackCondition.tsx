@@ -63,6 +63,30 @@ export const AttackCondition: FC<AttackConditionProps> = ({
     [],
   );
 
+  const xmlRefOperatorCollection = useMemo(
+    () =>
+      createListCollection({
+        items: [
+          {
+            value: 'equal',
+            label: 'Equal',
+            description: 'Exact match (full or relative URL)',
+          },
+          {
+            value: 'startswith',
+            label: 'Starts with',
+            description: 'Full http:// or https:// URL prefix',
+          },
+          {
+            value: 'regex',
+            label: 'Regex',
+            description: 'Regular expression (must start with http:// or https://)',
+          },
+        ],
+      }),
+    [],
+  );
+
   const handleAttackTypeChange = (details: SelectValueChangeDetails<Choice>) => {
     const attackType = details.value[0] || '';
     onChange({
@@ -271,29 +295,7 @@ export const AttackCondition: FC<AttackConditionProps> = ({
             <Field>
               <FieldLabel>Reference operator (optional)</FieldLabel>
               <Select
-                collection={useMemo(
-                  () =>
-                    createListCollection({
-                      items: [
-                        {
-                          value: 'equal',
-                          label: 'Equal',
-                          description: 'Exact match (full or relative URL)',
-                        },
-                        {
-                          value: 'startswith',
-                          label: 'Starts with',
-                          description: 'Full http:// or https:// URL prefix',
-                        },
-                        {
-                          value: 'regex',
-                          label: 'Regex',
-                          description: 'Regular expression (must start with http:// or https://)',
-                        },
-                      ],
-                    }),
-                  [],
-                )}
+                collection={xmlRefOperatorCollection}
                 value={condition.reference?.operator ? [condition.reference.operator] : []}
                 onValueChange={details => {
                   const operator = details.value[0] as 'equal' | 'startswith' | 'regex' | undefined;

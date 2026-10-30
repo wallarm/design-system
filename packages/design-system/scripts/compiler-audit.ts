@@ -145,9 +145,10 @@ console.log(
 );
 // biome-ignore lint/suspicious/noConsole: CLI script output
 console.log('\nBy category:');
-// biome-ignore lint/suspicious/noConsole: CLI script output
-for (const [k, v] of Object.entries(report.byCategory))
+for (const [k, v] of Object.entries(report.byCategory)) {
+  // biome-ignore lint/suspicious/noConsole: CLI script output
   console.log(`  ${String(v).padStart(4)}  ${k}`);
+}
 // biome-ignore lint/suspicious/noConsole: CLI script output
 console.log('\nBy file:');
 // biome-ignore lint/suspicious/noConsole: CLI script output

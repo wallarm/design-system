@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noConsole: CLI script
 import fs from 'fs';
 import path from 'path';
 import { Project } from 'ts-morph';

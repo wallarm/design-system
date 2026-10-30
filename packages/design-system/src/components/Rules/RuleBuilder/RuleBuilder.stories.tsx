@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { RuleBuilder } from './RuleBuilder';
-import type { RuleBuilderProps } from './RuleBuilder';
-import type { ActionDraft, Choice, GroupCondition } from './types';
 import { newAction } from './models/actionModel';
 import { newField, newGroup } from './models/conditionModel';
+import type { RuleBuilderProps } from './RuleBuilder';
+import { RuleBuilder } from './RuleBuilder';
+import type { ActionDraft, Choice, GroupCondition } from './types';
 
 const meta = {
   title: 'Rules/RuleBuilder',
@@ -76,7 +76,12 @@ SimpleFieldCondition.args = {
         ...newField('http_request'),
         value: {
           segments: [
-            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent', value: 'header' },
+            {
+              text: '[http:header:user-agent]',
+              kind: 'native',
+              label: 'User-Agent',
+              value: 'header',
+            },
           ] as any,
           condition: 'contains',
           value: 'bot',
@@ -124,7 +129,9 @@ ComplexNestedConditions.args = {
           {
             ...newField('http_request'),
             value: {
-              segments: [{ text: '[http:method]', kind: 'native', label: 'Method', value: 'method' }] as any,
+              segments: [
+                { text: '[http:method]', kind: 'native', label: 'Method', value: 'method' },
+              ] as any,
               condition: 'equal',
               value: 'POST',
               ignoreCase: false,
@@ -135,7 +142,9 @@ ComplexNestedConditions.args = {
           {
             ...newField('http_request'),
             value: {
-              segments: [{ text: '[http:method]', kind: 'native', label: 'Method', value: 'method' }] as any,
+              segments: [
+                { text: '[http:method]', kind: 'native', label: 'Method', value: 'method' },
+              ] as any,
               condition: 'equal',
               value: 'PUT',
               ignoreCase: false,

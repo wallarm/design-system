@@ -1396,9 +1396,14 @@ export const usePointSelector = ({
     /* match */
     conditionTitle: !last
       ? 'How should the value match?'
-      : (last.kind === 'dup_index' || last.kind === 'dup_all' || last.kind === 'dup_any') && last.dup
+      : (last.kind === 'dup_index' || last.kind === 'dup_all' || last.kind === 'dup_any') &&
+          last.dup
         ? `How should the ${last.label} match?`
-        : last.kind === 'wild' || last.kind === 'dup_index' || last.kind === 'dup_all' || last.kind === 'dup_any' || last.kind === 'joined'
+        : last.kind === 'wild' ||
+            last.kind === 'dup_index' ||
+            last.kind === 'dup_all' ||
+            last.kind === 'dup_any' ||
+            last.kind === 'joined'
           ? `How should ${last.label} match?`
           : `How should the value of ${last.label} match?`,
     conditionRows: conditionItems.map((c: { row: any }) => c.row),

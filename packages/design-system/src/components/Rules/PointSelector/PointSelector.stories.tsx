@@ -69,7 +69,8 @@ const POINT_EXAMPLES = [
       condition: 'exists' as ConditionType,
       value: '',
       ignoreCase: false,
-      canonical: "[http:body][encoding:gzip][format:json]['token'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
+      canonical:
+        "[http:body][encoding:gzip][format:json]['token'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
       canonicalVersion: null,
     },
   },
@@ -91,7 +92,8 @@ const POINT_EXAMPLES = [
       condition: 'exists' as ConditionType,
       value: '',
       ignoreCase: false,
-      canonical: "[http:header]['authorization'][format:auth]['bearer'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
+      canonical:
+        "[http:header]['authorization'][format:auth]['bearer'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
       canonicalVersion: null,
     },
   },
@@ -108,7 +110,7 @@ const POINT_EXAMPLES = [
       condition: 'equal' as ConditionType,
       value: '*admin*',
       ignoreCase: true,
-      canonical: "[http:body][format:json][**][key:*username*]",
+      canonical: '[http:body][format:json][**][key:*username*]',
       canonicalVersion: null,
     },
   },
@@ -257,7 +259,8 @@ export const JWTClaims: StoryFn = () => {
     condition: 'exists',
     value: '',
     ignoreCase: false,
-    canonical: "[http:header]['authorization'][format:auth]['bearer'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
+    canonical:
+      "[http:header]['authorization'][format:auth]['bearer'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
     canonicalVersion: null,
   });
 
@@ -284,7 +287,7 @@ export const WithWildcards: StoryFn = () => {
     condition: 'equal',
     value: '*admin*',
     ignoreCase: true,
-    canonical: "[http:body][format:json][**][key:*username*]",
+    canonical: '[http:body][format:json][**][key:*username*]',
     canonicalVersion: null,
   });
 
@@ -316,7 +319,8 @@ export const MultiFormatParsing: StoryFn = () => {
     condition: 'exists',
     value: '',
     ignoreCase: false,
-    canonical: "[http:body][encoding:gzip][format:json]['token'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
+    canonical:
+      "[http:body][encoding:gzip][format:json]['token'][format:jwt]['payload'][encoding:base64][format:json]['sub']",
     canonicalVersion: null,
   });
 

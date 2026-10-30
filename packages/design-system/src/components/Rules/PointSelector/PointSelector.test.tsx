@@ -131,7 +131,6 @@ describe('PointSelector', () => {
 
   describe('Props interface', () => {
     it('accepts context prop', () => {
-      const onChange = rs.fn();
       const container = render({
         segments: [],
         condition: null,
@@ -143,7 +142,6 @@ describe('PointSelector', () => {
     });
 
     it('accepts value prop with segments', () => {
-      const onChange = rs.fn();
       const container = render({
         segments: [nativeSeg('header', 'Header'), headerSeg('authorization')],
         condition: null,
