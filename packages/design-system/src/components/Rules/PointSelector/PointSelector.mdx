@@ -325,37 +325,6 @@ No debounce or loading state — keys appear instantly.
 | `?` | Open keyboard shortcuts dialog |
 | `Ctrl+Enter` | Submit point (if implemented by consumer) |
 
-## Analytics Integration
-
-PointSelector uses a **wrapper-level, onChange-based** analytics pattern. See [`ANALYTICS_GAPS.md`](https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/PointSelector/ANALYTICS_GAPS.md) for details.
-
-**tl;dr:** Track interactions via `onChange` state diffs:
-
-```tsx
-<PointSelector
-  onChange={(newValue) => {
-    // Segment added?
-    if (newValue.segments.length > oldValue.segments.length) {
-      analytics.track('point_selector.segment_added', {
-        segment: newValue.segments[newValue.segments.length - 1],
-        canonical: newValue.canonical,
-      });
-    }
-
-    // Condition changed?
-    if (newValue.condition !== oldValue.condition) {
-      analytics.track('point_selector.condition_changed', {
-        from: oldValue.condition,
-        to: newValue.condition,
-      });
-    }
-
-    setOldValue(newValue); // Save for next diff
-  }}
-  data-analytics-id="POINT_BUILDER_MODAL" // Lands on root wrapper only
-/>
-```
-
 ## Accessibility
 
 - ✅ **ARIA roles**: Proper `role="combobox"`, `role="menu"`, `role="menuitem"`

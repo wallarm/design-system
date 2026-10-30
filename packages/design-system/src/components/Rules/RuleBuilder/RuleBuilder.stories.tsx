@@ -1,76 +1,59 @@
-/**
- * RuleBuilder Stories
- */
-
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { newAction } from './models/actionModel';
-import { newAttack, newField, newGroup, newSignal } from './models/conditionModel';
-import { RuleBuilder, type RuleBuilderProps } from './RuleBuilder';
-import { ActionSummary } from './Summary/ActionSummary';
-import { ConditionSummary } from './Summary/ConditionSummary';
+import { RuleBuilder } from './RuleBuilder';
+import type { RuleBuilderProps } from './RuleBuilder';
 import type { ActionDraft, Choice, GroupCondition } from './types';
+import { newAction } from './models/actionModel';
+import { newField, newGroup } from './models/conditionModel';
 
 const meta = {
   title: 'Rules/RuleBuilder',
   component: RuleBuilder,
   parameters: {
-    layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'A comprehensive rule authoring component for Wallarm WAF rules. Combines condition tree editing, action configuration, and JSON code generation.',
-      },
-    },
+    layout: 'centered',
   },
-  argTypes: {
-    condition: { control: false },
-    action: { control: false },
-    onConditionChange: { action: 'onConditionChange' },
-    onActionChange: { action: 'onActionChange' },
-    attackTypes: { control: false },
-    showProblems: { control: 'boolean' },
-    sections: { control: 'check', options: ['conditions', 'action', 'code'] },
-    afterConditions: { control: false },
-  },
+  tags: ['autodocs'],
 } satisfies Meta<typeof RuleBuilder>;
 
 export default meta;
 
-// Sample attack types
 const attackTypes: Choice[] = [
-  { value: 'sqli', label: 'SQL Injection' },
-  { value: 'xss', label: 'Cross-Site Scripting' },
-  { value: 'rce', label: 'Remote Code Execution' },
-  { value: 'ptrav', label: 'Path Traversal' },
-  { value: 'ldapi', label: 'LDAP Injection' },
+  { value: 'sqli', label: 'SQL Injection', description: 'Database query manipulation' },
+  { value: 'xss', label: 'Cross-Site Scripting', description: 'JavaScript injection' },
+  { value: 'rce', label: 'Remote Code Execution', description: 'Arbitrary code execution' },
+  { value: 'xxe', label: 'XML External Entity', description: 'XML parser exploitation' },
+  { value: 'path_traversal', label: 'Path Traversal', description: 'Directory traversal attack' },
 ];
 
 /**
- * Interactive wrapper for stories
+ * Interactive rule builder component for creating/editing rules.
  */
 const InteractiveRuleBuilder: StoryFn<RuleBuilderProps> = args => {
   const [condition, setCondition] = useState(args.condition);
   const [action, setAction] = useState(args.action);
 
   return (
-    <RuleBuilder
-      {...args}
-      condition={condition}
-      action={action}
-      onConditionChange={setCondition}
-      onActionChange={setAction}
-    />
+    <div className='w-[900px]'>
+      <RuleBuilder
+        {...args}
+        condition={condition}
+        action={action}
+        onConditionChange={setCondition}
+        onActionChange={setAction}
+      />
+    </div>
   );
 };
 
 /**
- * Empty rule - unconditional with default action
+ * Empty rule
+ *
+ * Starting point with empty condition and action.
  */
 export const EmptyRule: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
 EmptyRule.args = {
-  ruleId: 'empty-rule-1',
-  ruleDescription: 'Empty rule for testing',
+  ruleId: 'new-rule',
+  ruleDescription: '',
   condition: newGroup('and'),
   action: newAction('add_attack'),
   attackTypes,
@@ -79,6 +62,8 @@ EmptyRule.args = {
 
 /**
  * Simple field condition
+ *
+ * Basic rule with a single field check condition.
  */
 export const SimpleFieldCondition: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
 SimpleFieldCondition.args = {
@@ -91,7 +76,7 @@ SimpleFieldCondition.args = {
         ...newField('http_request'),
         value: {
           segments: [
-            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' },
+            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent', value: 'header' },
           ] as any,
           condition: 'contains',
           value: 'bot',
@@ -112,18 +97,20 @@ SimpleFieldCondition.args = {
 
 /**
  * Complex nested conditions
+ *
+ * Rule with nested AND/OR groups and multiple conditions.
  */
 export const ComplexNestedConditions: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
 ComplexNestedConditions.args = {
-  ruleId: 'complex-sql-check',
-  ruleDescription: 'Complex SQL injection detection with multiple conditions',
+  ruleId: 'admin-access',
+  ruleDescription: 'Detect unauthorized admin access attempts',
   condition: {
-    ...newGroup('or'),
+    ...newGroup('and'),
     children: [
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
+          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI', value: 'uri' }] as any,
           condition: 'contains',
           value: 'admin',
           ignoreCase: false,
@@ -132,12 +119,12 @@ ComplexNestedConditions.args = {
         },
       },
       {
-        ...newGroup('and'),
+        ...newGroup('or'),
         children: [
           {
             ...newField('http_request'),
             value: {
-              segments: [{ text: '[http:method]', kind: 'native', label: 'Method' }] as any,
+              segments: [{ text: '[http:method]', kind: 'native', label: 'Method', value: 'method' }] as any,
               condition: 'equal',
               value: 'POST',
               ignoreCase: false,
@@ -146,62 +133,57 @@ ComplexNestedConditions.args = {
             },
           },
           {
-            ...newAttack('sqli', 'flow'),
+            ...newField('http_request'),
+            value: {
+              segments: [{ text: '[http:method]', kind: 'native', label: 'Method', value: 'method' }] as any,
+              condition: 'equal',
+              value: 'PUT',
+              ignoreCase: false,
+              canonical: '[http:method]',
+              canonicalVersion: null,
+            },
           },
         ],
       },
     ],
   },
   action: {
-    ...newAction('add_tag'),
-    tagKey: 'suspicious',
-    tagValue: 'true',
+    ...newAction('add_attack'),
+    attackType: 'admin_abuse',
   },
   attackTypes,
   showProblems: false,
 };
 
 /**
- * Attack detection condition
+ * Attack detection
+ *
+ * Rule that detects specific attack types in request data.
  */
 export const AttackDetection: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
 AttackDetection.args = {
-  ruleId: 'suppress-xss',
-  ruleDescription: 'Suppress XSS false positives',
+  ruleId: 'sqli-detection',
+  ruleDescription: 'Detect SQL injection in query parameters',
   condition: {
     ...newGroup('and'),
-    children: [newAttack('xss', 'flow')],
+    children: [
+      {
+        kind: 'attack',
+        id: 'atk-1',
+        attackType: 'sqli',
+        point: '[http:query][format:form]',
+      },
+    ],
   },
-  action: {
-    ...newAction('suppress_attack'),
-    attackType: 'xss',
-  },
+  action: newAction('add_attack'),
   attackTypes,
   showProblems: false,
 };
 
 /**
- * Signal (anomaly) detection
- */
-export const SignalDetection: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
-SignalDetection.args = {
-  ruleId: 'detect-duplicate-headers',
-  ruleDescription: 'Tag requests with duplicate headers',
-  condition: {
-    ...newGroup('and'),
-    children: [newSignal('key_duplicate', '[http:header]')],
-  },
-  action: {
-    ...newAction('add_tag'),
-    tagKey: 'anomaly',
-    tagValue: 'duplicate_headers',
-  },
-  attackTypes,
-  showProblems: false,
-};
-
-/**
- * With validation problems shown
+ * With validation problems
+ *
+ * Shows validation errors when required fields are missing.
  */
 export const WithValidationProblems: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
 WithValidationProblems.args = {
@@ -222,219 +204,7 @@ WithValidationProblems.args = {
       },
     ],
   },
-  action: {
-    ...newAction('add_attack'),
-    attackType: '', // Missing required field
-  },
-  attackTypes,
-  showProblems: true,
-};
-
-/**
- * Conditions only (no action section)
- */
-export const ConditionsOnly: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
-ConditionsOnly.args = {
-  ruleId: 'conditions-only',
-  condition: newGroup('and'),
   action: newAction('add_attack'),
   attackTypes,
-  showProblems: false,
-  sections: ['conditions'],
-};
-
-/**
- * Action only (no conditions section)
- */
-export const ActionOnly: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
-ActionOnly.args = {
-  ruleId: 'action-only',
-  condition: newGroup('and'),
-  action: newAction('add_attack'),
-  attackTypes,
-  showProblems: false,
-  sections: ['action'],
-};
-
-/**
- * Code output only
- */
-export const CodeOutputOnly: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
-CodeOutputOnly.args = {
-  ruleId: 'code-output-example',
-  ruleDescription: 'Example rule showing generated JSON output',
-  condition: {
-    ...newGroup('and'),
-    children: [
-      {
-        ...newField('http_request'),
-        value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
-          condition: 'contains',
-          value: 'admin',
-          ignoreCase: false,
-          canonical: '[http:uri]',
-          canonicalVersion: null,
-        },
-      },
-    ],
-  },
-  action: {
-    ...newAction('add_attack'),
-    attackType: 'sqli',
-  },
-  attackTypes,
-  showProblems: false,
-  sections: ['code'],
-};
-
-/**
- * All action types showcase
- */
-export const AllActionTypes: StoryFn = () => {
-  const baseCondition: GroupCondition = {
-    ...newGroup('and'),
-    children: [
-      {
-        ...newField('http_request'),
-        value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
-          condition: 'contains',
-          value: 'test',
-          ignoreCase: false,
-          canonical: '[http:uri]',
-          canonicalVersion: null,
-        },
-      },
-    ],
-  };
-
-  const actions: ActionDraft[] = [
-    { ...newAction('add_attack'), attackType: 'sqli' },
-    { ...newAction('add_tag'), tagKey: 'env', tagValue: 'prod' },
-    { ...newAction('suppress_attack'), attackType: 'xss' },
-    { ...newAction('mark_attack'), attackType: 'rce' },
-    { ...newAction('combine'), separator: ',' },
-    { ...newAction('processing_time_limit'), limit: '1s' },
-    { ...newAction('processing_space_limit'), limit: '10MB' },
-    { ...newAction('entry_limits'), softLimit: '1KB', hardLimit: '10KB' },
-  ];
-
-  return (
-    <div className='flex flex-col gap-32'>
-      {actions.map((action, i) => {
-        const [currentAction, setAction] = useState(action);
-        return (
-          <div key={i} className='rounded-8 border border-border-primary-light p-16'>
-            <RuleBuilder
-              ruleId={`action-example-${i}`}
-              condition={baseCondition}
-              action={currentAction}
-              onConditionChange={() => {}}
-              onActionChange={setAction}
-              attackTypes={attackTypes}
-              showProblems={false}
-              sections={['action']}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-/**
- * ConditionSummary component (read-only)
- */
-export const ConditionSummaryExample: StoryFn = () => {
-  const condition: GroupCondition = {
-    ...newGroup('and'),
-    children: [
-      {
-        ...newField('http_request'),
-        value: {
-          segments: [
-            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' },
-          ] as any,
-          condition: 'contains',
-          value: 'bot',
-          ignoreCase: true,
-          canonical: '[http:header:user-agent]',
-          canonicalVersion: null,
-        },
-      },
-      {
-        ...newAttack('xss', 'flow'),
-      },
-    ],
-  };
-
-  return <ConditionSummary condition={condition} />;
-};
-
-/**
- * ActionSummary component (read-only)
- */
-export const ActionSummaryExample: StoryFn = () => {
-  const action: ActionDraft = {
-    ...newAction('add_attack'),
-    attackType: 'sqli',
-    comment: 'Detected SQL injection attempt',
-    experimental: true,
-  };
-
-  return <ActionSummary action={action} attackTypes={attackTypes} />;
-};
-
-/**
- * Full example with after conditions content
- */
-export const WithAfterConditionsContent: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind(
-  {},
-);
-WithAfterConditionsContent.args = {
-  ruleId: 'with-tips',
-  condition: newGroup('and'),
-  action: newAction('add_attack'),
-  attackTypes,
-  showProblems: false,
-  afterConditions: (
-    <div className='rounded-8 bg-bg-surface-2 p-12'>
-      <p className='text-sm text-text-secondary'>
-        💡 Tip: Add conditions to control when this rule applies
-      </p>
-    </div>
-  ),
-};
-
-/**
- * With application scope (restricts rule to specific application)
- */
-export const WithApplicationScope: StoryFn<RuleBuilderProps> = InteractiveRuleBuilder.bind({});
-WithApplicationScope.args = {
-  ruleId: 'app-scoped-rule',
-  ruleDescription: 'Rule that only applies to a specific application',
-  scope: { application_id: 'app-123' },
-  condition: {
-    ...newGroup('and'),
-    children: [
-      {
-        ...newField('http_request'),
-        value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
-          condition: 'contains',
-          value: 'admin',
-          ignoreCase: false,
-          canonical: '[http:uri]',
-          canonicalVersion: null,
-        },
-      },
-    ],
-  },
-  action: {
-    ...newAction('add_attack'),
-    attackType: 'sqli',
-  },
-  attackTypes,
-  showProblems: false,
+  showProblems: true, // Enable validation display
 };
