@@ -181,6 +181,7 @@ npm install modal-rc@npm:@wallarm-org/design-system@1.1.0-rc-feat-modal.1
 
 - `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish)
 - `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by repository rulesets that `GITHUB_TOKEN` cannot bypass (see Branch Rules), so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
+- `GITLAB_SSH_KEY`: Private SSH key with read access to `gl.wallarm.com`. Required for `pnpm install` to clone the private `proton-new-js` dependency used by `@wallarm-org/rules-lib`
 - `FIGMA_ACCESS_TOKEN`: Figma personal access token (scopes: File content read, Code Connect write), used by `publish-code-connect`
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions
 
