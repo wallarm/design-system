@@ -507,7 +507,7 @@ test.describe('Component: PointSelector', () => {
 
   test.describe('Parser Vocabulary Completion', () => {
     test('Should offer JWT parser keys after [format:jwt]', async ({ page }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:body][format:jwt]
       await page.keyboard.press('2'); // Body
@@ -527,7 +527,7 @@ test.describe('Component: PointSelector', () => {
     });
 
     test('Should offer auth parser keys after [format:auth]', async ({ page }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:header]['authorization'][format:auth]
       await page.keyboard.press('3'); // Header
@@ -548,7 +548,7 @@ test.describe('Component: PointSelector', () => {
     });
 
     test('Should offer protobuf reading keys after [format:protobuf]', async ({ page }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:body][format:protobuf][3][format:protobuf][1]
       await page.keyboard.press('2'); // Body
@@ -582,7 +582,7 @@ test.describe('Component: PointSelector', () => {
     });
 
     test('Should offer Basic auth decomposition keys', async ({ page }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:header]['authorization'][format:auth]['basic']
       await page.keyboard.press('3'); // Header
@@ -608,7 +608,7 @@ test.describe('Component: PointSelector', () => {
     test('Should NOT offer parser vocabulary for JSON (keys come from document)', async ({
       page,
     }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:body][format:json]
       await page.keyboard.press('2'); // Body
@@ -627,7 +627,7 @@ test.describe('Component: PointSelector', () => {
     });
 
     test('Should offer JWT keys after Bearer token in Authorization', async ({ page }) => {
-      await pointSelectorStory.goto(page, 'Default');
+      await pointSelectorStory.goto(page, 'BuildFromScratch');
 
       // Type: [http:header]['authorization'][format:auth]['bearer'][format:jwt]
       await page.keyboard.press('3'); // Header
@@ -1045,7 +1045,8 @@ test.describe('Component: PointSelector', () => {
       await expect(chips.nth(0)).toContainText('Header');
       await expect(chips.nth(1)).toContainText('authorization');
       // ... more chips
-      await expect(chips.nth(chips.count() - 1)).toContainText('sub');
+      const chipCount = await chips.count();
+      await expect(chips.nth(chipCount - 1)).toContainText('sub');
 
       // Verify canonical form includes full JWT path
       const canonical = page.getByText(/\[http:header\]\['authorization'\]/);
@@ -1357,7 +1358,7 @@ test.describe('Component: PointSelector', () => {
       await page.keyboard.type('secret-key');
 
       // Verify value entered
-      await expect(page.getByDisplayValue('secret-key')).toBeVisible();
+      await expect(page.locator('input[value="secret-key"]')).toBeVisible();
     });
 
     test('Should toggle multi-select items via Space', async ({ page }) => {

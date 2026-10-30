@@ -7,6 +7,7 @@ import {
   headerSeg,
   keySeg,
   nativeSeg,
+  type Segment as ProtonSegment,
   type RuleContext,
   seg,
 } from '@wallarm-org/rules-lib';
@@ -29,7 +30,7 @@ const meta = {
 export default meta;
 
 const EMPTY: PointSelectorValue = {
-  segments: [],
+  segments: [] as any,
   condition: null,
   value: '',
   ignoreCase: false,
@@ -43,7 +44,7 @@ const POINT_EXAMPLES = [
     id: 'header',
     label: 'Header X-Api-Version',
     value: {
-      segments: [nativeSeg('header', 'Header'), headerSeg('x-api-version')],
+      segments: [nativeSeg('header', 'Header'), headerSeg('x-api-version')] as any,
       condition: 'equal' as ConditionType,
       value: '1',
       ignoreCase: false,
@@ -59,13 +60,13 @@ const POINT_EXAMPLES = [
         nativeSeg('header', 'Header'),
         headerSeg('authorization'),
         FORMATS.auth,
-        keySeg('bearer', 'scheme'),
+        keySeg('bearer'),
         FORMATS.jwt,
-        keySeg('payload', 'part'),
+        keySeg('payload'),
         ENCODINGS.base64,
         seg('[format:json]', 'format', 'JSON', { name: 'json', claims: true }),
-        keySeg('sub', 'claim'),
-      ],
+        keySeg('sub'),
+      ] as any,
       condition: 'exists' as ConditionType,
       value: '',
       ignoreCase: false,
@@ -77,7 +78,7 @@ const POINT_EXAMPLES = [
     id: 'json-body',
     label: 'Body JSON key "email"',
     value: {
-      segments: [nativeSeg('body', 'Body'), FORMATS.json, keySeg('email')],
+      segments: [nativeSeg('body', 'Body'), FORMATS.json, keySeg('email')] as any,
       condition: 'contains' as ConditionType,
       value: '@example.com',
       ignoreCase: false,
@@ -102,7 +103,7 @@ const POINT_EXAMPLES = [
           fuzzy: true,
           reserved: true,
         }),
-      ],
+      ] as any,
       condition: 'equal' as ConditionType,
       value: '*admin*',
       ignoreCase: true,
@@ -126,16 +127,14 @@ export const BuildFromScratch: StoryFn = () => {
       </div>
       <PointSelector context='http_request' value={value} onChange={setValue} />
       <div className='mt-12 rounded-12 border border-border-primary bg-bg-secondary p-12'>
-        <div className='mb-4 text-sm text-text-tertiary'>Segments:</div>
+        <div className='mb-4 text-sm text-text-tertiary'>Canonical point:</div>
         <div className='font-mono text-xs'>
-          {value.segments.length > 0 ? (
-            value.segments.map((s, i) => (
-              <div key={i} className='mb-2'>
-                {i + 1}. {s.text} ({s.label})
-              </div>
-            ))
+          {value.canonical || value.segments.length > 0 ? (
+            <div className='text-text-primary'>
+              {value.canonical || `(${value.segments.length} segments)`}
+            </div>
           ) : (
-            <span className='text-text-tertiary'>(empty)</span>
+            <span className='text-text-tertiary'>Nothing chosen yet</span>
           )}
         </div>
       </div>
@@ -175,9 +174,11 @@ export const TwoStageFlow: StoryFn = () => {
   return (
     <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          This story demonstrates the complete two-stage flow:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            This story demonstrates the complete two-stage flow:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Step 1: Choose where the value is (build the point)</li>
           <li>Step 2: Set how it should match (condition + value)</li>
@@ -185,9 +186,11 @@ export const TwoStageFlow: StoryFn = () => {
       </div>
       <PointSelector context='http_request' value={value} onChange={setValue} />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Segments: {value.segments.map(s => s.text).join('') || '—'}
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Segments: {value.segments.map(s => s.text).join('') || '—'}
+          </Text>
+        </div>
         {value.condition && (
           <Text size='xs' color='secondary'>
             Condition: {value.condition} "{value.value}"
@@ -267,9 +270,11 @@ export const CompleteDemo: StoryFn = () => {
       </div>
       <PointSelector key={mount} context={context} value={value} onChange={setValue} />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Segments: {value.segments.map(s => s.text).join('') || '—'}
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Segments: {value.segments.map(s => s.text).join('') || '—'}
+          </Text>
+        </div>
         {value.condition && (
           <Text size='xs' color='secondary'>
             Condition: {value.condition} "{value.value}"
@@ -283,10 +288,12 @@ export const CompleteDemo: StoryFn = () => {
 // Different condition types examples
 export const ConditionEqual: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('x-api-version')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('x-api-version')] as any,
     condition: 'equal',
     value: '2.0',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -303,10 +310,12 @@ export const ConditionEqual: StoryFn = () => {
 
 export const ConditionContains: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('body', 'Body'), FORMATS.json, keySeg('email')],
+    segments: [nativeSeg('body', 'Body'), FORMATS.json, keySeg('email')] as any,
     condition: 'contains',
     value: '@example.com',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -323,10 +332,12 @@ export const ConditionContains: StoryFn = () => {
 
 export const ConditionStartsWith: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('path', 'Path')],
+    segments: [nativeSeg('path', 'Path')] as any,
     condition: 'startswith',
     value: '/api/v2',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -338,10 +349,12 @@ export const ConditionStartsWith: StoryFn = () => {
 
 export const ConditionEndsWith: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('path', 'Path')],
+    segments: [nativeSeg('path', 'Path')] as any,
     condition: 'endswith',
     value: '.json',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -353,10 +366,12 @@ export const ConditionEndsWith: StoryFn = () => {
 
 export const ConditionRegexp: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('user-agent')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('user-agent')] as any,
     condition: 'regexp',
     value: '^Mozilla.*Firefox',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -368,10 +383,12 @@ export const ConditionRegexp: StoryFn = () => {
 
 export const ConditionNotEqual: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('method', 'Method')],
+    segments: [nativeSeg('method', 'Method')] as any,
     condition: 'nequal',
     value: 'GET',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -383,10 +400,12 @@ export const ConditionNotEqual: StoryFn = () => {
 
 export const ConditionNotRegexp: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('content-type')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('content-type')] as any,
     condition: 'nregexp',
     value: 'text/.*',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -398,10 +417,12 @@ export const ConditionNotRegexp: StoryFn = () => {
 
 export const ConditionExists: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('authorization')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('authorization')] as any,
     condition: 'exists',
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -413,10 +434,12 @@ export const ConditionExists: StoryFn = () => {
 
 export const ConditionAbsent: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('x-debug-mode')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('x-debug-mode')] as any,
     condition: 'absent',
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -433,24 +456,28 @@ export const JWTClaims: StoryFn = () => {
       nativeSeg('header', 'Header'),
       headerSeg('authorization'),
       FORMATS.auth,
-      keySeg('bearer', 'scheme'),
+      keySeg('bearer'),
       FORMATS.jwt,
-      keySeg('payload', 'part'),
+      keySeg('payload'),
       ENCODINGS.base64,
       seg('[format:json]', 'format', 'JSON', { name: 'json', claims: true }),
-      keySeg('sub', 'claim'),
-    ],
+      keySeg('sub'),
+    ] as any,
     condition: 'exists',
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
     <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          JWT claim extraction example:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            JWT claim extraction example:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Authorization header → Bearer token → JWT</li>
           <li>Payload → Base64 decode → JSON → claim</li>
@@ -477,18 +504,22 @@ export const WithWildcards: StoryFn = () => {
         fuzzy: true,
         reserved: true,
       }),
-    ],
+    ] as any,
     condition: 'equal',
     value: '*admin*',
     ignoreCase: true,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
     <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Wildcard matching example:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Wildcard matching example:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>* stands for any text in key names</li>
           <li>*username* matches "admin_username", "username_hash", etc.</li>
@@ -509,18 +540,22 @@ export const MultiFormatParsing: StoryFn = () => {
       keySeg('data'),
       keySeg('user'),
       keySeg('id'),
-    ],
+    ] as any,
     condition: 'equal',
     value: '12345',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
     <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Multi-stage parsing example:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Multi-stage parsing example:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Body → gzip decompress → JSON parse</li>
           <li>Navigate nested keys: data.user.id</li>
@@ -535,10 +570,12 @@ export const MultiFormatParsing: StoryFn = () => {
 // Point-only mode (for action targets)
 export const PointOnlyMode: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('x-custom-header')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('x-custom-header')] as any,
     condition: null,
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -557,9 +594,11 @@ export const PointOnlyMode: StoryFn = () => {
         title='Where to apply the action?'
       />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Generated segments:
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Generated segments:
+          </Text>
+        </div>
         <div className='break-all font-mono text-sm'>
           {value.segments.map(s => s.text).join('') || '—'}
         </div>
@@ -571,10 +610,12 @@ export const PointOnlyMode: StoryFn = () => {
 // With initial value
 export const WithInitialValue: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>({
-    segments: [nativeSeg('header', 'Header'), headerSeg('authorization')],
+    segments: [nativeSeg('header', 'Header'), headerSeg('authorization')] as any,
     condition: 'startswith',
     value: 'Bearer ',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
@@ -605,23 +646,27 @@ export const CanonicalFormFeedback: StoryFn = () => {
         text: '[key:**]',
         label: 'zero or more keys',
       },
-    ],
+    ] as any,
     condition: 'exists',
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
 
   return (
     <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          This story demonstrates canonical form feedback. The point uses adjacent wildcards{' '}
-          <code className='rounded-4 bg-bg-surface-3 px-4 py-2 font-mono text-xs'>
-            [key:*][key:**]
-          </code>{' '}
-          which the SDK canonicalizes to{' '}
-          <code className='rounded-4 bg-bg-surface-3 px-4 py-2 font-mono text-xs'>[key:+]</code>.
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            This story demonstrates canonical form feedback. The point uses adjacent wildcards{' '}
+            <code className='rounded-4 bg-bg-surface-3 px-4 py-2 font-mono text-xs'>
+              [key:*][key:**]
+            </code>{' '}
+            which the SDK canonicalizes to{' '}
+            <code className='rounded-4 bg-bg-surface-3 px-4 py-2 font-mono text-xs'>[key:+]</code>.
+          </Text>
+        </div>
         <Text size='sm' color='secondary'>
           This is an educational feature, not an error. It helps users understand how the system
           normalizes their points for consistency and duplicate detection.
@@ -634,9 +679,11 @@ export const CanonicalFormFeedback: StoryFn = () => {
         onChange={setValue}
       />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Canonical form (stored):
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Canonical form (stored):
+          </Text>
+        </div>
         <div className='break-all font-mono text-sm'>{value.canonical || '—'}</div>
       </div>
     </div>
@@ -1036,7 +1083,7 @@ export const ReferenceRulesetCoverage: StoryFn = () => {
           return (
             <Button
               key={cat}
-              variant={isActive ? 'solid' : 'outline'}
+              variant={isActive ? 'primary' : 'outline'}
               color={isActive ? 'brand' : 'neutral'}
               size='small'
               onClick={() => {
@@ -1054,20 +1101,20 @@ export const ReferenceRulesetCoverage: StoryFn = () => {
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-1 p-12'>
         <div className='mb-8 flex items-center justify-between'>
           <Text size='sm' weight='medium'>
-            {currentExample.category} Examples
+            {currentExample?.category} Examples
           </Text>
           <Text size='xs' color='secondary'>
             {selectedExample + 1} / {REFERENCE_EXAMPLES.length}
           </Text>
         </div>
         <div className='mb-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4'>
-          {REFERENCE_EXAMPLES.filter(e => e.category === currentExample.category).map(
+          {REFERENCE_EXAMPLES.filter(e => e.category === currentExample?.category).map(
             (example, i) => {
               const globalIndex = REFERENCE_EXAMPLES.indexOf(example);
               return (
                 <Button
                   key={globalIndex}
-                  variant={globalIndex === selectedExample ? 'solid' : 'outline'}
+                  variant={globalIndex === selectedExample ? 'primary' : 'outline'}
                   color={globalIndex === selectedExample ? 'brand' : 'neutral'}
                   size='small'
                   onClick={() => setSelectedExample(globalIndex)}
@@ -1085,9 +1132,9 @@ export const ReferenceRulesetCoverage: StoryFn = () => {
               Canonical form:
             </Text>
           </div>
-          <div className='mb-8 break-all font-mono text-sm'>{currentExample.canonical}</div>
+          <div className='mb-8 break-all font-mono text-sm'>{currentExample?.canonical}</div>
           <Text size='xs' color='secondary'>
-            {currentExample.desc}
+            {currentExample?.desc}
           </Text>
         </div>
       </div>
@@ -1108,7 +1155,7 @@ export const ReferenceRulesetCoverage: StoryFn = () => {
           </Text>
         </div>
         <div className='mb-8 break-all font-mono text-sm'>{value.canonical || '(empty)'}</div>
-        {value.canonical === currentExample.canonical && (
+        {value.canonical && currentExample && value.canonical === currentExample.canonical && (
           <div className='flex items-center gap-6 text-text-success'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -1122,12 +1169,14 @@ export const ReferenceRulesetCoverage: StoryFn = () => {
                 clipRule='evenodd'
               />
             </svg>
-            <Text size='sm' weight='medium' className='text-text-success'>
-              ✓ Matches reference point!
-            </Text>
+            <div className='text-text-success'>
+              <Text size='sm' weight='medium'>
+                ✓ Matches reference point!
+              </Text>
+            </div>
           </div>
         )}
-        {value.canonical && value.canonical !== currentExample.canonical && (
+        {value.canonical && value.canonical !== currentExample?.canonical && (
           <div className='text-text-warning'>
             <Text size='xs' weight='medium'>
               ⚠ Does not match reference (try another example or reset)
@@ -1163,11 +1212,13 @@ export const WithProfileSelector: StoryFn = () => {
   const [profile, setProfile] = useState<'tree' | 'value' | 'grammar'>('tree');
 
   return (
-    <div className='w-[700px] flex flex-col gap-16'>
+    <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Profile selector demonstrates different validation modes:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Profile selector demonstrates different validation modes:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>
             <strong>Tree</strong>: Validates against traffic structure (default)
@@ -1189,9 +1240,11 @@ export const WithProfileSelector: StoryFn = () => {
         onProfileChange={setProfile}
       />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current profile: <strong>{profile}</strong>
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current profile: <strong>{profile}</strong>
+          </Text>
+        </div>
         <Text size='xs' color='secondary'>
           Point: {value.canonical || '(empty)'}
         </Text>
@@ -1232,11 +1285,13 @@ export const AsyncKeys: StoryFn = () => {
   };
 
   return (
-    <div className='w-[800px] flex flex-col gap-16'>
+    <div className='flex w-[800px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Async keys provider demonstration:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Async keys provider demonstration:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Select Header (3) to see async loading for header names</li>
           <li>Requests are debounced by 300ms (configurable)</li>
@@ -1288,9 +1343,11 @@ export const AsyncKeys: StoryFn = () => {
       </div>
 
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current point: {value.canonical || '(empty)'}
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current point: {value.canonical || '(empty)'}
+          </Text>
+        </div>
         <Text size='xs' color='secondary'>
           Segments: {value.segments.map(s => s.text).join('') || '—'}
         </Text>
@@ -1339,11 +1396,13 @@ export const AsyncKeysWithCaching: StoryFn = () => {
   };
 
   return (
-    <div className='w-[800px] flex flex-col gap-16'>
+    <div className='flex w-[800px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Caching pattern demonstration:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Caching pattern demonstration:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>First request: shows loading state (~400ms delay)</li>
           <li>Subsequent requests: instant (returned from cache)</li>
@@ -1397,12 +1456,16 @@ export const AsyncKeysWithCaching: StoryFn = () => {
       </div>
 
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Cache size: {cacheRef.current.size} parent(s)
-        </Text>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current point: {value.canonical || '(empty)'}
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Cache size: {cacheRef.current.size} parent(s)
+          </Text>
+        </div>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current point: {value.canonical || '(empty)'}
+          </Text>
+        </div>
       </div>
     </div>
   );
@@ -1434,11 +1497,13 @@ export const AsyncKeysCustomDebounce: StoryFn = () => {
   };
 
   return (
-    <div className='w-[800px] flex flex-col gap-16'>
+    <div className='flex w-[800px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          Custom debounce demonstration:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            Custom debounce demonstration:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Adjust debounce delay with the slider below</li>
           <li>Lower values: more responsive, but more requests</li>
@@ -1526,19 +1591,23 @@ export const ProfileRevalidation: StoryFn = () => {
     segments: [
       nativeSeg('header', 'Header'),
       { kind: 'key', value: '*', text: "['*']", label: "key '*'" },
-    ],
+    ] as any,
     condition: null,
     value: '',
     ignoreCase: false,
+    canonical: null,
+    canonicalVersion: null,
   });
   const [profile, setProfile] = useState<'tree' | 'value' | 'grammar'>('tree');
 
   return (
-    <div className='w-[700px] flex flex-col gap-16'>
+    <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          This story shows how profile changes trigger re-validation:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            This story shows how profile changes trigger re-validation:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>
             <code className='rounded-4 bg-bg-surface-3 px-4 py-2 font-mono text-xs'>
@@ -1563,27 +1632,29 @@ export const ProfileRevalidation: StoryFn = () => {
         title='Point with wildcard'
       />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current profile: <strong>{profile}</strong>
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current profile: <strong>{profile}</strong>
+          </Text>
+        </div>
         <Text size='xs' color='secondary'>
           Point: {value.canonical || '(empty)'}
         </Text>
         <div className='mt-8'>
           {profile === 'tree' && (
-            <Text size='xs' className='text-text-success'>
-              ✓ Valid in tree profile (wildcards allowed)
-            </Text>
+            <div className='text-text-success'>
+              <Text size='xs'>✓ Valid in tree profile (wildcards allowed)</Text>
+            </div>
           )}
           {profile === 'value' && (
-            <Text size='xs' className='text-text-warning'>
-              ⚠ Will show error in value profile (wildcard not allowed)
-            </Text>
+            <div className='text-text-warning'>
+              <Text size='xs'>⚠ Will show error in value profile (wildcard not allowed)</Text>
+            </div>
           )}
           {profile === 'grammar' && (
-            <Text size='xs' className='text-text-success'>
-              ✓ Valid in grammar profile (syntax only)
-            </Text>
+            <div className='text-text-success'>
+              <Text size='xs'>✓ Valid in grammar profile (syntax only)</Text>
+            </div>
           )}
         </div>
       </div>
@@ -1611,9 +1682,11 @@ export const ParserVocabulary: StoryFn = () => {
   return (
     <div className='flex w-[600px] flex-col gap-16'>
       <div>
-        <Text size='sm' weight='medium' className='mb-8'>
-          Parser Vocabulary Examples
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' weight='medium'>
+            Parser Vocabulary Examples
+          </Text>
+        </div>
         <ul className='list-disc space-y-4 pl-20 text-sm text-text-secondary'>
           <li>
             <strong>JWT parser:</strong> After <code>[format:jwt]</code>, completion offers{' '}
@@ -1633,10 +1706,12 @@ export const ParserVocabulary: StoryFn = () => {
           </li>
         </ul>
         <div className='mt-12 rounded-8 bg-bg-surface-3 p-12'>
-          <Text size='xs' color='secondary' className='mb-6'>
-            Note: These keys are <strong>parser-planted</strong>, not from wire data. They appear
-            even when no backend keys provider is configured.
-          </Text>
+          <div className='mb-6'>
+            <Text size='xs' color='secondary'>
+              Note: These keys are <strong>parser-planted</strong>, not from wire data. They appear
+              even when no backend keys provider is configured.
+            </Text>
+          </div>
           <Text size='xs' color='secondary'>
             Source:{' '}
             <code className='rounded-4 bg-bg-surface-1 px-4 py-2'>
@@ -1653,9 +1728,11 @@ export const ParserVocabulary: StoryFn = () => {
         title='Try typing parser-specific points'
       />
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current point:
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current point:
+          </Text>
+        </div>
         <code className='block rounded-4 bg-bg-surface-3 p-8 font-mono text-xs'>
           {value.canonical || '(empty)'}
         </code>
@@ -1683,11 +1760,13 @@ export const ErrorFixes: StoryFn = () => {
   const [value, setValue] = useState<PointSelectorValue>(EMPTY);
 
   return (
-    <div className='w-[700px] flex flex-col gap-16'>
+    <div className='flex w-[700px] flex-col gap-16'>
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-16'>
-        <Text size='sm' color='secondary' className='mb-8'>
-          SDK Error Fixes demonstration:
-        </Text>
+        <div className='mb-8'>
+          <Text size='sm' color='secondary'>
+            SDK Error Fixes demonstration:
+          </Text>
+        </div>
         <ul className='list-disc space-y-2 pl-20 text-sm text-text-secondary'>
           <li>Build a point like: Body &gt; type "user" (without format:json)</li>
           <li>SDK will show error: "Point cannot reach under [http:body]"</li>
@@ -1731,9 +1810,11 @@ export const ErrorFixes: StoryFn = () => {
       </div>
 
       <div className='rounded-12 border border-border-primary-light bg-bg-surface-2 p-12'>
-        <Text size='xs' color='secondary' className='mb-6'>
-          Current point:
-        </Text>
+        <div className='mb-6'>
+          <Text size='xs' color='secondary'>
+            Current point:
+          </Text>
+        </div>
         <code className='block rounded-4 bg-bg-surface-3 p-8 font-mono text-xs'>
           {value.canonical || '(empty)'}
         </code>

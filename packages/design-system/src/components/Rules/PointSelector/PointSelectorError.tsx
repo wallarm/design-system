@@ -115,7 +115,7 @@ export const PointSelectorError: FC<PointSelectorErrorProps> = ({
 
   // Map SDK error layer to human-readable badge
   const layerBadge = !incomplete && !transport && (
-    <Badge size='small' color={error.layer === 'grammar' ? 'danger' : 'warning'}>
+    <Badge size='small' color={error.layer === 'grammar' ? 'red' : 'amber'}>
       {error.layer === 'grammar' ? 'Grammar' : error.layer === 'tree' ? 'Tree' : 'Value'}
     </Badge>
   );
@@ -168,12 +168,14 @@ export const PointSelectorError: FC<PointSelectorErrorProps> = ({
               {error.fixes.map((fix, i) => (
                 <Button
                   key={i}
-                  ref={el => (fixButtonRefs.current[i] = el)}
+                  ref={(el: HTMLButtonElement | null) => {
+                    fixButtonRefs.current[i] = el;
+                  }}
                   size='small'
                   variant='outline'
                   color='neutral'
                   onClick={() => onApplyFix(fix)}
-                  onKeyDown={e => handleFixKeyDown(e, i)}
+                  onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => handleFixKeyDown(e, i)}
                   aria-label={`Fix ${i + 1} of ${error.fixes!.length}: ${fix.label}`}
                   data-testid={testId ? `${testId}--fix-${i}` : undefined}
                 >

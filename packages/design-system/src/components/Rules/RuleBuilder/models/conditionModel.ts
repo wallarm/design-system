@@ -694,7 +694,7 @@ function checkToNode(check: Record<string, unknown>, proton: Proton | null): Con
       value: {
         segments,
         canonical: point, // Store canonical form from API
-        canonicalVersion: currentVersion,
+        canonicalVersion: currentVersion ?? null,
         condition: type as ConditionType,
         value: (value as string | undefined) ?? '',
         ignoreCase: check.case_sensitive === false,

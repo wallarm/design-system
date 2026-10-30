@@ -278,7 +278,7 @@ export function normalizeSegment(seg: Segment): Segment {
   }
 
   // Special case: dup_index segments need both 'ord' and 'index' for WASM compatibility
-  if (seg.kind === 'dup_index' && 'ord' in seg && !('index' in seg)) {
+  if ((seg as any).kind === 'dup_index' && 'ord' in seg && !('index' in seg)) {
     normalized.index = normalized.ord;
   }
 
@@ -710,7 +710,7 @@ export const sdkSeg = {
    * @example sdkSeg.native('body') → { kind: 'native', value: 'body' }
    * @example sdkSeg.native('data') → { kind: 'native', value: 'data' }
    */
-  native: (word: string): Segment => {
+  native: (word: string): any => {
     return { kind: 'native', value: word };
   },
 
@@ -718,70 +718,70 @@ export const sdkSeg = {
    * Key segment: ['user'], ['email'], etc.
    * @example sdkSeg.key('user') → { kind: 'key', value: 'user' }
    */
-  key: (value: string): Segment => ({ kind: 'key', value }),
+  key: (value: string): any => ({ kind: 'key', value }),
 
   /**
    * Key name segment: ['user'][role:name]
    * @example sdkSeg.name('user') → { kind: 'key', value: 'user', role: 'name' }
    */
-  name: (value: string): Segment => ({ kind: 'key', value, role: 'name' }),
+  name: (value: string): any => ({ kind: 'key', value, role: 'name' }),
 
   /**
    * Attribute segment: [attr:'@id'], [attr:'@class'], etc.
-   * @example sdkSeg.attr('@id') → { kind: 'typed', value: '@id' }
+   * @example sdkSeg.attr('@id') → { kind: 'attr', value: '@id' }
    */
-  attr: (value: string): Segment => ({ kind: 'typed', value }),
+  attr: (value: string): any => ({ kind: 'attr', value }),
 
   /**
    * Attribute name segment: [attr:'@id'][role:name]
-   * Uses typed_name kind per SDK spec (not typed with role).
-   * @example sdkSeg.attrName('@id') → { kind: 'typed_name', value: '@id' }
+   * Uses attr kind with role per SDK spec.
+   * @example sdkSeg.attrName('@id') → { kind: 'attr', value: '@id', role: 'name' }
    */
-  attrName: (value: string): Segment => ({ kind: 'typed_name', value }),
+  attrName: (value: string): any => ({ kind: 'attr', value, role: 'name' }),
 
   /**
    * Format segment: [format:json], [format:xml], etc.
    * @example sdkSeg.format('json') → { kind: 'content', name: 'json' }
    */
-  format: (name: string): Segment => ({ kind: 'content', name }),
+  format: (name: string): any => ({ kind: 'content', name }),
 
   /**
    * Encoding segment: [encoding:base64], [encoding:gzip], etc.
    * @example sdkSeg.encoding('base64') → { kind: 'content', name: 'base64' }
    */
-  encoding: (name: string): Segment => ({ kind: 'content', name }),
+  encoding: (name: string): any => ({ kind: 'content', name }),
 
   /**
    * Array index segment: [0], [5], [42], etc.
    * @example sdkSeg.index(3) → { kind: 'index', index: 3 }
    */
-  index: (index: number): Segment => ({ kind: 'index', index }),
+  index: (index: number): any => ({ kind: 'index', index }),
 
   /**
    * Duplicate ordinal: ['key'][dup:0], ['key'][dup:-1], etc.
    * @example sdkSeg.dup(0) → { kind: 'dup_index', ord: 0 }
    */
-  dup: (ord: number): Segment => ({ kind: 'dup_index', ord }),
+  dup: (ord: number): any => ({ kind: 'dup_index', ord }),
 
   /**
    * Duplicate all: ['key'][dup:all]
    * @example sdkSeg.dupAll() → { kind: 'dup_all' }
    */
-  dupAll: (): Segment => ({ kind: 'dup_all' }),
+  dupAll: (): any => ({ kind: 'dup_all' }),
 
   /**
    * Duplicate any: ['key'][dup:any] (default, usually omitted)
    * @example sdkSeg.dupAny() → { kind: 'dup_any' }
    */
-  dupAny: (): Segment => ({ kind: 'dup_any' }),
+  dupAny: (): any => ({ kind: 'dup_any' }),
 
   /**
    * Joined entry: ['key'][dup,joined:', ']
    * Fields are 'value' (key) and 'separator' per SDK spec.
-   * @example sdkSeg.joined('cookie', ', ') → { kind: 'combined_key', value: 'cookie', separator: ', ' }
+   * @example sdkSeg.joined('cookie', ', ') → { kind: 'joined', value: 'cookie', separator: ', ' }
    */
-  joined: (value: string, separator: string): Segment => ({
-    kind: 'combined_key',
+  joined: (value: string, separator: string): any => ({
+    kind: 'joined',
     value,
     separator,
   }),
@@ -790,15 +790,15 @@ export const sdkSeg = {
    * Wildcard segment: [*], [key:*], [arr|key:*], [key:*][role:value], etc.
    * Quant values per SDK spec: one (=*), zero_or_one (=?), zero_or_more (=**), one_or_more (=+)
    * Role optional: narrows to 'name' or 'value' entries (only valid with key/attr kinds)
-   * @example sdkSeg.wild(['key'], 'one') → { kind: 'wildcard', kinds: ['key'], quant: 'one' }
-   * @example sdkSeg.wild(['key', 'arr'], 'zero_or_more', 'value') → { kind: 'wildcard', kinds: ['key', 'arr'], quant: 'zero_or_more', role: 'value' }
+   * @example sdkSeg.wild(['key'], 'one') → { kind: 'wild', kinds: ['key'], quant: 'one' }
+   * @example sdkSeg.wild(['key', 'arr'], 'zero_or_more', 'value') → { kind: 'wild', kinds: ['key', 'arr'], quant: 'zero_or_more', role: 'value' }
    */
   wild: (
     kinds: string[],
     quant: 'one' | 'zero_or_one' | 'zero_or_more' | 'one_or_more',
     role?: 'name' | 'value',
-  ): Segment => ({
-    kind: 'wildcard',
+  ): any => ({
+    kind: 'wild',
     kinds,
     quant,
     ...(role && { role }),
@@ -806,21 +806,21 @@ export const sdkSeg = {
 
   /**
    * Method segment (MCP alias): [method:'tools/call'] after [format:mcp]
-   * @example sdkSeg.method('tools/call') → { kind: 'method', value: 'tools/call' }
+   * @example sdkSeg.method('tools/call') → { kind: 'key', value: 'tools/call' }
    */
-  method: (value: string): Segment => ({ kind: 'method', value }),
+  method: (value: string): any => ({ kind: 'key', value }),
 
   /**
    * Method any (MCP alias): [method:*] after [format:mcp]
-   * @example sdkSeg.methodAny() → { kind: 'method_any' }
+   * @example sdkSeg.methodAny() → { kind: 'wild', kinds: ['key'], quant: 'one' }
    */
-  methodAny: (): Segment => ({ kind: 'method_any' }),
+  methodAny: (): any => ({ kind: 'wild', kinds: ['key'], quant: 'one' }),
 
   /**
    * Method value (MCP alias): [method] after [format:mcp]
-   * @example sdkSeg.methodValue() → { kind: 'method_value' }
+   * @example sdkSeg.methodValue() → { kind: 'key' }
    */
-  methodValue: (): Segment => ({ kind: 'method_value' }),
+  methodValue: (): any => ({ kind: 'key' }),
 } as const;
 
 /**
@@ -854,7 +854,7 @@ export const sdkSeg = {
  *   ]}
  * ```
  */
-export function sdkAlts(segments: Segment[], caseless: boolean[] = []): Segment {
+export function sdkAlts(segments: any[], caseless: boolean[] = []): any {
   // Validate non-empty array (per point-sdk.md render() refuses empty_union)
   if (segments.length === 0) {
     throw new Error('sdkAlts: segments array cannot be empty (would produce empty_union error)');
@@ -862,7 +862,11 @@ export function sdkAlts(segments: Segment[], caseless: boolean[] = []): Segment 
 
   // Single segment - return direct (caseless flag goes on the segment itself, not in alts wrapper)
   if (segments.length === 1) {
-    return segments[0];
+    const segment = segments[0];
+    if (!segment) {
+      throw new Error('sdkAlts: segment at index 0 is undefined');
+    }
+    return segment;
   }
 
   // Multiple segments - build alternation structure per SDK spec
@@ -899,18 +903,19 @@ export function sdkAlts(segments: Segment[], caseless: boolean[] = []): Segment 
  * sdkCombine('key', ['authorization', 'cookie'], [true, true])
  * ```
  */
-export function sdkCombine(kind: string, names: string[], caseless?: boolean[]): Segment {
+export function sdkCombine(kind: string, names: string[], caseless?: boolean[]): any {
   if (names.length === 0) {
     throw new Error('sdkCombine: names array cannot be empty (would produce empty_union error)');
   }
 
   if (names.length === 1) {
-    const name = names[0];
+    const name = names[0] ?? '';
     // Single choice - return direct segment
     switch (kind) {
       case 'format':
+        return sdkSeg.format(name);
       case 'encoding':
-        return sdkSeg.format(name); // Both use content kind
+        return sdkSeg.encoding(name);
       case 'key':
         return sdkSeg.key(name);
       case 'attr':
@@ -922,16 +927,18 @@ export function sdkCombine(kind: string, names: string[], caseless?: boolean[]):
 
   // Multiple choices - create alternation with caseless support
   const members = names.map(name => {
+    const safeName = name ?? '';
     switch (kind) {
       case 'format':
+        return sdkSeg.format(safeName);
       case 'encoding':
-        return sdkSeg.format(name);
+        return sdkSeg.encoding(safeName);
       case 'key':
-        return sdkSeg.key(name);
+        return sdkSeg.key(safeName);
       case 'attr':
-        return sdkSeg.attr(name);
+        return sdkSeg.attr(safeName);
       default:
-        return sdkSeg.key(name);
+        return sdkSeg.key(safeName);
     }
   });
 

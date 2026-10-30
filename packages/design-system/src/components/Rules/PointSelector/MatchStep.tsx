@@ -35,6 +35,22 @@ export const MatchStep: FC<Props> = ({
   const { ui, actions, keys } = model;
   const choosing = ui.stage === 'condition';
 
+  // Safe wrappers for actions/keys that might be undefined
+  const safeActions = {
+    closeConditionList: actions?.closeConditionList ?? (() => {}),
+    setConditionQuery: actions?.setConditionQuery ?? (() => {}),
+    highlightCondition: actions?.highlightCondition ?? (() => {}),
+    chooseCondition: actions?.chooseCondition ?? (() => {}),
+    editCondition: actions?.editCondition ?? (() => {}),
+    setValue: actions?.setValue ?? (() => {}),
+    setIgnoreCase: actions?.setIgnoreCase ?? (() => {}),
+  };
+
+  const safeKeys = {
+    handleConditionKey: keys?.handleConditionKey ?? (() => {}),
+    handleValueKey: keys?.handleValueKey ?? (() => {}),
+  };
+
   // Live regex validation state
   const [regexError, setRegexError] = useState<string | null>(null);
   const [validatingRegex, setValidatingRegex] = useState(false);
@@ -86,7 +102,7 @@ export const MatchStep: FC<Props> = ({
   // would reopen the where menu and pull focus away from what was clicked.
   const handleListClose = () =>
     requestAnimationFrame(() => {
-      if (conditionInputRef.current !== document.activeElement) actions.closeConditionList();
+      if (conditionInputRef.current !== document.activeElement) safeActions.closeConditionList();
     });
 
   return (
@@ -107,8 +123,8 @@ export const MatchStep: FC<Props> = ({
             value={ui.conditionQuery}
             spellCheck={false}
             autoComplete='off'
-            onChange={e => actions.setConditionQuery(e.target.value)}
-            onKeyDown={keys.handleConditionKey}
+            onChange={e => safeActions.setConditionQuery(e.target.value)}
+            onKeyDown={safeKeys.handleConditionKey}
           />
           <StepMenu
             open
@@ -117,11 +133,11 @@ export const MatchStep: FC<Props> = ({
             focusRef={conditionInputRef}
             title='Choose a condition'
             rows={model.conditionRows}
-            highlightedId={model.conditionHighlightedId}
+            highlightedId={model.conditionHighlightedId ?? null}
             footer='list'
             escLabel='to go back'
-            onHighlight={actions.highlightCondition}
-            onChoose={actions.chooseCondition}
+            onHighlight={safeActions.highlightCondition}
+            onChoose={safeActions.chooseCondition}
             onClose={handleListClose}
           />
         </div>
@@ -133,7 +149,7 @@ export const MatchStep: FC<Props> = ({
               variant='outline'
               color='neutral'
               size='large'
-              onClick={actions.editCondition}
+              onClick={safeActions.editCondition}
             >
               {condition ? `${conditionLabel(condition)} ✎` : 'Choose a condition'}
             </Button>
@@ -147,8 +163,8 @@ export const MatchStep: FC<Props> = ({
                   value={value}
                   spellCheck={false}
                   autoComplete='off'
-                  onChange={e => actions.setValue(e.target.value)}
-                  onKeyDown={keys.handleValueKey}
+                  onChange={e => safeActions.setValue(e.target.value)}
+                  onKeyDown={safeKeys.handleValueKey}
                   aria-invalid={regexError !== null}
                   aria-describedby={regexError ? `${testId}--regex-error` : undefined}
                 />
@@ -177,7 +193,7 @@ export const MatchStep: FC<Props> = ({
               </Text>
               <Checkbox
                 checked={ignoreCase}
-                onCheckedChange={d => actions.setIgnoreCase(d.checked === true)}
+                onCheckedChange={d => safeActions.setIgnoreCase(d.checked === true)}
               >
                 <CheckboxIndicator />
                 <CheckboxLabel>Ignore letter case (⌥C)</CheckboxLabel>

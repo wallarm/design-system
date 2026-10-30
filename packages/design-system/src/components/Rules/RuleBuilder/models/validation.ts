@@ -6,7 +6,8 @@
  */
 
 import type { Proton } from '@wallarm-org/rules-lib';
-import { checkPoint } from '../../../PointSelector/sdkBridge';
+import { checkPoint } from '../../PointSelector/sdkBridge';
+import type { RuleContext } from '../../PointSelector/types';
 import type { ActionDraft, ActionKind, ConditionNode, GroupCondition } from '../types';
 import { ACTION_KIND_CHOICES, TARGET_REQUIREMENT } from '../utils/constants';
 import { extractBindings } from '../utils/extractBindings';
@@ -614,17 +615,17 @@ export function validateBindingRefs(
           // Get the check type from the node
           let checkType: string;
           let point: string;
-          let context: string;
+          let context: RuleContext | undefined;
 
           if (check.kind === 'field') {
             checkType = check.value.condition || '';
             point = check.value.canonical || '';
-            context = check.context;
+            context = check.context as RuleContext;
           } else {
             // signal check
             checkType = check.absent ? 'signal_absent' : 'signal_present';
             point = check.point || '';
-            context = check.context;
+            context = undefined; // Signal checks don't have context
           }
 
           // bind_point cannot be on signal checks
@@ -635,7 +636,8 @@ export function validateBindingRefs(
           }
 
           // Validate point is exact (no wildcards, alternations, caseless keys)
-          if (proton && point && context) {
+          // Only validate for field checks since signal checks don't have context
+          if (proton && point && context && check.kind === 'field') {
             const result = checkPoint(proton, point, { context });
             if (result.canonical && !result.exact) {
               problems.push(

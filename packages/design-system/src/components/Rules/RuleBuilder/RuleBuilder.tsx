@@ -179,7 +179,7 @@ export const RuleBuilder: FC<RuleBuilderProps> = ({
         // FieldCondition uses PointSelectorValue with canonicalVersion
         if (
           node.value.canonical &&
-          needsRecanonalization(currentVersion, node.value.canonicalVersion)
+          needsRecanonalization(currentVersion, node.value.canonicalVersion ?? undefined)
         ) {
           const result = checkPoint(proton, node.value.canonical, {
             context: node.context,

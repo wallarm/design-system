@@ -138,12 +138,17 @@ if (jsonOut) {
   writeFileSync(path.resolve(jsonOut), `${JSON.stringify(report, null, 2)}\n`);
 }
 
+// biome-ignore lint/suspicious/noConsole: CLI script output
 console.log(
   `React Compiler audit: ${report.files} files, ${report.compiledFunctions} functions compiled, ` +
     `${report.bailouts} bailouts in ${report.bailoutFiles} files, ${report.optedOutFiles} files (${report.optedOutFunctions} functions) opted out ('use no memo').`,
 );
+// biome-ignore lint/suspicious/noConsole: CLI script output
 console.log('\nBy category:');
+// biome-ignore lint/suspicious/noConsole: CLI script output
 for (const [k, v] of Object.entries(report.byCategory))
   console.log(`  ${String(v).padStart(4)}  ${k}`);
+// biome-ignore lint/suspicious/noConsole: CLI script output
 console.log('\nBy file:');
+// biome-ignore lint/suspicious/noConsole: CLI script output
 for (const b of bailouts) console.log(`  ${b.file}:${b.line ?? '?'}  [${b.category}] ${b.reason}`);

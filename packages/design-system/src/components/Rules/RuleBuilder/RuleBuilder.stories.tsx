@@ -90,10 +90,14 @@ SimpleFieldCondition.args = {
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' }],
+          segments: [
+            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' },
+          ] as any,
           condition: 'contains',
           value: 'bot',
           ignoreCase: true,
+          canonical: '[http:header:user-agent]',
+          canonicalVersion: null,
         },
       },
     ],
@@ -119,10 +123,12 @@ ComplexNestedConditions.args = {
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }],
+          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
           condition: 'contains',
           value: 'admin',
           ignoreCase: false,
+          canonical: '[http:uri]',
+          canonicalVersion: null,
         },
       },
       {
@@ -131,10 +137,12 @@ ComplexNestedConditions.args = {
           {
             ...newField('http_request'),
             value: {
-              segments: [{ text: '[http:method]', kind: 'native', label: 'Method' }],
+              segments: [{ text: '[http:method]', kind: 'native', label: 'Method' }] as any,
               condition: 'equal',
               value: 'POST',
               ignoreCase: false,
+              canonical: '[http:method]',
+              canonicalVersion: null,
             },
           },
           {
@@ -204,10 +212,12 @@ WithValidationProblems.args = {
       {
         ...newField('http_request'),
         value: {
-          segments: [],
+          segments: [] as any,
           condition: null,
           value: '',
           ignoreCase: false,
+          canonical: null,
+          canonicalVersion: null,
         },
       },
     ],
@@ -259,10 +269,12 @@ CodeOutputOnly.args = {
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }],
+          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
           condition: 'contains',
           value: 'admin',
           ignoreCase: false,
+          canonical: '[http:uri]',
+          canonicalVersion: null,
         },
       },
     ],
@@ -280,16 +292,18 @@ CodeOutputOnly.args = {
  * All action types showcase
  */
 export const AllActionTypes: StoryFn = () => {
-  const baseCondition = {
+  const baseCondition: GroupCondition = {
     ...newGroup('and'),
     children: [
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }],
+          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
           condition: 'contains',
           value: 'test',
           ignoreCase: false,
+          canonical: '[http:uri]',
+          canonicalVersion: null,
         },
       },
     ],
@@ -339,10 +353,14 @@ export const ConditionSummaryExample: StoryFn = () => {
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' }],
+          segments: [
+            { text: '[http:header:user-agent]', kind: 'native', label: 'User-Agent' },
+          ] as any,
           condition: 'contains',
           value: 'bot',
           ignoreCase: true,
+          canonical: '[http:header:user-agent]',
+          canonicalVersion: null,
         },
       },
       {
@@ -403,10 +421,12 @@ WithApplicationScope.args = {
       {
         ...newField('http_request'),
         value: {
-          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }],
+          segments: [{ text: '[http:uri]', kind: 'native', label: 'URI' }] as any,
           condition: 'contains',
           value: 'admin',
           ignoreCase: false,
+          canonical: '[http:uri]',
+          canonicalVersion: null,
         },
       },
     ],

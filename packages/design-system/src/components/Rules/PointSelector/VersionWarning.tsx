@@ -74,7 +74,7 @@ export const VersionWarning: FC<VersionWarningProps> = ({
 
   if (isTooOld) {
     return (
-      <Alert color='critical' data-testid='sdk-version-error'>
+      <Alert color='destructive' data-testid='sdk-version-error'>
         <AlertIcon />
         <AlertContent>
           <AlertTitle>Incompatible SDK Version</AlertTitle>

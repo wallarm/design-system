@@ -368,7 +368,7 @@ test.describe('Component: RuleBuilder', () => {
 
       // Check delete button
       const deleteButton = page.getByRole('button', { name: /delete/i }).first();
-      await expect(deleteButton).toHaveAccessibleName();
+      await expect(deleteButton).toHaveAttribute('aria-label');
     });
 
     test('Should have visible focus indicators on all controls', async ({ page }) => {

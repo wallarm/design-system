@@ -343,7 +343,7 @@ test.describe('Component: PointSelector', () => {
       await page.keyboard.type('secret123');
 
       // Verify value entered
-      const valueInput = page.getByDisplayValue('secret123');
+      const valueInput = page.locator('input[value="secret123"]');
       await expect(valueInput).toBeVisible();
     });
   });

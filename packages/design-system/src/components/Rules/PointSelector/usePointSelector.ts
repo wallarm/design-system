@@ -20,6 +20,7 @@ import {
   PICK_LABELS,
   type PickStep,
   pickByNumber,
+  type Segment,
   takesValue,
 } from '@wallarm-org/rules-lib/ui';
 import {
@@ -119,7 +120,7 @@ export const usePointSelector = ({
   // Temporary cache for most recent setSegments() call optimization
   // When setSegments() calls SDK to check for auto-open, we cache the result
   // so the useMemo for menu rows can reuse it instead of calling SDK again
-  const nextItemsRef = useRef<{ segments: typeof segments; items: NextOption[] } | null>(null);
+  const nextItemsRef = useRef<{ segments: typeof segments; items: CompletionItem[] } | null>(null);
 
   // Wrap keys provider to handle async with debounce and abort
   const syncKeysProvider = useMemo(() => {
@@ -136,7 +137,7 @@ export const usePointSelector = ({
     // Function provider - wrap to handle async with debounce (300ms) and abort
     const timeoutRefs = new Map<string, NodeJS.Timeout>();
 
-    return (parent: string): string[] | undefined => {
+    return (parent: string): string[] => {
       const cached = keysCache.current.get(parent);
       if (cached !== undefined) {
         return cached; // Return cached results
@@ -155,7 +156,7 @@ export const usePointSelector = ({
       // Check if fetch already in progress (dedupe)
       const inFlight = inFlightFetches.current.get(parent);
       if (inFlight) {
-        return undefined; // Fetch in progress, show loading
+        return []; // Fetch in progress, return empty array (loading state handled by loadingKeys)
       }
 
       // Clear existing timeout (debounce)
@@ -198,7 +199,7 @@ export const usePointSelector = ({
 
       timeoutRefs.set(parent, timeout);
 
-      return undefined; // Loading
+      return []; // Loading - return empty array (loading state handled by loadingKeys)
     };
   }, [keys, keysDebounceMs, triggerRecomplete]);
 
@@ -296,12 +297,12 @@ export const usePointSelector = ({
     };
 
     // Get current canonical version from SDK
-    const canonicalVersion = proton ? parseInt(proton.version().canonical) : undefined;
+    const canonicalVersion = proton ? parseInt(proton.version().canonical) : null;
 
     onChange({
       ...value,
       segments: next,
-      canonical,
+      canonical: canonical ?? null,
       canonicalVersion,
     });
 
@@ -327,7 +328,7 @@ export const usePointSelector = ({
       const lastSeg = next[next.length - 1];
       const justAddedKey =
         lastSeg &&
-        (lastSeg.kind === 'key' || lastSeg.kind === 'typed') &&
+        (lastSeg.kind === 'key' || lastSeg.kind === 'attr') &&
         'value' in lastSeg &&
         !('role' in lastSeg);
 
@@ -403,16 +404,20 @@ export const usePointSelector = ({
     // Level 1: Check temporary cache from most recent setSegments() call
     // Reference equality check is safe: setSegments() creates a new array each time
     if (nextItemsRef.current?.segments === segments) {
-      return nextItemsRef.current.items;
+      // Guard: ensure cached items is an array
+      const items = nextItemsRef.current.items;
+      return Array.isArray(items) ? items : [];
     }
 
     // Level 2: Check full cache by parent point
     const parentPoint = renderSegments(proton, segments);
     const cached = nextCache.current.get(parentPoint);
     if (cached !== undefined) {
+      // Guard: ensure cached value is an array
+      const items = Array.isArray(cached) ? cached : [];
       // Update temporary cache for reference equality checks
-      nextItemsRef.current = { segments, items: cached };
-      return cached;
+      nextItemsRef.current = { segments, items };
+      return items;
     }
 
     // Cache miss - fetch from SDK
@@ -497,7 +502,7 @@ export const usePointSelector = ({
         if (completion && !completion.error) {
           // Convert SDK completion items to name items
           items = completion.items.map((item, i) => {
-            const nameRow: NameRow = {
+            const nameRow = {
               id: item.key || `sdk-name-${i}`,
               label: item.label,
               desc: item.detail,
@@ -507,7 +512,7 @@ export const usePointSelector = ({
 
             return {
               kind: 'name' as const,
-              name: nameRow,
+              name: nameRow as any,
               row: {
                 id: nameRow.id,
                 label: nameRow.label,
@@ -520,44 +525,85 @@ export const usePointSelector = ({
           status = items.length === 0 ? `No matches for "${query.trim()}".` : '';
         } else {
           // SDK returned error or no results, fall back to legacy
-          const r = nameRows(nameStep, query, ui.nameIgnoreCase);
-          status = r.status;
-          items = r.rows.map(n => ({
+          const rows = nameRows(query, nameStep, true);
+          status = rows.length === 0 ? `No matches for "${query.trim()}".` : '';
+          items = rows.map(n => ({
             kind: 'name',
             name: n,
-            row: { id: n.id, label: n.label, desc: n.desc, custom: n.custom },
+            row: { id: n.id, label: n.label, desc: n.desc, custom: (n as any).custom },
           }));
         }
       } catch {
         // SDK name completion failed, fall back to legacy nameRows
-        const r = nameRows(nameStep, query, ui.nameIgnoreCase);
-        status = r.status;
-        items = r.rows.map(n => ({
+        const rows = nameRows(query, nameStep, true);
+        status = rows.length === 0 ? `No matches for "${query.trim()}".` : '';
+        items = rows.map(n => ({
           kind: 'name',
           name: n,
-          row: { id: n.id, label: n.label, desc: n.desc, custom: n.custom },
+          row: { id: n.id, label: n.label, desc: n.desc, custom: (n as any).custom },
         }));
       }
     } else {
       // Legacy name completion
-      const r = nameRows(nameStep, query, ui.nameIgnoreCase);
-      status = r.status;
-      items = r.rows.map(n => ({
+      const rows = nameRows(query, nameStep, true);
+      status = rows.length === 0 ? `No matches for "${query.trim()}".` : '';
+      items = rows.map(n => ({
         kind: 'name',
         name: n,
-        row: { id: n.id, label: n.label, desc: n.desc, custom: n.custom },
+        row: { id: n.id, label: n.label, desc: n.desc, custom: (n as any).custom },
       }));
     }
   } else if (pointStage) {
     // Build items from SDK completion
     // SDK-based items
+    // Guard against undefined sdkCompletionItems (shouldn't happen, but defensive)
+    if (!sdkCompletionItems) {
+      console.error('sdkCompletionItems is undefined - this should not happen');
+      const errorPoint = renderSegments(proton, segments);
+      const errorCheck = value.condition
+        ? checkOf(value.condition, value.value, value.ignoreCase, errorPoint, context)
+        : null;
+      return {
+        ui,
+        point: errorPoint,
+        check: errorCheck,
+        sentence: '',
+        reserved: false,
+        sdkError: null,
+        incomplete: false,
+        canonicalInfo: null,
+        loadingKeys,
+        pointStage: true,
+        menuOpen: false,
+        menuTitle: 'Error',
+        menuFooter: 'list' as const,
+        rows: [],
+        highlightedId: null,
+        status: 'An error occurred',
+        pendingLabel: '',
+        nameStep: null,
+        nameInputPlaceholder: '',
+        nameAllowsCase: false,
+        nameShowsStarHint: false,
+        applyLabel: null,
+        conditionStage: false,
+        conditionRows: [],
+        conditionHighlight: 0,
+        conditionQuery: '',
+        valueStage: false,
+        allowsCase: false,
+        showsIgnoreCase: false,
+        showsStarHint: false,
+        showsProfilePicker: false,
+      };
+    }
     let baseItems = sdkCompletionItems.map((item, i) => ({
       kind: 'option' as const,
       option: {
         label: item.label,
         desc: item.detail,
-        name: null,
-        pick: null,
+        name: undefined,
+        pick: undefined,
         segs: [],
         done: false,
         sdkItem: item, // Store original SDK item for later use
@@ -569,12 +615,12 @@ export const usePointSelector = ({
     const lastSeg = segments[segments.length - 1];
     const canHaveDup =
       lastSeg &&
-      (lastSeg.kind === 'key' || lastSeg.kind === 'typed' || lastSeg.kind === 'index') &&
+      (lastSeg.kind === 'key' || lastSeg.kind === 'attr' || lastSeg.kind === 'index') &&
       !('ord' in lastSeg) && // Not already a dup segment
       !('separator' in lastSeg); // Not a joined segment
 
     const canHaveRole =
-      lastSeg && (lastSeg.kind === 'key' || lastSeg.kind === 'typed') && !('role' in lastSeg); // Not already a role segment
+      lastSeg && (lastSeg.kind === 'key' || lastSeg.kind === 'attr') && !('role' in lastSeg); // Not already a role segment
 
     // Inject dup/role options at the beginning of the menu
     const dupRoleItems: Item[] = [];
@@ -587,8 +633,8 @@ export const usePointSelector = ({
         option: {
           label: 'Select key name',
           desc: "Address the key's own text (e.g., 'Authorization' → the word itself)",
-          name: null,
-          pick: null,
+          name: undefined,
+          pick: undefined,
           segs: [],
           done: false,
           roleModifier: 'name' as const,
@@ -610,8 +656,8 @@ export const usePointSelector = ({
           option: {
             label: 'First duplicate',
             desc: 'The first occurrence of this key (0-indexed)',
-            name: null,
-            pick: null,
+            name: undefined,
+            pick: undefined,
             segs: [],
             done: false,
             dupModifier: 0 as const,
@@ -628,8 +674,8 @@ export const usePointSelector = ({
           option: {
             label: 'Second duplicate',
             desc: 'The second occurrence of this key (1-indexed)',
-            name: null,
-            pick: null,
+            name: undefined,
+            pick: undefined,
             segs: [],
             done: false,
             dupModifier: 1 as const,
@@ -646,8 +692,8 @@ export const usePointSelector = ({
           option: {
             label: 'Last duplicate',
             desc: 'The last occurrence of this key (negative index)',
-            name: null,
-            pick: null,
+            name: undefined,
+            pick: undefined,
             segs: [],
             done: false,
             dupModifier: -1 as const,
@@ -664,8 +710,8 @@ export const usePointSelector = ({
           option: {
             label: 'All duplicates',
             desc: 'Every occurrence of this key (universal quantifier)',
-            name: null,
-            pick: null,
+            name: undefined,
+            pick: undefined,
             segs: [],
             done: false,
             dupModifier: 'all' as const,
@@ -682,8 +728,8 @@ export const usePointSelector = ({
           option: {
             label: 'Any duplicate',
             desc: 'Any occurrence of this key (default behavior)',
-            name: null,
-            pick: null,
+            name: undefined,
+            pick: undefined,
             segs: [],
             done: false,
             dupModifier: 'any' as const,
@@ -748,7 +794,7 @@ export const usePointSelector = ({
                 .slice(0, 1)
                 .filter(item => item.source === 'dictionary')
                 .map((item, i) => {
-                  const nameRow: NameRow = {
+                  const nameRow = {
                     id: item.key || `sdk-typed-${i}`,
                     label: item.label,
                     desc: `${templateItem.label}: ${item.detail}`,
@@ -758,7 +804,7 @@ export const usePointSelector = ({
 
                   return {
                     kind: 'name' as const,
-                    name: nameRow,
+                    name: nameRow as any,
                     row: {
                       id: nameRow.id,
                       label: nameRow.label,
@@ -904,7 +950,7 @@ export const usePointSelector = ({
       }
 
       // Legacy name handling: use pre-built segments
-      return setSegments([...segments, ...item.name.segs], { menuOpen: true });
+      return setSegments([...segments, ...(item.name as any).segs], { menuOpen: true });
     }
 
     const o = item.option;
@@ -932,7 +978,7 @@ export const usePointSelector = ({
     if (o.roleModifier !== undefined && proton) {
       // Role modifiers modify the last segment, not add a new one
       const lastSeg = segments[segments.length - 1];
-      if (lastSeg && (lastSeg.kind === 'key' || lastSeg.kind === 'typed')) {
+      if (lastSeg && (lastSeg.kind === 'key' || lastSeg.kind === 'attr')) {
         const modifiedSeg: Segment = { ...lastSeg, role: o.roleModifier };
         const newSegments = [...segments.slice(0, -1), modifiedSeg];
         return setSegments(newSegments, { menuOpen: true });
@@ -1016,8 +1062,8 @@ export const usePointSelector = ({
         context,
       });
 
-      const canonical = result.ok ? result.canonical : undefined;
-      const canonicalVersion = proton ? parseInt(proton.version().canonical) : undefined;
+      const canonical = result.ok ? result.canonical : null;
+      const canonicalVersion = proton ? parseInt(proton.version().canonical) : null;
 
       onChange({ ...value, segments: newSegments, canonical, canonicalVersion });
       return focus(value.condition ? 'value' : 'condition', {
@@ -1053,10 +1099,7 @@ export const usePointSelector = ({
   ) => {
     if (!isDigit(e.key) || !(typed === '' || /^\d+$/.test(typed))) return false;
     e.preventDefault();
-    const r = pickByNumber(typed, e.key, count);
-    if (r.kind === 'wait') onWait(r.query);
-    if (r.kind === 'choose') onPick(r.index);
-    return true;
+    return pickByNumber(e.key, typed, count, onWait, onPick);
   };
 
   const handleBarKey = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -1277,11 +1320,25 @@ export const usePointSelector = ({
   const last = segments[segments.length - 1];
   const nameAllowsCase = !!nameStep && isKeyStep(nameStep) && !isCaseFixed(nameStep);
 
+  // Compute human-readable sentence from segments
+  // First try describe() (uses segment.label if available)
+  // Fall back to canonical point if labels are missing
+  const computeSentence = (): string => {
+    if (segments.length === 0) return '';
+
+    const described = describe(segments);
+    if (described) return described;
+
+    // Fallback: use canonical point as sentence if describe() returned empty
+    // This happens when segments don't have label fields (e.g., from SDK parse)
+    return value.canonical || '';
+  };
+
   return {
     ui,
     point,
     check,
-    sentence: segments.length ? describe(segments) : '',
+    sentence: computeSentence(),
     reserved: segments.some(s => s.reserved),
     sdkError: ui.sdkError,
     incomplete: ui.incomplete,
@@ -1339,17 +1396,15 @@ export const usePointSelector = ({
     /* match */
     conditionTitle: !last
       ? 'How should the value match?'
-      : last.kind === 'mod' && last.dup
+      : (last.kind === 'dup_index' || last.kind === 'dup_all' || last.kind === 'dup_any') && last.dup
         ? `How should the ${last.label} match?`
-        : last.kind === 'wild' || last.kind === 'mod'
+        : last.kind === 'wild' || last.kind === 'dup_index' || last.kind === 'dup_all' || last.kind === 'dup_any' || last.kind === 'joined'
           ? `How should ${last.label} match?`
           : `How should the value of ${last.label} match?`,
     conditionRows: conditionItems.map((c: { row: any }) => c.row),
     conditionHighlightedId: conditionItems[conditionHighlight]?.row.id ?? null,
     conditionTakesValue: !!value.condition && takesValue(value.condition),
-    readAs: check?.readAs
-      ? `Read as: ${check.readAs}${value.ignoreCase ? ', in any letter case' : ''}`
-      : 'Use * for any text: *admin* means contains admin.',
+    readAs: 'Use * for any text: *admin* means contains admin.',
     /* actions */
     actions: {
       setQuery: (q: string) => patch({ query: q, highlight: 0, menuOpen: true }),

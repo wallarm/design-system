@@ -128,12 +128,34 @@ export const PointSelector: FC<PointSelectorProps> = props => {
   const conditionChipRef = useRef<HTMLButtonElement | null>(null);
   const menuId = useId();
 
+  // Safe wrappers for actions/keys that might be undefined
+  const safeActions = {
+    setQuery: actions?.setQuery ?? (() => {}),
+    toggleNameCase: actions?.toggleNameCase ?? (() => {}),
+    closeMenu: actions?.closeMenu ?? (() => {}),
+    applyFix: actions?.applyFix ?? (() => {}),
+    clearSdkError: actions?.clearSdkError ?? (() => {}),
+    clearCanonicalInfo: actions?.clearCanonicalInfo ?? (() => {}),
+    goMatch: actions?.goMatch ?? (() => {}),
+    editPoint: actions?.editPoint ?? (() => {}),
+    openMenu: actions?.openMenu ?? (() => false),
+    truncateTo: actions?.truncateTo ?? (() => {}),
+    applyPick: actions?.applyPick ?? (() => {}),
+    highlight: actions?.highlight ?? (() => {}),
+    chooseRow: actions?.chooseRow ?? (() => {}),
+  };
+
+  const safeKeys = {
+    handleNameKey: keys?.handleNameKey ?? (() => {}),
+    handleBarKey: keys?.handleBarKey ?? (() => {}),
+  };
+
   // Auto-re-canonicalize when SDK version changes (point-sdk.md:341-349)
   useEffect(() => {
     if (!proton || !props.value.canonical) return;
 
     const currentVersion = parseInt(proton.version().canonical);
-    if (!needsRecanonalization(currentVersion, props.value.canonicalVersion)) {
+    if (!needsRecanonalization(currentVersion, props.value.canonicalVersion ?? undefined)) {
       return; // No update needed
     }
 
@@ -220,7 +242,7 @@ export const PointSelector: FC<PointSelectorProps> = props => {
       const typing = [barInputRef, nameInputRef].some(
         r => r.current && r.current === document.activeElement,
       );
-      if (!typing) actions.closeMenu();
+      if (!typing) safeActions.closeMenu();
     });
 
   const nameHeader = model.nameStep ? (
@@ -232,14 +254,14 @@ export const PointSelector: FC<PointSelectorProps> = props => {
         value={ui.query}
         spellCheck={false}
         autoComplete='off'
-        onChange={e => actions.setQuery(e.target.value)}
-        onKeyDown={keys.handleNameKey}
+        onChange={e => safeActions.setQuery(e.target.value)}
+        onKeyDown={safeKeys.handleNameKey}
       />
       {(model.nameAllowsCase || model.nameShowsStarHint) && (
         <div className='flex items-center gap-12 px-8 pb-6'>
           {model.nameAllowsCase && (
             <span className='shrink-0 whitespace-nowrap'>
-              <Checkbox checked={ui.nameIgnoreCase} onCheckedChange={actions.toggleNameCase}>
+              <Checkbox checked={ui.nameIgnoreCase} onCheckedChange={safeActions.toggleNameCase}>
                 <CheckboxIndicator />
                 <CheckboxLabel>Ignore letter case (⌥C)</CheckboxLabel>
               </Checkbox>
@@ -312,8 +334,8 @@ export const PointSelector: FC<PointSelectorProps> = props => {
           <PointSelectorError
             error={model.sdkError as CheckError}
             incomplete={model.incomplete}
-            onApplyFix={actions.applyFix}
-            onDismiss={actions.clearSdkError}
+            onApplyFix={safeActions.applyFix}
+            onDismiss={safeActions.clearSdkError}
           />
         )}
         {/* Canonical form feedback */}
@@ -324,7 +346,7 @@ export const PointSelector: FC<PointSelectorProps> = props => {
             onKeyDown={e => {
               if (e.key === 'Escape') {
                 e.preventDefault();
-                actions.clearCanonicalInfo();
+                safeActions.clearCanonicalInfo();
               }
             }}
             tabIndex={-1}
@@ -355,7 +377,7 @@ export const PointSelector: FC<PointSelectorProps> = props => {
                 </div>
               </AlertDescription>
             </AlertContent>
-            <AlertClose onClick={actions.clearCanonicalInfo} aria-label='Close (Esc)' />
+            <AlertClose onClick={safeActions.clearCanonicalInfo} aria-label='Close (Esc)' />
           </Alert>
         )}
         <div className='flex flex-col gap-8 rounded-12 border border-border-primary-light bg-bg-surface-1 p-12'>
@@ -370,12 +392,17 @@ export const PointSelector: FC<PointSelectorProps> = props => {
                 color='brand'
                 size='medium'
                 disabled={!model.canContinue}
-                onClick={actions.goMatch}
+                onClick={safeActions.goMatch}
               >
                 Next: set the condition
               </Button>
             ) : (
-              <Button variant='outline' color='neutral' size='medium' onClick={actions.editPoint}>
+              <Button
+                variant='outline'
+                color='neutral'
+                size='medium'
+                onClick={safeActions.editPoint}
+              >
                 Change where
               </Button>
             )}
@@ -396,7 +423,7 @@ export const PointSelector: FC<PointSelectorProps> = props => {
             inputRef={barInputRef}
             segments={props.value.segments}
             proton={proton}
-            pointString={props.value.canonical}
+            pointString={props.value.canonical ?? undefined}
             pendingLabel={model.pointStage ? model.pendingLabel : ''}
             showInput={model.pointStage && !model.nameStep}
             editable={model.pointStage}
@@ -406,10 +433,10 @@ export const PointSelector: FC<PointSelectorProps> = props => {
             menuId={menuId}
             errorSpan={model.sdkError?.span}
             errorMessage={model.sdkError?.message}
-            onQueryChange={actions.setQuery}
-            onKeyDown={keys.handleBarKey}
-            onFocus={actions.openMenu}
-            onChipClick={actions.truncateTo}
+            onQueryChange={safeActions.setQuery}
+            onKeyDown={safeKeys.handleBarKey}
+            onFocus={safeActions.openMenu}
+            onChipClick={safeActions.truncateTo}
           />
           <div role='status' aria-live='polite' aria-atomic='true'>
             <Text size='sm' color='secondary'>
@@ -424,22 +451,22 @@ export const PointSelector: FC<PointSelectorProps> = props => {
             focusRef={model.nameStep ? nameInputRef : barInputRef}
             title={model.menuTitle}
             rows={model.rows}
-            highlightedId={model.highlightedId}
+            highlightedId={model.highlightedId ?? null}
             status={model.status}
-            footer={model.menuFooter}
+            footer={model.menuFooter ?? 'list'}
             escLabel={model.menuFooter === 'list' ? 'to close' : 'to go back'}
             header={nameHeader}
-            applyLabel={model.applyLabel}
+            applyLabel={model.applyLabel ?? undefined}
             applyDisabled={ui.picked.length === 0}
-            onApply={model.menuFooter === 'pick' ? actions.applyPick : undefined}
-            onHighlight={actions.highlight}
-            onChoose={actions.chooseRow}
+            onApply={model.menuFooter === 'pick' ? safeActions.applyPick : undefined}
+            onHighlight={safeActions.highlight}
+            onChoose={safeActions.chooseRow}
             onClose={handleMenuClose}
             showExamples={props.value.segments.length === 0 && model.pointStage}
             onSelectExample={point => {
               // Parse example point string via SDK
               if (!proton) {
-                actions.openMenu();
+                safeActions.openMenu();
                 return;
               }
 
@@ -454,10 +481,10 @@ export const PointSelector: FC<PointSelectorProps> = props => {
                 });
 
                 // Open menu for next step
-                actions.openMenu();
+                safeActions.openMenu();
               } catch {
                 // Failed to parse example point, fallback: just open menu
-                actions.openMenu();
+                safeActions.openMenu();
               }
             }}
           />

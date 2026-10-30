@@ -87,38 +87,40 @@ export const KeyboardShortcutsDialog: FC<KeyboardShortcutsDialogProps> = ({
             <DialogTitle>Keyboard Shortcuts</DialogTitle>
             <DialogClose />
           </DialogHeader>
-          <DialogBody className='flex flex-col gap-24'>
-            {SHORTCUTS.map(section => (
-              <div key={section.title} className='flex flex-col gap-12'>
-                <Text size='sm' weight='semibold' color='secondary'>
-                  {section.title}
-                </Text>
-                <div className='flex flex-col gap-8'>
-                  {section.shortcuts.map(shortcut => (
-                    <div
-                      key={shortcut.description}
-                      className='flex items-center justify-between gap-16'
-                    >
-                      <Text size='sm' className='flex-1'>
-                        {shortcut.description}
-                      </Text>
-                      <div className='flex items-center gap-4'>
-                        {shortcut.keys.map((key, j) => (
-                          <span key={`${shortcut.description}-${key}`} className='contents'>
-                            <Kbd size='small'>{key}</Kbd>
-                            {j < shortcut.keys.length - 1 && (
-                              <Text size='xs' color='secondary'>
-                                +
-                              </Text>
-                            )}
-                          </span>
-                        ))}
+          <DialogBody>
+            <div className='flex flex-col gap-24'>
+              {SHORTCUTS.map(section => (
+                <div key={section.title} className='flex flex-col gap-12'>
+                  <Text size='sm' weight='bold' color='secondary'>
+                    {section.title}
+                  </Text>
+                  <div className='flex flex-col gap-8'>
+                    {section.shortcuts.map(shortcut => (
+                      <div
+                        key={shortcut.description}
+                        className='flex items-center justify-between gap-16'
+                      >
+                        <div className='flex-1'>
+                          <Text size='sm'>{shortcut.description}</Text>
+                        </div>
+                        <div className='flex items-center gap-4'>
+                          {shortcut.keys.map((key, j) => (
+                            <span key={`${shortcut.description}-${key}`} className='contents'>
+                              <Kbd size='small'>{key}</Kbd>
+                              {j < shortcut.keys.length - 1 && (
+                                <Text size='xs' color='secondary'>
+                                  +
+                                </Text>
+                              )}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </DialogBody>
         </DialogContent>
       </DialogPositioner>

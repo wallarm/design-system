@@ -58,7 +58,7 @@ export const PointSelectorEmptyState: FC<PointSelectorEmptyStateProps> = ({ onSe
       className='flex flex-col gap-12 p-8'
     >
       <div className='flex flex-col gap-8 px-4'>
-        <Text size='sm' weight='semibold'>
+        <Text size='sm' weight='bold'>
           Build a point to match values in requests
         </Text>
         <Text size='xs' color='secondary'>
@@ -67,9 +67,11 @@ export const PointSelectorEmptyState: FC<PointSelectorEmptyStateProps> = ({ onSe
       </div>
 
       <div className='flex flex-col gap-8'>
-        <Text size='xs' weight='medium' color='secondary' className='px-4'>
-          Common patterns:
-        </Text>
+        <div className='px-4'>
+          <Text size='xs' weight='medium' color='secondary'>
+            Common patterns:
+          </Text>
+        </div>
         <div className='grid gap-6'>
           {EXAMPLES.map((example, i) => (
             <div

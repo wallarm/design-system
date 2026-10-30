@@ -242,7 +242,7 @@ export const ActionFields: FC<ActionFieldsProps> = ({
                 <Input
                   value={limitValue}
                   onChange={e => set({ limit: e.target.value })}
-                  invalid={hasError}
+                  error={hasError}
                 />
                 {hasError ? (
                   <FieldError>
@@ -276,7 +276,7 @@ export const ActionFields: FC<ActionFieldsProps> = ({
                   <Input
                     value={softValue}
                     onChange={e => set({ softLimit: e.target.value })}
-                    invalid={softError}
+                    error={softError}
                   />
                   {softError ? (
                     <FieldError>Invalid quantity (e.g., "512", "1.5Ki", "2Mi")</FieldError>
@@ -291,7 +291,7 @@ export const ActionFields: FC<ActionFieldsProps> = ({
                   <Input
                     value={hardValue}
                     onChange={e => set({ hardLimit: e.target.value })}
-                    invalid={hardError}
+                    error={hardError}
                   />
                   {hardError ? (
                     <FieldError>Invalid quantity (e.g., "512", "1.5Ki", "2Mi")</FieldError>

@@ -11,13 +11,17 @@ export type RuleContext = 'http_request' | 'http_response' | 'grpc_request' | 'g
 
 export type SegmentKind =
   | 'native'
-  | 'format'
-  | 'encoding'
+  | 'content' // format and encoding segments use 'content' with a 'name' field
+  | 'format' // deprecated alias for 'content'
+  | 'encoding' // deprecated alias for 'content'
   | 'key'
   | 'index'
   | 'attr'
   | 'wild'
-  | 'mod';
+  | 'dup_index' // duplicate ordinal: ['key'][dup:0]
+  | 'dup_all' // duplicate all: ['key'][dup:all]
+  | 'dup_any' // duplicate any: ['key'][dup:any]
+  | 'joined'; // joined duplicate: ['key'][dup,joined:', ']
 
 /**
  * UI Segment with metadata for display
