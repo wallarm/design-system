@@ -694,28 +694,6 @@ export {
   passwordValidators,
 } from './components/PasswordComplexity';
 export { PasswordInput, type PasswordInputProps } from './components/PasswordInput';
-export {
-  chipSeparatorClasses,
-  errorMessageClasses,
-  MenuFooterHints,
-  type MenuFooterHintsProps,
-  menuFooterHintsClasses,
-  PointSelector,
-  PointSelectorError,
-  type PointSelectorErrorProps,
-  PointSelectorInput,
-  type PointSelectorInputProps,
-  PointSelectorMenu,
-  type PointSelectorMenuProps,
-  type PointSelectorProps,
-  pendingLabelClasses,
-  type Segment,
-  StepMenu,
-  WhereBar,
-  type WhereBarProps,
-  whereBarInputClasses,
-  whereBarVariants,
-} from './components/PointSelector';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Progress,
@@ -770,6 +748,28 @@ export {
   type ResponseCodeCategory,
   type ResponseCodeProps,
 } from './components/ResponseCode';
+export {
+  chipSeparatorClasses,
+  errorMessageClasses,
+  MenuFooterHints,
+  type MenuFooterHintsProps,
+  menuFooterHintsClasses,
+  PointSelector,
+  PointSelectorError,
+  type PointSelectorErrorProps,
+  PointSelectorInput,
+  type PointSelectorInputProps,
+  PointSelectorMenu,
+  type PointSelectorMenuProps,
+  type PointSelectorProps,
+  pendingLabelClasses,
+  type Segment,
+  StepMenu,
+  WhereBar,
+  type WhereBarProps,
+  whereBarInputClasses,
+  whereBarVariants,
+} from './components/Rules/PointSelector';
 export {
   ACTION_KIND_CHOICES,
   type ActionDraft,
@@ -870,7 +870,7 @@ export {
   toProtonAction,
   toProtonCondition,
   validators,
-} from './components/RuleBuilder';
+} from './components/Rules/RuleBuilder';
 export {
   ScrollArea,
   ScrollAreaContent,
