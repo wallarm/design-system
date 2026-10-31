@@ -49,8 +49,8 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
 
 /**
  * `variant` sets emphasis and `color` sets meaning, and only the pairings drawn here are
- * designed: `primary` exists for `brand` and `destructive` only, and the neutral colors start at
- * `outline`. `neutral-alt` is the same ladder for a dark or coloured surface.
+ * designed: `primary` exists for `brand` and `destructive` only. `neutral-alt` has ghost and
+ * secondary variants, shown on an inverted surface so they remain readable in both themes.
  */
 export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
@@ -88,11 +88,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
 
     <span className='sb-annotation'>Neutral Alt</span>
 
-    <HStack>
-      <Button {...args} variant='outline' color='neutral-alt'>
-        Outline
-      </Button>
-
+    <HStack className='rounded-8 bg-component-toast-bg p-8'>
       <Button {...args} variant='ghost' color='neutral-alt'>
         Ghost
       </Button>
@@ -183,11 +179,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
 
     <span className='sb-annotation'>Neutral Alt</span>
 
-    <HStack>
-      <Button {...args} variant='outline' color='neutral-alt' disabled>
-        Outline
-      </Button>
-
+    <HStack className='rounded-8 bg-component-toast-bg p-8'>
       <Button {...args} variant='ghost' color='neutral-alt' disabled>
         Ghost
       </Button>
@@ -260,11 +252,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
 
     <span className='sb-annotation'>Neutral Alt</span>
 
-    <HStack>
-      <Button {...args} variant='outline' color='neutral-alt' loading>
-        Outline
-      </Button>
-
+    <HStack className='rounded-8 bg-component-toast-bg p-8'>
       <Button {...args} variant='ghost' color='neutral-alt' loading>
         Ghost
       </Button>

@@ -593,3 +593,43 @@ export const CustomIcon: StoryFn = () => {
     </VStack>
   );
 };
+
+/** Neutral custom icons follow the toast's foreground. A status supplies its colour, while an explicit icon colour takes precedence. */
+export const CustomIconColors: StoryFn = () => {
+  const toast = useToast();
+  const examples = [
+    { name: 'default', label: 'Default', type: 'default' as const },
+    { name: 'loading', label: 'Loading', type: 'loading' as const },
+    { name: 'info', label: 'Info', type: 'info' as const },
+    { name: 'own-color', label: 'Own color', type: 'success' as const },
+  ];
+
+  return (
+    <HStack gap={8} wrap='wrap'>
+      {examples.map(({ name, label, type }) => (
+        <Button
+          key={name}
+          variant='outline'
+          color='neutral'
+          data-testid={`custom-icon-trigger-${name}`}
+          onClick={() =>
+            toast.create({
+              id: `custom-icon-${name}`,
+              title: `${label} custom icon`,
+              type,
+              duration: STATIC_DURATION,
+              icon: (
+                <Activity
+                  data-testid={`custom-icon-${name}-svg`}
+                  className={name === 'own-color' ? 'text-purple-500' : undefined}
+                />
+              ),
+            })
+          }
+        >
+          {label}
+        </Button>
+      ))}
+    </HStack>
+  );
+};

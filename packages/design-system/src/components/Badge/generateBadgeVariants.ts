@@ -43,7 +43,7 @@ export const generateBadgeVariants = (): ColorVariant[] => {
       secondary: 'bg-badge-slate-light text-badge-slate-dark',
       secondaryMuted: 'bg-badge-slate-light text-badge-slate-muted',
       outline: 'border-badge-slate-dark text-badge-slate-dark',
-      outlineMuted: 'border-badge-slate-muted text-badge-slate-muted',
+      outlineMuted: 'border-border-primary text-badge-slate-dark',
       text: 'text-badge-label-primary [&_svg]:text-badge-slate-strong before:bg-badge-slate-strong',
       textMuted:
         'text-badge-label-primary [&_svg]:text-badge-slate-muted before:bg-badge-slate-muted',

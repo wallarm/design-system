@@ -1,5 +1,8 @@
 # CLAUDE.md - AI Assistant Instructions for Wallarm Monorepo
 
+Shared instructions for Claude Code and Codex. Read the relevant scoped
+`CLAUDE.md` before editing a package or component with its own instructions.
+
 ## 🎯 Project Overview
 
 You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite), with unit tests on Rstest (also Rspack-based). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
@@ -65,6 +68,21 @@ Special triggers:
 ## 🤖 Agent System
 
 > `AGENTS.md` is a symlink to this file — edit `CLAUDE.md` only.
+
+Codex shares canonical skills and hooks through `.codex/skills` and
+`.codex/hooks.json` symlinks; `.codex/agents/*.toml` points to the role bodies below.
+`pnpm install` generates the local Codex MCP config from `.mcp.json`;
+run `pnpm agents:sync` after changing servers and restart the agent session.
+See [agent harness](docs/agent-harness.md) for discovery, hook trust and Figma setup.
+
+Claude loads `.claude/rules/` automatically. Codex should read the relevant rules:
+
+- [Coding standards](.claude/rules/coding-standards.md) for source and tooling edits.
+- [Component development](.claude/rules/component-development.md),
+  [metrics](.claude/rules/metrics.md) and [test IDs](.claude/rules/test-id.md)
+  for component work; test IDs also apply when writing test locators.
+- [E2E](.claude/rules/e2e.md) for `*.e2e.ts` files.
+- [Icons](.claude/rules/icons.md) for icon changes or missing icons.
 
 For complex domain-specific tasks, use the specialized agents defined in [`.claude/agents/`](./.claude/agents/):
 
@@ -165,7 +183,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 3. ✅ Use conventional commits (required for PR titles)
 4. ✅ Update documentation with code changes
 5. ✅ Review CI/CD status before merging (all checks must pass)
-6. ✅ Use TodoWrite for task tracking
+6. ✅ Use TodoWrite for task tracking when available; otherwise use the client's plan tool or a short checklist
 7. ✅ Wait for the E2E job's Storybook readiness check (an HTTP polling loop, not a Docker `services:` health check) before assuming the container is ready
 8. ✅ Run quality checks (lint, typecheck, test) in parallel
 
@@ -181,7 +199,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 `check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). The GitHub Pages deploy is a third workflow, [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` (see item 8). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
-2. **quality** - Lint (Biome), typecheck and Rstest unit tests (3 shards) in parallel
+2. **quality** - Lint (Biome), typecheck, agent harness tests and Rstest unit tests (3 shards) in parallel
 3. **build** - Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
 4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
 5. **unit-test-report** / **e2e-report** - Publish JUnit results

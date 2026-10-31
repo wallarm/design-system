@@ -141,6 +141,7 @@ jobs:
         include:
           - check: lint
           - check: typecheck
+          - check: test:harness
           # Unit tests take ~3 min on a 4-vCPU runner; Rstest splits them by file
           - { check: test, shard: 1/3 }
           - { check: test, shard: 2/3 }

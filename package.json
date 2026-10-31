@@ -14,13 +14,16 @@
     "build:configs": "pnpm --filter=\"./packages/configs/*\" build",
     "dev": "turbo run dev",
     "storybook": "turbo run storybook",
-    "lint": "turbo run lint",
+    "lint": "pnpm lint:harness && turbo run lint",
+    "lint:harness": "biome check scripts/agents .claude/hooks .claude/settings.json",
     "lint:fix": "turbo run lint:fix",
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "test:run": "turbo run test:run",
+    "test:harness": "node --test scripts/agents/*.test.mjs .claude/hooks/*.test.mjs",
+    "agents:sync": "node scripts/agents/sync-codex.mjs",
     "e2e": "turbo run e2e",
     "e2e:ui": "turbo run e2e:ui",
     "e2e:report": "turbo run e2e:report",
@@ -40,7 +43,7 @@
     "commit": "cz",
     "semantic-release": "semantic-release",
     "semantic-release:dry-run": "semantic-release --dry-run",
-    "prepare": "husky"
+    "prepare": "husky && node -e \"if (require('node:fs').existsSync('.mcp.json')) import('./scripts/agents/sync-codex.mjs').then(({ syncCodex }) => syncCodex(process.cwd()))\""
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

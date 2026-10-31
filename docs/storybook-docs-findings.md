@@ -55,14 +55,15 @@ One `###` heading per finding, newest last, with these lines:
 
 ### Button: the type system allows variant/colour pairings that aren't designed
 
-- **What** — `variant` × `color` type-checks to 16 combinations, but only 13 are
-  drawn. `variant='primary' color='neutral'` compiles and renders **with no
-  background at all**.
+- **What** — `variant` × `color` type-checks to 16 combinations, but only 12 are
+  drawn in the current Figma set. `variant='primary' color='neutral'` compiles
+  and renders **with no background at all**.
 - **Evidence** — `Button.tsx` `compoundVariants` covers brand (primary, ghost,
   secondary), neutral and neutral-alt (outline, ghost, secondary) and destructive
-  (all four). `Button.figma.ts` draws the same set. The `Variants` story shows
-  exactly the supported pairings, so the gap is invisible until someone reaches
-  for an unsupported one.
+  (all four): 13 implemented combinations. The Figma set has no neutral-alt
+  Outline variant. `Variants`, `Disabled` and `Loading` now show the 12 designed
+  pairings, with neutral-alt Ghost/Secondary on an inverted surface; the public
+  API still permits the other combinations. See [dark component audit](dark-theme-audit.md).
 - **Why it matters** — Nothing stops a consumer picking a pairing that renders
   invisibly, and the props table advertises all 16.
 - **Suggested action** — Narrow the type so only designed pairings are
@@ -1013,7 +1014,7 @@ Not findings — decisions worth remembering so they are not rediscovered.
   in a spec file nobody edited.
 - **Suggested action** — Fixed: the story is now `Basic` (matching the house
   convention for a first story) and its spec follows. Guarded against recurrence
-  by `scripts/metadata/__tests__/story-names.test.ts`, which fails if any story
+  by `packages/design-system/scripts/metadata/__tests__/story-names.test.ts`, which fails if any story
   export takes a name the docs page reserves. `Tour` was the only collision in the
   library.
 - **Found while** — classifying e2e failures before opening the PR, after CI

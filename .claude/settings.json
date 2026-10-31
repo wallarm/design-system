@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/require-vestige-audit.sh"
+            "command": "\"$(git rev-parse --show-toplevel)/.claude/hooks/require-vestige-audit.sh\""
           }
         ]
       }
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if git diff --name-only --diff-filter=M 2>/dev/null | grep -q 'packages/design-system/src/'; then echo 'Design system files were modified. Run quality checks before committing: pnpm typecheck && pnpm lint && pnpm test:run'; fi"
+            "command": "sh \"$(git rev-parse --show-toplevel)/.claude/hooks/quality-reminder.sh\""
           }
         ]
       }
