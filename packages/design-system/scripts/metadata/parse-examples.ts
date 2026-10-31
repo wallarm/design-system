@@ -56,8 +56,16 @@ export const parseExamples = (
           // StoryFn pattern — extract the function source
           code = initializer.getText();
         } else if (kind === SyntaxKind.ObjectLiteralExpression) {
-          // StoryObj pattern — reconstruct JSX from args
-          code = reconstructJsxFromStoryObj(initializer.getText(), componentName);
+          // StoryObj pattern — keep the render body; reconstruct JSX from args otherwise
+          const render = initializer
+            .getProperty('render')
+            ?.asKind(SyntaxKind.PropertyAssignment)
+            ?.getInitializer();
+          code =
+            render?.isKind(SyntaxKind.ArrowFunction) ||
+            render?.isKind(SyntaxKind.FunctionExpression)
+              ? render.getText()
+              : reconstructJsxFromStoryObj(initializer.getText(), componentName);
         } else {
           continue;
         }

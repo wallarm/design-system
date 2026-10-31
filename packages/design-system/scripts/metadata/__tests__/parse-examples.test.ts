@@ -242,4 +242,14 @@ D.tags = dynamic;`,
       expect(examples).toEqual([]);
     });
   });
+
+  describe('FilterInput (StoryObj with render)', () => {
+    const examples = parseExamples(project, path.join(componentsDir, 'FilterInput'), 'FilterInput');
+    it('uses the render body, not args-only JSX', () => {
+      const story = examples.find(e => e.name === 'WithPresetValue')!;
+      expect(story.code).not.toBe('<FilterInput />');
+      expect(story.code).toContain('<FilterInput');
+      expect(story.code).toContain('setExpression');
+    });
+  });
 });
