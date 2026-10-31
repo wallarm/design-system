@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildAssets } from './assets/build-assets';
 import { buildBundle } from './bundle/build-bundle';
@@ -12,7 +12,11 @@ import { buildPreviews } from './previews/build-previews';
 import { buildTokens } from './tokens/build-tokens';
 
 const git = (...args: string[]) =>
-  execFileSync('git', args, { cwd: PACKAGE_DIR, encoding: 'utf8' }).trim();
+  execFileSync('git', args, {
+    cwd: PACKAGE_DIR,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim();
 export async function buildProject() {
   const root = dirname(CLAUDE_DESIGN.outDir);
   await mkdir(root, { recursive: true });
@@ -144,13 +148,18 @@ async function buildInto(root: string, outDir: string) {
   }
   if (totalBytes > 256 * 1024 * 1024) throw new Error('Artifact exceeds 256 MiB');
   // Preserve the previous generated project while replacing the publish root atomically.
-  const backup = join(root, `previous-${outDir.slice(outDir.lastIndexOf('/') + 1)}`);
+  const backup = join(root, `previous-${basename(outDir)}`);
   try {
     await rename(CLAUDE_DESIGN.outDir, backup);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
-  await rename(outDir, CLAUDE_DESIGN.outDir);
+  try {
+    await rename(outDir, CLAUDE_DESIGN.outDir);
+  } catch (error) {
+    await rename(backup, CLAUDE_DESIGN.outDir).catch(() => {});
+    throw error;
+  }
   await rm(backup, { recursive: true, force: true });
   await writeFile(join(root, 'file-hashes.json'), `${JSON.stringify(hashes, null, 2)}\n`);
   const summary = {
