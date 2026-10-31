@@ -3,24 +3,13 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
 import { buildCanvasScripts, readInlineScript } from '../bundle/rslib-build';
-import { PACKAGE_DIR } from '../config';
+import { CLAUDE_DESIGN, PACKAGE_DIR } from '../config';
 
 const require = createRequire(import.meta.url);
 const { findStoryFiles, readStoryTitle } = require('../../scripts/metadata/story-source.ts') as {
   findStoryFiles: (project: Project, dir: string) => string[];
   readStoryTitle: (file: SourceFile) => string | undefined;
 };
-const NO_CARD = new Set([
-  'ThemeProvider',
-  'DateFormatProvider',
-  'ButtonBase',
-  'Polymorphic',
-  'TemporalCore',
-  'Checkmark',
-  'BulkBar',
-  'NavPanel',
-  'SimpleCharts',
-]);
 const htmlEscape = (value: string) =>
   value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 
@@ -33,7 +22,6 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     skipFileDependencyResolution: true,
   });
   const withPreview: string[] = [];
-  const withoutStories: string[] = [];
   const componentsDir = resolve(PACKAGE_DIR, 'src/components');
   const names = (await readdir(componentsDir, { withFileTypes: true }))
     .filter(d => d.isDirectory())
@@ -44,7 +32,7 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
   const entryDir = resolve(PACKAGE_DIR, '.claude-design/runtime/previews');
   await mkdir(entryDir, { recursive: true });
   for (const name of names) {
-    if (NO_CARD.has(name)) continue;
+    if (CLAUDE_DESIGN.internal.has(name)) continue;
     const files = findStoryFiles(project, join(componentsDir, name)).sort(
       (a, b) =>
         Number(basename(b) === `${name}.stories.tsx`) -
@@ -62,10 +50,7 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
         selected.push({ file, story, group });
       if (selected.length === 4) break;
     }
-    if (!selected.length) {
-      withoutStories.push(name);
-      continue;
-    }
+    if (!selected.length) continue;
     const imports = selected
       .map(
         ({ file, story }, i) =>
@@ -111,5 +96,5 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     );
     withPreview.push(name);
   }
-  return { withPreview, withoutStories };
+  return { withPreview };
 }

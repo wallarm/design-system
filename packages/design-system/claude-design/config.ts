@@ -9,5 +9,15 @@ export const CLAUDE_DESIGN = {
   outDir: resolve(PACKAGE_DIR, '.claude-design/project'),
   bundleBudgetBytes: 5_700_000,
   cssCapBytes: 2_000_000,
-  excludedModules: ['CodeSnippet/adapters/shiki', 'CodeSnippet/adapters/highlightjs'],
+  /** Internal primitives: no guide, no preview. */
+  internal: new Set([
+    'ThemeProvider',
+    'DateFormatProvider',
+    'ButtonBase',
+    'Polymorphic',
+    'TemporalCore',
+    'Checkmark',
+  ]) as ReadonlySet<string>,
+  /** One metadata entry, one guide per Storybook story file. */
+  splitByStoryFile: new Set(['SimpleCharts']) as ReadonlySet<string>,
 } as const;

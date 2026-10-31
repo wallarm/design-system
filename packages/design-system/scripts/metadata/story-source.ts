@@ -139,8 +139,8 @@ const stripUnusedParams = (project: Project, code: string): string | undefined =
 
     const open = fn.getFirstChildByKind(SyntaxKind.OpenParenToken);
     const close = fn.getFirstChildByKind(SyntaxKind.CloseParenToken);
-    const from = open ? open.getStart() : params[0].getStart();
-    const to = close ? close.getEnd() : params[params.length - 1].getEnd();
+    const from = open ? open.getStart() : params[0]!.getStart();
+    const to = close ? close.getEnd() : params[params.length - 1]!.getEnd();
     const text = fn.getText();
     const base = fn.getStart();
     return `${text.slice(0, from - base)}()${text.slice(to - base)}`;

@@ -47,7 +47,7 @@ export const readMetaDescription = (sourceFile: SourceFile): string | undefined 
     node = prop?.asKind(SyntaxKind.PropertyAssignment)?.getInitializer();
     if (!node) return undefined;
   }
-  return evalText(node, sourceFile)?.trim() || undefined;
+  return (node && evalText(node, sourceFile)?.trim()) || undefined;
 };
 
 /** JSDoc of the variable or function named `name`; helpers in the file are ignored. */

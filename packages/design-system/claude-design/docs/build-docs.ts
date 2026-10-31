@@ -1,23 +1,70 @@
-import { Node, Project } from 'ts-morph';
-import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
+import { Node, Project, type SourceFile } from 'ts-morph';
+import type { DesignSystemMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
+import { existsSync, statSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { PACKAGE_DIR } from '../config';
+import { readMetaDescription } from '../../scripts/metadata/parse-description';
+import { CLAUDE_DESIGN, PACKAGE_DIR } from '../config';
 import { componentReadme } from './component-readme';
 import { consuming } from './consuming';
+import { README_CAP_BYTES, storyGuide } from './story-guide';
 
 const packageRoot = PACKAGE_DIR;
-const excluded = new Set([
-  'ThemeProvider',
-  'DateFormatProvider',
-  'ButtonBase',
-  'Polymorphic',
-  'TemporalCore',
-  'Checkmark',
-  'BulkBar',
-  'NavPanel',
-  'SimpleCharts',
-]);
+const componentsDir = path.join(packageRoot, 'src/components');
+const fromComponents = (file: string): string =>
+  path.relative(componentsDir, file).split(path.sep).join('/');
+
+const resolveImport = (from: string, specifier: string): string => {
+  const base = path.resolve(path.dirname(from), specifier);
+  const file = [base, `${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`].find(
+    candidate => existsSync(candidate) && statSync(candidate).isFile(),
+  );
+  if (!file) throw new Error(`${fromComponents(from)}: cannot resolve ${specifier}`);
+  return file;
+};
+
+/**
+ * Story files plus every relative import that brings in at least one non-public value name,
+ * recursively, deduplicated by path. Public names are already reachable as `WallarmDS.*`.
+ */
+const storyModules = (
+  project: Project,
+  storyFiles: string[],
+  publicNames: ReadonlySet<string>,
+): { path: string; text: string }[] => {
+  const files = storyFiles.map(file => path.join(componentsDir, file));
+  const sources: SourceFile[] = [];
+  for (let i = 0; i < files.length; i++) {
+    const source = project.addSourceFileAtPath(files[i]!);
+    sources.push(source);
+    for (const declaration of source.getImportDeclarations()) {
+      const specifier = declaration.getModuleSpecifierValue();
+      if (!specifier.startsWith('.') || declaration.isTypeOnly()) continue;
+      const names = [
+        ...(declaration.getDefaultImport() ? ['default'] : []),
+        ...(declaration.getNamespaceImport() ? ['*'] : []),
+        ...declaration
+          .getNamedImports()
+          .filter(named => !named.isTypeOnly())
+          .map(named => named.getName()),
+      ];
+      if (names.every(name => publicNames.has(name))) continue;
+      const file = resolveImport(source.getFilePath(), specifier);
+      if (!files.includes(file)) files.push(file);
+    }
+  }
+  return sources.map(source => ({
+    path: fromComponents(source.getFilePath()),
+    text: source.getFullText(),
+  }));
+};
+
+interface Guide {
+  name: string;
+  description?: string;
+  reference: string;
+  stories: ExampleMetadata[];
+}
 
 export interface BuildDocsOptions {
   outDir: string;
@@ -59,59 +106,100 @@ export const buildDocs = async ({
   notSynced,
 }: BuildDocsOptions): Promise<{
   components: string[];
+  notSynced: string[];
 }> => {
   const metadata: DesignSystemMetadata = JSON.parse(await readFile(metadataPath, 'utf8'));
-  const components = metadata.components
-    .filter(component => !excluded.has(component.name))
-    .sort((a, b) => a.name.localeCompare(b.name, 'en'));
   const project = new Project({ skipAddingFilesFromTsConfig: true });
   project.addSourceFilesAtPaths(path.join(packageRoot, 'src/components/**/*.tsx'));
-  const publicNames = new Map<string, string>();
-  for (const [file, namespace] of [
-    ['src/index.ts', 'window.WallarmDS'],
-    ['src/icons/index.ts', 'window.WallarmDS.Icons'],
-  ] as const) {
-    const source = project.addSourceFileAtPath(path.join(packageRoot, file));
+  // Names reachable as `WallarmDS.*`: the root barrel, icons and component subpaths, as in the bundle.
+  const publicNames = new Set<string>();
+  for (const source of [
+    project.addSourceFileAtPath(path.join(packageRoot, 'src/index.ts')),
+    project.addSourceFileAtPath(path.join(packageRoot, 'src/icons/index.ts')),
+    ...project.addSourceFilesAtPaths(path.join(componentsDir, '*/index.ts')),
+  ]) {
     for (const declaration of source.getExportDeclarations()) {
       if (declaration.isTypeOnly()) continue;
-      for (const named of declaration.getNamedExports()) {
-        if (!named.isTypeOnly()) {
-          const name = named.getAliasNode()?.getText() ?? named.getName();
-          publicNames.set(
-            namespace.endsWith('.Icons') ? `Icons.${name}` : name,
-            `${namespace}.${name}`,
-          );
-        }
-      }
+      for (const named of declaration.getNamedExports())
+        if (!named.isTypeOnly())
+          publicNames.add(named.getAliasNode()?.getText() ?? named.getName());
     }
   }
-  const storySources = new Map(
-    project
-      .getSourceFiles()
-      .filter(source => source.getFilePath().endsWith('.stories.tsx'))
-      .map(source => [
-        path
-          .relative(path.join(packageRoot, 'src/components'), source.getFilePath())
-          .split(path.sep)
-          .join('/'),
-        source.getFullText(),
-      ]),
-  );
 
-  await mkdir(path.join(outDir, 'components'), { recursive: true });
-  for (const component of components) {
-    const componentDir = path.join(outDir, 'components', component.name);
-    await mkdir(componentDir, { recursive: true });
-    const defaults = Object.fromEntries(
-      [component.name, ...component.subComponents.map(part => part.name)].map(name => [
-        name,
-        sourceDefaults(project, name),
-      ]),
+  const reference = (part: Parameters<typeof componentReadme>[0]): string =>
+    componentReadme(
+      part,
+      Object.fromEntries(
+        [part.name, ...part.subComponents.map(sub => sub.name)].map(name => [
+          name,
+          sourceDefaults(project, name),
+        ]),
+      ),
     );
-    const readme = componentReadme(component, defaults, storySources, publicNames);
-    if (Buffer.byteLength(readme) > 64_000)
-      throw new Error(`${component.name} README exceeds 64,000 bytes.`);
+  const guides: Guide[] = [];
+  const omitted: string[] = [];
+  for (const component of metadata.components) {
+    if (CLAUDE_DESIGN.internal.has(component.name)) {
+      omitted.push(`${component.name}: internal primitive; no guide.`);
+    } else if (CLAUDE_DESIGN.splitByStoryFile.has(component.name)) {
+      const byFile = new Map<string, ExampleMetadata[]>();
+      for (const example of component.examples) {
+        const file = example.storyFile ?? '';
+        byFile.set(file, [...(byFile.get(file) ?? []), example]);
+      }
+      for (const [storyFile, stories] of byFile) {
+        const name = path.basename(storyFile, '.stories.tsx');
+        const part = component.subComponents.find(sub => sub.name === name);
+        guides.push({
+          name,
+          description: readMetaDescription(
+            project.getSourceFileOrThrow(path.join(componentsDir, storyFile)),
+          ),
+          reference: part
+            ? reference({ name, props: part.props, variants: [], subComponents: [] })
+            : '',
+          stories,
+        });
+      }
+    } else {
+      if (!component.examples.length)
+        omitted.push(`${component.name}: no Storybook story; props only.`);
+      guides.push({
+        name: component.name,
+        description: component.description,
+        reference: reference(component),
+        stories: component.examples,
+      });
+    }
+  }
+  guides.sort((a, b) => a.name.localeCompare(b.name, 'en'));
+  const duplicate = guides.find((guide, i) => guides[i + 1]?.name === guide.name);
+  if (duplicate) throw new Error(`Two guides are named ${duplicate.name}.`);
+
+  // Story files and fixture modules ship verbatim; a separate project keeps them out of
+  // sourceDefaults' scan.
+  const modulesProject = new Project({
+    skipAddingFilesFromTsConfig: true,
+    skipFileDependencyResolution: true,
+  });
+  await mkdir(path.join(outDir, 'components'), { recursive: true });
+  for (const guide of guides) {
+    const componentDir = path.join(outDir, 'components', guide.name);
+    await mkdir(componentDir, { recursive: true });
+    const storyFiles = [...new Set(guide.stories.map(story => story.storyFile ?? ''))];
+    const { readme, overflow } = storyGuide({
+      ...guide,
+      modules: storyModules(modulesProject, storyFiles, publicNames),
+    });
+    if (Buffer.byteLength(readme) > README_CAP_BYTES)
+      throw new Error(`${guide.name} README exceeds ${README_CAP_BYTES} bytes.`);
+    const stories = readme.split(/^## Stories$/m)[1]?.split(/^## Story sources$/m)[0] ?? '';
+    const headings = [...stories.matchAll(/^### (.+)$/gm)].map(match => match[1]).sort();
+    const names = guide.stories.map(story => story.name).sort();
+    if (headings.join('\n') !== names.join('\n'))
+      throw new Error(`${guide.name}: guide stories do not match its Storybook stories.`);
     await writeFile(path.join(componentDir, 'README.md'), readme);
+    if (overflow) await writeFile(path.join(componentDir, 'stories.md'), overflow);
   }
 
   const distDir = path.join(packageRoot, 'dist');
@@ -136,18 +224,12 @@ export const buildDocs = async ({
   await writeFile(path.join(outDir, 'components/index.d.ts'), declarations);
 
   const brandBook = await readFile(new URL('./readme-root.md', import.meta.url), 'utf8');
-  const omissions = [...new Set(notSynced)]
-    .sort()
-    .map(note => `- ${note}`)
-    .join('\n');
+  const omissions = [...new Set([...notSynced, ...omitted])].sort();
   const readme =
     `${brandBook.trim()}\n\n${consuming}\n\n## Not synced\n\n` +
     'This is the separate Claude Design build; the npm package still targets React 19.\n\n' +
-    '- Tour needs a hook-driven controller and is not directly mountable via x-import. Toast uses the lifecycle recipe in its guide.\n' +
-    '- ThemeProvider and DateFormatProvider and internal primitives have no component cards. Root scopes the canvas theme and overlays.\n' +
-    '- Story examples with unresolved dependencies are not rewritten into incomplete canvas markup; their source paths and live previews remain the reference.\n' +
-    (omissions ? `${omissions}\n` : '') +
+    omissions.map(note => `- ${note}\n`).join('') +
     '\nGenerated component guides and types are derived from repository source and build metadata. Change them in wallarm/design-system and run /claude-design-sync there.\n';
   await writeFile(path.join(outDir, 'README.md'), readme);
-  return { components: components.map(component => component.name) };
+  return { components: guides.map(guide => guide.name), notSynced: omissions };
 };

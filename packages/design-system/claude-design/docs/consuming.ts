@@ -1,23 +1,3 @@
-export const tableExample = `\`\`\`html
-<x-import component-from-global-scope="WallarmDS.Root" theme="light">
-  <x-import component-from-global-scope="WallarmDS.Table"
-    data="{{rows}}" columns="{{columns}}" get-row-id="{{getRowId}}"></x-import>
-</x-import>
-\`\`\`
-
-\`\`\`js
-function renderVals() {
-  return {
-    rows: [{ id: 'event-1', method: 'GET', ip: '192.0.2.10' }],
-    columns: [
-      { accessorKey: 'method', header: 'Method', cell: WallarmDS.TableCells.httpMethod() },
-      { accessorKey: 'ip', header: 'Source IP', cell: WallarmDS.TableCells.ip() }
-    ],
-    getRowId: function (row) { return row.id; }
-  };
-}
-\`\`\``;
-
 export const consuming = `## Consuming this system
 
 The namespace is **WallarmDS**. Read a component's guide before using its props and composition. Names are flat: \`WallarmDS.DialogContent\`, not \`WallarmDS.Dialog.Content\`.
@@ -68,8 +48,6 @@ Use the group's static SVG assets when React is unnecessary. Do not draw replace
 
 ### Tables
 
-Pass real arrays and column callbacks through holes. \`WallarmDS.TableCells\` supplies cell-renderer factories built from the existing components. Column accessors must match the row fields:
-
-${tableExample}
+Pass real arrays and column callbacks through holes. \`WallarmDS.TableCells\` supplies cell-renderer factories built from the existing components. Column accessors must match the row fields.
 
 The artifact exposes public component-subpath exports as canvas globals too, including Dialog, CodeEditor and CodeSnippet families that are absent from the npm root barrel. This does not add npm root exports. Root and TableCells are canvas-only helpers. Product applications use the package's existing root or component subpath imports and compose their own providers and cells.`;

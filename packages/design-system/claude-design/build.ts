@@ -36,8 +36,7 @@ export async function buildProject() {
   const notSynced = [
     ...tokens.skipped,
     'Shiki and highlight.js adapters are excluded; use the Prism adapter.',
-    'Screen templates and prop-driven Tour are deferred to phase 2.',
-    ...previews.withoutStories.map(name => `${name}: no Storybook story; guidelines only.`),
+    'Screen templates are deferred.',
   ];
   const docs = await buildDocs({
     outDir,
@@ -138,7 +137,7 @@ export async function buildProject() {
     components: docs.components.length,
     previews: previews.withPreview.length,
     icons: assets.icons,
-    notSynced,
+    notSynced: docs.notSynced,
   };
   await writeFile(join(root, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\nProject: ${CLAUDE_DESIGN.outDir}\n`);
