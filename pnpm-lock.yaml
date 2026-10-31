@@ -468,6 +468,9 @@ importers:
       '@zag-js/focus-trap':
         specifier: 1.43.3
         version: 1.43.3
+      '@zag-js/image-cropper':
+        specifier: 1.43.3
+        version: 1.43.3
       '@zag-js/react':
         specifier: 1.43.3
         version: 1.43.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
