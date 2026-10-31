@@ -94,7 +94,7 @@
     "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
+    "@babel/core": "8.0.7",
     "@babel/preset-typescript": "7.29.7",
     "@figma/code-connect": "2.0.2",
     "@internationalized/date": "3.12.4",
