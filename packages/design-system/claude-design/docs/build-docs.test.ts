@@ -4,7 +4,7 @@ import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { CLAUDE_DESIGN } from '../config';
-import { buildDocs } from './build-docs';
+import { assertStoriesShipped, buildDocs } from './build-docs';
 import { storyGuide } from './story-guide';
 
 const guideName = (storyFile: string): string => path.basename(storyFile, '.stories.tsx');
@@ -145,6 +145,17 @@ describe('Claude Design documentation', () => {
     expect(readme).toContain('- ThemeProvider: internal primitive; no guide.');
   });
 
+  it('ships barrel re-export targets', async () => {
+    expect(await guideText('AppShell')).toContain('### AppShell/story-content/_storyRouter.tsx\n');
+    expect(await guideText('FileUpload')).toContain('### FileUpload/lib/formatFileSize.ts\n');
+  });
+
+  it('lists story files outside component guides in Not synced', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    expect(readme).toContain('- src/theme/Pixel.stories.tsx: theme gallery story');
+    expect(readme).toContain('- src/icons/module/Icons.stories.tsx: icon gallery story');
+  });
+
   it('omits internal primitives and stays within the declaration budget', async () => {
     for (const name of CLAUDE_DESIGN.internal) {
       expect(components).not.toContain(name);
@@ -154,6 +165,19 @@ describe('Claude Design documentation', () => {
     const declarations = await readFile(path.join(outDir, 'components/index.d.ts'), 'utf8');
     expect(declarations).toContain('ButtonProps');
     expect(Buffer.byteLength(declarations)).toBeLessThanOrEqual(1_500_000);
+  });
+});
+
+describe('drop guard', () => {
+  it('throws when a guide misses a story', () => {
+    const stories = [
+      { name: 'Basic', code: '', storyFile: 'X/X.stories.tsx' },
+      { name: 'Sizes', code: '', storyFile: 'X/X.stories.tsx' },
+    ];
+    expect(() => assertStoriesShipped('X', stories, ['Basic'])).toThrow(
+      'X: guide stories do not match its Storybook stories.',
+    );
+    expect(() => assertStoriesShipped('X', stories, ['Sizes', 'Basic'])).not.toThrow();
   });
 });
 

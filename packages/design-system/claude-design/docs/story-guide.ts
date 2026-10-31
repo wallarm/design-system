@@ -23,8 +23,9 @@ export const storyGuide = ({
   reference,
   stories,
   modules,
-}: StoryGuideInput): { readme: string; overflow?: string } => {
+}: StoryGuideInput): { readme: string; overflow?: string; headings: string[] } => {
   const head = [description, reference.trim()].filter((part): part is string => Boolean(part));
+  const headings = stories.map(story => story.name);
   const storyList = stories.length
     ? [
         '## Stories',
@@ -46,7 +47,7 @@ export const storyGuide = ({
     ...storyList,
     ...(sources.length ? ['## Story sources', ...sources] : []),
   ]);
-  if (!sources.length || Buffer.byteLength(readme) <= README_CAP_BYTES) return { readme };
+  if (!sources.length || Buffer.byteLength(readme) <= README_CAP_BYTES) return { readme, headings };
   return {
     readme: join([
       ...head,
@@ -55,5 +56,6 @@ export const storyGuide = ({
       'The story files and their local imports are in [stories.md](./stories.md), verbatim.',
     ]),
     overflow: join([`# ${name} story sources`, ...sources]),
+    headings,
   };
 };

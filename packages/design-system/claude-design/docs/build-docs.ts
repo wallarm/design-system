@@ -37,17 +37,33 @@ const storyModules = (
   for (let i = 0; i < files.length; i++) {
     const source = project.addSourceFileAtPath(files[i]!);
     sources.push(source);
-    for (const declaration of source.getImportDeclarations()) {
-      const specifier = declaration.getModuleSpecifierValue();
-      if (!specifier.startsWith('.') || declaration.isTypeOnly()) continue;
-      const names = [
-        ...(declaration.getDefaultImport() ? ['default'] : []),
-        ...(declaration.getNamespaceImport() ? ['*'] : []),
-        ...declaration
-          .getNamedImports()
-          .filter(named => !named.isTypeOnly())
-          .map(named => named.getName()),
-      ];
+    const dependencies = [
+      ...source.getImportDeclarations().map(declaration => ({
+        specifier: declaration.getModuleSpecifierValue(),
+        typeOnly: declaration.isTypeOnly(),
+        names: [
+          ...(declaration.getDefaultImport() ? ['default'] : []),
+          ...(declaration.getNamespaceImport() ? ['*'] : []),
+          ...declaration
+            .getNamedImports()
+            .filter(named => !named.isTypeOnly())
+            .map(named => named.getName()),
+        ],
+      })),
+      // Re-export barrels: their targets ship by the same rule; `export *` always ships.
+      ...source.getExportDeclarations().map(declaration => ({
+        specifier: declaration.getModuleSpecifierValue() ?? '',
+        typeOnly: declaration.isTypeOnly(),
+        names: declaration.hasNamedExports()
+          ? declaration
+              .getNamedExports()
+              .filter(named => !named.isTypeOnly())
+              .map(named => named.getAliasNode()?.getText() ?? named.getName())
+          : ['*'],
+      })),
+    ];
+    for (const { specifier, typeOnly, names } of dependencies) {
+      if (!specifier.startsWith('.') || typeOnly) continue;
       if (names.every(name => publicNames.has(name))) continue;
       const file = resolveImport(source.getFilePath(), specifier);
       if (!files.includes(file)) files.push(file);
@@ -57,6 +73,23 @@ const storyModules = (
     path: fromComponents(source.getFilePath()),
     text: source.getFullText(),
   }));
+};
+
+/** Throws unless a guide emitted exactly one heading per Storybook story. */
+export const assertStoriesShipped = (
+  guide: string,
+  stories: ExampleMetadata[],
+  headings: string[],
+): void => {
+  const sorted = (names: string[]) => [...names].sort().join('\n');
+  if (sorted(headings) !== sorted(stories.map(story => story.name)))
+    throw new Error(`${guide}: guide stories do not match its Storybook stories.`);
+};
+
+/** Story files outside src/components that have no component guide, by src-relative prefix. */
+const NON_COMPONENT_STORIES: Record<string, string> = {
+  'theme/': 'theme gallery story, not a component; see tokens.css',
+  'icons/': 'icon gallery story, not a component; see assets/Icons',
 };
 
 interface Guide {
@@ -173,6 +206,20 @@ export const buildDocs = async ({
     }
   }
   guides.sort((a, b) => a.name.localeCompare(b.name, 'en'));
+  // Every story file under src/ ships in a guide or is listed with a reason.
+  const guided = new Set(
+    guides.flatMap(guide => guide.stories.map(story => `components/${story.storyFile}`)),
+  );
+  for (const file of (await readdir(path.join(packageRoot, 'src'), { recursive: true }))
+    .map(file => file.split(path.sep).join('/'))
+    .filter(file => file.endsWith('.stories.tsx') && !guided.has(file))
+    .sort()) {
+    const reason = Object.entries(NON_COMPONENT_STORIES).find(([prefix]) =>
+      file.startsWith(prefix),
+    )?.[1];
+    if (!reason) throw new Error(`src/${file}: story file is in no guide.`);
+    omitted.push(`src/${file}: ${reason}.`);
+  }
   const duplicate = guides.find((guide, i) => guides[i + 1]?.name === guide.name);
   if (duplicate) throw new Error(`Two guides are named ${duplicate.name}.`);
 
@@ -187,17 +234,13 @@ export const buildDocs = async ({
     const componentDir = path.join(outDir, 'components', guide.name);
     await mkdir(componentDir, { recursive: true });
     const storyFiles = [...new Set(guide.stories.map(story => story.storyFile ?? ''))];
-    const { readme, overflow } = storyGuide({
+    const { readme, overflow, headings } = storyGuide({
       ...guide,
       modules: storyModules(modulesProject, storyFiles, publicNames),
     });
     if (Buffer.byteLength(readme) > README_CAP_BYTES)
       throw new Error(`${guide.name} README exceeds ${README_CAP_BYTES} bytes.`);
-    const stories = readme.split(/^## Stories$/m)[1]?.split(/^## Story sources$/m)[0] ?? '';
-    const headings = [...stories.matchAll(/^### (.+)$/gm)].map(match => match[1]).sort();
-    const names = guide.stories.map(story => story.name).sort();
-    if (headings.join('\n') !== names.join('\n'))
-      throw new Error(`${guide.name}: guide stories do not match its Storybook stories.`);
+    assertStoriesShipped(guide.name, guide.stories, headings);
     await writeFile(path.join(componentDir, 'README.md'), readme);
     if (overflow) await writeFile(path.join(componentDir, 'stories.md'), overflow);
   }
