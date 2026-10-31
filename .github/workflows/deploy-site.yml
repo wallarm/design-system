@@ -109,11 +109,13 @@ jobs:
 
       - name: Check tag has the Claude Design build
         id: guard
+        env:
+          TAG: ${{ inputs.tag }}
         run: |
           if test -f packages/design-system/claude-design/build.ts; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::${{ inputs.tag }} predates the Claude Design build; nothing to attach"
+            echo "::notice::$TAG predates the Claude Design build; nothing to attach"
           fi
 
       - name: Setup pnpm
@@ -144,6 +146,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           out=packages/design-system/.claude-design
+          gh release view "$TAG" >/dev/null \
+            || { echo "::error::No GitHub release for $TAG; the export cannot be attached"; exit 1; }
           tar czf "claude-design-$TAG.tgz" -C "$out" project file-hashes.json summary.json
           gh release upload "$TAG" "claude-design-$TAG.tgz" --clobber
           cat "$out/summary.json" >> "$GITHUB_STEP_SUMMARY"
