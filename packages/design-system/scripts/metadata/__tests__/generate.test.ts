@@ -84,12 +84,12 @@ describe('metadata generation (integration)', () => {
     expect(button!.examples[0]?.name).toBe('Basic');
   });
 
-  it('CodeSnippet has a concise MCP description from CodeSnippetRoot JSDoc', () => {
+  it('CodeSnippet has a description from the story meta', () => {
     const codeSnippet = components.find(c => c.name === 'CodeSnippet');
 
     expect(codeSnippet).toBeDefined();
-    expect(codeSnippet!.description).toBe(
-      'Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.',
+    expect(codeSnippet!.description).toMatch(
+      /^A block of code to be read and copied, never edited/,
     );
   });
 
