@@ -1,26 +1,15 @@
-import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
+import { describe, expect, it } from '@rstest/core';
 import type { Root } from 'react-dom/client';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createReact18Window } from './react18';
 
 const names = ['Button', 'Copyable', 'FilterInput', 'Select', 'CodeSnippet', 'AssistantMessage'];
-// The Shiki and highlight.js stories load adapters that Claude Design swaps for a throwing stub;
-// CodeSnippet falls back to plain text, but the loader's rejection surfaces as unhandled.
-const adapterStub = (reason: unknown) => {
-  if (!String(reason).includes('syntax adapter is not included')) throw reason;
-};
+// Stories that legitimately render only their heading, each with the reason.
+const headingOnly = new Set([
+  'FilterInput/Closed', // the menu is closed, so there is nothing but the heading until it opens
+]);
 describe('compiled Storybook previews', () => {
-  // The runner's own listener would fail the file, so it is set aside for the stub's rejection only.
-  const runnerListeners = process.listeners('unhandledRejection');
-  beforeAll(() => {
-    process.removeAllListeners('unhandledRejection');
-    process.on('unhandledRejection', adapterStub);
-  });
-  afterAll(() => {
-    process.off('unhandledRejection', adapterStub);
-    for (const listener of runnerListeners) process.on('unhandledRejection', listener);
-  });
   for (const name of names)
     it(`mounts real ${name} stories using the shared canvas components`, async () => {
       const env = createReact18Window();
@@ -73,8 +62,11 @@ describe('compiled Storybook previews', () => {
         expect(errors).toEqual([]);
         const stories = env.window.document.querySelectorAll('[data-preview-story]');
         expect(stories.length).toBeGreaterThan(0);
-        // A story may render nothing but its heading (a closed overlay), so only the first must show content.
-        expect(stories[0]?.children.length, stories[0]?.textContent ?? '').toBeGreaterThan(1);
+        for (const story of stories) {
+          const storyName = story.getAttribute('data-preview-story');
+          if (!headingOnly.has(`${name}/${storyName}`))
+            expect(story.children.length, `${name}/${storyName}`).toBeGreaterThan(1);
+        }
         // The first Button story has a fixed label, not the generic meta.component fallback.
         if (name === 'Button')
           expect(stories[0]?.querySelector('button')?.textContent).toBe('Button');

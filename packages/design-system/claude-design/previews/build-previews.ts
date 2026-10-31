@@ -16,8 +16,14 @@ const htmlEscape = (value: string) =>
 export type PreviewRow = { file: string; story: string };
 export type PreviewGroup = { name: string; group: string; rows: PreviewRow[] };
 
+/** Stories that load the Shiki or highlight.js adapter, which the Claude Design bundle stubs out. */
+const EXCLUDED_ADAPTER =
+  /\b(loadShikiAdapter|loadHighlightJsAdapter|shikiAdapter|highlightJsAdapter)\b/;
+
 /** One group per guide: a component, or a story file for `splitByStoryFile` components. */
-export async function previewGroups(): Promise<PreviewGroup[]> {
+export async function previewGroups(
+  only?: string[],
+): Promise<{ groups: PreviewGroup[]; omitted: string[] }> {
   const project = new Project({
     skipAddingFilesFromTsConfig: true,
     skipFileDependencyResolution: true,
@@ -28,8 +34,9 @@ export async function previewGroups(): Promise<PreviewGroup[]> {
     .map(d => d.name)
     .sort();
   const groups: PreviewGroup[] = [];
+  const omitted: string[] = [];
   for (const name of names) {
-    if (CLAUDE_DESIGN.internal.has(name)) continue;
+    if (CLAUDE_DESIGN.internal.has(name) || (only && !only.includes(name))) continue;
     const files = findStoryFiles(project, join(componentsDir, name)).sort(
       (a, b) =>
         Number(basename(b) === `${name}.stories.tsx`) -
@@ -47,19 +54,32 @@ export async function previewGroups(): Promise<PreviewGroup[]> {
         .getVariableStatements()
         .filter(v => v.hasExportKeyword())
         .flatMap(v => v.getDeclarations()))
-        target.rows.push({ file, story: decl.getName() });
+        if (EXCLUDED_ADAPTER.test(decl.getText()))
+          omitted.push(
+            `${name}/${decl.getName()}: preview omitted; Shiki/highlight.js adapters are not bundled (source in guide).`,
+          );
+        else target.rows.push({ file, story: decl.getName() });
     }
     groups.push(...[...found.values()].filter(g => g.rows.length));
   }
-  return groups;
+  return { groups, omitted };
 }
 
-export async function buildPreviews({ outDir }: { outDir: string }) {
+/** `maxBytes` is the per-file cap; `only` limits the build to named components (tests). */
+export async function buildPreviews({
+  outDir,
+  maxBytes = 512_000,
+  only,
+}: {
+  outDir: string;
+  maxBytes?: number;
+  only?: string[];
+}) {
   const meta = JSON.parse(
     await readFile(resolve(PACKAGE_DIR, '.claude-design/meta.json'), 'utf8'),
   ) as { exports: string[] };
   const withPreview: string[] = [];
-  const groups = await previewGroups();
+  const { groups, omitted } = await previewGroups(only);
   const entryDir = resolve(PACKAGE_DIR, '.claude-design/runtime/previews');
   await mkdir(entryDir, { recursive: true });
   const partsOf = (rows: PreviewRow[], count: number): PreviewRow[][] => {
@@ -114,10 +134,10 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     const dir = join(outDir, 'components', g.name);
     let scripts = [await readScript(g.name, 'stories')];
     let names = ['stories'];
-    // A script over the platform's 512 KB text cap is rebuilt in as few parts as fit.
-    for (let count = 2; scripts.some(code => Buffer.byteLength(code) > 512_000); count++) {
+    // A script over the platform's text cap is rebuilt in as few parts as fit.
+    for (let count = 2; scripts.some(code => Buffer.byteLength(code) > maxBytes); count++) {
       if (count > g.rows.length)
-        throw new Error(`${g.name} preview exceeds 512 KB even with one story per part`);
+        throw new Error(`${g.name} preview exceeds ${maxBytes} bytes even with one story per part`);
       const parts = partsOf(g.rows, count);
       const entries: Record<string, string> = {};
       for (const [i, rows] of parts.entries())
@@ -136,5 +156,5 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
     }
     withPreview.push(g.name);
   }
-  return { withPreview };
+  return { withPreview, omitted };
 }

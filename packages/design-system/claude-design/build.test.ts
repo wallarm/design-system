@@ -17,7 +17,7 @@ describe('complete Claude Design project', () => {
       expect(await readFile(join(out, 'components', path), 'utf8')).toMatch(/^<!-- @dsCard /);
   });
   it('previews every exported story across its preview parts', async () => {
-    for (const { name, rows } of await previewGroups()) {
+    for (const { name, rows } of (await previewGroups()).groups) {
       const dir = join(out, 'components', name);
       const scripts = (await readdir(dir)).filter(file => /^stories(-\d+)?\.js$/.test(file));
       const code = (await Promise.all(scripts.map(file => readFile(join(dir, file), 'utf8')))).join(

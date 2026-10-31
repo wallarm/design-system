@@ -35,6 +35,7 @@ export async function buildProject() {
   const assets = await buildAssets({ outDir });
   const notSynced = [
     ...tokens.skipped,
+    ...previews.omitted,
     'Shiki and highlight.js adapters are excluded; use the Prism adapter.',
     'Screen templates are deferred.',
   ];
