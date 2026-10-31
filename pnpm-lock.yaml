@@ -616,9 +616,6 @@ importers:
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
-      esbuild:
-        specifier: 0.28.1
-        version: 0.28.1
       glob:
         specifier: 13.0.6
         version: 13.0.6
@@ -648,7 +645,7 @@ importers:
         version: 10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)
       storybook-react-rsbuild:
         specifier: 3.6.0
-        version: 3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
+        version: 3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
@@ -10231,7 +10228,7 @@ snapshots:
     dependencies:
       react: 19.3.0
 
-  '@storybook/react-docgen-typescript-plugin@1.0.1(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))':
+  '@storybook/react-docgen-typescript-plugin@1.0.1(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))':
     dependencies:
       debug: 4.4.3
       endent: 2.1.0
@@ -10241,7 +10238,7 @@ snapshots:
       react-docgen-typescript: 2.4.0(typescript@7.0.2)
       tslib: 2.8.1
       typescript: 7.0.2
-      webpack: 5.102.1(esbuild@0.28.1)(postcss@8.5.28)
+      webpack: 5.102.1(postcss@8.5.28)
     transitivePeerDependencies:
       - supports-color
 
@@ -15400,12 +15397,12 @@ snapshots:
       - '@rspack/core'
       - '@typescript/native-preview'
 
-  storybook-react-rsbuild@3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28)):
+  storybook-react-rsbuild@3.6.0(@rsbuild/core@2.2.11(core-js@3.47.0))(@rspack/core@2.2.8(@swc/helpers@0.5.23))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rollup@4.62.2)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28)):
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
       '@rsbuild/core': 2.2.11(core-js@3.47.0)
       '@storybook/react': 10.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0))(typescript@7.0.2)
-      '@storybook/react-docgen-typescript-plugin': 1.0.1(typescript@7.0.2)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
+      '@storybook/react-docgen-typescript-plugin': 1.0.1(typescript@7.0.2)(webpack@5.102.1(postcss@8.5.28))
       magic-string: 1.4.2
       react: 19.3.0
       react-docgen: 8.0.3
@@ -15594,17 +15591,6 @@ snapshots:
       type-fest: 2.19.0
       unique-string: 3.0.0
 
-  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.28)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28)):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      jest-worker: 27.5.1
-      schema-utils: 4.3.3
-      terser: 5.49.2
-      webpack: 5.102.1(esbuild@0.28.1)(postcss@8.5.28)
-    optionalDependencies:
-      esbuild: 0.28.1
-      postcss: 8.5.28
-
   terser-webpack-plugin@5.6.1(esbuild@0.28.1)(webpack@5.102.1(esbuild@0.28.1)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -15615,6 +15601,16 @@ snapshots:
     optionalDependencies:
       esbuild: 0.28.1
     optional: true
+
+  terser-webpack-plugin@5.6.1(postcss@8.5.28)(webpack@5.102.1(postcss@8.5.28)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      jest-worker: 27.5.1
+      schema-utils: 4.3.3
+      terser: 5.49.2
+      webpack: 5.102.1(postcss@8.5.28)
+    optionalDependencies:
+      postcss: 8.5.28
 
   terser-webpack-plugin@5.6.1(webpack@5.102.1):
     dependencies:
@@ -16110,7 +16106,7 @@ snapshots:
       - uglify-js
     optional: true
 
-  webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28):
+  webpack@5.102.1(postcss@8.5.28):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.9
@@ -16134,7 +16130,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.28)(webpack@5.102.1(esbuild@0.28.1)(postcss@8.5.28))
+      terser-webpack-plugin: 5.6.1(postcss@8.5.28)(webpack@5.102.1(postcss@8.5.28))
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     transitivePeerDependencies:
