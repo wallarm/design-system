@@ -105,7 +105,33 @@ describe('parseComponentProps', () => {
 
   it('falls back to the first call-signature parameter when <Name>Props is not exported', () => {
     const { mainProps } = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Kbd'), 'Kbd');
-    expect(mainProps.length).toBeGreaterThan(0);
+    expect(mainProps.map(p => p.name)).toContain('size');
+  });
+
+  it('keeps wrapped-element attributes and own props that share a DOM name', () => {
+    const link = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Link'), 'Link');
+    expect(link.mainProps.map(p => p.name)).toContain('download');
+    const avatar = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Avatar'), 'Avatar');
+    expect(avatar.mainProps.map(p => p.name)).toEqual(expect.arrayContaining(['size']));
+  });
+
+  it('keeps an inherited-only prop that has a destructured default', () => {
+    const dir = path.join(COMPONENTS_DIR, 'ZzDefaulted');
+    project.createSourceFile(
+      `${dir}/index.ts`,
+      "export { ZzDefaulted, type ZzDefaultedProps } from './ZzDefaulted';",
+      { overwrite: true },
+    );
+    project.createSourceFile(
+      `${dir}/ZzDefaulted.tsx`,
+      `import type { ComponentProps, FC } from 'react';
+export type ZzDefaultedProps = ComponentProps<'div'>;
+export const ZzDefaulted: FC<ZzDefaultedProps> = ({ draggable = true, accessKey }) => null;`,
+      { overwrite: true },
+    );
+    const names = parseComponentProps(project, dir, 'ZzDefaulted').mainProps.map(p => p.name);
+    expect(names).toContain('draggable');
+    expect(names).not.toContain('accessKey');
   });
 
   it('returns empty for non-existent component', () => {

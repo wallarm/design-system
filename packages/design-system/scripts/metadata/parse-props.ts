@@ -50,12 +50,24 @@ const KEEP_NATIVE = new Set([
   'accept',
   'autoComplete',
   'onChange',
+  'src',
+  'alt',
+  'width',
+  'height',
+  'loading',
+  'htmlFor',
+  'download',
+  'hrefLang',
 ]);
 
 // A prop is inherited when every declaration lives in @types/react (DOM attributes);
 // ones a component declares itself (e.g. `onSubmit`) are part of its API.
-function isInheritedHtmlProp(name: string, declarations: Node[]): boolean {
-  if (KEEP_NATIVE.has(name)) return false;
+function isInheritedHtmlProp(
+  name: string,
+  declarations: Node[],
+  defaults: Record<string, string>,
+): boolean {
+  if (KEEP_NATIVE.has(name) || name in defaults) return false;
   return declarations.every(d =>
     d.getSourceFile().getFilePath().includes('/node_modules/@types/react/'),
   );
@@ -126,7 +138,7 @@ export function parsePropsFromType(
     if (SKIP_PROPS.has(name)) continue;
 
     const declarations = prop.getDeclarations();
-    if (isInheritedHtmlProp(name, declarations)) continue;
+    if (isInheritedHtmlProp(name, declarations, defaults)) continue;
     const declaration = declarations[0];
 
     // Get type from the symbol's value declaration
