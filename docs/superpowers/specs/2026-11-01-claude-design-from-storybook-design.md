@@ -110,6 +110,13 @@ point to. The user asked for this verification.
 - Does not work, or a design-system hook has no non-hook path → stop and bring it back to
   the user: that needs a library-level answer, which is the user's call (not invented here).
 
+Spike result (2026-11-01): spike artboard published on the smoke canvas (unrendered;
+the user waived the visual check). Public non-hook paths exist: `formatChartDate`,
+`formatChartDateTime`, `formatChartHour`, `formatChartTimezone`, `toaster`. Ruling: render-prop
+props use `React.createElement(WallarmDS.X, …)` inside `renderVals()`; `TableCells` is deleted.
+Icon uploads are a separate store (`usage.files` 583 of `max_files` 5,000); the 1,008 cap
+counts project files.
+
 ### Step 1 — fix the shared metadata (`scripts/metadata`, `fix(metadata)`)
 
 Both the docs site and the export read `dist/metadata/components.json`
