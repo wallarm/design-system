@@ -519,6 +519,23 @@ export {
   type HttpMethodName,
   type HttpMethodProps,
 } from './components/HttpMethod';
+export {
+  ImageCropper,
+  type ImageCropperApi,
+  ImageCropperContext,
+  type ImageCropperContextProps,
+  type ImageCropperExportOptions,
+  ImageCropperGrid,
+  type ImageCropperGridProps,
+  ImageCropperImage,
+  type ImageCropperImageProps,
+  type ImageCropperProps,
+  ImageCropperSelection,
+  type ImageCropperSelectionProps,
+  type ImageCropperSize,
+  ImageCropperViewport,
+  type ImageCropperViewportProps,
+} from './components/ImageCropper';
 export { Indicator, type IndicatorProps } from './components/Indicator';
 export {
   InlineEdit,
