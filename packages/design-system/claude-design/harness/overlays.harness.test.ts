@@ -4,12 +4,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createReact18Window } from './react18';
 
-type CellFactory = () => (context: { getValue: () => unknown }) => ReactNode;
-type TableCellFactories = Record<
-  'severity' | 'httpMethod' | 'responseCode' | 'ip' | 'dateTime' | 'tags' | 'text',
-  CellFactory
->;
-
 const cleanups: (() => void)[] = [];
 
 function setup() {
@@ -169,115 +163,6 @@ describe('canvas helpers on real React 18', () => {
       }
     },
   );
-
-  it('uses severity and HTTP method factories as real Table cell renderers', async () => {
-    const { window, DS, h, mount } = setup();
-    expect(DS).toHaveProperty('TableCells');
-    const cells = DS.TableCells as TableCellFactories;
-    mount(
-      h(
-        'Root',
-        {},
-        h('Table', {
-          'aria-label': 'Requests',
-          data: [{ id: 'one', severity: 'critical', method: 'POST' }],
-          getRowId: (row: { id: string }) => row.id,
-          columns: [
-            { accessorKey: 'severity', header: 'Severity', cell: cells.severity() },
-            { accessorKey: 'method', header: 'Method', cell: cells.httpMethod() },
-          ],
-        }),
-      ),
-    );
-    await expect
-      .poll(() => window.document.querySelector('tbody')?.textContent)
-      .toContain('critical');
-    const row = window.document.querySelector('tbody tr')!;
-    expect(row.textContent).toContain('POST');
-    expect(row.querySelector('[data-method="POST"]')).not.toBeNull();
-    expect(row.querySelector('td')?.querySelector('[data-type="secondary"]')).not.toBeNull();
-  });
-
-  it('renders all cell factories and safely handles malformed or missing values', () => {
-    const { React, window, DS, h, mount } = setup();
-    expect(DS).toHaveProperty('TableCells');
-    const cells = DS.TableCells as TableCellFactories;
-    const samples: [keyof TableCellFactories, unknown, string][] = [
-      ['severity', 'critical', 'critical'],
-      ['httpMethod', 'PROPFIND', 'PROPFIND'],
-      ['responseCode', 403, '403'],
-      ['ip', '203.0.113.7', '203.0.113.7'],
-      ['dateTime', '2026-10-28T12:00:00Z', 'Oct'],
-      ['tags', ['production', 'api', 'api'], 'productionapiapi'],
-      ['text', 0, '0'],
-      ['text', false, 'false'],
-      ['tags', ['valid', {}, null, false], 'valid'],
-      ['text', { secret: 'do not coerce objects' }, '—'],
-      ['severity', null, '—'],
-      ['httpMethod', {}, '—'],
-      ['responseCode', Number.NaN, '—'],
-      ['ip', ['wrong shape'], '—'],
-      ['dateTime', true, '—'],
-      ['dateTime', 'invalid date', '—'],
-      ['tags', {}, '—'],
-    ];
-    mount(
-      h(
-        'Root',
-        {},
-        ...samples.map(([name, value], index) =>
-          React.createElement(
-            'div',
-            { key: index, 'data-testid': `sample-${index}` },
-            cells[name]()({ getValue: () => value }),
-          ),
-        ),
-      ),
-    );
-    samples.forEach(([, , expected], index) => {
-      expect(
-        window.document.querySelector(`[data-testid="sample-${index}"]`)?.textContent,
-      ).toContain(expected);
-    });
-    expect(window.document.querySelector('time[datetime]')?.getAttribute('datetime')).toBe(
-      '2026-10-28T12:00:00.000Z',
-    );
-    expect(window.document.querySelector('[data-response-category="client-error"]')).not.toBeNull();
-  });
-
-  it('maps severity labels to semantic badge colors and keeps unknown labels neutral', () => {
-    const { React, window, DS, h, mount } = setup();
-    expect(DS).toHaveProperty('TableCells');
-    const cells = DS.TableCells as TableCellFactories;
-    const severities = [
-      ['Critical', 'bg-badge-red-light'],
-      ['HIGH', 'bg-badge-w-orange-light'],
-      ['medium', 'bg-badge-amber-light'],
-      ['low', 'bg-badge-blue-light'],
-      ['info', 'bg-badge-slate-light'],
-      ['informational', 'bg-badge-slate-light'],
-      ['toString', 'bg-badge-slate-light'],
-    ] as const;
-    mount(
-      h(
-        'Root',
-        {},
-        ...severities.map(([severity]) =>
-          React.createElement(
-            'div',
-            { key: severity, 'data-testid': severity },
-            cells.severity()({ getValue: () => severity }),
-          ),
-        ),
-      ),
-    );
-    for (const [severity, color] of severities) {
-      const badge = window.document.querySelector(`[data-testid="${severity}"]`)!
-        .firstElementChild!;
-      expect(badge.textContent).toBe(severity);
-      expect(badge.classList.contains(color)).toBe(true);
-    }
-  });
 
   it('preserves canvas Text child identity for Button trailing-content spacing', () => {
     const { React, window, h, mount } = setup();

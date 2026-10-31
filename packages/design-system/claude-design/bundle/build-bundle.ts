@@ -10,7 +10,7 @@ async function canvasEntry(): Promise<{ source: string; exports: string[] }> {
     string,
     unknown
   >;
-  const exported = new Set([...Object.keys(root), 'Root', 'TableCells', 'Icons']);
+  const exported = new Set([...Object.keys(root), 'Root', 'Icons']);
   const lines = [await readFile(resolve(PACKAGE_DIR, 'claude-design/bundle/entry.ts'), 'utf8')];
   // The package supports public component subpaths as well as its root barrel.
   for (const dir of (await readdir(resolve(PACKAGE_DIR, 'src/components'))).sort()) {
@@ -42,9 +42,7 @@ export async function buildBundle({ outDir }: { outDir: string }) {
     entries: { bundle: entry },
     outDir: join(outDir, 'components'),
   });
-  const components = exports.filter(
-    name => /^[A-Z]/.test(name) && !['Icons', 'TableCells'].includes(name),
-  );
+  const components = exports.filter(name => /^[A-Z]/.test(name) && name !== 'Icons');
   const header = `/* @ds-bundle: ${JSON.stringify({ format: 4, namespace: CLAUDE_DESIGN.namespace, components: components.map(name => ({ name })) })} */`;
   const code = `${header}\n${await readInlineScript(join(outDir, 'components/bundle.js'))}\n`;
   const bytes = Buffer.byteLength(code);

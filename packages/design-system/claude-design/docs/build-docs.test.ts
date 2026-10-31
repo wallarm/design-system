@@ -44,7 +44,11 @@ describe('Claude Design documentation', () => {
       '## Consuming this system',
       'WallarmDS.Root',
       'WallarmDS.Icons.',
-      'WallarmDS.TableCells',
+      'From a Storybook story to an artboard',
+      'React.createElement(WallarmDS.X',
+      'this.setState',
+      'formatChartDate',
+      'WallarmDS.toaster',
       'x-import',
       'theme="dark"',
       'Example intentionally skipped token',
@@ -52,6 +56,7 @@ describe('Claude Design documentation', () => {
       expect(readme).toContain(required);
     }
     expect(readme).not.toContain('components/lib/react');
+    expect(readme).not.toContain('TableCells');
   });
 
   it('corrects CVA booleans, reads current source defaults and kebab-cases attributes', async () => {
