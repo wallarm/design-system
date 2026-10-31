@@ -2,6 +2,7 @@ import { describe, expect, it } from '@rstest/core';
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { CLAUDE_DESIGN } from './config';
 import { previewGroups } from './previews/build-previews';
 
 const out = resolve('.claude-design/project');
@@ -27,13 +28,24 @@ describe('complete Claude Design project', () => {
       expect(shipped.sort(), name).toEqual(rows.map(row => row.story).sort());
     }
   });
-  it('ships 582 inked SVG icons and React18 code-editing metadata without local React', async () => {
+  it('ships all inked SVG icons and React18 code-editing metadata without local React', async () => {
     const icons = (await readdir(join(out, 'assets/Icons'))).filter(name => name.endsWith('.svg'));
-    expect(icons).toHaveLength(582);
+    const source = await readFile(resolve('dist/icons/index.js'), 'utf8');
+    const exportCount = source.match(/^export\s/gm)?.length ?? 0;
+    expect(exportCount).toBeGreaterThan(0);
+    expect(icons).toHaveLength(exportCount);
     for (const icon of icons)
       expect(await readFile(join(out, 'assets/Icons', icon), 'utf8')).not.toContain('currentColor');
     const index = JSON.parse(await readFile(join(out, 'design-system.json'), 'utf8'));
     expect(index.editing).toBe('code');
+    expect(index.lastChange.by).toBe('Wallarm');
+    for (const [group, value] of Object.entries(index.assetGroups) as [
+      string,
+      { name: string; order: string[]; files: Record<string, unknown> },
+    ][]) {
+      expect(value.name).toBe(group);
+      expect(value.order).toEqual(Object.keys(value.files).sort());
+    }
     expect(index.libraries).toEqual([
       { name: 'react', version: '18' },
       { name: 'react-dom', version: '18' },
@@ -44,16 +56,19 @@ describe('complete Claude Design project', () => {
     const files = (await readdir(out, { recursive: true, withFileTypes: true })).filter(file =>
       file.isFile(),
     );
-    expect(files.length).toBeLessThanOrEqual(1008);
+    const inAssets = (file: { parentPath: string }) =>
+      file.parentPath.startsWith(join(out, 'assets'));
+    expect(files.filter(file => !inAssets(file)).length).toBeLessThanOrEqual(1008);
+    expect(files.filter(inAssets).length).toBeLessThanOrEqual(5000);
     const hashes: Record<string, string> = {};
     for (const file of files) {
       const path = join(file.parentPath, file.name);
       const bytes = await readFile(path);
       expect(bytes.length, path).toBeLessThanOrEqual(
         path.endsWith('/bundle.js')
-          ? 5_700_000
+          ? CLAUDE_DESIGN.bundleBudgetBytes
           : path.endsWith('/bundle.css')
-            ? 2_000_000
+            ? CLAUDE_DESIGN.cssCapBytes
             : path.endsWith('/index.d.ts')
               ? 1_500_000
               : 512_000,

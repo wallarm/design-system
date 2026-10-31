@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildAssets } from './assets/build-assets';
@@ -17,8 +17,21 @@ export async function buildProject() {
   const root = dirname(CLAUDE_DESIGN.outDir);
   await mkdir(root, { recursive: true });
   const outDir = await mkdtemp(join(root, 'build-'));
+  try {
+    return await buildInto(root, outDir);
+  } catch (error) {
+    await rm(outDir, { recursive: true, force: true });
+    throw error;
+  }
+}
+async function buildInto(root: string, outDir: string) {
   const sha = git('rev-parse', 'HEAD');
-  const branch = git('rev-parse', '--abbrev-ref', 'HEAD');
+  let ref: string;
+  try {
+    ref = git('describe', '--tags', '--exact-match');
+  } catch {
+    ref = git('rev-parse', '--abbrev-ref', 'HEAD');
+  }
   const at = git('show', '-s', '--format=%cI', 'HEAD');
   const pkg = JSON.parse(await readFile(resolve(PACKAGE_DIR, 'package.json'), 'utf8')) as {
     version: string;
@@ -26,7 +39,7 @@ export async function buildProject() {
   const tokens = buildTokens({
     themeDir: resolve(PACKAGE_DIR, 'src/theme'),
     outDir,
-    ref: `${branch}@${sha}`,
+    ref: `${ref}@${sha}`,
     syncedAt: at,
   });
   const bundle = await buildBundle({ outDir });
@@ -47,7 +60,11 @@ export async function buildProject() {
   const groups = ['Logos', 'Icons'];
   const assetGroups: Record<
     string,
-    { files: Record<string, { name: string; size: number; type: string; sha256: string }> }
+    {
+      name: string;
+      order: string[];
+      files: Record<string, { name: string; size: number; type: string; sha256: string }>;
+    }
   > = {};
   for (const group of groups) {
     const files: Record<string, { name: string; size: number; type: string; sha256: string }> = {};
@@ -62,7 +79,7 @@ export async function buildProject() {
         sha256: createHash('sha256').update(bytes).digest('hex'),
       };
     }
-    assetGroups[group] = { files };
+    assetGroups[group] = { name: group, order: Object.keys(files), files };
   }
   const index = {
     v: 3,
@@ -81,7 +98,7 @@ export async function buildProject() {
     blobs: {},
     docs: { readme: 'project/README.md', sections: [] },
     lastChange: {
-      by: git('show', '-s', '--format=%an', 'HEAD'),
+      by: 'Wallarm',
       at,
       via: `GitHub · wallarm/design-system@${sha.slice(0, 8)}`,
       note: `v${pkg.version}: ${tokens.counts.color} colors, ${docs.components.length} component guides, ${assets.icons} icons.`,
@@ -92,7 +109,14 @@ export async function buildProject() {
     .filter(file => file.isFile())
     .map(file => join(file.parentPath, file.name))
     .sort();
-  if (files.length > 1008) throw new Error(`Artifact has ${files.length} files; maximum 1008`);
+  // The platform asset store is separate: assets/ uploads have their own cap.
+  const assetsDir = `${join(outDir, 'assets')}/`;
+  const assetCount = files.filter(file => file.startsWith(assetsDir)).length;
+  if (files.length - assetCount > 1008)
+    throw new Error(
+      `Artifact has ${files.length - assetCount} files outside assets/; maximum 1008`,
+    );
+  if (assetCount > 5000) throw new Error(`Artifact has ${assetCount} assets; maximum 5000`);
   const hashes: Record<string, string> = {};
   let totalBytes = 0;
   for (const file of files) {
@@ -101,9 +125,9 @@ export async function buildProject() {
     const relative = file.slice(outDir.length + 1);
     const cap =
       relative === 'components/bundle.js'
-        ? 5_700_000
+        ? CLAUDE_DESIGN.bundleBudgetBytes
         : relative === 'components/bundle.css'
-          ? 2_000_000
+          ? CLAUDE_DESIGN.cssCapBytes
           : relative === 'components/index.d.ts'
             ? 1_500_000
             : relative.endsWith('preview.html')
@@ -120,12 +144,14 @@ export async function buildProject() {
   }
   if (totalBytes > 256 * 1024 * 1024) throw new Error('Artifact exceeds 256 MiB');
   // Preserve the previous generated project while replacing the publish root atomically.
+  const backup = join(root, `previous-${outDir.slice(outDir.lastIndexOf('/') + 1)}`);
   try {
-    await rename(CLAUDE_DESIGN.outDir, join(root, `previous-${basenameOf(outDir)}`));
+    await rename(CLAUDE_DESIGN.outDir, backup);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
   await rename(outDir, CLAUDE_DESIGN.outDir);
+  await rm(backup, { recursive: true, force: true });
   await writeFile(join(root, 'file-hashes.json'), `${JSON.stringify(hashes, null, 2)}\n`);
   const summary = {
     version: pkg.version,
@@ -144,6 +170,5 @@ export async function buildProject() {
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\nProject: ${CLAUDE_DESIGN.outDir}\n`);
   return summary;
 }
-const basenameOf = (path: string) => path.slice(path.lastIndexOf('/') + 1);
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]))
   await buildProject();
