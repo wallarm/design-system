@@ -157,7 +157,7 @@ async function buildInto(root: string, outDir: string) {
   try {
     await rename(outDir, CLAUDE_DESIGN.outDir);
   } catch (error) {
-    await rename(backup, CLAUDE_DESIGN.outDir).catch(() => {});
+    await rename(backup, CLAUDE_DESIGN.outDir).catch(() => undefined); // no backup when there was no previous project
     throw error;
   }
   await rm(backup, { recursive: true, force: true });
