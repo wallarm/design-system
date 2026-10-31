@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 export const PACKAGE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const CLAUDE_DESIGN = {
+  // apps/docs/docs/ai/claude-design.mdx:8 repeats this URL; change both.
   artifactUrl: 'https://claude.ai/artifact/N9vi3rNMFVZ3g8HmckRe9S',
   title: 'Wallarm Design System',
   namespace: 'WallarmDS',

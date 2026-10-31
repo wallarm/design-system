@@ -118,7 +118,7 @@ The command writes the component files, `src/icons/index.ts`, the gallery catego
 ## Claude Design
 
 Choose **Wallarm Design System** in Claude Design to prototype with the generated component
-bundle, tokens, fonts and icons. See the [designer guide](../../apps/docs/docs/ai/claude-design.mdx).
+bundle, tokens, fonts and icons. See the [designer guide](https://wallarm.github.io/design-system/ai/claude-design).
 Run `pnpm --filter @wallarm-org/design-system build:claude-design` to build the package and
 generate the ignored `.claude-design/project/` folder. The bundle and story previews share
 an Rslib IIFE configuration with the native SWC React Compiler targeting React 18.

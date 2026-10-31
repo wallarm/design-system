@@ -92,7 +92,6 @@
     "icons:sync": "tsx scripts/icons/sync.ts",
     "code-connect:preview": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect preview",
     "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files",
-    "claude-design:no-impact": "tsx claude-design/no-impact.ts",
     "test:claude-design": "rstest run --config rstest.claude-design.config.ts",
     "build:claude-design": "turbo run build --filter=@wallarm-org/design-system... && tsx claude-design/build.ts",
     "claude-design:verify": "turbo run build --filter=@wallarm-org/design-system... && tsx claude-design/verify.ts"
@@ -131,7 +130,6 @@
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "babel-plugin-react-compiler": "1.0.0",
-    "esbuild": "0.28.1",
     "glob": "13.0.6",
     "jsdom": "catalog:",
     "postcss": "8.5.28",
