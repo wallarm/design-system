@@ -52,7 +52,7 @@ From \`Button/Button.stories.tsx#Basic\` (the \`args\` spread and \`data-testid\
 </x-import>
 \`\`\`
 
-From \`Table/Table.stories.tsx#MasterCellWithDrawer\`: the first column's \`cell\` is a render prop, and \`activeRowId\` state moves to \`this.state\`.
+From \`Table/Table.stories.tsx#MasterCellWithDrawer\`: the first column's \`cell\` is a render prop, and \`activeRowId\` state moves to \`this.state\`. The excerpt is abridged, not verbatim: the story's sorting, \`className\` and \`Drawer\` are omitted.
 
 \`\`\`tsx
 const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -73,7 +73,10 @@ cell: ({ row }) => <Text size='xs'>{row.original.objectName}</Text>,
 
 \`\`\`js
 class Component extends DCLogic {
-  state = { activeRowId: null };
+  constructor(props) {
+    super(props);
+    this.state = { activeRowId: null };
+  }
   renderVals() {
     var h = React.createElement;
     var self = this;

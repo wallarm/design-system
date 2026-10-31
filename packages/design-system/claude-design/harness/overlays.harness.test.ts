@@ -9,7 +9,7 @@ const cleanups: (() => void)[] = [];
 function setup() {
   const env = createReact18Window();
   // jsdom has no layout engine. These observers are browser capabilities used by
-  // Ark positioning and Table measurements, not component implementations.
+  // Ark positioning and Table virtualization, not component implementations.
   env.window.ResizeObserver = class {
     observe() {
       /* No layout measurements in jsdom. */
@@ -163,6 +163,37 @@ describe('canvas helpers on real React 18', () => {
       }
     },
   );
+
+  it('mounts Table with createElement cells and a master-cell handler as the README translates it', async () => {
+    const { React, window, DS, h, mount } = setup();
+    const onMasterCellClick = rs.fn();
+    const columns = [
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        cell: (ctx: { row: { original: { name: string } } }) =>
+          React.createElement(DS.Text as ElementType, { size: 'xs' }, ctx.row.original.name),
+      },
+    ];
+    mount(
+      h(
+        'Root',
+        {},
+        h('Table', {
+          'aria-label': 'Rules',
+          data: [{ id: 'r1', name: 'Block bots' }],
+          columns,
+          getRowId: (row: { id: string }) => row.id,
+          onMasterCellClick,
+        }),
+      ),
+    );
+    await expect
+      .poll(() => window.document.querySelector('tbody')?.textContent)
+      .toContain('Block bots');
+    (window.document.querySelector('tbody td') as HTMLElement).click();
+    expect(onMasterCellClick).toHaveBeenCalledWith('r1');
+  });
 
   it('preserves canvas Text child identity for Button trailing-content spacing', () => {
     const { React, window, h, mount } = setup();
