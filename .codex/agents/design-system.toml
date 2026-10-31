@@ -1,0 +1,3 @@
+name = "design-system"
+description = "Create and modify design-system components, variants, stories, styling and tokens."
+developer_instructions = "Read and follow the Markdown body of .claude/agents/design-system.md from the repository root. Its YAML frontmatter is Claude Code metadata; use inherited Codex model settings and available tool equivalents."

@@ -47,6 +47,9 @@ package.json.backup
 .claude/agent-memory
 .playwright-mcp
 
+# Generated from .mcp.json by pnpm agents:sync / pnpm install.
+/.codex/config.toml
+
 # Superpowers workflow scratch (brainstorm specs + implementation plans) — ignored by default; commit finished specs/plans with `git add -f`
 docs/superpowers/
 .superpowers/

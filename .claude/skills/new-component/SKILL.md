@@ -1,3 +1,8 @@
+---
+name: new-component
+description: Use when scaffolding a new Wallarm design-system component with its source, exports, Storybook stories and tests.
+---
+
 # New Component Scaffolding
 
 Scaffold a new design system component with all required files, proper structure, and registration.

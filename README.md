@@ -20,6 +20,15 @@ pnpm dev
 pnpm storybook
 ```
 
+### Claude Code and Codex
+
+Both clients share `CLAUDE.md`, `.claude/skills`, specialist roles and hooks.
+`AGENTS.md` files are relative links to the corresponding `CLAUDE.md`.
+`pnpm install` generates `.codex/config.toml` from the canonical `.mcp.json`;
+run `pnpm agents:sync` after changing MCP servers, then restart Codex.
+Run `pnpm test:harness` to check the adapter and shared PR hook.
+See [agent harness](docs/agent-harness.md) for configuration, hook trust and Figma access.
+
 ### Build
 
 ```bash

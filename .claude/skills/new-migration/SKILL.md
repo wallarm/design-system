@@ -1,3 +1,8 @@
+---
+name: new-migration
+description: Use when a design-system breaking change needs a consumer migration in @wallarm-org/migrator, including report-only migrations for changes requiring no consumer edits.
+---
+
 # New Migration
 
 Write the `@wallarm-org/migrator` migration for a design-system breaking change, so consumer apps upgrade via Renovate and still render the same.

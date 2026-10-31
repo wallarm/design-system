@@ -1,3 +1,8 @@
+---
+name: review-pr
+description: Use when reviewing a Wallarm design-system pull request or the current branch for code quality, design-system conventions, tests and CI readiness.
+---
+
 # Pull Request Review
 
 Review a pull request for code quality, design system compliance, and CI/CD readiness.

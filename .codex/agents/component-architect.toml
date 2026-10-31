@@ -1,0 +1,3 @@
+name = "component-architect"
+description = "Design compound component APIs, sub-components, context, primitives and accessibility."
+developer_instructions = "Read and follow the Markdown body of .claude/agents/component-architect.md from the repository root. Its YAML frontmatter is Claude Code metadata; use inherited Codex model settings and available tool equivalents."

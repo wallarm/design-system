@@ -1,3 +1,8 @@
+---
+name: metrics-audit
+description: Use when auditing a design-system component for analytics readiness, data attribute forwarding, interactive target coverage or documented analytics gaps.
+---
+
 # Metrics Audit
 
 Audit a design-system component against the analytics-readiness contract and output its target inventory, gaps, and the tests it still needs.
