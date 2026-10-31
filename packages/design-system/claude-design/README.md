@@ -6,6 +6,8 @@ reference on 2026-10-29. This comparison uses commit
 (MIT) and Wallarm commit `3259ecc8`. It records the adoption direction and remaining
 differences; the changes described below have not been implemented by this review.
 
+What Storybook does not show, and so Claude Design cannot learn: [CLAUDE_DESIGN_GAP.md](./CLAUDE_DESIGN_GAP.md).
+
 ## Current priority: publish and prototype
 
 The user clarified on 2026-10-29 that the immediate goal is to give Claude Code the
