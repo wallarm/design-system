@@ -11,6 +11,14 @@ this supersedes the original esbuild proposal below. Publication and the live Cl
 check remain a separate, user-confirmed step. This document records the approved design;
 see the implementation plan for completed-work notes.
 
+Reference selected 2026-10-29: use nxds for the exporter/artifact workflow. The
+[pinned comparison and current priority](../../../packages/design-system/claude-design/README.md)
+record the differences found in the existing build. Rslib and npm isolation remain
+the implementation constraints; nxds's toolchain is not adopted wholesale. The user
+subsequently clarified that publication of the current build and generation of
+prototypes from its real components come first. Type generation and catalogue changes
+are deferred; they are not prerequisites for attempting publication and a live canvas check.
+
 ## Intent
 
 Anyone in the organization opens Claude Design (a "Design" canvas on claude.ai) and gets
