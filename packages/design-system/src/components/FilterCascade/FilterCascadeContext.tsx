@@ -76,7 +76,7 @@ export interface UseFilterCascadeResult<T = unknown> {
  * What custom levels render from: the open levels, top first. `FilterCascadeLevels` maps them for
  * you; reach for this to render something around them.
  */
-export const useFilterCascade = <T = unknown>(): UseFilterCascadeResult<T> => {
+export const useFilterCascade = <T = unknown,>(): UseFilterCascadeResult<T> => {
   const { api, path, query, clear, isFlat, loadState } = useFilterCascadeContext();
   const { collection } = api;
 

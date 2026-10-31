@@ -10,10 +10,7 @@ export {
   type OverflowListMoreContentProps,
 } from './OverflowListMoreContent';
 export { OverflowListMoreCount, type OverflowListMoreCountProps } from './OverflowListMoreCount';
-export {
-  OverflowListMoreHeader,
-  type OverflowListMoreHeaderProps,
-} from './OverflowListMoreHeader';
+export { OverflowListMoreHeader, type OverflowListMoreHeaderProps } from './OverflowListMoreHeader';
 export { OverflowListMoreItems, type OverflowListMoreItemsProps } from './OverflowListMoreItems';
 export {
   OverflowListMoreTrigger,

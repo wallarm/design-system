@@ -5,7 +5,8 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { ResizableProvider } from './ResizableContext';
 
 export interface ResizablePanelGroupProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
     Pick<
       GroupProps,
       | 'defaultLayout'

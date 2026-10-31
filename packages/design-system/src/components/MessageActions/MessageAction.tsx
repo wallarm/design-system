@@ -6,8 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { messageActionVariants } from './classes';
 
 export interface MessageActionProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Required: the accessible name and the tooltip text. */
   'aria-label': string;

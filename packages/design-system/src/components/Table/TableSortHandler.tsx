@@ -7,6 +7,7 @@ import { tableHeaderButtonClass } from './classes';
 import { type DSTableFeatures, SORT_LABELS, useTableValue } from './lib';
 import { useTableContext } from './TableContext';
 
+// oxlint-disable-next-line no-redeclare -- TypeScript permits the type and value to share this public name.
 interface TableSortHandler<T extends RowData> {
   header: Header<DSTableFeatures, T, unknown>;
 }

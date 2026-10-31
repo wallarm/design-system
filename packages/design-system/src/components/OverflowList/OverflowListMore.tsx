@@ -6,8 +6,7 @@ import { OverflowListMoreContent } from './OverflowListMoreContent';
 import { OverflowListMoreTrigger } from './OverflowListMoreTrigger';
 
 export interface OverflowListMoreProps
-  extends Pick<PopoverProps, 'open' | 'onOpenChange'>,
-    TestableProps {
+  extends Pick<PopoverProps, 'open' | 'onOpenChange'>, TestableProps {
   /**
    * Defaults to `<OverflowListMoreTrigger />` + `<OverflowListMoreContent />`.
    * Compose from the `OverflowListMore*` parts only — they know to render a bare

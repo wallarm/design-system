@@ -1,19 +1,10 @@
 {
   "fileKey": "ezgUqbCqEBXqC4ViRausYIAN",
   "pageId": "5702:845",
-  "brandGroups": [
-    "smm-icon",
-    "novu-providers"
-  ],
+  "brandGroups": ["smm-icon", "novu-providers"],
   "exclude": {
-    "groups": [
-      "Flag",
-      "Modifiers"
-    ],
-    "namePrefixes": [
-      "old /",
-      "figmaonly-"
-    ],
+    "groups": ["Flag", "Modifiers"],
+    "namePrefixes": ["old /", "figmaonly-"],
     "nodes": {
       "6622:2357": "second \"loader\" (8 uniform rays) — repo Loader is node 5725:891",
       "6622:2252": "\"zoom out\" is a sharp-corner Maximize, duplicate of zoom-out 6026:1063",

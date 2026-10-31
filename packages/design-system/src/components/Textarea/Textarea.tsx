@@ -21,10 +21,7 @@ type TextareaVariantsProps = VariantProps<typeof textareaPaddingVariants>;
 type InputVariantsProps = VariantProps<typeof inputVariants>;
 
 export interface TextareaProps
-  extends TextareaNativeProps,
-    TextareaVariantsProps,
-    InputVariantsProps,
-    TestableProps {
+  extends TextareaNativeProps, TextareaVariantsProps, InputVariantsProps, TestableProps {
   ref?: Ref<HTMLTextAreaElement>;
   minRows?: number;
   maxRows?: number;

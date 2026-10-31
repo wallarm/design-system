@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import {
   ChevronDown,
   ChevronRight,
@@ -315,7 +315,7 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
   // it so the Storybook actions panel shows one consistent stream.
   const track = useCallback(
     (event: string, props?: Record<string, unknown>) =>
-      // biome-ignore lint/suspicious/noConsole: demo story stand-in for an SDK call
+      // oxlint-disable-next-line no-console -- demo story stand-in for an SDK call
       console.info('[analytics]', event, props ?? {}),
     [],
   );

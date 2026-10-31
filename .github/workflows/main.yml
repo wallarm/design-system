@@ -139,6 +139,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # pnpm lint runs Oxlint and checks Oxfmt formatting across the repository
           - check: lint
           - check: typecheck
           # Unit tests take ~3 min on a 4-vCPU runner; Rstest splits them by file

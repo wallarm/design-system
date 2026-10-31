@@ -4,8 +4,7 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuContextTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   children: ReactNode;
   asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;

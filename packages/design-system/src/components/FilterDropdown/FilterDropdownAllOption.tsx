@@ -5,8 +5,10 @@ import { SelectOptionIndicator } from '../Select/SelectOptionIndicator';
 import { SelectOptionText } from '../Select/SelectOptionText';
 import { useFilterDropdownContext } from './FilterDropdownContext';
 
-export interface FilterDropdownAllOptionProps
-  extends Omit<ComponentProps<typeof SelectOption>, 'item' | 'children'> {
+export interface FilterDropdownAllOptionProps extends Omit<
+  ComponentProps<typeof SelectOption>,
+  'item' | 'children'
+> {
   ref?: Ref<HTMLDivElement>;
   /** @default the root's `allLabel` */
   children?: ReactNode;

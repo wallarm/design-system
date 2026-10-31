@@ -1,8 +1,8 @@
 import { type FC, type HTMLAttributes, type Ref, useState } from 'react';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
-import { ConversationContext } from './ConversationContext';
 import { conversationVariants } from './classes';
+import { ConversationContext } from './ConversationContext';
 import { useStickToBottom } from './useStickToBottom';
 
 export interface ConversationProps extends HTMLAttributes<HTMLDivElement>, TestableProps {

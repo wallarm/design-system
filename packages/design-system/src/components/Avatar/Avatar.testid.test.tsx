@@ -1,6 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { TestIdProvider } from '../../utils/testId';
 import {
   Avatar,
   AvatarContent,
@@ -10,6 +9,7 @@ import {
   AvatarName,
   AvatarOverlay,
 } from '.';
+import { TestIdProvider } from '../../utils/testId';
 
 describe('Avatar — test ids', () => {
   it('cascades {id}--image and {id}--fallback', () => {

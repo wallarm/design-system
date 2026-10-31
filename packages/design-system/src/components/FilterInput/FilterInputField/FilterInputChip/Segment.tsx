@@ -6,8 +6,8 @@ import { FilterInputContext } from '../../FilterInputContext/FilterInputContext'
 import { applyEditCaret } from './applyEditCaret';
 import { editingValueMinWidth, segmentContainer, segmentTextVariants } from './classes';
 import { CHAR_WIDTH_PX } from './constants';
-import { MultiValueSegment } from './MultiValueSegment';
 import { useSizerWidth } from './model/useSizerWidth';
+import { MultiValueSegment } from './MultiValueSegment';
 import { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';
 
 export type SegmentProps = HTMLAttributes<HTMLDivElement> & {

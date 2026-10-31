@@ -12,8 +12,7 @@ import { FilterDropdownFooter } from './FilterDropdownFooter';
 import { FilterDropdownSearch } from './FilterDropdownSearch';
 
 export interface FilterDropdownContentProps
-  extends Omit<ArkUiSelect.ContentProps, 'asChild' | 'children'>,
-    TestableProps {
+  extends Omit<ArkUiSelect.ContentProps, 'asChild' | 'children'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   children?: ReactNode;
 }

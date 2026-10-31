@@ -26,7 +26,7 @@ export function useStory(load: StoryLoader, name: string): StoryState {
         if (active) setState({ Story, error: null });
       })
       .catch((cause: unknown) => {
-        // biome-ignore lint/suspicious/noConsole: keep the original error (stack) visible to developers
+        // oxlint-disable-next-line no-console -- keep the original error (stack) visible to developers
         console.error(cause);
         const error = cause instanceof Error ? cause : new Error(String(cause));
         if (active) setState({ Story: null, error });

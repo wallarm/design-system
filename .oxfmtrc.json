@@ -1,0 +1,73 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "endOfLine": "lf",
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "all",
+  "semi": true,
+  "arrowParens": "avoid",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "embeddedLanguageFormatting": "off",
+  "sortPackageJson": false,
+  "sortImports": {
+    "customGroups": [
+      {
+        "groupName": "react-libs",
+        "elementNamePattern": ["react", "react*", "react*/**"]
+      },
+      {
+        "groupName": "wallarm",
+        "elementNamePattern": ["@wallarm-org/**"]
+      }
+    ],
+    "groups": [
+      "react-libs",
+      ["builtin", "external"],
+      "wallarm",
+      ["internal", "subpath", "parent", "sibling", "index"],
+      "style",
+      "unknown"
+    ],
+    "newlinesBetween": false,
+    "sortSideEffects": false,
+    "partitionByComment": true
+  },
+  "overrides": [
+    {
+      "files": ["**/*.css"],
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/__fixtures__/**",
+    "**/storybook-static/**",
+    "**/*.gen.ts",
+    "**/CodeEditor/engine/languages/http/parser.ts",
+    "**/CodeEditor/engine/languages/http/parser.terms.ts",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/coverage/**",
+    "**/doc_build/**",
+    "**/doc_build_local/**",
+    "**/.rspress/**",
+    "**/src/theme/**/*.css",
+    "**/*.md",
+    "**/*.mdx",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.toml",
+    "**/*.html",
+    "**/*.svg",
+    "**/CHANGELOG*"
+  ]
+}

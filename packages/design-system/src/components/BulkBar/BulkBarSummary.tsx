@@ -3,8 +3,7 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface BulkBarSummaryProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
-    TestableProps {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, TestableProps {
   children: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }

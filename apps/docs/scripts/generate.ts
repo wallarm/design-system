@@ -1,7 +1,7 @@
-import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { findNewComponents } from './newComponents';
 import {
   kebab,

@@ -9,8 +9,7 @@ import type { WallyIconStyle } from './types';
 type WallyIconVariantProps = VariantProps<typeof wallyIconVariants>;
 
 export interface WallyIconProps
-  extends Omit<SVGProps<SVGSVGElement>, 'style'>,
-    WallyIconVariantProps {
+  extends Omit<SVGProps<SVGSVGElement>, 'style'>, WallyIconVariantProps {
   ref?: Ref<SVGSVGElement>;
   variant?: WallyIconStyle;
 }

@@ -408,7 +408,7 @@ export const createEditor = (
         view.dispatch({ effects: compartments.language.reconfigure(extension) });
       },
       error => {
-        // biome-ignore lint/suspicious/noConsole: surfaced once per failed load; editor keeps working without structure
+        // oxlint-disable-next-line no-console -- surfaced once per failed load; editor keeps working without structure
         console.error(`[CodeEditor] failed to load the ${lang} parser`, error);
       },
     );

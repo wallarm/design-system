@@ -2,8 +2,8 @@ import { type FC, useContext } from 'react';
 import { XAxis } from 'recharts';
 import type { TickFormatter } from 'recharts/types/cartesian/CartesianAxis';
 import type { XAxisTickContentProps } from 'recharts/types/util/types';
-import { LineChartDataContext } from './LineChartContext';
 import { renderAxisTick } from './lib/renderAxisTick';
+import { LineChartDataContext } from './LineChartContext';
 
 /**
  * Tick-spacing preset. Maps to `minTickGap` so callers don't have to think in
