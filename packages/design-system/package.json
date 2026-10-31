@@ -126,7 +126,7 @@
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "babel-plugin-react-compiler": "1.0.0",
-    "glob": "13.0.6",
+    "glob": "14.0.2",
     "jsdom": "catalog:",
     "postcss": "8.5.28",
     "react": "catalog:",
