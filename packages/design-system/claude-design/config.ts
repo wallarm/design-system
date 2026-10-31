@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 export const PACKAGE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const CLAUDE_DESIGN = {
-  artifactUrl: 'https://claude.ai/artifact/XyodGNRtEkFNAUfyoMD5HN',
+  artifactUrl: 'https://claude.ai/artifact/N9vi3rNMFVZ3g8HmckRe9S',
   title: 'Wallarm Design System',
   namespace: 'WallarmDS',
   outDir: resolve(PACKAGE_DIR, '.claude-design/project'),
