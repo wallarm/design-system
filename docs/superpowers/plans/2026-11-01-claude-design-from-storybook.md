@@ -374,7 +374,7 @@ it('lists components without stories and internals in Not synced', () => { /* RE
 - [ ] **Step 1:** Run in parallel:
   - `pnpm lint`
   - `pnpm --filter @wallarm-org/design-system typecheck`
-  - `pnpm test`
+  - `pnpm test:run`
   - `pnpm --filter @wallarm-org/design-system test:claude-design`
   - `claude-design:verify`
   - `pnpm --filter @wallarm-org/docs build`
