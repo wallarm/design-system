@@ -94,6 +94,20 @@ describe('parseComponentProps', () => {
     expect(provider?.props.find(p => p.name === 'status')?.defaultValue).toBe('ready');
   });
 
+  it('Input props exclude attributes declared only in @types/react', () => {
+    const { mainProps } = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Input'), 'Input');
+    const names = mainProps.map(p => p.name);
+    expect(names).not.toContain('onCopy');
+    expect(names).not.toContain('autoCapitalize');
+    expect(names).not.toContain('accessKey');
+    expect(names).toContain('placeholder');
+  });
+
+  it('falls back to the first call-signature parameter when <Name>Props is not exported', () => {
+    const { mainProps } = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Kbd'), 'Kbd');
+    expect(mainProps.length).toBeGreaterThan(0);
+  });
+
   it('returns empty for non-existent component', () => {
     const { mainProps, subComponents } = parseComponentProps(
       project,

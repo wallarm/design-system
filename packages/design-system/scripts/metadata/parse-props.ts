@@ -21,12 +21,41 @@ const SKIP_PROPS = new Set([
   'dangerouslySetInnerHTML',
 ]);
 
-// on*/aria-*/data-* props are skipped only when inherited from the DOM attribute
-// types; ones a component declares itself (e.g. `onSubmit`) are part of its API.
-const HTML_ATTR_PREFIXES = ['on', 'aria-', 'data-'];
+// Native attributes worth documenting even when a component only inherits them.
+const KEEP_NATIVE = new Set([
+  'disabled',
+  'readOnly',
+  'required',
+  'placeholder',
+  'value',
+  'defaultValue',
+  'checked',
+  'defaultChecked',
+  'name',
+  'type',
+  'id',
+  'title',
+  'tabIndex',
+  'autoFocus',
+  'href',
+  'target',
+  'rel',
+  'min',
+  'max',
+  'step',
+  'minLength',
+  'maxLength',
+  'pattern',
+  'multiple',
+  'accept',
+  'autoComplete',
+  'onChange',
+]);
 
+// A prop is inherited when every declaration lives in @types/react (DOM attributes);
+// ones a component declares itself (e.g. `onSubmit`) are part of its API.
 function isInheritedHtmlProp(name: string, declarations: Node[]): boolean {
-  if (!HTML_ATTR_PREFIXES.some(p => name.startsWith(p))) return false;
+  if (KEEP_NATIVE.has(name)) return false;
   return declarations.every(d =>
     d.getSourceFile().getFilePath().includes('/node_modules/@types/react/'),
   );
@@ -173,6 +202,23 @@ export function parseComponentProps(
       .filter(e => !e.isTypeOnly())
       .map(e => e.getAliasNode()?.getText() ?? e.getName()),
   );
+
+  // Fallback when `<Name>Props` isn't exported: first parameter of the component's call signature.
+  const hasMainPropsExport = indexFile
+    .getExportDeclarations()
+    .some(d =>
+      d
+        .getNamedExports()
+        .some(e => (e.getAliasNode()?.getText() ?? e.getName()) === `${componentName}Props`),
+    );
+  if (!hasMainPropsExport) {
+    const componentSym = indexFile.getExportSymbols().find(sym => sym.getName() === componentName);
+    const decl =
+      componentSym?.getAliasedSymbol()?.getDeclarations()[0] ?? componentSym?.getDeclarations()[0];
+    const param = decl?.getType().getCallSignatures()[0]?.getParameters()[0];
+    if (param)
+      mainProps.push(...parsePropsFromType(param.getTypeAtLocation(indexFile), mainDefaults));
+  }
 
   // Iterate over exported types from index.ts
   for (const exportDecl of indexFile.getExportDeclarations()) {
