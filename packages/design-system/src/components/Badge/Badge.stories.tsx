@@ -238,6 +238,18 @@ export const MutedVariants: StoryFn<typeof meta> = () => (
   </table>
 );
 
+/** A quieter outline keeps its neutral label and border inside a coloured message. */
+export const MutedOutline: StoryFn<typeof meta> = () => (
+  <div
+    className='rounded-8 bg-bg-light-danger p-16 text-text-danger'
+    data-testid='muted-outline-host'
+  >
+    <Badge data-testid='muted-outline' type='outline' color='slate' muted>
+      Muted outline
+    </Badge>
+  </div>
+);
+
 /**
  * The full palette. Every colour already means something in the system, so borrowing one for
  * decoration teaches the reader the wrong thing.

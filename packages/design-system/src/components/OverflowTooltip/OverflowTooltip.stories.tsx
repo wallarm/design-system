@@ -184,7 +184,7 @@ export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
               <code className='rounded-6 bg-component-kbi-tooltip-bg px-4 py-2 font-mono text-text-primary-alt text-xs'>
                 /api/v1/users/1234567890/sessions/abc-def-ghi-jkl-mno/tokens/refresh
               </code>
-              <div className='text-xs text-text-secondary'>
+              <div className='text-xs text-text-secondary-alt'>
                 Method: POST
                 <br />
                 Auth: Bearer Token
