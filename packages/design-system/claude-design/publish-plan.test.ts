@@ -139,6 +139,45 @@ describe('publish plan', () => {
     expect(second.indexSha256).toBe(sha(bytes));
   });
 
+  it('merges in remote key order, appends missing replaced keys, drops local-only keys', () => {
+    const { dir, write } = fixture({});
+    const local = JSON.parse(readFileSync(join(dir, 'project/design-system.json'), 'utf8'));
+    write('project/design-system.json', JSON.stringify({ ...local, localOnly: 1 }));
+    write(
+      'remote/index.json',
+      JSON.stringify({ lastChange: { at: 'remote' }, docs: { a: 1 }, namespace: 'WallarmDS' }),
+    );
+    const index = JSON.parse(readFileSync(plan(dir).indexPath, 'utf8'));
+    expect(Object.keys(index)).toEqual([
+      'lastChange',
+      'docs',
+      'namespace',
+      'title',
+      'libraries',
+      'editing',
+      'groups',
+      'assetGroups',
+    ]);
+    expect(index.lastChange).toEqual({ at: 'local' });
+    expect(index.docs).toEqual({ a: 1 });
+  });
+
+  it('uploads one file per unique hash, any .svg case', () => {
+    const { dir } = fixture({
+      files: { 'assets/Icons/a.svg': '<svg/>', 'assets/Icons/b.SVG': '<svg/>' },
+    });
+    expect(plan(dir).uploads).toEqual([['project/assets/Icons/a.svg']]);
+  });
+
+  it('throws on a truncated asset list or a manifest entry missing on disk', () => {
+    const { dir, write } = fixture({});
+    write('remote/assets.json', JSON.stringify({ assets: [], next: 'cursor' }));
+    expect(() => plan(dir)).toThrow(/truncated/);
+    const other = fixture({});
+    rmSync(join(other.dir, 'project/README.md'));
+    expect(() => plan(other.dir)).toThrow(/project\/README.md, which is missing/);
+  });
+
   it('reports a title mismatch as identityOk false', () => {
     expect(plan(fixture({ title: 'Other' }).dir).identityOk).toBe(false);
     expect(plan(fixture({ remoteIndex: { namespace: 'X' } }).dir).identityOk).toBe(false);
@@ -171,5 +210,14 @@ describe('publish plan', () => {
     expect(problems).toContain('sha256 mismatch: project/README.md');
     expect(problems).toContain('stale path still published: project/old.md');
     expect(problems).toContain('sha256 mismatch: project/design-system.json');
+  });
+
+  it('check trusts only the listed asset store, not saved upload results', () => {
+    const { dir } = fixture({
+      svgs: 1,
+      uploads: [{ opaque_id: 'a0', source_sha256: sha('<svg id="0"/>') }],
+    });
+    expect(plan(dir).uploads).toEqual([]);
+    expect(check(dir)).toContain('asset not uploaded: project/assets/Icons/i000.svg');
   });
 });

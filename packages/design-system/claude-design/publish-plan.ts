@@ -41,7 +41,7 @@ const REPLACED = [
 
 const readJson = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const sha256 = (text: string) => createHash('sha256').update(text).digest('hex');
-const isSvgAsset = (path: string) => path.startsWith('project/assets/') && path.endsWith('.svg');
+const isSvgAsset = (path: string) => path.startsWith('project/assets/') && /\.svg$/i.test(path);
 const chunk = <T>(items: T[], size: number) =>
   Array.from({ length: Math.ceil(items.length / size) }, (_, i) =>
     items.slice(i * size, (i + 1) * size),
@@ -64,7 +64,8 @@ const readRemoteIndex = (path: string): Json => {
   return typeof parsed.content === 'string' ? JSON.parse(parsed.content) : parsed;
 };
 
-const compute = (dir: string) => {
+/** `withUploads: false` trusts only the listed asset store (for check). */
+const compute = (dir: string, withUploads = true) => {
   const remoteDir = join(dir, 'remote');
   const artifact = readJson(join(remoteDir, 'artifact.json')) as Json;
   const remoteFiles = (readJson(join(remoteDir, 'files.json')) as { files: RemoteFile[] }).files;
@@ -72,11 +73,17 @@ const compute = (dir: string) => {
   const localIndex = readJson(join(dir, 'project/design-system.json')) as Json;
   const hashes = readJson(join(dir, 'file-hashes.json')) as Record<string, string>;
 
+  for (const path of Object.keys(hashes))
+    if (!existsSync(join(dir, 'project', path)))
+      throw new Error(`file-hashes.json lists project/${path}, which is missing on disk`);
+
   const ids = new Map<string, string>();
-  collectAssetIds(readJson(join(remoteDir, 'assets.json')), ids);
+  const assets = readJson(join(remoteDir, 'assets.json')) as Json;
+  if (assets.next) throw new Error('assets.json is truncated (has a next cursor); save every page');
+  collectAssetIds(assets, ids);
   const remoteAssetCount = ids.size;
   const uploadsDir = join(remoteDir, 'uploads');
-  if (existsSync(uploadsDir))
+  if (withUploads && existsSync(uploadsDir))
     for (const name of readdirSync(uploadsDir)
       .filter(name => name.endsWith('.json'))
       .sort())
@@ -85,7 +92,15 @@ const compute = (dir: string) => {
   const local = new Map(Object.entries(hashes).map(([path, hash]) => [`project/${path}`, hash]));
   const remote = new Map(remoteFiles.map(file => [file.path, file]));
   const svgs = [...local.keys()].filter(isSvgAsset).sort();
-  const pendingUploads = svgs.filter(path => !ids.has(local.get(path) ?? ''));
+  // One upload per unique hash; index entries with the same bytes share its id.
+  const pendingUploads = [
+    ...new Map(
+      svgs
+        .filter(path => !ids.has(local.get(path) ?? ''))
+        .reverse()
+        .map(path => [local.get(path), path]),
+    ).values(),
+  ].sort();
   const changed = [...local.keys()]
     .filter(path => !isSvgAsset(path) && path !== INDEX)
     .filter(path => remote.get(path)?.sha256 !== local.get(path))
@@ -102,14 +117,9 @@ const compute = (dir: string) => {
       const blob = ids.get(file.sha256);
       if (blob) file.blob = blob;
     }
-  const merged: Json = {};
-  for (const key of [...Object.keys(localIndex), ...Object.keys(remoteIndex)]) {
-    if (key in merged) continue;
-    if (key === 'assetGroups') merged[key] = assetGroups;
-    else if (REPLACED.includes(key)) merged[key] = localIndex[key];
-    else if (key in remoteIndex) merged[key] = remoteIndex[key];
-    else merged[key] = localIndex[key];
-  }
+  // Remote key order; replaced keys the remote lacks go last; other local-only keys are dropped.
+  const merged: Json = { ...remoteIndex };
+  for (const key of REPLACED) merged[key] = key === 'assetGroups' ? assetGroups : localIndex[key];
   const indexText = `${JSON.stringify(merged, null, 2)}\n`;
   const indexSha256 = sha256(indexText);
   const usedIds = new Set(svgs.map(path => ids.get(local.get(path) ?? '')));
@@ -181,7 +191,7 @@ export const plan = (dir: string): Plan => {
 };
 
 export const check = (dir: string): string[] => {
-  const result = compute(dir);
+  const result = compute(dir, false);
   return [
     ...(result.identityOk ? [] : ['remote title or namespace does not match CLAUDE_DESIGN']),
     ...result.pendingUploads.map(path => `asset not uploaded: ${path}`),

@@ -1,7 +1,7 @@
 // Downloads the released Claude Design project into .claude-design/ (replacing project/).
 // Usage: tsx claude-design/fetch.ts [vX.Y.Z]  (default: the latest stable v* release)
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { CLAUDE_DESIGN } from './config';
@@ -26,16 +26,30 @@ const tag =
   ).find(release => /^v\d/.test(release.tagName))?.tagName;
 if (!tag) throw new Error('No stable v* release found');
 
+const root = dirname(CLAUDE_DESIGN.outDir);
+mkdirSync(root, { recursive: true });
 const download = mkdtempSync(join(tmpdir(), 'claude-design-'));
+// Same filesystem as root, so the final renames are atomic.
+const unpacked = mkdtempSync(join(root, 'fetch-'));
 try {
   run('gh', ['release', 'download', tag, '-p', 'claude-design-*.tgz', '-D', download]);
-  const [archive] = readdirSync(download);
-  if (!archive) throw new Error(`${tag} has no claude-design-*.tgz asset`);
-  const root = dirname(CLAUDE_DESIGN.outDir);
-  mkdirSync(root, { recursive: true });
-  rmSync(CLAUDE_DESIGN.outDir, { recursive: true, force: true });
-  run('tar', ['-xzf', join(download, archive), '-C', root]);
+  const archives = readdirSync(download);
+  if (archives.length !== 1)
+    throw new Error(
+      `${tag} must have exactly one claude-design-*.tgz asset, found ${archives.length}`,
+    );
+  const [archive] = archives as [string];
+  run('tar', ['-xzf', join(download, archive), '-C', unpacked]);
+  for (const required of ['project/design-system.json', 'file-hashes.json'])
+    if (!existsSync(join(unpacked, required)))
+      throw new Error(`${archive} has no ${required}; local state left unchanged`);
+  // The manifest drives stale-path removal, so it must never outlive its project.
+  for (const name of ['project', 'file-hashes.json', 'summary.json']) {
+    rmSync(join(root, name), { recursive: true, force: true });
+    if (existsSync(join(unpacked, name))) renameSync(join(unpacked, name), join(root, name));
+  }
   process.stdout.write(`Unpacked ${archive} (${tag}) into ${root}\n`);
 } finally {
   rmSync(download, { recursive: true, force: true });
+  rmSync(unpacked, { recursive: true, force: true });
 }
