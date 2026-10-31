@@ -2,6 +2,7 @@ import { describe, expect, it } from '@rstest/core';
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { previewGroups } from './previews/build-previews';
 
 const out = resolve('.claude-design/project');
 describe('complete Claude Design project', () => {
@@ -12,8 +13,19 @@ describe('complete Claude Design project', () => {
       );
     }
     const paths = await readdir(join(out, 'components'), { recursive: true });
-    for (const path of paths.filter(path => path.endsWith('/preview.html')))
+    for (const path of paths.filter(path => /\/preview(-\d+)?\.html$/.test(path)))
       expect(await readFile(join(out, 'components', path), 'utf8')).toMatch(/^<!-- @dsCard /);
+  });
+  it('previews every exported story across its preview parts', async () => {
+    for (const { name, rows } of await previewGroups()) {
+      const dir = join(out, 'components', name);
+      const scripts = (await readdir(dir)).filter(file => /^stories(-\d+)?\.js$/.test(file));
+      const code = (await Promise.all(scripts.map(file => readFile(join(dir, file), 'utf8')))).join(
+        '',
+      );
+      const shipped = [...code.matchAll(/\{name:"((?:[^"\\]|\\.)*)",story:/g)].map(m => m[1]);
+      expect(shipped.sort(), name).toEqual(rows.map(row => row.story).sort());
+    }
   });
   it('ships 582 inked SVG icons and React18 code-editing metadata without local React', async () => {
     const icons = (await readdir(join(out, 'assets/Icons'))).filter(name => name.endsWith('.svg'));

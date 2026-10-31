@@ -1,5 +1,5 @@
 import { Project, type SourceFile } from 'ts-morph';
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
 import { buildCanvasScripts, readInlineScript } from '../bundle/rslib-build';
@@ -13,24 +13,21 @@ const { findStoryFiles, readStoryTitle } = require('../../scripts/metadata/story
 const htmlEscape = (value: string) =>
   value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 
-export async function buildPreviews({ outDir }: { outDir: string }) {
-  const meta = JSON.parse(
-    await readFile(resolve(PACKAGE_DIR, '.claude-design/meta.json'), 'utf8'),
-  ) as { exports: string[] };
+export type PreviewRow = { file: string; story: string };
+export type PreviewGroup = { name: string; group: string; rows: PreviewRow[] };
+
+/** One group per guide: a component, or a story file for `splitByStoryFile` components. */
+export async function previewGroups(): Promise<PreviewGroup[]> {
   const project = new Project({
     skipAddingFilesFromTsConfig: true,
     skipFileDependencyResolution: true,
   });
-  const withPreview: string[] = [];
   const componentsDir = resolve(PACKAGE_DIR, 'src/components');
   const names = (await readdir(componentsDir, { withFileTypes: true }))
     .filter(d => d.isDirectory())
     .map(d => d.name)
     .sort();
-  const entries: Record<string, string> = {};
-  const previews: { name: string; group: string }[] = [];
-  const entryDir = resolve(PACKAGE_DIR, '.claude-design/runtime/previews');
-  await mkdir(entryDir, { recursive: true });
+  const groups: PreviewGroup[] = [];
   for (const name of names) {
     if (CLAUDE_DESIGN.internal.has(name)) continue;
     const files = findStoryFiles(project, join(componentsDir, name)).sort(
@@ -38,20 +35,41 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
         Number(basename(b) === `${name}.stories.tsx`) -
         Number(basename(a) === `${name}.stories.tsx`),
     );
-    const selected: { file: string; story: string; group: string }[] = [];
+    const bySplit = CLAUDE_DESIGN.splitByStoryFile.has(name);
+    const found = new Map<string, PreviewGroup>();
     for (const file of files) {
       const source = project.addSourceFileAtPath(file);
       const group = readStoryTitle(source)?.split('/')[0] ?? 'Components';
-      const stories = source
+      const guide = bySplit ? basename(file, '.stories.tsx') : name;
+      const target = found.get(guide) ?? { name: guide, group, rows: [] };
+      found.set(guide, target);
+      for (const decl of source
         .getVariableStatements()
         .filter(v => v.hasExportKeyword())
-        .flatMap(v => v.getDeclarations().map(d => d.getName()));
-      for (const story of stories.slice(0, 4 - selected.length))
-        selected.push({ file, story, group });
-      if (selected.length === 4) break;
+        .flatMap(v => v.getDeclarations()))
+        target.rows.push({ file, story: decl.getName() });
     }
-    if (!selected.length) continue;
-    const imports = selected
+    groups.push(...[...found.values()].filter(g => g.rows.length));
+  }
+  return groups;
+}
+
+export async function buildPreviews({ outDir }: { outDir: string }) {
+  const meta = JSON.parse(
+    await readFile(resolve(PACKAGE_DIR, '.claude-design/meta.json'), 'utf8'),
+  ) as { exports: string[] };
+  const withPreview: string[] = [];
+  const groups = await previewGroups();
+  const entryDir = resolve(PACKAGE_DIR, '.claude-design/runtime/previews');
+  await mkdir(entryDir, { recursive: true });
+  const partsOf = (rows: PreviewRow[], count: number): PreviewRow[][] => {
+    const size = Math.ceil(rows.length / count);
+    return Array.from({ length: Math.ceil(rows.length / size) }, (_, i) =>
+      rows.slice(i * size, (i + 1) * size),
+    );
+  };
+  const entryFor = async (key: string, rows: PreviewRow[]): Promise<string> => {
+    const imports = rows
       .map(
         ({ file, story }, i) =>
           `import meta${i}, {${story} as Story${i}} from ${JSON.stringify(file)};`,
@@ -59,7 +77,7 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
       .join('\n');
     const source = `${imports}
       import React from 'react';
-      const rows=[${selected.map(({ story }, i) => `{name:${JSON.stringify(story)},story:Story${i},meta:meta${i}}`).join(',')}];
+      const rows=[${rows.map(({ story }, i) => `{name:${JSON.stringify(story)},story:Story${i},meta:meta${i}}`).join(',')}];
       function Example({entry}) {
         const {story,meta}=entry; const args={...meta.args,...story.args};
         let Render=(typeof story==='function'||story.$$typeof)?story:story.render||meta.render||meta.component;
@@ -68,33 +86,55 @@ export async function buildPreviews({ outDir }: { outDir: string }) {
         for(const decorate of [...(meta.decorators||[]),...(story.decorators||[])].reverse()) { const previous=child; child=()=>decorate(previous,context); }
         return React.createElement('section',{'data-preview-story':entry.name,className:'p-16'},React.createElement('h2',{className:'text-sm mb-12'},entry.name),React.createElement(child));
       }
-      window.WallarmPreview={mount(node){const root=window.ReactDOM.createRoot(node);root.render(React.createElement(window.WallarmDS.Root,null,rows.map(entry=>React.createElement(Example,{key:entry.name,entry}))));return root;}};
+      window.WallarmPreview={mount(node){const root=window.ReactDOM.createRoot(node);root.render(React.createElement(window.WallarmDS.Root,null,rows.map((entry,i)=>React.createElement(Example,{key:i,entry}))));return root;}};
     `;
-    const entry = join(entryDir, `${name}.tsx`);
+    const entry = join(entryDir, `${key.replaceAll('/', '__')}.tsx`);
     await writeFile(entry, source);
-    entries[`${name}/stories`] = entry;
-    previews.push({ name, group: selected[0]!.group });
-  }
-  await buildCanvasScripts({
-    entries,
-    outDir: join(outDir, 'components'),
-    globalExports: meta.exports,
-  });
-  for (const { name, group } of previews) {
-    const code = await readInlineScript(join(outDir, 'components', name, 'stories.js'));
-    if (Buffer.byteLength(code) > 512_000)
-      throw new Error(
-        `${name} preview exceeds 512 KB (${Buffer.byteLength(code)}); check duplicate component imports`,
-      );
+    return entry;
+  };
+  const scriptPath = (name: string, script: string) =>
+    join(outDir, 'components', name, `${script}.js`);
+  const build = async (entries: Record<string, string>) =>
+    buildCanvasScripts({
+      entries,
+      outDir: join(outDir, 'components'),
+      globalExports: meta.exports,
+    });
+  const readScript = async (name: string, script: string): Promise<string> => {
+    const code = await readInlineScript(scriptPath(name, script));
     if (/<\/script|<!--/i.test(code)) throw new Error(`${name} preview is unsafe to inline`);
-    const dir = join(outDir, 'components', name);
-    await mkdir(dir, { recursive: true });
-    await writeFile(join(dir, 'stories.js'), code);
-    await writeFile(
-      join(dir, 'preview.html'),
-      `<!-- @dsCard group="${htmlEscape(group)}" height=480 -->\n<!doctype html><html><head><meta charset="utf-8"></head><body><div id="preview"></div><script src="./stories.js"></script><script>window.WallarmPreview.mount(document.getElementById('preview'));</script></body></html>\n`,
-    );
-    withPreview.push(name);
+    return code;
+  };
+
+  const whole: Record<string, string> = {};
+  for (const g of groups) whole[`${g.name}/stories`] = await entryFor(`${g.name}/stories`, g.rows);
+  await build(whole);
+
+  for (const g of groups) {
+    const dir = join(outDir, 'components', g.name);
+    let scripts = [await readScript(g.name, 'stories')];
+    let names = ['stories'];
+    // A script over the platform's 512 KB text cap is rebuilt in as few parts as fit.
+    for (let count = 2; scripts.some(code => Buffer.byteLength(code) > 512_000); count++) {
+      if (count > g.rows.length)
+        throw new Error(`${g.name} preview exceeds 512 KB even with one story per part`);
+      const parts = partsOf(g.rows, count);
+      const entries: Record<string, string> = {};
+      for (const [i, rows] of parts.entries())
+        entries[`${g.name}/stories-${i + 1}`] = await entryFor(`${g.name}/stories-${i + 1}`, rows);
+      await build(entries);
+      names = parts.map((_, i) => `stories-${i + 1}`);
+      scripts = await Promise.all(names.map(script => readScript(g.name, script)));
+    }
+    if (names.length > 1) await rm(join(dir, 'stories.js'));
+    for (const [i, script] of names.entries()) {
+      await writeFile(join(dir, `${script}.js`), scripts[i]!);
+      await writeFile(
+        join(dir, i === 0 ? 'preview.html' : `preview-${i + 1}.html`),
+        `<!-- @dsCard group="${htmlEscape(g.group)}" height=480 -->\n<!doctype html><html><head><meta charset="utf-8"></head><body><div id="preview"></div><script src="./${script}.js"></script><script>window.WallarmPreview.mount(document.getElementById('preview'));</script></body></html>\n`,
+      );
+    }
+    withPreview.push(g.name);
   }
   return { withPreview };
 }
