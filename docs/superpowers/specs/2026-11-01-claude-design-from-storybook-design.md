@@ -119,15 +119,10 @@ Both the docs site and the export read `dist/metadata/components.json`
 - Component description: prefer the meta's `parameters.docs.description.component`
   (`parse-description.ts:7-28` today takes the first JSDoc in the file); fall back to JSDoc
   on the declaration named after the component only.
-- Add a new field `source` per example: the raw story text from the `.stories.tsx` module
-  (the export plus its `render:` body and `args`), next to the existing paste-ready `code`.
-  `code` (`toCopyableCode`, `story-source.ts:193-252`) and its consumers — docs-site code
-  panels (`apps/docs/scripts/render.ts:88,100`) and MCP `get-component` — stay unchanged;
-  the schema change in `mcp-core/src/schema.ts` is additive. (My call: changing `code`
-  would show `{...args}`/`fn()` to MCP users.) Separately, fix the StoryObj bug where
-  `code` is rebuilt from `args` only (`parse-examples.ts:58-60`).
-- Record, per story module, its relative imports (fixtures/mocks/helpers) so consumers can
-  ship them verbatim.
+- Fix the StoryObj bug where `code` is rebuilt from `args` only (`parse-examples.ts:58-60`).
+  `code` keeps its meaning for the docs site and MCP. (Planning note 2026-11-01: no new
+  `source` field — the export copies whole story modules from disk, which is more verbatim
+  than any per-story field and needs no schema change.)
 - Cleanup findings 18–20 from the 2026-10-31 synthesis: inherited HTML props flooding
   tables (`parse-props.ts:28`), missing `<Name>Props` fallback (`parse-props.ts:173`).
 
