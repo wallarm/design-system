@@ -15,9 +15,6 @@
     },
     {
       "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.claude-design.json"
     }
   ],
   "exclude": [

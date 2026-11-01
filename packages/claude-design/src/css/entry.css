@@ -1,0 +1,10 @@
+@import 'tailwindcss' source(none);
+@import 'tw-animate-css';
+@import '../../../design-system/src/theme/index.css';
+
+@source '../../../design-system/src/**/*.{ts,tsx}';
+@source '../bundle/helpers';
+@source not '../../../design-system/src/**/*.test.{ts,tsx}';
+@source not '../../../design-system/src/**/*.e2e.{ts,tsx}';
+@source not '../../../design-system/src/**/__tests__/**';
+@source not '../../../design-system/src/**/__fixtures__/**';

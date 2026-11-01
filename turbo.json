@@ -4,8 +4,8 @@
   "agentGuidance": false,
   "globalPassThroughEnv": ["STORYBOOK_URL"],
   "tasks": {
-    "build:claude-design": {
-      "dependsOn": ["build"],
+    "@wallarm-org/claude-design#export": {
+      "dependsOn": ["^build"],
       "cache": false,
       "outputs": [
         ".claude-design/project/**",
@@ -13,9 +13,16 @@
         ".claude-design/file-hashes.json"
       ]
     },
-    "test:claude-design": {
-      "dependsOn": ["build:claude-design"],
+    "@wallarm-org/claude-design#verify": {
+      "dependsOn": ["^build"],
       "cache": false
+    },
+    "@wallarm-org/claude-design#test": {
+      "dependsOn": ["export"],
+      "cache": false
+    },
+    "@wallarm-org/claude-design#typecheck": {
+      "dependsOn": ["@wallarm-org/mcp-core#build"]
     },
     "dev": {
       "dependsOn": ["@wallarm-org/design-system#build"],

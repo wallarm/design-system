@@ -119,14 +119,11 @@ The command writes the component files, `src/icons/index.ts`, the gallery catego
 
 Choose **Wallarm Design System** in Claude Design to prototype with the generated component
 bundle, tokens, fonts and icons. See the [designer guide](https://wallarm.github.io/design-system/ai/claude-design).
-Run `pnpm --filter @wallarm-org/design-system build:claude-design` to build the package and
-generate the ignored `.claude-design/project/` folder. The bundle and story previews share
-an Rslib IIFE configuration with the native SWC React Compiler targeting React 18.
-Run `pnpm --filter @wallarm-org/design-system test:claude-design` for the React 18 harness and
-producer checks, or `pnpm --filter @wallarm-org/design-system claude-design:verify` to compare
-every output file across two consecutive builds. The repository's `/claude-design-sync`
-skill previews and manually publishes release changes; the first sync and remote deletions
-require confirmation. The npm package remains React 19; the separate canvas bundle uses React 18.
+The export is built by the private [`@wallarm-org/claude-design`](../claude-design/README.md)
+package; its README lists the build, test and verify commands. The repository's
+`/claude-design-sync` skill previews and manually publishes release changes; the first sync and
+remote deletions require confirmation. The npm package remains React 19; the separate canvas
+bundle uses React 18.
 
 ## 📖 Resources
 
