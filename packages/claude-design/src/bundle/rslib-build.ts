@@ -90,7 +90,9 @@ export async function canvasRslibConfig(options: CanvasBuildOptions): Promise<Rs
       legalComments: 'inline',
       sourceMap: false,
     },
-    performance: { printFileSize: false },
+    // No persistent cache: `verify` and `export` run in parallel under turbo and would contend for
+    // its lock (Rspack panics), and a stale cache once kept a fixed resolution failing.
+    performance: { printFileSize: false, buildCache: false },
     plugins: [pluginReact({ reactCompiler: { target: '18' }, splitChunks: false })],
     tools: {
       rspack(config) {
