@@ -32,6 +32,13 @@
       "require": "./dist/icons/index.js",
       "default": "./dist/icons/index.js"
     },
+    "./icons/*": {
+      "development": "./src/icons/*.tsx",
+      "types": "./dist/icons/*.d.ts",
+      "import": "./dist/icons/*.js",
+      "require": "./dist/icons/*.js",
+      "default": "./dist/icons/*.js"
+    },
     "./theme": {
       "development": "./src/theme/index.css",
       "import": "./dist/theme/index.css",

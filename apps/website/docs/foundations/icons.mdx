@@ -17,6 +17,14 @@ export const IconExamples = () => (
 );
 ```
 
+Each icon also has its own subpath, so an icon can be loaded on its own, in a separate chunk:
+
+```tsx
+import { Search } from '@wallarm-org/design-system/icons/Search';
+
+const loadSearch = () => import('@wallarm-org/design-system/icons/Search').then(m => m.Search);
+```
+
 ## Size
 
 `size` takes `inherit` (the default) or a step from the icon scale: `xs`, `sm`, `md`, `lg`, `xl`,
