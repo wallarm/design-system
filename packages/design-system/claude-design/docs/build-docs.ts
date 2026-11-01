@@ -75,15 +75,43 @@ const storyModules = (
   }));
 };
 
-/** Throws unless a guide emitted exactly one heading per Storybook story. */
+/** Every named export of the story files, read from source: Storybook's own story list. */
+const exportedStories = (project: Project, storyFiles: string[]): string[] =>
+  storyFiles.flatMap(file =>
+    (
+      project.getSourceFile(path.join(componentsDir, file)) ??
+      project.addSourceFileAtPath(path.join(componentsDir, file))
+    )
+      .getVariableStatements()
+      .filter(statement => statement.hasExportKeyword())
+      .flatMap(statement => statement.getDeclarations().map(declaration => declaration.getName())),
+  );
+
+/**
+ * Throws unless a guide emitted one heading per story its files export, except stories
+ * listed in Not synced as `<guide>/<story>: <reason>`.
+ */
 export const assertStoriesShipped = (
   guide: string,
-  stories: ExampleMetadata[],
+  exported: string[],
   headings: string[],
+  notSynced: readonly string[],
 ): void => {
-  const sorted = (names: string[]) => [...names].sort().join('\n');
-  if (sorted(headings) !== sorted(stories.map(story => story.name)))
-    throw new Error(`${guide}: guide stories do not match its Storybook stories.`);
+  const missing = [...exported];
+  const extra: string[] = [];
+  for (const heading of headings) {
+    const i = missing.indexOf(heading);
+    if (i < 0) extra.push(heading);
+    else missing.splice(i, 1);
+  }
+  const listed = new Set(notSynced.map(note => note.split(': ')[0]));
+  const dropped = missing.filter(story => !listed.has(`${guide}/${story}`));
+  if (dropped.length || extra.length)
+    throw new Error(
+      `${guide}: guide stories do not match its story files' exports (missing: ${
+        dropped.join(', ') || 'none'
+      }; unknown: ${extra.join(', ') || 'none'}).`,
+    );
 };
 
 /** Story files outside src/components that have no component guide, by src-relative prefix. */
@@ -91,6 +119,9 @@ const NON_COMPONENT_STORIES: Record<string, string> = {
   'theme/': 'theme gallery story, not a component; see tokens.css',
   'icons/': 'icon gallery story, not a component; see assets/Icons',
 };
+
+/** Public providers with no guide: the canvas wraps every artboard in `WallarmDS.Root`. */
+const PROVIDERS: ReadonlySet<string> = new Set(['ThemeProvider', 'DateFormatProvider']);
 
 interface Guide {
   name: string;
@@ -172,7 +203,9 @@ export const buildDocs = async ({
   const guides: Guide[] = [];
   const omitted: string[] = [];
   for (const component of metadata.components) {
-    if (CLAUDE_DESIGN.internal.has(component.name)) {
+    if (PROVIDERS.has(component.name)) {
+      omitted.push(`${component.name}: provider; use WallarmDS.Root on the canvas.`);
+    } else if (CLAUDE_DESIGN.internal.has(component.name)) {
       omitted.push(`${component.name}: internal primitive; no guide.`);
     } else if (CLAUDE_DESIGN.splitByStoryFile.has(component.name)) {
       const byFile = new Map<string, ExampleMetadata[]>();
@@ -189,7 +222,15 @@ export const buildDocs = async ({
             project.getSourceFileOrThrow(path.join(componentsDir, storyFile)),
           ),
           reference: part
-            ? reference({ name, props: part.props, variants: [], subComponents: [] })
+            ? reference({
+                name,
+                props: part.props,
+                variants: [],
+                // The family's parts: LineChart* for LineChart.
+                subComponents: component.subComponents.filter(
+                  sub => sub.name !== name && sub.name.startsWith(name),
+                ),
+              })
             : '',
           stories,
         });
@@ -240,7 +281,12 @@ export const buildDocs = async ({
     });
     if (Buffer.byteLength(readme) > README_CAP_BYTES)
       throw new Error(`${guide.name} README exceeds ${README_CAP_BYTES} bytes.`);
-    assertStoriesShipped(guide.name, guide.stories, headings);
+    assertStoriesShipped(
+      guide.name,
+      exportedStories(modulesProject, storyFiles),
+      headings,
+      notSynced,
+    );
     await writeFile(path.join(componentDir, 'README.md'), readme);
     if (overflow) await writeFile(path.join(componentDir, 'stories.md'), overflow);
   }

@@ -128,6 +128,18 @@ describe('Claude Design documentation', () => {
     expect(components).not.toContain('SimpleCharts');
   });
 
+  it("lists a split guide's own family parts", async () => {
+    const readme = await readFile(path.join(outDir, 'components/LineChart/README.md'), 'utf8');
+    expect(readme).toContain('- `WallarmDS.LineChartZoomBrush`');
+    expect(readme).not.toContain('- `WallarmDS.MetricValue`');
+    expect(readme).not.toContain('- `WallarmDS.LineChart` ');
+  });
+
+  it('heads every Template.bind story in its guide', async () => {
+    expect(await guideText('HorizontalBarStack')).toContain('\n### NoDelta\n');
+    expect(await guideText('FilterInput')).toContain('\n### WithDeleteButton\n');
+  });
+
   it('no fallback prose and no recipes', async () => {
     for (const component of components) {
       const text = await guideText(component);
@@ -147,7 +159,9 @@ describe('Claude Design documentation', () => {
     const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
     for (const name of ['NavRail', 'TopHeader', 'BulkBar'])
       expect(readme).toContain(`- ${name}: no Storybook story; props only.`);
-    expect(readme).toContain('- ThemeProvider: internal primitive; no guide.');
+    expect(readme).toContain('- ThemeProvider: provider; use WallarmDS.Root on the canvas.');
+    expect(readme).toContain('- DateFormatProvider: provider; use WallarmDS.Root on the canvas.');
+    expect(readme).toContain('- ButtonBase: internal primitive; no guide.');
   });
 
   it('ships barrel re-export targets', async () => {
@@ -174,15 +188,33 @@ describe('Claude Design documentation', () => {
 });
 
 describe('drop guard', () => {
-  it('throws when a guide misses a story', () => {
-    const stories = [
-      { name: 'Basic', code: '', storyFile: 'X/X.stories.tsx' },
-      { name: 'Sizes', code: '', storyFile: 'X/X.stories.tsx' },
-    ];
-    expect(() => assertStoriesShipped('X', stories, ['Basic'])).toThrow(
-      'X: guide stories do not match its Storybook stories.',
+  it('throws when a guide misses an exported story unless Not synced lists it', () => {
+    expect(() => assertStoriesShipped('X', ['Basic', 'Sizes'], ['Basic'], [])).toThrow(
+      "X: guide stories do not match its story files' exports (missing: Sizes; unknown: none).",
     );
-    expect(() => assertStoriesShipped('X', stories, ['Sizes', 'Basic'])).not.toThrow();
+    expect(() =>
+      assertStoriesShipped('X', ['Basic', 'Sizes'], ['Basic'], ['X/Sizes: reason']),
+    ).not.toThrow();
+    expect(() =>
+      assertStoriesShipped('X', ['Basic', 'Sizes'], ['Sizes', 'Basic'], []),
+    ).not.toThrow();
+    expect(() => assertStoriesShipped('X', ['Basic'], ['Basic', 'Other'], [])).toThrow(
+      'unknown: Other',
+    );
+  });
+
+  it('fails the build when metadata lacks an exported story', async () => {
+    const outDir = await mkdtemp(path.join(tmpdir(), 'wallarm-canvas-guard-'));
+    const metadata: DesignSystemMetadata = JSON.parse(
+      await readFile('dist/metadata/components.json', 'utf8'),
+    );
+    const button = metadata.components.find(component => component.name === 'Button');
+    if (button) button.examples = button.examples.filter(example => example.name !== 'Sizes');
+    const metadataPath = path.join(outDir, 'metadata.json');
+    await writeFile(metadataPath, JSON.stringify(metadata));
+    await expect(buildDocs({ outDir, metadataPath, notSynced: [] })).rejects.toThrow(
+      'Button: guide stories do not match',
+    );
   });
 });
 

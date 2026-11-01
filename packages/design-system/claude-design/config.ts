@@ -10,7 +10,7 @@ export const CLAUDE_DESIGN = {
   outDir: resolve(PACKAGE_DIR, '.claude-design/project'),
   bundleBudgetBytes: 5_700_000,
   cssCapBytes: 2_000_000,
-  /** Internal primitives: no guide, no preview. */
+  /** No guide, no preview: internal primitives and the providers `Root` stands in for. */
   internal: new Set([
     'ThemeProvider',
     'DateFormatProvider',
