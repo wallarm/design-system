@@ -6,12 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@biomejs/biome':
-      specifier: 2.5.15
-      version: 2.5.15
-    '@playwright/test':
-      specifier: 1.63.0
-      version: 1.63.0
     '@rsbuild/core':
       specifier: 2.2.11
       version: 2.2.11
@@ -21,9 +15,6 @@ catalogs:
     '@rslib/core':
       specifier: 1.0.3
       version: 1.0.3
-    '@rspack/core':
-      specifier: 2.2.8
-      version: 2.2.8
     '@rstest/core':
       specifier: 0.12.3
       version: 0.12.3
@@ -63,9 +54,6 @@ catalogs:
     typescript:
       specifier: 7.0.2
       version: 7.0.2
-    zod:
-      specifier: 4.6.7
-      version: 4.6.7
 
 overrides:
   hono: '>=4.13.11'
@@ -703,9 +691,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.3.0
-      react-compiler-runtime:
-        specifier: 1.0.0
-        version: 1.0.0(react@19.3.0)
       react-dom:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)

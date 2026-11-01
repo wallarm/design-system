@@ -130,7 +130,6 @@
     "jsdom": "catalog:",
     "postcss": "8.5.28",
     "react": "catalog:",
-    "react-compiler-runtime": "1.0.0",
     "react-dom": "catalog:",
     "storybook": "catalog:",
     "storybook-react-rsbuild": "3.6.0",

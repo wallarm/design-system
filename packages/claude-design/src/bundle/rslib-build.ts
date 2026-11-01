@@ -55,7 +55,8 @@ async function runtimeAliases(): Promise<Record<string, string>> {
     'react-dom/client$': resolve(runtimeDir, 'react-dom.js'),
     'react/jsx-runtime$': resolve(runtimeDir, 'jsx.js'),
     'react/jsx-dev-runtime$': resolve(runtimeDir, 'jsx.js'),
-    'react/compiler-runtime$': require.resolve('react-compiler-runtime'),
+    // The compiler's React 18 target imports this package from the DS sources; resolve it here.
+    'react-compiler-runtime$': require.resolve('react-compiler-runtime'),
     'canvas-component-bridge$': resolve(runtimeDir, 'bridge.js'),
   };
 }
