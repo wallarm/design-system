@@ -370,7 +370,7 @@ export const Approval: StoryFn<typeof meta> = () => {
 };
 
 /** A run that failed before any output: `AssistantMessageError` with Retry, wired to `onRetry`. */
-const ErrorStory: StoryFn<typeof meta> = () => {
+export const ErrorState: StoryFn<typeof meta> = () => {
   const wally = useMockWally({ initial: ERROR_TURN });
   const [feedback, setFeedback] = useState<Record<string, ChatFeedback | null>>({});
   const [permissions, setPermissions] = useState(ERROR_TURN.permissions);
@@ -412,8 +412,6 @@ const ErrorStory: StoryFn<typeof meta> = () => {
     </div>
   );
 };
-
-export { ErrorStory as Error };
 
 /**
  * Every seam at once: `renderPart` draws a `custom` attack summary, `renderStepContent` puts a table
