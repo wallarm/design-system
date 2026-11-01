@@ -17,7 +17,7 @@
       "dependsOn": ["^build"],
       "cache": false
     },
-    "@wallarm-org/claude-design#test": {
+    "@wallarm-org/claude-design#test:export": {
       "dependsOn": ["export"],
       "cache": false
     },

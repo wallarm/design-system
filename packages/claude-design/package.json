@@ -12,7 +12,7 @@
   "scripts": {
     "export": "tsx src/build.ts",
     "verify": "tsx src/verify.ts",
-    "test": "rstest run",
+    "test:export": "rstest run",
     "plan": "tsx src/publish-plan.ts plan",
     "check": "tsx src/publish-plan.ts check",
     "fetch": "tsx src/fetch.ts",

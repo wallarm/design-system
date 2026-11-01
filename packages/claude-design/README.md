@@ -26,13 +26,13 @@ All under `src/`.
 
 ## Commands
 
-`export`, `verify` and `test` need a built design system. Through turbo it is built first:
+`export`, `verify` and `test:export` need a built design system. Through turbo it is built first:
 run them from the repo root as `pnpm turbo run <script> --filter=@wallarm-org/claude-design`.
 After a `pnpm build`, `pnpm --filter @wallarm-org/claude-design run <script>` (or `pnpm run
 <script>` in this folder) runs the script alone.
 
 - `export` writes `.claude-design/project/`, `file-hashes.json` and `summary.json` (git-ignored). Fails over budget.
-- `test` runs the producer unit tests and the React 18 harness (through turbo it runs `export` first).
+- `test:export` runs the producer unit tests and the React 18 harness (through turbo it runs `export` first).
 - `verify` builds twice and compares every output file.
 - `typecheck` type-checks the exporter.
 - `plan`, `check`, `fetch` build the publish diff against the remote artifact. Call `fetch` as `pnpm run fetch`: plain `pnpm fetch` is a pnpm built-in.

@@ -239,7 +239,7 @@ jobs:
       - name: Verify Claude Design build
         run: |
           pnpm --filter @wallarm-org/claude-design verify
-          pnpm --filter @wallarm-org/claude-design test
+          pnpm --filter @wallarm-org/claude-design test:export
 
       - name: Build Storybook
         run: pnpm --filter=@wallarm-org/design-system build-storybook
