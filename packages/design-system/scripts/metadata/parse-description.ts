@@ -66,7 +66,12 @@ export const parseComponentDescription = (
   componentDir: string,
   componentName: string,
 ): string | undefined => {
-  const storyPath = findStoryFiles(project, componentDir)[0];
+  // A family of components in one folder (SimpleCharts) has no meta of its own: a
+  // sibling's story meta describes that sibling, not the family.
+  const files = findStoryFiles(project, componentDir);
+  const storyPath =
+    files.find(file => path.basename(file) === `${componentName}.stories.tsx`) ??
+    (files.length === 1 ? files[0] : undefined);
   const story =
     storyPath &&
     (project.getSourceFile(storyPath) ?? storiesProject.addSourceFileAtPathIfExists(storyPath));

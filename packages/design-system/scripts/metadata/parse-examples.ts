@@ -16,6 +16,7 @@ const storiesProject = new Project();
  * 2. For each named export (excluding default):
  *    - StoryFn: extract the initializer (arrow/function expression) text
  *    - StoryObj: reconstruct minimal JSX from args
+ *    - `Template.bind({})`: the bound template's function text
  * 3. Extract descriptions from JSDoc or .parameters assignments
  */
 export const parseExamples = (
@@ -67,7 +68,10 @@ export const parseExamples = (
               ? render.getText()
               : reconstructJsxFromStoryObj(initializer.getText(), componentName);
         } else {
-          continue;
+          // `Template.bind({})` — the bound template's function source, as for StoryFn
+          const template = boundTemplate(sourceFile, initializer);
+          if (!template) continue;
+          code = template.getText();
         }
 
         const example: ExampleMetadata = {
@@ -100,6 +104,18 @@ export const parseExamples = (
   }
 
   return examples;
+};
+
+/** The arrow/function initializer of `X` in `X.bind(...)`, if `X` is a local variable. */
+const boundTemplate = (sourceFile: SourceFile, node: Node): Node | undefined => {
+  const callee = node.asKind(SyntaxKind.CallExpression)?.getExpression();
+  const access = callee?.asKind(SyntaxKind.PropertyAccessExpression);
+  if (access?.getName() !== 'bind') return undefined;
+  const target = access.getExpression().asKind(SyntaxKind.Identifier);
+  const init = target && sourceFile.getVariableDeclaration(target.getText())?.getInitializer();
+  return init?.isKind(SyntaxKind.ArrowFunction) || init?.isKind(SyntaxKind.FunctionExpression)
+    ? init
+    : undefined;
 };
 
 /** `['a', 'b']` → `['a', 'b']`; undefined unless every element is a string literal. */

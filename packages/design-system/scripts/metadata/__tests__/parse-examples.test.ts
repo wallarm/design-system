@@ -176,6 +176,31 @@ export const First = () => <Foo />;`,
     }
   });
 
+  describe('Template.bind stories (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile(
+      '/src/components/Chip/Chip.stories.tsx',
+      `const meta = { title: 'Components/Chip' };
+export default meta;
+const Template = (args) => <Chip {...args} />;
+/** Bound to the template. */
+export const Bound = Template.bind({});
+Bound.args = { label: 'x' };
+Bound.tags = ['!autodocs'];
+export const Unbound = unknown.bind({});`,
+    );
+    const examples = parseExamples(fixtureProject, '/src/components/Chip', 'Chip');
+
+    it('reads a bound template as a story with its JSDoc and tags', () => {
+      expect(examples.map(e => e.name)).toEqual(['Bound']);
+      expect(examples[0]).toMatchObject({
+        description: 'Bound to the template.',
+        tags: ['!autodocs'],
+      });
+      expect(examples[0]!.code).toContain('export const Bound = () => <Chip />;');
+    });
+  });
+
   describe('story tags (fixture)', () => {
     const fixtureProject = new Project({ useInMemoryFileSystem: true });
     fixtureProject.createSourceFile(
