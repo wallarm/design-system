@@ -18,8 +18,8 @@ No `*.stories.tsx` exists in the component folder for any of these.
 | `src/components/NavPanel` | public | The panel with header, groups, items, back, skeleton and resize handle. Only mentioned in AppShell prose (`AppShell.stories.tsx:69`). |
 | `src/components/NavRail` | public | Rail with body, items, separator, footer, skeleton. Appears only inside AppShell stories (`AppShell.stories.tsx:21`). |
 | `src/components/TopHeader` | public | Header with logo, actions, separator. Appears only inside AppShell stories (`AppShell.stories.tsx:160`). |
-| `src/components/ThemeProvider` | public | `ThemeProvider` / `useTheme` (theme, frame style). `useTheme` is used only in `AppShell.stories.tsx:33`. |
-| `src/components/DateFormatProvider` | internal | Internal; imported by the date stories (e.g. `DateInput.stories.tsx:4`). Marked "internal primitive" in the README. |
+| `src/components/ThemeProvider` | public provider | `ThemeProvider` / `useTheme` (theme, frame style). `useTheme` is used only in `AppShell.stories.tsx:33`. Listed in the README as "provider; use WallarmDS.Root on the canvas". |
+| `src/components/DateFormatProvider` | public provider | Imported by the date stories (e.g. `DateInput.stories.tsx:4`). Listed in the README as "provider; use WallarmDS.Root on the canvas". |
 | `src/components/ButtonBase` | internal | Internal primitive (`ButtonBase.tsx`); shown through Button. |
 | `src/components/Checkmark` | internal | Internal primitive (`Checkmark.tsx`); shown through Checkbox. |
 | `src/components/Polymorphic` | internal | Internal primitive (`Polymorphic.tsx`). |
@@ -52,9 +52,9 @@ gap.
   (`src/components/SimpleCharts/LineChart/index.ts:50-60`) are exported but have no story. They
   render only inside `LineChartZoomBrush.tsx:213-218`. Show them composed by hand (custom confirm
   label, custom range text) next to the brush story.
-- `SimpleCharts/Metric` uses a local `Card` wrapper (`Metric.stories.tsx:40`, used from `:150`);
+- `SimpleCharts/Metric` uses a local `Card` wrapper (`Metric.stories.tsx:40`, used from `:58`);
   `SimpleCharts/Overview` builds its page from local `*Card` components
-  (`Overview.stories.tsx:93-182`) and its meta has no `component`. Each should render the real
+  (`Overview.stories.tsx:93-182`) and has no `component:` field on meta. Each should render the real
   components directly.
 
 ## Stories built on a local wrapper component

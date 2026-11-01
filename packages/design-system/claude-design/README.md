@@ -27,7 +27,7 @@ Run from the repo root as `pnpm --filter @wallarm-org/design-system <script>`.
 - `build:claude-design` builds the package, then writes `.claude-design/project/`, `file-hashes.json` and `summary.json` (git-ignored). Fails over budget.
 - `test:claude-design` runs the producer unit tests and the React 18 harness.
 - `claude-design:verify` builds twice and compares every output file.
-- `claude-design:plan`, `claude-design:check`, `claude-design:fetch` build the publish diff against the remote artifact (added with the publish plan).
+- `claude-design:plan`, `claude-design:check`, `claude-design:fetch` build the publish diff against the remote artifact.
 
 ## Which tests need a build
 

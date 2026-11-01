@@ -27,16 +27,19 @@ stay inside it.
 ```
 
 ```js
-function renderVals() {
-  return { loading: false };
+class Component extends DCLogic {
+  renderVals() {
+    return { loading: false };
+  }
 }
 ```
 
 Use kebab-case for canvas props: `default-open`, `on-value-change`, `class-name`. Strings
 can be attributes directly. Pass booleans, numbers, collections, data and callbacks through
-holes from `renderVals()`: `loading="false"` is a string, not the boolean `false`. Combine
-example values into the canvas's one `renderVals()` function. Its code is ordinary JavaScript,
-without JSX, TypeScript or module imports.
+holes from `renderVals()`: `loading="false"` is a string, not the boolean `false`. The
+artboard has one `class Component extends DCLogic`; state lives in `this.state` and changes
+with `this.setState`. Its code is classic JavaScript, without JSX, TypeScript or module
+imports.
 
 The canvas supplies React 18. Outside the canvas, the artifact loads `tokens.css`, then
 `components/bundle.css`, then `components/bundle.js` after the page's React and ReactDOM.
@@ -54,8 +57,7 @@ should also close. Root scopes the theme; ThemeProvider changes the whole page a
 not be used as the canvas wrapper.
 
 The bundle also exposes components available through npm component subpaths, such as the
-Dialog family. Root and TableCells are canvas-only helpers; the package's npm exports stay
-unchanged.
+Dialog family. Root is a canvas-only helper; the package's npm exports stay unchanged.
 
 Icons live under `WallarmDS.Icons`, for example:
 
@@ -64,9 +66,14 @@ Icons live under `WallarmDS.Icons`, for example:
   class-name="icon-md text-icon-primary" aria-hidden="true"></x-import>
 ```
 
-## Tables
+## From a story to an artboard
 
-Pass rows and columns as values. `TableCells` supplies renderers made from existing components.
+Each component guide carries its Storybook stories verbatim — description, source and the
+local mocks they import — as reference. The agent reads a story and writes its own artboard
+with `x-import` and `DCLogic`, following the translation rule in the system's README: imports
+become `WallarmDS.X`, JSX elements become `x-import`, React state becomes `this.state`, and
+mock data becomes constants in the script. Props that take a render function, such as a Table
+column's `cell`, are built in `renderVals()` with `React.createElement`:
 
 ```html
 <x-import component-from-global-scope="WallarmDS.Root" theme="light">
@@ -76,22 +83,30 @@ Pass rows and columns as values. `TableCells` supplies renderers made from exist
 ```
 
 ```js
-function renderVals() {
-  return {
-    rows: [{ id: 'event-1', method: 'GET', ip: '192.0.2.10' }],
-    columns: [
-      { accessorKey: 'method', header: 'Method', cell: WallarmDS.TableCells.httpMethod() },
-      { accessorKey: 'ip', header: 'Source IP', cell: WallarmDS.TableCells.ip() }
-    ],
-    getRowId: function (row) { return row.id; }
-  };
+class Component extends DCLogic {
+  renderVals() {
+    var h = React.createElement;
+    return {
+      rows: [{ id: 'event-1', method: 'GET', ip: '192.0.2.10' }],
+      columns: [
+        { accessorKey: 'method', header: 'Method' },
+        {
+          accessorKey: 'ip',
+          header: 'Source IP',
+          cell: function (ctx) {
+            return h(WallarmDS.Text, { size: 'xs' }, ctx.row.original.ip);
+          },
+        },
+      ],
+      getRowId: function (row) { return row.id; },
+    };
+  }
 }
 ```
 
-Select and FilterDropdown require a real `WallarmDS.createListCollection(...)`, not a plain
-array; their generated guides contain complete recipes. Tour needs a hook-driven controller
-and is not directly mountable with `x-import`. Toast uses the guide's `Toaster` adapter and
-creates notifications in `componentDidMount`.
+Hooks cannot run in `renderVals()`; the README names the non-hook path for each case, such as
+`WallarmDS.toaster.create(...)` from a `DCLogic` handler instead of `useToast`. When a
+component's guide has no story for what you need, request the story in the repository.
 
 ## Request a change
 
@@ -100,9 +115,9 @@ Change the component, story or token in **wallarm/design-system**, then run
 theme and relevant state when requesting a change; include the canvas or a screenshot that
 shows it. The repository is the source of truth, and the artifact is generated from it.
 
-Maintainers run
-`pnpm --filter @wallarm-org/design-system build:claude-design`. The manual sync skill checks
-the release tag, previews the exact changes, uploads changed assets and publishes the index
-last. The first publication and remote deletions require confirmation. This is not a CI
+Maintainers sync with the `claude-design-sync` skill: it fetches the export built from the
+release tag, plans the exact changes against the artifact, uploads changed assets, publishes
+the changed files with the index last, and checks that the artifact matches. The first
+publication and every remote deletion need the operator's approval. This is not a CI
 auto-publish workflow. Check the generated README's **Not synced** section for the current
 build's omissions.
