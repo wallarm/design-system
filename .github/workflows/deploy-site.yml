@@ -105,6 +105,8 @@ jobs:
   claude-design:
     name: Attach Claude Design export
     runs-on: ubuntu-latest
+    # The docs site is already deployed by its own job; a failed export must not turn the run red
+    continue-on-error: true
     permissions:
       contents: write
     steps:

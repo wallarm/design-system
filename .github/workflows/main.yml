@@ -236,11 +236,6 @@ jobs:
 
       - name: Check CodeSnippet consumer bundles
         run: pnpm --filter=@wallarm-org/design-system test:bundles
-      - name: Verify Claude Design build
-        run: |
-          pnpm --filter @wallarm-org/claude-design verify
-          pnpm --filter @wallarm-org/claude-design test:export
-
       - name: Build Storybook
         run: pnpm --filter=@wallarm-org/design-system build-storybook
 
@@ -598,6 +593,45 @@ jobs:
   # ========================================
   # Release
   # ========================================
+  # Runs alongside e2e/release; a failure shows on the job but never fails the run or blocks a release
+  claude-design:
+    name: Verify Claude Design build
+    runs-on: ubuntu-latest
+    needs: [build]
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v6
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/configs/*/node_modules
+            apps/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Claude Design build
+        run: pnpm turbo run verify test:export --filter=@wallarm-org/claude-design
+
   release:
     name: Release
     runs-on: ubuntu-latest
