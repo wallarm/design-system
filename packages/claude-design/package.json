@@ -1,0 +1,51 @@
+{
+  "name": "@wallarm-org/claude-design",
+  "version": "0.0.0",
+  "description": "Builds the design system into a Claude Design project; never published",
+  "private": true,
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "export": "tsx src/build.ts",
+    "bundle": "rslib build",
+    "verify": "tsx src/verify.ts",
+    "test:export": "rstest run",
+    "plan": "tsx src/publish-plan.ts plan",
+    "check": "tsx src/publish-plan.ts check",
+    "fetch": "tsx src/fetch.ts",
+    "lint": "biome check",
+    "lint:fix": "biome check --fix",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.7",
+    "@rsbuild/plugin-react": "catalog:",
+    "@rslib/core": "catalog:",
+    "@rstest/core": "catalog:",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/babel__core": "7.20.5",
+    "@types/jsdom": "21.1.7",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@wallarm-org/design-system": "workspace:*",
+    "@wallarm-org/mcp-core": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "jsdom": "catalog:",
+    "postcss": "8.5.28",
+    "react": "catalog:",
+    "react-compiler-runtime": "1.0.0",
+    "react-dom": "catalog:",
+    "react-dom18": "npm:react-dom@18.3.1",
+    "react18": "npm:react@18.3.1",
+    "tailwindcss": "catalog:",
+    "ts-morph": "28.0.0",
+    "tsx": "4.23.15",
+    "tw-animate-css": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -176,6 +176,31 @@ export const First = () => <Foo />;`,
     }
   });
 
+  describe('Template.bind stories (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile(
+      '/src/components/Chip/Chip.stories.tsx',
+      `const meta = { title: 'Components/Chip' };
+export default meta;
+const Template = (args) => <Chip {...args} />;
+/** Bound to the template. */
+export const Bound = Template.bind({});
+Bound.args = { label: 'x' };
+Bound.tags = ['!autodocs'];
+export const Unbound = unknown.bind({});`,
+    );
+    const examples = parseExamples(fixtureProject, '/src/components/Chip', 'Chip');
+
+    it('reads a bound template as a story with its JSDoc and tags', () => {
+      expect(examples.map(e => e.name)).toEqual(['Bound']);
+      expect(examples[0]).toMatchObject({
+        description: 'Bound to the template.',
+        tags: ['!autodocs'],
+      });
+      expect(examples[0]!.code).toContain('export const Bound = () => <Chip />;');
+    });
+  });
+
   describe('story tags (fixture)', () => {
     const fixtureProject = new Project({ useInMemoryFileSystem: true });
     fixtureProject.createSourceFile(
@@ -240,6 +265,16 @@ D.tags = dynamic;`,
         'ThemeProvider',
       );
       expect(examples).toEqual([]);
+    });
+  });
+
+  describe('FilterInput (StoryObj with render)', () => {
+    const examples = parseExamples(project, path.join(componentsDir, 'FilterInput'), 'FilterInput');
+    it('uses the render body, not args-only JSX', () => {
+      const story = examples.find(e => e.name === 'WithPresetValue')!;
+      expect(story.code).not.toBe('<FilterInput />');
+      expect(story.code).toContain('<FilterInput');
+      expect(story.code).toContain('setExpression');
     });
   });
 });

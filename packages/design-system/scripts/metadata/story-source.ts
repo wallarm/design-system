@@ -41,8 +41,8 @@ const unwrap = (node: Node): Node => {
   return n;
 };
 
-/** The `title` of the default-exported `meta` object. */
-export const readStoryTitle = (sourceFile: SourceFile): string | undefined => {
+/** The object literal of the default-exported `meta`, following one identifier hop. */
+export const readMeta = (sourceFile: SourceFile) => {
   const assignment = sourceFile.getExportAssignment(a => !a.isExportEquals());
   if (!assignment) return undefined;
 
@@ -52,9 +52,12 @@ export const readStoryTitle = (sourceFile: SourceFile): string | undefined => {
     if (!init) return undefined;
     target = unwrap(init);
   }
-  if (!target.isKind(SyntaxKind.ObjectLiteralExpression)) return undefined;
+  return target.asKind(SyntaxKind.ObjectLiteralExpression);
+};
 
-  const title = target.getProperty('title');
+/** The `title` of the default-exported `meta` object. */
+export const readStoryTitle = (sourceFile: SourceFile): string | undefined => {
+  const title = readMeta(sourceFile)?.getProperty('title');
   if (!title?.isKind(SyntaxKind.PropertyAssignment)) return undefined;
   const value = title.getInitializer();
   return value?.isKind(SyntaxKind.StringLiteral) ||
@@ -136,8 +139,8 @@ const stripUnusedParams = (project: Project, code: string): string | undefined =
 
     const open = fn.getFirstChildByKind(SyntaxKind.OpenParenToken);
     const close = fn.getFirstChildByKind(SyntaxKind.CloseParenToken);
-    const from = open ? open.getStart() : params[0].getStart();
-    const to = close ? close.getEnd() : params[params.length - 1].getEnd();
+    const from = open ? open.getStart() : params[0]!.getStart();
+    const to = close ? close.getEnd() : params[params.length - 1]!.getEnd();
     const text = fn.getText();
     const base = fn.getStart();
     return `${text.slice(0, from - base)}()${text.slice(to - base)}`;

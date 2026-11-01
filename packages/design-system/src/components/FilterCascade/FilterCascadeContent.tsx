@@ -8,7 +8,7 @@ import {
   useLayoutEffect,
   useRef,
 } from 'react';
-import { Portal } from '@zag-js/react';
+import { Portal } from '../../lib/portal/Portal';
 import { cn } from '../../utils/cn';
 import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { type TestableProps, useTestId } from '../../utils/testId';

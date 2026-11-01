@@ -48,8 +48,16 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
         run: |
-          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && test -f apps/docs/scripts/check-build.ts \
-            || { echo "::error::$TAG is not a stable tag with the docs site"; exit 1; }
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::$TAG is not a stable tag"; exit 1; }
+          # Tags before the rename keep the site in apps/docs as @wallarm-org/docs
+          for dir in apps/website apps/docs; do
+            if test -f "$dir/scripts/check-build.ts"; then
+              echo "SITE_DIR=$dir" >> "$GITHUB_ENV"
+              echo "SITE_PKG=$(jq -r .name "$dir/package.json")" >> "$GITHUB_ENV"
+              exit 0
+            fi
+          done
+          echo "::error::$TAG has no docs site"; exit 1
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -66,10 +74,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build docs site
-        run: pnpm turbo run build --filter=@wallarm-org/docs...
+        run: pnpm turbo run build --filter="$SITE_PKG..."
 
       - name: Check docs build output
-        run: pnpm --filter @wallarm-org/docs check:build
+        run: pnpm --filter "$SITE_PKG" check:build
 
       - name: Build Storybook
         run: pnpm --filter @wallarm-org/design-system build-storybook
@@ -77,7 +85,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p site/storybook
-          cp -r apps/docs/doc_build/* site/
+          cp -r "$SITE_DIR"/doc_build/* site/
           cp -r packages/design-system/storybook-static/* site/storybook/
 
       - name: Setup Pages
@@ -91,3 +99,75 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # Attaches the Claude Design export to the release; publishing stays manual
+  # (.claude/skills/claude-design-sync). No-ops on tags without the build.
+  claude-design:
+    name: Attach Claude Design export
+    runs-on: ubuntu-latest
+    # The docs site is already deployed by its own job; a failed export must not turn the run red
+    continue-on-error: true
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          # build.ts reads git tags and commit info
+          fetch-depth: 0
+
+      - name: Check tag has the Claude Design build
+        id: guard
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          # Tags before the exporter became its own package build it from design-system.
+          if test -f packages/claude-design/src/build.ts; then
+            printf 'enabled=true\nout=packages/claude-design/.claude-design\n' >> "$GITHUB_OUTPUT"
+          elif test -f packages/design-system/claude-design/build.ts; then
+            printf 'enabled=true\nout=packages/design-system/.claude-design\n' >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::$TAG predates the Claude Design build; nothing to attach"
+          fi
+
+      - name: Setup pnpm
+        if: steps.guard.outputs.enabled == 'true'
+        uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        if: steps.guard.outputs.enabled == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.guard.outputs.enabled == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Claude Design export
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          OUT: ${{ steps.guard.outputs.out }}
+        run: |
+          if [ "$OUT" = packages/claude-design/.claude-design ]; then
+            pnpm turbo run export --filter=@wallarm-org/claude-design
+          else
+            pnpm --filter @wallarm-org/design-system build:claude-design
+          fi
+
+      - name: Package and attach to the release
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+          OUT: ${{ steps.guard.outputs.out }}
+        run: |
+          gh release view "$TAG" >/dev/null \
+            || { echo "::error::No GitHub release for $TAG; the export cannot be attached"; exit 1; }
+          tar czf "claude-design-$TAG.tgz" -C "$OUT" project file-hashes.json summary.json
+          gh release upload "$TAG" "claude-design-$TAG.tgz" --clobber
+          cat "$OUT/summary.json" >> "$GITHUB_STEP_SUMMARY"

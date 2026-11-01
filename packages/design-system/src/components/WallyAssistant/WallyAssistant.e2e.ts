@@ -6,7 +6,7 @@ const panelStory = createStoryHelper('ai-wallyassistant', [
   'Conversation',
   'Streaming Simulation',
   'Approval',
-  'Error',
+  'Error State',
   'In Drawer',
 ] as const);
 
@@ -58,7 +58,7 @@ test.describe('Component: WallyAssistant', () => {
     });
 
     test('Should render error with retry correctly', async ({ page }) => {
-      await panelStory.goto(page, 'Error');
+      await panelStory.goto(page, 'Error State');
       await expect(page).toHaveScreenshot();
     });
 

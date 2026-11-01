@@ -32,7 +32,8 @@ main only:                                        → publish-code-connect
 |-----|---------|---------|
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
 | `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards), all parallel | Always |
-| `build` | Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
+| `build` | Builds all packages except `@wallarm-org/website` (`--filter='!@wallarm-org/website'`) + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
+| `claude-design` | Verifies the Claude Design build (`verify`, `test:export`); `continue-on-error`, never fails the run or blocks `release` | After build, parallel with e2e/release |
 | `e2e` | Sharded Playwright tests (4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
 | `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
 | `e2e-update-screenshots` | Auto-update visual snapshots (4 shards) | Any branch, `[update-screenshots]` in head commit |

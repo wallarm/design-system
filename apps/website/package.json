@@ -1,12 +1,12 @@
 {
-  "name": "@wallarm-org/docs",
+  "name": "@wallarm-org/website",
   "version": "0.0.0",
   "description": "Public documentation site for the Wallarm design system",
   "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wallarm/design-system.git",
-    "directory": "apps/docs"
+    "directory": "apps/website"
   },
   "license": "MIT",
   "author": "Wallarm",

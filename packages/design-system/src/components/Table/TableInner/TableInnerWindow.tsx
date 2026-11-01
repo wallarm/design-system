@@ -125,9 +125,9 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
             <TableColGroup tableWidth={tableWidth} />
             {!isEmpty && (
-              <WindowScrollRootContext value={scrollRoot}>
+              <WindowScrollRootContext.Provider value={scrollRoot}>
                 <TableBody />
-              </WindowScrollRootContext>
+              </WindowScrollRootContext.Provider>
             )}
           </table>
           {children}

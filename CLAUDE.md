@@ -104,6 +104,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 | `/new-migration` | Write the `@wallarm-org/migrator` migration for a breaking change |
 | `/metrics-audit` | Audit a component against the analytics-readiness contract |
 | `/storybook-docs` | Write or level up a component's Storybook Overview page |
+| `/claude-design-sync` | Build and manually sync the released design system to Claude Design |
 | `/vestige-audit` | Remove docs/configs/scripts the branch made obsolete — required before `gh pr create` (enforced by a hook in `.claude/settings.json`) |
 
 ## 🔧 Key Configuration Files
@@ -196,18 +197,19 @@ New compound component workflow: `component-architect` → `design-system` → `
 
 ### Pipeline Jobs
 
-`check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). The GitHub Pages deploy is a third workflow, [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` (see item 8). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
+`check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). The GitHub Pages deploy is a third workflow, [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` (see item 9). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
 2. **quality** - Lint (Biome), typecheck, agent harness tests and Rstest unit tests (3 shards) in parallel
-3. **build** - Builds all packages except `@wallarm-org/docs` (`--filter='!@wallarm-org/docs'`) and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
-4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
-5. **unit-test-report** / **e2e-report** - Publish JUnit results
-6. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
-7. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run
-8. **deploy-site.yml** (separate workflow) - After a stable design-system release on `main`, `release` dispatches it with the `vX.Y.Z` tag; it builds the docs site and Storybook from that tag and deploys both to GitHub Pages (docs: https://wallarm.github.io/design-system/, Storybook: https://wallarm.github.io/design-system/storybook/). Redeploy or roll back with `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`
-9. **release** - `semantic-release` for `@wallarm-org/design-system`, and when needed `@wallarm-org/mcp` / `@wallarm-org/migrator` — stable on `main`, RC on `feature/*` / `feat/*` / `fix/*` (see [RELEASE.md](./RELEASE.md))
-10. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
+3. **build** - Builds all packages except `@wallarm-org/website` (`--filter='!@wallarm-org/website'`), and builds Storybook as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
+4. **claude-design** - After `build`, in parallel with `e2e` and `release`: verifies the separate Claude Design build (repeatability and React 18 harness). `continue-on-error`, so a failure never fails the run or blocks a release
+5. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
+6. **unit-test-report** / **e2e-report** - Publish JUnit results
+7. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
+8. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run
+9. **deploy-site.yml** (separate workflow) - After a stable design-system release on `main`, `release` dispatches it with the `vX.Y.Z` tag; it builds the docs site and Storybook from that tag and deploys both to GitHub Pages (docs: https://wallarm.github.io/design-system/, Storybook: https://wallarm.github.io/design-system/storybook/). Redeploy or roll back with `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`
+10. **release** - `semantic-release` for `@wallarm-org/design-system`, and when needed `@wallarm-org/mcp` / `@wallarm-org/migrator` — stable on `main`, RC on `feature/*` / `feat/*` / `fix/*` (see [RELEASE.md](./RELEASE.md))
+11. **publish-code-connect** - In parallel with `release`, on `main` only when a stable release is due: publishes Figma Code Connect templates (`pnpm code-connect:publish`, needs `FIGMA_ACCESS_TOKEN`)
 
 Secrets and branch rules: [RELEASE.md → Requirements](./RELEASE.md#requirements).
 

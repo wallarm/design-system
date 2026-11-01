@@ -1,0 +1,19 @@
+{
+  "extends": "@wallarm-org/typescript-config/nodejs.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src",
+    "rstest.config.ts",
+    "rslib.config.ts",
+    "../design-system/src/components/CodeSnippet/adapters/prismjs.d.ts"
+  ]
+}

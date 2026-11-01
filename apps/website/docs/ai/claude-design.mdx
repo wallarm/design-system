@@ -1,0 +1,123 @@
+---
+description: Prototype with the real Wallarm components, tokens, fonts and icons in Claude Design.
+---
+
+# Claude Design
+
+Choose **Wallarm Design System** when creating a Design canvas in Claude Design. The
+[system artifact](https://claude.ai/artifact/N9vi3rNMFVZ3g8HmckRe9S) contains the components,
+light and dark tokens, Geist fonts, icons and live examples generated from this repository.
+
+Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
+prototype a rules list with a primary Create rule action, environment filter, empty state and
+dark theme.” Ask for the existing components and semantic tokens, then check the component
+guides for the intended composition.
+
+## Mount components
+
+Canvas markup uses `x-import`. The namespace is `WallarmDS`; component names are flat, such
+as `WallarmDS.DialogContent`. Wrap each artboard in `WallarmDS.Root` so themes and overlays
+stay inside it.
+
+```html
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.Button"
+    variant="primary" loading="{{loading}}">Create rule</x-import>
+</x-import>
+```
+
+```js
+class Component extends DCLogic {
+  renderVals() {
+    return { loading: false };
+  }
+}
+```
+
+Use kebab-case for canvas props: `default-open`, `on-value-change`, `class-name`. Strings
+can be attributes directly. Pass booleans, numbers, collections, data and callbacks through
+holes from `renderVals()`: `loading="false"` is a string, not the boolean `false`. The
+artboard has one `class Component extends DCLogic`; state lives in `this.state` and changes
+with `this.setState`. Its code is classic JavaScript, without JSX, TypeScript or module
+imports.
+
+The canvas supplies React 18. Outside the canvas, the artifact loads `tokens.css`, then
+`components/bundle.css`, then `components/bundle.js` after the page's React and ReactDOM.
+The npm package continues to use React 19.
+
+## Dark artboards and overlays
+
+Set `theme="dark"` on `WallarmDS.Root` to switch the artboard's semantic tokens. Use the same
+Root for Dialog, DropdownMenu, Select and other overlay compositions so their portal content
+inherits the theme. Follow each component's guide for its required parts.
+
+For an overlay shown in a static design, use `default-open="{{shown}}"` and return
+`shown: true` from `renderVals()`. Controlled `open` values need callbacks if the prototype
+should also close. Root scopes the theme; ThemeProvider changes the whole page and should
+not be used as the canvas wrapper.
+
+The bundle also exposes components available through npm component subpaths, such as the
+Dialog family. Root is a canvas-only helper; the package's npm exports stay unchanged.
+
+Icons live under `WallarmDS.Icons`, for example:
+
+```html
+<x-import component-from-global-scope="WallarmDS.Icons.Search"
+  class-name="icon-md text-icon-primary" aria-hidden="true"></x-import>
+```
+
+## From a story to an artboard
+
+Each component guide carries its Storybook stories verbatim — description, source and the
+local mocks they import — as reference. The agent reads a story and writes its own artboard
+with `x-import` and `DCLogic`, following the translation rule in the system's README: imports
+become `WallarmDS.X`, JSX elements become `x-import`, React state becomes `this.state`, and
+mock data becomes constants in the script. Props that take a render function, such as a Table
+column's `cell`, are built in `renderVals()` with `React.createElement`:
+
+```html
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.Table"
+    data="{{rows}}" columns="{{columns}}" get-row-id="{{getRowId}}"></x-import>
+</x-import>
+```
+
+```js
+class Component extends DCLogic {
+  renderVals() {
+    var h = React.createElement;
+    return {
+      rows: [{ id: 'event-1', method: 'GET', ip: '192.0.2.10' }],
+      columns: [
+        { accessorKey: 'method', header: 'Method' },
+        {
+          accessorKey: 'ip',
+          header: 'Source IP',
+          cell: function (ctx) {
+            return h(WallarmDS.Text, { size: 'xs' }, ctx.row.original.ip);
+          },
+        },
+      ],
+      getRowId: function (row) { return row.id; },
+    };
+  }
+}
+```
+
+Hooks cannot run in `renderVals()`; the README names the non-hook path for each case, such as
+`WallarmDS.toaster.create(...)` from a `DCLogic` handler instead of `useToast`. When a
+component's guide has no story for what you need, request the story in the repository.
+
+## Request a change
+
+Change the component, story or token in **wallarm/design-system**, then run
+`/claude-design-sync` there after the release. Describe the component, expected behavior,
+theme and relevant state when requesting a change; include the canvas or a screenshot that
+shows it. The repository is the source of truth, and the artifact is generated from it.
+
+Maintainers sync with the `claude-design-sync` skill: it fetches the export built from the
+release tag, plans the exact changes against the artifact, uploads changed assets, publishes
+the changed files with the index last, and checks that the artifact matches. The first
+publication and every remote deletion need the operator's approval. This is not a CI
+auto-publish workflow. Check the generated README's **Not synced** section for the current
+build's omissions.

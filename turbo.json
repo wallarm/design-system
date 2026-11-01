@@ -4,6 +4,30 @@
   "agentGuidance": false,
   "globalPassThroughEnv": ["STORYBOOK_URL"],
   "tasks": {
+    "@wallarm-org/claude-design#export": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": [
+        ".claude-design/project/**",
+        ".claude-design/summary.json",
+        ".claude-design/file-hashes.json"
+      ]
+    },
+    "@wallarm-org/claude-design#bundle": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "@wallarm-org/claude-design#verify": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "@wallarm-org/claude-design#test:export": {
+      "dependsOn": ["export"],
+      "cache": false
+    },
+    "@wallarm-org/claude-design#typecheck": {
+      "dependsOn": ["@wallarm-org/mcp-core#build"]
+    },
     "dev": {
       "dependsOn": ["@wallarm-org/design-system#build"],
       "cache": true,

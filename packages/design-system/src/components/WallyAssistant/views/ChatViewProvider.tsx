@@ -62,7 +62,7 @@ export const ChatViewProvider: FC<ChatViewProviderProps> = ({
     hasRetry: onRetry != null,
   };
 
-  return <ChatViewContext value={value}>{children}</ChatViewContext>;
+  return <ChatViewContext.Provider value={value}>{children}</ChatViewContext.Provider>;
 };
 
 ChatViewProvider.displayName = 'ChatViewProvider';

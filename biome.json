@@ -9,7 +9,7 @@
       "**/packages/**/*.tsx",
       "**/packages/**/*.js",
       "**/packages/**/*.jsx",
-      "**/apps/docs/**/*.{ts,tsx}",
+      "**/apps/website/**/*.{ts,tsx}",
       "scripts/agents/**/*.mjs",
       ".claude/hooks/**/*.mjs",
       ".claude/settings.json",
@@ -30,7 +30,19 @@
       "!**/coverage",
       "!**/doc_build",
       "!**/doc_build_local",
-      "!**/.rspress"
+      "!**/.rspress",
+      "!**/.claude-design",
+      "!packages/claude-design/src/assets/cover.html"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/claude-design/src/css/entry.css"],
+      "css": {
+        "parser": {
+          "tailwindDirectives": true
+        }
+      }
+    }
+  ]
 }
