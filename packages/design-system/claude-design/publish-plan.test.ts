@@ -78,11 +78,12 @@ describe('publish plan', () => {
   it('chunks uploads by 10 and file batches by 256 entries', () => {
     const files: Record<string, string> = {};
     for (let i = 0; i < 300; i++) files[`components/C${i}/README.md`] = `# ${i}\n`;
-    const { dir } = fixture({
+    const { dir, write } = fixture({
       files,
       svgs: 23,
       remoteFiles: [{ path: 'project/gone.md', sha256: 'x' }],
     });
+    write('remote/approved-stale.json', JSON.stringify(['project/gone.md']));
     const result = plan(dir);
     expect(result.phase).toBe('assets');
     expect(result.uploads.map(chunk => chunk.length)).toEqual([10, 10, 3]);
@@ -122,6 +123,21 @@ describe('publish plan', () => {
     expect(result.stale).toEqual(['project/old/README.md']);
     expect(result.batches[0]?.files).toEqual(['project/README.md']);
     expect(hashes['README.md']).toBeTruthy();
+  });
+
+  it('removes only operator-approved stale paths but reports them all', () => {
+    const { dir, write } = fixture({
+      remoteFiles: [
+        { path: 'project/a.md', sha256: 'x' },
+        { path: 'project/b.md', sha256: 'x' },
+      ],
+    });
+    expect(plan(dir).batches.flatMap(b => b.remove)).toEqual([]);
+    write('remote/approved-stale.json', JSON.stringify(['project/b.md', 'project/README.md']));
+    const result = plan(dir);
+    expect(result.stale).toEqual(['project/a.md', 'project/b.md']);
+    expect(result.batches.flatMap(b => b.remove)).toEqual(['project/b.md']);
+    expect(check(dir)).toContain('stale path still published: project/a.md');
   });
 
   it('keeps page-owned index keys, replaces lastChange, and is byte-stable', () => {

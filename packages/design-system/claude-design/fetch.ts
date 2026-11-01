@@ -1,4 +1,5 @@
-// Downloads the released Claude Design project into .claude-design/ (replacing project/).
+// Downloads the released Claude Design project into .claude-design/ (replacing project/ and
+// clearing remote/ and publish/).
 // Usage: tsx claude-design/fetch.ts [vX.Y.Z]  (default: the latest stable v* release)
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync } from 'node:fs';
@@ -43,7 +44,10 @@ try {
   for (const required of ['project/design-system.json', 'file-hashes.json'])
     if (!existsSync(join(unpacked, required)))
       throw new Error(`${archive} has no ${required}; local state left unchanged`);
-  // The manifest drives stale-path removal, so it must never outlive its project.
+  // The manifest drives stale-path removal, so it must never outlive its project; saved remote
+  // reads, upload results and the old plan describe the previous sync, so they go too.
+  for (const name of ['remote', 'publish'])
+    rmSync(join(root, name), { recursive: true, force: true });
   for (const name of ['project', 'file-hashes.json', 'summary.json']) {
     rmSync(join(root, name), { recursive: true, force: true });
     if (existsSync(join(unpacked, name))) renameSync(join(unpacked, name), join(root, name));

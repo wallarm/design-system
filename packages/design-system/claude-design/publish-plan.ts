@@ -1,6 +1,7 @@
 // Plans and checks a Claude Design publish from saved tool results; no network.
 // Inputs: <dir>/project, <dir>/file-hashes.json and <dir>/remote/{artifact,files,assets,index}.json
-// plus optional <dir>/remote/uploads/*.json (raw claude-artifacts tool results).
+// plus optional <dir>/remote/uploads/*.json (raw claude-artifacts tool results) and
+// <dir>/remote/approved-stale.json (JSON array of stale paths the operator approved to remove).
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -148,11 +149,17 @@ const compute = (dir: string, withUploads = true) => {
 
 export const plan = (dir: string): Plan => {
   const result = compute(dir);
+  // Deletion needs the operator's approval (repository CLAUDE.md); unapproved paths stay published.
+  const approvedPath = join(dir, 'remote/approved-stale.json');
+  const approvedList: unknown = existsSync(approvedPath) ? readJson(approvedPath) : [];
+  if (!Array.isArray(approvedList) || approvedList.some(path => typeof path !== 'string'))
+    throw new Error('remote/approved-stale.json must be a JSON array of paths');
+  const approved = new Set<string>(approvedList);
   const batches: Plan['batches'] = [];
   let bytes = 0;
   const entries = [
     ...result.changed.map(path => ({ path, remove: false })),
-    ...result.stale.map(path => ({ path, remove: true })),
+    ...result.stale.filter(path => approved.has(path)).map(path => ({ path, remove: true })),
   ];
   for (const { path, remove } of entries) {
     const size = remove ? 0 : statSync(join(dir, path)).size;
