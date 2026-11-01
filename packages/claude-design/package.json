@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "export": "tsx src/build.ts",
+    "bundle": "rslib build",
     "verify": "tsx src/verify.ts",
     "test:export": "rstest run",
     "plan": "tsx src/publish-plan.ts plan",

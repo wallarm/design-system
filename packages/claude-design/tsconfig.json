@@ -13,6 +13,7 @@
   "include": [
     "src",
     "rstest.config.ts",
+    "rslib.config.ts",
     "../design-system/src/components/CodeSnippet/adapters/prismjs.d.ts"
   ]
 }

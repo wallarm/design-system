@@ -13,6 +13,10 @@
         ".claude-design/file-hashes.json"
       ]
     },
+    "@wallarm-org/claude-design#bundle": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
     "@wallarm-org/claude-design#verify": {
       "dependsOn": ["^build"],
       "cache": false

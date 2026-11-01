@@ -70,6 +70,8 @@ export type CanvasBuildOptions = {
 export async function canvasRslibConfig(options: CanvasBuildOptions): Promise<RslibConfig> {
   const alias = await runtimeAliases();
   return {
+    // Module ids are relative to the root; `rslib build` here and `createRslib` must agree.
+    root: DESIGN_SYSTEM_DIR,
     lib: [{ format: 'iife', bundle: true, dts: false }],
     source: {
       entry: options.entries,

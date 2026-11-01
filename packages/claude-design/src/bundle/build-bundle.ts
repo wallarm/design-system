@@ -28,7 +28,8 @@ async function canvasEntry(): Promise<{ source: string; exports: string[] }> {
   return { source: lines.join('\n'), exports: [...exported].sort() };
 }
 
-export async function buildBundle({ outDir }: { outDir: string }) {
+/** Writes the generated `window.WallarmDS` entry; `rslib.config.ts` builds it too. */
+export async function prepareBundleEntry(): Promise<{ entry: string; exports: string[] }> {
   const runtimeDir = resolve(PACKAGE_DIR, '.claude-design/runtime');
   await mkdir(runtimeDir, { recursive: true });
   const { source, exports } = await canvasEntry();
@@ -39,6 +40,11 @@ export async function buildBundle({ outDir }: { outDir: string }) {
   );
   const entry = resolve(runtimeDir, 'bundle.ts');
   await writeFile(entry, `import * as WallarmDS from './public-api'; window.WallarmDS=WallarmDS;`);
+  return { entry, exports };
+}
+
+export async function buildBundle({ outDir }: { outDir: string }) {
+  const { entry, exports } = await prepareBundleEntry();
   const stats = await buildCanvasScripts({
     entries: { bundle: entry },
     outDir: join(outDir, 'components'),
