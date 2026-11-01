@@ -9,7 +9,7 @@
       "**/packages/**/*.tsx",
       "**/packages/**/*.js",
       "**/packages/**/*.jsx",
-      "**/apps/docs/**/*.{ts,tsx}",
+      "**/apps/website/**/*.{ts,tsx}",
       "scripts/agents/**/*.mjs",
       ".claude/hooks/**/*.mjs",
       ".claude/settings.json",

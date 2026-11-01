@@ -25,7 +25,7 @@ function ThemeSync() {
   return null;
 }
 
-// Generated pages have no source file under apps/docs/docs to edit; component pages link Source.
+// Generated pages have no source file under apps/website/docs to edit; component pages link Source.
 const GENERATED = ['/foundations/tokens', '/get-started/changelog'];
 
 export function EditLink(props: Parameters<typeof OriginalEditLink>[0]) {

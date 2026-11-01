@@ -5,7 +5,7 @@ into a Claude Design project: a runtime bundle, guides, previews, tokens, CSS, f
 It reads the design-system sources, `scripts/metadata/` and `dist/` from `../design-system`
 (`DESIGN_SYSTEM_DIR` in `src/config.ts`); the npm package is not affected.
 Maintainers publish it manually with the [`claude-design-sync`](../../.claude/skills/claude-design-sync/SKILL.md)
-skill; the designer guide is `apps/docs/docs/ai/claude-design.mdx`. What Storybook does not
+skill; the designer guide is `apps/website/docs/ai/claude-design.mdx`. What Storybook does not
 show, and so Claude Design cannot learn: [CLAUDE_DESIGN_GAP.md](./CLAUDE_DESIGN_GAP.md).
 
 ## Folders

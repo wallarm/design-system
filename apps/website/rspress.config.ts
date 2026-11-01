@@ -37,7 +37,7 @@ export default defineConfig({
       { icon: 'github', mode: 'link', content: 'https://github.com/wallarm/design-system' },
     ],
     editLink: {
-      docRepoBaseUrl: 'https://github.com/wallarm/design-system/tree/main/apps/docs/docs',
+      docRepoBaseUrl: 'https://github.com/wallarm/design-system/tree/main/apps/website/docs',
     },
     llmsUI: { viewOptions: ['markdownLink', 'chatgpt', 'claude'] },
   },

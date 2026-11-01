@@ -232,7 +232,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build all packages
-        run: pnpm build --filter='!@wallarm-org/docs'
+        run: pnpm build --filter='!@wallarm-org/website'
 
       - name: Check CodeSnippet consumer bundles
         run: pnpm --filter=@wallarm-org/design-system test:bundles
