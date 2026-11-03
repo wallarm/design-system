@@ -14,6 +14,11 @@ export const LINE_ANIMATION_BEGIN = 0;
 
 export const LINE_INACTIVE_OPACITY = 0.3;
 
+// `<ResponsiveContainer debounce>`: recharts throttles its resize re-render to this interval
+// (trailing), so a container that resizes every frame — a window drag, a side panel sliding —
+// redraws the SVG a few times instead of on every frame. The body clips the stale width meanwhile.
+export const LINE_RESIZE_DEBOUNCE_MS = 50;
+
 // Card sizing — Figma `7533-3334` (anatomy):
 //   single-line:  card 196 = header 32 + plot 164
 //   multi-line:   card 196 = header 32 + legend 24 + plot 140

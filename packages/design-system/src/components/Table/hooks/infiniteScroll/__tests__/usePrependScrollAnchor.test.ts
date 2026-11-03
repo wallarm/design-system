@@ -101,4 +101,27 @@ describe('usePrependScrollAnchor', () => {
       scrollBySpy.mockRestore();
     }
   });
+  it('reads scrollHeight only while a previous page is loading', () => {
+    let reads = 0;
+    const el = {
+      scrollTop: 0,
+      get scrollHeight() {
+        reads++;
+        return 1000;
+      },
+    } as unknown as HTMLElement;
+    const scrollRef = { current: el };
+    const { rerender } = renderHook(
+      ({ rows, isLoadingPrevious }: { rows: { id: string }[]; isLoadingPrevious: boolean }) =>
+        usePrependScrollAnchor({ mode: 'container', scrollRef, rows, isLoadingPrevious }),
+      { initialProps: { rows: [{ id: 'b' }], isLoadingPrevious: false } },
+    );
+    // Steady commits (a resize re-renders the table every frame) force no layout.
+    rerender({ rows: [{ id: 'b' }], isLoadingPrevious: false });
+    rerender({ rows: [{ id: 'b' }], isLoadingPrevious: false });
+    expect(reads).toBe(0);
+
+    rerender({ rows: [{ id: 'b' }], isLoadingPrevious: true });
+    expect(reads).toBe(1);
+  });
 });

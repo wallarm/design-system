@@ -12,7 +12,12 @@ import type { CategoricalChartFunc } from 'recharts/types/chart/types';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { lineChartBodyClasses, lineChartBodyZoomEnabledClasses } from './classes';
-import { LINE_CARD_HEIGHT, LINE_DEFAULT_BODY_MARGIN, LINE_HEADER_HEIGHT } from './constants';
+import {
+  LINE_CARD_HEIGHT,
+  LINE_DEFAULT_BODY_MARGIN,
+  LINE_HEADER_HEIGHT,
+  LINE_RESIZE_DEBOUNCE_MS,
+} from './constants';
 import { LineChartDataContext, LineChartZoomContext } from './LineChartContext';
 
 const DEFAULT_BODY_HEIGHT = LINE_CARD_HEIGHT - LINE_HEADER_HEIGHT;
@@ -92,7 +97,7 @@ export const LineChartBody: FC<LineChartBodyProps> = ({
         className,
       )}
     >
-      <ResponsiveContainer width='100%' height={height}>
+      <ResponsiveContainer width='100%' height={height} debounce={LINE_RESIZE_DEBOUNCE_MS}>
         <RechartsLineChart
           data={dataCtx?.data ?? []}
           margin={LINE_DEFAULT_BODY_MARGIN}

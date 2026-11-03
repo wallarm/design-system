@@ -12,8 +12,11 @@ export const lineChartRootClasses = ['relative w-full flex flex-col min-h-0'].jo
 // `ds-chart-fade-in` is defined in `theme/components/chart.css`.
 // `motion-reduce:` overrides suppress the animation when the user prefers
 // reduced motion.
+// `overflow-x-clip`: between resizes (see `LINE_RESIZE_DEBOUNCE_MS`) the SVG keeps its last
+// width, and recharts' zero-width, overflow-visible inner div would let a wider one spill past
+// the card. Only the x axis — the tooltip stays inside the plot anyway (`allowEscapeViewBox`).
 export const lineChartBodyClasses = [
-  'relative flex-1 min-h-0 min-w-0',
+  'relative flex-1 min-h-0 min-w-0 overflow-x-clip',
   '[&_*]:outline-none',
   '[&_.recharts-line]:animate-[ds-chart-fade-in_400ms_ease-out]',
   '[&_.recharts-area]:animate-[ds-chart-fade-in_400ms_ease-out]',
