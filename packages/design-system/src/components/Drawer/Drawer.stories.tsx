@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
+import { Input } from '../Input';
 import { OverflowList } from '../OverflowList';
 import {
   Select,
@@ -489,8 +490,9 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
 };
 
 /**
- * A long value — a URL, an id — truncates inside the body instead of widening the drawer: the body
- * never grows past the drawer's width.
+ * A long value — a URL, an id — truncates inside the body instead of widening the drawer, so the
+ * full-width field below it stays within the drawer too: the body never grows past the drawer's
+ * width. Content that is genuinely wider brings its own `overflow-x-auto` container.
  */
 export const LongValues: StoryFn<DrawerProps> = () => (
   <Drawer data-testid='drawer'>
@@ -504,12 +506,17 @@ export const LongValues: StoryFn<DrawerProps> = () => (
         <DrawerTitle>Long values</DrawerTitle>
       </DrawerHeader>
       <DrawerBody>
-        <Attribute data-testid='url-attribute' orientation='horizontal'>
-          <AttributeLabel width={120}>URL</AttributeLabel>
-          <AttributeValue>
-            https://cdn.example.com/microfrontends/a-very-long-application-name/0.1.0-build.2469/mf-manifest.json
-          </AttributeValue>
-        </Attribute>
+        <VStack gap={16}>
+          <Attribute data-testid='url-attribute' orientation='horizontal'>
+            <AttributeLabel width={120}>URL</AttributeLabel>
+            <AttributeValue>
+              <Text data-testid='url-text' size='sm' truncate>
+                https://cdn.example.com/microfrontends/a-very-long-application-name/0.1.0-build.2469/mf-manifest.json
+              </Text>
+            </AttributeValue>
+          </Attribute>
+          <Input data-testid='notes-input' placeholder='Notes' />
+        </VStack>
       </DrawerBody>
     </DrawerContent>
   </Drawer>
@@ -649,6 +656,37 @@ export const NoOverlay: StoryFn<DrawerProps> = () => {
     </Drawer>
   );
 };
+
+/**
+ * `modal={false}` with no overlay keeps the page behind usable: scroll it, click it, keep typing.
+ * Closing returns focus to the trigger without scrolling the page back to it — unless the drawer
+ * was closed by a click on the page, where the user has already moved on.
+ */
+export const NonModal: StoryFn<DrawerProps> = () => (
+  <VStack gap={16} align='start'>
+    <Drawer data-testid='drawer' modal={false} overlay={false}>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          Open Non-Modal Drawer
+        </Button>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Non-modal drawer</DrawerTitle>
+          <DrawerClose />
+        </DrawerHeader>
+
+        <DrawerBody>
+          <div className='py-12'>
+            <p>The page behind stays usable while this drawer is open.</p>
+          </div>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+    <ContentPlaceholder height={1600} />
+  </VStack>
+);
 
 /**
  * A drawer from a drawer: same family, so the outer one steps back and the depth is legible.

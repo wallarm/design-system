@@ -13,6 +13,11 @@ export interface DrawerBodyProps {
   ref?: Ref<HTMLDivElement>;
 }
 
+/**
+ * The drawer's vertically scrolling body. Its content must fit the drawer's width: a long value
+ * truncates, and anything genuinely wider (a chart, a fixed-width block) brings its own
+ * `overflow-x-auto` container — Table, CodeSnippet and CodeEditor already do.
+ */
 export const DrawerBody: FC<DrawerBodyProps> = ({ children, ref }) => {
   const testId = useTestId('body');
 
