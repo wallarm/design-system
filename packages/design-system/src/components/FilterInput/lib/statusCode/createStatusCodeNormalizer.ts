@@ -8,10 +8,8 @@
  *   - "222", "4XX", "40X" → unchanged (already 3 chars)
  * Leaves anything unrecognised alone so `validate` can still flag it.
  */
-export const createStatusCodeNormalizer = (): ((
-  value: string | number | boolean,
-) => string | number | boolean) => {
-  return value => {
+export const createStatusCodeNormalizer =
+  (): ((value: string | number | boolean) => string | number | boolean) => value => {
     if (typeof value !== 'string' && typeof value !== 'number') return value;
     const s = String(value).toUpperCase();
     if (!/^\d[0-9X]{0,2}$/.test(s)) return value;
@@ -19,4 +17,3 @@ export const createStatusCodeNormalizer = (): ((
     if (s.length === 2) return `${s}X`;
     return s;
   };
-};

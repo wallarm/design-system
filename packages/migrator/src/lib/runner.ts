@@ -64,8 +64,9 @@ function applyMigrations(
   sourceFile: SourceFile,
   migrations: Migration[],
 ): { code: string; manual: Omit<ManualItem, 'file'>[] } {
-  if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0)
+  if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0) {
     throw new Error(SYNTAX_ERROR);
+  }
 
   const manual: Omit<ManualItem, 'file'>[] = [];
   for (const migration of migrations) {

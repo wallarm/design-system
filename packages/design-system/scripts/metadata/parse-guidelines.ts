@@ -305,8 +305,9 @@ const parseGuidelineFile = (
   } else if (description.length > DESCRIPTION_MAX_CHARS) {
     fail(`frontmatter "description" is ${description.length} chars (max ${DESCRIPTION_MAX_CHARS})`);
   }
-  if (!Array.isArray(components))
+  if (!Array.isArray(components)) {
     fail('frontmatter "components" must be a list, e.g. [Stack, Flex] or []');
+  }
   if (!Array.isArray(keywords)) fail('frontmatter "keywords" must be a list, e.g. [gap, padding]');
   if (typeof order !== 'number') fail('frontmatter "order" must be a number');
 

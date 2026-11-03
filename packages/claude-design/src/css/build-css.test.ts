@@ -45,8 +45,9 @@ describe('buildCss', () => {
       '.text-text-info',
       '.text-icon-ai',
       '.border-border-danger',
-    ])
+    ]) {
       expect(selectors.has(selector)).toBe(true);
+    }
   });
 
   it('ships the author layout kit on the token scale', () => {
@@ -78,8 +79,9 @@ describe('buildCss', () => {
       'last:pb-0',
       'last:border-b-0',
       'text-md',
-    ])
+    ]) {
       expect(classes.has(name), name).toBe(true);
+    }
   });
 
   it('declares every theme token bundle.css reads in tokens.css', () => {
@@ -101,10 +103,11 @@ describe('buildCss', () => {
     expect(css).toMatch(/\.last\\:pb-0:last-child:where\(:not\(\.sc-host-x > \*\)\)/);
     // Forms with no wrapper-tolerant rewrite keep their selector; none may be a layout-kit class.
     expect(result.wrapperSkipped.length).toBeLessThanOrEqual(30);
-    for (const reason of result.wrapperSkipped)
+    for (const reason of result.wrapperSkipped) {
       expect(reason).not.toMatch(
         /`\.(?:space-|divide-|(?:first|last)\\:(?:p|border)|hover\\:(?:bg|border)-)/,
       );
+    }
   });
 
   it('writes UTILITIES.md listing exactly the authorable classes', () => {

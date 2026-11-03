@@ -78,7 +78,6 @@ export const NotificationCenterHeaderActions: FC<NotificationCenterHeaderActions
     className={cn('flex items-center gap-4', className)}
   >
     {Children.toArray(children).map((child, index) => (
-      // oxlint-disable-next-line react/no-array-index-key -- children keep their order; Children.toArray keys the child itself
       <Fragment key={index}>
         {index > 0 && <Separator orientation='vertical' />}
         {child}

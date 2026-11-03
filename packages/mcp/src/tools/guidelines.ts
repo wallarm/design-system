@@ -108,7 +108,7 @@ const storiesText = (g: Guideline, page: number): string => {
 export function getGuidelineText(
   guidelines: GuidelinesMetadata,
   slug: string,
-  section?: string,
+  requestedSection?: string,
   page = 1,
 ): string {
   const guideline = findGuideline(guidelines, slug);
@@ -117,7 +117,7 @@ export function getGuidelineText(
     return `Guideline "${slug}" not found.${hint.length > 0 ? `\n\nDid you mean: ${hint.join(', ')}?` : ''}`;
   }
   // A link's `#anchor` selects the section unless one is passed.
-  section ??= splitLink(slug).anchor;
+  const section = requestedSection ?? splitLink(slug).anchor;
   // Pattern examples carry their stories' code, so long pages paginate.
   const pageCall = (next: number) =>
     `\`{ slug: '${guideline.slug}'${section ? `, section: '${section}'` : ''}, page: ${next} }\``;

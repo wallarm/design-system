@@ -6,8 +6,8 @@ export interface VStackProps extends Omit<StackProps, 'direction'> {
   ref?: Ref<HTMLDivElement>;
 }
 
-export const VStack: FC<VStackProps> = ({ ref, ...props }) => {
-  return <Stack ref={ref} direction='column' {...props} />;
-};
+export const VStack: FC<VStackProps> = ({ ref, ...props }) => (
+  <Stack ref={ref} direction='column' {...props} />
+);
 
 VStack.displayName = 'VStack';

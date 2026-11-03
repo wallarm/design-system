@@ -9,6 +9,4 @@ interface SelectSharedProviderProps {
 export const SelectSharedProvider: FC<PropsWithChildren<SelectSharedProviderProps>> = ({
   children,
   value,
-}) => {
-  return <SelectSharedContext.Provider value={value}>{children}</SelectSharedContext.Provider>;
-};
+}) => <SelectSharedContext.Provider value={value}>{children}</SelectSharedContext.Provider>;

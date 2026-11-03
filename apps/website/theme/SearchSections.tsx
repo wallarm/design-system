@@ -26,8 +26,9 @@ export function SearchSections({ onNavigate }: SearchSectionsProps) {
     const onKeyDown = (e: KeyboardEvent) => {
       const input = document.querySelector<HTMLInputElement>('.rp-search-panel__input');
       // A focused section link handles Enter natively; acting here too would navigate twice.
-      if (!input || input.value || e.isComposing || listRef.current?.contains(e.target as Node))
+      if (!input || input.value || e.isComposing || listRef.current?.contains(e.target as Node)) {
         return;
+      }
       if (e.code === 'ArrowDown') setCurrent(i => (i + 1) % sections.length);
       else if (e.code === 'ArrowUp') setCurrent(i => (i - 1 + sections.length) % sections.length);
       else if (e.code === 'Enter') listRef.current?.querySelectorAll('a')[current]?.click();

@@ -79,8 +79,9 @@ const readJson = (file, what) => {
 const readIndex = file => {
   let remote = readJson(file, `the system's ${INDEX} as JSON`);
   if (typeof remote?.content === 'string') remote = JSON.parse(remote.content);
-  if (!remote || typeof remote !== 'object' || Array.isArray(remote))
+  if (!remote || typeof remote !== 'object' || Array.isArray(remote)) {
     throw new Failure(`${file} must be the system's ${INDEX}, a JSON object.`, 2);
+  }
   return remote;
 };
 
@@ -93,11 +94,12 @@ const mergeIndex = (file, packed) => {
 
 const readPaths = file => {
   const value = readJson(file, "the system's file paths as a JSON array");
-  if (!Array.isArray(value) || !value.every(path => typeof path === 'string'))
+  if (!Array.isArray(value) || !value.every(path => typeof path === 'string')) {
     throw new Failure(
       `${file} must be a JSON array of the system's file paths, such as ["project/tokens.css"].`,
       2,
     );
+  }
   return value;
 };
 
@@ -109,27 +111,33 @@ const readPaths = file => {
 function writeAssetIndex(values, cwd) {
   const out = resolve(cwd, values.dir);
   const shown = relative(cwd, out) || '.';
-  if (!existsSync(join(out, 'assets.json')))
+  if (!existsSync(join(out, 'assets.json'))) {
     throw new Failure(
       `${join(shown, 'assets.json')} is missing. Run the export first (same --dir).`,
       2,
     );
+  }
   const assets = readJson(join(out, 'assets.json'), 'the export');
   const blobsFile = resolve(cwd, values.blobs ?? join(out, 'blobs.json'));
   const blobs = existsSync(blobsFile) ? readJson(blobsFile, 'a JSON object') : {};
-  if (!blobs || typeof blobs !== 'object' || Array.isArray(blobs))
+  if (!blobs || typeof blobs !== 'object' || Array.isArray(blobs)) {
     throw new Failure(
       `${blobsFile} must be a JSON object of asset path or sha256 to blob id, such as {"assets/Icons/activity.svg": "<id>"}.`,
       2,
     );
+  }
 
   // Blob ids by sha256: the person's current index first, then this release's uploads.
   const ids = new Map();
-  if (values.index)
-    for (const group of Object.values(readIndex(resolve(cwd, values.index)).assetGroups ?? {}))
-      for (const file of Object.values(group?.files ?? {}))
-        if (typeof file?.sha256 === 'string' && BLOB_ID.test(file.blob ?? ''))
+  if (values.index) {
+    for (const group of Object.values(readIndex(resolve(cwd, values.index)).assetGroups ?? {})) {
+      for (const file of Object.values(group?.files ?? {})) {
+        if (typeof file?.sha256 === 'string' && BLOB_ID.test(file.blob ?? '')) {
           ids.set(file.sha256, file.blob);
+        }
+      }
+    }
+  }
   const reused = new Set(ids.keys());
   const shaOf = new Map(assets.map(a => [a.path, a.sha256]));
   const saved = {};
@@ -146,8 +154,9 @@ function writeAssetIndex(values, cwd) {
       kept[key] = value;
     }
   }
-  if (existsSync(blobsFile))
+  if (existsSync(blobsFile)) {
     writeFileSync(blobsFile, `${JSON.stringify({ ...saved, ...kept }, null, 2)}\n`);
+  }
   // One path per missing sha256: identical SVGs share an upload.
   const missing = [
     ...new Map(
@@ -163,10 +172,11 @@ function writeAssetIndex(values, cwd) {
     const lines = [
       `${missing.length} of ${assets.length} assets have no blob id yet; ${join(shown, INDEX)} is unchanged.`,
     ];
-    if (invalid.length)
+    if (invalid.length) {
       lines.push(
         `These ${invalid.length} blobs.json entries match no asset or hold no 32-character blob id or /_blob/<id> url: ${listed(invalid)}.`,
       );
+    }
     lines.push(
       `Upload the files listed in ${join(shown, 'upload.json')} to the system as assets, add each one's path (as listed) and returned url to ${relative(cwd, blobsFile)}, then run this command again.`,
     );
@@ -216,11 +226,12 @@ function writeAssetIndex(values, cwd) {
 /** Writes <dir>/UPDATE.md for this release and deletes blobs.json and upload.json: an update starts with nothing uploaded. */
 function writeUpdateGuide(values, cwd) {
   const guide = join(SOURCE, 'UPDATE.md');
-  if (!existsSync(guide))
+  if (!existsSync(guide)) {
     throw new Failure(
       `This @wallarm-org/claude-design ${version} has no UPDATE.md. Run the command again with @latest, or report it at https://github.com/wallarm/design-system/issues.`,
       1,
     );
+  }
   const out = resolve(cwd, values.dir);
   mkdirSync(out, { recursive: true });
   cpSync(guide, join(out, 'UPDATE.md'));
@@ -254,20 +265,23 @@ function run(argv, cwd) {
   const { values, positionals } = parsed;
   if (positionals.length === 1 && positionals[0] === 'index') return writeAssetIndex(values, cwd);
   if (positionals.length === 1 && positionals[0] === 'update') return writeUpdateGuide(values, cwd);
-  if (positionals.length !== 1 || positionals[0] !== 'export')
+  if (positionals.length !== 1 || positionals[0] !== 'export') {
     throw new Failure(`Unknown command ${positionals.join(' ') || '(none)'}.\n${USAGE}`, 2);
-  if (!existsSync(join(SOURCE, 'project/design-system.json')))
+  }
+  if (!existsSync(join(SOURCE, 'project/design-system.json'))) {
     throw new Failure(
       `This @wallarm-org/claude-design ${version} has no packaged export. Run the command again with @latest, or report it at https://github.com/wallarm/design-system/issues.`,
       1,
     );
+  }
 
   const out = resolve(cwd, values.dir);
-  if (existsSync(out) && readdirSync(out).length > 0 && !values.overwrite)
+  if (existsSync(out) && readdirSync(out).length > 0 && !values.overwrite) {
     throw new Failure(
       `${out} already has files. Pass --overwrite to replace the export in it, or choose another --dir.`,
       2,
     );
+  }
   const existing = values.existing ? readPaths(resolve(cwd, values.existing)) : undefined;
   const packed = JSON.parse(readFileSync(join(SOURCE, INDEX), 'utf8'));
   const index = values.index ? mergeIndex(resolve(cwd, values.index), packed) : undefined;
@@ -279,7 +293,9 @@ function run(argv, cwd) {
     let blobs;
     try {
       blobs = JSON.parse(readFileSync(blobsFile, 'utf8'));
-    } catch {}
+    } catch {
+      // An unreadable blobs.json is rewritten empty below.
+    }
     const bySha = Object.entries(blobs ?? {}).filter(([key]) => SHA256.test(key));
     writeFileSync(blobsFile, `${JSON.stringify(Object.fromEntries(bySha), null, 2)}\n`);
   }
@@ -310,10 +326,11 @@ function run(argv, cwd) {
   const lines = [
     `Exported Wallarm Design System ${version}: ${projectFiles} files in ${join(shown, 'project')} and ${assets} icons and logos in ${join(shown, 'assets')}.`,
   ];
-  if (removed.length)
+  if (removed.length) {
     lines.push(
       `Remove the ${removed.length} files the system has and this release doesn't: they're listed in ${join(shown, 'removed.json')}.`,
     );
+  }
   lines.push(
     existing
       ? `Carry on with ${join(shown, 'UPDATE.md')} from step 3; it points into ${join(shown, 'SETUP.md')}.`

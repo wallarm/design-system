@@ -24,23 +24,21 @@ export const EmptyState: FC<EmptyStateProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <EmptyStateProvider value={type}>
-        <div
-          {...props}
-          ref={ref}
-          role='status'
-          data-slot='empty-state'
-          data-testid={testId}
-          className={cn(emptyStateVariants({ type }), className)}
-        >
-          {children}
-        </div>
-      </EmptyStateProvider>
-    </TestIdProvider>
-  );
-};
+}) => (
+  <TestIdProvider value={testId}>
+    <EmptyStateProvider value={type}>
+      <div
+        {...props}
+        ref={ref}
+        role='status'
+        data-slot='empty-state'
+        data-testid={testId}
+        className={cn(emptyStateVariants({ type }), className)}
+      >
+        {children}
+      </div>
+    </EmptyStateProvider>
+  </TestIdProvider>
+);
 
 EmptyState.displayName = 'EmptyState';

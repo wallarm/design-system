@@ -44,12 +44,13 @@ describe('parseComponentDescription', () => {
   });
 
   it('falls back to JSDoc with several story files and none named for the component', () => {
-    for (const n of ['A', 'B'])
+    for (const n of ['A', 'B']) {
       memory.createSourceFile(
         `/c/Many/${n}.stories.tsx`,
         `const meta = { parameters: { docs: { description: { component: '${n}.' } } } }; export default meta;`,
         { overwrite: true },
       );
+    }
     memory.createSourceFile('/c/Many/Many.tsx', '/** Many. */\nexport const Many = () => null;', {
       overwrite: true,
     });

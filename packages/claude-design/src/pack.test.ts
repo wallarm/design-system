@@ -141,10 +141,11 @@ describe('pack', () => {
       expect(setup).toContain(`(${files} files)`);
       expect(setup).toContain(`${assets} SVG files`);
       expect(setup).toContain('<script src="./support.js"></script>');
-      for (const file of [CANVAS_SAMPLER, CANVAS_SKELETON])
+      for (const file of [CANVAS_SAMPLER, CANVAS_SKELETON]) {
         expect(readFileSync(join(out, file), 'utf8')).toContain(
           '<script src="ds/wallarm-design-system/components/bundle.js"></script>',
         );
+      }
       expect(readFileSync(join(out, CANVAS_SKELETON), 'utf8')).toContain('var APP = {');
       const update = readFileSync(join(out, 'UPDATE.md'), 'utf8');
       expect(update).not.toMatch(/\{\{\w+\}\}/);

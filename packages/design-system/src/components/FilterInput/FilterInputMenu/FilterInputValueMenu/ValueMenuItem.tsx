@@ -60,7 +60,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
       </div>
     ) : isChecked ? (
       <div className='ml-auto flex shrink-0 items-start justify-end'>
-        <Checkmark checkedState={true} />
+        <Checkmark checkedState />
       </div>
     ) : null}
 

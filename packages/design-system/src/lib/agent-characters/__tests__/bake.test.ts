@@ -35,10 +35,11 @@ describe('bake port (look v17)', () => {
         if (a === 255) opaque++;
         for (let ch = 0; ch < 3; ch++) {
           const diff = Math.abs((got[i + ch] as number) - (want[i + ch] as number));
-          if (diff > tol)
+          if (diff > tol) {
             expect(
               `${c.name} px ${i / 4} ch ${ch}: ${got[i + ch]} vs ${want[i + ch]} (alpha ${a})`,
             ).toBe('within tolerance');
+          }
         }
       }
       expect(opaque).toBeGreaterThan(100);
@@ -58,7 +59,9 @@ describe('bake cache', () => {
       created.push(u);
       return u;
     };
-    URL.revokeObjectURL = u => void revoked.push(u);
+    URL.revokeObjectURL = u => {
+      revoked.push(u);
+    };
     let runs = 0;
     const run = async () => {
       runs++;

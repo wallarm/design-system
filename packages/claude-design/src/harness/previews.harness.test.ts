@@ -12,7 +12,7 @@ const headingOnly = new Set([
   'FilterInput/Closed', // the menu is closed, so there is nothing but the heading until it opens
 ]);
 describe('compiled Storybook previews', () => {
-  for (const name of names)
+  for (const name of names) {
     it(`mounts real ${name} stories using the shared canvas components`, async () => {
       const env = createReact18Window();
       const errors: unknown[] = [];
@@ -66,15 +66,18 @@ describe('compiled Storybook previews', () => {
         expect(stories.length).toBeGreaterThan(0);
         for (const story of stories) {
           const storyName = story.getAttribute('data-preview-story');
-          if (!headingOnly.has(`${name}/${storyName}`))
+          if (!headingOnly.has(`${name}/${storyName}`)) {
             expect(story.children.length, `${name}/${storyName}`).toBeGreaterThan(1);
+          }
         }
         // The first Button story has a fixed label, not the generic meta.component fallback.
-        if (name === 'Button')
+        if (name === 'Button') {
           expect(stories[0]?.querySelector('button')?.textContent).toBe('Button');
+        }
       } finally {
         if (root) env.ReactDOM.flushSync(() => root?.unmount());
         env.dom.window.close();
       }
     });
+  }
 });

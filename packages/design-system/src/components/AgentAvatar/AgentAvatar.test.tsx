@@ -37,7 +37,7 @@ const svgOf = (el: HTMLElement) => el.querySelector('svg') as SVGSVGElement;
 
 describe('AgentAvatar (static)', () => {
   it('renders the core static frame for every preset and state', () => {
-    for (const p of CAST)
+    for (const p of CAST) {
       for (const state of [
         'idle',
         'needs',
@@ -60,6 +60,7 @@ describe('AgentAvatar (static)', () => {
         expect(root.hasAttribute('data-veiled')).toBe(tree.veiled);
         unmount();
       }
+    }
   });
 
   it('keeps the crown in every state but Deactivated (04 §4.11)', () => {

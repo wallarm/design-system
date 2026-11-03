@@ -1668,7 +1668,7 @@ describe('Row reordering inside sub-row groups', () => {
         getRowId={row => row.id}
         getSubRows={row => row.children}
         renderGroupRow={row => row.original.name}
-        expanded={true}
+        expanded
         onRowReorder={rs.fn()}
         showEmptyGroups={showEmptyGroups}
         data-testid='tbl'
@@ -1714,7 +1714,7 @@ describe('Row reordering inside sub-row groups', () => {
         columns={baseColumns as never}
         getRowId={row => row.id}
         getSubRows={row => row.children}
-        expanded={true}
+        expanded
         onRowReorder={rs.fn()}
         getRowCanDrag={row => row.original.id !== 'a'}
         data-testid='tbl'
@@ -1739,7 +1739,7 @@ describe('Row reordering inside sub-row groups', () => {
         renderGroupRow={row => <span data-testid={`group-${row.id}`}>{row.original.name}</span>}
         groupRowSpan='full'
         showEmptyGroups
-        expanded={true}
+        expanded
         onRowReorder={rs.fn()}
         data-testid='tbl'
       />,
@@ -1764,7 +1764,7 @@ describe('Row reordering inside sub-row groups', () => {
         groupRowSpan='full'
         groupExpandColumn
         showEmptyGroups
-        expanded={true}
+        expanded
         onExpandedChange={rs.fn()}
         onRowReorder={rs.fn()}
         data-testid='tbl'
@@ -1795,7 +1795,7 @@ describe('Row reordering inside sub-row groups', () => {
         getRowId={row => row.id}
         getSubRows={row => row.children}
         renderGroupRow={row => row.original.name}
-        expanded={true}
+        expanded
         onRowReorder={rs.fn()}
         renderFullWidthRow={row =>
           row.original.id === 'a' ? <span data-testid='banner'>Banner</span> : undefined
@@ -1818,7 +1818,7 @@ describe('Row reordering inside sub-row groups', () => {
         getRowId={row => row.id}
         getSubRows={row => row.children}
         renderGroupRow={row => row.original.name}
-        expanded={true}
+        expanded
         onRowReorder={rs.fn()}
         renderFullWidthRow={row => (row.original.id === 'a' ? 'Banner' : undefined)}
         getRowCanDrag={() => false}

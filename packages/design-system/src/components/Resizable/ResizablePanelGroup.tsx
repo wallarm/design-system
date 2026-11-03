@@ -32,24 +32,22 @@ export const ResizablePanelGroup: FC<ResizablePanelGroupProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <ResizableProvider value={{ orientation }}>
-      <TestIdProvider value={testId}>
-        <Group
-          {...props}
-          id={autoSaveId}
-          elementRef={ref}
-          orientation={orientation}
-          data-slot='resizable-panel-group'
-          data-testid={testId}
-          className={cn(className)}
-        >
-          {children}
-        </Group>
-      </TestIdProvider>
-    </ResizableProvider>
-  );
-};
+}) => (
+  <ResizableProvider value={{ orientation }}>
+    <TestIdProvider value={testId}>
+      <Group
+        {...props}
+        id={autoSaveId}
+        elementRef={ref}
+        orientation={orientation}
+        data-slot='resizable-panel-group'
+        data-testid={testId}
+        className={cn(className)}
+      >
+        {children}
+      </Group>
+    </TestIdProvider>
+  </ResizableProvider>
+);
 
 ResizablePanelGroup.displayName = 'ResizablePanelGroup';

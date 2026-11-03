@@ -33,11 +33,12 @@ export const TableBodyVirtualizedContainer: FC = () => {
   // Clear on unmount so any `scrollToRow` call landing between this body's
   // unmount and a successor body's first render doesn't act on a dead
   // virtualizer instance.
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       virtualizerRef.current = null;
-    };
-  }, [virtualizerRef]);
+    },
+    [virtualizerRef],
+  );
 
   useResetVirtualizerOnDataChange(table, virtualizer);
   useSmoothScrollOnSort(table, getScrollElement);

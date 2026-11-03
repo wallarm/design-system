@@ -15,20 +15,17 @@ export const Timeline: FC<TimelineProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <ol
-      {...props}
-      ref={ref}
-      data-slot='timeline'
-      data-testid={testId}
-      // oxlint-disable-next-line jsx-a11y/no-redundant-roles -- Safari/VoiceOver drops list semantics from any list styled with `list-style: none` (applied via `list-none` below); role='list' restores it
-      role='list'
-      className={cn(timelineVariants(), className)}
-    >
-      <TestIdProvider value={testId}>{children}</TestIdProvider>
-    </ol>
-  );
-};
+}) => (
+  <ol
+    {...props}
+    ref={ref}
+    data-slot='timeline'
+    data-testid={testId}
+    role='list'
+    className={cn(timelineVariants(), className)}
+  >
+    <TestIdProvider value={testId}>{children}</TestIdProvider>
+  </ol>
+);
 
 Timeline.displayName = 'Timeline';

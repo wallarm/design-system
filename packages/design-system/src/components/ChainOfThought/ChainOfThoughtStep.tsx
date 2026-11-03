@@ -84,8 +84,9 @@ export const ChainOfThoughtStep: FC<ChainOfThoughtStepProps> = ({
       status === 'done' &&
       event.target === event.currentTarget &&
       event.propertyName.endsWith('text-fill-color')
-    )
+    ) {
       setSettled(true);
+    }
   };
   const isOpen = open ?? internalOpen;
   const collapsible = children != null && children !== false;

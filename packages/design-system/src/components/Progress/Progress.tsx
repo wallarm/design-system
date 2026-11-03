@@ -29,35 +29,33 @@ export const Progress: FC<ProgressProps> = ({
   className,
   'data-testid': testId,
   ref,
-}) => {
-  return (
-    <ArkUiProgress.Root
-      ref={ref}
-      value={value}
-      defaultValue={value}
-      min={min}
-      max={max}
-      data-slot='progress'
-      data-testid={testId}
-      className={cn('flex w-full min-w-118 items-center gap-8', className)}
+}) => (
+  <ArkUiProgress.Root
+    ref={ref}
+    value={value}
+    defaultValue={value}
+    min={min}
+    max={max}
+    data-slot='progress'
+    data-testid={testId}
+    className={cn('flex w-full min-w-118 items-center gap-8', className)}
+  >
+    <ArkUiProgress.Track
+      data-slot='progress-track'
+      className={progressTrackVariants({ size, color })}
     >
-      <ArkUiProgress.Track
-        data-slot='progress-track'
-        className={progressTrackVariants({ size, color })}
-      >
-        <ArkUiProgress.Range
-          data-slot='progress-range'
-          className={progressRangeVariants({ size, color })}
-        />
-      </ArkUiProgress.Track>
-      {showLabel && (
-        <ArkUiProgress.ValueText
-          data-slot='progress-label'
-          className='font-sans-display text-xs font-medium text-text-secondary tabular-nums'
-        />
-      )}
-    </ArkUiProgress.Root>
-  );
-};
+      <ArkUiProgress.Range
+        data-slot='progress-range'
+        className={progressRangeVariants({ size, color })}
+      />
+    </ArkUiProgress.Track>
+    {showLabel && (
+      <ArkUiProgress.ValueText
+        data-slot='progress-label'
+        className='font-sans-display text-xs font-medium text-text-secondary tabular-nums'
+      />
+    )}
+  </ArkUiProgress.Root>
+);
 
 Progress.displayName = 'Progress';

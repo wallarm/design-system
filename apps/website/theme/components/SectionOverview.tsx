@@ -52,8 +52,9 @@ export function overviewGroups(
   const cards = (items: SidebarEntry[]): OverviewCard[] =>
     items.flatMap(item => {
       if (!('text' in item)) return [];
-      if (item.link)
+      if (item.link) {
         return isEqualPath(item.link, routePath) ? [] : [card(item.text, item.link, item.tag)];
+      }
       return 'items' in item ? cards(item.items) : [];
     });
 

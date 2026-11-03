@@ -25,8 +25,9 @@ export function mapColorValue(
     const seen = new Set([alpha[1]]);
     while (source && ALIAS.test(source.trim())) {
       const next = ALIAS.exec(source.trim())?.[1];
-      if (!next || seen.has(next) || seen.size >= 16)
+      if (!next || seen.has(next) || seen.size >= 16) {
         return { skipped: `cyclic or deep alpha alias in ${theme}` };
+      }
       seen.add(next);
       source = resolve(next);
     }

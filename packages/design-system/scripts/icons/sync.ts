@@ -140,13 +140,15 @@ const listComponents = async (): Promise<Component[]> => {
   const out: Component[] = [];
   const visit = (node: FigmaNode, group: string, set?: string) => {
     if (node.type === 'COMPONENT') out.push({ id: node.id, layer: node.name, group, set });
-    else
-      for (const child of node.children ?? [])
+    else {
+      for (const child of node.children ?? []) {
         visit(
           child,
           node.type === 'CANVAS' ? '' : node.name,
           node.type === 'COMPONENT_SET' ? node.id : undefined,
         );
+      }
+    }
   };
   visit(page, '');
   return out;
@@ -351,8 +353,9 @@ const main = async () => {
   const { targets, errors, stale } = planTargets(components);
   const newTargets = targets.filter(t => t.isNew);
 
-  for (const [id, name] of stale)
+  for (const [id, name] of stale) {
     console.warn(`! ${name}: node ${id} is gone from Figma (file left untouched)`);
+  }
   if (errors.length) {
     for (const e of errors) console.error(`✗ ${e}`);
     process.exit(1);

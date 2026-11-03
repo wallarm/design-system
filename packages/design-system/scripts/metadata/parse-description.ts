@@ -25,8 +25,9 @@ const evalText = (node: Node, sourceFile: SourceFile): string | undefined => {
   if (n.isKind(SyntaxKind.CallExpression)) {
     const callee = n.getExpression();
     const [sep, ...rest] = n.getArguments();
-    if (!callee.isKind(SyntaxKind.PropertyAccessExpression) || callee.getName() !== 'join')
+    if (!callee.isKind(SyntaxKind.PropertyAccessExpression) || callee.getName() !== 'join') {
       return undefined;
+    }
     if (rest.length > 0 || !sep) return undefined;
     let arr: Node | undefined = callee.getExpression();
     if (arr.isKind(SyntaxKind.Identifier)) {

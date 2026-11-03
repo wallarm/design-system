@@ -25,14 +25,15 @@ export function solveField(maskAt: MaskAt, R: number): Float32Array {
     const nu = new Float32Array(N * N);
     if (u) {
       const prev = u;
-      for (let y = 0; y < N; y++)
+      for (let y = 0; y < N; y++) {
         for (let x = 0; x < N; x++) {
           const i = y * N + x;
           nu[i] = m[i] ? (prev[(y >> 1) * pN + (x >> 1)] as number) : 0;
         }
+      }
     }
-    for (let k = 0; k < it; k++)
-      for (let y = 1; y < N - 1; y++)
+    for (let k = 0; k < it; k++) {
+      for (let y = 1; y < N - 1; y++) {
         for (let x = 1; x < N - 1; x++) {
           const i = y * N + x;
           if (!m[i]) continue;
@@ -46,6 +47,8 @@ export function solveField(maskAt: MaskAt, R: number): Float32Array {
           const cur = nu[i] as number;
           nu[i] = cur + 1.85 * (v - cur);
         }
+      }
+    }
     u = nu;
     pN = N;
   }
@@ -104,7 +107,7 @@ export function shade(
     return seed / 2147483647;
   };
   const h = R / G;
-  for (let py = 0; py < P; py++)
+  for (let py = 0; py < P; py++) {
     for (let px = 0; px < P; px++) {
       const j = (py * P + px) * 4;
       const al = alpha[py * P + px] as number;
@@ -142,6 +145,7 @@ export function shade(
       }
       o[j + 3] = al;
     }
+  }
   return o;
 }
 

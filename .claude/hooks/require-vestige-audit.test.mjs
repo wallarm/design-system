@@ -25,8 +25,9 @@ function fixture(t) {
   mkdirSync(join(root, '.claude/hooks'), { recursive: true });
   mkdirSync(join(root, 'packages/example'), { recursive: true });
   for (const file of readdirSync(join(source, '.claude/hooks'))) {
-    if (file.endsWith('.sh'))
+    if (file.endsWith('.sh')) {
       copyFileSync(join(source, '.claude/hooks', file), join(root, '.claude/hooks', file));
+    }
   }
   const git = (...args) =>
     execFileSync('git', args, {

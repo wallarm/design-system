@@ -104,9 +104,9 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
  * Start and end in one control, each segmented. The end cannot precede the start, so the field
  * cannot produce a range the system would reject.
  */
-export const Basic: StoryFn<typeof meta> = args => {
-  return <DateRangeInput {...(args as DateRangeInputProps)} />;
-};
+export const Basic: StoryFn<typeof meta> = args => (
+  <DateRangeInput {...(args as DateRangeInputProps)} />
+);
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 

@@ -66,8 +66,9 @@ function normalize(
     '$$typeof' in type &&
     type.$$typeof === Symbol.for('react.context') &&
     'Provider' in type
-  )
+  ) {
     type = type.Provider;
+  }
   if (
     typeof type === 'function' &&
     props.ref != null &&

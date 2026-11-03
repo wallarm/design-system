@@ -35,8 +35,9 @@ async function main() {
   let guidelinesSource = '';
   if (!guidelines && source.kind === 'installed') {
     guidelines = loadBundledGuidelines();
-    if (guidelines)
+    if (guidelines) {
       guidelinesSource = `\n\n_Guidelines: bundled snapshot v${guidelines.version} — your installed @wallarm-org/design-system v${metadata.version} ships no guidelines.json._`;
+    }
   }
   log(sourceLine, `(${metadataPath})`);
   log(

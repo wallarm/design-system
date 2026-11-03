@@ -22,8 +22,9 @@ describe('derived values (look v17 data)', () => {
       expect(mix(hex, '#ffffff', 0.6), `${id} visorLip`).toBe(d.visorLip);
       expect(mix(hex, '#0d0b0c', 0.28), `${id} glyphRim`).toBe(d.glyphRim);
       expect(mix(hex, '#B8BCC4', 0.6), `${id} glyphOffFill`).toBe(d.glyphOffFill);
-      if (typeof d.luma === 'number')
+      if (typeof d.luma === 'number') {
         expect(Math.round(luma(hex) * 100) / 100, `${id} luma`).toBeCloseTo(d.luma, 1);
+      }
     }
   });
 

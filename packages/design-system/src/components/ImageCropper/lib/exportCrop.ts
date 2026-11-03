@@ -21,8 +21,9 @@ export const exportCrop = async (
     !image.naturalHeight ||
     crop.width <= 0 ||
     crop.height <= 0
-  )
+  ) {
     return null;
+  }
   try {
     const canvas = image.ownerDocument.createElement('canvas');
     canvas.width = outputSize.width;

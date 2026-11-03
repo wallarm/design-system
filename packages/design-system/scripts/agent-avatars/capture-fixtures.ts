@@ -20,8 +20,9 @@ const { chromium } = createRequire(
   path.resolve(here, '../../../configs/playwright-config/package.json'),
 )('@playwright/test') as { chromium: BrowserType };
 const REF = process.env.REF;
-if (!REF)
+if (!REF) {
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
+}
 const OUT = path.resolve(here, '../../src/lib/agent-characters/__tests__/__fixtures__/v17.json');
 
 const browser = await chromium.launch({ channel: 'chrome' });
@@ -190,5 +191,4 @@ writeFileSync(
     1,
   )}\n`,
 );
-// oxlint-disable-next-line no-console -- CLI output
 console.log(`fixtures and ${path.relative(process.cwd(), geomOut)} written`);

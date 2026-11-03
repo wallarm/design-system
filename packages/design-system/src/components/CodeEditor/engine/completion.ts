@@ -136,12 +136,13 @@ const reportSourceError = (error: unknown): null => {
 };
 
 /** Adapts a public `CodeEditorCompletionSource` to a CodeMirror `CompletionSource`. */
-const adaptSource = (
-  source: CodeEditorCompletionSource,
-  language: CodeEditorLanguage,
-  startingLineNumber: number,
-): CompletionSource => {
-  return ctx => {
+const adaptSource =
+  (
+    source: CodeEditorCompletionSource,
+    language: CodeEditorLanguage,
+    startingLineNumber: number,
+  ): CompletionSource =>
+  ctx => {
     const from = completionWord(ctx).from;
     const finish = (items: CodeEditorCompletion[] | null): CompletionResult | null =>
       items && items.length > 0 ? { from, options: items.map(toCompletion) } : null;
@@ -153,7 +154,6 @@ const adaptSource = (
       return reportSourceError(error);
     }
   };
-};
 
 /** Re-open the list after a `Name: ` header (or `"key": `) pick, so values show up at once. */
 const reopensAfter = (completion: Completion): boolean =>

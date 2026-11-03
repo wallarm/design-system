@@ -105,8 +105,9 @@ export function glyphTree(c: Look, size: number, state: StateId, clipId: string)
   }
   if (!ghost && !inv && c.prop && GLYPH_PROPS.has(c.prop)) {
     // light layers get the rim, or they vanish on white
-    for (const l of propOf(c.prop, S, col)?.layers ?? [])
+    for (const l of propOf(c.prop, S, col)?.layers ?? []) {
       out.push(luma(l.col) > 190 ? L(l.d, l.col) : { tag: 'path', attrs: { d: l.d, fill: l.col } });
+    }
   }
   return {
     width: size,

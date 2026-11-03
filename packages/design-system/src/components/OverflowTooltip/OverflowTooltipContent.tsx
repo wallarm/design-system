@@ -16,15 +16,13 @@ export const OverflowTooltipContent = ({
   children,
   className,
   maxWidth = 400,
-}: OverflowTooltipContentProps) => {
-  return (
-    <TooltipContent
-      className={cn('wrap-break-word whitespace-normal', className)}
-      style={{ maxWidth }}
-    >
-      {children}
-    </TooltipContent>
-  );
-};
+}: OverflowTooltipContentProps) => (
+  <TooltipContent
+    className={cn('wrap-break-word whitespace-normal', className)}
+    style={{ maxWidth }}
+  >
+    {children}
+  </TooltipContent>
+);
 
 OverflowTooltipContent.displayName = 'OverflowTooltipContent';

@@ -144,7 +144,8 @@ console.log(
     `${report.bailouts} bailouts in ${report.bailoutFiles} files, ${report.optedOutFiles} files (${report.optedOutFunctions} functions) opted out ('use no memo').`,
 );
 console.log('\nBy category:');
-for (const [k, v] of Object.entries(report.byCategory))
+for (const [k, v] of Object.entries(report.byCategory)) {
   console.log(`  ${String(v).padStart(4)}  ${k}`);
+}
 console.log('\nBy file:');
 for (const b of bailouts) console.log(`  ${b.file}:${b.line ?? '?'}  [${b.category}] ${b.reason}`);

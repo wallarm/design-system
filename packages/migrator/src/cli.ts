@@ -31,8 +31,9 @@ function installedVersion(cwd: string): string {
   for (let dir = cwd; ; dir = path.dirname(dir)) {
     const file = path.join(dir, 'node_modules/@wallarm-org/design-system/package.json');
     if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')).version;
-    if (path.dirname(dir) === dir)
+    if (path.dirname(dir) === dir) {
       throw new UsageError('could not find installed @wallarm-org/design-system: pass --to');
+    }
   }
 }
 

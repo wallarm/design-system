@@ -146,8 +146,9 @@ export const ImageCropper: FC<ImageCropperProps> = ({
               ready,
               zoom: ark.zoom,
               setZoom: value => {
-                if (Number.isFinite(value))
+                if (Number.isFinite(value)) {
                   ark.setZoom(Math.min(maxZoom, Math.max(minZoom, value)));
+                }
               },
               reset: ark.reset,
               getCroppedImage: async options => {

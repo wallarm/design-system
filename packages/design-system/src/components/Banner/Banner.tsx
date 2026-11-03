@@ -40,24 +40,22 @@ export const Banner: FC<BannerProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <BannerVariantProvider value={variant}>
-      <TestIdProvider value={testId}>
-        <div
-          {...props}
-          ref={ref}
-          role='status'
-          data-slot='banner'
-          data-testid={testId}
-          data-variant={variant}
-          className={cn(bannerVariants({ variant }), className)}
-        >
-          {children}
-        </div>
-      </TestIdProvider>
-    </BannerVariantProvider>
-  );
-};
+}) => (
+  <BannerVariantProvider value={variant}>
+    <TestIdProvider value={testId}>
+      <div
+        {...props}
+        ref={ref}
+        role='status'
+        data-slot='banner'
+        data-testid={testId}
+        data-variant={variant}
+        className={cn(bannerVariants({ variant }), className)}
+      >
+        {children}
+      </div>
+    </TestIdProvider>
+  </BannerVariantProvider>
+);
 
 Banner.displayName = 'Banner';

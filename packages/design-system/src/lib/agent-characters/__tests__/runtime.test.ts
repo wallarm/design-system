@@ -13,7 +13,9 @@ const fakeChar = (
     st: 'idle',
     clips: [],
     ticks,
-    tick: (now: number) => void ticks.push(now),
+    tick: (now: number) => {
+      ticks.push(now);
+    },
   };
   return ch;
 };
@@ -153,7 +155,12 @@ describe('document runtime', () => {
       document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
     );
     const dts: number[] = [];
-    const ch = { ...fakeChar(svg), tick: (_: number, dt: number) => void dts.push(dt) };
+    const ch = {
+      ...fakeChar(svg),
+      tick: (_: number, dt: number) => {
+        dts.push(dt);
+      },
+    };
     rt.register(ch);
     rs.advanceTimersByTime(100);
     const hidden = Object.getOwnPropertyDescriptor(Document.prototype, 'hidden');
@@ -179,7 +186,9 @@ describe('document runtime', () => {
       document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
     );
     const ms: number[] = [];
-    rt.onFrame = js => void ms.push(js);
+    rt.onFrame = js => {
+      ms.push(js);
+    };
     const ch = fakeChar(svg);
     rt.register(ch);
     rs.advanceTimersByTime(100);
@@ -236,8 +245,12 @@ describe('runtime listeners (07 §6.4: start on the first live mount, stop after
     window.matchMedia = ((q: string) => ({
       matches: false,
       media: q,
-      addEventListener: () => void mm.push(`+${q}`),
-      removeEventListener: () => void mm.push(`-${q}`),
+      addEventListener: () => {
+        mm.push(`+${q}`);
+      },
+      removeEventListener: () => {
+        mm.push(`-${q}`);
+      },
     })) as unknown as typeof window.matchMedia;
     return {
       active: () => [...live].filter(([, n]) => n > 0).map(([k]) => k),

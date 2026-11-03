@@ -14,20 +14,18 @@ export const Chart: FC<ChartProps> = ({
   ref,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        data-slot='chart'
-        data-testid={testId}
-        className={cn(chartRootClasses, className)}
-      >
-        {children}
-      </div>
-    </TestIdProvider>
-  );
-};
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='chart'
+      data-testid={testId}
+      className={cn(chartRootClasses, className)}
+    >
+      {children}
+    </div>
+  </TestIdProvider>
+);
 
 Chart.displayName = 'Chart';

@@ -24,10 +24,11 @@ describe('preview splitting', () => {
     expect(files).toContain('stories-2.js');
     expect(files).not.toContain('stories.js');
     const shipped: (string | undefined)[] = [];
-    for (const html of files.filter(file => /^preview(-\d+)?\.html$/.test(file)))
+    for (const html of files.filter(file => /^preview(-\d+)?\.html$/.test(file))) {
       expect(await readFile(join(dir, html), 'utf8')).toMatch(
         /^<!-- @dsCard group="[^"]+" height=\d+/,
       );
+    }
     expect(files).toContain('preview-2.html');
     for (const script of files.filter(file => /^stories-\d+\.js$/.test(file))) {
       const code = await readFile(join(dir, script), 'utf8');

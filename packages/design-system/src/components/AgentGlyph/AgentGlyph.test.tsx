@@ -37,8 +37,8 @@ const svgOf = (el: HTMLElement) => el.querySelector('svg') as SVGSVGElement;
 
 describe('AgentGlyph', () => {
   it('renders the page glyph for every preset and state', () => {
-    for (const p of CAST)
-      for (const st of STATES)
+    for (const p of CAST) {
+      for (const st of STATES) {
         for (const size of [16, 20, 24, 32] as const) {
           const { container, unmount } = render(<AgentGlyph agent={p.id} size={size} state={st} />);
           expect(norm(svgOf(container).innerHTML), `${p.id} ${st} ${size}`).toBe(
@@ -46,6 +46,8 @@ describe('AgentGlyph', () => {
           );
           unmount();
         }
+      }
+    }
   });
 
   it('lifts by optPx when optical, not when box', () => {
@@ -72,8 +74,9 @@ describe('AgentGlyph', () => {
       render(
         <AgentGlyph agent='radar' size={20} hasApplications coverage='partial' state='needs' />,
       ).container,
-    ])
+    ]) {
       expect(crown(el)).toBeNull();
+    }
   });
 
   it('names each crown clip by its shape, so copies and React roots can share an id safely', () => {

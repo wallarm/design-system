@@ -25,7 +25,6 @@ export function propOf(kind: string, S: AgentShapeDef, col: string): PropDef | n
   if (hit) return hit;
   if (kind !== 'none' && process.env.NODE_ENV !== 'production' && !warned.has(key)) {
     warned.add(key);
-    // oxlint-disable-next-line no-console -- dev-only warning
     console.warn(
       `[AgentAvatar] the prop "${kind}" on ${S.id} needs the full prop library: call enableAgentLookLibrary() from @wallarm-org/design-system/AgentLookBuilder. Drawn without the prop.`,
     );

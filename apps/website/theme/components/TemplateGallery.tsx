@@ -219,8 +219,9 @@ function Gallery({ templates }: TemplateGalleryProps) {
       setPreview(p => (t ? next : { ...p, open: false }));
       // An unknown template or state is dropped from the URL, so it isn't shared on.
       const shown = previewParams(templates, next);
-      if (shown.preview !== params.preview || shown.state !== params.state)
+      if (shown.preview !== params.preview || shown.state !== params.state) {
         writeUrl(templates, next, false);
+      }
     };
     fromUrl();
     window.addEventListener('popstate', fromUrl);

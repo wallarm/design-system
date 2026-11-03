@@ -10,33 +10,31 @@ export const ColorStickColumn: FC<{
   visibleDisplayItems: DisplayItem[];
   lines: Map<number, LineConfig>;
   lineHeightClass: string;
-}> = ({ visibleDisplayItems, lines, lineHeightClass }) => {
-  return (
-    <div className='flex flex-col' data-slot='code-snippet-color-stick'>
-      {visibleDisplayItems.map(item => {
-        if (item.type === 'fold-summary') {
-          return (
-            <span
-              key={`fold-${item.fold.id}`}
-              className={cn(lineHeightClass, 'border-l-2 border-transparent pl-12')}
-            />
-          );
-        }
-        const lineConfig = lines.get(item.lineNumber);
-        const colorStyles = lineConfig?.color ? LINE_COLOR_STYLES[lineConfig.color] : undefined;
-
+}> = ({ visibleDisplayItems, lines, lineHeightClass }) => (
+  <div className='flex flex-col' data-slot='code-snippet-color-stick'>
+    {visibleDisplayItems.map(item => {
+      if (item.type === 'fold-summary') {
         return (
           <span
-            key={item.lineNumber}
-            className={cn(
-              lineHeightClass,
-              'border-l-2 pl-12',
-              colorStyles?.border ?? 'border-transparent',
-              colorStyles?.bg,
-            )}
+            key={`fold-${item.fold.id}`}
+            className={cn(lineHeightClass, 'border-l-2 border-transparent pl-12')}
           />
         );
-      })}
-    </div>
-  );
-};
+      }
+      const lineConfig = lines.get(item.lineNumber);
+      const colorStyles = lineConfig?.color ? LINE_COLOR_STYLES[lineConfig.color] : undefined;
+
+      return (
+        <span
+          key={item.lineNumber}
+          className={cn(
+            lineHeightClass,
+            'border-l-2 pl-12',
+            colorStyles?.border ?? 'border-transparent',
+            colorStyles?.bg,
+          )}
+        />
+      );
+    })}
+  </div>
+);

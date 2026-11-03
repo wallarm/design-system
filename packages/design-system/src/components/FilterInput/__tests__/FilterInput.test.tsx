@@ -137,7 +137,7 @@ describe('FilterInput', () => {
 
   describe('keyboard hint', () => {
     it('shows keyboard hint when showKeyboardHint is true', () => {
-      render(<FilterInput fields={sampleFields} showKeyboardHint={true} />);
+      render(<FilterInput fields={sampleFields} showKeyboardHint />);
 
       expect(screen.getByText('K')).toBeInTheDocument();
     });
@@ -151,13 +151,13 @@ describe('FilterInput', () => {
 
   describe('error state', () => {
     it('applies error border when error is true', () => {
-      render(<FilterInput data-testid='fi' fields={sampleFields} error={true} />);
+      render(<FilterInput data-testid='fi' fields={sampleFields} error />);
       const field = screen.getByTestId('fi');
       expect(field).toHaveClass('border-border-strong-danger');
     });
 
     it('sets aria-invalid when error is true', () => {
-      render(<FilterInput fields={sampleFields} error={true} />);
+      render(<FilterInput fields={sampleFields} error />);
       const input = screen.getByRole('combobox');
       expect(input).toHaveAttribute('aria-invalid', 'true');
     });

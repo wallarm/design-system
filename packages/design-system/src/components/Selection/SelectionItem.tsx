@@ -25,9 +25,7 @@ export const SelectionItem: FC<SelectionItemProps> = ({
   const selected = isSelected(itemId);
   const testId = useTestId('item');
 
-  useEffect(() => {
-    return registerDisabled(itemId, disabled);
-  }, [itemId, disabled, registerDisabled]);
+  useEffect(() => registerDisabled(itemId, disabled), [itemId, disabled, registerDisabled]);
 
   // Shift-click toggles a range. The browser suppresses the label→input
   // forwarding click when a modifier key is held (verified in Chromium),

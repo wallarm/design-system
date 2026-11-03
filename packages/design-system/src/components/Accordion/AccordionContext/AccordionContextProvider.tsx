@@ -9,6 +9,4 @@ interface AccordionContextProviderProps extends PropsWithChildren {
 export const AccordionContextProvider: FC<AccordionContextProviderProps> = ({
   children,
   variant,
-}) => {
-  return <AccordionContext.Provider value={{ variant }}>{children}</AccordionContext.Provider>;
-};
+}) => <AccordionContext.Provider value={{ variant }}>{children}</AccordionContext.Provider>;

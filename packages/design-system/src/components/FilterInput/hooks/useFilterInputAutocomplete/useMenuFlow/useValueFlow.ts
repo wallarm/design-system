@@ -52,8 +52,9 @@ export const useValueFlow = ({
         editingChipId ||
         !selectedField ||
         !selectedOperator
-      )
+      ) {
         return false;
+      }
       setBuildingBase({ field: selectedField, operator: selectedOperator, value });
       setSelectedField(pairedField);
       setSelectedOperator(null);

@@ -48,8 +48,9 @@ const getFirstIncompleteSegment = (
     condition.value === null ||
     condition.value === '' ||
     condition.error === SEGMENT_VARIANT.value
-  )
+  ) {
     return SEGMENT_VARIANT.value;
+  }
   return null;
 };
 

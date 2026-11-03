@@ -18,9 +18,11 @@ export function styledClasses(document: Document): Set<string> | undefined {
   const walk = (rules: CSSRuleList): void => {
     for (const rule of Array.from(rules)) {
       const selector = (rule as CSSStyleRule).selectorText;
-      if (selector)
-        for (const [, name = ''] of selector.matchAll(CLASS_IN_SELECTOR))
+      if (selector) {
+        for (const [, name = ''] of selector.matchAll(CLASS_IN_SELECTOR)) {
           classes.add(unescapeCss(name));
+        }
+      }
       const nested = (rule as CSSGroupingRule).cssRules;
       if (nested) walk(nested);
     }
@@ -63,13 +65,13 @@ export function reportUnstyledClasses(root: Element): void {
     if (page.sheets !== sheets) Object.assign(page, { sheets, styled: styledClasses(document) });
     const { reported, styled } = page;
     if (!styled || styled.size === 0) return;
-    for (const element of [root, ...Array.from(root.querySelectorAll('[class]'))])
+    for (const element of [root, ...Array.from(root.querySelectorAll('[class]'))]) {
       for (const name of Array.from(element.classList)) {
         if (reported.has(name) || styled.has(name) || MARKERS.test(name)) continue;
         reported.add(name);
-        // oxlint-disable-next-line no-console -- the console is how the canvas author sees it.
         console.warn(unstyledMessage(name, styled));
       }
+    }
   } catch {
     // Diagnostics only: a canvas must never break because of them.
   }

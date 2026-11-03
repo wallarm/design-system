@@ -179,8 +179,9 @@ export function packAssets(
       const { size, type, sha256 } = record;
       const path = `assets/${group}/${name}`;
       const bytes = readFileSync(join(project, path));
-      if (createHash('sha256').update(bytes).digest('hex') !== sha256)
+      if (createHash('sha256').update(bytes).digest('hex') !== sha256) {
         throw new Error(`project/${path} does not match its sha256 in design-system.json`);
+      }
       mkdirSync(join(outDir, 'assets', group), { recursive: true });
       writeFileSync(join(outDir, path), bytes);
       return { group, name, path, sha256, size, type } satisfies AssetEntry;
@@ -194,20 +195,22 @@ export function pack(
   outDir = resolve(PACKAGE_DIR, 'dist'),
 ) {
   const project = join(source, 'project');
-  if (!existsSync(join(source, 'summary.json')))
+  if (!existsSync(join(source, 'summary.json'))) {
     throw new Error(
       `${source} has no export. Run \`pnpm turbo run export --filter=@wallarm-org/claude-design\` from the repo root first.`,
     );
+  }
   const { version } = JSON.parse(readFileSync(join(source, 'summary.json'), 'utf8')) as {
     version: string;
   };
   const own = (
     JSON.parse(readFileSync(join(PACKAGE_DIR, 'package.json'), 'utf8')) as { version: string }
   ).version;
-  if (own !== '0.0.0' && own !== version)
+  if (own !== '0.0.0' && own !== version) {
     throw new Error(
       `package.json is ${own} but the export was built from design-system ${version}`,
     );
+  }
 
   rmSync(outDir, { recursive: true, force: true });
   cpSync(project, join(outDir, 'project'), {
@@ -236,7 +239,7 @@ export function pack(
   writeFileSync(join(outDir, CANVAS_SAMPLER), sampler);
   const skeleton = canvasSampler(readFileSync(join(project, SKELETON_FILE), 'utf8'), SKELETON_FILE);
   writeFileSync(join(outDir, CANVAS_SKELETON), skeleton);
-  for (const name of ['SETUP.md', 'UPDATE.md'])
+  for (const name of ['SETUP.md', 'UPDATE.md']) {
     writeFileSync(
       join(outDir, name),
       renderSetup({
@@ -250,6 +253,7 @@ export function pack(
         assets,
       }),
     );
+  }
   return { version, files, assets: assets.length };
 }
 

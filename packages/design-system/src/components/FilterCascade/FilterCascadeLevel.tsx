@@ -58,7 +58,7 @@ export const FilterCascadeLevel: FC<FilterCascadeLevelProps> = ({
 
   let body: ReactNode;
   if (level.status === 'loading') body = <LevelLoading />;
-  else if (level.status === 'error')
+  else if (level.status === 'error') {
     body = (
       <div className='flex items-center justify-between gap-8 py-2 pl-8 text-sm text-text-secondary'>
         Couldn’t load
@@ -67,13 +67,14 @@ export const FilterCascadeLevel: FC<FilterCascadeLevelProps> = ({
         </Button>
       </div>
     );
-  else
+  } else {
     body = children ?? (
       <>
         <FilterCascadeParentItem />
         <FilterCascadeItems />
       </>
     );
+  }
 
   return (
     <CurrentLevel.Provider value={level}>

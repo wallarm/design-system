@@ -16,8 +16,8 @@ export interface UseToastReturn {
   dismiss: (options?: DismissToastOptions) => void;
 }
 
-export const useToast = (): UseToastReturn => {
-  return useMemo(
+export const useToast = (): UseToastReturn =>
+  useMemo(
     () => ({
       create: (options: CreateToastOptions) => toaster.create(options),
       update: ({ id, ...options }: UpdateToastOptions) => toaster.update(id, options),
@@ -25,6 +25,5 @@ export const useToast = (): UseToastReturn => {
     }),
     [],
   );
-};
 
 useToast.displayName = 'useToast';

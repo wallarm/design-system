@@ -40,13 +40,11 @@ export default meta;
  * A button with nothing set: you get the brand primary at the large size. Label it with a
  * verb and its object — `Delete rule` rather than `Delete` — so the action still reads on its own.
  */
-export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
-  return (
-    <Button {...args} data-testid='button'>
-      Button
-    </Button>
-  );
-};
+export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
+  <Button {...args} data-testid='button'>
+    Button
+  </Button>
+);
 
 /**
  * `variant` sets emphasis and `color` sets meaning, and only the pairings drawn here are

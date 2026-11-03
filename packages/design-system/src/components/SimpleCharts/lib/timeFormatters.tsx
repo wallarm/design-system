@@ -82,10 +82,9 @@ export const formatChartTimezone = (value: unknown): string => {
  * Wrap a string formatter so it appends a dimmed timezone chip. Returns a
  * `ReactNode` so it can be passed to tooltip / zoom-popover slots.
  */
-export const withTimezoneChip = (
-  formatter: (value: unknown) => string,
-): ((value: unknown) => ReactNode) => {
-  return (value: unknown): ReactNode => {
+export const withTimezoneChip =
+  (formatter: (value: unknown) => string): ((value: unknown) => ReactNode) =>
+  (value: unknown): ReactNode => {
     const date = toDate(value);
     if (!date) return null;
     const main = formatter(value);
@@ -97,4 +96,3 @@ export const withTimezoneChip = (
       </>
     );
   };
-};

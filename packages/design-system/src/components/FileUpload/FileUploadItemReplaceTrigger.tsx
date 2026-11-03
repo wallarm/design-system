@@ -61,8 +61,9 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
       validate: root.validate,
     });
     // zag would drop one of two equal files from the list — the original with it.
-    if (root.api.acceptedFiles.some(file => file !== current && isSameFile(file, picked)))
+    if (root.api.acceptedFiles.some(file => file !== current && isSameFile(file, picked))) {
       errors.push('FILE_EXISTS');
+    }
     if (errors.length) {
       root.reportRejections([{ file: picked, errors }]);
       return;

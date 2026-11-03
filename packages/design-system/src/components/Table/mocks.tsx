@@ -584,8 +584,8 @@ const ENDPOINTS = [
 export const createLargeGroupedData = (
   groupCount = 12,
   childrenPerGroup = 50,
-): SecurityHeaderEntry[] => {
-  return Array.from({ length: groupCount }, (_, gi): SecurityHeaderEntry => {
+): SecurityHeaderEntry[] =>
+  Array.from({ length: groupCount }, (_, gi): SecurityHeaderEntry => {
     const groupName = HEADER_GROUPS.at(gi % HEADER_GROUPS.length)!;
     const groupId = `group-${gi}`;
 
@@ -614,7 +614,6 @@ export const createLargeGroupedData = (
       })),
     };
   });
-};
 
 // ---------------------------------------------------------------------------
 // Large flat data — for a Virtualized story

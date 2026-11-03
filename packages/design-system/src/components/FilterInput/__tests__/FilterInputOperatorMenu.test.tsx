@@ -11,7 +11,7 @@ import { OPERATOR_LABELS, OPERATORS_BY_TYPE } from '../lib';
 describe.skip('FilterInputOperatorMenu', () => {
   describe('operator filtering by field type', () => {
     it('displays operators for string field type', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const stringOperators = OPERATORS_BY_TYPE.string;
       for (const operator of stringOperators) {
@@ -20,7 +20,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for integer field type', () => {
-      render(<FilterInputOperatorMenu fieldType='integer' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='integer' onSelect={rs.fn()} open />);
 
       const integerOperators = OPERATORS_BY_TYPE.integer;
       // Check for numeric operators
@@ -35,7 +35,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for boolean field type', () => {
-      render(<FilterInputOperatorMenu fieldType='boolean' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='boolean' onSelect={rs.fn()} open />);
 
       const booleanOperators = OPERATORS_BY_TYPE.boolean;
       const allButtons = screen.getAllByRole('menuitem');
@@ -43,7 +43,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for date field type', () => {
-      render(<FilterInputOperatorMenu fieldType='date' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='date' onSelect={rs.fn()} open />);
 
       const dateOperators = OPERATORS_BY_TYPE.date;
       const allButtons = screen.getAllByRole('menuitem');
@@ -56,7 +56,7 @@ describe.skip('FilterInputOperatorMenu', () => {
       const user = userEvent.setup();
       const onSelect = rs.fn();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open />);
 
       const isButton = screen.getByText(OPERATOR_LABELS['=']);
       await user.click(isButton);
@@ -75,7 +75,7 @@ describe.skip('FilterInputOperatorMenu', () => {
           fieldType='string'
           onSelect={onSelect}
           onOpenChange={onOpenChange}
-          open={true}
+          open
         />,
       );
 
@@ -87,12 +87,7 @@ describe.skip('FilterInputOperatorMenu', () => {
 
     it('highlights selected operator with aria-selected', () => {
       render(
-        <FilterInputOperatorMenu
-          fieldType='string'
-          selectedOperator='='
-          onSelect={rs.fn()}
-          open={true}
-        />,
+        <FilterInputOperatorMenu fieldType='string' selectedOperator='=' onSelect={rs.fn()} open />,
       );
 
       // Find the button containing the label text
@@ -112,7 +107,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('renders menu when open is true', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toBeInTheDocument();
@@ -123,7 +118,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     it('navigates down with ArrowDown key', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const menu = screen.getByRole('menu');
       menu.focus();
@@ -138,7 +133,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     it('navigates up with ArrowUp key', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const menu = screen.getByRole('menu');
       menu.focus();
@@ -154,7 +149,7 @@ describe.skip('FilterInputOperatorMenu', () => {
       const user = userEvent.setup();
       const onSelect = rs.fn();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open />);
 
       const menu = screen.getByRole('menu');
       menu.focus();
@@ -174,7 +169,7 @@ describe.skip('FilterInputOperatorMenu', () => {
           fieldType='string'
           onSelect={rs.fn()}
           onOpenChange={onOpenChange}
-          open={true}
+          open
         />,
       );
 
@@ -189,7 +184,7 @@ describe.skip('FilterInputOperatorMenu', () => {
 
   describe('accessibility', () => {
     it('has correct ARIA attributes', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toHaveAttribute('aria-label', 'Filter operators');
@@ -197,7 +192,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('has correct role attributes for menu items', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open />);
 
       const menuItems = screen.getAllByRole('menuitem');
       expect(menuItems.length).toBeGreaterThan(0);
@@ -211,7 +206,7 @@ describe.skip('FilterInputOperatorMenu', () => {
           data-testid='operator-menu'
           fieldType='string'
           onSelect={rs.fn()}
-          open={true}
+          open
           className='custom-class'
         />,
       );
@@ -226,7 +221,7 @@ describe.skip('FilterInputOperatorMenu', () => {
           data-testid='operator-menu'
           fieldType='string'
           onSelect={rs.fn()}
-          open={true}
+          open
         />,
       );
 

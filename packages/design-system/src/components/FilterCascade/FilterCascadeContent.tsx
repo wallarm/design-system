@@ -75,9 +75,10 @@ export const FilterCascadeContent: FC<FilterCascadeContentProps> = ({
       const opener = previous.querySelector<HTMLElement>(
         `[data-slot=filter-cascade-item][data-highlighted][data-depth="${depth}"]`,
       );
-      if (opener)
+      if (opener) {
         offset +=
           opener.getBoundingClientRect().top - previous.getBoundingClientRect().top - PANEL_INSET;
+      }
       panel.style.marginTop = `${Math.max(offset, 0)}px`;
     });
   });

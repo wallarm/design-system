@@ -20,10 +20,11 @@ async function canvasEntry(): Promise<{ source: string; exports: string[] }> {
     const names = Object.keys(module)
       .filter(name => name !== 'default' && !exported.has(name))
       .sort();
-    if (names.length)
+    if (names.length) {
       lines.push(
         `export {${names.join(',')}} from '../../../design-system/src/components/${dir}/index';`,
       );
+    }
     for (const name of names) exported.add(name);
   }
   return { source: lines.join('\n'), exports: [...exported].sort() };
@@ -60,13 +61,16 @@ export async function buildBundle({ outDir }: { outDir: string }) {
     .replaceAll(String.fromCharCode(0xfffd), '\\uFFFD')
     .replaceAll('data:image/svg+xml,<svg', 'dat\\x61:image/svg+xml,\\x3csvg');
   const bytes = Buffer.byteLength(code);
-  if (bytes > CLAUDE_DESIGN.bundleBudgetBytes)
+  if (bytes > CLAUDE_DESIGN.bundleBudgetBytes) {
     throw new Error(`bundle.js ${bytes} bytes exceeds ${CLAUDE_DESIGN.bundleBudgetBytes}`);
-  if (/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i.test(code))
+  }
+  if (/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i.test(code)) {
     throw new Error('Bundle is unsafe to inline');
+  }
   // URL-encoded SVG data URIs (the Country flags) pass the public-sharing review.
-  if (/data:image\/svg\+xml,\s*</i.test(code))
+  if (/data:image\/svg\+xml,\s*</i.test(code)) {
     throw new Error('Bundle has a raw SVG data URI, which blocks public sharing');
+  }
   await mkdir(join(outDir, 'components'), { recursive: true });
   await writeFile(join(outDir, 'components/bundle.js'), code);
   await mkdir(resolve(PACKAGE_DIR, '.claude-design'), { recursive: true });
@@ -78,5 +82,6 @@ export async function buildBundle({ outDir }: { outDir: string }) {
   process.stdout.write(`bundle.js: ${bytes} bytes; ${exports.length} exports\n`);
   return { bytes, components };
 }
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]))
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   await buildBundle({ outDir: CLAUDE_DESIGN.outDir });
+}

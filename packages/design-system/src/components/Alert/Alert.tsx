@@ -56,22 +56,20 @@ export const Alert: FC<AlertProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        role='alert'
-        data-testid={testId}
-        data-color={color}
-        className={alertVariants({ color })}
-        style={{ minWidth, maxWidth }}
-      >
-        {children}
-      </div>
-    </TestIdProvider>
-  );
-};
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      role='alert'
+      data-testid={testId}
+      data-color={color}
+      className={alertVariants({ color })}
+      style={{ minWidth, maxWidth }}
+    >
+      {children}
+    </div>
+  </TestIdProvider>
+);
 
 Alert.displayName = 'Alert';

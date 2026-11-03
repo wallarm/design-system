@@ -16,8 +16,9 @@ export function renderSvgNode(
   extra?: (n: SvgNode) => Record<string, string | number | boolean | undefined> | undefined,
 ): ReactNode {
   const props: Record<string, unknown> = { key };
-  for (const [k, v] of Object.entries(n.attrs))
+  for (const [k, v] of Object.entries(n.attrs)) {
     props[k === 'class' ? 'data-part' : reactName(k)] = v;
+  }
   const more = extra?.(n);
   if (more) Object.assign(props, more);
   return createElement(

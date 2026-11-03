@@ -7,8 +7,9 @@ module.exports = function canvasCompatLoader(source) {
     'transform-source.ts',
     'ref-components.ts',
     '../previews/global-imports.ts',
-  ])
+  ]) {
     this.addDependency(resolve(__dirname, dependency));
+  }
   const done = this.async();
   transformCanvasSource(source, this.resourcePath, this.getOptions()).then(
     result => done(null, result),

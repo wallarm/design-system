@@ -25,15 +25,13 @@ export const Indicator: FC<IndicatorProps> = ({
   size = 'sm',
   color = 'info',
   ...props
-}) => {
-  return (
-    <span
-      {...props}
-      ref={ref}
-      className={cn(indicatorVariants({ size, color }), className)}
-      data-slot='indicator'
-    />
-  );
-};
+}) => (
+  <span
+    {...props}
+    ref={ref}
+    className={cn(indicatorVariants({ size, color }), className)}
+    data-slot='indicator'
+  />
+);
 
 Indicator.displayName = 'Indicator';

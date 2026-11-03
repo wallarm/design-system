@@ -222,10 +222,7 @@ describe('useSelectionState', () => {
             getItemId,
             value,
             disabledIds,
-            onChange: ids => {
-              value = ids;
-              onChange(ids);
-            },
+            onChange,
           }),
         { initialProps: { value, disabledIds: new Set(['b']) } },
       );
@@ -246,10 +243,7 @@ describe('useSelectionState', () => {
             getItemId,
             value,
             disabledIds,
-            onChange: ids => {
-              value = ids;
-              onChange(ids);
-            },
+            onChange,
           }),
         { initialProps: { value, disabledIds: new Set(['b']) } },
       );

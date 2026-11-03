@@ -25,8 +25,9 @@ export function findNewComponents(
     }).trim();
   try {
     // Shallow clones make the boundary commit look like the one that added every component.
-    if (isShallowOutput(git('rev-parse', '--is-shallow-repository')))
+    if (isShallowOutput(git('rev-parse', '--is-shallow-repository'))) {
       throw new Error('shallow clone');
+    }
     const dates = new Map<string, Date>();
     for (const line of git(
       'for-each-ref',

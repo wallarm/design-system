@@ -118,8 +118,9 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
             t.closest(
               '[data-slot^="segment-"], button, input, [data-slot="filter-input-chip-delete"]',
             )
-          )
+          ) {
             return;
+          }
           onAreaClick();
         }}
         {...props}
@@ -151,8 +152,9 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                   t.closest(
                     '[data-slot^="segment-"], button, input, [data-slot="filter-input-chip-delete"]',
                   )
-                )
+                ) {
                   return;
+                }
                 if (t.closest('[data-building]')) onAreaClick();
               }}
             >

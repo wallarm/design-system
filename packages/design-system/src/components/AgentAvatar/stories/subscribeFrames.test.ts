@@ -12,8 +12,12 @@ describe('subscribeFrames (story-only frame meter)', () => {
     const rt = getRuntime();
     const a: number[] = [];
     const b: number[] = [];
-    const offA = subscribeFrames(ms => void a.push(ms));
-    const offB = subscribeFrames(ms => void b.push(ms));
+    const offA = subscribeFrames(ms => {
+      a.push(ms);
+    });
+    const offB = subscribeFrames(ms => {
+      b.push(ms);
+    });
     rt.onFrame?.(0.5);
     expect([a, b]).toEqual([[0.5], [0.5]]);
     offA(); // the first one goes first

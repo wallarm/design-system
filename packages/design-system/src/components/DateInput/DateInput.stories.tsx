@@ -93,9 +93,7 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
  * The bare field. Each segment is its own target: arrows step a segment, typing fills it and
  * moves on, so the whole date is reachable without a pointer.
  */
-export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
-  return <DateInput {...args} />;
-};
+export const Basic: StoryFn<typeof meta> = ({ ...args }) => <DateInput {...args} />;
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 

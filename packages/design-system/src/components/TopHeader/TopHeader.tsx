@@ -14,20 +14,18 @@ export const TopHeader: FC<TopHeaderProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        data-slot='top-header'
-        data-testid={testId}
-        className={cn('flex items-center justify-between py-6 pr-12 pl-7', className)}
-      >
-        {children}
-      </div>
-    </TestIdProvider>
-  );
-};
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='top-header'
+      data-testid={testId}
+      className={cn('flex items-center justify-between py-6 pr-12 pl-7', className)}
+    >
+      {children}
+    </div>
+  </TestIdProvider>
+);
 
 TopHeader.displayName = 'TopHeader';

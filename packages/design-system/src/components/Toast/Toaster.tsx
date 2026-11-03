@@ -71,8 +71,8 @@ const arkToaster = createToaster({
 export const toaster: TypedToaster = {
   ...arkToaster,
   __arkToaster: arkToaster,
-  create: (options: ToastCreateOptions) => {
-    return arkToaster.create({
+  create: (options: ToastCreateOptions) =>
+    arkToaster.create({
       ...options,
       duration:
         options.duration ??
@@ -86,8 +86,7 @@ export const toaster: TypedToaster = {
             ? DEFAULT_TOAST_PRIORITY.actionable
             : DEFAULT_TOAST_PRIORITY.nonActionable
           : undefined),
-    });
-  },
+    }),
   // The duration is settled by the `create` call: zag only re-derives the
   // remaining time when `type` or `duration` changes, and a partial update
   // cannot tell a caller's deliberate duration from the one injected above. So

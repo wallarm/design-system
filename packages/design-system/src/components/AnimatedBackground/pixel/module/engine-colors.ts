@@ -31,11 +31,12 @@ export function parseColor(value: string): RGB | null {
   if (!v) return null;
   if (v[0] === '#') {
     let hex = v.slice(1);
-    if (hex.length === 3)
+    if (hex.length === 3) {
       hex = hex
         .split('')
         .map(c => c + c)
         .join('');
+    }
     if (hex.length !== 6) return null;
     const n = parseInt(hex, 16);
     if (Number.isNaN(n)) return null;

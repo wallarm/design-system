@@ -50,8 +50,9 @@ describe('complete browser bundle on real React 18', () => {
     ) as { format: number; namespace: string; components: { name: string }[] };
     expect(header.namespace).toBe('WallarmDS');
     expect(header.format).toBe(4);
-    for (const name of Object.keys(DS).filter(name => /^[A-Z]/.test(name) && name !== 'Icons'))
+    for (const name of Object.keys(DS).filter(name => /^[A-Z]/.test(name) && name !== 'Icons')) {
       expect(header.components.map(c => c.name)).toContain(name);
+    }
     expect(Buffer.byteLength(bundle)).toBeLessThanOrEqual(5_700_000);
     expect(bundle).not.toMatch(/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i);
   });

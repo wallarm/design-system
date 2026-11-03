@@ -64,8 +64,9 @@ writeFileSync(
   ),
 );
 
-for (const dir of ['foundations', 'get-started', 'public'])
+for (const dir of ['foundations', 'get-started', 'public']) {
   mkdirSync(path.join(docs, dir), { recursive: true });
+}
 writeFileSync(path.join(docs, 'foundations/tokens.mdx'), renderTokensPage(metadata.tokens));
 writeFileSync(
   path.join(docs, 'get-started/changelog.md'),
@@ -85,7 +86,7 @@ for (const dir of Object.values(STORY_DIRS)) {
   rmSync(path.join(docs, dir), { recursive: true, force: true });
   mkdirSync(path.join(docs, dir), { recursive: true });
 }
-for (const g of guidelines)
+for (const g of guidelines) {
   writeFileSync(
     path.join(docs, `${g.slug}.mdx`),
     renderGuidelinePage(
@@ -94,6 +95,7 @@ for (const g of guidelines)
       g.kind === 'foundation' ? {} : { storyImportBase: storyBase(STORY_DIRS[g.kind]) },
     ),
   );
+}
 const patterns = guidelines.filter(g => g.kind === 'pattern');
 const templates = guidelines.filter(g => g.kind === 'template');
 writeFileSync(

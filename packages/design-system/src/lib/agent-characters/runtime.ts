@@ -99,7 +99,7 @@ function createRuntime(): Runtime {
   const scrollOpts: AddEventListenerOptions = { capture: true, passive: true };
   const attach = () => {
     if (!hasDom) return;
-    if (typeof IntersectionObserver !== 'undefined')
+    if (typeof IntersectionObserver !== 'undefined') {
       io = new IntersectionObserver(
         es => {
           for (const e of es) {
@@ -113,6 +113,7 @@ function createRuntime(): Runtime {
         },
         { rootMargin: '100px' },
       );
+    }
     window.addEventListener('scroll', bump, scrollOpts);
     window.addEventListener('resize', bump, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);

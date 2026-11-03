@@ -122,7 +122,7 @@ describe('FilterInputChip', () => {
 
   describe('error state', () => {
     it('applies error styling when error is true', () => {
-      render(<FilterInputChip data-testid='chip' attribute='Test' error={true} />);
+      render(<FilterInputChip data-testid='chip' attribute='Test' error />);
 
       const chip = screen.queryByTestId('chip');
       expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');

@@ -160,8 +160,9 @@ describe('migrateSource markers', () => {
       id: 'x',
       title: 'x',
       transform: (f: SourceFile, ctx: MigrationContext) => {
-        for (const el of f.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement))
+        for (const el of f.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement)) {
           ctx.report(el, 'm');
+        }
       },
     };
     const inner = `<Avatar ${mark('x', 'm')} />`;

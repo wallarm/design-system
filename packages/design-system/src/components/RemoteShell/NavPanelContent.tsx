@@ -34,7 +34,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({
   const activeItemId = entry.activeItemId;
   const hasHeaderActions = !!config.headerActions?.length;
 
-  if (level === 0)
+  if (level === 0) {
     return (
       <>
         {hasHeaderActions ? (
@@ -56,6 +56,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({
         />
       </>
     );
+  }
 
   const parentEntry = navStack[level - 1]!;
   const drillNode = findDrillNode(parentEntry.items, parentEntry.activeItemId);

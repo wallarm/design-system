@@ -34,7 +34,7 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
     config.productPath,
   );
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div
         {...props}
@@ -49,6 +49,7 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
         </NavPanel>
       </div>
     );
+  }
 
   if (transition) {
     const isForward = transition.direction === 'forward';

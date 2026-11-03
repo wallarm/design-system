@@ -12,11 +12,10 @@ import { MASK_ROOTS, STATUS_CODE_LENGTH } from './utils';
  * Returns `true` when the value is invalid, matching the
  * `FieldMetadata.validate` contract.
  */
-export const createStatusCodeValidator = (): ((value: string | number | boolean) => boolean) => {
-  return value => {
+export const createStatusCodeValidator =
+  (): ((value: string | number | boolean) => boolean) => value => {
     const s = String(value);
     if (s.length !== STATUS_CODE_LENGTH) return true;
     if (!MASK_ROOTS.includes(s.charAt(0))) return true;
     return !/^(XX|\dX|\d\d)$/.test(s.slice(1));
   };
-};

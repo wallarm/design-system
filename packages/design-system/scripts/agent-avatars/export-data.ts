@@ -36,8 +36,9 @@ export function generate(read: typeof readJson = readJson): string {
   // The geometry is measured on the page (capture-fixtures.ts); refuse to ship it for outlines it was not measured on.
   for (const sh of shapes.shapes as { id: string; d: string }[]) {
     const g = geomData.byShape[sh.id];
-    if (!g || g.d !== sh.d)
+    if (!g || g.d !== sh.d) {
       throw new Error(`geom.json is stale for ${sh.id}: recapture with capture-fixtures.ts`);
+    }
   }
   const extra = Object.keys(geomData.byShape).filter(
     id => !shapes.shapes.some((x: { id: string }) => x.id === id),
@@ -193,15 +194,12 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const rel = path.relative(process.cwd(), OUT);
   if (process.argv.includes('--check')) {
     if (readFileSync(OUT, 'utf8') !== out) {
-      // oxlint-disable-next-line no-console -- CLI output
       console.error(`${rel} is out of date: run pnpm agent-avatars:export`);
       process.exit(1);
     }
-    // oxlint-disable-next-line no-console -- CLI output
     console.log('agent-avatars data: up to date');
   } else {
     writeFileSync(OUT, out);
-    // oxlint-disable-next-line no-console -- CLI output
     console.log(`wrote ${rel}`);
   }
 }

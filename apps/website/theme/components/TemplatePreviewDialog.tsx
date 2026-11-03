@@ -86,7 +86,6 @@ function useStoryCode(slug: string, story: string, enabled: boolean): string | n
         if (active) setCode({ key, code: index[story] ?? '' });
       })
       .catch((cause: unknown) => {
-        // oxlint-disable-next-line no-console -- Copy code stays disabled; keep the reason visible
         console.error(cause);
       });
     return () => {

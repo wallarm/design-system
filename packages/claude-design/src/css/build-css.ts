@@ -24,8 +24,9 @@ export function stripTokenDeclarations(css: string, tokenNames: Set<string>): st
     if (
       parent?.type !== 'rule' ||
       !parent.selectors.every(selector => themeSelector(selector) !== undefined)
-    )
+    ) {
       return;
+    }
     let ancestor = parent.parent;
     while (ancestor && ancestor.type !== 'root') {
       if (ancestor.type !== 'atrule' || ancestor.name !== 'layer') return;
@@ -43,8 +44,9 @@ export function stripTokenDeclarations(css: string, tokenNames: Set<string>): st
 export function definedClasses(css: string): string[] {
   const classes = new Set<string>();
   postcss.parse(css).walkRules(rule => {
-    for (const [, name = ''] of rule.selector.matchAll(/\.((?:\\.|[\w-])+)/g))
+    for (const [, name = ''] of rule.selector.matchAll(/\.((?:\\.|[\w-])+)/g)) {
       classes.add(name.replace(/\\(.)/g, '$1'));
+    }
   });
   classes.delete(CANVAS_WRAPPER_CLASS);
   return [...classes]
@@ -77,8 +79,9 @@ export function utilitiesReference(css: string): string {
   ];
   for (const [variant, byRoot] of [...groups].sort(([a], [b]) => a.localeCompare(b, 'en'))) {
     lines.push(`## ${variant ? `\`${variant}\` variants` : 'Base utilities'}`, '');
-    for (const [root, names] of [...byRoot].sort(([a], [b]) => a.localeCompare(b, 'en')))
+    for (const [root, names] of [...byRoot].sort(([a], [b]) => a.localeCompare(b, 'en'))) {
       lines.push(`- **${root}**: ${names.map(name => `\`${name}\``).join(' ')}`);
+    }
     lines.push('');
   }
   return lines.join('\n');
@@ -100,8 +103,9 @@ export async function buildCss({
   });
   const compiled = postcss.parse(stripTokenDeclarations(result.root.toString(), tokenNames));
   compiled.walkRules(rule => {
-    if (!rule.selectors.every(selector => [':root', ':host', ':where(:root)'].includes(selector)))
+    if (!rule.selectors.every(selector => [':root', ':host', ':where(:root)'].includes(selector))) {
       return;
+    }
     if (!rule.nodes.some(node => node.type === 'decl' && node.prop.startsWith('--'))) return;
     let ancestor = rule.parent;
     while (ancestor && ancestor.type !== 'root') {
@@ -115,10 +119,12 @@ export async function buildCss({
   const wrapped = tolerateCanvasWrappers(compiled.toString());
   const css = wrapped.css;
   const bytes = Buffer.byteLength(css);
-  if (bytes > CLAUDE_DESIGN.cssCapBytes)
+  if (bytes > CLAUDE_DESIGN.cssCapBytes) {
     throw new Error(`bundle.css exceeds ${CLAUDE_DESIGN.cssCapBytes} bytes (${bytes})`);
-  if (/<\/style/i.test(css))
+  }
+  if (/<\/style/i.test(css)) {
     throw new Error('bundle.css contains an unsafe inline style terminator');
+  }
   await mkdir(path.join(outDir, 'components'), { recursive: true });
   await writeFile(path.join(outDir, 'components/bundle.css'), css);
   await writeFile(path.join(outDir, 'components/UTILITIES.md'), utilitiesReference(css));

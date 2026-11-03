@@ -115,7 +115,7 @@ export const buildTree = <T>({ source, loaded, parentLabel }: BuildOptions<T>) =
     };
     if (!isBranch) return node;
     const children = (items ?? []).map(child => toNode(child, path));
-    if (parentLabel)
+    if (parentLabel) {
       children.unshift({
         value: PARENT_VALUE,
         label: parentLabel(item),
@@ -124,6 +124,7 @@ export const buildTree = <T>({ source, loaded, parentLabel }: BuildOptions<T>) =
         path: [...path, PARENT_VALUE],
         isParent: true,
       });
+    }
     node.children = children;
     // Zag needs a count to treat a branch with nothing loaded yet as one.
     if (!items) node.childrenCount = 0;
@@ -138,7 +139,7 @@ export const searchTree = <T>(nodes: FilterCascadeNode<T>[], query: string) => {
   const matches: FilterCascadeNode<T>[] = [];
   const visit = (node: FilterCascadeNode<T>, trail: string[]) => {
     if (node.isParent) return;
-    if (node.label.toLowerCase().includes(needle))
+    if (node.label.toLowerCase().includes(needle)) {
       matches.push({
         ...node,
         value: pathKey(node.path),
@@ -146,6 +147,7 @@ export const searchTree = <T>(nodes: FilterCascadeNode<T>[], query: string) => {
         children: undefined,
         childrenCount: undefined,
       });
+    }
     for (const child of node.children ?? []) visit(child, [...trail, node.label]);
   };
   for (const node of nodes) visit(node, []);

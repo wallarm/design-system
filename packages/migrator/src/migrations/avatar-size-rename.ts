@@ -22,11 +22,12 @@ export const migration: Migration = {
         const next = value === undefined ? undefined : RENAMES[value];
         if (value === undefined) ctx.report(attr, `${HINT}: non-static value, review manually`);
         else if (next && Object.hasOwn(RENAMES, value)) replaceStaticString(attr, next);
-        if (value !== undefined && hasSpreadAfter(el, attr))
+        if (value !== undefined && hasSpreadAfter(el, attr)) {
           ctx.report(
             attr,
             `${HINT}: spread props after size may override it with an old value, review manually`,
           );
+        }
       } else if (hasSpread(el)) {
         ctx.report(el, `${HINT}: size may come from spread props, review manually`);
       }
