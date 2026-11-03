@@ -16,6 +16,7 @@ const drawerStory = createStoryHelper('overlay-drawer', [
   'With Nested',
   'With Tabs',
   'Resizable With Overflow List',
+  'Long Values',
   'With Nested Select',
   'With Nested Dialog',
 ] as const);
@@ -266,6 +267,19 @@ test.describe('Component: Drawer', () => {
       await page.mouse.up();
 
       await expect.poll(countVisibleTags, { timeout: 5000 }).toBeGreaterThan(before);
+    });
+
+    test('Should truncate a long value instead of widening the drawer body', async ({ page }) => {
+      await drawerStory.goto(page, 'Long Values');
+      await openDrawer(page);
+
+      const content = await getDrawerContent(page).boundingBox();
+      const value = page.getByTestId('url-attribute--value');
+      const valueBox = await value.boundingBox();
+      if (!content || !valueBox) throw new Error('Drawer content or value not found');
+
+      expect(valueBox.x + valueBox.width).toBeLessThanOrEqual(content.x + content.width);
+      expect(await value.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
     });
   });
 

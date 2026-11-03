@@ -489,6 +489,33 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
 };
 
 /**
+ * A long value — a URL, an id — truncates inside the body instead of widening the drawer: the body
+ * never grows past the drawer's width.
+ */
+export const LongValues: StoryFn<DrawerProps> = () => (
+  <Drawer data-testid='drawer'>
+    <DrawerTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Drawer with Long Values
+      </Button>
+    </DrawerTrigger>
+    <DrawerContent>
+      <DrawerHeader>
+        <DrawerTitle>Long values</DrawerTitle>
+      </DrawerHeader>
+      <DrawerBody>
+        <Attribute data-testid='url-attribute' orientation='horizontal'>
+          <AttributeLabel width={120}>URL</AttributeLabel>
+          <AttributeValue>
+            https://cdn.example.com/microfrontends/a-very-long-application-name/0.1.0-build.2469/mf-manifest.json
+          </AttributeValue>
+        </Attribute>
+      </DrawerBody>
+    </DrawerContent>
+  </Drawer>
+);
+
+/**
  * The body scrolls between a fixed header and footer, so the actions never scroll away from the
  * work.
  */

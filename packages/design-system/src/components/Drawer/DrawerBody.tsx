@@ -20,7 +20,10 @@ export const DrawerBody: FC<DrawerBodyProps> = ({ children, ref }) => {
     <ScrollArea className={cn('flex-1 min-h-0')} data-slot='drawer-body' data-testid={testId}>
       <ScrollAreaViewport ref={ref}>
         <ScrollAreaContent
-          className={cn('flex flex-col px-24 min-h-full h-auto')}
+          // zag gives scroll-area content an inline `min-width: fit-content`. A drawer has a fixed
+          // width, so its body must not grow with its widest line — otherwise a long value widens
+          // the whole body instead of truncating.
+          className={cn('flex flex-col px-24 min-h-full h-auto min-w-0!')}
           data-slot='drawer-scroll-area-content'
         >
           {children}
