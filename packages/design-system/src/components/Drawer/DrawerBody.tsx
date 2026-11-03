@@ -13,6 +13,11 @@ export interface DrawerBodyProps {
   ref?: Ref<HTMLDivElement>;
 }
 
+/**
+ * The drawer's vertically scrolling body. Its content must fit the drawer's width: a long value
+ * truncates, and anything genuinely wider (a chart, a fixed-width block) brings its own
+ * `overflow-x-auto` container — Table, CodeSnippet and CodeEditor already do.
+ */
 export const DrawerBody: FC<DrawerBodyProps> = ({ children, ref }) => {
   const testId = useTestId('body');
 
@@ -20,7 +25,10 @@ export const DrawerBody: FC<DrawerBodyProps> = ({ children, ref }) => {
     <ScrollArea className={cn('flex-1 min-h-0')} data-slot='drawer-body' data-testid={testId}>
       <ScrollAreaViewport ref={ref}>
         <ScrollAreaContent
-          className={cn('flex flex-col px-24 min-h-full h-auto')}
+          // zag gives scroll-area content an inline `min-width: fit-content`. A drawer has a fixed
+          // width, so its body must not grow with its widest line — otherwise a long value widens
+          // the whole body instead of truncating.
+          className={cn('flex flex-col px-24 min-h-full h-auto min-w-0!')}
           data-slot='drawer-scroll-area-content'
         >
           {children}

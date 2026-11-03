@@ -549,3 +549,175 @@ describe('Overlay handoff', () => {
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });
+
+// zag returns focus on close only through the modal focus trap; a non-modal drawer does it itself.
+describe('Non-modal focus return', () => {
+  interface NonModalDrawerProps {
+    modal?: boolean;
+    closeOnOutsideClick?: boolean;
+  }
+
+  const NonModalDrawer = ({ modal = false, closeOnOutsideClick }: NonModalDrawerProps) => {
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+
+    return (
+      <>
+        <Button onClick={handleOpen}>Open</Button>
+        <Button onClick={handleOpen}>Open another</Button>
+        <button type='button'>Elsewhere</button>
+        <p>Page text</p>
+        <Drawer
+          open={open}
+          onOpenChange={setOpen}
+          modal={modal}
+          overlay={false}
+          closeOnOutsideClick={closeOnOutsideClick}
+        >
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Title</DrawerTitle>
+              <DrawerClose />
+            </DrawerHeader>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  };
+
+  const openFromButton = async (user: ReturnType<typeof userEvent.setup>, name = 'Open') => {
+    await user.click(screen.getByRole('button', { name }));
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: /close/i }).focus());
+  };
+
+  it('returns focus to the element that opened the drawer when it closes', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer />);
+    const opener = screen.getByRole('button', { name: 'Open' });
+    const focus = rs.spyOn(opener, 'focus');
+
+    await openFromButton(user);
+    await user.keyboard('{Escape}');
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(opener);
+    // The page behind a non-modal drawer may have been scrolled; returning focus must not undo that.
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it('leaves focus where the user moved it when the drawer closes', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer />);
+
+    await openFromButton(user);
+    const elsewhere = screen.getByRole('button', { name: 'Elsewhere' });
+    act(() => elsewhere.focus());
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it('does not return focus when a click on the page closes the drawer', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer />);
+
+    await openFromButton(user);
+    await user.click(screen.getByText('Page text'));
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).not.toBe(screen.getByRole('button', { name: 'Open' }));
+  });
+
+  it('returns focus to the page element that last retargeted the open drawer', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer closeOnOutsideClick={false} />);
+
+    await openFromButton(user);
+    await user.click(screen.getByRole('button', { name: 'Open another' }));
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: /close/i }).focus());
+    await user.keyboard('{Escape}');
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open another' }));
+  });
+
+  it('returns focus to the DrawerTrigger when a pointer press did not focus it', async () => {
+    const user = userEvent.setup();
+    render(
+      <Drawer modal={false} overlay={false}>
+        <DrawerTrigger data-testid='trigger'>Open</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+            <DrawerClose />
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    // Safari does not focus a clicked button; fireEvent.click opens without focusing it either.
+    fireEvent.click(screen.getByTestId('trigger'));
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: /close/i }).focus());
+    await user.keyboard('{Escape}');
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(screen.getByTestId('trigger'));
+  });
+
+  it('leaves focus in another open drawer when this one closes', async () => {
+    const DrawerBesideDrawer = ({ open }: { open: boolean }) => (
+      <>
+        <Button>Open</Button>
+        <Drawer open modal={false} overlay={false}>
+          <DrawerContent>
+            <DrawerBody>
+              <input aria-label='Name' />
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
+        <Drawer open={open} modal={false} overlay={false}>
+          <DrawerContent>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+
+    const { rerender } = render(<DrawerBesideDrawer open={false} />);
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: 'Open' }).focus());
+    rerender(<DrawerBesideDrawer open />);
+    await screen.findByText('Body');
+    await flushLayers();
+    const input = screen.getByRole('textbox', { name: 'Name' });
+    act(() => input.focus());
+    rerender(<DrawerBesideDrawer open={false} />);
+    await flushLayers();
+
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('keeps an open drawer open, with focus inside, when modal changes', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<NonModalDrawer />);
+
+    await openFromButton(user);
+    rerender(<NonModalDrawer modal />);
+    await flushLayers();
+
+    expect(screen.getByText('Body')).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /close/i }));
+  });
+});

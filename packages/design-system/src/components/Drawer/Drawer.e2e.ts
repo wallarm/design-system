@@ -13,9 +13,11 @@ const drawerStory = createStoryHelper('overlay-drawer', [
   'Controlled',
   'No Closable On Esc',
   'No Overlay',
+  'Non Modal',
   'With Nested',
   'With Tabs',
   'Resizable With Overflow List',
+  'Long Values',
   'With Nested Select',
   'With Nested Dialog',
 ] as const);
@@ -267,9 +269,71 @@ test.describe('Component: Drawer', () => {
 
       await expect.poll(countVisibleTags, { timeout: 5000 }).toBeGreaterThan(before);
     });
+
+    test('Should truncate a long value when it is wider than the drawer body', async ({ page }) => {
+      await drawerStory.goto(page, 'Long Values');
+      await openDrawer(page);
+
+      const content = await getDrawerContent(page).boundingBox();
+      const value = await page.getByTestId('url-attribute--value').boundingBox();
+      const input = await page.getByTestId('notes-input').boundingBox();
+      if (!content || !value || !input) throw new Error('Drawer content, value or input not found');
+
+      const drawerRight = content.x + content.width;
+      expect(value.x + value.width).toBeLessThanOrEqual(drawerRight);
+      expect(input.x + input.width).toBeLessThanOrEqual(drawerRight);
+      expect(
+        await page
+          .getByTestId('url-text')
+          .evaluate(element => element.scrollWidth > element.clientWidth),
+      ).toBe(true);
+    });
   });
 
   test.describe('Accessibility', () => {
+    test('Should be closed with focus returned to the trigger via Escape key', async ({ page }) => {
+      await drawerStory.goto(page, 'Non Modal');
+      await getDrawerTrigger(page).focus();
+      await page.keyboard.press('Enter');
+      await expect(getDrawerContent(page)).toBeVisible();
+
+      await page.keyboard.press('Escape');
+
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(getDrawerTrigger(page)).toBeFocused();
+    });
+
+    test('Should be closed without scrolling the page via the close button', async ({ page }) => {
+      await drawerStory.goto(page, 'Non Modal');
+      await getDrawerTrigger(page).focus();
+      await page.keyboard.press('Enter');
+      await expect(getDrawerContent(page)).toBeVisible();
+      await page.evaluate(() => window.scrollTo(0, 800));
+      const scrolled = await page.evaluate(() => window.scrollY);
+      expect(scrolled).toBeGreaterThan(0);
+
+      await page.getByTestId('drawer--close').click();
+
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(getDrawerTrigger(page)).toBeFocused();
+      expect(await page.evaluate(() => window.scrollY)).toBe(scrolled);
+    });
+
+    test('Should be dismissed without refocusing the trigger via a click on the page', async ({
+      page,
+    }) => {
+      await drawerStory.goto(page, 'Non Modal');
+      await getDrawerTrigger(page).focus();
+      await page.keyboard.press('Enter');
+      await expect(getDrawerContent(page)).toBeVisible();
+
+      // A non-focusable spot on the page, left of the drawer.
+      await page.mouse.click(100, 400);
+
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(getDrawerTrigger(page)).not.toBeFocused();
+    });
+
     test('Should close drawer via Escape key', async ({ page }) => {
       await drawerStory.goto(page, 'Basic');
       await openDrawer(page);
