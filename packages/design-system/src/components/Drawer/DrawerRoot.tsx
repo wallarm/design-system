@@ -5,6 +5,7 @@ import {
   type DialogInteractOutsideEvent as DrawerInteractOutsideEvent,
 } from '@ark-ui/react/dialog';
 import { useDrawerContext } from './DrawerContext';
+import { useNonModalFocusReturn } from './useNonModalFocusReturn';
 
 type LayerDismissRequest = Parameters<NonNullable<Dialog.RootProps['onRequestDismiss']>>[0];
 
@@ -61,6 +62,7 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
 }) => {
   const { isOpen, onOpenChange, contentId } = useDrawerContext();
   const ancestorIds = useContext(DrawerAncestorIdsContext);
+  useNonModalFocusReturn(isOpen, modal);
 
   const handleOpenChange = ({ open }: Dialog.OpenChangeDetails) => {
     onOpenChange(open);

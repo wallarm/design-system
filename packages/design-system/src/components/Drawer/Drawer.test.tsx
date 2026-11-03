@@ -549,3 +549,58 @@ describe('Overlay handoff', () => {
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });
+
+// zag returns focus on close only through the modal focus trap; a non-modal drawer does it itself.
+describe('Non-modal focus return', () => {
+  const NonModalDrawer = () => {
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+
+    return (
+      <>
+        <Button onClick={handleOpen}>Open</Button>
+        <button type='button'>Elsewhere</button>
+        <Drawer open={open} onOpenChange={setOpen} modal={false} overlay={false}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Title</DrawerTitle>
+              <DrawerClose />
+            </DrawerHeader>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  };
+
+  it('returns focus to the element that opened the drawer when it closes', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer />);
+    const opener = screen.getByRole('button', { name: 'Open' });
+
+    await user.click(opener);
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: /close/i }).focus());
+    await user.keyboard('{Escape}');
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('leaves focus where the user moved it when the drawer closes', async () => {
+    const user = userEvent.setup();
+    render(<NonModalDrawer />);
+
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await screen.findByText('Body');
+    await flushLayers();
+    const elsewhere = screen.getByRole('button', { name: 'Elsewhere' });
+    act(() => elsewhere.focus());
+    await flushLayers();
+
+    expect(screen.queryByText('Body')).toBeNull();
+    expect(document.activeElement).toBe(elsewhere);
+  });
+});
