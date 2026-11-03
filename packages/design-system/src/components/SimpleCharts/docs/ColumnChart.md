@@ -41,7 +41,7 @@ It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` 
 ```
 
 - `ColumnChart<T>` — root. `data`, `series`, `xKey`, generic over the datum like `LineChart<T>`. Provides the `LineChart` data + active-series contexts; renders `<div data-slot='column-chart'>`, a vertical flex — JSX order places the legend.
-- `ColumnChartBody` — recharts' `<ResponsiveContainer>` + `<ComposedChart>`. Without `height` the plot starts at 164px (Figma card 220 = header 32 + legend 24 + plot 164) and follows the card: give `<Chart>` a height and the plot stretches or shrinks with it. A fixed `height` opts out. `aria-hidden`.
+- `ColumnChartBody` — recharts' `<ResponsiveContainer>` + `<ComposedChart>`. Without `height` the plot starts at 164px (Figma card 220 = header 32 + legend 24 + plot 164) and follows the card: give `<Chart>` a height and the plot stretches or shrinks with it. A fixed `height` opts out. `aria-hidden`. Resizes re-render the plot at most every `LINE_RESIZE_DEBOUNCE_MS` (50ms, recharts' `debounce`); in between the body clips the previous width (`overflow-x-clip`) instead of letting it spill past the card.
 - `ColumnChartStack` — every `series` entry as one stacked column per datum. No props; mount once.
 - `ColumnChartXAxis` — `tickFormatter`, `interval` (default `'preserveStartEnd'`), `minTickGap`. Labels centred under their columns.
 - Reused unchanged: `LineChartLegend` / `LineChartLegendItem` (legend + hover fade), `LineChartGrid`, `LineChartYAxis`, `LineChartTooltip` (ruler + popover), `LineChartHoverPopoverDot`, `LineChartEmpty` (empty / loading frame).

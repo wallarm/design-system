@@ -3,6 +3,7 @@ export {
   LINE_DEFAULT_BODY_MARGIN as AREA_DEFAULT_BODY_MARGIN,
   LINE_HEADER_HEIGHT as AREA_HEADER_HEIGHT,
   LINE_INACTIVE_OPACITY as AREA_INACTIVE_OPACITY,
+  LINE_RESIZE_DEBOUNCE_MS as AREA_RESIZE_DEBOUNCE_MS,
 } from '../LineChart/constants';
 
 /** 1.5px stroke per Figma spec — thinner than LineChart's 2px. */

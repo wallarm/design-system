@@ -8,7 +8,7 @@ import {
   columnChartBodyFillClasses,
   columnChartContainerFillClasses,
 } from './classes';
-import { COLUMN_DEFAULT_BODY_MARGIN } from './constants';
+import { COLUMN_DEFAULT_BODY_MARGIN, COLUMN_RESIZE_DEBOUNCE_MS } from './constants';
 
 export interface ColumnChartBodyProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -44,6 +44,7 @@ export const ColumnChartBody: FC<ColumnChartBodyProps> = ({
       <ResponsiveContainer
         width='100%'
         height={height ?? '100%'}
+        debounce={COLUMN_RESIZE_DEBOUNCE_MS}
         className={fill ? columnChartContainerFillClasses : undefined}
       >
         {/* `ComposedChart`, not `BarChart`: recharts draws a rectangle cursor for `BarChart` and

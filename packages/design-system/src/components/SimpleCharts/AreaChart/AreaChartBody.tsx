@@ -13,7 +13,12 @@ import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { LineChartDataContext, LineChartZoomContext } from '../LineChart/LineChartContext';
 import { areaChartBodyClasses, areaChartBodyZoomEnabledClasses } from './classes';
-import { AREA_CARD_HEIGHT, AREA_DEFAULT_BODY_MARGIN, AREA_HEADER_HEIGHT } from './constants';
+import {
+  AREA_CARD_HEIGHT,
+  AREA_DEFAULT_BODY_MARGIN,
+  AREA_HEADER_HEIGHT,
+  AREA_RESIZE_DEBOUNCE_MS,
+} from './constants';
 
 const DEFAULT_BODY_HEIGHT = AREA_CARD_HEIGHT - AREA_HEADER_HEIGHT;
 
@@ -84,7 +89,7 @@ export const AreaChartBody: FC<AreaChartBodyProps> = ({
         className,
       )}
     >
-      <ResponsiveContainer width='100%' height={height}>
+      <ResponsiveContainer width='100%' height={height} debounce={AREA_RESIZE_DEBOUNCE_MS}>
         <RechartsAreaChart
           data={dataCtx?.data ?? []}
           margin={AREA_DEFAULT_BODY_MARGIN}

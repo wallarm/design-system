@@ -1,6 +1,7 @@
 export {
   LINE_DEFAULT_BODY_MARGIN as COLUMN_DEFAULT_BODY_MARGIN,
   LINE_INACTIVE_OPACITY as COLUMN_INACTIVE_OPACITY,
+  LINE_RESIZE_DEBOUNCE_MS as COLUMN_RESIZE_DEBOUNCE_MS,
 } from '../LineChart/constants';
 
 // Column width — Figma `12610-10640`: 32px at most, 16px at least, and in between a
