@@ -88,8 +88,12 @@ export const usePrependScrollAnchor = ({
     };
 
     // scrollHeight is a forced-reflow read, so the fallback baseline is kept
-    // only while there is no virtualizer to provide clean virtual offsets.
-    const trackScrollHeight = !virtualizerRef?.current;
+    // only while there is no virtualizer to provide clean virtual offsets, and
+    // only while a previous page is loading: the baseline feeds a prepend in
+    // the next commit, which compensates only during (or right after) that
+    // fetch. Otherwise every commit — a resize re-rendering the table on each
+    // frame — would force a layout here.
+    const trackScrollHeight = !virtualizerRef?.current && !!isLoadingPrevious;
 
     // Seed the baselines on first run — there is nothing to diff against.
     if (!seededRef.current) {
