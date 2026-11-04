@@ -7,7 +7,7 @@ export const PACKAGE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..'
 export const DESIGN_SYSTEM_DIR = resolve(PACKAGE_DIR, '../design-system');
 export const CLAUDE_DESIGN = {
   // apps/website/docs/ai/claude-design.mdx:8 repeats this URL; change both.
-  artifactUrl: 'https://claude.ai/artifact/N9vi3rNMFVZ3g8HmckRe9S',
+  artifactUrl: 'https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7',
   title: 'Wallarm Design System',
   namespace: 'WallarmDS',
   outDir: resolve(PACKAGE_DIR, '.claude-design/project'),
