@@ -103,13 +103,17 @@ jobs:
   # Publishes @wallarm-org/claude-design (the one-prompt Claude Design install) to
   # npm and attaches the export to the release. Syncing Wallarm's own artifact stays
   # manual (.claude/skills/claude-design-sync). No-ops on tags without the build.
+  # The first version was published by hand; later ones go through npm Trusted
+  # Publishing (OIDC, configured on npm for wallarm/design-system + deploy-site.yml).
   claude-design:
     name: Publish Claude Design export
     runs-on: ubuntu-latest
     # The docs site is already deployed by its own job; a failed export must not turn the run red
     continue-on-error: true
+    # contents: the release attach; id-token: npm Trusted Publishing and provenance
     permissions:
       contents: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -167,8 +171,10 @@ jobs:
         working-directory: packages/claude-design
         env:
           TAG: ${{ inputs.tag }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # npm >= 11.5.1 (Node 24) exchanges the OIDC id-token first and falls back to
+          # NODE_AUTH_TOKEN only when Trusted Publishing is not configured
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
         run: |
           test -f bin/claude-design.js || { echo "::notice::$TAG predates the npm package; nothing to publish"; exit 0; }
           [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::notice::$TAG is a pre-release; not publishing"; exit 0; }
