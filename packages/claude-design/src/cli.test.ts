@@ -95,10 +95,17 @@ describe('claude-design export', () => {
     expect(again.code).toBe(2);
     expect(again.stderr).toContain('Pass --overwrite');
     writeFileSync(join(cwd, 'out/project/stale.md'), 'old');
-    writeFileSync(join(cwd, 'out/blobs.json'), '{}');
+    const shaKey = sha('<svg id="a"/>');
+    writeFileSync(
+      join(cwd, 'out/blobs.json'),
+      JSON.stringify({ [shaKey]: ID_A, 'assets/Icons/a.svg': ID_A }),
+    );
     expect(run('export', '--dir', 'out', '--overwrite').code).toBe(0);
     expect(existsSync(join(cwd, 'out/project/stale.md'))).toBe(false);
-    expect(existsSync(join(cwd, 'out/blobs.json'))).toBe(false);
+    // Path keys may name changed SVGs; sha256 keys stay.
+    expect(JSON.parse(readFileSync(join(cwd, 'out/blobs.json'), 'utf8'))).toEqual({
+      [shaKey]: ID_A,
+    });
   });
 
   it('lists what an update drops in removed.json and exits 3', () => {
@@ -225,6 +232,38 @@ describe('claude-design index', () => {
       },
     });
     expect(existsSync(join(out(), 'upload.json'))).toBe(false);
+    // Rewritten keyed by sha256.
+    expect(JSON.parse(readFileSync(join(out(), 'blobs.json'), 'utf8'))).toEqual({
+      [sha('<svg id="a"/>')]: ID_A,
+      [sha('<svg id="w"/>')]: ID_W,
+    });
+  });
+
+  it('accepts keys with a local prefix or a sha256', () => {
+    writeBlobs({
+      'wallarm-design-system/assets/Icons/a.svg': ID_A,
+      [sha('<svg id="w"/>')]: ID_W,
+    });
+    expect(run('index').code).toBe(0);
+    expect(readIndex().assetGroups.Logos.files['wallarm.svg'].blob).toBe(ID_W);
+  });
+
+  it('names keys that match no asset and values that are icon names, not ids', () => {
+    writeBlobs({
+      'assets/Icons/typo.svg': ID_A,
+      'assets/Icons/a.svg': 'android-neutral',
+      'assets/Logos/wallarm.svg': ID_W,
+    });
+    const { code, stdout } = run('index');
+    expect(code).toBe(3);
+    expect(stdout).toContain('2 blobs.json entries');
+    expect(stdout).toContain('assets/Icons/typo.svg, assets/Icons/a.svg');
+    // Invalid entries survive the rewrite so they can be fixed.
+    expect(JSON.parse(readFileSync(join(out(), 'blobs.json'), 'utf8'))).toEqual({
+      [sha('<svg id="w"/>')]: ID_W,
+      'assets/Icons/typo.svg': ID_A,
+      'assets/Icons/a.svg': 'android-neutral',
+    });
   });
 
   it('exits 3 listing one path per missing SVG and leaves the index alone', () => {
@@ -233,8 +272,8 @@ describe('claude-design index', () => {
     expect(stdout).toContain('2 of 3 assets have no blob id yet');
     expect(stdout).toContain('upload.json');
     expect(JSON.parse(readFileSync(join(out(), 'upload.json'), 'utf8'))).toEqual([
-      'assets/Icons/a.svg',
-      'assets/Logos/wallarm.svg',
+      'wallarm-design-system/assets/Icons/a.svg',
+      'wallarm-design-system/assets/Logos/wallarm.svg',
     ]);
     expect(readIndex()).toEqual({ createdOnFiles: { v: 1 } });
   });
@@ -247,7 +286,7 @@ describe('claude-design index', () => {
       exitCode: 3,
       data: {
         assets: 3,
-        missing: ['assets/Logos/wallarm.svg'],
+        missing: ['wallarm-design-system/assets/Logos/wallarm.svg'],
         invalid: ['assets/Logos/wallarm.svg'],
       },
     });
@@ -264,7 +303,9 @@ describe('claude-design index', () => {
       JSON.stringify({ content: JSON.stringify(current) }),
     );
     const first = run('index', '--index', 'current-index.json', '--json');
-    expect(JSON.parse(first.stdout).data.missing).toEqual(['assets/Icons/a.svg']);
+    expect(JSON.parse(first.stdout).data.missing).toEqual([
+      'wallarm-design-system/assets/Icons/a.svg',
+    ]);
     writeBlobs({ 'assets/Icons/a.svg': `/_blob/${ID_A}` });
     const { code, stdout } = run('index', '--index', 'current-index.json');
     expect(code).toBe(0);

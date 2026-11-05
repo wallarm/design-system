@@ -28,11 +28,18 @@ const RELEASE_KEYS = [
   'lastChange',
 ];
 const INDEX = 'project/design-system.json';
-// What `export` writes beside project/; --overwrite replaces it. blobs.json goes too: its ids
-// belong to the previous release's SVGs.
-const OWNED = ['project', 'assets', 'assets.json', 'blobs.json', 'upload.json'];
+// What `export` writes beside project/; --overwrite replaces it. blobs.json stays: `index` keys
+// it by sha256, so an id never attaches to a changed SVG.
+const OWNED = ['project', 'assets', 'assets.json', 'upload.json'];
 // An uploaded asset's blob id, alone or at the end of its `/_blob/<id>` url.
-const BLOB_ID = /^[A-Za-z0-9_-]{8,128}$/;
+const BLOB_ID = /^[0-9a-f]{32}$/;
+const SHA256 = /^[0-9a-f]{64}$/;
+// A blobs.json key: a sha256, or a path ending in `assets/<group>/<name>` (any prefix).
+const assetPath = key => /(?:^|\/)(assets\/[^/]+\/[^/]+)$/.exec(key.split('\\').join('/'))?.[1];
+const listed = items =>
+  items.length > 10
+    ? `${items.slice(0, 10).join(', ')} and ${items.length - 10} more`
+    : items.join(', ');
 const blobId = value =>
   typeof value === 'string' ? (/\/_blob\/([^/?#]+)/.exec(value)?.[1] ?? value) : undefined;
 
@@ -85,7 +92,8 @@ const readPaths = file => {
 
 /**
  * Adds every SVG in assets.json to the index's asset groups with its blob id: from blobs.json
- * (asset path to id or `/_blob/<id>` url) or, for unchanged bytes, from the current index.
+ * (asset path or sha256 to id or `/_blob/<id>` url) or, for unchanged bytes, from the current
+ * index. Rewrites blobs.json keyed by sha256.
  */
 function writeAssetIndex(values, cwd) {
   const out = resolve(cwd, values.dir);
@@ -100,7 +108,7 @@ function writeAssetIndex(values, cwd) {
   const blobs = existsSync(blobsFile) ? readJson(blobsFile, 'a JSON object') : {};
   if (!blobs || typeof blobs !== 'object' || Array.isArray(blobs))
     throw new Failure(
-      `${blobsFile} must be a JSON object of asset path to blob id, such as {"assets/Icons/activity.svg": "<id>"}.`,
+      `${blobsFile} must be a JSON object of asset path or sha256 to blob id, such as {"assets/Icons/activity.svg": "<id>"}.`,
       2,
     );
 
@@ -112,19 +120,29 @@ function writeAssetIndex(values, cwd) {
         if (typeof file?.sha256 === 'string' && BLOB_ID.test(file.blob ?? ''))
           ids.set(file.sha256, file.blob);
   const reused = new Set(ids.keys());
+  const shaOf = new Map(assets.map(a => [a.path, a.sha256]));
+  const saved = {};
+  const kept = {};
   const invalid = [];
-  for (const asset of assets) {
-    if (!(asset.path in blobs)) continue;
-    const id = blobId(blobs[asset.path]);
-    if (BLOB_ID.test(id ?? '')) ids.set(asset.sha256, id);
-    else invalid.push(asset.path);
+  for (const [key, value] of Object.entries(blobs)) {
+    const sha = SHA256.test(key) ? key : shaOf.get(assetPath(key));
+    const id = blobId(value);
+    if (sha && BLOB_ID.test(id ?? '')) {
+      ids.set(sha, id);
+      saved[sha] = id;
+    } else {
+      invalid.push(key);
+      kept[key] = value;
+    }
   }
+  if (existsSync(blobsFile))
+    writeFileSync(blobsFile, `${JSON.stringify({ ...saved, ...kept }, null, 2)}\n`);
   // One path per missing sha256: identical SVGs share an upload.
   const missing = [
     ...new Map(
       assets
         .filter(a => !ids.has(a.sha256))
-        .map(a => [a.sha256, a.path])
+        .map(a => [a.sha256, join(shown, a.path)])
         .reverse(),
     ).values(),
   ].reverse();
@@ -136,10 +154,10 @@ function writeAssetIndex(values, cwd) {
     ];
     if (invalid.length)
       lines.push(
-        `These blobs.json values are not a blob id or a /_blob/<id> url: ${invalid.join(', ')}.`,
+        `These ${invalid.length} blobs.json entries match no asset or hold no 32-character blob id or /_blob/<id> url: ${listed(invalid)}.`,
       );
     lines.push(
-      `Upload the files listed in ${join(shown, 'upload.json')} to the system as assets, add each one's path and returned url to ${relative(cwd, blobsFile)}, then run this command again.`,
+      `Upload the files listed in ${join(shown, 'upload.json')} to the system as assets, add each one's path (as listed) and returned url to ${relative(cwd, blobsFile)}, then run this command again.`,
     );
     return { exitCode: 3, lines, data: { assets: assets.length, missing, invalid } };
   }
@@ -171,7 +189,7 @@ function writeAssetIndex(values, cwd) {
     join(out, INDEX),
     `${JSON.stringify({ ...index, groups, assetGroups }, null, 2)}\n`,
   );
-  const reusedCount = assets.filter(a => reused.has(a.sha256) && !(a.path in blobs)).length;
+  const reusedCount = assets.filter(a => reused.has(a.sha256) && !(a.sha256 in saved)).length;
   return {
     exitCode: 0,
     lines: [
@@ -220,6 +238,16 @@ function run(argv, cwd) {
   const index = values.index ? mergeIndex(resolve(cwd, values.index), packed) : undefined;
 
   for (const path of OWNED) rmSync(join(out, path), { recursive: true, force: true });
+  // Path keys `index` hasn't turned into sha256 keys may name changed SVGs: drop them.
+  const blobsFile = join(out, 'blobs.json');
+  if (existsSync(blobsFile)) {
+    let blobs;
+    try {
+      blobs = JSON.parse(readFileSync(blobsFile, 'utf8'));
+    } catch {}
+    const bySha = Object.entries(blobs ?? {}).filter(([key]) => SHA256.test(key));
+    writeFileSync(blobsFile, `${JSON.stringify(Object.fromEntries(bySha), null, 2)}\n`);
+  }
   cpSync(SOURCE, out, { recursive: true });
   if (index) writeFileSync(join(out, INDEX), `${JSON.stringify(index, null, 2)}\n`);
   const written = filesUnder(SOURCE);

@@ -25,7 +25,8 @@ folder has files), `--existing <file>` (a JSON array of the artifact's current p
 written index keeps its keys and takes only the release's `title`, `namespace`, `libraries`,
 `editing`, `groups`, `assetGroups` and `lastChange`, as `publish-plan.ts` does), `--json` (prints `{ ok, exitCode, data | error }`). Exit codes: `0` done,
 `1` error, `2` usage, `3` done with a manual step (remove the paths in `removed.json`).
-`--overwrite` replaces `project/`, `assets/`, `assets.json`, `blobs.json` and `upload.json`.
+`--overwrite` replaces `project/`, `assets/`, `assets.json` and `upload.json`, and keeps only
+the sha256 keys of `blobs.json`.
 
 After the SVGs are uploaded, `index` writes the galleries into the exported index:
 
@@ -33,11 +34,11 @@ After the SVGs are uploaded, `index` writes the galleries into the exported inde
 npx -y @wallarm-org/claude-design@latest index [--blobs wallarm-design-system/blobs.json] [--index current-index.json] [--json]
 ```
 
-`blobs.json` maps each manifest path (`assets/Icons/activity.svg`) to its blob id or upload url
-(`…/_blob/<id>`). `--index` reuses the blob id of every SVG whose sha256 the system's current
+`blobs.json` maps each SVG's path (anything ending in `assets/Icons/activity.svg`) or sha256 to
+its 32-hex blob id or upload url (`…/_blob/<id>`); `index` rewrites it keyed by sha256. `--index` reuses the blob id of every SVG whose sha256 the system's current
 index already has, so an update uploads only new and changed SVGs. Exit `0`: it wrote `groups`
 and `assetGroups` (`{name, blob, size, type, sha256}` per file) into `project/design-system.json`.
-Exit `3`: it wrote the paths still to upload, one per unique sha256, to `upload.json` and left the
+Exit `3`: it wrote the local paths still to upload, one per unique sha256, to `upload.json` and left the
 index alone.
 
 The package version is the design-system version it was built from.

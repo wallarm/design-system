@@ -13,7 +13,7 @@ The export wrote `wallarm-design-system/`:
 | `{{samplerFile}}` | The sampler artboard, for step 4 | To the canvas, in step 4 |
 | `files.json` | Every file the export wrote, with its sha256 | No |
 | `removed.json` | Paths an update drops. Written only with `--existing` | No |
-| `blobs.json` | You write it in step 1: each SVG's path and the url its upload returned | No |
+| `blobs.json` | You write it in step 1: each SVG's path and the url its upload returned. The `index` command rewrites it keyed by sha256; an update keeps it | No |
 
 If the person already has a Wallarm Design System artifact and gave you its link, skip to [Update to a new release](#update-to-a-new-release).
 
@@ -25,15 +25,15 @@ Create a new **Design System** artifact titled `{{title}}`, with the description
    - Send {{textPlainFiles}} with the content type `text/plain`; the artifact refuses it otherwise. Every other file's type follows its extension.
    - A publish takes at most 255 files, so send the files in batches of up to 200.
 2. **Icons and logos.** The galleries are asset uploads, not files: never publish anything from `wallarm-design-system/assets/` as a file under `project/`.
-   1. Run `npx -y @wallarm-org/claude-design@latest index --blobs wallarm-design-system/blobs.json`. It exits 3 and lists in `wallarm-design-system/upload.json` the SVGs to upload (identical SVGs share one upload).
-   2. Upload them in the order listed, at most {{assetCallFiles}} per call: the Artifact tool's publish with the system's `url`, `asset: true` and `file_paths` (the local paths `wallarm-design-system/<path>`), or `upload_asset` if that is the tool you have. The first install takes about {{assetCalls}} calls.
-   3. After each call, add one entry per uploaded file to `wallarm-design-system/blobs.json`, a JSON object: the path as `upload.json` lists it, mapped to the `url` the result gives for that file (or its id), for example `{"assets/Icons/activity.svg": "https://…/_blob/<id>"}`.
-   4. Run the `index` command again. Exit 3: upload the paths it lists now and run it again. Exit 0: it wrote the asset groups into `project/design-system.json`.
+   1. Run `npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json`. It exits 3 and lists in `wallarm-design-system/upload.json` the local paths of the SVGs to upload (identical SVGs share one upload).
+   2. Upload them in the order listed: the Artifact tool's publish with the system's `url`, `asset: true` and `file_paths` set to the next {{assetCallFiles}} paths from `upload.json`, copied as they are. With `upload_asset`, if that is the tool you have, send at most 10 per call. The first install takes about {{assetCalls}} calls. If an upload is refused, show the person the error and stop.
+   3. After each call, add one entry per uploaded file to `wallarm-design-system/blobs.json`, a JSON object: the path as `upload.json` lists it, mapped to the `url` the result gives for that file, for example `{"wallarm-design-system/assets/Icons/activity.svg": "https://…/_blob/<id>"}`. Copy the url, not the asset's `id`. If the result has no url but gives each file's sha256 and id (as `upload_asset` does), key the entry by that sha256 instead.
+   4. Run the `index` command again. It rewrites `blobs.json` keyed by sha256; keep its entries and add new ones after them. Exit 3: upload the paths it lists now and run it again. Exit 0: it wrote the asset groups into `project/design-system.json`.
 3. **Index.** Publish `project/design-system.json` last, alone, after the `index` command exited 0. It is the system's index; it carries the marker a new system needs.
 
 In artboards, icons are still `WallarmDS.Icons.<Name>` and the logo `WallarmDS.Logo`, from `components/bundle.js`; the galleries show them on the system's page.
 
-Check: every `project/` path in `wallarm-design-system/files.json` ({{files}} files) is in the artifact, its title is `{{title}}`, and `project/design-system.json` has a `lastChange.note` that starts with `v{{version}}:`. The system's page shows the asset groups {{assetGroups}}, with every icon drawn (no broken image). The page may add `project/manifest.json` and files under `project/api/`; they don't count. Give the person the artifact's link: they need it to install the system on other canvases and to update it.
+Check: every `project/` path in `wallarm-design-system/files.json` ({{files}} files) is in the artifact, its title is `{{title}}`, and `project/design-system.json` has a `lastChange.note` that starts with `v{{version}}:`. The Artifact tool's `list` with the system's `url` and `scope: "assets"` shows at least {{assetUploads}} assets. The system's page shows the asset groups {{assetGroups}}, with every icon drawn (no broken image). The page may add `project/manifest.json` and files under `project/api/`; they don't count. Give the person the artifact's link: they need it to install the system on other canvases and to update it.
 
 If a publish is refused for a reason this step doesn't cover, show the person the error and stop. Don't edit or rename files to get past it.
 
@@ -108,14 +108,14 @@ If the link is Wallarm's shared system, {{sharedArtifact}}, stop. Its maintainer
    npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json --index current-index.json
    ```
 
-   `--index` keeps what the system's page added to its index and replaces only what the release owns. If the command exits 3, carry on: the output names the manual step, which is removing the paths in `wallarm-design-system/removed.json`. `--overwrite` also clears the previous release's `blobs.json`; its ids belong to the old SVGs.
+   `--index` keeps what the system's page added to its index and replaces only what the release owns. If the command exits 3, carry on: the output names the manual step, which is removing the paths in `wallarm-design-system/removed.json`. `--overwrite` keeps `blobs.json`: its ids are keyed by sha256, so they only attach to unchanged SVGs.
 3. Read the new `wallarm-design-system/SETUP.md`; it belongs to the new release.
 4. If `wallarm-design-system/removed.json` lists any path, show the person the list and ask them to confirm the removal. Remove nothing they don't confirm.
 5. Publish `wallarm-design-system/project/` to the same artifact link: every file except `project/design-system.json`, in batches as in step 1, {{textPlainFiles}} as `text/plain`. Then remove each confirmed path from `wallarm-design-system/removed.json`.
 6. Upload only the new and changed SVGs, as step 1's "Icons and logos" says, but run the `index` command with the current index:
 
    ```bash
-   npx -y @wallarm-org/claude-design@latest index --blobs wallarm-design-system/blobs.json --index current-index.json
+   npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json
    ```
 
    It reuses the blob id of every SVG whose sha256 the current index already has, so `upload.json` lists only what changed. If it exits 0 straight away, nothing needs uploading. Then publish `project/design-system.json` last, alone.
@@ -129,7 +129,8 @@ If the link is Wallarm's shared system, {{sharedArtifact}}, stop. Its maintainer
 | --- | --- |
 | The publish is refused for `index.d.ts` | Send `project/components/index.d.ts` as `text/plain`. |
 | The publish is refused for too many files | Send smaller batches, as step 1 says. |
-| The `index` command exits 3 | Upload the paths in `upload.json`, add their urls to `blobs.json` and run it again. A value it names as invalid isn't a blob id or `/_blob/<id>` url: copy it again from the upload result. |
+| The `index` command exits 3 | Upload the paths in `upload.json`, add their urls to `blobs.json` and run it again. An entry it names as invalid has a key that matches no SVG or a value that isn't a 32-character blob id or `/_blob/<id>` url: copy it again from `upload.json` and the upload result. |
+| Publishing `project/design-system.json` is refused as stale | The system's page saved a newer index. Save the version the refusal hands back as `current-index.json`, run `npx -y @wallarm-org/claude-design@{{version}} export --overwrite --index current-index.json`, then `npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json`, and publish the index again. Nothing needs uploading again. |
 | The gallery is empty or shows broken images | `project/design-system.json` was published before the `index` command exited 0, or with a wrong url. Fix `blobs.json`, run `index` again and publish the index again. |
 | No sampler board shows | The file isn't at `project/{{samplerFile}}`, or `project/canvas.json` has no `"{{samplerFile}}"` in `boards` or `order`. |
 | Components render unstyled | The link lines don't reach `project/ds/{{folder}}/`. The artboard must sit directly in `project/`, and the folder name must match step 2. |

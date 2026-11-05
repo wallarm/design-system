@@ -126,6 +126,7 @@ export function renderSetup({
     readmeSections: README_SECTIONS.map(name => `"${name}"`).join(', '),
     assets: String(assets.length),
     assetCallFiles: String(ASSET_CALL_FILES),
+    assetUploads: String(new Set(assets.map(a => a.sha256)).size),
     assetCalls: String(Math.ceil(new Set(assets.map(a => a.sha256)).size / ASSET_CALL_FILES)),
     assetGroups: [...new Set(assets.map(a => a.group))]
       .map(group => `${group} (${assets.filter(a => a.group === group).length})`)
