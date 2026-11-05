@@ -118,6 +118,43 @@ describe('get_guideline', () => {
     );
   });
 
+  it('lists pattern stories in the overview and serves their code as the stories section', () => {
+    const withStories = {
+      ...guidelines,
+      guidelines: guidelines.guidelines.map(g =>
+        g.slug === 'patterns/empty-states'
+          ? {
+              ...g,
+              stories: [
+                {
+                  name: 'Default',
+                  code: 'export const Default = () => <Page />;',
+                  description: 'Main.',
+                },
+                { name: 'NoResults', code: 'x'.repeat(50_000) },
+              ],
+            }
+          : g,
+      ),
+    };
+    expect(getGuidelineText(withStories, 'empty-states')).toContain(
+      "Live stories (Storybook `Patterns/Empty states`): Default, NoResults. Full, runnable code: `get_guideline({ slug: 'patterns/empty-states', section: 'stories' })`",
+    );
+    const first = getGuidelineText(withStories, 'empty-states', 'stories');
+    expect(first).toContain(
+      '## Default\n\nMain.\n\n```tsx\nexport const Default = () => <Page />;\n```',
+    );
+    expect(first).toContain("section: 'stories', page: 2");
+    expect(getGuidelineText(withStories, 'empty-states', 'stories', 2)).toContain('xxxx');
+    for (const page of [1, 2, 3]) {
+      expect(
+        getGuidelineText(withStories, 'empty-states', 'stories', page).length,
+      ).toBeLessThanOrEqual(40_000);
+    }
+    expect(getGuidelineText(withStories, 'empty-states', 'nope')).toMatch(/related, stories$/);
+    expect(getGuidelineText(guidelines, 'empty-states')).not.toContain('Live stories');
+  });
+
   it('suggests nearest slugs for an unknown slug', () => {
     expect(nearestSlugs(guidelines, 'empty-state')[0]).toBe('patterns/empty-states');
     expect(nearestSlugs(guidelines, 'gap')[0]).toBe('foundations/spacing');

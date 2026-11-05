@@ -67,8 +67,16 @@ const patterns = guidelines.filter(g => g.kind === 'pattern');
 const patternsDir = path.join(docs, 'patterns');
 rmSync(patternsDir, { recursive: true, force: true });
 mkdirSync(patternsDir, { recursive: true });
+// Pattern stories live next to their markdown: src/guidelines/patterns/<slug>.stories.tsx.
+const patternStoryBase = path
+  .relative(patternsDir, path.join(ds, 'src/guidelines/patterns'))
+  .split(path.sep)
+  .join('/');
 for (const g of guidelines)
-  writeFileSync(path.join(docs, `${g.slug}.mdx`), renderGuidelinePage(g, link));
+  writeFileSync(
+    path.join(docs, `${g.slug}.mdx`),
+    renderGuidelinePage(g, link, g.kind === 'pattern' ? { storyImportBase: patternStoryBase } : {}),
+  );
 writeFileSync(path.join(patternsDir, 'index.mdx'), renderPatternsIndex(patterns, link));
 writeFileSync(
   path.join(patternsDir, '_meta.json'),

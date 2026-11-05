@@ -59,7 +59,7 @@ For local development or custom setups:
 | `search_token` | `{ query: string }` | Search design tokens by name, Tailwind class, value, or category; results include the utility classes. Top 20 by relevance |
 | `get_token_category` | `{ name: string, page?: number }` | All tokens in a category (case-insensitive) with Tailwind classes, e.g. `spacing`, `colors-primary` |
 | `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' }` | Guidelines with slug, title, description and the components they use |
-| `get_guideline` | `{ slug: string, section?: string }` | A guideline as markdown, or one section (`rules`, `example`, …). Also accepts a guideline's own relative links (`../foundations/spacing.md#rules`, the anchor picks the section). Unknown slugs get the nearest slugs |
+| `get_guideline` | `{ slug: string, section?: string, page?: number }` | A guideline as markdown, or one section (`rules`, `example`, …). A pattern's overview ends with its live story names; `section: 'stories'` returns their full code (paginated). Also accepts a guideline's own relative links (`../foundations/spacing.md#rules`, the anchor picks the section). Unknown slugs get the nearest slugs |
 
 `get_component` also lists the guidelines that use the component.
 

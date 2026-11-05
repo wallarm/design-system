@@ -193,6 +193,36 @@ describe('parseGuidelines', () => {
     );
   });
 
+  it('attaches a pattern story file in export order and checks its title', () => {
+    const stories = (title: string) => `const meta = { title: '${title}' };
+export default meta;
+
+/** Nothing exists yet. */
+export const Default = () => <p>Empty</p>;
+export const NoResults = () => <p>No results</p>;
+`;
+    const result = parse({
+      'rules.md': 'ok',
+      'patterns/empty.md': PATTERN,
+      'patterns/empty.stories.tsx': stories('Patterns/Empty'),
+    });
+    expect(result.guidelines[0]?.stories).toEqual([
+      {
+        name: 'Default',
+        code: 'export const Default = () => <p>Empty</p>;',
+        description: 'Nothing exists yet.',
+      },
+      { name: 'NoResults', code: 'export const NoResults = () => <p>No results</p>;' },
+    ]);
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'patterns/empty.md': PATTERN,
+        'patterns/empty.stories.tsx': stories('Inputs/Empty'),
+      }),
+    ).toThrow(/empty\.stories\.tsx meta title must be "Patterns\/Empty" \(found "Inputs\/Empty"\)/);
+  });
+
   it('validates the real guidelines directory', () => {
     // Root exports plus the `@wallarm-org/design-system/<Component>` subpath entries
     const src = path.resolve(__dirname, '../../../src');

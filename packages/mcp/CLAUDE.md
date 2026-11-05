@@ -16,7 +16,7 @@ src/
 │   ├── get-example.ts        # get_example tool: one example's code, fuzzy name match
 │   ├── search-token.ts       # search_token tool: token search by name, utility, value, or category; tokenUtilities()
 │   ├── get-token-category.ts # get_token_category tool: full category details as markdown
-│   └── guidelines.ts         # list_guidelines / get_guideline tools, server instructions, related guidelines
+│   └── guidelines.ts         # list_guidelines / get_guideline tools (incl. the `stories` section), server instructions, related guidelines
 ├── resources/
 │   ├── components.ts     # ds://components resource: markdown table of all components
 │   └── tokens.ts         # ds://tokens resource: all design tokens by category

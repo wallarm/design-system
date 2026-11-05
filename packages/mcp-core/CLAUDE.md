@@ -24,8 +24,9 @@ src/
 | `TokenCategory` | Token group: name, description?, tokens[] |
 | `TokenMetadata` | Single token: name, value |
 | `GuidelinesMetadata` | Root of `guidelines.json`: version, rules (rules.md digest), guidelines[] |
-| `Guideline` | Foundation/pattern: slug, kind, title, description, components[], keywords[], order, markdown, sections[] |
+| `Guideline` | Foundation/pattern: slug, kind, title, description, components[], keywords[], order, markdown, sections[], stories? |
 | `GuidelineSection` | H2 section: id (kebab-case), heading, markdown |
+| `GuidelineStory` | Pattern story (`patterns/<slug>.stories.tsx`): name, code, description? |
 
 ## Design Decisions
 

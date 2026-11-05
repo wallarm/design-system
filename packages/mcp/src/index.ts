@@ -242,7 +242,7 @@ async function main() {
     'get_guideline',
     {
       description:
-        'Use when composing a screen (read the matching pattern first) or applying a foundation — returns the guideline as markdown. Pass `section` to get one section only.',
+        "Use when composing a screen (read the matching pattern first) or applying a foundation — returns the guideline as markdown. Pass `section` to get one section only; `section: 'stories'` returns a pattern's full live-story code (paginated — pass `page`).",
       inputSchema: {
         slug: z
           .string()
@@ -252,15 +252,16 @@ async function main() {
         section: z
           .string()
           .optional()
-          .describe('Section id or heading, e.g. "rules", "examples", "states"'),
+          .describe('Section id or heading, e.g. "rules", "examples", "states", "stories"'),
+        page: z.number().int().min(1).optional().describe('Page of a paginated response, from 1'),
       },
     },
-    async ({ slug, section }) => ({
+    async ({ slug, section, page }) => ({
       content: [
         {
           type: 'text',
           text: guidelines
-            ? `${getGuidelineText(guidelines, slug, section)}${guidelinesSource}`
+            ? `${getGuidelineText(guidelines, slug, section, page)}${guidelinesSource}`
             : noGuidelines,
         },
       ],

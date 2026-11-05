@@ -61,8 +61,13 @@ const sitePath = new URL(llms.match(/https?:\/\/\S+?\/design-system\//)?.[0] ?? 
 for (const file of guidelineMd) {
   expect(llms.includes(`/${file})`), `llms.txt does not list ${file}`);
   const md = read(file);
-  if (file.startsWith('patterns/') && file !== 'patterns/index.md')
+  if (file.startsWith('patterns/') && file !== 'patterns/index.md') {
     expect(md.includes('```tsx'), `${file} has no tsx code fence`);
+    expect(
+      md.includes('## Live example'),
+      `${file} has no live example: add packages/design-system/src/guidelines/${file.replace(/\.md$/, '.stories.tsx')}`,
+    );
+  }
   for (const [, href] of md.matchAll(/\]\((https?:\/\/[^)\s#]+)/g)) {
     const { pathname } = new URL(href ?? '');
     // Storybook is deployed next to the site, not inside it.

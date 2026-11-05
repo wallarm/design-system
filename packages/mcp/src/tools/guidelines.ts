@@ -1,4 +1,5 @@
 import type { Guideline, GuidelineKind, GuidelinesMetadata } from '@wallarm-org/mcp-core';
+import { paginate } from './format';
 
 export const ROUTING = [
   "Tools: `search_component` / `get_component` for components — `get_component` returns an overview, pass `section` for full props, sub-components or examples, and `get_example` for one example's code;",
@@ -79,10 +80,35 @@ export function nearestSlugs(guidelines: GuidelinesMetadata, slug: string, limit
     .map(r => r.slug);
 }
 
+const STORIES = 'stories';
+
+/** Overview footer: the pattern's live stories and how to read their code. */
+const storiesFooter = (g: Guideline): string =>
+  g.stories?.length
+    ? `\n\n---\nLive stories (Storybook \`Patterns/${g.title}\`): ${g.stories.map(s => s.name).join(', ')}. Full, runnable code: \`get_guideline({ slug: '${g.slug}', section: '${STORIES}' })\`.`
+    : '';
+
+/** Every story of a pattern as `## Name`, description and a tsx block; paginated. */
+const storiesText = (g: Guideline, page: number): string => {
+  const body = (g.stories ?? [])
+    .map(s =>
+      [`## ${s.name}`, s.description ?? '', `\`\`\`tsx\n${s.code}\n\`\`\``]
+        .filter(Boolean)
+        .join('\n\n'),
+    )
+    .join('\n\n');
+  return paginate(
+    `# ${g.title} — Stories\n\n${body}`,
+    page,
+    next => `\`{ slug: '${g.slug}', section: '${STORIES}', page: ${next} }\``,
+  );
+};
+
 export function getGuidelineText(
   guidelines: GuidelinesMetadata,
   slug: string,
   section?: string,
+  page = 1,
 ): string {
   const guideline = findGuideline(guidelines, slug);
   if (!guideline) {
@@ -91,16 +117,21 @@ export function getGuidelineText(
   }
   // A link's `#anchor` selects the section unless one is passed.
   section ??= splitLink(slug).anchor;
-  if (!section) return guideline.markdown;
+  if (!section) return `${guideline.markdown}${storiesFooter(guideline)}`;
 
   const id = section
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+  if (id === STORIES && guideline.stories?.length) return storiesText(guideline, page);
   const match = guideline.sections.find(s => s.id === id);
   if (!match) {
-    return `Section "${section}" not found in ${guideline.slug}.\n\nAvailable sections: ${guideline.sections.map(s => s.id).join(', ')}`;
+    const ids = [
+      ...guideline.sections.map(s => s.id),
+      ...(guideline.stories?.length ? [STORIES] : []),
+    ];
+    return `Section "${section}" not found in ${guideline.slug}.\n\nAvailable sections: ${ids.join(', ')}`;
   }
   return `# ${guideline.title} — ${match.heading}\n\n${match.markdown}`;
 }

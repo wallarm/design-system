@@ -95,6 +95,16 @@ export const guidelineSectionSchema = z.object({
 
 export type GuidelineSection = z.infer<typeof guidelineSectionSchema>;
 
+export const guidelineStorySchema = z.object({
+  /** Story export name, e.g. `Default`, `NoResults`. */
+  name: z.string(),
+  /** Paste-ready source: public imports plus the story function. */
+  code: z.string(),
+  description: z.string().optional(),
+});
+
+export type GuidelineStory = z.infer<typeof guidelineStorySchema>;
+
 export const guidelineKindSchema = z.enum(['foundation', 'pattern']);
 
 export type GuidelineKind = z.infer<typeof guidelineKindSchema>;
@@ -111,6 +121,11 @@ export const guidelineSchema = z.object({
   /** Body without frontmatter. */
   markdown: z.string(),
   sections: z.array(guidelineSectionSchema),
+  /**
+   * Live stories of a pattern (`src/guidelines/patterns/<slug>.stories.tsx`, Storybook
+   * `Patterns/<title>`), in file order. Absent in older design-system versions.
+   */
+  stories: z.array(guidelineStorySchema).optional(),
 });
 
 export type Guideline = z.infer<typeof guidelineSchema>;

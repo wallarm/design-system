@@ -4,8 +4,10 @@ import type {
   Guideline,
   GuidelineKind,
   GuidelineSection,
+  GuidelineStory,
   GuidelinesMetadata,
 } from '@wallarm-org/mcp-core';
+import { parsePatternStories } from './parse-examples.js';
 
 const RULES_MAX_CHARS = 2000;
 const DESCRIPTION_MAX_CHARS = 200;
@@ -174,6 +176,8 @@ const parseGuidelineFile = (
     fail(`broken relative link "${target}"`);
   }
 
+  const stories = kind === 'pattern' ? parseStories(filePath, title, fail) : undefined;
+
   if (
     typeof title !== 'string' ||
     typeof description !== 'string' ||
@@ -194,7 +198,35 @@ const parseGuidelineFile = (
     order,
     markdown: body.trim(),
     sections,
+    ...(stories?.length ? { stories } : {}),
   };
+};
+
+/**
+ * `patterns/<slug>.stories.tsx` next to the guideline: its exported stories in file order.
+ * Optional here; the docs site requires one per pattern (apps/website check-build).
+ */
+const parseStories = (
+  filePath: string,
+  title: FrontmatterValue | undefined,
+  fail: (message: string) => void,
+): GuidelineStory[] | undefined => {
+  const storiesPath = filePath.replace(/\.md$/, '.stories.tsx');
+  if (!fs.existsSync(storiesPath)) return undefined;
+  // src/guidelines/patterns/x.stories.tsx → src/
+  const srcDir = path.resolve(path.dirname(storiesPath), '../..');
+  const examples = parsePatternStories(storiesPath, srcDir);
+  const expected = `Patterns/${title}`;
+  const found = examples[0]?.storyTitle;
+  if (examples.length === 0) fail(`${path.basename(storiesPath)} exports no stories`);
+  else if (found !== expected) {
+    fail(`${path.basename(storiesPath)} meta title must be "${expected}" (found "${found}")`);
+  }
+  return examples.map(({ name, code, description }) => ({
+    name,
+    code,
+    ...(description && { description }),
+  }));
 };
 
 /**

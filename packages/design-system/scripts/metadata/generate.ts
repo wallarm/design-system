@@ -123,10 +123,17 @@ const main = () => {
   const guidelinesPath = path.join(outDir, 'guidelines.json');
   fs.writeFileSync(guidelinesPath, JSON.stringify(guidelines, null, 2));
   fs.rmSync(path.join(ROOT, 'dist/guidelines'), { recursive: true, force: true });
-  fs.cpSync(guidelinesDir, path.join(ROOT, 'dist/guidelines'), { recursive: true });
+  // Markdown only: pattern stories, their E2E tests and screenshots stay in the repo.
+  fs.cpSync(guidelinesDir, path.join(ROOT, 'dist/guidelines'), {
+    recursive: true,
+    filter: src =>
+      (fs.statSync(src).isDirectory() && !src.endsWith('-snapshots')) || src.endsWith('.md'),
+  });
 
   console.log(`Guidelines written to ${guidelinesPath}`);
-  console.log(`  Guidelines: ${guidelines.guidelines.length}`);
+  console.log(
+    `  Guidelines: ${guidelines.guidelines.length}, pattern stories: ${guidelines.guidelines.reduce((n, g) => n + (g.stories?.length ?? 0), 0)}`,
+  );
 };
 
 main();

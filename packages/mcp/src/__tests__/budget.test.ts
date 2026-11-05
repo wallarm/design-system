@@ -2,7 +2,7 @@ import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { designSystemMetadataSchema, guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
 import { paginate, RESPONSE_LIMIT } from '../tools/format';
 import {
   componentSections,
@@ -13,6 +13,7 @@ import {
 } from '../tools/get-component';
 import { getExampleText } from '../tools/get-example';
 import { formatTokenCategory } from '../tools/get-token-category';
+import { getGuidelineText } from '../tools/guidelines';
 import { ALIASES, searchComponents } from '../tools/search-component';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -69,6 +70,21 @@ describe.skipIf(!fs.existsSync(REAL_METADATA))('response budget (real metadata)'
       for (const text of allPages(page =>
         paginate(formatTokenCategory(category), page, next => String(next)),
       )) {
+        expect(text.length).toBeLessThanOrEqual(RESPONSE_LIMIT);
+      }
+    }
+  });
+
+  it('every guideline and its stories section stay under the limit', () => {
+    const guidelinesPath = path.join(path.dirname(REAL_METADATA), 'guidelines.json');
+    if (!fs.existsSync(guidelinesPath)) return;
+    const guidelines = guidelinesMetadataSchema.parse(
+      JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8')),
+    );
+    for (const g of guidelines.guidelines) {
+      expect(getGuidelineText(guidelines, g.slug).length).toBeLessThanOrEqual(RESPONSE_LIMIT);
+      if (!g.stories?.length) continue;
+      for (const text of allPages(page => getGuidelineText(guidelines, g.slug, 'stories', page))) {
         expect(text.length).toBeLessThanOrEqual(RESPONSE_LIMIT);
       }
     }
