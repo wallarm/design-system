@@ -67,7 +67,7 @@ Responses stay under 40,000 characters (`RESPONSE_LIMIT`, below Claude Code's 25
 
 ### Instructions
 
-On `initialize` the server sends `instructions`: the design-system rules digest (`guidelines/rules.md`) followed by which tool to use for what and the metadata source (installed design system or bundled snapshot, with its version). When the installed design system has no `guidelines.json` (versions before guidelines shipped), the digest bundled into this package is used and the guideline tools say so.
+On `initialize` the server sends `instructions`: the design-system rules digest (`src/guidelines/rules.md` in the design system) followed by which tool to use for what and the metadata source (installed design system or bundled snapshot, with its version). When the installed design system has no `guidelines.json` (versions before guidelines shipped), the digest bundled into this package is used and the guideline tools say so.
 
 ### Resources
 

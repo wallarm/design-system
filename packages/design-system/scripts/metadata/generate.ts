@@ -100,9 +100,18 @@ const main = () => {
   console.log(`  Total tokens: ${tokens.reduce((sum, cat) => sum + cat.tokens.length, 0)}`);
 
   // Guidelines: validate, emit guidelines.json, and ship the raw markdown
-  const guidelinesDir = path.join(ROOT, 'guidelines');
+  const guidelinesDir = path.join(ROOT, 'src', 'guidelines');
+  // Root exports plus every `@wallarm-org/design-system/<Component>` subpath export
+  const exportEntries = [
+    path.join(ROOT, 'src/index.ts'),
+    ...componentDirs
+      .map(name => path.join(componentsDir, name, 'index.ts'))
+      .filter(file => fs.existsSync(file)),
+  ];
   const knownComponents = new Set(
-    project.getSourceFileOrThrow(path.join(ROOT, 'src/index.ts')).getExportedDeclarations().keys(),
+    exportEntries.flatMap(file => [
+      ...project.getSourceFileOrThrow(file).getExportedDeclarations().keys(),
+    ]),
   );
   let guidelines: ReturnType<typeof parseGuidelines>;
   try {

@@ -2,7 +2,7 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 // Fallback digest for design-system versions that predate guidelines.json.
-import bundledRules from '../../design-system/guidelines/rules.md?raw';
+import bundledRules from '../../design-system/src/guidelines/rules.md?raw';
 import { describeSource, loadGuidelines, loadMetadata } from './metadata';
 import { getComponentListContent } from './resources/components';
 import { getTokensContent } from './resources/tokens';

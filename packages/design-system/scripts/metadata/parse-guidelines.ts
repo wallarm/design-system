@@ -196,7 +196,7 @@ const parseGuidelineFile = (
 };
 
 /**
- * Read and validate `guidelines/` (rules.md + foundations/*.md + patterns/*.md).
+ * Read and validate `src/guidelines/` (rules.md + foundations/*.md + patterns/*.md).
  * Throws one Error listing every problem so the build fails with all of them at once.
  */
 export const parseGuidelines = ({

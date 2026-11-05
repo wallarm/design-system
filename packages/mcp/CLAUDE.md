@@ -74,5 +74,5 @@ Every `ALIASES` target must be a real component — `budget.test.ts` checks it a
 
 - `@modelcontextprotocol/sdk` — MCP server SDK
 - `@wallarm-org/mcp-core` — devDependency (not published to npm), shared Zod schemas and types, bundled into `dist/index.js`
-- `@wallarm-org/design-system` — peerDependency (optional), source of `components.json` and `guidelines.json` (also copied into `dist/metadata/` by `rslib.config.ts` `output.copy` as the fallback snapshot, so the design system must be built first — turbo's `^build` does it); its `guidelines/rules.md` is also bundled (`?raw`) as the instructions fallback for DS versions without `guidelines.json`
+- `@wallarm-org/design-system` — peerDependency (optional), source of `components.json` and `guidelines.json` (also copied into `dist/metadata/` by `rslib.config.ts` `output.copy` as the fallback snapshot, so the design system must be built first — turbo's `^build` does it); its `src/guidelines/rules.md` is also bundled (`?raw`) as the instructions fallback for DS versions without `guidelines.json`
 - `zod` — devDependency, used for tool input schemas in `index.ts`

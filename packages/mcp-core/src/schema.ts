@@ -117,7 +117,7 @@ export type Guideline = z.infer<typeof guidelineSchema>;
 
 export const guidelinesMetadataSchema = z.object({
   version: z.string(),
-  /** Contents of `guidelines/rules.md` — the agent digest. */
+  /** Contents of `src/guidelines/rules.md` — the agent digest. */
   rules: z.string(),
   guidelines: z.array(guidelineSchema),
 });

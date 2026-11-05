@@ -12,7 +12,7 @@ import {
 } from '../parse-guidelines.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const GUIDELINES_DIR = path.resolve(__dirname, '../../../guidelines');
+const GUIDELINES_DIR = path.resolve(__dirname, '../../../src/guidelines');
 
 const FOUNDATION = `---
 title: Spacing
@@ -147,13 +147,22 @@ describe('parseGuidelines', () => {
   });
 
   it('validates the real guidelines directory', () => {
+    // Root exports plus the `@wallarm-org/design-system/<Component>` subpath entries
+    const src = path.resolve(__dirname, '../../../src');
+    const entries = [
+      path.join(src, 'index.ts'),
+      ...fs
+        .readdirSync(path.join(src, 'components'))
+        .map(name => path.join(src, 'components', name, 'index.ts'))
+        .filter(file => fs.existsSync(file)),
+    ];
     const result = parseGuidelines({
       dir: GUIDELINES_DIR,
       version: '0.0.0',
       knownComponents: new Set(
-        fs
-          .readFileSync(path.resolve(__dirname, '../../../src/index.ts'), 'utf-8')
-          .match(/\b[A-Z][A-Za-z0-9]*\b/g),
+        entries.flatMap(
+          file => fs.readFileSync(file, 'utf-8').match(/\b[A-Z][A-Za-z0-9]*\b/g) ?? [],
+        ),
       ),
     });
     expect(result.guidelines.length).toBeGreaterThan(0);
