@@ -7,7 +7,10 @@ import type {
   GuidelineStory,
   GuidelinesMetadata,
 } from '@wallarm-org/mcp-core';
-import { parsePatternStories } from './parse-examples.js';
+import { INTERNAL_COMPONENTS, type PublicApi } from './internal.js';
+import { parsePatternStories, patternStoryImports } from './parse-examples.js';
+
+const PKG = '@wallarm-org/design-system';
 
 const RULES_MAX_CHARS = 2000;
 const DESCRIPTION_MAX_CHARS = 200;
@@ -75,6 +78,91 @@ const checkStoryRefs = (
       fail(`story "${name}" of ${storiesFile} is referenced ${count} times (exactly 1 expected)`);
     }
   }
+};
+
+const FENCE = /^\s*(```|~~~)([^\n]*)\n([\s\S]*?)^\s*\1[ \t]*$/gm;
+
+/**
+ * Guidelines never show internal components: not in a tsx fence (imports or JSX tags),
+ * not as a backticked name in prose. The fix is to use or name the public API instead.
+ */
+export const findInternalUsage = (markdown: string, internal: Set<string>): string[] => {
+  const problems = new Set<string>();
+  for (const [, , info = '', code = ''] of markdown.matchAll(FENCE)) {
+    if (!/^(tsx|jsx)\b/.test(info.trim())) continue;
+    for (const [, names = '', spec = ''] of code.matchAll(
+      /^\s*import\s+(?:type\s+)?([\s\S]*?)\s+from\s+['"]([^'"]+)['"]/gm,
+    )) {
+      const dir = spec.startsWith(`${PKG}/`) ? spec.slice(PKG.length + 1) : undefined;
+      if (dir && INTERNAL_COMPONENTS.has(dir)) {
+        problems.add(`tsx example imports internal "${spec}"`);
+      }
+      for (const name of names.match(/[A-Za-z_$][\w$]*/g) ?? []) {
+        if (internal.has(name)) problems.add(`tsx example imports internal "${name}"`);
+      }
+    }
+    for (const [, tag = ''] of code.matchAll(/<([A-Z][\w$]*)/g)) {
+      if (internal.has(tag)) problems.add(`tsx example renders internal <${tag}>`);
+    }
+  }
+  const prose = markdown.replace(FENCE, '');
+  for (const [, span = ''] of prose.matchAll(/`([^`\n]+)`/g)) {
+    for (const name of span.match(/[A-Za-z_$][\w$]*/g) ?? []) {
+      if (internal.has(name)) {
+        problems.add(`prose names internal \`${name}\` (not exported to consumers); rephrase`);
+      }
+    }
+  }
+  return [...problems];
+};
+
+/**
+ * Pattern stories show only public API: imports from `../../components/<Dir>` (its index, a
+ * public dir, names that index exports) or `../../icons`, and the extracted code MCP serves
+ * imports only `@wallarm-org/design-system`, `/<PublicDir>` or `/icons`.
+ */
+export const findPrivateStoryImports = (
+  storiesPath: string,
+  srcDir: string,
+  stories: GuidelineStory[],
+  api: PublicApi,
+): string[] => {
+  const problems: string[] = [];
+  for (const { spec, names } of patternStoryImports(storiesPath)) {
+    if (!spec.startsWith('.')) continue;
+    const rel = path
+      .relative(srcDir, path.resolve(path.dirname(storiesPath), spec))
+      .split(path.sep)
+      .join('/');
+    const [root, dir, ...rest] = rel.split('/');
+    if (root !== 'components' || !dir) continue;
+    if (INTERNAL_COMPONENTS.has(dir)) {
+      problems.push(`imports internal component "${spec}" (not exported to consumers)`);
+      continue;
+    }
+    if (rest.length > 0 && rest.join('/') !== 'index') {
+      problems.push(`deep import "${spec}"; import from "../../components/${dir}" instead`);
+      continue;
+    }
+    const exported = api.dirs.get(dir);
+    for (const name of names) {
+      if (!exported?.has(name)) {
+        problems.push(
+          `imports "${name}" from "${spec}", which components/${dir}/index.ts does not export`,
+        );
+      }
+    }
+  }
+  for (const story of stories) {
+    for (const [, spec = ''] of story.code.matchAll(/^import\s[\s\S]*?\sfrom\s+'([^']+)';/gm)) {
+      const sub = spec.startsWith(`${PKG}/`) ? spec.slice(PKG.length + 1) : undefined;
+      const ok = spec.startsWith('.')
+        ? false
+        : !spec.startsWith(PKG) || spec === PKG || sub === 'icons' || (!!sub && api.dirs.has(sub));
+      if (!ok) problems.push(`story "${story.name}" extracts as a non-public import "${spec}"`);
+    }
+  }
+  return problems;
 };
 
 /** Max prose words per guideline body (code fences excluded). */
@@ -183,7 +271,7 @@ const parseGuidelineFile = (
   filePath: string,
   slug: string,
   kind: GuidelineKind,
-  knownComponents: Set<string>,
+  api: PublicApi,
   errors: string[],
 ): Guideline | undefined => {
   const fail = (message: string) => errors.push(`${slug}.md: ${message}`);
@@ -208,7 +296,9 @@ const parseGuidelineFile = (
   if (typeof order !== 'number') fail('frontmatter "order" must be a number');
 
   for (const name of Array.isArray(components) ? components : []) {
-    if (!knownComponents.has(name)) {
+    if (api.internal.has(name)) {
+      fail(`internal component "${name}" in "components" (not exported to consumers)`);
+    } else if (!api.names.has(name)) {
       fail(
         `unknown component "${name}" in "components" (not exported from @wallarm-org/design-system)`,
       );
@@ -231,7 +321,14 @@ const parseGuidelineFile = (
     fail(`broken relative link "${target}"`);
   }
 
-  const stories = kind === 'pattern' ? parseStories(filePath, title, fail) : undefined;
+  for (const problem of findInternalUsage(body, api.internal)) fail(problem);
+
+  const stories =
+    kind === 'pattern'
+      ? parseStories(filePath, title, fail, api, message =>
+          errors.push(`${slug}.stories.tsx: ${message}`),
+        )
+      : undefined;
   if (kind === 'pattern') {
     const storiesFile = path.basename(filePath).replace(/\.md$/, '.stories.tsx');
     checkStoryRefs(body, sections, stories ?? [], storiesFile, fail);
@@ -270,6 +367,8 @@ const parseStories = (
   filePath: string,
   title: FrontmatterValue | undefined,
   fail: (message: string) => void,
+  api: PublicApi,
+  failStories: (message: string) => void,
 ): GuidelineStory[] | undefined => {
   const storiesPath = filePath.replace(/\.md$/, '.stories.tsx');
   if (!fs.existsSync(storiesPath)) return undefined;
@@ -282,11 +381,15 @@ const parseStories = (
   else if (found !== expected) {
     fail(`${path.basename(storiesPath)} meta title must be "${expected}" (found "${found}")`);
   }
-  return examples.map(({ name, code, description }) => ({
+  const stories = examples.map(({ name, code, description }) => ({
     name,
     code,
     ...(description && { description }),
   }));
+  for (const problem of findPrivateStoryImports(storiesPath, srcDir, stories, api)) {
+    failStories(problem);
+  }
+  return stories;
 };
 
 /**
@@ -296,11 +399,12 @@ const parseStories = (
 export const parseGuidelines = ({
   dir,
   version,
-  knownComponents,
+  api,
 }: {
   dir: string;
   version: string;
-  knownComponents: Set<string>;
+  /** Public API and internal names (`collectPublicApi`). */
+  api: PublicApi;
 }): GuidelinesMetadata => {
   const errors: string[] = [];
 
@@ -311,6 +415,9 @@ export const parseGuidelines = ({
     errors.push(`rules.md: ${rules.length} chars (max ${RULES_MAX_CHARS})`);
   }
   if (rules.startsWith('---')) errors.push('rules.md: must not have frontmatter');
+  for (const problem of findInternalUsage(rules, api.internal)) {
+    errors.push(`rules.md: ${problem}`);
+  }
   for (const target of findBrokenLinks(rules, dir)) {
     errors.push(`rules.md: broken relative link "${target}"`);
   }
@@ -324,13 +431,7 @@ export const parseGuidelines = ({
       .filter(f => f.endsWith('.md'))
       .sort()) {
       const slug = `${subdir}/${file.slice(0, -'.md'.length)}`;
-      const guideline = parseGuidelineFile(
-        path.join(kindDir, file),
-        slug,
-        kind,
-        knownComponents,
-        errors,
-      );
+      const guideline = parseGuidelineFile(path.join(kindDir, file), slug, kind, api, errors);
       if (guideline) guidelines.push(guideline);
     }
   }

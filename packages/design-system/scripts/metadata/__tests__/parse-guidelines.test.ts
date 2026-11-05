@@ -2,10 +2,14 @@ import { afterEach, describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
 import { guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
+import { collectPublicApi, type PublicApi } from '../internal.js';
 import {
   countProseWords,
+  findInternalUsage,
+  findPrivateStoryImports,
   parseFrontmatter,
   parseGuidelines,
   splitSections,
@@ -101,8 +105,14 @@ export const Default = () => <p>Empty</p>;
 export const NoResults = () => <p>No results</p>;
 `;
 
+const API: PublicApi = {
+  names: new Set(['Stack']),
+  dirs: new Map([['Stack', new Set(['Stack'])]]),
+  internal: new Set(['NavPanel', 'NavPanelItem', 'ButtonBase']),
+};
+
 const parse = (files: Record<string, string>) =>
-  parseGuidelines({ dir: makeDir(files), version: '1.0.0', knownComponents: new Set(['Stack']) });
+  parseGuidelines({ dir: makeDir(files), version: '1.0.0', api: API });
 
 afterEach(() => {
   for (const dir of tmpDirs.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
@@ -303,24 +313,149 @@ describe('parseGuidelines', () => {
   });
 
   it('validates the real guidelines directory', () => {
-    // Root exports plus the `@wallarm-org/design-system/<Component>` subpath entries
     const src = path.resolve(__dirname, '../../../src');
-    const entries = [
-      path.join(src, 'index.ts'),
-      ...fs
-        .readdirSync(path.join(src, 'components'))
-        .map(name => path.join(src, 'components', name, 'index.ts'))
-        .filter(file => fs.existsSync(file)),
-    ];
+    const project = new Project({
+      tsConfigFilePath: path.resolve(src, '../tsconfig.app.json'),
+      skipAddingFilesFromTsConfig: true,
+    });
     const result = parseGuidelines({
       dir: GUIDELINES_DIR,
       version: '0.0.0',
-      knownComponents: new Set(
-        entries.flatMap(
-          file => fs.readFileSync(file, 'utf-8').match(/\b[A-Z][A-Za-z0-9]*\b/g) ?? [],
-        ),
-      ),
+      api: collectPublicApi(project, src),
     });
     expect(result.guidelines.length).toBeGreaterThan(0);
+  });
+});
+
+describe('internal components in guidelines', () => {
+  it('rejects an internal component in frontmatter "components"', () => {
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'foundations/spacing.md': FOUNDATION.replace('[Stack]', '[Stack, NavPanel]'),
+      }),
+    ).toThrow(
+      /foundations\/spacing\.md: internal component "NavPanel" in "components" \(not exported to consumers\)/,
+    );
+  });
+
+  it('rejects internal imports and JSX tags in tsx fences', () => {
+    const md = [
+      '```tsx',
+      "import { NavPanelItem, Stack } from '@wallarm-org/design-system';",
+      "import { ButtonBase } from '@wallarm-org/design-system/ButtonBase';",
+      '<NavPanel><Stack /></NavPanel>',
+      '```',
+    ].join('\n');
+    expect(findInternalUsage(md, API.internal)).toEqual([
+      'tsx example imports internal "NavPanelItem"',
+      'tsx example imports internal "@wallarm-org/design-system/ButtonBase"',
+      'tsx example imports internal "ButtonBase"',
+      'tsx example renders internal <NavPanel>',
+    ]);
+    expect(findInternalUsage('```tsx\n<Stack gap={12} />\n```', API.internal)).toEqual([]);
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'foundations/spacing.md': FOUNDATION.replace('<Stack gap={12} />', '<NavPanelItem />'),
+      }),
+    ).toThrow(/foundations\/spacing\.md: tsx example renders internal <NavPanelItem>/);
+  });
+
+  it('rejects backticked internal names in prose, outside code fences', () => {
+    expect(
+      findInternalUsage('Use `RemoteShell`, not `<NavPanelItem>` or NavPanel.', API.internal),
+    ).toEqual(['prose names internal `NavPanelItem` (not exported to consumers); rephrase']);
+    expect(() =>
+      parse({ 'rules.md': 'Never use `NavPanel`.', 'foundations/spacing.md': FOUNDATION }),
+    ).toThrow(/rules\.md: prose names internal `NavPanel`/);
+  });
+
+  const STACK_INDEX = "export { Stack } from './Stack';\nexport const Hidden = 1;";
+  const storyWith = (imports: string) => `${imports}
+const meta = { title: 'Patterns/Empty' };
+export default meta;
+
+export const Default = () => <Stack />;
+export const NoResults = () => <Stack />;
+`;
+  const parseSrc = (stories: string) => {
+    const src = makeDir({
+      'guidelines/rules.md': 'ok',
+      'guidelines/patterns/empty.md': PATTERN,
+      'guidelines/patterns/empty.stories.tsx': stories,
+      'components/Stack/index.ts': STACK_INDEX,
+      'components/Stack/Stack.tsx': 'export const Stack = () => null;',
+    });
+    return parseGuidelines({ dir: path.join(src, 'guidelines'), version: '1.0.0', api: API });
+  };
+
+  it('accepts pattern stories that import a public component index', () => {
+    const [g] = parseSrc(storyWith("import { Stack } from '../../components/Stack';")).guidelines;
+    expect(g?.stories?.[0]?.code).toContain("from '@wallarm-org/design-system/Stack'");
+  });
+
+  it('rejects internal, deep and unexported imports in pattern stories', () => {
+    expect(() =>
+      parseSrc(storyWith("import { NavPanel as Stack } from '../../components/NavPanel';")),
+    ).toThrow(
+      /patterns\/empty\.stories\.tsx: imports internal component "\.\.\/\.\.\/components\/NavPanel"/,
+    );
+    expect(() =>
+      parseSrc(storyWith("import { Stack } from '../../components/Stack/Stack';")),
+    ).toThrow(/deep import "\.\.\/\.\.\/components\/Stack\/Stack"/);
+    expect(() =>
+      parseSrc(storyWith("import { Hidden as Stack } from '../../components/Stack';")),
+    ).toThrow(
+      /imports "Hidden" from "\.\.\/\.\.\/components\/Stack", which components\/Stack\/index\.ts does not export/,
+    );
+  });
+
+  it('rejects extracted story code with a non-public import', () => {
+    const story = (spec: string) => ({
+      name: 'Default',
+      code: `import { x } from '${spec}';\n\nexport const Default = () => x;`,
+    });
+    const check = (spec: string) =>
+      findPrivateStoryImports('/src/guidelines/patterns/a.stories.tsx', '/src', [story(spec)], API);
+    for (const ok of [
+      'react',
+      '@wallarm-org/design-system',
+      '@wallarm-org/design-system/Stack',
+      '@wallarm-org/design-system/icons',
+    ]) {
+      expect(check(ok), ok).toEqual([]);
+    }
+    for (const bad of [
+      '../../components/Stack/lib/x',
+      '@wallarm-org/design-system/NavPanel',
+      '@wallarm-org/design-system/utils/cn',
+    ]) {
+      expect(check(bad), bad).toEqual([`story "Default" extracts as a non-public import "${bad}"`]);
+    }
+  });
+});
+
+describe('collectPublicApi', () => {
+  it('excludes internal dirs and their exports from the public API', () => {
+    const src = path.resolve(__dirname, '../../../src');
+    const project = new Project({
+      tsConfigFilePath: path.resolve(src, '../tsconfig.app.json'),
+      skipAddingFilesFromTsConfig: true,
+    });
+    const api = collectPublicApi(project, src);
+    expect(api.names.has('Button')).toBe(true);
+    expect(api.dirs.has('Button')).toBe(true);
+    for (const name of [
+      'NavPanel',
+      'NavPanelItem',
+      'ButtonBase',
+      'Polymorphic',
+      'TemporalSegment',
+    ]) {
+      expect(api.internal.has(name), name).toBe(true);
+      expect(api.names.has(name), name).toBe(false);
+    }
+    expect(api.dirs.has('NavPanel')).toBe(false);
   });
 });

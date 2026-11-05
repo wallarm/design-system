@@ -272,3 +272,19 @@ export const parsePatternStories = (storiesPath: string, srcDir: string): Exampl
   const storyFile = path.relative(srcDir, storiesPath).split(path.sep).join('/');
   return parseStoryFile(sourceFile, { componentName: 'Story', storyFile, srcDir });
 };
+
+/** Import declarations of a pattern stories file: specifier plus imported names (`default`, `*`). */
+export const patternStoryImports = (storiesPath: string): { spec: string; names: string[] }[] =>
+  (
+    storiesProject.getSourceFile(storiesPath) ??
+    storiesProject.addSourceFileAtPathIfExists(storiesPath)
+  )
+    ?.getImportDeclarations()
+    .map(decl => ({
+      spec: decl.getModuleSpecifierValue(),
+      names: [
+        ...decl.getNamedImports().map(n => n.getName()),
+        ...(decl.getDefaultImport() ? ['default'] : []),
+        ...(decl.getNamespaceImport() ? ['*'] : []),
+      ],
+    })) ?? [];

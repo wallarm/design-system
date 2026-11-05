@@ -4,7 +4,7 @@ import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
-import { INTERNAL_COMPONENTS } from './internal.js';
+import { collectPublicApi, INTERNAL_COMPONENTS } from './internal.js';
 import { parseComponentDescription } from './parse-description.js';
 import { parseComponentDocs } from './parse-docs.js';
 import { parseExamples } from './parse-examples.js';
@@ -102,21 +102,11 @@ const main = () => {
 
   // Guidelines: validate, emit guidelines.json, and ship the raw markdown
   const guidelinesDir = path.join(ROOT, 'src', 'guidelines');
-  // Root exports plus every `@wallarm-org/design-system/<Component>` subpath export
-  const exportEntries = [
-    path.join(ROOT, 'src/index.ts'),
-    ...componentDirs
-      .map(name => path.join(componentsDir, name, 'index.ts'))
-      .filter(file => fs.existsSync(file)),
-  ];
-  const knownComponents = new Set(
-    exportEntries.flatMap(file => [
-      ...project.getSourceFileOrThrow(file).getExportedDeclarations().keys(),
-    ]),
-  );
+  // Public API: root exports plus every `@wallarm-org/design-system/<Component>` subpath, minus internals
+  const api = collectPublicApi(project, path.join(ROOT, 'src'));
   let guidelines: ReturnType<typeof parseGuidelines>;
   try {
-    guidelines = parseGuidelines({ dir: guidelinesDir, version, knownComponents });
+    guidelines = parseGuidelines({ dir: guidelinesDir, version, api });
   } catch (error) {
     console.error((error as Error).message);
     process.exit(1);
