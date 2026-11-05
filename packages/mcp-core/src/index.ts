@@ -1,4 +1,5 @@
 export type {
+  ComponentDoc,
   ComponentMetadata,
   DesignSystemMetadata,
   ExampleMetadata,
@@ -13,6 +14,7 @@ export type {
   VariantMetadata,
 } from './schema';
 export {
+  componentDocSchema,
   componentMetadataSchema,
   designSystemMetadataSchema,
   exampleMetadataSchema,

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 import { parseComponentDescription } from './parse-description.js';
+import { parseComponentDocs } from './parse-docs.js';
 import { parseExamples } from './parse-examples.js';
 import { parseGuidelines } from './parse-guidelines.js';
 import { parseComponentProps } from './parse-props.js';
@@ -47,6 +48,8 @@ const main = () => {
 
     const description = parseComponentDescription(project, componentDir, name);
 
+    const docs = parseComponentDocs(componentDir);
+
     components.push({
       name,
       ...(description && { description }),
@@ -58,6 +61,7 @@ const main = () => {
         props: sc.props,
       })),
       examples,
+      ...(docs.length > 0 && { docs }),
     });
   }
 

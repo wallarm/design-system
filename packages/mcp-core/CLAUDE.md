@@ -15,7 +15,8 @@ src/
 | Type | Description |
 |---|---|
 | `DesignSystemMetadata` | Root: version, generatedAt, components[], tokens[] |
-| `ComponentMetadata` | Component: name, description, importPath, props, variants, subComponents, examples |
+| `ComponentMetadata` | Component: name, description, importPath, props, variants, subComponents, examples, docs? |
+| `ComponentDoc` | Usage doc from the component folder (`docs/*.md`, `*_DESIGN.md`): name, markdown |
 | `PropMetadata` | Prop: name, type, required, description?, defaultValue? |
 | `VariantMetadata` | CVA variant: name, options[], defaultValue? |
 | `SubComponentMetadata` | Sub-component: name, description?, props[] |

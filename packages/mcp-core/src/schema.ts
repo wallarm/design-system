@@ -40,6 +40,14 @@ export const exampleMetadataSchema = z.object({
 
 export type ExampleMetadata = z.infer<typeof exampleMetadataSchema>;
 
+export const componentDocSchema = z.object({
+  /** File name without `.md`, e.g. `LineChart` or `TABLE_DESIGN`. */
+  name: z.string(),
+  markdown: z.string(),
+});
+
+export type ComponentDoc = z.infer<typeof componentDocSchema>;
+
 export const componentMetadataSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -48,6 +56,8 @@ export const componentMetadataSchema = z.object({
   variants: z.array(variantMetadataSchema),
   subComponents: z.array(subComponentMetadataSchema),
   examples: z.array(exampleMetadataSchema),
+  /** Usage docs from the component folder (`docs/*.md`, `*_DESIGN.md`); optional — older DS versions lack it. */
+  docs: z.array(componentDocSchema).optional(),
 });
 
 export type ComponentMetadata = z.infer<typeof componentMetadataSchema>;
