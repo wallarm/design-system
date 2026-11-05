@@ -17,6 +17,12 @@ test.describe('Component: WallySkeleton', () => {
   });
 
   test.describe('Interactions', () => {
+    test('Should hold the greeting Wally footprint of 120 × 113 px', async ({ page }) => {
+      await story.goto(page, 'Default');
+      const box = await page.getByTestId('wally-loading--wally').boundingBox();
+      expect(box && { width: box.width, height: box.height }).toEqual({ width: 120, height: 113 });
+    });
+
     test('Should preserve the image when the next loading stage remounts', async ({ page }) => {
       await story.goto(page, 'Handoff');
       const loading = page.getByTestId('wally-loading');

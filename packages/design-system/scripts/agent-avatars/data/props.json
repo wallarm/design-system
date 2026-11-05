@@ -1,0 +1,2457 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "PROPS ids and labels as the page holds them. Prop geometry is code, not data: propDef(kind, shape, color) builds each prop from the shape's anchors (line 1402). This file serialises the data and describes the code; prop paths for the six presets are in cast.json (resolved).",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "PROPS": 1394,
+      "propDef": 1402,
+      "PROP_FID": 1614,
+      "HELLO_PROP": 1590,
+      "FIDDLE": 1602,
+      "GLYPH_PROPS": 2010,
+      "glyph": 2011,
+      "workMotion": "Char.render(), lines 1989-2000"
+    },
+    "keys": {
+      "glyph": "drawn by glyph() at 16-32 px (GLYPH_PROPS); every other prop is left out of the flat glyph",
+      "anchor": "what the prop is placed on, described from propDef(); tx, ty is the shape's top anchor, vx, vy, vw, vh its visor, half-width is geom().hw(y) floored at 8",
+      "shapeExceptions": "shapes with a dedicated branch in propDef()",
+      "layers": "number of lit layers",
+      "tones": "TONE key per layer (colors.json), or derived from the body color",
+      "layerMaterial": "light model per layer: vinyl for hard tones, felt otherwise",
+      "decoClasses": "animated vector decoration on top of the layers (glint, stitch, beam)",
+      "decoClippedToBody": "decoration clipped to the body outline",
+      "workMotion": "what the prop does while Working (and at 0.3 strength while Needs you, for rotating props)",
+      "fiddleKind": "PROP_FID: the idle \"plays with its prop\" move; bob = a greeting lift only, none = no move",
+      "idleFiddle": "the prop has an idle fiddle (FIDDLE)",
+      "helloMove": "HELLO_PROP key used during Hello"
+    }
+  },
+  "props": [
+    {
+      "id": "antennae",
+      "name": "Antennae",
+      "glyph": true,
+      "anchor": "top anchor (tx, ty): two stalks with ball tips at (tx +/- 22.5, ty - 15.5)",
+      "shapeExceptions": [],
+      "layers": 1,
+      "tones": [
+        "ink"
+      ],
+      "layerMaterial": [
+        "vinyl"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the stalk foot, 5 deg amplitude, 0.45 s period",
+      "fiddleKind": "twitch",
+      "idleFiddle": true,
+      "helloMove": "twitch"
+    },
+    {
+      "id": "dish",
+      "name": "Dish antenna",
+      "glyph": true,
+      "anchor": "top anchor: a mast, the dish (body color mixed 55% to white) and a feed rod",
+      "shapeExceptions": [],
+      "layers": 3,
+      "tones": [
+        "ink",
+        "derived from body color",
+        "ink"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "felt",
+        "vinyl"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the mast foot, 14 deg, 1.5 s",
+      "fiddleKind": "scan",
+      "idleFiddle": true,
+      "helloMove": "scan"
+    },
+    {
+      "id": "glasses",
+      "name": "Glasses",
+      "glyph": false,
+      "anchor": "visor: lens centres on the eye centres (vx + 0.3 vw, vx + 0.7 vw) on the visor centre line, outer radius 10.5, inner 8.4",
+      "shapeExceptions": [],
+      "layers": 1,
+      "tones": [
+        "oat"
+      ],
+      "layerMaterial": [
+        "vinyl"
+      ],
+      "decoClasses": [
+        "glint"
+      ],
+      "decoClippedToBody": false,
+      "workMotion": "the glint brightens: opacity 0.25 + 0.7 x work, 1.5 s",
+      "fiddleKind": "bob",
+      "idleFiddle": false,
+      "helloMove": "bob"
+    },
+    {
+      "id": "seam",
+      "name": "Seam",
+      "glyph": false,
+      "anchor": "top anchor and the half-width at ty + 16: a curved stitched line, drawn as decoration clipped to the body; no layers of its own",
+      "shapeExceptions": [],
+      "layers": 0,
+      "tones": [],
+      "layerMaterial": [],
+      "decoClasses": [
+        "stitch"
+      ],
+      "decoClippedToBody": true,
+      "workMotion": "the stitch runs: dash offset -12 per 1.6 s",
+      "fiddleKind": "none",
+      "idleFiddle": false,
+      "helloMove": null
+    },
+    {
+      "id": "beanie",
+      "name": "Beanie",
+      "glyph": true,
+      "anchor": "top anchor and the half-width at ty + 12 (at least 16): the hat in the body color mixed 50% to #0d0b0c, the band and pompom 22% lighter",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "derived from body color",
+        "derived from body color"
+      ],
+      "layerMaterial": [
+        "felt",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "bob",
+      "idleFiddle": false,
+      "helloMove": "bob"
+    },
+    {
+      "id": "headlamp",
+      "name": "Headlamp",
+      "glyph": false,
+      "anchor": "top anchor and the half-width at ty + 13: a strap across the head at ty + 15, the housing at ty + 5 to ty + 16, a lens; the beam is decoration, invisible at rest",
+      "shapeExceptions": [],
+      "layers": 3,
+      "tones": [
+        "ink",
+        "metal",
+        "oat"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "vinyl",
+        "vinyl"
+      ],
+      "decoClasses": [
+        "beam"
+      ],
+      "decoClippedToBody": false,
+      "workMotion": "the beam lights: opacity 0.55 x work",
+      "fiddleKind": "flicker",
+      "idleFiddle": true,
+      "helloMove": "flicker"
+    },
+    {
+      "id": "periscope",
+      "name": "Periscope",
+      "glyph": true,
+      "anchor": "top anchor: a tube rising 21 units and a head with a lens",
+      "shapeExceptions": [],
+      "layers": 3,
+      "tones": [
+        "metal",
+        "metal",
+        "ink"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "vinyl",
+        "vinyl"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the tube foot, 7 deg, 1.2 s",
+      "fiddleKind": "turn",
+      "idleFiddle": true,
+      "helloMove": "turn"
+    },
+    {
+      "id": "magnifier",
+      "name": "Magnifier",
+      "glyph": false,
+      "anchor": "visor: the ring centred at (vx + vw - 3, visor centre + 3), radius 11.5, a wooden handle down and to the right",
+      "shapeExceptions": [],
+      "layers": 3,
+      "tones": [
+        "metal",
+        "glass",
+        "wood"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "vinyl",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "sweep",
+      "idleFiddle": true,
+      "helloMove": "sweep"
+    },
+    {
+      "id": "pennant",
+      "name": "Pennant",
+      "glyph": true,
+      "anchor": "top anchor: a pole rising 26 units and a triangular flag",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "ink",
+        "oat"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the pole at the flag, 9 deg, 0.8 s",
+      "fiddleKind": "flutter",
+      "idleFiddle": true,
+      "helloMove": "flutter"
+    },
+    {
+      "id": "flowerclip",
+      "name": "Flower clip",
+      "glyph": false,
+      "anchor": "right of the visor centre line by min(0.55 x half-width at ty + 11, 17), at y = min(ty + 8, vy - 11); on the kettle it is seated on the handle at (77, 38); 1.5x scale",
+      "shapeExceptions": [
+        "kettle"
+      ],
+      "layers": 2,
+      "tones": [
+        "oat",
+        "honey"
+      ],
+      "layerMaterial": [
+        "felt",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "bob",
+      "idleFiddle": false,
+      "helloMove": "bob"
+    },
+    {
+      "id": "plaster",
+      "name": "Plaster",
+      "glyph": false,
+      "anchor": "left of the top anchor by min(0.45 x half-width at ty + 14, 16), at ty + 15: two crossed strips",
+      "shapeExceptions": [],
+      "layers": 1,
+      "tones": [
+        "beige"
+      ],
+      "layerMaterial": [
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "none",
+      "idleFiddle": false,
+      "helloMove": null
+    },
+    {
+      "id": "sprout",
+      "name": "Sprout",
+      "glyph": true,
+      "anchor": "top anchor: a stem and two leaves",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "leaf",
+        "leaf"
+      ],
+      "layerMaterial": [
+        "felt",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the stem foot, 7 deg, 1.2 s",
+      "fiddleKind": "sway",
+      "idleFiddle": true,
+      "helloMove": "sway"
+    },
+    {
+      "id": "badge",
+      "name": "Badge",
+      "glyph": false,
+      "anchor": "visor right edge: a clip and a card at (vx + vw + 2, visor centre + 6)",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "metal",
+        "oat"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "bob",
+      "idleFiddle": false,
+      "helloMove": "bob"
+    },
+    {
+      "id": "windkey",
+      "name": "Wind-up key",
+      "glyph": true,
+      "anchor": "top anchor: a shaft and a two-lobed bow above it",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "brass",
+        "brass"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "vinyl"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "the key turns about its shaft: horizontal scale cos(t) with a floor of 0.14, 1.6 s",
+      "fiddleKind": "spin",
+      "idleFiddle": true,
+      "helloMove": "spin"
+    },
+    {
+      "id": "monocle",
+      "name": "Monocle",
+      "glyph": false,
+      "anchor": "right eye centre (vx + 0.7 vw, visor centre), radius min(10.6, 0.4 x vh); a bead chain to a pin on the cheek, found by scanning the half-width below the visor; on the safe the pin moves 16 units in from the visor's right edge to clear the handle",
+      "shapeExceptions": [
+        "safe"
+      ],
+      "layers": 2,
+      "tones": [
+        "brass",
+        "brass"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "vinyl"
+      ],
+      "decoClasses": [
+        "glint"
+      ],
+      "decoClippedToBody": false,
+      "workMotion": "focus: 6% scale in and out about the eye, 1.5 s; the glint brightens as on the glasses",
+      "fiddleKind": "slip",
+      "idleFiddle": true,
+      "helloMove": "slip"
+    },
+    {
+      "id": "none",
+      "name": "No prop",
+      "glyph": false
+    }
+  ],
+  "fit": {
+    "$about": "Measured for this package (not page data): every prop on every shape, rasterised at 4 px per unit over the viewBox, layers only (decoration excluded). bbox: [x0, y0, x1, y1] of the layers. overflowsViewBox: any layer outside -8..128 x -14..114. outsideBody: share of prop pixels outside the body and its parts. visorCovered: share of the visor area under the prop. crownCovered: share of the Partial coverage crown (body above crownLine) under the prop. Seam has no layers.",
+    "byShape": {
+      "dome": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            10.1,
+            86.9,
+            36.4724
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.884,
+          "visorCovered": 0,
+          "crownCovered": 0.0263
+        },
+        "dish": {
+          "bbox": [
+            52,
+            3.6,
+            79,
+            35.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9308,
+          "visorCovered": 0,
+          "crownCovered": 0.012
+        },
+        "glasses": {
+          "bbox": [
+            36.7,
+            67.5,
+            83.3,
+            88.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1632,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            30,
+            13.2,
+            90,
+            46
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4945,
+          "visorCovered": 0,
+          "crownCovered": 0.5747
+        },
+        "headlamp": {
+          "bbox": [
+            30.0951,
+            35,
+            89.9049,
+            46.4785
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.028,
+          "visorCovered": 0,
+          "crownCovered": 0.2427
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            3,
+            73,
+            37
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8608,
+          "visorCovered": 0,
+          "crownCovered": 0.0336
+        },
+        "magnifier": {
+          "bbox": [
+            77.5,
+            69.5,
+            107.302,
+            100.302
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0326,
+          "visorCovered": 0.1433,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            8.0878,
+            83,
+            35.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9211,
+          "visorCovered": 0,
+          "crownCovered": 0.0103
+        },
+        "flowerclip": {
+          "bbox": [
+            65.1764,
+            28.4502,
+            83.65,
+            47.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1951,
+          "visorCovered": 0,
+          "crownCovered": 0.1645
+        },
+        "plaster": {
+          "bbox": [
+            37.49,
+            36.81,
+            57.31,
+            53.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1821
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            9.484,
+            81,
+            34.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0083
+        },
+        "badge": {
+          "bbox": [
+            94,
+            79,
+            107,
+            102
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2125,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            10.4962,
+            73,
+            33
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
+        },
+        "monocle": {
+          "bbox": [
+            62.2,
+            67.4,
+            92.6,
+            103.6051
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1066,
+          "crownCovered": 0
+        }
+      },
+      "gumdrop": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            -3.9,
+            86.9,
+            22.4724
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9934,
+          "visorCovered": 0,
+          "crownCovered": 0.0022
+        },
+        "dish": {
+          "bbox": [
+            52,
+            -10.4,
+            79,
+            21.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9413,
+          "visorCovered": 0,
+          "crownCovered": 0.0149
+        },
+        "glasses": {
+          "bbox": [
+            39.1,
+            72.5,
+            80.9,
+            93.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.2108,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            42,
+            -0.8,
+            78,
+            32
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.59,
+          "visorCovered": 0,
+          "crownCovered": 0.4075
+        },
+        "headlamp": {
+          "bbox": [
+            42.5608,
+            21,
+            77.4392,
+            32.4755
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0588,
+          "visorCovered": 0,
+          "crownCovered": 0.2511
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            -11,
+            73,
+            23
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8751,
+          "visorCovered": 0,
+          "crownCovered": 0.044
+        },
+        "magnifier": {
+          "bbox": [
+            71.5,
+            74.4921,
+            101.3004,
+            105.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1882,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            -5.9122,
+            83,
+            21.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9368,
+          "visorCovered": 0,
+          "crownCovered": 0.0121
+        },
+        "flowerclip": {
+          "bbox": [
+            58.5764,
+            14.4502,
+            77.05,
+            33.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.334,
+          "visorCovered": 0,
+          "crownCovered": 0.1988
+        },
+        "plaster": {
+          "bbox": [
+            43.34,
+            22.81,
+            63.16,
+            39.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0874,
+          "visorCovered": 0,
+          "crownCovered": 0.2423
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            -4.516,
+            81,
+            20.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9689,
+          "visorCovered": 0,
+          "crownCovered": 0.012
+        },
+        "badge": {
+          "bbox": [
+            88,
+            84,
+            101,
+            107
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0002,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            -3.5038,
+            73,
+            19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9558,
+          "visorCovered": 0,
+          "crownCovered": 0.0136
+        },
+        "monocle": {
+          "bbox": [
+            60,
+            72.6,
+            86.6,
+            105.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1403,
+          "crownCovered": 0
+        }
+      },
+      "cushion": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            7.6,
+            86.9,
+            33.9725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8416,
+          "visorCovered": 0,
+          "crownCovered": 0.0207
+        },
+        "dish": {
+          "bbox": [
+            52,
+            1.1,
+            79,
+            32.801
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9292,
+          "visorCovered": 0,
+          "crownCovered": 0.0071
+        },
+        "glasses": {
+          "bbox": [
+            36.7,
+            63.5,
+            83.3,
+            84.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1632,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            12,
+            10.7,
+            108,
+            43.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4123,
+          "visorCovered": 0,
+          "crownCovered": 0.6159
+        },
+        "headlamp": {
+          "bbox": [
+            12.4962,
+            32.5,
+            107.503,
+            44.0046
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0401,
+          "visorCovered": 0,
+          "crownCovered": 0.1906
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            0.5,
+            73,
+            34.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.859,
+          "visorCovered": 0,
+          "crownCovered": 0.0196
+        },
+        "magnifier": {
+          "bbox": [
+            77.5,
+            65.5,
+            107.302,
+            96.302
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0091,
+          "visorCovered": 0.1433,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            5.5878,
+            83,
+            33.4122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0061
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            25.9502,
+            86.9,
+            45.0498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0519,
+          "visorCovered": 0,
+          "crownCovered": 0.1115
+        },
+        "plaster": {
+          "bbox": [
+            34.09,
+            34.31,
+            53.91,
+            50.69
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1049
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            6.984,
+            81,
+            31.6
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0048
+        },
+        "badge": {
+          "bbox": [
+            94,
+            75,
+            107,
+            98
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0633,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            7.9962,
+            73,
+            30.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0057
+        },
+        "monocle": {
+          "bbox": [
+            62.2,
+            63.4,
+            92.6,
+            99.6051
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1066,
+          "crownCovered": 0
+        }
+      },
+      "pebble": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            20.1,
+            86.9,
+            46.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8629,
+          "visorCovered": 0,
+          "crownCovered": 0.0292
+        },
+        "dish": {
+          "bbox": [
+            52,
+            13.6,
+            79,
+            45.3012
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9292,
+          "visorCovered": 0,
+          "crownCovered": 0.0116
+        },
+        "glasses": {
+          "bbox": [
+            36.7,
+            68.5,
+            83.3,
+            89.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1746,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            22.5,
+            23.2,
+            97.5,
+            56
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4746,
+          "visorCovered": 0,
+          "crownCovered": 0.7027
+        },
+        "headlamp": {
+          "bbox": [
+            21.9973,
+            45,
+            98.0027,
+            56.5027
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0246,
+          "visorCovered": 0,
+          "crownCovered": 0.2691
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            13,
+            73,
+            47
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8597,
+          "visorCovered": 0,
+          "crownCovered": 0.0319
+        },
+        "magnifier": {
+          "bbox": [
+            77.5,
+            70.5,
+            107.302,
+            101.302
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0329,
+          "visorCovered": 0.1501,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            18.0878,
+            83,
+            45.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.919,
+          "visorCovered": 0,
+          "crownCovered": 0.01
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            38.4502,
+            86.9,
+            57.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1356,
+          "visorCovered": 0,
+          "crownCovered": 0.1662
+        },
+        "plaster": {
+          "bbox": [
+            34.09,
+            46.81,
+            53.91,
+            63.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1579
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            19.484,
+            81,
+            44.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0078
+        },
+        "badge": {
+          "bbox": [
+            94,
+            80,
+            107,
+            103
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1379,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            20.4962,
+            73,
+            43
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0093
+        },
+        "monocle": {
+          "bbox": [
+            62.4,
+            68.5928,
+            92.6,
+            103.6051
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1122,
+          "crownCovered": 0
+        }
+      },
+      "capsule": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            0.1,
+            86.9,
+            26.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8791,
+          "visorCovered": 0,
+          "crownCovered": 0.0253
+        },
+        "dish": {
+          "bbox": [
+            52,
+            -6.4,
+            79,
+            25.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9301,
+          "visorCovered": 0,
+          "crownCovered": 0.0112
+        },
+        "glasses": {
+          "bbox": [
+            39.9,
+            61.5,
+            80.1,
+            82.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.2055,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            31.5,
+            3.2,
+            88.5,
+            36
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4842,
+          "visorCovered": 0,
+          "crownCovered": 0.5133
+        },
+        "headlamp": {
+          "bbox": [
+            31.9968,
+            25,
+            88.0026,
+            36.5036
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0396,
+          "visorCovered": 0,
+          "crownCovered": 0.212
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            -7,
+            73,
+            27
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8604,
+          "visorCovered": 0,
+          "crownCovered": 0.0311
+        },
+        "magnifier": {
+          "bbox": [
+            69.5,
+            63.4921,
+            99.3004,
+            94.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1705,
+          "visorCovered": 0.1967,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            -1.9122,
+            83,
+            25.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9203,
+          "visorCovered": 0,
+          "crownCovered": 0.0096
+        },
+        "flowerclip": {
+          "bbox": [
+            64.6264,
+            18.4502,
+            83.1,
+            37.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.176,
+          "visorCovered": 0,
+          "crownCovered": 0.1554
+        },
+        "plaster": {
+          "bbox": [
+            38.39,
+            26.81,
+            58.21,
+            43.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1678
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            -0.516,
+            81,
+            24.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0077
+        },
+        "badge": {
+          "bbox": [
+            86,
+            73,
+            99,
+            96
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.7172,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            0.4962,
+            73,
+            23
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0091
+        },
+        "monocle": {
+          "bbox": [
+            59,
+            61.4,
+            84.6,
+            97.6051
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1464,
+          "crownCovered": 0
+        }
+      },
+      "cloud": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            25.1,
+            86.9,
+            51.4724
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.7782,
+          "visorCovered": 0,
+          "crownCovered": 0.0501
+        },
+        "dish": {
+          "bbox": [
+            52,
+            18.6,
+            79,
+            50.3012
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9132,
+          "visorCovered": 0,
+          "crownCovered": 0.0151
+        },
+        "glasses": {
+          "bbox": [
+            37.5,
+            74.5,
+            82.5,
+            95.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1847,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            24.5,
+            28.2,
+            95.5,
+            61
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.3937,
+          "visorCovered": 0,
+          "crownCovered": 0.813
+        },
+        "headlamp": {
+          "bbox": [
+            25.5693,
+            50,
+            94.4307,
+            61.4863
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0722,
+          "visorCovered": 0,
+          "crownCovered": 0.2533
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            18,
+            73,
+            52
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8491,
+          "visorCovered": 0,
+          "crownCovered": 0.0364
+        },
+        "magnifier": {
+          "bbox": [
+            75.5,
+            76.5,
+            105.3004,
+            107.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0225,
+          "visorCovered": 0.1609,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            23.0878,
+            83,
+            50.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8982,
+          "visorCovered": 0,
+          "crownCovered": 0.0133
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            43.4502,
+            86.9,
+            62.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.2037
+        },
+        "plaster": {
+          "bbox": [
+            35.91,
+            51.81,
+            55.74,
+            68.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1474
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            24.484,
+            81,
+            49.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9733,
+          "visorCovered": 0,
+          "crownCovered": 0.007
+        },
+        "badge": {
+          "bbox": [
+            92,
+            86,
+            105,
+            109
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1267,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            25.4962,
+            73,
+            48
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9595,
+          "visorCovered": 0,
+          "crownCovered": 0.0085
+        },
+        "monocle": {
+          "bbox": [
+            61.6,
+            74.5928,
+            90.6,
+            105.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1204,
+          "crownCovered": 0
+        }
+      },
+      "egg": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            0.1,
+            86.9,
+            26.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8974,
+          "visorCovered": 0,
+          "crownCovered": 0.0225
+        },
+        "dish": {
+          "bbox": [
+            52,
+            -6.4,
+            79,
+            25.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9311,
+          "visorCovered": 0,
+          "crownCovered": 0.0116
+        },
+        "glasses": {
+          "bbox": [
+            38.3,
+            64.5,
+            81.7,
+            85.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1972,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            33,
+            3.2,
+            87,
+            36
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.5102,
+          "visorCovered": 0,
+          "crownCovered": 0.4838
+        },
+        "headlamp": {
+          "bbox": [
+            33.5538,
+            25,
+            86.4461,
+            36.4859
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0334,
+          "visorCovered": 0,
+          "crownCovered": 0.2157
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            -7,
+            73,
+            27
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8615,
+          "visorCovered": 0,
+          "crownCovered": 0.0323
+        },
+        "magnifier": {
+          "bbox": [
+            73.5,
+            66.5,
+            103.3004,
+            97.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0917,
+          "visorCovered": 0.1735,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            -1.9122,
+            83,
+            25.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9215,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
+        },
+        "flowerclip": {
+          "bbox": [
+            63.5264,
+            18.4502,
+            82,
+            37.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2197,
+          "visorCovered": 0,
+          "crownCovered": 0.1543
+        },
+        "plaster": {
+          "bbox": [
+            39.06,
+            26.81,
+            58.89,
+            43.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1758
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            -0.516,
+            81,
+            24.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.008
+        },
+        "badge": {
+          "bbox": [
+            90,
+            76,
+            103,
+            99
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.5613,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            0.4962,
+            73,
+            23
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0095
+        },
+        "monocle": {
+          "bbox": [
+            60.8,
+            64.6,
+            88.6,
+            96.6
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1294,
+          "crownCovered": 0
+        }
+      },
+      "mochi": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            30.1,
+            86.9,
+            56.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.857,
+          "visorCovered": 0,
+          "crownCovered": 0.0384
+        },
+        "dish": {
+          "bbox": [
+            52,
+            23.6,
+            79,
+            55.3012
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9292,
+          "visorCovered": 0,
+          "crownCovered": 0.0146
+        },
+        "glasses": {
+          "bbox": [
+            35.9,
+            71.4928,
+            84.1,
+            92.5073
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1781,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            18,
+            33.2,
+            102,
+            66
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4714,
+          "visorCovered": 0,
+          "crownCovered": 0.9963
+        },
+        "headlamp": {
+          "bbox": [
+            18.0441,
+            55,
+            101.9559,
+            66.4929
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0137,
+          "visorCovered": 0,
+          "crownCovered": 0.365
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            23,
+            73,
+            57
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8592,
+          "visorCovered": 0,
+          "crownCovered": 0.0403
+        },
+        "magnifier": {
+          "bbox": [
+            79.5,
+            73.5,
+            109.3004,
+            104.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.026,
+          "visorCovered": 0.1475,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            28.0878,
+            83,
+            55.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0126
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            48.4502,
+            86.9,
+            67.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0978,
+          "visorCovered": 0,
+          "crownCovered": 0.2118
+        },
+        "plaster": {
+          "bbox": [
+            34.09,
+            56.81,
+            53.91,
+            73.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.0147,
+          "crownCovered": 0.1204
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            29.484,
+            81,
+            54.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
+        },
+        "badge": {
+          "bbox": [
+            96,
+            83,
+            109,
+            106
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1195,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            30.4962,
+            73,
+            53
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0117
+        },
+        "monocle": {
+          "bbox": [
+            64,
+            72.3934,
+            94.6,
+            104.6
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1026,
+          "crownCovered": 0
+        }
+      },
+      "kettle": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            24.1,
+            86.9,
+            50.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.73,
+          "visorCovered": 0,
+          "crownCovered": 0.0329
+        },
+        "dish": {
+          "bbox": [
+            52,
+            17.6,
+            79,
+            49.3008
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4327,
+          "visorCovered": 0,
+          "crownCovered": 0.0144
+        },
+        "glasses": {
+          "bbox": [
+            37.5,
+            70.5,
+            82.5,
+            91.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1847,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            28.5,
+            27.2,
+            91.5,
+            60
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2175,
+          "visorCovered": 0,
+          "crownCovered": 0.7215
+        },
+        "headlamp": {
+          "bbox": [
+            28.4956,
+            49,
+            91.5044,
+            60.5044
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0288,
+          "visorCovered": 0,
+          "crownCovered": 0.2967
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            17,
+            73,
+            51
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.6099,
+          "visorCovered": 0,
+          "crownCovered": 0.04
+        },
+        "magnifier": {
+          "bbox": [
+            75.5,
+            72.5,
+            105.3004,
+            103.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0329,
+          "visorCovered": 0.1609,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            22.0878,
+            83,
+            49.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.6917,
+          "visorCovered": 0,
+          "crownCovered": 0.0124
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            28.4502,
+            86.9,
+            47.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.5553,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "plaster": {
+          "bbox": [
+            36.81,
+            50.81,
+            56.64,
+            67.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0,
+          "crownCovered": 0.1802
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            23.484,
+            81,
+            48.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.5237,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
+        },
+        "badge": {
+          "bbox": [
+            92,
+            82,
+            105,
+            105
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.217,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            24.4962,
+            73,
+            47
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4821,
+          "visorCovered": 0,
+          "crownCovered": 0.0117
+        },
+        "monocle": {
+          "bbox": [
+            61.6,
+            70.5928,
+            90.6,
+            105.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1204,
+          "crownCovered": 0
+        }
+      },
+      "mug": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            14.1,
+            86.9,
+            40.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8323,
+          "visorCovered": 0,
+          "crownCovered": 0.0355
+        },
+        "dish": {
+          "bbox": [
+            52,
+            7.6,
+            79,
+            39.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9292,
+          "visorCovered": 0,
+          "crownCovered": 0.0115
+        },
+        "glasses": {
+          "bbox": [
+            28.9,
+            59.5,
+            73.1,
+            80.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1781,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            12,
+            17.2,
+            108,
+            50
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.483,
+          "visorCovered": 0,
+          "crownCovered": 0.8784
+        },
+        "headlamp": {
+          "bbox": [
+            13.1232,
+            39,
+            106.8767,
+            50.4825
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.1865,
+          "visorCovered": 0,
+          "crownCovered": 0.2594
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            7,
+            73,
+            41
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.859,
+          "visorCovered": 0,
+          "crownCovered": 0.0318
+        },
+        "magnifier": {
+          "bbox": [
+            65.5,
+            61.5,
+            95.302,
+            92.302
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0398,
+          "visorCovered": 0.1595,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            12.0878,
+            83,
+            39.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.01
+        },
+        "flowerclip": {
+          "bbox": [
+            59.4264,
+            32.4502,
+            77.9,
+            51.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0261,
+          "visorCovered": 0,
+          "crownCovered": 0.1858
+        },
+        "plaster": {
+          "bbox": [
+            34.09,
+            40.81,
+            53.91,
+            57.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.0022,
+          "crownCovered": 0.1221
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            13.484,
+            81,
+            38.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0078
+        },
+        "badge": {
+          "bbox": [
+            82,
+            71,
+            95,
+            94
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2838,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            14.4962,
+            73,
+            37
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0092
+        },
+        "monocle": {
+          "bbox": [
+            52,
+            59.3927,
+            80.6,
+            95.6036
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1189,
+          "crownCovered": 0
+        }
+      },
+      "padlock": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            -5.9,
+            86.9,
+            20.4725
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.895,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "dish": {
+          "bbox": [
+            52,
+            -12.4,
+            79,
+            19.3009
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9311,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "glasses": {
+          "bbox": [
+            37.5,
+            68.5,
+            82.5,
+            89.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1847,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            42,
+            -2.8,
+            78,
+            30
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4517,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "headlamp": {
+          "bbox": [
+            48.9966,
+            19,
+            71.0034,
+            30.5034
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2886,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            -13,
+            73,
+            21
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8613,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "magnifier": {
+          "bbox": [
+            75.5,
+            70.5,
+            105.3004,
+            101.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0672,
+          "visorCovered": 0.1609,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            -7.9122,
+            83,
+            19.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9215,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "flowerclip": {
+          "bbox": [
+            55.8264,
+            12.4502,
+            74.3,
+            31.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.209,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "plaster": {
+          "bbox": [
+            46.49,
+            20.81,
+            66.31,
+            37.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.6084,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            -6.516,
+            81,
+            18.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "badge": {
+          "bbox": [
+            92,
+            80,
+            105,
+            103
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.409,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            -5.5038,
+            73,
+            17
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "monocle": {
+          "bbox": [
+            61.6,
+            68.5928,
+            90.6,
+            103.6
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1204,
+          "crownCovered": 0
+        }
+      },
+      "safe": {
+        "antennae": {
+          "bbox": [
+            33.1,
+            10.1,
+            86.9,
+            36.4724
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8323,
+          "visorCovered": 0,
+          "crownCovered": 0.0511
+        },
+        "dish": {
+          "bbox": [
+            52,
+            3.6,
+            79,
+            35.301
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9292,
+          "visorCovered": 0,
+          "crownCovered": 0.0165
+        },
+        "glasses": {
+          "bbox": [
+            35.9,
+            46.4928,
+            84.1,
+            67.5073
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1653,
+          "crownCovered": 0
+        },
+        "seam": {
+          "layers": 0
+        },
+        "beanie": {
+          "bbox": [
+            10,
+            13.2,
+            110,
+            46
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.349,
+          "visorCovered": 0.0646,
+          "crownCovered": 1
+        },
+        "headlamp": {
+          "bbox": [
+            10.9966,
+            35,
+            109.0016,
+            46.5034
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0416,
+          "visorCovered": 0.0134,
+          "crownCovered": 0.0757
+        },
+        "periscope": {
+          "bbox": [
+            59,
+            3,
+            73,
+            37
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.859,
+          "visorCovered": 0,
+          "crownCovered": 0.0458
+        },
+        "magnifier": {
+          "bbox": [
+            79.5,
+            48.5,
+            109.3004,
+            79.3002
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.0324,
+          "visorCovered": 0.1406,
+          "crownCovered": 0
+        },
+        "pennant": {
+          "bbox": [
+            62.0097,
+            8.0878,
+            83,
+            35.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0143
+        },
+        "flowerclip": {
+          "bbox": [
+            68.4264,
+            23.4502,
+            86.9,
+            42.5498
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.2812,
+          "visorCovered": 0,
+          "crownCovered": 0.1826
+        },
+        "plaster": {
+          "bbox": [
+            34.09,
+            36.81,
+            53.91,
+            53.19
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.0695,
+          "crownCovered": 0.0269
+        },
+        "sprout": {
+          "bbox": [
+            42,
+            9.484,
+            81,
+            34.1
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9685,
+          "visorCovered": 0,
+          "crownCovered": 0.0112
+        },
+        "badge": {
+          "bbox": [
+            96,
+            58,
+            109,
+            81
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.194,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "windkey": {
+          "bbox": [
+            47,
+            10.4962,
+            73,
+            33
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9532,
+          "visorCovered": 0,
+          "crownCovered": 0.0133
+        },
+        "monocle": {
+          "bbox": [
+            63.2,
+            46.6,
+            84,
+            81.6036
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0,
+          "visorCovered": 0.1049,
+          "crownCovered": 0
+        }
+      }
+    }
+  }
+}

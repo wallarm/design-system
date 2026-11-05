@@ -57,7 +57,13 @@ export const WallySkeleton: FC<WallySkeletonProps> = ({
       <ChatBody>
         <div className='flex flex-col items-center gap-24 pt-103'>
           <div className='flex w-full flex-col items-center gap-12'>
-            <Skeleton width='64px' height='64px' rounded='full' />
+            {/* the greeting's 120 px Wally (120 × 113), so the swap to the empty chat does not move it */}
+            <Skeleton
+              width='120px'
+              height='113px'
+              rounded={24}
+              data-testid={testId && `${testId}--wally`}
+            />
             <Skeleton className='max-w-[90%]' width='280px' height='24px' />
           </div>
           <div className='flex w-full flex-col items-center gap-12'>

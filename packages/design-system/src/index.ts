@@ -42,6 +42,31 @@ export {
   type AccordionVariant,
 } from './components/Accordion';
 export {
+  AgentAvatar,
+  type AgentAvatarBeat,
+  AgentAvatarGroup,
+  type AgentAvatarGroupProps,
+  type AgentAvatarHandle,
+  type AgentAvatarProps,
+  type AgentAvatarSize,
+  type AgentAvatarState,
+  setAgentMotion,
+  useAgentMotion,
+} from './components/AgentAvatar';
+export {
+  type AgentCharacterId,
+  type AgentColorId,
+  type AgentEyeStyle,
+  AgentGlyph,
+  type AgentGlyphProps,
+  type AgentGlyphSize,
+  type AgentGlyphState,
+  type AgentLook,
+  type AgentPropId,
+  type AgentShapeId,
+  defaultLook,
+} from './components/AgentGlyph';
+export {
   Alert,
   AlertClose,
   type AlertCloseProps,

@@ -110,7 +110,7 @@ const threads = createListCollection({
 });
 
 /**
- * Figma Default (2:42): the "Ask Wally" title with History, a More menu, a separator and Close.
+ * Figma Default (2:42): Wally's 24 px glyph and the "Ask Wally" title with History, a More menu, a separator and Close.
  * Every action is a ghost neutral small `Button` with an `aria-label`.
  */
 export const HeaderDefault: StoryFn<typeof meta> = () => (
@@ -198,8 +198,9 @@ export const HeaderWithThreadSelect: StoryFn<typeof meta> = () => (
 );
 
 /**
- * The empty state (Figma 44:1464): the circle mark and a heading, with Large suggestion pills
- * centered under it, over the `strong` background.
+ * The empty state (Figma 44:1464): Wally as its live 120 px character with a contact shadow, then a
+ * heading, with Large suggestion pills centered under it, over the `strong` background. Wally says
+ * Hello once, 250 ms after the empty chat comes into view; under reduced motion it stays still.
  */
 export const Greeting: StoryFn<typeof meta> = () => {
   const [picked, setPicked] = useState<string>();

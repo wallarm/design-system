@@ -1,0 +1,690 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "STATES keys and labels as the page holds them, the product state each one stands for (the page's States table), and eyeTargets() for every eye style x state.",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "STATES": 2152,
+      "NO_APPS": 2153,
+      "eyeTargets": 1547,
+      "helloPop": 1560,
+      "springs": 1542,
+      "glyph": 2011,
+      "setCover": 1783
+    }
+  },
+  "states": [
+    {
+      "key": "idle",
+      "label": "On duty",
+      "product": "Active, waiting for work",
+      "engine": "idle"
+    },
+    {
+      "key": "hello",
+      "label": "Hello",
+      "product": "Chat or drawer opened",
+      "engine": "hello"
+    },
+    {
+      "key": "working",
+      "label": "Working",
+      "product": "Run in progress",
+      "engine": "working"
+    },
+    {
+      "key": "needs",
+      "label": "Needs you",
+      "product": "N pending approval",
+      "engine": "needs"
+    },
+    {
+      "key": "done",
+      "label": "Done",
+      "product": "Run finished, change applied",
+      "engine": "done"
+    },
+    {
+      "key": "failed",
+      "label": "Failed",
+      "product": "Run failed",
+      "engine": "failed"
+    },
+    {
+      "key": "off",
+      "label": "Deactivated",
+      "product": "Deactivated",
+      "engine": "off"
+    },
+    {
+      "key": "box",
+      "label": "Not set up",
+      "product": "Not set up",
+      "engine": "box"
+    },
+    {
+      "key": "invite",
+      "label": "Inviting",
+      "product": "Not set up, inviting",
+      "engine": "invite"
+    },
+    {
+      "key": "partly",
+      "label": "Partial coverage",
+      "product": "Active in some applications",
+      "engine": "idle with the cover flag (setCover(true))"
+    }
+  ],
+  "internal": {
+    "power": "the landing after Activate, from box or invite; eyes use the box targets (invite targets when coming from invite) until the flicker at 800 ms; at 1150 ms it ends in idle, or in the state picked during the landing",
+    "partly": "\"Partial coverage\" is not an engine state: it is idle plus a grey crown (setCover). It is offered only to agents that have applications."
+  },
+  "noPartialCoverage": [
+    "wally",
+    "trim"
+  ],
+  "eyeTargets": {
+    "$about": "eyeTargets(style, state) for every style and state, numbers rounded to 4 decimals. \"partly\" uses idle. \"hello\" first springs to helloPop (below), then to these targets 260 ms later.",
+    "byStyle": {
+      "round": {
+        "idle": {
+          "w": 1.05,
+          "ht": 1,
+          "hb": 1,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "hello": {
+          "w": 1.155,
+          "ht": 1.045,
+          "hb": -0.627,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "working": {
+          "w": 1.05,
+          "ht": 0.5,
+          "hb": 0.5,
+          "kt": 0.7,
+          "kb": 0.7,
+          "lid": 0.15,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "needs": {
+          "w": 1.176,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "done": {
+          "w": 1.155,
+          "ht": 1.045,
+          "hb": -0.627,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "failed": {
+          "w": 1.1025,
+          "ht": 0,
+          "hb": 0,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 6,
+          "bright": 0.7,
+          "gy": 0.55
+        },
+        "off": {
+          "w": 0.1575,
+          "ht": 0.06,
+          "hb": 0.06,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.12,
+          "gy": 0
+        },
+        "box": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        },
+        "invite": {
+          "w": 1.05,
+          "ht": 1,
+          "hb": 1,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.8,
+          "gy": 0
+        },
+        "power": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        }
+      },
+      "oval": {
+        "idle": {
+          "w": 1,
+          "ht": 1.25,
+          "hb": 1.25,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "hello": {
+          "w": 1.1,
+          "ht": 1.1875,
+          "hb": -0.7125,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "working": {
+          "w": 1,
+          "ht": 0.625,
+          "hb": 0.625,
+          "kt": 0.7,
+          "kb": 0.7,
+          "lid": 0.15,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "needs": {
+          "w": 1.12,
+          "ht": 1.4375,
+          "hb": 1.4375,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "done": {
+          "w": 1.1,
+          "ht": 1.1875,
+          "hb": -0.7125,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "failed": {
+          "w": 1.05,
+          "ht": 0,
+          "hb": 0,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 6,
+          "bright": 0.7,
+          "gy": 0.55
+        },
+        "off": {
+          "w": 0.15,
+          "ht": 0.06,
+          "hb": 0.06,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.12,
+          "gy": 0
+        },
+        "box": {
+          "w": 1,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        },
+        "invite": {
+          "w": 1,
+          "ht": 1.25,
+          "hb": 1.25,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.8,
+          "gy": 0
+        },
+        "power": {
+          "w": 1,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        }
+      },
+      "tall": {
+        "idle": {
+          "w": 0.8,
+          "ht": 1.6,
+          "hb": 1.6,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "hello": {
+          "w": 0.88,
+          "ht": 1.52,
+          "hb": -0.912,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "working": {
+          "w": 0.8,
+          "ht": 0.8,
+          "hb": 0.8,
+          "kt": 0.7,
+          "kb": 0.7,
+          "lid": 0.15,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "needs": {
+          "w": 0.896,
+          "ht": 1.84,
+          "hb": 1.84,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "done": {
+          "w": 0.88,
+          "ht": 1.52,
+          "hb": -0.912,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "failed": {
+          "w": 1.05,
+          "ht": 0,
+          "hb": 0,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 6,
+          "bright": 0.7,
+          "gy": 0.55
+        },
+        "off": {
+          "w": 0.12,
+          "ht": 0.06,
+          "hb": 0.06,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.12,
+          "gy": 0
+        },
+        "box": {
+          "w": 0.8,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        },
+        "invite": {
+          "w": 0.8,
+          "ht": 1.6,
+          "hb": 1.6,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.8,
+          "gy": 0
+        },
+        "power": {
+          "w": 0.8,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        }
+      },
+      "sleepy": {
+        "idle": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "hello": {
+          "w": 1.155,
+          "ht": 1.0925,
+          "hb": -0.6555,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "working": {
+          "w": 1.05,
+          "ht": 0.575,
+          "hb": 0.575,
+          "kt": 0.7,
+          "kb": 0.7,
+          "lid": 0.65,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "needs": {
+          "w": 1.176,
+          "ht": 1.3225,
+          "hb": 1.3225,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.15,
+          "rot": 0,
+          "bright": 1,
+          "gy": 0
+        },
+        "done": {
+          "w": 1.155,
+          "ht": 1.0925,
+          "hb": -0.6555,
+          "kt": 0.6,
+          "kb": 0.6,
+          "lid": 0,
+          "rot": 0,
+          "bright": 1,
+          "gy": -0.1
+        },
+        "failed": {
+          "w": 1.1025,
+          "ht": 0,
+          "hb": 0,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 6,
+          "bright": 0.7,
+          "gy": 0.55
+        },
+        "off": {
+          "w": 0.1575,
+          "ht": 0.06,
+          "hb": 0.06,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0,
+          "rot": 0,
+          "bright": 0.12,
+          "gy": 0
+        },
+        "box": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        },
+        "invite": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.3,
+          "rot": 0,
+          "bright": 0.8,
+          "gy": 0
+        },
+        "power": {
+          "w": 1.05,
+          "ht": 1.15,
+          "hb": 1.15,
+          "kt": 0.55,
+          "kb": 0.55,
+          "lid": 0.5,
+          "rot": 0,
+          "bright": 0.35,
+          "gy": 0
+        }
+      }
+    }
+  },
+  "helloPop": {
+    "$about": "helloPop(eyeTargets(style, \"idle\")): the first beat of Hello, eyes wider and brighter",
+    "byStyle": {
+      "round": {
+        "w": 1.218,
+        "ht": 1.28,
+        "hb": 1.28,
+        "kt": 0.55,
+        "kb": 0.55,
+        "lid": 0,
+        "rot": 0,
+        "bright": 1.15,
+        "gy": -0.06
+      },
+      "oval": {
+        "w": 1.16,
+        "ht": 1.6,
+        "hb": 1.6,
+        "kt": 0.55,
+        "kb": 0.55,
+        "lid": 0,
+        "rot": 0,
+        "bright": 1.15,
+        "gy": -0.06
+      },
+      "tall": {
+        "w": 0.928,
+        "ht": 2.048,
+        "hb": 2.048,
+        "kt": 0.55,
+        "kb": 0.55,
+        "lid": 0,
+        "rot": 0,
+        "bright": 1.15,
+        "gy": -0.06
+      },
+      "sleepy": {
+        "w": 1.218,
+        "ht": 1.472,
+        "hb": 1.472,
+        "kt": 0.55,
+        "kb": 0.55,
+        "lid": 0,
+        "rot": 0,
+        "bright": 1.15,
+        "gy": -0.06
+      }
+    }
+  },
+  "springs": {
+    "$about": "Spring presets as written in the source: SPR(T, zeta) with response time T in seconds and damping ratio zeta; k = (2 pi / T)^2, c = 2 zeta (2 pi / T). P_SHAPE moves eye shapes, P_POP the Hello and Done pops, P_DART fast gaze moves, P_PURSUIT cursor and steady gaze, P_BRIGHT brightness, P_SQ the hop squash, P_LAND the landing squash, P_W the motion weights (breathe, bob, float, work).",
+    "values": {
+      "P_SHAPE": {
+        "T": 0.28,
+        "zeta": 0.8
+      },
+      "P_POP": {
+        "T": 0.32,
+        "zeta": 0.45
+      },
+      "P_DART": {
+        "T": 0.12,
+        "zeta": 0.65
+      },
+      "P_PURSUIT": {
+        "T": 0.3,
+        "zeta": 0.85
+      },
+      "P_BRIGHT": {
+        "T": 0.2,
+        "zeta": 1
+      },
+      "P_SQ": {
+        "T": 0.22,
+        "zeta": 0.3
+      },
+      "P_LAND": {
+        "T": 0.35,
+        "zeta": 0.4
+      },
+      "P_W": {
+        "T": 0.6,
+        "zeta": 1
+      }
+    }
+  },
+  "glyph": {
+    "$about": "What glyph() draws per state at 16-32 px. Glyphs are static.",
+    "byState": {
+      "idle": {
+        "fill": "body",
+        "eyes": "idle targets",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      },
+      "hello": {
+        "fill": "body",
+        "eyes": "hello targets (arc), stroked",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      },
+      "working": {
+        "fill": "body",
+        "eyes": "working targets",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      },
+      "needs": {
+        "fill": "body",
+        "eyes": "needs targets",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      },
+      "done": {
+        "fill": "body",
+        "eyes": "done targets (arc), stroked",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      },
+      "failed": {
+        "fill": "body",
+        "eyes": "failed targets (dash), stroke at least 0.9 x 136 / size",
+        "eyeOpacity": 0.75,
+        "prop": "glyph props only"
+      },
+      "off": {
+        "fill": "glyphOffFill",
+        "eyes": "off targets",
+        "eyeOpacity": 0.35,
+        "prop": "glyph props only, in their own colors"
+      },
+      "box": {
+        "fill": "#C9CED6, whole glyph at opacity 0.55",
+        "eyes": "none",
+        "visor": "none",
+        "prop": "none"
+      },
+      "invite": {
+        "fill": "#C9CED6",
+        "eyes": "invite targets",
+        "eyeOpacity": 0.6,
+        "prop": "none"
+      },
+      "partly": {
+        "fill": "body, the part above crownLine redrawn in #C9CED6 with its rim",
+        "eyes": "idle targets",
+        "eyeOpacity": 1,
+        "prop": "glyph props only"
+      }
+    }
+  }
+}

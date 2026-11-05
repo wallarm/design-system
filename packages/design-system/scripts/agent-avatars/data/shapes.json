@@ -1,0 +1,567 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "Every SHAPES entry as the page holds it, plus values the page computes from it.",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "SHAPES": 1345,
+      "LIBC": 1363,
+      "geom": 1369,
+      "setCover": 1783,
+      "makeChar": 1658
+    },
+    "keys": {
+      "id": "shape id, used in configs",
+      "fam": "family: soft or object",
+      "name": "label in the builder",
+      "d": "body outline as an SVG path on the 120-unit grid; outlines clockwise, holes counter-clockwise",
+      "v": "visor rectangle [x, y, width, height]; corner radius is 0.46 x height",
+      "top": "declared top anchor [x, y]; when absent the page measures it from the body mask (geom)",
+      "parts": "extra layers drawn with the body: d, tone (a TONE key in colors.json), z (b = behind the body, anything else = in front)"
+    },
+    "note": "The page has two unused hooks: the spots() helper (line 1344) and an optional S.deco on a shape (read in makeChar); no shape sets them. S.note is read by the library and the builder; no shape sets it either."
+  },
+  "grid": {
+    "unitBox": 120,
+    "floorY": 108,
+    "centreX": 60,
+    "viewBox": "-8 -14 136 128",
+    "viewBoxCentreY": 50,
+    "pxPerUnit": "size / 136 (size = rendered width in px)",
+    "renderedHeight": "Math.round(size * 128 / 136)",
+    "bodyTransformOrigin": [
+      60,
+      108
+    ]
+  },
+  "shapes": [
+    {
+      "id": "dome",
+      "fam": "soft",
+      "name": "Dome",
+      "d": "M16 100C16 56 36 30 60 30C84 30 104 56 104 100Q104 108 96 108H24Q16 108 16 100Z",
+      "v": [
+        28,
+        64,
+        64,
+        28
+      ]
+    },
+    {
+      "id": "gumdrop",
+      "fam": "soft",
+      "name": "Gumdrop",
+      "d": "M60 16C72 16 106 82 106 97C106 105 100 108 91 108H29C20 108 14 105 14 97C14 82 48 16 60 16Z",
+      "v": [
+        34,
+        70,
+        52,
+        26
+      ]
+    },
+    {
+      "id": "cushion",
+      "fam": "soft",
+      "name": "Cushion",
+      "d": "M24 32C40 26 80 26 96 32C104 35 106 42 106 58V92C106 104 100 108 88 108H32C20 108 14 104 14 92V58C14 42 16 35 24 32Z",
+      "v": [
+        28,
+        60,
+        64,
+        28
+      ]
+    },
+    {
+      "id": "pebble",
+      "fam": "soft",
+      "name": "Pebble",
+      "d": "M60 40C90 40 108 62 108 84C108 100 96 108 80 108H40C24 108 12 100 12 84C12 62 30 40 60 40Z",
+      "v": [
+        28,
+        66,
+        64,
+        26
+      ]
+    },
+    {
+      "id": "capsule",
+      "fam": "soft",
+      "name": "Capsule",
+      "d": "M60 20C80 20 90 34 90 54V96C90 104 84 108 76 108H44C36 108 30 104 30 96V54C30 34 40 20 60 20Z",
+      "v": [
+        36,
+        58,
+        48,
+        28
+      ]
+    },
+    {
+      "id": "cloud",
+      "fam": "soft",
+      "name": "Cloud",
+      "d": "M30 108C16 108 10 98 13 88C8 76 18 63 31 66C31 50 46 40 60 46C72 36 92 44 92 60C104 60 112 72 107 85C112 98 104 108 92 108Z",
+      "v": [
+        30,
+        72,
+        60,
+        26
+      ],
+      "top": [
+        60,
+        45
+      ]
+    },
+    {
+      "id": "egg",
+      "fam": "soft",
+      "name": "Egg",
+      "d": "M60 20C84 20 98 54 98 78C98 98 82 108 60 108C38 108 22 98 22 78C22 54 36 20 60 20Z",
+      "v": [
+        32,
+        62,
+        56,
+        26
+      ]
+    },
+    {
+      "id": "mochi",
+      "fam": "soft",
+      "name": "Mochi",
+      "d": "M60 50C92 50 112 70 112 88C112 102 100 108 84 108H36C20 108 8 102 8 88C8 70 28 50 60 50Z",
+      "v": [
+        26,
+        70,
+        68,
+        24
+      ]
+    },
+    {
+      "id": "kettle",
+      "fam": "object",
+      "name": "Kettle",
+      "d": "M18 100C18 66 36 44 60 44C84 44 102 66 102 100Q102 108 94 108H26Q18 108 18 100ZM24 80C14 74 8 64 5 56L9 53C13 61 20 69 28 74Z",
+      "v": [
+        30,
+        68,
+        60,
+        26
+      ],
+      "top": [
+        60,
+        44
+      ],
+      "parts": [
+        {
+          "d": "M31 64.07L30.87 57.86L31.66 52.01L33.32 46.78L35.74 42.21L38.82 38.31L42.44 35.13L46.48 32.66L50.83 30.9L55.36 29.85L60 29.5L64.64 29.85L69.17 30.9L73.52 32.66L77.56 35.13L81.18 38.31L84.26 42.21L86.68 46.78L88.34 52.01L89.13 57.86L89 64.07A3 3 0 0 1 83 63.93L83.14 58.17L82.48 53.31L81.14 49.09L79.23 45.47L76.82 42.44L74 39.95L70.82 38.01L67.37 36.62L63.73 35.78L60 35.5L56.27 35.78L52.63 36.62L49.18 38.01L46 39.95L43.18 42.44L40.77 45.47L38.86 49.09L37.52 53.31L36.86 58.17L37 63.93A3 3 0 0 1 31 64.07Z",
+          "tone": "ink",
+          "z": "b"
+        },
+        {
+          "d": "M55 42A5 4 0 1 1 65 42A5 4 0 1 1 55 42Z",
+          "tone": "ink",
+          "z": "f"
+        }
+      ]
+    },
+    {
+      "id": "mug",
+      "fam": "object",
+      "name": "Mug",
+      "d": "M28 34H74A12 12 0 0 1 86 46V96A12 12 0 0 1 74 108H28A12 12 0 0 1 16 96V46A12 12 0 0 1 28 34ZM77 70A15 19 0 1 1 107 70A15 19 0 1 1 77 70ZM87.5 70A6.5 9.5 0 1 0 100.5 70A6.5 9.5 0 1 0 87.5 70Z",
+      "v": [
+        22,
+        56,
+        58,
+        28
+      ]
+    },
+    {
+      "id": "padlock",
+      "fam": "object",
+      "name": "Padlock",
+      "d": "M36 52H84A16 16 0 0 1 100 68V92A16 16 0 0 1 84 108H36A16 16 0 0 1 20 92V68A16 16 0 0 1 36 52Z",
+      "v": [
+        30,
+        66,
+        60,
+        26
+      ],
+      "top": [
+        60,
+        14
+      ],
+      "parts": [
+        {
+          "d": "M34 58V40A26 26 0 0 1 86 40V58H74V40A14 14 0 0 0 46 40V58Z",
+          "tone": "metal",
+          "z": "b"
+        }
+      ]
+    },
+    {
+      "id": "safe",
+      "fam": "object",
+      "name": "Safe",
+      "d": "M28 30H92A14 14 0 0 1 106 44V86A14 14 0 0 1 92 100H28A14 14 0 0 1 14 86V44A14 14 0 0 1 28 30Z",
+      "v": [
+        26,
+        44,
+        68,
+        26
+      ],
+      "parts": [
+        {
+          "d": "M26 96H32A4 4 0 0 1 36 100V104A4 4 0 0 1 32 108H26A4 4 0 0 1 22 104V100A4 4 0 0 1 26 96ZM88 96H94A4 4 0 0 1 98 100V104A4 4 0 0 1 94 108H88A4 4 0 0 1 84 104V100A4 4 0 0 1 88 96Z",
+          "tone": "ink",
+          "z": "b"
+        },
+        {
+          "d": "M53 86A7 7 0 1 1 67 86A7 7 0 1 1 53 86ZM73.5 83.5H87.5A2.5 2.5 0 0 1 90 86V86A2.5 2.5 0 0 1 87.5 88.5H73.5A2.5 2.5 0 0 1 71 86V86A2.5 2.5 0 0 1 73.5 83.5Z",
+          "tone": "metal",
+          "z": "f"
+        }
+      ]
+    }
+  ],
+  "computed": {
+    "$about": "Computed in the browser by geom() from a 240 x 240 alpha mask of the path (canvas raster, so values can move by up to half a unit with a different raster path; see doc 12 section 11.1). anchorTop: where top props sit. foot: left and right x of the silhouette (body and parts) at y 104, used for the contact shadow. bodyBBox and allBBox: SVGGraphicsElement.getBBox of the body, and of the body with its parts, as [x0, y0, x1, y1]. visorRadius: 0.46 x visor height. eyeUnit: 0.17 x visor height. crownLine: the y of the Partial coverage line, min(top + 0.3 x (108 - top), visor y - 4) from setCover(); crownHeight is crownLine minus the top. libraryColor: the color the shape library tile uses (LIBC).",
+    "byShape": {
+      "dome": {
+        "anchorTop": [
+          60,
+          30
+        ],
+        "topDeclared": false,
+        "foot": [
+          17,
+          103
+        ],
+        "bodyBBox": [
+          16,
+          30,
+          104,
+          108
+        ],
+        "allBBox": [
+          16,
+          30,
+          104,
+          108
+        ],
+        "visorRadius": 12.88,
+        "eyeUnit": 4.76,
+        "crownLine": 53.4,
+        "crownHeight": 23.4,
+        "libraryColor": "pink"
+      },
+      "gumdrop": {
+        "anchorTop": [
+          60,
+          16
+        ],
+        "topDeclared": false,
+        "foot": [
+          16.5,
+          103
+        ],
+        "bodyBBox": [
+          14,
+          16,
+          106,
+          108
+        ],
+        "allBBox": [
+          14,
+          16,
+          106,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 43.6,
+        "crownHeight": 27.6,
+        "libraryColor": "sage"
+      },
+      "cushion": {
+        "anchorTop": [
+          60,
+          27.5
+        ],
+        "topDeclared": false,
+        "foot": [
+          18,
+          101.5
+        ],
+        "bodyBBox": [
+          14,
+          27.5,
+          106,
+          108
+        ],
+        "allBBox": [
+          14,
+          27.5,
+          106,
+          108
+        ],
+        "visorRadius": 12.88,
+        "eyeUnit": 4.76,
+        "crownLine": 51.65,
+        "crownHeight": 24.15,
+        "libraryColor": "lilac"
+      },
+      "pebble": {
+        "anchorTop": [
+          60,
+          40
+        ],
+        "topDeclared": false,
+        "foot": [
+          23,
+          96
+        ],
+        "bodyBBox": [
+          12,
+          40,
+          108,
+          108
+        ],
+        "allBBox": [
+          12,
+          40,
+          108,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 60.4,
+        "crownHeight": 20.4,
+        "libraryColor": "sand"
+      },
+      "capsule": {
+        "anchorTop": [
+          60,
+          20
+        ],
+        "topDeclared": false,
+        "foot": [
+          33,
+          86.5
+        ],
+        "bodyBBox": [
+          30,
+          20,
+          90,
+          108
+        ],
+        "allBBox": [
+          30,
+          20,
+          90,
+          108
+        ],
+        "visorRadius": 12.88,
+        "eyeUnit": 4.76,
+        "crownLine": 46.4,
+        "crownHeight": 26.4,
+        "libraryColor": "cyan"
+      },
+      "cloud": {
+        "anchorTop": [
+          60,
+          45
+        ],
+        "topDeclared": true,
+        "foot": [
+          17.5,
+          103
+        ],
+        "bodyBBox": [
+          11.688,
+          41.5895,
+          108.5137,
+          108
+        ],
+        "allBBox": [
+          11.688,
+          41.5895,
+          108.5137,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 63.9,
+        "crownHeight": 18.9,
+        "libraryColor": "butter"
+      },
+      "egg": {
+        "anchorTop": [
+          60,
+          20
+        ],
+        "topDeclared": false,
+        "foot": [
+          39,
+          80
+        ],
+        "bodyBBox": [
+          22,
+          20,
+          98,
+          108
+        ],
+        "allBBox": [
+          22,
+          20,
+          98,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 46.4,
+        "crownHeight": 26.4,
+        "libraryColor": "oat"
+      },
+      "mochi": {
+        "anchorTop": [
+          60,
+          50
+        ],
+        "topDeclared": false,
+        "foot": [
+          17.5,
+          102
+        ],
+        "bodyBBox": [
+          8,
+          50,
+          112,
+          108
+        ],
+        "allBBox": [
+          8,
+          50,
+          112,
+          108
+        ],
+        "visorRadius": 11.04,
+        "eyeUnit": 4.08,
+        "crownLine": 66,
+        "crownHeight": 16,
+        "libraryColor": "blush"
+      },
+      "kettle": {
+        "anchorTop": [
+          60,
+          44
+        ],
+        "topDeclared": true,
+        "foot": [
+          19,
+          101
+        ],
+        "bodyBBox": [
+          5,
+          44,
+          102,
+          108
+        ],
+        "allBBox": [
+          5,
+          29.5,
+          102,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 63.2,
+        "crownHeight": 19.2,
+        "libraryColor": "butter"
+      },
+      "mug": {
+        "anchorTop": [
+          60,
+          34
+        ],
+        "topDeclared": false,
+        "foot": [
+          19,
+          82.5
+        ],
+        "bodyBBox": [
+          16,
+          34,
+          107,
+          108
+        ],
+        "allBBox": [
+          16,
+          34,
+          107,
+          108
+        ],
+        "visorRadius": 12.88,
+        "eyeUnit": 4.76,
+        "crownLine": 52,
+        "crownHeight": 18,
+        "libraryColor": "petrol"
+      },
+      "padlock": {
+        "anchorTop": [
+          60,
+          14
+        ],
+        "topDeclared": true,
+        "foot": [
+          25.5,
+          94
+        ],
+        "bodyBBox": [
+          20,
+          52,
+          100,
+          108
+        ],
+        "allBBox": [
+          20,
+          14,
+          100,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 42.2,
+        "crownHeight": 28.2,
+        "libraryColor": "lilac"
+      },
+      "safe": {
+        "anchorTop": [
+          60,
+          30
+        ],
+        "topDeclared": false,
+        "foot": [
+          22,
+          97.5
+        ],
+        "bodyBBox": [
+          14,
+          30,
+          106,
+          100
+        ],
+        "allBBox": [
+          14,
+          30,
+          106,
+          108
+        ],
+        "visorRadius": 11.96,
+        "eyeUnit": 4.42,
+        "crownLine": 40,
+        "crownHeight": 10,
+        "libraryColor": "graphite"
+      }
+    }
+  }
+}

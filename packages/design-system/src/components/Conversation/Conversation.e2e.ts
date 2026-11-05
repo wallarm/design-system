@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const conversationStory = createStoryHelper('ai-conversation', [
   'Default',
@@ -70,8 +71,10 @@ test.describe('Component: Conversation', () => {
     });
 
     test('Should render the empty state correctly', async ({ page }) => {
+      await holdAgentsStill(page);
       await conversationStory.goto(page, 'Empty');
       await expect(page.getByTestId('chat--empty-state')).toBeVisible();
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
   });

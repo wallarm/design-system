@@ -1,0 +1,197 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "optY() for every shape and the lift optPx() gives at common sizes.",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "optY": 1384,
+      "optPx": 1391,
+      "css": "line 769: .who svg, .chip svg, .g6 svg, .ip-gl svg, .opt, #inprod .ip-ovr .ip-av { translate: 0 var(--oy, 0px) }"
+    },
+    "formula": "optY = ((top + 108) / 2 + centroidY) / 2 - 50, where top is geom().top[1], centroidY is the half-width-weighted mean y of the body between top and the floor (rows every 0.5 unit), and 50 is the viewBox centre. Props never count. optPx(size) = -round2(optY x size / 136): a negative number, the px to move the character up so the body's optical centre sits on the row's centre line. glyph() writes it as --oy on its <svg>; inline places apply translate: 0 var(--oy)."
+  },
+  "sizes": [
+    20,
+    32,
+    40,
+    48,
+    56,
+    72,
+    96
+  ],
+  "renderedHeight": {
+    "20": 19,
+    "32": 30,
+    "40": 38,
+    "48": 45,
+    "56": 53,
+    "72": 68,
+    "96": 90
+  },
+  "shapes": {
+    "dome": {
+      "optY": 21.4242,
+      "anchorTop": 30,
+      "liftPx": {
+        "20": -3.15,
+        "32": -5.04,
+        "40": -6.3,
+        "48": -7.56,
+        "56": -8.82,
+        "72": -11.34,
+        "96": -15.12
+      }
+    },
+    "gumdrop": {
+      "optY": 17.1466,
+      "anchorTop": 16,
+      "liftPx": {
+        "20": -2.52,
+        "32": -4.03,
+        "40": -5.04,
+        "48": -6.05,
+        "56": -7.06,
+        "72": -9.08,
+        "96": -12.1
+      }
+    },
+    "cushion": {
+      "optY": 18.1068,
+      "anchorTop": 27.5,
+      "liftPx": {
+        "20": -2.66,
+        "32": -4.26,
+        "40": -5.33,
+        "48": -6.39,
+        "56": -7.46,
+        "72": -9.59,
+        "96": -12.78
+      }
+    },
+    "pebble": {
+      "optY": 25.1939,
+      "anchorTop": 40,
+      "liftPx": {
+        "20": -3.7,
+        "32": -5.93,
+        "40": -7.41,
+        "48": -8.89,
+        "56": -10.37,
+        "72": -13.34,
+        "96": -17.78
+      }
+    },
+    "capsule": {
+      "optY": 15.0188,
+      "anchorTop": 20,
+      "liftPx": {
+        "20": -2.21,
+        "32": -3.53,
+        "40": -4.42,
+        "48": -5.3,
+        "56": -6.18,
+        "72": -7.95,
+        "96": -10.6
+      }
+    },
+    "cloud": {
+      "optY": 27.6431,
+      "anchorTop": 45,
+      "liftPx": {
+        "20": -4.07,
+        "32": -6.5,
+        "40": -8.13,
+        "48": -9.76,
+        "56": -11.38,
+        "72": -14.63,
+        "96": -19.51
+      }
+    },
+    "egg": {
+      "optY": 15.2563,
+      "anchorTop": 20,
+      "liftPx": {
+        "20": -2.24,
+        "32": -3.59,
+        "40": -4.49,
+        "48": -5.38,
+        "56": -6.28,
+        "72": -8.08,
+        "96": -10.77
+      }
+    },
+    "mochi": {
+      "optY": 30.1353,
+      "anchorTop": 50,
+      "liftPx": {
+        "20": -4.43,
+        "32": -7.09,
+        "40": -8.86,
+        "48": -10.64,
+        "56": -12.41,
+        "72": -15.95,
+        "96": -21.27
+      }
+    },
+    "kettle": {
+      "optY": 27.8453,
+      "anchorTop": 44,
+      "liftPx": {
+        "20": -4.09,
+        "32": -6.55,
+        "40": -8.19,
+        "48": -9.83,
+        "56": -11.47,
+        "72": -14.74,
+        "96": -19.66
+      }
+    },
+    "mug": {
+      "optY": 20.8761,
+      "anchorTop": 34,
+      "liftPx": {
+        "20": -3.07,
+        "32": -4.91,
+        "40": -6.14,
+        "48": -7.37,
+        "56": -8.6,
+        "72": -11.05,
+        "96": -14.74
+      }
+    },
+    "padlock": {
+      "optY": 20.3776,
+      "anchorTop": 14,
+      "liftPx": {
+        "20": -3,
+        "32": -4.79,
+        "40": -5.99,
+        "48": -7.19,
+        "56": -8.39,
+        "72": -10.79,
+        "96": -14.38
+      }
+    },
+    "safe": {
+      "optY": 16.8761,
+      "anchorTop": 30,
+      "liftPx": {
+        "20": -2.48,
+        "32": -3.97,
+        "40": -4.96,
+        "48": -5.96,
+        "56": -6.95,
+        "72": -8.93,
+        "96": -11.91
+      }
+    }
+  },
+  "presets": {
+    "wally": "dome",
+    "radar": "gumdrop",
+    "sift": "cushion",
+    "mend": "pebble",
+    "trim": "capsule",
+    "probe": "egg"
+  }
+}

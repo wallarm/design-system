@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const panelStory = createStoryHelper('ai-wallyassistant', [
   'Empty',
@@ -43,7 +44,9 @@ const openDrawer = async (page: Page) => {
 test.describe('Component: WallyAssistant', () => {
   test.describe('Visual', () => {
     test('Should render empty panel correctly', async ({ page }) => {
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Empty');
+      await waitForAgentBakes(page.getByTestId('wally'));
       await expect(page).toHaveScreenshot();
     });
 

@@ -1,0 +1,42 @@
+/* AgentAvatar: the reference page's engine rules (look v14, lines 325–332; handoff 03 §7.10), keyed on data
+   attributes. Each layer shows its flat fill until its baked image is decoded; the grey felt veil shows for Not set
+   up, Inviting and the Partial coverage crown, and hides the colour layers under it for the first two. */
+/* In the components layer, so a consumer's utilities (display, filter) still win. */
+@layer components {
+  [data-slot='agent-avatar'] {
+    display: block;
+    overflow: visible;
+    transition: filter 0.5s;
+  }
+
+  /* Deactivated */
+  [data-slot='agent-avatar'][data-state='off'] {
+    filter: saturate(0.3) brightness(1.04);
+  }
+
+  [data-slot='agent-avatar'] [data-part~='ly'] > [data-part~='li'] {
+    display: none;
+  }
+  [data-slot='agent-avatar'] [data-part~='ly'][data-ready] > [data-part~='li'] {
+    display: inline;
+  }
+  [data-slot='agent-avatar'] [data-part~='ly'][data-ready] > [data-part~='lg'] {
+    display: none;
+  }
+
+  [data-slot='agent-avatar'] [data-part~='veil'] {
+    display: none;
+  }
+  [data-slot='agent-avatar'][data-ghosting] [data-part~='veil'] {
+    display: inline;
+  }
+  [data-slot='agent-avatar'][data-veiled] [data-part~='fig'] > :is([data-part~='bodyly'], [data-part~='back'], [data-part~='front'], g[clip-path]:not([data-part~='veil'])) {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot='agent-avatar'] {
+      transition: none;
+    }
+  }
+}

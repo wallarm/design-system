@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const panelStory = createStoryHelper('ai-chat', [
   'Empty Panel',
@@ -22,7 +23,9 @@ const openDrawer = async (page: Page) => {
 test.describe('Component: ChatComposed', () => {
   test.describe('Visual', () => {
     test('Should render empty panel correctly', async ({ page }) => {
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Empty Panel');
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
 
@@ -47,9 +50,11 @@ test.describe('Component: ChatComposed', () => {
     });
 
     test('Should render permissions popover inside the input correctly', async ({ page }) => {
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Permissions');
       await page.getByTestId('chat--input--permissions--trigger').click();
       await expect(page.getByTestId('chat--input--permissions--content')).toBeVisible();
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 

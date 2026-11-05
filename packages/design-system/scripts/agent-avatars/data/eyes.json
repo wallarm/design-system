@@ -1,0 +1,89 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "EYES and EYE_BASE as the page holds them, and the geometry eyesPath() and eyeD() build from them. Per-state targets are in states.json.",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "EYE_BASE": 1545,
+      "EYES": 1546,
+      "eyeTargets": 1547,
+      "helloPop": 1560,
+      "eyeD": 1561,
+      "eyesPath": 1568,
+      "makeChar": 1658
+    }
+  },
+  "styles": [
+    {
+      "id": "round",
+      "label": "Round"
+    },
+    {
+      "id": "oval",
+      "label": "Oval"
+    },
+    {
+      "id": "tall",
+      "label": "Tall"
+    },
+    {
+      "id": "sleepy",
+      "label": "Sleepy"
+    }
+  ],
+  "base": {
+    "round": {
+      "w": 1.05,
+      "ht": 1,
+      "hb": 1,
+      "kt": 0.55,
+      "kb": 0.55,
+      "lid": 0
+    },
+    "oval": {
+      "w": 1,
+      "ht": 1.25,
+      "hb": 1.25,
+      "kt": 0.55,
+      "kb": 0.55,
+      "lid": 0
+    },
+    "tall": {
+      "w": 0.8,
+      "ht": 1.6,
+      "hb": 1.6,
+      "kt": 0.6,
+      "kb": 0.6,
+      "lid": 0
+    },
+    "sleepy": {
+      "w": 1.05,
+      "ht": 1.15,
+      "hb": 1.15,
+      "kt": 0.55,
+      "kb": 0.55,
+      "lid": 0.5
+    }
+  },
+  "params": {
+    "w": "half-width, in eye units",
+    "ht": "top height above the centre line, in eye units",
+    "hb": "bottom height below the centre line; negative makes a crescent (the happy arc)",
+    "kt": "roundness of the top half (0.55 is close to an ellipse)",
+    "kb": "roundness of the bottom half",
+    "lid": "upper lid, 0 open to 1 closed; it lowers the top and flattens it",
+    "rot": "tilt in degrees, mirrored per eye (added by eyeTargets)",
+    "bright": "opacity of the eyes group; the visor glow follows at 0.8 x (added by eyeTargets)",
+    "gy": "resting vertical gaze, -1 up to 1 down (added by eyeTargets)"
+  },
+  "geometry": {
+    "unit": "0.17 x visor height (eyeUnit per shape in shapes.json)",
+    "centres": "x = vx + vw x (0.5 - 0.2) and vx + vw x (0.5 + 0.2); y = vy + vh / 2",
+    "gaze": "gaze gx, gy in -1..1 move both centres by gx x 0.18 x vw and gy x 0.12 x vh; the eye on the side of the gaze grows by 8% x |gx|, the other shrinks by 6% x |gx|, both get 10% x |gx| narrower; a downward gaze lowers the lid to at least 0.25 x gy",
+    "blink": "openness 0..1.04 scales the heights and moves the centre down by 0.25 x (1 - openness) x ht; widths grow by up to 6% while closed",
+    "contour": "four cubic curves through the left, top, right and bottom points; the bottom never rises above -0.8 x the top (a crescent cannot invert)",
+    "stroke": "fill and stroke in the eye color; stroke width 0.25 x vh x 0.17 (a quarter of the eye unit); the contour is inset by half of s = 0.25 x w x unit (the stroke width when w = 1), so a zero-height eye draws as a clean capsule line",
+    "glow": "a second copy of the path with stroke width 2.6 at opacity 0.2, and a radial glow on the visor (rx 0.42 x vw, ry 0.5 x vh) in the eye color from opacity 0.55 to 0",
+    "color": "eye color = mix(body, white, 0.62); Wally (coral) uses #FF7A5E (colors.json derived.byColor.*.eye)"
+  }
+}

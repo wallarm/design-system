@@ -90,6 +90,7 @@
     "e2e:report": "playwright show-report",
     "e2e:docker:report": "playwright show-report ./playwright-report --port=9323",
     "icons:sync": "tsx scripts/icons/sync.ts",
+    "agent-avatars:export": "tsx scripts/agent-avatars/export-data.ts",
     "code-connect:preview": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect preview",
     "code-connect:publish": "node --env-file-if-exists=../../.env.local node_modules/@figma/code-connect/bin/figma connect publish --exit-on-unreadable-files"
   },

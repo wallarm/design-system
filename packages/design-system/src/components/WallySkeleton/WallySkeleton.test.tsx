@@ -1,6 +1,7 @@
 import { createRef } from 'react';
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+import { AgentAvatar } from '../AgentAvatar';
 import { WallySkeleton } from '.';
 
 describe('WallySkeleton', () => {
@@ -42,5 +43,18 @@ describe('WallySkeleton', () => {
     expect(screen.getByTestId('loading--chat--header')).toBeInTheDocument();
     expect(screen.getByTestId('loading--chat--body')).toBeInTheDocument();
     expect(screen.getByTestId('loading--chat--footer')).toBeInTheDocument();
+  });
+
+  // WDS-203: the greeting's Wally is the 120 px character; the placeholder keeps its footprint, so the swap
+  // from the skeleton to the empty chat does not move the greeting.
+  it('sizes the Wally placeholder to the greeting character at 120 px', () => {
+    render(<AgentAvatar agent='wally' seed='w' size={120} data-testid='wally' />);
+    const wally = screen.getByTestId('wally');
+    render(<WallySkeleton data-testid='loading' />);
+    const box = screen.getByTestId('loading--wally');
+    expect(box.style.getPropertyValue('--skeleton-width')).toBe(`${wally.getAttribute('width')}px`);
+    expect(box.style.getPropertyValue('--skeleton-height')).toBe(
+      `${wally.getAttribute('height')}px`,
+    );
   });
 });
