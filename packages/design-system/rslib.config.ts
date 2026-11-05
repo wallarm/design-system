@@ -32,6 +32,7 @@ export default defineConfig({
         '!./src/**/mocks.{ts,tsx}',
         '!./src/**/mocks/**', // folder form (WallyAssistant/mocks/index.ts)
         '!./src/testUtils/**',
+        '!./src/components/Rules/**', // Rules depend on unpublished rules-lib; excluded until it ships
       ],
     },
     tsconfigPath: './tsconfig.app.json',

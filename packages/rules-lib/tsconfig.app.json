@@ -1,0 +1,25 @@
+{
+  "extends": "@wallarm-org/typescript-config/react-library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__tests__/**",
+    "**/mocks.ts",
+    "**/mocks.tsx",
+    "src/testUtils",
+    "node_modules",
+    "dist"
+  ]
+}

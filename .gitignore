@@ -55,6 +55,7 @@ docs/superpowers/
 .superpowers/
 
 .superset
+packages/docs/
 
 # Unpublished Claude Design output
 .claude-design/
