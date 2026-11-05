@@ -90,6 +90,32 @@ export const formatRelativeTime = (
 };
 
 /**
+ * Compact relative time for space-constrained lists (the notification inbox):
+ * "now", "3m", "2h", "5d", "1w", then the short date ("11 Feb" / "11 Feb, 2025").
+ * No "ago" suffix. Future dates read "now" (clock skew tolerance).
+ */
+export const formatCompactRelativeTime = (
+  date: Date,
+  now: Date = new Date(),
+  options: DateTimeFormatOptions = {},
+): string => {
+  if (!isValid(date)) return '—';
+
+  const minutes = differenceInMinutes(now, date);
+  if (minutes < 1) return 'now';
+  if (minutes < 60) return `${minutes}m`;
+
+  const hours = differenceInHours(now, date);
+  if (hours < 24) return `${hours}h`;
+
+  const days = differenceInDays(now, date);
+  if (days < 7) return `${days}d`;
+  if (days < 28) return `${differenceInWeeks(now, date)}w`;
+
+  return formatAbsoluteDate(date, now, options);
+};
+
+/**
  * Format a date as absolute time for tooltips.
  *
  * Output: "11 Feb, 2026 14:32:07 GMT+2"

@@ -7,6 +7,7 @@ import type { TabsSize, TabsVariant } from './types';
 
 export interface TabsProps extends TestableProps {
   children: ReactNode;
+  className?: string;
   size?: TabsSize;
   variant?: TabsVariant;
   value?: string;
@@ -19,6 +20,7 @@ export interface TabsProps extends TestableProps {
 
 export const Tabs: FC<TabsProps> = ({
   children,
+  className,
   value,
   defaultValue,
   onChange,
@@ -36,7 +38,7 @@ export const Tabs: FC<TabsProps> = ({
   return (
     <TabsSharedContextProvider size={size} variant={variant}>
       <ArkUiTabs.Root
-        className={cn('relative')}
+        className={cn('relative', className)}
         data-testid={testId}
         value={value}
         defaultValue={defaultValue}
