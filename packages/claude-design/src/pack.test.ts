@@ -2,7 +2,14 @@ import { describe, expect, it } from '@rstest/core';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CANVAS_SAMPLER, canvasSampler, pack, README_SECTIONS, renderSetup } from './pack';
+import {
+  type AssetEntry,
+  CANVAS_SAMPLER,
+  canvasSampler,
+  pack,
+  README_SECTIONS,
+  renderSetup,
+} from './pack';
 
 const template = readFileSync(new URL('../content/SETUP.md', import.meta.url), 'utf8');
 const sampler = canvasSampler(
@@ -49,10 +56,19 @@ describe('canvasSampler', () => {
 
 // test:export runs after `export`, so the real build is on disk.
 describe('pack', () => {
-  it('packs the real export with no assets/ and no reference to it', () => {
+  it('packs the real export with the SVGs outside project/ and no reference to them', () => {
     const out = mkdtempSync(join(tmpdir(), 'claude-design-pack-'));
     try {
-      const { files } = pack(undefined, out);
+      const { files, assets } = pack(undefined, out);
+      const manifest = JSON.parse(readFileSync(join(out, 'assets.json'), 'utf8')) as AssetEntry[];
+      expect(manifest).toHaveLength(assets);
+      expect(new Set(manifest.map(asset => asset.group))).toEqual(new Set(['Icons', 'Logos']));
+      for (const asset of manifest) {
+        expect(asset.path).toMatch(/^assets\/(Icons|Logos)\/[^/]+\.svg$/);
+        expect(readFileSync(join(out, asset.path)).length).toBe(asset.size);
+      }
+      const index = JSON.parse(readFileSync(join(out, 'project/design-system.json'), 'utf8'));
+      expect([index.groups, index.assetGroups]).toEqual([[], {}]);
       const paths = readdirSync(join(out, 'project'), { recursive: true }).map(String);
       expect(paths.filter(path => /^assets([/\\]|$)/.test(path))).toEqual([]);
       const referencing = paths
@@ -61,6 +77,7 @@ describe('pack', () => {
       expect(referencing).toEqual([]);
       const setup = readFileSync(join(out, 'SETUP.md'), 'utf8');
       expect(setup).toContain(`(${files} files)`);
+      expect(setup).toContain(`${assets} SVG files`);
       expect(setup).toContain('<script src="./support.js"></script>');
     } finally {
       rmSync(out, { recursive: true, force: true });

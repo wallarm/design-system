@@ -1,8 +1,18 @@
 // Packs `.claude-design/` (from `export`) into `dist/` for the npm package: the bin
-// copies dist/ into a user's sandbox. Runs as `prepack`. A prompt-installed system has
-// no asset uploads: icons ship in bundle.js, so `assets/`, the asset groups and the README's
-// pointers to static SVGs are left out.
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+// copies dist/ into a user's sandbox. Runs as `prepack`. The icon and logo SVGs are asset
+// uploads, not project files: they go to `dist/assets/` (outside `project/`) with the
+// `dist/assets.json` manifest, and the packed index lists no asset groups until the CLI's
+// `index` command adds them with the uploaded blob ids.
+import { createHash } from 'node:crypto';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import { CLAUDE_DESIGN, PACKAGE_DIR } from './config';
 import { SAMPLER_FILE } from './sampler/sampler';
@@ -38,7 +48,9 @@ export const CANVAS_HEAD = [
   '<script src="./support.js"></script>',
   ...SYSTEM_LINKS.map(line => line.replace(/(href|src)="/, `$1="ds/${CANVAS_FOLDER}/`)),
 ].join('\n');
-/** README lines that point at static SVGs, which the npm export doesn't ship. */
+/** Most files an Artifact asset upload takes per call (`file_paths`). */
+export const ASSET_CALL_FILES = 25;
+/** README lines that point at static SVGs; the npm export's SVGs are assets, not project files. */
 const README_ASSET_LINES: [string, string][] = [
   [' Exported single-ink SVG assets use slate ink; see `assets/Icons/README.md`.', ''],
   [' Static versions live under `assets/Logos/`.', ''],
@@ -86,12 +98,14 @@ export function renderSetup({
   sampler,
   version,
   files,
+  assets = [],
 }: {
   template: string;
   readme: string;
   sampler: string;
   version: string;
   files: number;
+  assets?: AssetEntry[];
 }) {
   const missing = README_SECTIONS.filter(name => !readme.split('\n').includes(`## ${name}`));
   if (missing.length) throw new Error(`README.md has no section ${missing.join(', ')}`);
@@ -110,6 +124,12 @@ export function renderSetup({
     textPlainFiles: TEXT_PLAIN_FILES.map(file => `\`project/${file}\``).join(' and '),
     canvasFiles: CANVAS_FILES.map(file => `- \`project/ds/${CANVAS_FOLDER}/${file}\``).join('\n'),
     readmeSections: README_SECTIONS.map(name => `"${name}"`).join(', '),
+    assets: String(assets.length),
+    assetCallFiles: String(ASSET_CALL_FILES),
+    assetCalls: String(Math.ceil(new Set(assets.map(a => a.sha256)).size / ASSET_CALL_FILES)),
+    assetGroups: [...new Set(assets.map(a => a.group))]
+      .map(group => `${group} (${assets.filter(a => a.group === group).length})`)
+      .join(', '),
   };
   const guide = template.replace(/\{\{(\w+)\}\}/g, (match, name: string) => values[name] ?? match);
   const left = [...new Set(guide.match(/\{\{\w+\}\}/g))];
@@ -117,7 +137,44 @@ export function renderSetup({
   return guide;
 }
 
-/** Writes `<outDir>/{project,SETUP.md,wallarm-sampler.dc.html}` from a built `.claude-design/`. */
+export interface AssetEntry {
+  group: string;
+  name: string;
+  /** Relative to the export folder, outside `project/`. */
+  path: string;
+  sha256: string;
+  size: number;
+  type: string;
+}
+type AssetGroups = Record<
+  string,
+  { order: string[]; files: Record<string, Omit<AssetEntry, 'group' | 'path'>> }
+>;
+
+/** The index's asset records in gallery order, each SVG copied to `<outDir>/assets/<group>/`. */
+export function packAssets(
+  project: string,
+  index: { groups: string[]; assetGroups: AssetGroups },
+  outDir: string,
+) {
+  return index.groups.flatMap(group => {
+    const { order, files } = index.assetGroups[group] ?? { order: [], files: {} };
+    return order.map(name => {
+      const record = files[name];
+      if (!record) throw new Error(`design-system.json: ${group} orders ${name} but has no record`);
+      const { size, type, sha256 } = record;
+      const path = `assets/${group}/${name}`;
+      const bytes = readFileSync(join(project, path));
+      if (createHash('sha256').update(bytes).digest('hex') !== sha256)
+        throw new Error(`project/${path} does not match its sha256 in design-system.json`);
+      mkdirSync(join(outDir, 'assets', group), { recursive: true });
+      writeFileSync(join(outDir, path), bytes);
+      return { group, name, path, sha256, size, type } satisfies AssetEntry;
+    });
+  });
+}
+
+/** Writes `<outDir>/{project,assets,assets.json,SETUP.md,wallarm-sampler.dc.html}` from a built `.claude-design/`. */
 export function pack(
   source = resolve(PACKAGE_DIR, '.claude-design'),
   outDir = resolve(PACKAGE_DIR, 'dist'),
@@ -146,7 +203,12 @@ export function pack(
   const readmePath = join(outDir, 'project/README.md');
   writeFileSync(readmePath, packReadme(readFileSync(readmePath, 'utf8')));
   const indexPath = join(outDir, 'project/design-system.json');
-  const index = JSON.parse(readFileSync(indexPath, 'utf8')) as Record<string, unknown>;
+  const index = JSON.parse(readFileSync(indexPath, 'utf8')) as Record<string, unknown> & {
+    groups: string[];
+    assetGroups: AssetGroups;
+  };
+  const assets = packAssets(project, index, outDir);
+  writeFileSync(join(outDir, 'assets.json'), `${JSON.stringify(assets, null, 2)}\n`);
   writeFileSync(
     indexPath,
     `${JSON.stringify({ ...index, groups: [], assetGroups: {} }, null, 2)}\n`,
@@ -164,12 +226,15 @@ export function pack(
     sampler,
     version,
     files,
+    assets,
   });
   writeFileSync(join(outDir, 'SETUP.md'), setup);
-  return { version, files };
+  return { version, files, assets: assets.length };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
-  const { version, files } = pack();
-  process.stdout.write(`Packed Wallarm Design System ${version}: ${files} files in dist/project\n`);
+  const { version, files, assets } = pack();
+  process.stdout.write(
+    `Packed Wallarm Design System ${version}: ${files} files in dist/project, ${assets} in dist/assets\n`,
+  );
 }

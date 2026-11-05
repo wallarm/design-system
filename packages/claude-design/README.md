@@ -12,7 +12,8 @@ The command writes `wallarm-design-system/` and never prompts:
 
 | Path | Contents |
 | --- | --- |
-| `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Icons are inside the bundle (`WallarmDS.Icons.*`), so there are no asset uploads and no `assets/` folder |
+| `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Its index lists no asset groups until `index` adds them |
+| `assets/`, `assets.json` | The icon and logo SVGs for the system's galleries, uploaded as assets (not files), and their manifest (group, name, path, sha256, size, type, in gallery order) |
 | `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler, update |
 | `wallarm-sampler.dc.html` | The sampler artboard, linked to the canvas's `ds/wallarm-design-system/` copy |
 | `files.json` | Each written file with its sha256 |
@@ -24,6 +25,20 @@ folder has files), `--existing <file>` (a JSON array of the artifact's current p
 written index keeps its keys and takes only the release's `title`, `namespace`, `libraries`,
 `editing`, `groups`, `assetGroups` and `lastChange`, as `publish-plan.ts` does), `--json` (prints `{ ok, exitCode, data | error }`). Exit codes: `0` done,
 `1` error, `2` usage, `3` done with a manual step (remove the paths in `removed.json`).
+`--overwrite` replaces `project/`, `assets/`, `assets.json`, `blobs.json` and `upload.json`.
+
+After the SVGs are uploaded, `index` writes the galleries into the exported index:
+
+```bash
+npx -y @wallarm-org/claude-design@latest index [--blobs wallarm-design-system/blobs.json] [--index current-index.json] [--json]
+```
+
+`blobs.json` maps each manifest path (`assets/Icons/activity.svg`) to its blob id or upload url
+(`…/_blob/<id>`). `--index` reuses the blob id of every SVG whose sha256 the system's current
+index already has, so an update uploads only new and changed SVGs. Exit `0`: it wrote `groups`
+and `assetGroups` (`{name, blob, size, type, sha256}` per file) into `project/design-system.json`.
+Exit `3`: it wrote the paths still to upload, one per unique sha256, to `upload.json` and left the
+index alone.
 
 The package version is the design-system version it was built from.
 
@@ -54,7 +69,7 @@ All under `src/`. Outside it: `bin/claude-design.js` (the npm CLI, plain Node ES
 | `assets/` | Icons, fonts and the cover |
 | `harness/` | React 18 tests that mount the built bundle and previews |
 | `config.ts` | Artifact identity, namespace, budgets |
-| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (no SVG assets, rendered `SETUP.md`, canvas sampler) |
+| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (SVGs moved to `dist/assets/` with `assets.json`, rendered `SETUP.md`, canvas sampler) |
 | `build.ts`, `verify.ts` | Builder and repeatability check |
 
 ### Commands

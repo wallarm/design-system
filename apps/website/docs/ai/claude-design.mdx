@@ -27,14 +27,15 @@ What you will see:
 
 1. Claude runs the command, which writes `wallarm-design-system/` with the system files and a
    `SETUP.md` written for that release.
-2. A new **Wallarm Design System** artifact in your account. Claude gives you its link: keep it
-   to install the system on other canvases and to update it.
+2. A new **Wallarm Design System** artifact in your account, with the icon and logo galleries.
+   Claude uploads the SVGs in batches of 25 (about 24 calls), then publishes the index. Claude
+   gives you its link: keep it to install the system on other canvases and to update it.
 3. A Design canvas with the system installed and a **Wallarm sampler** board: a Users settings
    screen with the app shell, a table, status tabs and an open drawer. Claude checks that it
    renders without `[WallarmDS]` warnings, then waits for your request.
 
-Icons come with the components (`WallarmDS.Icons.*`), so the system's page shows no icon
-gallery. The package `@wallarm-org/claude-design` is published with every stable release and
+On a canvas, icons come with the components (`WallarmDS.Icons.*`); the galleries are for
+browsing them on the system's page. The package `@wallarm-org/claude-design` is published with every stable release and
 its version matches the design-system version.
 
 ### Update to a new release
@@ -48,8 +49,8 @@ npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-f
 and follow "Update to a new release" in wallarm-design-system/SETUP.md.
 ```
 
-Claude publishes the new files to the same link, asks you before removing the files the release
-dropped, and reinstalls the system on your canvases. Use it only on a system you installed from the
+Claude publishes the new files to the same link, uploads only the new and changed icons, asks you
+before removing the files the release dropped, and reinstalls the system on your canvases. Use it only on a system you installed from the
 prompt: Wallarm's shared system below is updated by its maintainers, and Claude stops if you give
 it that link.
 
