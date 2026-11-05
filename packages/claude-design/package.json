@@ -37,6 +37,7 @@
     "@wallarm-org/typescript-config": "workspace:*",
     "jsdom": "catalog:",
     "postcss": "8.5.28",
+    "postcss-selector-parser": "7.1.1",
     "react": "catalog:",
     "react-compiler-runtime": "1.0.0",
     "react-dom": "catalog:",

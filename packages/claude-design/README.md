@@ -15,7 +15,7 @@ All under `src/`.
 | Folder | Does |
 | --- | --- |
 | `bundle/` | Rslib IIFE bundle (`WallarmDS` namespace, SWC React Compiler targeting React 18) |
-| `css/` | Tailwind CSS for the canvas |
+| `css/` | Tailwind CSS for the canvas: the author layout kit (`safelist.ts`), wrapper-tolerant structural selectors (`wrapper-css.ts`) and the generated `components/UTILITIES.md` class list |
 | `tokens/` | Design tokens |
 | `docs/` | Component guides, prop types and the project README |
 | `previews/` | Story previews |

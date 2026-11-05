@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { CLAUDE_DESIGN } from '../config';
 import { themeSelector } from '../tokens/build-tokens';
 import { canvasSafelist } from './safelist';
+import { CANVAS_WRAPPER_CLASS, tolerateCanvasWrappers } from './wrapper-css';
 
 export interface BuildCssOptions {
   outDir: string;
@@ -36,10 +37,55 @@ export function stripTokenDeclarations(css: string, tokenNames: Set<string>): st
   return root.toString();
 }
 
+/** Class names `css` defines, unescaped; arbitrary-value and `(--var)` classes are component internals. */
+export function definedClasses(css: string): string[] {
+  const classes = new Set<string>();
+  postcss.parse(css).walkRules(rule => {
+    for (const [, name = ''] of rule.selector.matchAll(/\.((?:\\.|[\w-])+)/g))
+      classes.add(name.replace(/\\(.)/g, '$1'));
+  });
+  classes.delete(CANVAS_WRAPPER_CLASS);
+  return [...classes]
+    .filter(name => !/[[(]/.test(name))
+    .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+}
+
+/** components/UTILITIES.md: every authorable class bundle.css defines, by variant and utility. */
+export function utilitiesReference(css: string): string {
+  const groups = new Map<string, Map<string, string[]>>();
+  for (const name of definedClasses(css)) {
+    const split = name.lastIndexOf(':') + 1;
+    const variant = name.slice(0, split);
+    const utility = name.slice(split);
+    const root = /^-?[a-z0-9]+/.exec(utility)?.[0] ?? utility;
+    const byRoot = groups.get(variant) ?? new Map<string, string[]>();
+    byRoot.set(root, [...(byRoot.get(root) ?? []), name]);
+    groups.set(variant, byRoot);
+  }
+  const lines = [
+    '# Utility classes that exist',
+    '',
+    'Generated from `components/bundle.css`. This is the complete list of utility classes you can write in canvas markup. **No other class exists**: the CSS is compiled ahead of time, there is no JIT, and arbitrary values such as `p-[13px]` or `w-[420px]` have no rule unless a component already uses that exact class. A missing class renders as nothing, silently.',
+    '',
+    '- Every numeric utility means N px (spacing *and* sizing): `p-16` is 16px, `w-256` is 256px, `size-24` is 24px. Tailwind habits are 4× off: write `p-16`, not `p-4`.',
+    '- Stay on the spacing scale; reach for `Stack` / `Flex` `gap` props and `Page*` / `Card*` components before raw layout classes.',
+    '- `sm:` / `md:` / `lg:` / `xl:` follow the viewport width, not the artboard width.',
+    '- For a value that is not here, use an inline style with a token: `style="gap: var(--spacing-16)"`.',
+    '',
+  ];
+  for (const [variant, byRoot] of [...groups].sort(([a], [b]) => a.localeCompare(b, 'en'))) {
+    lines.push(`## ${variant ? `\`${variant}\` variants` : 'Base utilities'}`, '');
+    for (const [root, names] of [...byRoot].sort(([a], [b]) => a.localeCompare(b, 'en')))
+      lines.push(`- **${root}**: ${names.map(name => `\`${name}\``).join(' ')}`);
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 export async function buildCss({
   outDir,
   tokenNames,
-}: BuildCssOptions): Promise<{ bytes: number }> {
+}: BuildCssOptions): Promise<{ bytes: number; wrapperSkipped: string[] }> {
   const entry = fileURLToPath(new URL('./entry.css', import.meta.url));
   const source = `${await readFile(entry, 'utf8')}\n@source inline(${JSON.stringify(canvasSafelist(tokenNames).join(' '))});\n`;
   const result = await postcss([
@@ -64,7 +110,8 @@ export async function buildCss({
     // artboard is nested in a dark page. Keep their expressions live in CSS.
     rule.selectors = [...rule.selectors, '[data-theme="light"]'];
   });
-  const css = compiled.toString();
+  const wrapped = tolerateCanvasWrappers(compiled.toString());
+  const css = wrapped.css;
   const bytes = Buffer.byteLength(css);
   if (bytes > CLAUDE_DESIGN.cssCapBytes)
     throw new Error(`bundle.css exceeds ${CLAUDE_DESIGN.cssCapBytes} bytes (${bytes})`);
@@ -72,5 +119,6 @@ export async function buildCss({
     throw new Error('bundle.css contains an unsafe inline style terminator');
   await mkdir(path.join(outDir, 'components'), { recursive: true });
   await writeFile(path.join(outDir, 'components/bundle.css'), css);
-  return { bytes };
+  await writeFile(path.join(outDir, 'components/UTILITIES.md'), utilitiesReference(css));
+  return { bytes, wrapperSkipped: wrapped.skipped };
 }
