@@ -103,7 +103,7 @@ Value vocabulary. Pick from this table.
 | --- | --- | --- |
 | Entity loading | `Attribute loading` on every row. It swaps label and value for skeletons; the skeleton label is 100 wide whatever `width` you set | A `Loader` over the body |
 | Nested table loading | `Table isLoading` with `skeletonCount={3}` | An empty table |
-| Nested collection empty | Keep the `Table` with its headers. Put `EmptyState` inside `TableEmptyState` | Hiding the table |
+| Nested collection empty | Keep the `Table` with its headers. Render `EmptyState type='collection-empty'` as a direct `Table` child, guarded by `rows.length === 0 && !isLoading` | Hiding the table; `TableEmptyState` (its `py-128` is too tall for a drawer) |
 | Empty nested table, action in the section header | `EmptyState` with title and description only | A second create button in `EmptyStateActions` |
 | Field has no value | `Attribute isEmpty` | Hiding the row |
 | Viewing an old version | `Alert color='info'` first in `DrawerBody`, with "Back to current" and "Restore" in `AlertControls` | A banner in the header |
@@ -166,7 +166,6 @@ import {
   Separator,
   Table,
   type TableColumnDef,
-  TableEmptyState,
   Tabs,
   TabsContent,
   TabsLineActions,
@@ -296,8 +295,8 @@ export const ProviderDrawer = ({
                   getRowId={row => row.id}
                   aria-label='Rules'
                 >
-                  <TableEmptyState>
-                    <EmptyState>
+                  {provider?.rules.length === 0 && (
+                    <EmptyState type='collection-empty'>
                       <EmptyStateMessage>
                         <EmptyStateTitle>No rules yet</EmptyStateTitle>
                         <EmptyStateDescription>
@@ -305,7 +304,7 @@ export const ProviderDrawer = ({
                         </EmptyStateDescription>
                       </EmptyStateMessage>
                     </EmptyState>
-                  </TableEmptyState>
+                  )}
                 </Table>
               </div>
             </TabsContent>

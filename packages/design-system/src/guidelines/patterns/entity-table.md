@@ -96,8 +96,8 @@ Set column widths with `size` in pixels:
 | State | Do | Not |
 | --- | --- | --- |
 | First load | `isLoading` (12 skeleton rows by default; change with `skeletonCount`) | A `Loader` over the table |
-| Nothing created yet | `TableEmptyState` with `EmptyState type='collection-empty'` and the create action | An empty frame |
-| Filters match nothing | `TableEmptyState` with `EmptyState type='no-results'` and a reset action | A create button |
+| Nothing created yet | `TableEmptyState` with `EmptyState type='collection-empty'`. No button when `PageActions` already holds Create | An empty frame; a second create button |
+| Filters match nothing | `TableEmptyState` with `EmptyState type='collection-empty'`, title "No results found" and a `Button variant='outline' color='neutral'` "Reset filters" | A create button; `type='no-results'` (the compact card or menu treatment) |
 | Rows selected | `TableActionBar` appears on its own | Showing the bar yourself |
 | Row open in a drawer | `activeRowId={openId}` highlights the row | `className` on a row |
 | Switch saving | Keep the `Switch`, show a `Loader` in a reserved slot next to it | Replacing the `Switch` with a spinner |
@@ -154,7 +154,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   EmptyState,
-  EmptyStateActions,
   EmptyStateDescription,
   EmptyStateMessage,
   EmptyStateTitle,
@@ -229,7 +228,6 @@ const renderGroup = (group: string) => <Tag key={group}>{group}</Tag>;
 interface UsersTableProps {
   users: User[];
   isLoading: boolean;
-  onCreate: () => void;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onBulkDelete: (ids: string[]) => void;
@@ -238,7 +236,6 @@ interface UsersTableProps {
 export const UsersTable = ({
   users,
   isLoading,
-  onCreate,
   onEdit,
   onDelete,
   onBulkDelete,
@@ -327,9 +324,6 @@ export const UsersTable = ({
             <EmptyStateTitle>No users yet</EmptyStateTitle>
             <EmptyStateDescription>Invite people to sign in to your organization.</EmptyStateDescription>
           </EmptyStateMessage>
-          <EmptyStateActions>
-            <Button onClick={onCreate}>Create user</Button>
-          </EmptyStateActions>
         </EmptyState>
       </TableEmptyState>
     </Table>

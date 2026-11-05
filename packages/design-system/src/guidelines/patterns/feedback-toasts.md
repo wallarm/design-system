@@ -25,7 +25,8 @@ Fire it with `useToast()`. One `Toaster` at the app root renders, stacks and tim
 | Show a field validation error | `FieldError` under the field | Toast |
 
 - If the message is the only place the user learns something important, do not use a toast. It disappears.
-- If a `Dialog` confirmed the action, close the dialog first, then fire the toast.
+- If a `Dialog` confirmed the action, close the dialog first, then fire the toast. A confirmed delete is a finished mutation: `type: 'default'`.
+- Exception: save toasts on a settings page use `type: 'success'`. See [Settings page](./settings-page.md).
 
 ## Anatomy
 

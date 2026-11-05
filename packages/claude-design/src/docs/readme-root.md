@@ -38,7 +38,7 @@ These are the design system's own rules (`src/guidelines/rules.md`), embedded at
 - Geist Variable is the UI font; Geist Mono is for code and identifiers. Geist Pixel is reserved for display moments and splash art.
 - The bundle's reset leaves raw `h1`–`h6`, `p`, `ul`, `ol` and `li` with no size, margin or list style; use `List` where one fits, and `Code` for code.
 - Prefer `Text`, `Heading` and `Code` over raw typography classes. Use the size and weight choices documented on their cards.
-- Use paired size and line-height tokens. Token typography classes use `body-*`, `heading-*`, `display-*` and `code-*`. The `text-<size>` utilities (`text-xs`, `text-sm`, `text-md`, `text-base`, `text-lg`…) use this system's type tokens, not Tailwind's defaults, and `text-<colour>` takes a semantic token such as `text-text-secondary`.
+- Use paired size and line-height tokens. `body-*`, `heading-*`, `display-*` and `code-*` are type-style names in the token document, not CSS classes — `class="body-sm"` renders nothing. Use `Text`, `Heading` or `Code`, or the `text-<size>` utility named in each style's usage ("Tailwind: text-sm font-sans-display"). The `text-<size>` utilities (`text-xs`, `text-sm`, `text-md`, `text-base`, `text-lg`…) use this system's type tokens, not Tailwind's defaults, and `text-<colour>` takes a semantic token such as `text-text-secondary`.
 
 ## Spacing, radius, elevation
 

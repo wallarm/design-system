@@ -95,7 +95,7 @@ All spacing is built into the parts. Numbers are pixels: `pt-20` is 20px.
 | Variant C, input empty or wrong | Confirm disabled | `disabled={value !== entityName}` |
 | Variant C, input matches | Confirm enabled | Exact, case-sensitive comparison |
 | Pending | Confirm shows a spinner and is disabled; the dialog stays open | `loading={pending}` on the confirm `Button`; ignore close requests while pending |
-| Success | The dialog closes; a success toast appears | `onOpenChange(false)`, then `toast.create({ title, type: 'success' })` |
+| Success | The dialog closes; a toast confirms the change | `onOpenChange(false)`, then `toast.create({ title, type: 'default' })`. See [Feedback toasts](./feedback-toasts.md) |
 | Failure | The dialog stays open; an error toast appears; confirm is enabled again | `toast.create({ title, type: 'error' })`, then `setPending(false)` |
 
 - If the request is running, keep the dialog open. Close it only after the request resolves.
@@ -116,7 +116,10 @@ All spacing is built into the parts. Numbers are pixels: `pt-20` is 20px.
 | Confirm | "Delete user" | "OK", "Yes", "Confirm", "Delete" |
 | Cancel | "Cancel" | "No", "Close", "Back" |
 | Type-to-confirm placeholder | `Enter "{provider name}" to confirm` | "Type here" |
-| Success toast | "User deleted" | "Success!", "User was deleted successfully." |
+| Title, bulk | "Delete 3 users?" | "Delete user?" for several rows, "Delete selected?" |
+| Description, bulk | "This permanently deletes 3 users and all their access. You can't undo this." | Naming only the first user |
+| Confirm, bulk | "Delete 3 users" | "Delete", "Delete all" |
+| Toast | "User deleted"; bulk: "3 users deleted" | "Success!", "User was deleted successfully." |
 
 - Write the title as `<Verb> <object>?` in sentence case.
 - Name the specific object in the description: the user, provider or rule name.
@@ -180,7 +183,7 @@ export const DeleteUserDialog = ({
     try {
       await onDelete();
       onOpenChange(false);
-      toast.create({ title: 'User deleted', type: 'success' });
+      toast.create({ title: 'User deleted', type: 'default' });
     } catch {
       toast.create({ title: "Couldn't delete user", type: 'error' });
     } finally {
@@ -408,7 +411,7 @@ Render one `Toaster` at the app root for `useToast` to work. `useToast` imports 
 | Dirty-form tracking for variant D | App | Your form library's dirty flag, passed as `isDirty` |
 | Intercepting drawer close for variant D | App | Controlled `Drawer` `open` + `onOpenChange`; open the guard dialog instead of closing |
 | Browser navigation away from a dirty form (route change, tab close) | App | Your router's blocker and `beforeunload`. The design system does not handle it |
-| The success and error toasts | App | `useToast().create` with one `Toaster` at the root |
+| The result and error toasts | App | `useToast().create` with one `Toaster` at the root |
 | All copy, including entity names in the description | App | The copy rules in the Rules section |
 
 Gaps in the design system today:

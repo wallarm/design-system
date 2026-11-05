@@ -107,7 +107,7 @@ Spacing utilities count in pixels: `gap-8` is 8px. See [Spacing](../foundations/
 | Element | Figma | Code |
 | --- | --- | --- |
 | Width | 960 | `Dialog width={960}` |
-| Header | 64 high | `DialogHeader` (`pt-16 pb-12 pl-24 pr-16`), built in |
+| Header | 64 high | `DialogHeader` (`pt-20 pb-16 px-24`), built in |
 | Side gutter | 24 | `DialogBody` (`px-24`), built in |
 | Search to status tabs | 12 | `<div className='flex items-center gap-12'>`; `SearchInput className='flex-1'` |
 | Toolbar to table | 8 | Wrap the body in `<div className='flex flex-col gap-8'>` |

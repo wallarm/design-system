@@ -17,6 +17,6 @@ Before composing a screen, call get_guideline for the pattern (list page, table,
 - rounded-lg, rounded, rounded-[15px] → rounded-8 (controls), rounded-12 (panels)
 - shadow-* on DS components, z-* on overlays → never; they own both
 - focus:ring → focus-visible:ring-3 ring-focus-primary outline-none
-- size on Dialog/Drawer, DIALOG_SIZES → width={400}
+- size on Dialog, DIALOG_SIZES → width={400} for confirms, omit for 560; size on Drawer → omit width (640), no DRAWER_SIZES
 - ConfirmDialog, FilterBar, Combobox → compose Dialog parts, PageToolbar + FilterDropdown, Select + useSelectSearch
 - data-slot in tests → data-testid

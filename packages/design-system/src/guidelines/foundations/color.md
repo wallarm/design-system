@@ -57,7 +57,8 @@ The prefix repeats on purpose. The token `--color-bg-surface-1` becomes the clas
 - Start every page on `bg-bg-page-bg`. Put content layers on surface levels.
 - If the element sits in page flow, use `bg-bg-surface-1`. `Card` uses it.
 - If the element floats over content, use `bg-bg-surface-2`. `Popover`, `DropdownMenu` and `Drawer` use it.
-- If the element is a control track inside a surface, use `bg-bg-surface-3`. `Slider`, `SegmentedControl` and `Radio` use it.
+- If the element is the raised thumb or indicator of a control, use `bg-bg-surface-3`. The `Slider` thumb, the `SegmentedControl` indicator and the `Radio` indicator use it.
+- If the element is a control track inside a surface, use `bg-bg-primary`. The `SegmentedControl` track uses it. A `bg-bg-surface-3` track is white on a white surface in the light theme.
 - Use `bg-bg-surface-5` only for a raised strip such as `Banner`.
 - In the light theme, surface levels 1 to 4 are all white. They differ only in the dark theme. Separate surfaces with borders and shadows, not with fill.
 - Choose the level by elevation. Never choose it by how it looks in the light theme.
@@ -106,7 +107,7 @@ An agent guesses these names. None of them is part of the system.
 
 **Never** write `bg-bg-fill-brand/90` for a hover. Use `overlay hover:overlay-states-on-fill-hover`.
 
-**Never** reuse a `bg-component-*` token outside its component. It changes when that component changes.
+**Never** reuse a `bg-component-*` token outside its component. It changes when that component changes. One exception: an auth page has no `AppShell` and paints its background with `bg-component-app-shell-bg`, so the signed-out screen matches the shell around the signed-in app. See [Auth page](../patterns/auth-page.md).
 
 **Never** edit `--color-syntax-*` mappings. They are code-managed.
 
@@ -170,11 +171,11 @@ An agent guesses these names. None of them is part of the system.
 | `bg-bg-page-bg` | white | slate-950 | Page |
 | `bg-bg-surface-1` | white | #0d1123 | In-flow content: `Card` |
 | `bg-bg-surface-2` | white | #141829 | Floating layers: `Popover`, `DropdownMenu`, `Drawer`. Also `Table` body cells and `Alert` `color='primary'` |
-| `bg-bg-surface-3` | white | #1b1f30 | Control tracks: `Slider`, `SegmentedControl` |
+| `bg-bg-surface-3` | white | #1b1f30 | Raised thumb or indicator: `Slider` thumb, `SegmentedControl` indicator, `Radio` indicator |
 | `bg-bg-surface-4` | white | #1f2334 | Reserved. No component uses it |
 | `bg-bg-surface-5` | slate-100 | #262a3b | Raised strip: `Banner` |
 | `bg-bg-light-primary` | slate-50 | #1b1f30 | Subtle neutral area. `Card` `color='secondary'` |
-| `bg-bg-primary` | slate-100 | #262a3b | Neutral tinted area |
+| `bg-bg-primary` | slate-100 | #262a3b | Neutral tinted area; control tracks (`SegmentedControl`) |
 | `bg-bg-strong-primary` | slate-300 | #333848 | Strong neutral area |
 | `bg-bg-light-<status>` | 50 shade | theme value | Lightest status tint. `Alert` uses it |
 | `bg-bg-<status>` | 100 shade | theme value | Status tint |

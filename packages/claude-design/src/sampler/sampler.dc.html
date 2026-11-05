@@ -126,13 +126,13 @@
         </x-import>
         <div class="-mx-8">
           <x-import component-from-global-scope="WallarmDS.Table" aria-label="API tokens" data="{{noTokens}}" columns="{{tokenColumns}}" get-row-id="{{getRowId}}">
-            <x-import component-from-global-scope="WallarmDS.TableEmptyState">
-              <!-- Empty nested table with the action in the section header: title and description only. -->
-              <x-import component-from-global-scope="WallarmDS.EmptyState">
-                <x-import component-from-global-scope="WallarmDS.EmptyStateMessage">
-                  <x-import component-from-global-scope="WallarmDS.EmptyStateTitle">No API tokens yet</x-import>
-                  <x-import component-from-global-scope="WallarmDS.EmptyStateDescription">Create one to call the Wallarm API as this user.</x-import>
-                </x-import>
+            <!-- Empty nested table: EmptyState as a direct Table child (TableEmptyState's py-128 is for page tables).
+                 It always renders, so a live table guards it with rows.length === 0 && !isLoading.
+                 The action is in the section header: title and description only. -->
+            <x-import component-from-global-scope="WallarmDS.EmptyState" type="collection-empty">
+              <x-import component-from-global-scope="WallarmDS.EmptyStateMessage">
+                <x-import component-from-global-scope="WallarmDS.EmptyStateTitle">No API tokens yet</x-import>
+                <x-import component-from-global-scope="WallarmDS.EmptyStateDescription">Create one to call the Wallarm API as this user.</x-import>
               </x-import>
             </x-import>
           </x-import>
