@@ -1,153 +1,122 @@
 ---
 title: Focus
 description: Use when an element must show keyboard focus, to pick the ring recipe, the focus color token, and where no ring goes.
-components: [Button, Input, Textarea, InputGroup, Card, Tabs, Checkbox, Radio, Switch, DropdownMenu, DropdownMenuItem, Select, SelectOption, NavRail, Slider, Link]
+components: [Button, Card, CardContent, Input, Textarea, InputGroup, Checkbox, Radio, Switch, DropdownMenu, DropdownMenuItem, Select, SelectOption, NavRail, Slider, Link]
 keywords: [focus, focus-visible, ring, focus ring, outline, keyboard, a11y, accessibility, tab, ring-inset, focus-within]
 order: 60
 ---
 
 # Focus
 
-Keyboard focus is a 3px box-shadow ring in a translucent focus color.
-DS components already draw it. Use the recipes on this page only for elements your app builds itself.
+Keyboard focus is a 3px ring in a translucent focus color, shown on `:focus-visible`.
+DS components draw it already. Write a ring only on elements your app builds.
 
 ## What you use
 
-| Need | Use |
-| --- | --- |
-| Focus ring on a standalone control | `outline-none focus-visible:ring-3 focus-visible:ring-focus-primary` |
-| Focus ring on a brand-colored control | `focus-visible:ring-focus-brand` instead of `ring-focus-primary` |
-| Focus ring on a destructive control or an invalid field | `focus-visible:ring-focus-destructive` |
-| Ring on an element clipped by `overflow-hidden` or flush to a container edge | Add `focus-visible:ring-inset` |
-| Ring on a wrapper around a native input | `has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-focus-primary` (or `focus-within:`) on the wrapper |
-| Clickable card | `Card` with an `onClick` handler |
-| Button | `Button` with `color` set; the ring color follows `color` (default `brand`) |
-
-The `ring-*` width utilities are px in Tailwind v4: `ring-3` is 3px, `ring-2` is 2px.
-They do not scale with `--spacing`.
+| Need | Use | Not |
+| --- | --- | --- |
+| Ring on an app-built control | `outline-none focus-visible:ring-3 focus-visible:ring-focus-primary` | `focus:ring-*` |
+| Ring on a brand-colored control | `focus-visible:ring-focus-brand` | `ring-focus-primary` |
+| Ring on a destructive control or invalid field | `focus-visible:ring-focus-destructive` | `ring-focus-primary` |
+| Ring inside `overflow-hidden` or flush to a container edge | add `focus-visible:ring-inset` | an outer ring, which gets clipped |
+| Ring on a wrapper around a native input | `has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-focus-primary` (or `focus-within:`) | a ring on the inner input |
+| Input with addons | `InputGroup` | a hand-built wrapper ring |
+| Focusable card | `Card` with `onClick` | a `<div tabIndex>` with your own ring |
+| Focus color on a DS button | the `Button` `color` prop (default `brand`) | a `className` override |
 
 ## Rules
 
-### Recipe
-
-- Use `focus-visible:`, not `focus:`. The ring shows for keyboard focus only.
-- Pair the ring with `outline-none`. The browser outline and the ring never show together.
-- Use `ring-3` for new work. `ring-2` in a few components is known drift.
-- Set the ring color explicitly. `ring-3` without a `ring-focus-*` color draws the default color.
-- If the element has a radius, keep it. The ring follows `border-radius`.
-- If a parent has `overflow-hidden`, add `ring-inset`. An outer ring is clipped there.
-
-### Color
-
-| Element | Ring color | Not |
-| --- | --- | --- |
-| Neutral control (`Button` with `color='neutral'` or `'neutral-alt'`, tabs, tags, inputs) | `ring-focus-primary` | `ring-focus-brand` |
-| Brand control (`Button` with `color='brand'` in any variant, checked or indeterminate checkbox, checked switch, checked radio) | `ring-focus-brand` | `ring-focus-primary` |
-| Destructive button (`color='destructive'`, any variant) | `ring-focus-destructive` | `ring-focus-brand` |
-| Invalid input, focused | `ring-focus-destructive` | `ring-focus-primary` |
-| Invalid input, hovered | `ring-focus-destructive-hover` | `ring-focus-destructive` |
-
-### Fields
-
-- If you build a text field, use the `Input` recipe. It sets `focus-visible:not-disabled:border-border-strong-primary` and `focus-visible:ring-focus-primary`.
-- If the field is invalid, swap the ring to `ring-focus-destructive` and keep `border-border-strong-danger`.
-- If an input sits inside a styled wrapper, put the ring on the wrapper. `InputGroup` does this with `has-[...]:ring-3`.
-- If you need an input with addons, use `InputGroup`. Do not rebuild the wrapper ring.
-
-### Where the ring does not go
-
-| Element | Focus treatment | Not |
-| --- | --- | --- |
-| Menu item (`DropdownMenuItem`) | Background `bg-states-primary-hover` on `data-highlighted` and `focus` (brand and danger items use `bg-states-brand-hover` and `bg-states-danger-hover`) | A ring |
-| Listbox option (`SelectOption`) | Background `bg-states-primary-hover` on `data-highlighted` | A ring |
-| Navigation item (`NavRail` items) | Overlay `focus-visible:overlay-states-primary-hover` | A ring |
-| Slider thumb (`Slider`) | `focus-visible:scale-110 focus-visible:shadow-md`, the same as hover | A ring |
-| Popover surfaces (`DropdownMenu` content, `Select` content, `Drawer` panel) | `outline-none`, no indicator | A ring around the whole surface |
-| Table cell with an open context menu | `ring-2 ring-inset ring-border-strong-brand` | This is an open state, not focus |
-
-- Inside a menu or listbox, focus moves by arrow keys. The highlighted row is the indicator.
-- **Never** add a ring to a menu item or a listbox option.
-- **Never** add a ring to a popover, dialog, or drawer surface.
-
-### Never
-
-- **Never** use `focus:ring-*` for the ring. Use `focus-visible:ring-*`.
-- **Never** use `outline-none` without a replacement indicator on an interactive element.
-- **Never** use `ring-focus-ring-primary`. The `--color-focus-ring-primary` token exists in `semantic.css` but no component uses it.
-- **Never** use a border color, `ring-border-*`, or a raw palette color as a focus ring.
-- **Never** add `ring-offset-*` to separate the ring. DS rings sit flush to the element.
-- **Never** override the ring on a DS component through `className`. Pick the right `color` prop instead.
+- Use `focus-visible:`, not `focus:`. The ring is for keyboard focus only.
+- Pair the ring with `outline-none`, so the browser outline and the ring never show together.
+- Use `ring-3`. **Never** copy `ring-2` from Card, Resizable, CodeEditor or SimpleCharts: it is known drift.
+- Always set a `ring-focus-*` color. `ring-3` alone draws the default color.
+- Keep the element's radius; the ring follows it.
+- If a parent has `overflow-hidden`, add `ring-inset`.
+- If the control is brand-colored (`Button` with `color='brand'` in any variant, a checked or indeterminate Checkbox, a checked Radio or Switch), use `ring-focus-brand`. Neutral controls (`Button` with `color='neutral'` or `'neutral-alt'`, unchecked Checkbox, Radio or Switch, tabs, tags, inputs) use `ring-focus-primary`.
+- If the control is destructive (`Button` with `color='destructive'`, any variant), use `ring-focus-destructive`.
+- If you build a text field, match `Input`: on focus, `focus-visible:not-disabled:border-border-strong-primary` plus `ring-focus-primary`. Invalid: keep `border-border-strong-danger`, ring `ring-focus-destructive`, hover `ring-focus-destructive-hover`.
+- If an input sits inside a styled wrapper, put the ring on the wrapper.
+- If focus moves by arrow keys (menu, listbox), the highlighted row is the indicator. `DropdownMenuItem` and `SelectOption` use `bg-states-primary-hover`; brand and danger items use `bg-states-brand-hover` and `bg-states-danger-hover`.
+- `NavRail` items show an overlay (`overlay-states-primary-hover`); the `Slider` thumb scales up with a shadow. Neither gets a ring.
+- **Never** add a ring to a menu item or listbox option.
+- **Never** add a ring to a popover, dialog or drawer surface (`DropdownMenu`, `Select` content, `Drawer`).
+- **Never** use `outline-none` on an interactive element without a replacement indicator.
+- **Never** use a border color, `ring-border-*` or a raw palette color as a focus ring.
+- **Never** use `ring-focus-ring-primary`. The token exists but nothing uses it.
+- **Never** add `ring-offset-*`. DS rings sit flush.
+- **Never** override a DS component's ring through `className`. Pick the `color` prop.
 
 ### What does not exist
 
-- There is no `ring-focus` token without a suffix. Use `ring-focus-primary`, `ring-focus-brand`, `ring-focus-destructive`, or `ring-focus-destructive-hover`.
-- There is no `--ring` or ring-width token. Width is the `ring-3` utility.
-- There is no `focusRing` prop on any component.
-- There is no exported focus-ring class helper. Write the class string.
-- `Link` has no focus-visible style. It sets `outline-none` only. This is a known gap.
+- No bare `ring-focus` token; always add a suffix.
+- No `--ring` or ring-width token. Width is the `ring-3` utility.
+- No `focusRing` prop on any component.
+- No exported focus-ring class helper. Write the class string.
+- `Link` has no focus-visible style, only `outline-none`. This is a known gap.
+
+## Examples
+
+A DS button picks its ring color from `color`; no class needed.
+
+```tsx
+import { Button } from '@wallarm-org/design-system';
+
+export const DeleteButton = ({ onDelete }: { onDelete: () => void }) => (
+  <Button variant='primary' color='destructive' onClick={onDelete}>
+    Delete
+  </Button>
+);
+```
+
+A card becomes focusable and draws its ring once it has a click handler.
+
+```tsx
+import { Card, CardContent } from '@wallarm-org/design-system';
+
+export const DetailsCard = ({ onOpen }: { onOpen: () => void }) => (
+  <Card onClick={onOpen}>
+    <CardContent>Open details</CardContent>
+  </Card>
+);
+```
+
+An app-built control uses the standard recipe.
+
+```tsx
+export const CustomTrigger = ({ onOpen }: { onOpen: () => void }) => (
+  <button
+    type='button'
+    className='rounded-8 outline-none focus-visible:ring-3 focus-visible:ring-focus-primary'
+    onClick={onOpen}
+  >
+    Custom trigger
+  </button>
+);
+```
+
+A row inside a scroller with `overflow-hidden` uses an inset ring.
+
+```tsx
+export const ClippedRow = ({ onSelect }: { onSelect: () => void }) => (
+  <div className='overflow-hidden'>
+    <button
+      type='button'
+      className='w-full outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-focus-primary'
+      onClick={onSelect}
+    >
+      Row
+    </button>
+  </div>
+);
+```
 
 ## Reference
 
-### Focus color tokens
-
-Defined in `src/theme/focus.css`, imported by `theme/index.css`.
+`ring-*` widths are px in Tailwind v4 (`ring-3` is 3px) and do not scale with `--spacing`.
 
 | Token | Utility | Value |
 | --- | --- | --- |
-| `--color-focus-primary` | `ring-focus-primary` | `slate-400` at 30% alpha |
-| `--color-focus-brand` | `ring-focus-brand` | `w-orange-600` at 30% alpha |
-| `--color-focus-destructive` | `ring-focus-destructive` | `red-600` at 20% alpha |
-| `--color-focus-destructive-hover` | `ring-focus-destructive-hover` | `red-600` at 30% alpha |
-
-### Recipes in use
-
-| Recipe | Used by |
-| --- | --- |
-| `focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary` | Accordion, Avatar, Breadcrumbs, Pagination, Page, Stepper, Tag, Tabs, SegmentedControl, Table header buttons, Attribute, InlineEdit |
-| `focus-visible:ring-3` + `ring-focus-{color}` from the `color` variant | Button (via ButtonBase) |
-| `focus-visible:ring-3` + `ring-focus-primary` or `ring-focus-destructive` | Input, Textarea |
-| `data-focus-visible:ring-3` + `ring-focus-primary` unchecked, `ring-focus-brand` checked | Checkbox, Radio, Switch |
-| `has-[...]:ring-3` on the wrapper | InputGroup, FilterDropdown, ChatInput |
-| `focus-within:ring-3` on the wrapper | FilterInput field |
-| `focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-focus-primary` | Conversation scroller, ImageCropper selection |
-| `focus-visible:ring-3 focus-visible:ring-focus-brand` | Chat |
-
-### Known drift (`ring-2`)
-
-These use `ring-2` instead of `ring-3`. Do not copy them.
-
-| Component | Recipe |
-| --- | --- |
-| Card (interactive) | `focus-visible:ring-2 focus-visible:ring-focus-primary` |
-| Resizable handle | `focus-visible:ring-2 focus-visible:ring-focus-primary focus-visible:ring-offset-0` |
-| CodeEditor | `focus-within:ring-2 focus-within:ring-focus-primary` |
-| SimpleCharts rows and segments | `focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus-primary` (one LineChart element uses `ring-focus-brand`) |
-
-### Example
-
-```tsx
-import { Button, Card, CardContent } from '@wallarm-org/design-system';
-
-export const FocusExamples = ({ onOpen, onDelete }: { onOpen: () => void; onDelete: () => void }) => (
-  <>
-    {/* DS components draw their own ring. Pick the color through props. */}
-    <Button variant='primary' color='destructive' onClick={onDelete}>
-      Delete
-    </Button>
-
-    {/* Card becomes focusable and draws its ring when it has an on* handler. */}
-    <Card onClick={onOpen}>
-      <CardContent>Open details</CardContent>
-    </Card>
-
-    {/* An app-built control uses the standard recipe. */}
-    <button
-      type='button'
-      className='rounded-8 outline-none focus-visible:ring-3 focus-visible:ring-focus-primary'
-      onClick={onOpen}
-    >
-      Custom trigger
-    </button>
-  </>
-);
-```
+| `--color-focus-primary` | `ring-focus-primary` | `slate-400` at 30% |
+| `--color-focus-brand` | `ring-focus-brand` | `w-orange-600` at 30% |
+| `--color-focus-destructive` | `ring-focus-destructive` | `red-600` at 20% |
+| `--color-focus-destructive-hover` | `ring-focus-destructive-hover` | `red-600` at 30% |

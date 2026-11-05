@@ -8,7 +8,7 @@ order: 30
 
 # Typography
 
-Set text with the `Text`, `Heading` and `Code` components. Use raw Tailwind classes only inside your own elements.
+Set text with `Text`, `Heading` and `Code`; raw classes go only on your own elements.
 
 ## What you use
 
@@ -20,85 +20,71 @@ Set text with the `Text`, `Heading` and `Code` components. Use raw Tailwind clas
 | Code, IDs, hashes, paths | `<Code size="m">` | `font-mono` on a `<span>` |
 | Text in your own element | `text-sm`, `font-medium`, `leading-20` | `font-regular` |
 
-There are no `heading-*` or `body-*` classes. There is no `font-regular` class. `text-md` is an alias of `text-sm` (14/20); write `text-sm`.
+There are no `heading-*` or `body-*` classes, no `font-regular`, and no `semibold` value on the `weight` prop.
 
 ## Rules
 
 - If you need body text in an app screen, pass `size="sm"` (14/20). `Text` defaults to `lg` (16/24).
-- If you need a heading, set `as` to the real level. `Heading` defaults to `as="h1"`, `size="xl"` and `weight="bold"`.
-- If you see `size="md"` on `Text`, it renders 14/20, the same as `sm`. Write `size="sm"` in new code.
-- **Never** pass `className` to `Text`. Its props type omits `className`, so the build fails.
-- **Never** pass `className` to `Heading`. The type accepts it, but the component overwrites it.
-- If you need a style that `Text` or `Heading` props do not cover, wrap the text in your own element and style that element.
-- **Never** pass `lineHeight="none"` to `Text`. `leading-none` resolves to `0px` here, so the lines overlap.
-- If you write a `leading-N` class, N is pixels. `leading-20` is 20px, `leading-5` is 5px.
-- If you need a line height for a size, use the named step: `leading-sm` is 20px, `leading-xl` is 28px.
-- If a `Text` or `Code` sits inside a `<p>`, pass `asChild` with a `<span>` child. Both render a `<p>` by default.
-- If you pass `lineClamp`, keep it between 1 and 6. The components build `line-clamp-N` at runtime. Tailwind generates only `line-clamp-1` to `line-clamp-6`, the ones DS source spells out. Higher values get no CSS.
-- If you color a `Code`, pass `color="destructive"` for errors. `Code` has no `danger` value; `Text` has no `destructive` value.
-- **Never** add letter spacing to text below 20px. `Heading` sets tracking per size for you.
-- **Never** use `font-pixel` or `font-serif` in app screens. `font-serif` points at Inter, which the DS does not ship.
-- If you need weight 800, write `font-extrabold`. **Never** write `font-extrablod`: it is a misspelled DS token.
+- If you see `size="md"` on `Text` or `text-md`, write `sm` / `text-sm`. They render the same 14/20.
+- If you need a heading, set `as` to the real level. `Heading` defaults to `h1`, `size="xl"`, `weight="bold"`.
+- **Never** pass `className` to `Text` (the build fails) or `Heading` (it is ignored). Style a wrapper element instead.
+- If a `Text` or `Code` sits inside a `<p>`, pass `asChild` with a `<span>` child. Both render a `<p>`. Still pass `size`: `asChild` keeps the default (16px).
+- `leading-N` is N pixels (`leading-5` is 5px). For a size's paired line height, use the named step (`leading-sm` = 20px).
+- **Never** use `leading-none` or `lineHeight="none"`: 0px, lines overlap.
+- Keep `lineClamp` 1–6; higher values get no CSS.
+- If you mark an error, use `color="danger"` on `Text` and `color="destructive"` on `Code`. Neither accepts the other's value.
+- **Never** add letter spacing below 20px. `Heading` sets tracking per size.
+- **Never** use `font-pixel` (decorative, `EmptyState` only) or `font-serif` (points at Inter, not bundled) in app screens.
+- If you need weight 800, write `font-extrabold`, **never** the misspelled `font-extrablod`.
+- `font-medium` is 450, not 500. You load no font: the theme ships Geist and Geist Mono.
 
-| Write | Not |
-| --- | --- |
-| `<Text size="sm">` | `<Text size="md">` |
-| `<Heading as="h2" size="lg" weight="medium">` | `<Heading size="lg">` for a section title (renders `h1`) |
-| `<Text size="sm" weight="medium">` | `<Text size="sm" className="font-semibold">` |
-| `<div className="text-sm leading-20">` | `<div className="text-sm leading-5">` |
-| `<Text asChild><span>…</span></Text>` inside a `<p>` | `<Text>` inside a `<p>` |
-| `font-extrabold` | `font-extrablod` |
+## Examples
+
+A section header with a secondary description and a code value.
+
+```tsx
+import { Code, Heading, Text } from '@wallarm-org/design-system';
+
+<section className='flex flex-col gap-8'>
+  <Heading as='h2' size='lg' weight='medium'>Blocking rules</Heading>
+  <Text size='sm' color='secondary'>Requests that match are blocked.</Text>
+  <Code size='m'>/api/v1/users/{'{id}'}</Code>
+</section>
+```
+
+Inline text inside a paragraph you own, with its size set to match.
+
+```tsx
+<p className='text-sm leading-20'>
+  Last seen <Text asChild size='sm' weight='medium'><span>2 min ago</span></Text>
+</p>
+```
+
+A style the props lack goes on a wrapper.
+
+```tsx
+<div className='tabular-nums'>
+  <Text size='sm'>1,204 requests</Text>
+</div>
+```
 
 ## Reference
 
-### Font families
+### Size scale (`text-*` sets size and paired line height, px)
 
-| Class | Font | Use for |
-| --- | --- | --- |
-| `font-sans` | Geist | UI text (the default) |
-| `font-sans-display` | Geist (same stack as `font-sans`) | Used by `Text` and `Heading` |
-| `font-mono` | Geist Mono | Code, IDs, values. Use `Code` |
-| `font-pixel` | Geist Pixel | Decorative only (`EmptyState`) |
-| `font-serif` | Inter (not bundled) | Nothing |
-
-The theme self-hosts Geist and Geist Mono. You load no font yourself.
-
-### Size scale
-
-Every `text-*` class sets the font size and its paired line height, in px.
-
-| Class | Size | Line height |
-| --- | --- | --- |
-| `text-2xs` | 10px | 12px |
-| `text-xs` | 12px | 16px |
-| `text-sm` | 14px | 20px |
-| `text-base` | 16px | 24px |
-| `text-lg` | 18px | 24px |
-| `text-xl` | 20px | 28px |
-| `text-2xl` | 24px | 32px |
-| `text-3xl` | 30px | 36px |
-| `text-4xl` | 36px | 40px |
-| `text-5xl` | 48px | 48px |
-| `text-6xl` | 60px | 60px |
-| `text-7xl` | 72px | 72px |
-| `text-8xl` | 96px | 96px |
-| `text-9xl` | 128px | 128px |
-
-`text-md` is an alias of `text-sm`: 14px, 20px line height.
-
-### Line height
-
-| Class | Value |
-| --- | --- |
-| `leading-2xs` … `leading-9xl` | The paired line height from the size scale (`leading-sm` = 20px) |
-| `leading-N` | N px (`leading-16` = 16px) |
-| `text-sm/20` | 14px size, 20px line height |
-| `leading-none` | 0px. Do not use |
-| `leading-tight`, `leading-snug`, `leading-normal`, `leading-relaxed` | Unitless Tailwind ratios |
+| Class | Size / LH | Class | Size / LH |
+| --- | --- | --- | --- |
+| `text-2xs` | 10 / 12 | `text-3xl` | 30 / 36 |
+| `text-xs` | 12 / 16 | `text-4xl` | 36 / 40 |
+| `text-sm` | 14 / 20 | `text-5xl` | 48 / 48 |
+| `text-base` | 16 / 24 | `text-6xl` | 60 / 60 |
+| `text-lg` | 18 / 24 | `text-7xl` | 72 / 72 |
+| `text-xl` | 20 / 28 | `text-8xl` | 96 / 96 |
+| `text-2xl` | 24 / 32 | `text-9xl` | 128 / 128 |
 
 ### Weights
 
-| Class | Value | `Text` / `Heading` `weight` |
+| Class | Value | `weight` prop |
 | --- | --- | --- |
 | `font-light` | 300 | `light` |
 | `font-normal` | 400 | `regular` |
@@ -107,72 +93,22 @@ Every `text-*` class sets the font size and its paired line height, in px.
 | `font-bold` | 700 | `bold` |
 | `font-extrabold` | 800 | none |
 
-`font-medium` is 450, not 500. The `weight` prop has no `semibold` value.
+### Component sizes (size / line height)
 
-### `Text` sizes
-
-`Text` renders a `<p>`. Its `color` defaults to `inherit`.
-
-| `size` | Size / line height |
-| --- | --- |
-| `xs` | 12 / 16 |
-| `sm` | 14 / 20 |
-| `md` | 14 / 20 (alias of `sm`) |
-| `lg` (default) | 16 / 24 |
-| `xl` | 18 / 28 |
-
-`color` values: `primary`, `primary-alt`, `secondary`, `secondary-alt`, `tertiary-alt`, `danger`, `inherit`. There is no `success`, `warning` or `brand` color on `Text`.
-
-Other props: `align`, `truncate`, `lineClamp`, `inline`, `grow`, `decoration="dashed"`, `textTransform`, `lineHeight`, `asChild`. If `truncate` is false, the text keeps its line breaks (`whitespace-pre-wrap`).
-
-### `Heading` sizes
-
-`Heading` renders the element in `as`, default `h1`.
-
-| `size` | Size / line height | Tracking |
+| Component | Sizes | Default |
 | --- | --- | --- |
-| `sm` | 14 / 20 | normal |
-| `md` | 16 / 24 | normal |
-| `lg` | 18 / 24 | normal |
-| `xl` (default) | 20 / 28 | -0.005em |
-| `2xl` | 24 / 32 | -0.01em |
-| `3xl` | 30 / 36 | -0.01em |
-| `4xl` | 36 / 40 | -0.015em |
-| `5xl` | 48 / 48 | -0.015em |
-| `6xl` | 60 / 60 | -0.02em |
-| `7xl` | 72 / 72 | -0.02em |
+| `Text` | `xs` 12/16, `sm` 14/20, `md` 14/20, `lg` 16/24, `xl` 18/28 | `lg` |
+| `Heading` | `sm`, `md`, `lg`, `xl`, `2xl`…`7xl` = `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`…`text-7xl` | `xl` |
+| `Code` | `xs` 10/12, `s` 12/16, `m` 14/20, `l` 16/20 | `l` |
 
-`color` values: `primary`, `primary-alt`, `secondary`, `secondary-alt`, `inherit` (default).
+### Component colors
 
-### `Code` sizes
+| Component | `color` values | Default |
+| --- | --- | --- |
+| `Text` | `primary`, `primary-alt`, `secondary`, `secondary-alt`, `tertiary-alt`, `danger`, `inherit` | `inherit` |
+| `Heading` | `primary`, `primary-alt`, `secondary`, `secondary-alt`, `inherit` | `inherit` |
+| `Code` | `primary`, `primary-alt`, `secondary`, `destructive` | `primary` |
 
-`Code` renders a `<p>` in Geist Mono. Its `color` defaults to `primary`.
+`Text` has no `success`, `warning` or `brand`. Without `truncate`, `Text` keeps line breaks. `Code` accepts `className`.
 
-| `size` | Size / line height |
-| --- | --- |
-| `xs` | 10 / 12 |
-| `s` | 12 / 16 |
-| `m` | 14 / 20 |
-| `l` (default) | 16 / 20 |
-
-`color` values: `primary` (default), `primary-alt`, `secondary`, `destructive`. Other props: `weight`, `italic`, `truncate`, `lineClamp`, `asChild`. `Code` accepts `className` and merges it.
-
-### Example
-
-```tsx
-import { Code, Heading, Text } from '@wallarm-org/design-system';
-
-export const RuleSummary = () => (
-  <section className='flex flex-col gap-8'>
-    <Heading as='h2' size='lg' weight='medium'>
-      Blocking rules
-    </Heading>
-    <Text size='sm' color='secondary'>
-      Requests that match these rules are blocked before they reach your API.
-    </Text>
-    <Code size='m'>/api/v1/users/{'{id}'}</Code>
-  </section>
-);
-```
-
-See [Spacing](../foundations/spacing.md) for gap and padding, and [Color](../foundations/color.md) for text colors.
+Related: [Spacing](../foundations/spacing.md), [Color](../foundations/color.md).

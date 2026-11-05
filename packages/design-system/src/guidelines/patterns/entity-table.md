@@ -8,364 +8,198 @@ order: 20
 
 # Entity table
 
-An entity table is one `Table` with a fixed cell vocabulary, a row menu and a bulk action bar.
+One `Table` with a fixed cell vocabulary, a trailing row menu and a bulk bar.
 
 ## When to use
 
 | Need | Use | Not |
 | --- | --- | --- |
-| A list of entities on a page | `Table` inside `PageContent` | A `div` grid, `Card` per row |
-| A list nested in a drawer or dialog | The same `Table` inside `DrawerBody` or `DialogBody` (import `Dialog*` from `@wallarm-org/design-system/Dialog`) | A custom list with borders |
-| Actions on many rows at once | `onRowSelectionChange` plus `TableActionBar` | Your own floating bar |
-| Actions on one row | A trailing `actions` display column with a `DropdownMenu` | Buttons repeated in every row |
-| Key-value details of one entity | `Attribute` in a drawer | A two-column `Table` |
+| A list of entities on a page | `Table` inside `PageContent` | A `div` grid, a `Card` per row |
+| A list in a drawer or dialog | The same `Table` inside `DrawerBody` or `DialogBody` (from `@wallarm-org/design-system/Dialog`) | A custom bordered list |
+| Actions on one row | A trailing `actions` column with a `DropdownMenu` | Buttons repeated in every row |
+| Actions on many rows | `onRowSelectionChange` plus `TableActionBar` | Your own floating bar |
+| Details of one entity | `Attribute` in a drawer | A two-column `Table` |
+| Kanban, preference matrix | Product code | This pattern |
 
-If the page also needs a header, search and status tabs, follow [Resource list page](./resource-list-page.md) for the page shell.
-
-## Anatomy
-
-| Part | What renders it | Notes |
-| --- | --- | --- |
-| Frame | `Table` | Draws `rounded-12 border border-border-primary-light`. Do not wrap it in a bordered `div`. |
-| Header row | `Table` | Built in. Grows when a column has `meta.description` with `type: 'text'`. |
-| Selection column | `Table`, when you pass `onRowSelectionChange` | Auto-injected, 33px, pinned left. You do not declare it. |
-| Master column | The first entry in `columns` | Always pinned left, never hideable. Holds the hover menu and the master-cell click. |
-| Data columns | Your `columns` entries | One entry per attribute. |
-| Actions column | A display column `{ id: 'actions', … }` placed last | Holds the always-visible `…` row menu. |
-| Bulk bar | `TableActionBar` as a child of `Table` | Pinned above the bottom edge of the viewport, within the table's width, while rows are selected. |
-| Empty state | `TableEmptyState` as a child of `Table` | Renders only when there are no rows and `isLoading` is false. |
-
-Cell vocabulary. Pick from this table; do not invent new cell styles.
+Use only these cells.
 
 | Data | Cell | Not |
 | --- | --- | --- |
-| Person | `Avatar size='md'` with `AvatarFallback name`, `AvatarContent`, `AvatarName` | An `img` plus a `span` |
-| Person or provider with a second line | Add `AvatarDescription` inside `AvatarContent` | Two `Text` lines with your own gap |
+| Person | `Avatar size='md'` with `AvatarName` | `img` plus `span` |
+| Second line | `AvatarDescription` | Two `Text` lines |
 | Status | `Badge variant='dotted' type='secondary' color=…` | Colored text, a raw dot |
-| Built-in or locked row | `Badge` with a `Lock` icon inside a `Tooltip` | A lock icon alone with no explanation |
-| Many short labels (groups, roles) | `OverflowList` of `Tag` | Comma-joined text, a custom "+N" |
-| ID, key, hash | `Code size='m'` | Monospace `span` |
-| Timestamp, recent | `FormatDateTime value={…} format='relative'` | `toLocaleString()` |
-| Timestamp, exact | `FormatDateTime format='datetime'` (stacked date over time by default) | Two cells for date and time |
-| Count, metric | The raw number; it aligns right on its own. If values can be missing, set `meta: { sortType: 'number' }` | `meta.align` on number columns |
-| On/off setting | `Switch` with `SwitchControl` | `Checkbox`, a `Badge` |
-| Missing value | The string `'—'` (em dash) | `0`, `N/A`, an empty cell |
-
-Status colors:
-
-| Status | `color` |
-| --- | --- |
-| Active, Enabled, Connected | `green` |
-| Invited, Pending, Needs attention | `yellow` |
-| Expired, Failed, Error | `red` |
-| Deactivated, Disabled, Draft | `gray` |
-
-## Layout and spacing
-
-These values are built into `Table`. **Never** override them with `className`, `meta.cellClassName` or wrappers.
-
-| Element | Built-in value | Figma |
-| --- | --- | --- |
-| Body cell | `px-16 py-8`, `text-sm`, `bg-bg-surface-2` | 36px single-line row |
-| Header cell | `pl-16 pr-4 py-4`, `text-xs font-medium text-text-secondary`, `bg-bg-light-primary` | 32px header |
-| Header with `description.type: 'text'` | Second line under the title | 48px header |
-| Cell borders | `border-b border-r border-border-primary-light` | 1px grid |
-| Selection column | 33px | 32px plus border |
-| Drag handle column | 24px, auto-injected with `onRowReorder` | |
-| Minimum column width | 96px unless you set `minSize` | |
-| Bulk bar | `pl-12 pr-8 py-8 rounded-16`, 40px between summary and actions, 8px between actions | |
-| Empty state wrapper | `py-128` | |
-
-Set column widths with `size` in pixels:
-
-| Column | `size` |
-| --- | --- |
-| Name with avatar | `320` |
-| Email | `240` |
-| Status | `140` |
-| Timestamp | `200` |
-| Actions | `60` with `minSize: 60` |
-
-- If you omit `minSize` on the actions column, it renders 96px wide. Set `minSize: 60`.
-- If columns should keep their `size` and leave empty space on the right, pass `stretch={false}`. The default `stretch` fills the container.
-- If a two-line cell is needed, use `AvatarDescription` or a `Text size='xs' color='secondary'` second line. **Never** set a row height.
-- Put the `Table` straight into `PageContent`, `DrawerBody` or `DialogBody`. **Never** add padding around it. See [Spacing](../foundations/spacing.md).
-
-## States
-
-| State | Do | Not |
-| --- | --- | --- |
-| First load | `isLoading` (12 skeleton rows by default; change with `skeletonCount`) | A `Loader` over the table |
-| Nothing created yet | `TableEmptyState` with `EmptyState type='collection-empty'`. No button when `PageActions` already holds Create | An empty frame; a second create button |
-| Filters match nothing | `TableEmptyState` with `EmptyState type='collection-empty'`, title "No results found" and a `Button variant='outline' color='neutral'` "Reset filters" | A create button; `type='no-results'` (the compact card or menu treatment) |
-| Rows selected | `TableActionBar` appears on its own | Showing the bar yourself |
-| Row open in a drawer | `activeRowId={openId}` highlights the row | `className` on a row |
-| Switch saving | Keep the `Switch`, show a `Loader` in a reserved slot next to it | Replacing the `Switch` with a spinner |
-| Row locked by a higher scope | Disable the control and show `Lock` with a `Tooltip` that names the scope | Hiding the row |
-
-- If the collection is empty, keep the page header and toolbar. See [Empty states](./empty-states.md).
-- If a value is `null`, `FormatDateTime` renders `—` on its own. Do not wrap it in a check.
+| Locked row | `Badge` with `Lock` in a `Tooltip` | A bare lock icon |
+| Groups, roles | `OverflowList` of `Tag` | Joined text, custom "+N" |
+| ID, key, hash | `Code size='m'` | A monospace `span` |
+| Recent time | `FormatDateTime format='relative'` | `toLocaleString()` |
+| Exact time | `FormatDateTime format='datetime'` | Two cells |
+| Count, metric | The raw number | `meta.align` |
+| On/off setting | `Switch` with `SwitchControl` | `Checkbox` |
+| Missing value | `'—'` (em dash) | `0`, `N/A`, an empty cell |
 
 ## Rules
 
-- If the table has row actions, add a trailing display column `{ id: 'actions', header: '', size: 60, minSize: 60, enableHiding: false, cell }`. A display column has an `id` and no `accessorKey`.
-- **Never** rely on `meta.renderMenuAction` for an entity table. Its menu is hidden until the row is hovered, and Figma requires an always-visible menu.
-- If you still use `meta.renderMenuAction`, put it on the first column. On other columns it renders nothing unless the column has `meta.resizeType: 'cut'`.
-- Render the row menu trigger as `<Button variant='ghost' color='neutral' size='small' aria-label=…>` with the `Ellipsis` icon.
-- Order row menu items: view or open, edit, reorder, state changes, then `DropdownMenuSeparator`, then destructive items.
-- Use `DropdownMenuItem variant='destructive'` for destructive items. Name the entity: "Delete user", not "Delete".
-- If a row is inherited or read-only, show only the view item and an "Open at {scope}" item.
-- If a destructive item is selected, open a confirmation dialog. See [Confirmation dialogs](./confirmation-dialogs.md).
-- Pass `getRowId={row => row.id}`. Selection, `activeRowId` and reordering key on this id.
-- If you need selection, pass both `rowSelection` and `onRowSelectionChange`. Without `onRowSelectionChange` there is no checkbox column.
-- If you need sorting, pass `sorting` and `onSortingChange`. If the server sorts, also pass `manualSorting`.
-- Put bulk actions inside `TableActionBar` as `Button variant='ghost' color='neutral-alt'`. Put a destructive action last with `color='destructive'`.
-- If a bulk action has several options, use a `DropdownMenu` with a `Button` trigger inside `TableActionBar`.
-- If you need different selection text, pass `TableActionBarSelection` with `BulkBarSummaryCount`, `BulkBarSummarySelectAll` and `BulkBarSummaryClear` as its direct children.
-- If a header needs an explanation, use `meta.description: { type: 'tooltip', content }`. The title gets a dashed underline.
-- If the explanation must stay visible, use `meta.description: { type: 'text', content }`.
-- Show a missing metric as `'—'`. **Never** show `0` for data that does not exist.
-- If a column holds numbers, do not set `meta.align`. Number columns detected from the first row align right on their own.
-- If the first row's value can be `null` or `'—'`, detection fails and the column aligns left. Set `meta: { sortType: 'number' }` on that column.
-- If rows can be dragged, pass `onRowReorder={({ activeRowId, overRowId }) => …}`. Pass `getRowCanDrag` to pin rows in place.
-- Keep the `items` array of `OverflowList` referentially stable. Pass `row.original.groups`, not a new array per render.
-- **Never** use `data-slot` in tests. Pass `data-testid` to `Table`; parts derive from it.
+**Layout and spacing**
 
-There is no `maxItems` prop on `OverflowList`; it hides what does not fit the cell width. There is no `rowHeight` prop on `Table`. There is no `actions` column type and no `alwaysShowMenu` option. There is no `TableRow` component to render rows by hand. There is no `status` prop on `Badge`; map status to `color` yourself.
+- The first column is pinned and never hideable: put the entity name there.
+- `Table` owns its frame, borders, padding and header. **Never** wrap it in a bordered `div` or restyle cells via `meta.cellClassName`.
+- `PageContent`, `DrawerBody` and `DialogBody` own the gutter. **Never** add `p-24` or any padding around `Table`.
+- Set widths with `size`: name `320`, email `240`, status `140`, timestamp `200`, actions `60` plus `minSize: 60` (the default minimum is 96px).
+- If columns must keep their `size`, pass `stretch={false}`.
+- Two-line cell: add a `Text size='xs' color='secondary'` line; there is no `rowHeight`.
 
-## Example
+**Row menu**
+
+- If rows have actions, add the trailing display column shown below (an `id`, no `accessorKey`, `enableHiding: false`).
+- **Never** use `meta.renderMenuAction` for entity actions: its menu shows only on hover. There is no `actions` column type, `alwaysShowMenu` or `TableRow`.
+- Trigger: `Button variant='ghost' color='neutral' size='small'`, `Ellipsis` icon, `aria-label` naming the row.
+- Order items: open, edit, reorder, state changes, `DropdownMenuSeparator`, destructive.
+- Use `variant='destructive'` and name the entity: "Delete user", not "Delete". Confirm before deleting.
+- Inherited or read-only row: only view and "Open at {scope}".
+
+**Data and selection**
+
+- Always pass `getRowId={row => row.id}`; selection, `activeRowId` and reordering key on it.
+- For selection, pass `rowSelection` and `onRowSelectionChange`; without the handler there are no checkboxes.
+- Sorting: `sorting` and `onSortingChange`, plus `manualSorting` if the server sorts.
+- Bulk actions: `Button variant='ghost' color='neutral-alt'` in `TableActionBar`; destructive last with `color='destructive'`; options go in a `DropdownMenu`.
+- Custom selection text: `TableActionBarSelection` (from `@wallarm-org/design-system/Table`) with `BulkBarSummaryCount`, `BulkBarSummarySelectAll`, `BulkBarSummaryClear` as direct children.
+- Drag to reorder: `onRowReorder`; pin rows with `getRowCanDrag`.
+
+**Values**
+
+- Status `color`: Active, Enabled, Connected `green`; Invited, Pending, Needs attention `yellow`; Expired, Failed, Error `red`; Deactivated, Disabled, Draft `gray`. `Badge` has no `status` prop.
+- **Never** show `0` for missing data; show `'—'`. `FormatDateTime` renders `—` for `null` itself.
+- **Never** set `meta.align` on numbers; they align right on their own. If the first row can be `null` or `'—'`, set `meta: { sortType: 'number' }`.
+- Header explanation: `meta.description: { type: 'tooltip', content }`; `type: 'text'` keeps it visible.
+- Import `OverflowList` from `@wallarm-org/design-system/OverflowList`; pass it a stable `items` array (`row.original.groups`). There is no `maxItems`.
+- Tests: pass `data-testid` to `Table`; **never** select by `data-slot`.
+
+## Examples
+
+A person cell with a second line.
 
 ```tsx
-import { useState } from 'react';
-import {
-  Avatar,
-  AvatarContent,
-  AvatarDescription,
-  AvatarFallback,
-  AvatarName,
-  Badge,
-  type BadgeProps,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuItemIcon,
-  DropdownMenuItemText,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  EmptyState,
-  EmptyStateDescription,
-  EmptyStateMessage,
-  EmptyStateTitle,
-  FormatDateTime,
-  Table,
-  TableActionBar,
-  type TableColumnDef,
-  TableEmptyState,
-  type TableRowSelectionState,
-  type TableSortingState,
-  Tag,
-} from '@wallarm-org/design-system';
-import { Ellipsis, Pencil, Trash2 } from '@wallarm-org/design-system/icons';
-import { OverflowList } from '@wallarm-org/design-system/OverflowList';
+cell: ({ row }) => (
+  <Avatar size='md'>
+    <AvatarFallback name={row.original.name} />
+    <AvatarContent>
+      <AvatarName>{row.original.name}</AvatarName>
+      <AvatarDescription>{row.original.email}</AvatarDescription>
+    </AvatarContent>
+  </Avatar>
+),
+```
 
-type UserStatus = 'active' | 'invited' | 'expired' | 'deactivated';
+Status badge and tags.
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  status: UserStatus;
-  groups: string[];
-  lastActiveAt: string | null;
-}
+```tsx
+const renderGroup = (group: string) => <Tag key={group}>{group}</Tag>;
 
-const STATUS: Record<UserStatus, { label: string; color: BadgeProps['color'] }> = {
-  active: { label: 'Active', color: 'green' },
-  invited: { label: 'Invited', color: 'yellow' },
-  expired: { label: 'Invite expired', color: 'red' },
-  deactivated: { label: 'Deactivated', color: 'gray' },
-};
+{ accessorKey: 'status', header: 'Status', size: 140,
+  cell: ({ row }) => (
+    <Badge variant='dotted' type='secondary' color={STATUS[row.original.status].color}>
+      {STATUS[row.original.status].label}
+    </Badge>
+  ) },
+{ accessorKey: 'groups', header: 'Groups', enableSorting: false,
+  cell: ({ row }) =>
+    row.original.groups.length > 0
+      ? <OverflowList className='gap-4' items={row.original.groups} itemRenderer={renderGroup} />
+      : '—' },
+```
 
-interface UserRowMenuProps {
-  user: User;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-}
+The always-visible row menu column.
 
-const UserRowMenu = ({ user, onEdit, onDelete }: UserRowMenuProps) => {
-  const handleEdit = () => onEdit(user);
-  const handleDelete = () => onDelete(user);
-
-  return (
+```tsx
+{ id: 'actions', header: '', size: 60, minSize: 60, enableHiding: false,
+  cell: ({ row }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' color='neutral' size='small' aria-label={`Actions for ${user.name}`}>
+        <Button variant='ghost' color='neutral' size='small' aria-label={`Actions for ${row.original.name}`}>
           <Ellipsis />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onSelect={handleEdit}>
-          <DropdownMenuItemIcon>
-            <Pencil />
-          </DropdownMenuItemIcon>
+        <DropdownMenuItem onSelect={() => onEdit(row.original)}>
           <DropdownMenuItemText>Edit</DropdownMenuItemText>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant='destructive' onSelect={handleDelete}>
-          <DropdownMenuItemIcon>
-            <Trash2 />
-          </DropdownMenuItemIcon>
+        <DropdownMenuItem variant='destructive' onSelect={() => onDelete(row.original)}>
           <DropdownMenuItemText>Delete user</DropdownMenuItemText>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-};
-
-const renderGroup = (group: string) => <Tag key={group}>{group}</Tag>;
-
-interface UsersTableProps {
-  users: User[];
-  isLoading: boolean;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-  onBulkDelete: (ids: string[]) => void;
-}
-
-export const UsersTable = ({
-  users,
-  isLoading,
-  onEdit,
-  onDelete,
-  onBulkDelete,
-}: UsersTableProps) => {
-  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'name', desc: false }]);
-  const [selection, setSelection] = useState<TableRowSelectionState>({});
-
-  const columns: TableColumnDef<User>[] = [
-    {
-      accessorKey: 'name',
-      header: 'Name',
-      size: 320,
-      cell: ({ row }) => (
-        <Avatar size='md'>
-          <AvatarFallback name={row.original.name} />
-          <AvatarContent>
-            <AvatarName>{row.original.name}</AvatarName>
-            <AvatarDescription>{row.original.email}</AvatarDescription>
-          </AvatarContent>
-        </Avatar>
-      ),
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      size: 140,
-      cell: ({ row }) => (
-        <Badge variant='dotted' type='secondary' color={STATUS[row.original.status].color}>
-          {STATUS[row.original.status].label}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'groups',
-      header: 'Groups',
-      enableSorting: false,
-      cell: ({ row }) =>
-        row.original.groups.length > 0 ? (
-          <OverflowList className='gap-4' items={row.original.groups} itemRenderer={renderGroup} />
-        ) : (
-          '—'
-        ),
-    },
-    {
-      accessorKey: 'lastActiveAt',
-      header: 'Last active',
-      size: 200,
-      meta: { description: { type: 'tooltip', content: 'Last sign-in or API call' } },
-      cell: ({ row }) => <FormatDateTime value={row.original.lastActiveAt} format='relative' />,
-    },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: ({ row }) => <UserRowMenu user={row.original} onEdit={onEdit} onDelete={onDelete} />,
-    },
-  ];
-
-  const handleBulkDelete = () => onBulkDelete(Object.keys(selection));
-
-  return (
-    <Table
-      aria-label='Users'
-      data={users}
-      columns={columns}
-      getRowId={user => user.id}
-      isLoading={isLoading}
-      sorting={sorting}
-      onSortingChange={setSorting}
-      rowSelection={selection}
-      onRowSelectionChange={setSelection}
-    >
-      <TableActionBar>
-        <Button variant='ghost' color='neutral-alt'>
-          Assign role
-        </Button>
-        <Button color='destructive' onClick={handleBulkDelete}>
-          <Trash2 /> Delete
-        </Button>
-      </TableActionBar>
-      <TableEmptyState>
-        <EmptyState type='collection-empty'>
-          <EmptyStateMessage>
-            <EmptyStateTitle>No users yet</EmptyStateTitle>
-            <EmptyStateDescription>Invite people to sign in to your organization.</EmptyStateDescription>
-          </EmptyStateMessage>
-        </EmptyState>
-      </TableEmptyState>
-    </Table>
-  );
-};
+  ) },
 ```
 
-To override the selection summary, import from the subpath. `TableActionBarSelection` is not in the root barrel.
+Selection, sorting, bulk bar and empty state together.
 
 ```tsx
-import {
-  BulkBarSummaryClear,
-  BulkBarSummaryCount,
-  TableActionBarSelection,
-} from '@wallarm-org/design-system/Table';
+<Table
+  aria-label='Users'
+  data={users}
+  columns={columns}
+  getRowId={user => user.id}
+  isLoading={isLoading}
+  sorting={sorting}
+  onSortingChange={setSorting}
+  rowSelection={selection}
+  onRowSelectionChange={setSelection}
+>
+  <TableActionBar>
+    <Button variant='ghost' color='neutral-alt'>Assign role</Button>
+    <Button color='destructive' onClick={handleBulkDelete}><Trash2 /> Delete</Button>
+  </TableActionBar>
+  <TableEmptyState>
+    <EmptyState type='collection-empty'>
+      <EmptyStateMessage>
+        <EmptyStateTitle>No users yet</EmptyStateTitle>
+        <EmptyStateDescription>Invite people to sign in to your organization.</EmptyStateDescription>
+      </EmptyStateMessage>
+    </EmptyState>
+  </TableEmptyState>
+</Table>
 ```
+
+A header tooltip on a number column that may be empty.
+
+```tsx
+{ accessorKey: 'requests', header: 'Requests', size: 140,
+  meta: { sortType: 'number', description: { type: 'tooltip', content: 'Last 24 hours' } },
+  cell: ({ row }) => row.original.requests ?? '—' },
+```
+
+## States
+
+| State | Show | Example component |
+| --- | --- | --- |
+| First load | `isLoading` (12 skeleton rows; `skeletonCount`), not a `Loader` | `Table` |
+| Nothing created | `EmptyState type='collection-empty'`; no button if `PageActions` has Create; keep header and toolbar | `TableEmptyState` |
+| No matches | `type='collection-empty'`, "No results found", `Button variant='outline' color='neutral'` "Reset filters"; not `type='no-results'` | `TableEmptyState` |
+| Rows selected | The bar appears on its own | `TableActionBar` |
+| Row open in a drawer | `activeRowId={openId}`; not a row `className` | `Table` |
+| Switch saving | Keep the `Switch`, `Loader` in a reserved slot beside it | `Switch`, `Loader` |
+| Locked by scope | Disabled control, `Lock` with a `Tooltip` naming the scope; never hide the row | `Tooltip` |
 
 ## What your app owns
 
 | You own | The DS owns |
 | --- | --- |
-| The `columns` array, column order and widths | Cell padding, borders, header styling, row hover and selected backgrounds |
-| Mapping each status to a `Badge` `color` and label | The `Badge` dot, size and colors |
-| The row menu items, their order and their handlers | `DropdownMenu` positioning, focus and keyboard |
-| Fetching, filtering, server sorting and pagination | Client sorting when `manualSorting` is not set |
-| Which bulk actions exist and what they do | Bar placement, open state, "Select all" and "Clear" wiring |
-| Confirmation before destructive actions | Nothing; compose it from `Dialog` parts |
-| The "Open at {scope}" link for inherited rows | Nothing; there is no scope marker component |
-
-Known gaps. Use the recipe; do not invent props.
-
-- **Always-visible row menu.** `meta.renderMenuAction` shows the menu only on row hover, while a menu is open, or while the row is `activeRowId`. Figma wants it always visible. Use the trailing `actions` display column. There is no Table option for this yet.
-- **Scope marker.** The level dot with owner and lock from Deployment designs has no component. Compose `Badge variant='dotted'` with a `Lock` icon locally.
-- **Metric cell.** A large percentage over a muted "x of y" has no component. Compose `FormatNumber` and `Text size='xs' color='secondary'` in the cell.
-- **Grouped, orderable tables, kanban boards and preference matrices** stay in your product. Build them from `Table` with `getSubRows`, `renderGroupRow` and `onRowReorder`.
+| `columns`, order, widths | Cell padding, borders, header, hover and selected backgrounds |
+| Status-to-`color` mapping and labels | `Badge` dot, size and colors |
+| Row menu items and handlers | Menu focus and keyboard |
+| Fetching, filtering, server sorting, pagination | Client sorting |
+| Which bulk actions exist | Bar placement, "Select all", "Clear" |
+| Delete confirmation | Nothing; compose `Dialog` |
+| Scope marker | Nothing; compose `Badge variant='dotted'` with `Lock` |
+| Metric cell (% over "x of y") | Nothing; compose `FormatNumber` and `Text size='xs'` |
+| Grouped or orderable tables | `getSubRows`, `renderGroupRow`, `onRowReorder` |
 
 ## Related
 
-- [Resource list page](./resource-list-page.md): the page shell around the table.
-- [Detail drawer](./detail-drawer.md): what opens from a row; pair with `activeRowId`.
-- [Confirmation dialogs](./confirmation-dialogs.md): confirm destructive row and bulk actions.
-- [Feedback toasts](./feedback-toasts.md): report the result of a row or bulk action.
-- [Empty states](./empty-states.md): empty collection versus no results.
-- [Filtering](./filtering.md): filters that feed `data`.
-- [Spacing](../foundations/spacing.md) and [Color](../foundations/color.md).
+- [Resource list page](./resource-list-page.md): the page shell.
+- [Detail drawer](./detail-drawer.md): opens from a row.
+- [Confirmation dialogs](./confirmation-dialogs.md): confirm deletes.
+- [Feedback toasts](./feedback-toasts.md): report results.
+- [Empty states](./empty-states.md), [Filtering](./filtering.md), [Spacing](../foundations/spacing.md).
