@@ -30,9 +30,15 @@ const allPages = (render: (page: number) => string): string[] => {
 };
 
 // Runs against the built design system (`pnpm --filter @wallarm-org/design-system build`).
-describe.skipIf(!fs.existsSync(REAL_METADATA))('response budget (real metadata)', () => {
+// skipIf still runs the describe body at collection, so the read itself must be guarded:
+// CI's quality job runs tests before any package is built.
+const hasRealMetadata = fs.existsSync(REAL_METADATA);
+
+describe.skipIf(!hasRealMetadata)('response budget (real metadata)', () => {
   const metadata = designSystemMetadataSchema.parse(
-    JSON.parse(fs.readFileSync(REAL_METADATA, 'utf-8')),
+    hasRealMetadata
+      ? JSON.parse(fs.readFileSync(REAL_METADATA, 'utf-8'))
+      : { version: '0.0.0', generatedAt: '', components: [], tokens: [] },
   );
   const source = 'Source: installed @wallarm-org/design-system v0.0.0';
 
