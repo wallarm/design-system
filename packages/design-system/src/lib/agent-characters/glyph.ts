@@ -14,7 +14,7 @@ export interface Look {
   prop: string;
 }
 
-let GUID = 0; // page-style clip ids, only for glyph(): components pass their own (useId)
+let GUID = 0; // page-style clip ids, only for glyph(): components pass their own, keyed by shape
 
 export interface GlyphTree {
   width: number;

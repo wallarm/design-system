@@ -1,8 +1,8 @@
 # Agent characters: Phase 0 decision record (WDS-196)
 
 Date: 2026-11-05. Reference: look v14, the handoff's `reference/agent-characters.html` (2,537 lines). Handoff:
-https://claude.ai/artifact/DaxA77RBheCmk1MtQELbGp. The spike lives on the branch `feat/WDS-196-agent-characters-spike`.
-It is not released.
+https://claude.ai/artifact/DaxA77RBheCmk1MtQELbGp. The work landed on `feat/WDS-195-agent-avatars`
+with WDS-196…204.
 
 This record covers the calls the handoff leaves to engineering for Phase 0 (09 «Phase 0 › Decide and record»). It cites
 the handoff rather than restating it.
@@ -40,30 +40,28 @@ Glyph pixel parity follows from string identity.
 | Package layout | The core sits inside `@wallarm-org/design-system`, framework-free, under `src/lib/agent-characters/` (an internal library the metadata scan skips). React wrappers come in WDS-198/199. A separate package only if P15 brings a non-React consumer (07 §6.1). | The port is plain TS with no React. The host shares DS subpaths per version (H1 below). |
 | Document runtime | One runtime per document on `globalThis[Symbol.for('wallarm.agent-characters')]`, keyed by protocol (07 §6.5). It owns the frame loop, the bake queue, the caches, the behaviour budget, the inviter slot, the id counter and the off switch. | H1: the host shares the DS exact-version and non-singleton, so two DS versions on one page are normal. |
 | Worker bake | **Default from Phase 1.** One blob-URL worker per document runs the same `solveField`/`shade` source with OffscreenCanvas. Any failure falls back to the main thread: no `Worker` or `OffscreenCanvas`, a CSP that blocks `blob:` workers (reported as an async `error`), a crash, or a job error. Pending jobs are re-run there, and later jobs go straight there (unit-tested). The shared functions use no spread or destructuring, so a transpiler injects no module helpers into the worker source. | Pixel-identical to the page in all three engines. The worker path ran natively in each, not via the fallback. The main thread is blocked for ≤ 6.6 ms per layer (27.6 ms on the first call, which starts the worker). The page's bake blocks 34–56 ms. |
-| Cache | PNG blobs as object URLs, never data-URL strings. LRU of 256 baked layers and 64 height fields; evicted URLs are revoked (06 §9). The key is `LOOK_VERSION`, path, colour, pixel size and material. `LOOK_VERSION` hashes the shading source. | `core/bake.ts`, `core/queue.ts`; LRU unit-tested. |
+| Cache | PNG blobs as object URLs, never data-URL strings. LRU of 256 baked layers and 64 height fields; evicted URLs are revoked (06 §9). The key is `LOOK_VERSION`, path, colour, pixel size and material. `LOOK_VERSION` hashes the shading source. | `src/lib/agent-characters/bake.ts`, `queue.ts`; LRU unit-tested. |
 | SVG rendering | **Core-built, React-rendered** (revised in WDS-199). The core builds the markup as a node tree (`charTree`, `glyphTree`) and React renders it; the root is the `<svg>` with `ref: Ref<SVGSVGElement>`, like `AgentGlyph` (07 §6.2's span root was a proposal, «Your call»). Live motion (WDS-201) writes attributes on the rendered nodes outside React render. Previously: **Core-rendered.** The core builds the reference's markup (the `makeChar` template, ported verbatim) and owns every per-frame attribute write. The React wrapper only mounts the node, passes the config and disposes. Final in WDS-199. | Markup ported from strings keeps pixel parity trivial, as the composites above show. Per-frame writes stay outside React render, which the React Compiler needs. |
 | Test runners | Rstest (jsdom) for the pure port, against fixtures captured from the page. Playwright with real browsers for canvas work (`geom`, mask, bake, worker) and side-by-side composites. | jsdom has no canvas or `getBBox`. CI Playwright is Chromium-only in Docker, so WebKit/Firefox parity is a pre-merge manual run of the harness. |
 | Closed sizes | Glyph: 16, 20, 24, 32. 3D: 40, 48, 56, 72, 120, 256. Each place sets liveness and shadow (05 §2.1, D1/D2). | 05 §2.1. No place uses 33–39 px. |
-| Bake scheduling | The page's queue: 14 ms slices, 16 ms apart, dead nodes skipped, front priority. Worker bakes run outside the slices. | `core/queue.ts`, unit-tested. |
+| Bake scheduling | The page's queue: 14 ms slices, 16 ms apart, dead nodes skipped, front priority. Worker bakes run outside the slices. | `src/lib/agent-characters/queue.ts`, unit-tested. |
 
-## Requirements carried into the next phases (from the Phase 0 review)
+## Requirements from the Phase 0 review, and where they landed
 
-These came out of the final review of the spike. Each one belongs to the ticket named in its heading.
-
-**Done in WDS-197:**
-- The core lives in `src/lib/agent-characters/`, so the metadata scan advertises no phantom component. Its JS is left out of the rslib entry until WDS-198 imports it, so only unreachable `.d.ts` files remain in `dist`.
-- The page's geometry for the 12 shapes ships as data (`geom.json`, each entry with the outline it was measured on; the generator refuses stale geometry). `glyph()` needs no canvas.
-- A test keeps `data.gen.ts` equal to `generate()`, which is the CI form of `--check`.
-
-**WDS-198:**
-- **Glyph clip ids come in from the caller (`useId`).** Today a module counter (`GUID`) collides across two DS copies on one page and is impure in render.
-- **Module-level state moves into the document runtime.** That covers caches, the measuring `<svg>` and the worker. `region()` appends to `document.body`, so it runs only in effects or the runtime, never in render.
-
-**WDS-199:**
-- **Revoke only layers nobody references.** Cache eviction must skip URLs that a mounted `<image>` still uses, so the runtime counts references. An evicted object URL breaks on remount or repaint.
-- **Pixel size:** P = ⌈R × size / 136 × min(2, devicePixelRatio)⌉. DPR is read at bake time, not at load.
-- **`bake()` defaults to the worker runner.** The bake queue's jobs are async, so rejections are caught.
-- **`LOOK_VERSION`:** a hand-bumped shading revision plus a hash of the generated data, not a hash of function source, which differs between dev and minified builds.
+- **No unfinished code in the package:** the core lives in `src/lib/agent-characters/` (the metadata scan skips it) and
+  ships only behind `AgentGlyph`, `AgentAvatar` and `AgentLookBuilder` (WDS-197, WDS-198).
+- **Geometry as data:** `GEOMS` and `PRESET_PROPS` are generated from the page; `glyph()` needs no canvas (WDS-197,
+  WDS-204). A test keeps `data.gen.ts` equal to the generator's output.
+- **Glyph clip ids:** named by shape (`agent-glyph-crown-<shape>`), so duplicates across DS copies resolve to identical
+  geometry (WDS-198).
+- **Document runtime:** caches, the measuring path, the queue, the worker and the id counter live on one
+  `globalThis[Symbol.for('wallarm.agent-characters')]` object; listeners start on the first live mount and stop after
+  the last unmount (WDS-200).
+- **Revoke only layers nobody references:** shown bakes are retained and the LRU skips pinned entries (WDS-199).
+- **Pixel size:** P = ⌈R × size / 136 × min(2, devicePixelRatio)⌉, read at bake time (`bakeSize`, WDS-199).
+- **Worker by default:** `useBakedLayers` bakes through the worker runner; its fallback runs through the 14 ms queue
+  (WDS-199).
+- **`LOOK_VERSION`:** a hand-bumped revision (`'v14.1'`), not a hash of function source (WDS-199).
 
 ## Measurements (this machine)
 
@@ -79,7 +77,7 @@ so they are **not** used for budgets.
   - solve 25–41 ms, mask ~2 ms;
   - shade 1.4 ms at P 87, 20.5 ms at P 347;
   - PNG encode 8–20 ms of wall time, async.
-- Raw numbers: the scratchpad `parity/` and `verify/` folders (to be copied next to the handoff's `perf/` once the owner says where they live).
+- Raw numbers: kept with the spike's scratch scripts, outside the repository.
 
 **Not measured:**
 - the low-end machine (P18 unnamed);
