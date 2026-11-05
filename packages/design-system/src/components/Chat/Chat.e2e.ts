@@ -68,7 +68,7 @@ test.describe('Component: Chat', () => {
   });
 
   test.describe('Interactions', () => {
-    test('Should play Wally's Hello once when the empty chat opens', async ({ page }) => {
+    test('Should play the Wally Hello once when the empty chat opens', async ({ page }) => {
       await chatStory.goto(page, 'Greeting');
       const wally = page.getByTestId('chat--greeting--wally');
       await expect(wally).toHaveAttribute('data-live', 'true');
