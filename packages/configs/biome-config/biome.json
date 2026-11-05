@@ -318,6 +318,14 @@
     {
       "includes": ["**/.storybook/main.{js,cjs,mjs,ts}"],
       "linter": { "rules": {} }
+    },
+    {
+      "includes": ["**/scripts/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noConsole": "off" }
+        }
+      }
     }
   ]
 }
