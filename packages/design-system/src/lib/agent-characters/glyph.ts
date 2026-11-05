@@ -4,7 +4,7 @@ import { type AgentToneId, GLYPH_PROPS, TONE } from './data.gen';
 import { eyesPath, eyeTargets, type StateId } from './eyes';
 import { geom, optPx, shapeOf } from './geom';
 import { r2 } from './paths';
-import { propDef } from './props';
+import { propOf } from './propOf';
 import { type SvgNode, toSvgString } from './svg';
 
 export interface Look {
@@ -105,7 +105,7 @@ export function glyphTree(c: Look, size: number, state: StateId, clipId: string)
   }
   if (!ghost && !inv && c.prop && GLYPH_PROPS.has(c.prop)) {
     // light layers get the rim, or they vanish on white
-    for (const l of propDef(c.prop, S, col).layers)
+    for (const l of propOf(c.prop, S, col)?.layers ?? [])
       out.push(luma(l.col) > 190 ? L(l.d, l.col) : { tag: 'path', attrs: { d: l.d, fill: l.col } });
   }
   return {

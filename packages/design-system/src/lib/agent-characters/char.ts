@@ -7,7 +7,7 @@ import { eyesPath, eyeTargets, type StateId } from './eyes';
 import { geom, shapeOf } from './geom';
 import type { Look } from './glyph';
 import { r2 } from './paths';
-import { propDef } from './props';
+import { propOf } from './propOf';
 import type { SvgNode } from './svg';
 
 export interface CharLayer {
@@ -108,7 +108,7 @@ export function charTree(c: Look, o: CharOptions): CharTree {
     .filter(p => p.z !== 'b')
     .map(p => LY(p.d, partCol(p), HARD.has(p.tone) ? 'vinyl' : null));
   const body = LY(S.d, col, null, `url(#${id}g)`, 'bodyly');
-  const P = c.prop && c.prop !== 'none' ? propDef(c.prop, S, col) : null;
+  const P = c.prop && c.prop !== 'none' ? propOf(c.prop, S, col) : null;
   const pv = P ? P.layers.map(l => LY(l.d, l.col, l.mat)) : [];
   const pdeco = P ? P.deco.filter(x => !x.clip).flatMap(x => parseFragment(x.s)) : [];
   const pdecoClip = P ? P.deco.filter(x => x.clip).flatMap(x => parseFragment(x.s)) : [];

@@ -1,25 +1,16 @@
 // propDef() of the reference page (look v14), ported line for line. Prop geometry depends on the shape
 // (its top anchor and half-widths), so it is code, not data.
 import { mix } from './color';
-import { type AgentShapeDef, HARD, TONE } from './data.gen';
+import {
+  type AgentShapeDef,
+  HARD,
+  type PropDeco,
+  type PropDef,
+  type PropLayer,
+  TONE,
+} from './data.gen';
 import { geom } from './geom';
 import { ell, type Pt, polar, qpts, r2, rotRect, rr, tube } from './paths';
-
-export interface PropLayer {
-  d: string;
-  col: string;
-  mat: 'vinyl' | 'felt' | null;
-}
-export interface PropDeco {
-  s: string;
-  clip?: boolean;
-}
-export interface PropDef {
-  layers: PropLayer[];
-  deco: PropDeco[];
-  anim: { type: string; px: number; py: number } | null;
-  fid: { k: string; px: number; py: number };
-}
 
 const PROP_FID: Record<string, string> = {
   antennae: 'twitch',

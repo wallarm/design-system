@@ -3,6 +3,8 @@ import { CAST, SHAPE_IDS } from '../data.gen';
 import type { StateId } from '../eyes';
 import { geom, optY, shapeOf } from '../geom';
 import { glyph } from '../glyph';
+import { setPropLibrary } from '../propOf';
+import { propDef } from '../props';
 import fixture from './__fixtures__/v14.json';
 
 // WDS-197: the glyph path reads geometry from data, never from a canvas (SSR, consumers' jsdom tests).
@@ -56,12 +58,15 @@ describe('glyph without a canvas', () => {
         color: string;
         eyes: string;
         prop: string;
-      }[])
+      }[]) {
+        setPropLibrary(propDef); // looks outside the cast take the builder entry's library (WDS-204)
         for (const st of ['idle', 'partly', 'invite'] as StateId[])
           expect(normIds(glyph(c, 24, st)), `${c.shape} ${st}`).toBe(
             normIds(glyphs[`${c.shape}+${c.prop}|${st}|24`] as string),
           );
+      }
     } finally {
+      setPropLibrary(null);
       proto.getContext = saved;
     }
   });

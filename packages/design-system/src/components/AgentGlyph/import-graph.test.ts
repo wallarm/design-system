@@ -30,6 +30,17 @@ describe('AgentGlyph import graph', () => {
     expect(files.filter(f => /agent-characters\/(bake|worker|queue)\.ts$/.test(f))).toEqual([]);
   });
 
+  // WDS-204: the full prop library (props.ts) loads only with the builder entry.
+  it('reaches no prop library from either component entry', () => {
+    for (const entry of ['index.ts', '../AgentAvatar/index.ts']) {
+      const files = graph(path.resolve(__dirname, entry));
+      expect(
+        files.filter(f => /agent-characters\/props\.ts$/.test(f)),
+        entry,
+      ).toEqual([]);
+    }
+  });
+
   it('is exported with the look types and the default look', async () => {
     const mod = await import('./index');
     expect(typeof mod.defaultLook).toBe('function');

@@ -1,10 +1,11 @@
-import { beforeAll, describe, expect, it } from '@rstest/core';
+import { beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import { hexOf, mix } from '../color';
 import { CAST, SHAPES } from '../data.gen';
 import { eyesPath, eyeTargets, helloPop, type StateId } from '../eyes';
 import { type Geom, optY, primeGeom, SHAPE } from '../geom';
 import { glyph } from '../glyph';
+import { setPropLibrary } from '../propOf';
 import { propDef } from '../props';
 import fixture from './__fixtures__/v14.json';
 
@@ -72,12 +73,28 @@ describe('port of the reference (look v14)', () => {
       }
   });
 
-  it('glyph matches for looks outside the cast', () => {
-    for (const c of extraLooks)
-      for (const key of Object.keys(glyphs).filter(k => k.startsWith(`${c.shape}+${c.prop}|`))) {
-        const st = key.split('|')[1];
-        expect(normIds(glyph(c, 24, st as StateId)), key).toBe(normIds(glyphs[key]));
-      }
+  it('glyph matches for looks outside the cast, only with the builder library (WDS-204)', () => {
+    const keysOf = (c: (typeof extraLooks)[number]) =>
+      Object.keys(glyphs).filter(
+        k => k.startsWith(`${c.shape}+${c.prop}|`) && k.includes('|idle|'),
+      );
+    const warn = rstest.spyOn(console, 'warn').mockImplementation(() => {});
+    const without = extraLooks.flatMap(keysOf).filter(key => {
+      const c = extraLooks.find(x => key.startsWith(`${x.shape}+${x.prop}|`))!;
+      return normIds(glyph(c, 24, 'idle')) !== normIds(glyphs[key]);
+    });
+    warn.mockRestore();
+    expect(without.length).toBeGreaterThan(0);
+    setPropLibrary(propDef);
+    try {
+      for (const c of extraLooks)
+        for (const key of Object.keys(glyphs).filter(k => k.startsWith(`${c.shape}+${c.prop}|`))) {
+          const st = key.split('|')[1];
+          expect(normIds(glyph(c, 24, st as StateId)), key).toBe(normIds(glyphs[key]));
+        }
+    } finally {
+      setPropLibrary(null);
+    }
   });
 
   // An independent source: the handoff's own export of the page output (data/cast.json «resolved»).

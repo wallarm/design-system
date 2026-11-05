@@ -45,7 +45,7 @@ import {
   stepS,
 } from './motion';
 import { clamp, r2 } from './paths';
-import { propDef } from './props';
+import { propOf } from './propOf';
 import { getRuntime, type LiveChar } from './runtime';
 
 type Look = Pick<AgentLook, 'shape' | 'color' | 'eyes' | 'prop'>;
@@ -1229,7 +1229,7 @@ export class Character implements LiveChar {
 /** The page's makeChar tail: the character on an SVG rendered from charTree(), live when asked and motion is on. */
 export function createCharacter(svg: SVGSVGElement, c: Look, o: CharacterOptions) {
   const ch = new Character(svg, c, o);
-  const P = c.prop && c.prop !== 'none' ? propDef(c.prop, ch.S, hexOf(c.color)) : null;
+  const P = c.prop && c.prop !== 'none' ? propOf(c.prop, ch.S, hexOf(c.color)) : null;
   ch.fid = P ? P.fid : null;
   if (o.cover)
     ch.setCover(true); // "Partial coverage": the crown is there from the first frame

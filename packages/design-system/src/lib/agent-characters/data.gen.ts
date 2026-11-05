@@ -45,6 +45,21 @@ export interface AgentColorDef {
   g: 'brand' | 'cool' | 'warm' | 'pastel' | 'deep' | 'neutral';
   brand?: boolean;
 }
+export interface PropLayer {
+  d: string;
+  col: string;
+  mat: 'vinyl' | 'felt' | null;
+}
+export interface PropDeco {
+  s: string;
+  clip?: boolean;
+}
+export interface PropDef {
+  layers: PropLayer[];
+  deco: PropDeco[];
+  anim: { type: string; px: number; py: number } | null;
+  fid: { k: string; px: number; py: number };
+}
 export interface EyeBase { w: number; ht: number; hb: number; kt: number; kb: number; lid: number }
 
 export const SHAPE_IDS: AgentShapeId[] = [
@@ -630,6 +645,150 @@ export const CAST: AgentPreset[] = [
     "prop": "headlamp"
   }
 ];
+
+/** propDef() for the six presets, keyed `shape|hex|prop`; any other look needs the AgentLookBuilder entry. */
+export const PRESET_PROPS: Partial<Record<string, PropDef>> = {
+  "dome|#FF4D2E|antennae": {
+    "layers": [
+      {
+        "d": "M49.69 35.73L48.83 34.18L47.97 32.67L47.1 31.2L46.21 29.75L45.32 28.33L44.42 26.95L43.51 25.6L42.59 24.27L41.66 22.98L40.72 21.72L39.77 20.49L38.82 19.29L37.85 18.13L36.86 16.98A1.5 1.5 0 0 1 39.14 15.02L40.14 16.19L41.14 17.4L42.13 18.64L43.11 19.91L44.08 21.21L45.04 22.54L45.99 23.9L46.92 25.29L47.85 26.72L48.76 28.17L49.67 29.65L50.56 31.16L51.44 32.71L52.31 34.27A1.5 1.5 0 0 1 49.69 35.73ZM33.1 14.5A4.4 4.4 0 1 1 41.9 14.5A4.4 4.4 0 1 1 33.1 14.5ZM67.69 34.27L68.56 32.71L69.44 31.16L70.33 29.65L71.24 28.17L72.15 26.72L73.08 25.29L74.01 23.9L74.96 22.54L75.92 21.21L76.89 19.91L77.87 18.64L78.86 17.4L79.86 16.19L80.86 15.02A1.5 1.5 0 0 1 83.14 16.98L82.15 18.13L81.18 19.29L80.23 20.49L79.28 21.72L78.34 22.98L77.41 24.27L76.49 25.6L75.58 26.95L74.68 28.33L73.79 29.75L72.9 31.2L72.03 32.67L71.17 34.18L70.31 35.73A1.5 1.5 0 0 1 67.69 34.27ZM78.1 14.5A4.4 4.4 0 1 1 86.9 14.5A4.4 4.4 0 1 1 78.1 14.5Z",
+        "col": "#262A36",
+        "mat": "vinyl"
+      }
+    ],
+    "deco": [],
+    "anim": {
+      "type": "twitch",
+      "px": 60,
+      "py": 34
+    },
+    "fid": {
+      "k": "twitch",
+      "px": 60,
+      "py": 34
+    }
+  },
+  "gumdrop|#3F63DB|dish": {
+    "layers": [
+      {
+        "d": "M60.73 19.71L63.73 6.71A1.3 1.3 0 0 1 66.27 7.29L63.27 20.29A1.3 1.3 0 0 1 60.73 19.71Z",
+        "col": "#262A36",
+        "mat": "vinyl"
+      },
+      {
+        "d": "M52 0Q65 15 79 2Z",
+        "col": "#a9b9ef",
+        "mat": null
+      },
+      {
+        "d": "M64.13 3.76L67.13 -7.24A0.9 0.9 0 0 1 68.87 -6.76L65.87 4.24A0.9 0.9 0 0 1 64.13 3.76ZM65.6 -8A2.4 2.4 0 1 1 70.4 -8A2.4 2.4 0 1 1 65.6 -8Z",
+        "col": "#262A36",
+        "mat": "vinyl"
+      }
+    ],
+    "deco": [],
+    "anim": {
+      "type": "dish",
+      "px": 63,
+      "py": 18
+    },
+    "fid": {
+      "k": "scan",
+      "px": 63,
+      "py": 18
+    }
+  },
+  "cushion|#9A7FE0|glasses": {
+    "layers": [
+      {
+        "d": "M36.7 74A10.5 10.5 0 1 1 57.7 74A10.5 10.5 0 1 1 36.7 74ZM38.8 74A8.4 8.4 0 1 0 55.6 74A8.4 8.4 0 1 0 38.8 74ZM62.3 74A10.5 10.5 0 1 1 83.3 74A10.5 10.5 0 1 1 62.3 74ZM64.4 74A8.4 8.4 0 1 0 81.2 74A8.4 8.4 0 1 0 64.4 74ZM56.07 71.86L56.57 71.37L57.1 70.93L57.65 70.55L58.21 70.25L58.8 70.03L59.39 69.9L60 69.85L60.61 69.9L61.2 70.03L61.79 70.25L62.35 70.55L62.9 70.93L63.43 71.37L63.93 71.86A0.9 0.9 0 0 1 62.67 73.14L62.22 72.7L61.81 72.36L61.42 72.09L61.04 71.89L60.68 71.75L60.34 71.68L60 71.65L59.66 71.68L59.32 71.75L58.96 71.89L58.58 72.09L58.19 72.36L57.78 72.7L57.33 73.14A0.9 0.9 0 0 1 56.07 71.86Z",
+        "col": "#EEE5D6",
+        "mat": "vinyl"
+      }
+    ],
+    "deco": [
+      {
+        "s": "<path class=\"glint\" d=\"M75.3 67.5l3.2 3.2M49.7 67.5l3.2 3.2\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" opacity=\".55\"/>"
+      }
+    ],
+    "anim": null,
+    "fid": {
+      "k": "bob",
+      "px": 60,
+      "py": 27.5
+    }
+  },
+  "pebble|#D8B68A|seam": {
+    "layers": [],
+    "deco": [
+      {
+        "clip": true,
+        "s": "<path d=\"M26.5 57Q60 47 93.5 57\" stroke=\"#877258\" stroke-width=\"1.3\" fill=\"none\"/><path class=\"stitch\" d=\"M26.5 57Q60 47 93.5 57\" stroke=\"#F4EEE4\" stroke-width=\"3.4\" stroke-dasharray=\"1.6 4.4\" stroke-linecap=\"round\" fill=\"none\"/>"
+      }
+    ],
+    "anim": null,
+    "fid": {
+      "k": "none",
+      "px": 60,
+      "py": 40
+    }
+  },
+  "capsule|#2BA6BF|windkey": {
+    "layers": [
+      {
+        "d": "M59.5 11H60.5A1.5 1.5 0 0 1 62 12.5V21.5A1.5 1.5 0 0 1 60.5 23H59.5A1.5 1.5 0 0 1 58 21.5V12.5A1.5 1.5 0 0 1 59.5 11Z",
+        "col": "#C8A35E",
+        "mat": "vinyl"
+      },
+      {
+        "d": "M47 6A6.5 5.5 0 1 1 60 6A6.5 5.5 0 1 1 47 6ZM50.9 6A2.6 2.2 0 1 0 56.1 6A2.6 2.2 0 1 0 50.9 6ZM60 6A6.5 5.5 0 1 1 73 6A6.5 5.5 0 1 1 60 6ZM63.9 6A2.6 2.2 0 1 0 69.1 6A2.6 2.2 0 1 0 63.9 6Z",
+        "col": "#C8A35E",
+        "mat": "vinyl"
+      }
+    ],
+    "deco": [],
+    "anim": {
+      "type": "wind",
+      "px": 60,
+      "py": 10
+    },
+    "fid": {
+      "k": "spin",
+      "px": 60,
+      "py": 10
+    }
+  },
+  "egg|#7E7C48|headlamp": {
+    "layers": [
+      {
+        "d": "M34.62 33.55L38.22 32.61L41.85 31.81L45.48 31.16L49.11 30.65L52.74 30.29L56.37 30.07L60 30L63.63 30.07L67.26 30.29L70.89 30.65L74.52 31.16L78.15 31.81L81.78 32.61L85.38 33.55A1.5 1.5 0 0 1 84.62 36.45L81.08 35.53L77.56 34.76L74.05 34.12L70.54 33.63L67.02 33.28L63.51 33.07L60 33L56.49 33.07L52.98 33.28L49.46 33.63L45.95 34.12L42.44 34.76L38.92 35.53L35.38 36.45A1.5 1.5 0 0 1 34.62 33.55Z",
+        "col": "#262A36",
+        "mat": "vinyl"
+      },
+      {
+        "d": "M57 25H63A4 4 0 0 1 67 29V32A4 4 0 0 1 63 36H57A4 4 0 0 1 53 32V29A4 4 0 0 1 57 25Z",
+        "col": "#A3ABBB",
+        "mat": "vinyl"
+      },
+      {
+        "d": "M55.4 30.5A4.6 3.8 0 1 1 64.6 30.5A4.6 3.8 0 1 1 55.4 30.5Z",
+        "col": "#EEE5D6",
+        "mat": "vinyl"
+      }
+    ],
+    "deco": [
+      {
+        "s": "<path class=\"beam\" d=\"M56 28L44 -6L76 -6L64 28Z\" fill=\"#FFF6D6\" opacity=\"0\"/>"
+      }
+    ],
+    "anim": null,
+    "fid": {
+      "k": "flicker",
+      "px": 60,
+      "py": 30
+    }
+  }
+};
 
 export const STATES: { key: string; label: string; product: string; engine: string }[] = [
   {

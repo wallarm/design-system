@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { propDef } from '../../src/lib/agent-characters/props';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const readJson = (name: string) =>
@@ -55,6 +56,15 @@ export function generate(read: typeof readJson = readJson): string {
       id,
       s.optY,
     ]),
+  );
+  // The six presets' props as resolved data, so preset rendering ships no prop library (WDS-204, 07 §6.4).
+  // propDef reads tones and geometry from the current data.gen.ts: after a tone or geometry change, export twice.
+  const presetProps = Object.fromEntries(
+    presets.map((p: { shape: string; color: string; prop: string }) => {
+      const S = shapes.shapes.find((x: { id: string }) => x.id === p.shape);
+      const hex = colors.colors.find((x: { id: string }) => x.id === p.color).hex;
+      return [`${p.shape}|${hex}|${p.prop}`, propDef(p.prop, S, hex)];
+    }),
   );
   const glyphProps = props.props
     .filter((p: { glyph: boolean }) => p.glyph)
@@ -115,6 +125,21 @@ export interface AgentColorDef {
   g: 'brand' | 'cool' | 'warm' | 'pastel' | 'deep' | 'neutral';
   brand?: boolean;
 }
+export interface PropLayer {
+  d: string;
+  col: string;
+  mat: 'vinyl' | 'felt' | null;
+}
+export interface PropDeco {
+  s: string;
+  clip?: boolean;
+}
+export interface PropDef {
+  layers: PropLayer[];
+  deco: PropDeco[];
+  anim: { type: string; px: number; py: number } | null;
+  fid: { k: string; px: number; py: number };
+}
 export interface EyeBase { w: number; ht: number; hb: number; kt: number; kb: number; lid: number }
 
 export const SHAPE_IDS: AgentShapeId[] = ${j(shapeIds)};
@@ -137,6 +162,9 @@ export const PROPS: [AgentPropId, string][] = ${j(props.props.map((p: { id: stri
 export const GLYPH_PROPS: ReadonlySet<string> = new Set(${j(glyphProps)});
 
 export const CAST: AgentPreset[] = ${j(presets)};
+
+/** propDef() for the six presets, keyed \`shape|hex|prop\`; any other look needs the AgentLookBuilder entry. */
+export const PRESET_PROPS: Partial<Record<string, PropDef>> = ${j(presetProps)};
 
 export const STATES: { key: string; label: string; product: string; engine: string }[] = ${j(states.states)};
 
