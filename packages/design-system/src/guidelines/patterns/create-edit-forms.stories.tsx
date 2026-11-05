@@ -85,9 +85,8 @@ const meta = {
 export default meta;
 
 /**
- * Up to six fields, one concern: a `Dialog` at its default 560px with a 24px field stack. Submit
- * stays disabled until the required fields are filled, the email error shows only after blur or
- * submit, and a successful request closes the dialog and shows a toast.
+ * Submit stays disabled until the required fields are filled, the email error shows only after
+ * blur or submit, and a successful request closes the dialog, then shows a toast.
  */
 export const CreateInDialog: StoryFn = () => {
   const toast = useToast();
@@ -208,17 +207,28 @@ export const CreateInDialog: StoryFn = () => {
   );
 };
 
+/** Shown after blur: the description stays above the control, the error line below it. */
+export const InvalidField: StoryFn = () => (
+  <div className='w-400 p-24'>
+    <Field required data-testid='invalid-email-field'>
+      <FieldLabel>
+        Email
+        <FieldIndicator />
+      </FieldLabel>
+      <FieldDescription>The invitation link expires in 7 days.</FieldDescription>
+      <Input type='email' defaultValue='maria.lopez' error />
+      <FieldError>Enter an email address.</FieldError>
+    </Field>
+  </div>
+);
+
 const USER = {
   id: 'u-1043',
   name: 'Daniel Okafor',
   email: 'daniel.okafor@acme-bank.com',
 };
 
-/**
- * Edit uses the same container as create: fields are prefilled, "Save changes" stays disabled
- * until a value changes, and the user ID, fixed after create, is disabled with a tooltip on a
- * wrapping `span`.
- */
+/** Fields are prefilled, and "Save changes" stays disabled until a value changes. */
 export const EditInDialog: StoryFn = () => {
   const toast = useToast();
   const [open, setOpen] = useState(false);
@@ -316,9 +326,8 @@ export const EditInDialog: StoryFn = () => {
 };
 
 /**
- * Dependent sections seen together: a `Drawer width={700}` with numbered `Timeline` sections and
- * 12px field stacks. Short related fields share a two-column row; URLs and secrets get full
- * width. "Test connection" reports in its section with an `Alert`, never a toast.
+ * Short related fields share a two-column row; URLs and secrets get full width. "Test
+ * connection" reports in its section with an `Alert`, never a toast.
  */
 export const CreateInDrawerWithSections: StoryFn = () => {
   const toast = useToast();
@@ -505,9 +514,8 @@ export const CreateInDrawerWithSections: StoryFn = () => {
 const POLICY_STEPS = ['General', 'Scope', 'Limit'] as const;
 
 /**
- * Gated parts: a `Drawer` at its default 640px with a `Stepper` wrapping body and footer. Cancel
- * sits left, Back and Next right; on the last step submit replaces Next. Steps never block: a
- * step left with empty required fields turns `danger`, a filled one `completed`.
+ * Cancel sits left, Back and Next right. Steps never block: a step left with empty required
+ * fields turns `danger`, a filled one `completed`.
  */
 export const CreateInDrawerWithSteps: StoryFn = () => {
   const toast = useToast();

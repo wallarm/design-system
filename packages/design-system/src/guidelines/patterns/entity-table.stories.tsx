@@ -128,22 +128,21 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
 
+// The host shell gives a page its height; 640px stands in for it.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
+
 /**
- * The full cell vocabulary in one table: a person cell with a second line, an ID in `Code`, groups
- * as an `OverflowList` of tags, a dotted status badge, an exact time, a raw number with a header
- * tooltip and `—` for missing values, and an always-visible row menu. Sort by any header; select
+ * Adds an ID in `Code` and an exact time to the `Cells` vocabulary. Sort by any header; select
  * rows to bring up the bulk bar.
  */
 export const Default: StoryFn = () => {
@@ -292,8 +291,160 @@ export const Default: StoryFn = () => {
   );
 };
 
+Default.decorators = hostShell;
+
 /**
- * First load: `isLoading` draws skeleton rows under the real header, not a `Loader`.
+ * Tags collapse into "+N" when the column runs out of room; a user with no groups or no requests
+ * shows `—`.
+ */
+export const Cells: StoryFn = () => {
+  const STATUS = {
+    active: { label: 'Active', color: 'green' },
+    invited: { label: 'Invited', color: 'yellow' },
+    expired: { label: 'Expired', color: 'red' },
+    deactivated: { label: 'Deactivated', color: 'gray' },
+  } as const;
+
+  const renderGroup = (group: string) => <Tag key={group}>{group}</Tag>;
+
+  const renderUser = ({ row }: TableCellContext<User, unknown>) => (
+    <Avatar size='md'>
+      <AvatarFallback name={row.original.name} />
+      <AvatarContent>
+        <AvatarName>{row.original.name}</AvatarName>
+        <AvatarDescription>{row.original.email}</AvatarDescription>
+      </AvatarContent>
+    </Avatar>
+  );
+
+  const renderStatus = ({ row }: TableCellContext<User, unknown>) => (
+    <Badge variant='dotted' type='secondary' color={STATUS[row.original.status].color}>
+      {STATUS[row.original.status].label}
+    </Badge>
+  );
+
+  const renderGroups = ({ row }: TableCellContext<User, unknown>) =>
+    row.original.groups.length > 0 ? (
+      <OverflowList className='gap-4' items={row.original.groups} itemRenderer={renderGroup} />
+    ) : (
+      '—'
+    );
+
+  const renderRequests = ({ row }: TableCellContext<User, unknown>) => row.original.requests ?? '—';
+
+  const columns: TableColumnDef<User>[] = [
+    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
+    { accessorKey: 'status', header: 'Status', size: 140, cell: renderStatus },
+    {
+      accessorKey: 'groups',
+      header: 'Groups',
+      size: 240,
+      enableSorting: false,
+      cell: renderGroups,
+    },
+    {
+      accessorKey: 'requests',
+      header: 'API requests',
+      size: 140,
+      meta: { sortType: 'number', description: { type: 'tooltip', content: 'Last 24 hours' } },
+      cell: renderRequests,
+    },
+  ];
+
+  return (
+    <Page name='settings-users' data-testid='users-page'>
+      <PageContent>
+        <Table
+          aria-label='Users'
+          data={USERS}
+          columns={columns}
+          getRowId={getUserId}
+          data-testid='users-table'
+        />
+      </PageContent>
+    </Page>
+  );
+};
+
+/**
+ * The column has an `id` and no `accessorKey`, and can't be hidden, so the menu never disappears
+ * behind the column settings.
+ */
+export const RowMenu: StoryFn = () => {
+  const renderUser = ({ row }: TableCellContext<User, unknown>) => (
+    <Avatar size='md'>
+      <AvatarFallback name={row.original.name} />
+      <AvatarContent>
+        <AvatarName>{row.original.name}</AvatarName>
+        <AvatarDescription>{row.original.email}</AvatarDescription>
+      </AvatarContent>
+    </Avatar>
+  );
+
+  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+    const user = row.original;
+    const handleEdit = () => onEditUser(user);
+    const handleDeactivate = () => onDeactivateUser(user);
+    const handleDelete = () => onDeleteUser(user);
+
+    return (
+      <DropdownMenu data-testid='users-row-menu'>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
+            aria-label={`Actions for ${user.name}`}
+          >
+            <Ellipsis />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onSelect={handleEdit}>
+            <DropdownMenuItemText>Edit</DropdownMenuItemText>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleDeactivate}>
+            <DropdownMenuItemText>Deactivate</DropdownMenuItemText>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant='destructive' onSelect={handleDelete}>
+            <DropdownMenuItemText>Delete user</DropdownMenuItemText>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
+  const columns: TableColumnDef<User>[] = [
+    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
+    {
+      id: 'actions',
+      header: '',
+      size: 60,
+      minSize: 60,
+      enableHiding: false,
+      cell: renderActions,
+    },
+  ];
+
+  return (
+    <Page name='settings-users' data-testid='users-page'>
+      <PageContent>
+        <Table
+          aria-label='Users'
+          data={USERS}
+          columns={columns}
+          getRowId={getUserId}
+          data-testid='users-table'
+        />
+      </PageContent>
+    </Page>
+  );
+};
+
+/**
+ * `isLoading` draws the skeleton rows, not a `Loader`; `skeletonCount` sets how many (12 by
+ * default).
  */
 export const Loading: StoryFn = () => {
   const columns: TableColumnDef<User>[] = [
@@ -320,10 +471,11 @@ export const Loading: StoryFn = () => {
     </Page>
   );
 };
+Loading.decorators = hostShell;
 
 /**
- * Nothing created yet: `EmptyState type='collection-empty'` inside `TableEmptyState`, under the
- * header. No button here when the page header already has Create.
+ * `EmptyState type='collection-empty'` inside `TableEmptyState`. It has no button when the page
+ * header already has Create.
  */
 export const Empty: StoryFn = () => {
   const columns: TableColumnDef<User>[] = [
@@ -362,3 +514,4 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
+Empty.decorators = hostShell;

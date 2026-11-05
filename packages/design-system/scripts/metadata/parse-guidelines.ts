@@ -22,22 +22,6 @@ const REQUIRED_SECTIONS: Record<GuidelineKind, string[]> = {
   pattern: ['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'],
 };
 
-/**
- * Patterns whose `## Examples` are still tsx snippets. They skip the story-ref rules below.
- * ponytail: transitional; drop each slug as its examples become stories, then the set itself.
- */
-const UNCONVERTED_PATTERNS = new Set([
-  'patterns/auth-page',
-  'patterns/confirmation-dialogs',
-  'patterns/create-edit-forms',
-  'patterns/detail-drawer',
-  'patterns/empty-states',
-  'patterns/entity-table',
-  'patterns/feedback-toasts',
-  'patterns/filtering',
-  'patterns/settings-page',
-]);
-
 /** A story reference: a ```story fence holding one export name of the sibling `.stories.tsx`. */
 const STORY_REF = /^```story[ \t]*\r?\n[ \t]*(\S+)[ \t]*\r?\n```[ \t]*$/gm;
 
@@ -250,11 +234,7 @@ const parseGuidelineFile = (
   const stories = kind === 'pattern' ? parseStories(filePath, title, fail) : undefined;
   if (kind === 'pattern') {
     const storiesFile = path.basename(filePath).replace(/\.md$/, '.stories.tsx');
-    if (!UNCONVERTED_PATTERNS.has(slug)) {
-      checkStoryRefs(body, sections, stories ?? [], storiesFile, fail);
-    } else if (body.match(STORY_REF)) {
-      fail('uses ```story refs: remove it from UNCONVERTED_PATTERNS in parse-guidelines.ts');
-    }
+    checkStoryRefs(body, sections, stories ?? [], storiesFile, fail);
   }
   const markdown = resolveStoryRefs(body, stories ?? []).trim();
 

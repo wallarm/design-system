@@ -41,7 +41,7 @@ If the message is the only place the user learns something important, do not use
 - `Toaster` owns position (bottom center), 24px padding, 12px gaps and layering above every drawer and dialog. **Never** wrap it in a positioned element.
 - `Toast` owns its padding and width (256–560px). **Never** add spacing or width to toast content.
 - Three toasts show at once; hover expands the stack and pauses every timer.
-- **Never** mount a second `Toaster`.
+- Mount one `Toaster` at the app root. **Never** mount a second.
 
 ### Loading and updates
 
@@ -79,99 +79,34 @@ If the message is the only place the user learns something important, do not use
 
 ## Examples
 
-Mount the region once, at the app root.
+Confirm a finished mutation with a plain toast. A delete confirmed in a dialog closes the dialog first.
 
-```tsx
-import type { ReactNode } from 'react';
-import { Toaster } from '@wallarm-org/design-system';
-
-export const App = ({ children }: { children: ReactNode }) => (
-  <>
-    {children}
-    <Toaster />
-  </>
-);
-```
-
-Confirm a finished mutation with a plain toast.
-
-```tsx
-import { useToast } from '@wallarm-org/design-system/Toast';
-
-export const useDeleteChannel = (deleteChannel: () => Promise<void>) => {
-  const toast = useToast();
-
-  return async () => {
-    await deleteChannel();
-    toast.create({ title: 'Channel deleted', type: 'default' });
-  };
-};
-```
-
-Turn a loading toast into the result in place, and extend the timer when the error adds a description.
-
-```tsx
-import { useToast } from '@wallarm-org/design-system/Toast';
-
-export const useTestChannel = (testChannel: () => Promise<void>, provider: string) => {
-  const toast = useToast();
-
-  return async () => {
-    const id = toast.create({ title: 'Testing channel…', type: 'loading' });
-    try {
-      await testChannel();
-      toast.update({ id, title: `Test delivered via ${provider}`, type: 'success' });
-    } catch (error) {
-      toast.update({
-        id,
-        title: 'Test failed',
-        description: error instanceof Error ? error.message : undefined,
-        type: 'error',
-        duration: 10000,
-      });
-    }
-  };
-};
+```story
+Default
 ```
 
 Offer one next step after create.
 
-```tsx
-import { Button } from '@wallarm-org/design-system';
-import { ToastActions, useToast } from '@wallarm-org/design-system/Toast';
+```story
+NextStep
+```
 
-export const useChannelCreated = (openDestination: () => void) => {
-  const toast = useToast();
+Turn a loading toast into the result in place.
 
-  return () =>
-    toast.create({
-      title: 'Channel created',
-      description: 'Route notifications through this channel in a destination.',
-      type: 'default',
-      actions: (
-        <ToastActions>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={openDestination}>
-            Go to destination
-          </Button>
-        </ToastActions>
-      ),
-    });
-};
+```story
+TestDelivered
+```
+
+If the failure adds a description, extend the timer in the same update.
+
+```story
+TestFailed
 ```
 
 Reuse an `id` so repeated clicks update one toast instead of stacking.
 
-```tsx
-import { useToast } from '@wallarm-org/design-system/Toast';
-
-export const useCopyLink = (link: string) => {
-  const toast = useToast();
-
-  return async () => {
-    await navigator.clipboard.writeText(link);
-    toast.create({ id: 'copy-link', title: 'Link copied', type: 'default' });
-  };
-};
+```story
+CopyLink
 ```
 
 ## States

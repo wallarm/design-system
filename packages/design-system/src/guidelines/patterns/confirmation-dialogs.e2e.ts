@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const confirmationStory = createStoryHelper('patterns-confirmation-dialogs', [
   'Default',
+  'Activate',
   'Type To Confirm',
   'Unsaved Changes',
 ] as const);
@@ -34,9 +35,8 @@ test.describe('Pattern: Confirmation dialogs', () => {
     });
 
     test('Should render the activate confirmation correctly', async ({ page }) => {
-      await confirmationStory.goto(page, 'Default');
-      await openUserActions(page, 'Anna Schmidt');
-      await page.getByTestId('users-change-status').click();
+      await confirmationStory.goto(page, 'Activate');
+      await page.getByTestId('user-change-status').click();
       await expect(page.getByTestId('user-status-dialog--content')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });

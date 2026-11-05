@@ -77,97 +77,34 @@ Use only these cells.
 
 ## Examples
 
-A person cell with a second line.
+The whole table: the cell vocabulary, an always-visible row menu, sorting and a bulk bar for selected rows.
 
-```tsx
-cell: ({ row }) => (
-  <Avatar size='md'>
-    <AvatarFallback name={row.original.name} />
-    <AvatarContent>
-      <AvatarName>{row.original.name}</AvatarName>
-      <AvatarDescription>{row.original.email}</AvatarDescription>
-    </AvatarContent>
-  </Avatar>
-),
+```story
+Default
 ```
 
-Status badge and tags.
+A person with a second line, a status badge, groups as tags, and a number whose header explains it.
 
-```tsx
-const renderGroup = (group: string) => <Tag key={group}>{group}</Tag>;
-
-{ accessorKey: 'status', header: 'Status', size: 140,
-  cell: ({ row }) => (
-    <Badge variant='dotted' type='secondary' color={STATUS[row.original.status].color}>
-      {STATUS[row.original.status].label}
-    </Badge>
-  ) },
-{ accessorKey: 'groups', header: 'Groups', enableSorting: false,
-  cell: ({ row }) =>
-    row.original.groups.length > 0
-      ? <OverflowList className='gap-4' items={row.original.groups} itemRenderer={renderGroup} />
-      : '—' },
+```story
+Cells
 ```
 
-The always-visible row menu column.
+The row menu: the trigger names the row, and the destructive item comes last and names the entity.
 
-```tsx
-{ id: 'actions', header: '', size: 60, minSize: 60, enableHiding: false,
-  cell: ({ row }) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant='ghost' color='neutral' size='small' aria-label={`Actions for ${row.original.name}`}>
-          <Ellipsis />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onSelect={() => onEdit(row.original)}>
-          <DropdownMenuItemText>Edit</DropdownMenuItemText>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant='destructive' onSelect={() => onDelete(row.original)}>
-          <DropdownMenuItemText>Delete user</DropdownMenuItemText>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ) },
+```story
+RowMenu
 ```
 
-Selection, sorting, bulk bar and empty state together.
+First load keeps the header and fills the body with placeholder rows.
 
-```tsx
-<Table
-  aria-label='Users'
-  data={users}
-  columns={columns}
-  getRowId={user => user.id}
-  isLoading={isLoading}
-  sorting={sorting}
-  onSortingChange={setSorting}
-  rowSelection={selection}
-  onRowSelectionChange={setSelection}
->
-  <TableActionBar>
-    <Button variant='ghost' color='neutral-alt'>Assign role</Button>
-    <Button color='destructive' onClick={handleBulkDelete}><Trash2 /> Delete</Button>
-  </TableActionBar>
-  <TableEmptyState>
-    <EmptyState type='collection-empty'>
-      <EmptyStateMessage>
-        <EmptyStateTitle>No users yet</EmptyStateTitle>
-        <EmptyStateDescription>Invite people to sign in to your organization.</EmptyStateDescription>
-      </EmptyStateMessage>
-    </EmptyState>
-  </TableEmptyState>
-</Table>
+```story
+Loading
 ```
 
-A header tooltip on a number column that may be empty.
+Nothing created yet: an empty state under the header.
 
-```tsx
-{ accessorKey: 'requests', header: 'Requests', size: 140,
-  meta: { sortType: 'number', description: { type: 'tooltip', content: 'Last 24 hours' } },
-  cell: ({ row }) => row.original.requests ?? '—' },
+```story
+Empty
 ```
 
 ## States

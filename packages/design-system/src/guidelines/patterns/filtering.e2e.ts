@@ -3,6 +3,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const filteringStory = createStoryHelper('patterns-filtering', [
   'Default',
+  'Searchable Filter',
+  'Scope Filter',
   'Searchable Select',
   'Picker Dialog',
 ] as const);
@@ -12,6 +14,20 @@ test.describe('Pattern: Filtering', () => {
     test('Should render the filter bar over the table correctly', async ({ page }) => {
       await filteringStory.goto(page, 'Default');
       await expect(page.getByTestId('attacks-table--container--row')).toHaveCount(8);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the searchable filter menu correctly', async ({ page }) => {
+      await filteringStory.goto(page, 'Searchable Filter');
+      await page.getByTestId('applications-filter--trigger').click();
+      await expect(page.getByTestId('applications-filter--content')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the scope filter menu correctly', async ({ page }) => {
+      await filteringStory.goto(page, 'Scope Filter');
+      await page.getByTestId('scope-filter--trigger').click();
+      await expect(page.getByTestId('scope-filter--content')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

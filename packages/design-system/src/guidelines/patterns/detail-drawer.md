@@ -79,103 +79,34 @@ A detail drawer is a `Drawer` with no footer. It shows one entity as `Attribute`
 
 ## Examples
 
-Import from `@wallarm-org/design-system`; `InlineCodeSnippet` from `/CodeSnippet`, icons from `/icons`.
-
 The list opens one shared drawer from the master cell.
 
-```tsx
-<Table
-  aria-label='Providers'
-  data={providers}
-  columns={columns}
-  getRowId={p => p.id}
-  activeRowId={open ? selectedId : null}
-  onMasterCellClick={id => { setSelectedId(id); setOpen(true); }}
-/>
-<ProviderDrawer provider={providers.find(p => p.id === selectedId) ?? null} open={open} onOpenChange={setOpen} />
+```story
+Default
 ```
 
 The drawer shell with a resize handle and the header actions menu.
 
-```tsx
-<Drawer open={open} onOpenChange={onOpenChange} width={640} data-testid='provider-drawer'>
-  <DrawerContent>
-    <DrawerResizeHandle onResizeEnd={saveWidth} />
-    <DrawerHeader>
-      <DrawerTitle>{provider?.name}</DrawerTitle>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='outline' color='neutral' size='small'>Actions <ChevronDown /></Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onSelect={onEdit}>Edit provider</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant='destructive' onSelect={onDelete}>Delete provider</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </DrawerHeader>
-    <DrawerBody>{children}</DrawerBody>
-  </DrawerContent>
-</Drawer>
+```story
+Header
 ```
 
 Attribute rows with a code value, a secret, a missing value and a timestamp.
 
-```tsx
-<VStack gap={6} className='pb-8'>
-  <Attribute orientation='horizontal' loading={isLoading}>
-    <AttributeLabel width={140}>Client ID</AttributeLabel>
-    <AttributeValue><InlineCodeSnippet code={provider.clientId} size='md' /></AttributeValue>
-  </Attribute>
-  <Attribute orientation='horizontal' loading={isLoading}>
-    <AttributeLabel width={140}>Client secret</AttributeLabel>
-    <AttributeValue>Set — never shown</AttributeValue>
-  </Attribute>
-  <Attribute orientation='horizontal' loading={isLoading} isEmpty={!provider.defaultRole}>
-    <AttributeLabel width={140}>Default role</AttributeLabel>
-    <AttributeValue>{provider.defaultRole && <Tag>{provider.defaultRole}</Tag>}</AttributeValue>
-  </Attribute>
-  <Attribute orientation='horizontal' loading={isLoading}>
-    <AttributeLabel width={140}>Created at</AttributeLabel>
-    <AttributeValue><FormatDateTime value={provider.createdAt} format='datetime' layout='inline' /></AttributeValue>
-  </Attribute>
-</VStack>
+```story
+Attributes
 ```
 
 A section with a title and an action.
 
-```tsx
-<Separator spacing={4} />
-<HStack justify='between' align='center' className='py-8'>
-  <Heading as='h3' size='md' weight='medium'>Access decisions</Heading>
-  <Button size='small' onClick={onCreateRule}><Plus /> Create rule</Button>
-</HStack>
+```story
+Section
 ```
 
 Full-width tabs with a count and an inset nested table that stays visible when empty.
 
-```tsx
-<Tabs value={tab} onChange={setTab}>
-  <div className='-mx-24'>
-    <TabsList>
-      <TabsTrigger value='rules'>Rules <NumericBadge>{rules.length}</NumericBadge></TabsTrigger>
-      <TabsLineActions>
-        <Button size='small' onClick={onCreateRule}><Plus /> Create rule</Button>
-      </TabsLineActions>
-    </TabsList>
-  </div>
-  <TabsContent value='rules'>
-    <div className='-mx-8 pt-8'>
-      <Table aria-label='Rules' data={rules} columns={ruleColumns} getRowId={r => r.id} isLoading={isLoading} skeletonCount={3}>
-        {rules.length === 0 && !isLoading && (
-          <EmptyState type='collection-empty'>
-            <EmptyStateMessage><EmptyStateTitle>No rules yet</EmptyStateTitle></EmptyStateMessage>
-          </EmptyState>
-        )}
-      </Table>
-    </div>
-  </TabsContent>
-</Tabs>
+```story
+NestedTable
 ```
 
 ## States
@@ -189,6 +120,18 @@ Full-width tabs with a count and an inset nested table that stays visible when e
 | Viewing an old version | `color='info'` first in `DrawerBody`, "Back to current" and "Restore" in `AlertControls`; disable header actions | `Alert` |
 | Row open in the drawer | `activeRowId={selectedId}`; not a row `className` | `Table` |
 | Action running | `loading` on its button, then a toast; keep the drawer open | `Button` |
+
+The entity is loading.
+
+```story
+Loading
+```
+
+Viewing an old version.
+
+```story
+OldVersion
+```
 
 ## What your app owns
 

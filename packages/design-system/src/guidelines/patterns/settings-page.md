@@ -67,79 +67,34 @@ There is no `SettingsPage`, `SettingsSection` or `SettingsRow`, no `className` o
 
 ## Examples
 
-A field row that saves on blur and shows an inline error.
+The page frame: breadcrumbs and a title in the header, sections straight in `PageContent`.
 
-```tsx
-<section className='flex flex-col gap-16'>
-  <Heading as='h2' size='xl' weight='medium' color='primary'>About</Heading>
-  <div className='flex flex-col'>
-    <Field orientation='horizontal'>
-      <FieldLabel>Name</FieldLabel>
-      <div className='flex w-[320px] shrink-0 flex-col gap-4'>
-        <Input value={name} error={!!nameError} onChange={handleNameChange} onBlur={handleNameBlur} />
-        {nameError && <FieldError>{nameError}</FieldError>}
-      </div>
-    </Field>
-    <Separator spacing={16} />
-  </div>
-</section>
+```story
+Default
 ```
 
-The save handler keeps the typed value on failure.
+A field row saves on blur and shows an inline error; a failed save keeps the typed value.
 
-```tsx
-const toast = useToast(); // from '@wallarm-org/design-system/Toast'
-
-const save = async (patch: Partial<Profile>, label: string) => {
-  try {
-    await onSave(patch);
-    toast.create({ title: `${label} updated`, type: 'success' });
-  } catch {
-    toast.create({ title: `${label} update failed`, type: 'error' });
-  }
-};
+```story
+InvalidValue
 ```
 
 An action row labels with `Text` and `aria-label`, not `FieldLabel`.
 
-```tsx
-<div className='flex min-h-36 items-center justify-between gap-16'>
-  <Text size='sm' weight='medium' color='primary'>Sidebar style</Text>
-  <SegmentedControl aria-label='Sidebar style' value={frameStyle} onChange={handleFrameStyleChange}>
-    <SegmentedControlItem value='neutral'>Neutral</SegmentedControlItem>
-    <SegmentedControlItem value='branded'>Branded</SegmentedControlItem>
-  </SegmentedControl>
-</div>
+```story
+ActionRow
 ```
 
 An org-locked value puts the tooltip on `Lock`; a disabled `Switch` never opens one.
 
-```tsx
-<Field orientation='horizontal'>
-  <FieldLabel>Two-factor authentication</FieldLabel>
-  <div className='flex items-center gap-8'>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Lock aria-label='Locked' />
-      </TooltipTrigger>
-      <TooltipContent>Enabled by your organization</TooltipContent>
-    </Tooltip>
-    <Switch checked disabled>
-      <SwitchControl />
-    </Switch>
-  </div>
-</Field>
+```story
+LockedValue
 ```
 
 A read-only email opens its dialog on click or Enter.
 
-```tsx
-<Field orientation='horizontal'>
-  <FieldLabel>Email</FieldLabel>
-  <div className='w-[320px] shrink-0'>
-    <Input readOnly value={email} onClick={onEditEmail} onKeyDown={handleEmailKeyDown} />
-  </div>
-</Field>
+```story
+ReadOnlyValue
 ```
 
 ## States
@@ -156,6 +111,12 @@ A read-only email opens its dialog on click or Enter.
 | Opens a dialog | Read-only value | `Input readOnly` |
 
 Pass `error` to `Input`; `Field invalid` alone does not mark it.
+
+While a value saves, only its own control changes.
+
+```story
+Saving
+```
 
 ## What your app owns
 

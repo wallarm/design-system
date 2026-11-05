@@ -27,7 +27,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuItemText,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../components/DropdownMenu';
 import { Field, FieldLabel } from '../../components/Field';
@@ -56,6 +55,14 @@ interface User {
   status: UserStatus;
 }
 
+const INACTIVE_USER: User = {
+  id: 'u-1060',
+  name: 'Anna Schmidt',
+  email: 'anna.schmidt@acme-bank.com',
+  role: 'Read only',
+  status: 'deactivated',
+};
+
 const USERS: User[] = [
   {
     id: 'u-1042',
@@ -78,13 +85,7 @@ const USERS: User[] = [
     role: 'Deploy',
     status: 'active',
   },
-  {
-    id: 'u-1060',
-    name: 'Anna Schmidt',
-    email: 'anna.schmidt@acme-bank.com',
-    role: 'Read only',
-    status: 'deactivated',
-  },
+  INACTIVE_USER,
 ];
 
 const PROVIDER_NAME = 'Okta Production';
@@ -122,21 +123,16 @@ const meta = {
 export default meta;
 
 /**
- * Delete and state-change confirmations opened from a table's actions menu. Each dialog has its
- * own controlled `open` state, set by the menu item. Delete and deactivate use a destructive
- * confirm; activate grants access, so it keeps the brand confirm. While the request runs the
- * confirm shows a spinner and close requests are ignored; on success the dialog closes, the
- * row updates and a toast reports the result.
+ * Opened from a row's actions menu, which sets the selected user and the dialog's own `open`
+ * state. While the request runs, `Escape` and outside clicks are ignored; on success the row is
+ * removed.
  */
 export const Default: StoryFn = () => {
   const toast = useToast();
   const [users, setUsers] = useState(USERS);
   const [selected, setSelected] = useState<User | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [statusOpen, setStatusOpen] = useState(false);
   const [pending, setPending] = useState(false);
-
-  const isActive = selected?.status === 'active';
 
   const renderStatus = ({ row }: TableCellContext<User, unknown>) =>
     row.original.status === 'active' ? (
@@ -151,10 +147,6 @@ export const Default: StoryFn = () => {
 
   const renderActions = ({ row }: TableCellContext<User, unknown>) => {
     const user = row.original;
-    const handleStatusSelect = () => {
-      setSelected(user);
-      setStatusOpen(true);
-    };
     const handleDeleteSelect = () => {
       setSelected(user);
       setDeleteOpen(true);
@@ -174,12 +166,6 @@ export const Default: StoryFn = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onSelect={handleStatusSelect} data-testid='users-change-status'>
-            <DropdownMenuItemText>
-              {user.status === 'active' ? 'Deactivate' : 'Activate'}
-            </DropdownMenuItemText>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             variant='destructive'
             onSelect={handleDeleteSelect}
@@ -211,10 +197,6 @@ export const Default: StoryFn = () => {
     if (!pending) setDeleteOpen(next);
   };
 
-  const handleStatusOpenChange = (next: boolean) => {
-    if (!pending) setStatusOpen(next);
-  };
-
   const handleDelete = async () => {
     if (!selected) return;
     setPending(true);
@@ -225,22 +207,6 @@ export const Default: StoryFn = () => {
       toast.create({ title: 'User deleted', type: 'default' });
     } catch {
       toast.create({ title: "Couldn't delete user", type: 'error' });
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const handleStatusChange = async () => {
-    if (!selected) return;
-    const status: UserStatus = isActive ? 'deactivated' : 'active';
-    setPending(true);
-    try {
-      await setUserStatus(selected.id, status);
-      setUsers(prev => prev.map(user => (user.id === selected.id ? { ...user, status } : user)));
-      setStatusOpen(false);
-      toast.create({ title: isActive ? 'User deactivated' : 'User activated', type: 'default' });
-    } catch {
-      toast.create({ title: "Couldn't update user", type: 'error' });
     } finally {
       setPending(false);
     }
@@ -297,11 +263,69 @@ export const Default: StoryFn = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </Page>
+  );
+};
+
+/**
+ * The description says what the user gets back. Once active, the same button deactivates: that
+ * dialog uses a destructive confirm and says the roles and data are kept.
+ */
+export const Activate: StoryFn = () => {
+  const toast = useToast();
+  const [status, setStatus] = useState(INACTIVE_USER.status);
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+
+  const isActive = status === 'active';
+
+  const handleOpen = () => setOpen(true);
+
+  const handleOpenChange = (next: boolean) => {
+    if (!pending) setOpen(next);
+  };
+
+  const handleStatusChange = async () => {
+    const nextStatus: UserStatus = isActive ? 'deactivated' : 'active';
+    setPending(true);
+    try {
+      await setUserStatus(INACTIVE_USER.id, nextStatus);
+      setStatus(nextStatus);
+      setOpen(false);
+      toast.create({ title: isActive ? 'User deactivated' : 'User activated', type: 'default' });
+    } catch {
+      toast.create({ title: "Couldn't update user", type: 'error' });
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <Page name='settings-user' fullSize fixedHeight data-testid='user-page'>
+      <PageHeader>
+        <PageHeaderGroup className='flex-1'>
+          <PageTitle>{INACTIVE_USER.name}</PageTitle>
+          <PageDescription>
+            {INACTIVE_USER.email} · {INACTIVE_USER.role}
+          </PageDescription>
+        </PageHeaderGroup>
+        <PageActions>
+          <Button
+            size='medium'
+            variant='outline'
+            color='neutral'
+            onClick={handleOpen}
+            data-testid='user-change-status'
+          >
+            {isActive ? 'Deactivate user' : 'Activate user'}
+          </Button>
+        </PageActions>
+      </PageHeader>
 
       <Dialog
         width={400}
-        open={statusOpen}
-        onOpenChange={handleStatusOpenChange}
+        open={open}
+        onOpenChange={handleOpenChange}
         data-testid='user-status-dialog'
       >
         <DialogContent>
@@ -309,8 +333,8 @@ export const Default: StoryFn = () => {
             <DialogTitle>{isActive ? 'Deactivate user?' : 'Activate user?'}</DialogTitle>
             <DialogDescription>
               {isActive
-                ? `${selected?.name} loses access until you reactivate them. Their roles and data are kept.`
-                : `${selected?.name} can sign in again with the roles they had before.`}
+                ? `${INACTIVE_USER.name} loses access until you reactivate them. Their roles and data are kept.`
+                : `${INACTIVE_USER.name} can sign in again with the roles they had before.`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -323,6 +347,7 @@ export const Default: StoryFn = () => {
               color={isActive ? 'destructive' : 'brand'}
               loading={pending}
               onClick={handleStatusChange}
+              data-testid='user-status-confirm'
             >
               {isActive ? 'Deactivate user' : 'Activate user'}
             </Button>
@@ -334,9 +359,8 @@ export const Default: StoryFn = () => {
 };
 
 /**
- * Type-to-confirm for a delete that also breaks linked objects. The dialog keeps its default
- * 560px width, the confirm stays disabled until the input matches the name exactly
- * (case-sensitive), and closing the dialog resets the input to `''`.
+ * For a delete that also breaks linked objects. The match is exact and case-sensitive, and
+ * closing the dialog resets the input to `''`.
  */
 export const TypeToConfirm: StoryFn = () => {
   const toast = useToast();
@@ -430,9 +454,8 @@ export const TypeToConfirm: StoryFn = () => {
 };
 
 /**
- * An unsaved-changes guard. The drawer's `onOpenChange(false)` is intercepted while the form is
- * dirty, so the close X, Cancel, `Escape` and an outside click all open the same dialog. The
- * dialog renders inside `DrawerContent` and keeps the default 560px width.
+ * While the form is dirty, the close X, Cancel, `Escape` and an outside click all open the same
+ * dialog. "Keep editing" returns to the form; "Leave without saving" drops the edits.
  */
 export const UnsavedChanges: StoryFn = () => {
   const toast = useToast();

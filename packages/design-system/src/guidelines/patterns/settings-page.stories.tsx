@@ -94,17 +94,18 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
+
+// The host shell gives a page its height; 640px stands in for it on whole-page stories.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
 
 /**
  * Settings › Profile: About, Preferences, Appearance, Security and the danger zone in one
@@ -429,12 +430,15 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
+Default.decorators = hostShell;
 
 /**
- * An invalid value: the message sits inside the 320px wrapper under the input, nothing saves and
- * no toast fires. The typed value stays until the user fixes it.
+ * Starts invalid: the message sits under the input inside the 320px wrapper, and nothing saves
+ * until the name is valid. A failed save shows an error toast instead of "Name updated".
  */
 export const InvalidValue: StoryFn = () => {
+  const toast = useToast();
+  const [savedName, setSavedName] = useState(PROFILE.name);
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('Enter your name');
 
@@ -443,22 +447,25 @@ export const InvalidValue: StoryFn = () => {
     setNameError('');
   };
 
-  const handleNameBlur = () => {
-    if (!name.trim()) setNameError('Enter your name');
+  // On failure the input keeps the typed value, and the next blur retries.
+  const handleNameBlur = async () => {
+    const value = name.trim();
+    if (!value) {
+      setNameError('Enter your name');
+      return;
+    }
+    if (value === savedName) return;
+    try {
+      await onSaveProfile({ name: value });
+      setSavedName(value);
+      toast.create({ title: 'Name updated', type: 'success' });
+    } catch {
+      toast.create({ title: 'Name update failed', type: 'error' });
+    }
   };
 
   return (
-    <Page name='settings-profile' fullSize fixedHeight data-testid='profile-page'>
-      <PageHeader className='flex-wrap gap-y-6'>
-        <Breadcrumbs className='basis-full -ml-4'>
-          <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-          <BreadcrumbsItem>Profile</BreadcrumbsItem>
-        </Breadcrumbs>
-        <PageHeaderGroup>
-          <PageTitle>Profile</PageTitle>
-        </PageHeaderGroup>
-      </PageHeader>
-
+    <Page name='settings-profile' data-testid='profile-page'>
       <PageContent>
         <div className='flex max-w-[640px] flex-col gap-16'>
           <section className='flex flex-col gap-16'>
@@ -479,19 +486,6 @@ export const InvalidValue: StoryFn = () => {
                   {nameError && <FieldError>{nameError}</FieldError>}
                 </div>
               </Field>
-              <Separator spacing={16} />
-              <Field orientation='horizontal'>
-                <FieldLabel>Email</FieldLabel>
-                <div className='w-[320px] shrink-0'>
-                  <Input
-                    readOnly
-                    value={EMAIL}
-                    onClick={onEditEmail}
-                    onKeyDown={handleEmailKeyDown}
-                    data-testid='profile-email'
-                  />
-                </div>
-              </Field>
             </div>
           </section>
         </div>
@@ -499,6 +493,108 @@ export const InvalidValue: StoryFn = () => {
     </Page>
   );
 };
+
+/** The control saves on change; the row keeps its 36px height whatever the control is. */
+export const ActionRow: StoryFn = () => {
+  const toast = useToast();
+  const [sidebarStyle, setSidebarStyle] = useState(PROFILE.sidebarStyle);
+
+  const handleSidebarStyleChange = (value: string) => {
+    setSidebarStyle(value);
+    onSaveProfile({ sidebarStyle: value });
+    toast.create({ title: 'Sidebar style updated', type: 'success' });
+  };
+
+  return (
+    <Page name='settings-profile' data-testid='profile-page'>
+      <PageContent>
+        <div className='flex max-w-[640px] flex-col gap-16'>
+          <section className='flex flex-col gap-16'>
+            <Heading as='h2' size='xl' weight='medium' color='primary'>
+              Appearance
+            </Heading>
+            <div className='flex flex-col'>
+              <div className='flex min-h-36 items-center justify-between gap-16'>
+                <Text size='sm' weight='medium' color='primary'>
+                  Sidebar style
+                </Text>
+                <SegmentedControl
+                  aria-label='Sidebar style'
+                  value={sidebarStyle}
+                  onChange={handleSidebarStyleChange}
+                  data-testid='profile-sidebar-style'
+                >
+                  <SegmentedControlItem value='neutral'>Neutral</SegmentedControlItem>
+                  <SegmentedControlItem value='branded'>Branded</SegmentedControlItem>
+                </SegmentedControl>
+              </div>
+            </div>
+          </section>
+        </div>
+      </PageContent>
+    </Page>
+  );
+};
+
+/** The row stays visible with its current value, so users see what the org enforces. */
+export const LockedValue: StoryFn = () => (
+  <Page name='settings-profile' data-testid='profile-page'>
+    <PageContent>
+      <div className='flex max-w-[640px] flex-col gap-16'>
+        <section className='flex flex-col gap-16'>
+          <Heading as='h2' size='xl' weight='medium' color='primary'>
+            Security
+          </Heading>
+          <div className='flex flex-col'>
+            <Field orientation='horizontal'>
+              <FieldLabel>Two-factor authentication</FieldLabel>
+              <div className='flex items-center gap-8'>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Lock aria-label='Locked' />
+                  </TooltipTrigger>
+                  <TooltipContent>Enabled by your organization</TooltipContent>
+                </Tooltip>
+                <Switch checked disabled data-testid='profile-two-factor'>
+                  <SwitchControl />
+                </Switch>
+              </div>
+            </Field>
+          </div>
+        </section>
+      </div>
+    </PageContent>
+  </Page>
+);
+
+/** The dialog asks for the current password before it changes the email. */
+export const ReadOnlyValue: StoryFn = () => (
+  <Page name='settings-profile' data-testid='profile-page'>
+    <PageContent>
+      <div className='flex max-w-[640px] flex-col gap-16'>
+        <section className='flex flex-col gap-16'>
+          <Heading as='h2' size='xl' weight='medium' color='primary'>
+            About
+          </Heading>
+          <div className='flex flex-col'>
+            <Field orientation='horizontal'>
+              <FieldLabel>Email</FieldLabel>
+              <div className='w-[320px] shrink-0'>
+                <Input
+                  readOnly
+                  value={EMAIL}
+                  onClick={onEditEmail}
+                  onKeyDown={handleEmailKeyDown}
+                  data-testid='profile-email'
+                />
+              </div>
+            </Field>
+          </div>
+        </section>
+      </div>
+    </PageContent>
+  </Page>
+);
 
 /**
  * Saving: a select and a switch stay disabled until the request ends, and a button action shows
@@ -585,3 +681,4 @@ export const Saving: StoryFn = () => {
     </Page>
   );
 };
+Saving.decorators = hostShell;

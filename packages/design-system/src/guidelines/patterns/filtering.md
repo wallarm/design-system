@@ -74,127 +74,34 @@ There is no `FilterBar`, `PageFilters` or `Combobox` (use `Select` + `useSelectS
 
 ## Examples
 
-A search-aware filter menu, reused by every `FilterDropdown`.
+A filter bar over a table: search, a multiple and a single filter, a scope chip, and the view toggle last.
 
-```tsx
-const FilterMenu = () => {
-  const { groups } = useFilterDropdown<Option>();
-  return (
-    <FilterDropdownContent>
-      <FilterDropdownSearch />
-      <FilterDropdownAllOption />
-      <FilterDropdownSelected<Option>>
-        {item => <FilterDropdownOption item={item} hint={item.count} />}
-      </FilterDropdownSelected>
-      {groups.map(([group, items]) => (
-        <FilterDropdownGroup key={group}>
-          {group && <FilterDropdownGroupLabel>{group}</FilterDropdownGroupLabel>}
-          {items.map(item => <FilterDropdownOption key={item.value} item={item} hint={item.count} />)}
-        </FilterDropdownGroup>
-      ))}
-      <FilterDropdownEmpty />
-      <FilterDropdownFooter />
-    </FilterDropdownContent>
-  );
-};
+```story
+Default
 ```
 
-A toolbar with search, a single and a multiple filter, and a view toggle.
+From eight options a filter menu gets a search, and its options follow the query.
 
-```tsx
-<PageToolbar>
-  <div className='flex items-center gap-8'>
-    <SearchInput value={query} onChange={setQuery} placeholder='Search name or ID' className='w-[320px]' />
-    <FilterDropdown label='Type' multiple collection={typeOptions} value={types}
-      onValueChange={details => setTypes(details.value)}>
-      <FilterDropdownTrigger />
-      <FilterMenu />
-    </FilterDropdown>
-    <FilterDropdown label='State' allLabel='All states' collection={stateOptions} value={state}
-      onValueChange={details => setState(details.value)}>
-      <FilterDropdownTrigger />
-      <FilterMenu />
-    </FilterDropdown>
-  </div>
-  <SegmentedControl value={view} onChange={setView} className='ml-auto'>
-    <SegmentedControlItem value='table'><List /><span className='sr-only'>Table view</span></SegmentedControlItem>
-    <SegmentedControlItem value='schema'><Workflow /><span className='sr-only'>Schema view</span></SegmentedControlItem>
-  </SegmentedControl>
-</PageToolbar>
+```story
+SearchableFilter
 ```
 
-A scope chip with lazy applications and pickable deployments.
+A scope chip whose applications load on demand and whose deployments can be picked.
 
-```tsx
-import { FilterCascade, FilterCascadeContent, FilterCascadeItems, FilterCascadeLevels,
-  FilterCascadeParentItem, FilterCascadeSearch, FilterCascadeTrigger,
-} from '@wallarm-org/design-system/FilterCascade';
-
-<FilterCascade label='Scope' collection={scopes} loadChildren={loadApplications}
-  parentLabel='Deployment level' value={scope} onValueChange={details => setScope(details.value)}>
-  <FilterCascadeTrigger />
-  <FilterCascadeContent>
-    <FilterCascadeSearch placeholder='Search' />
-    <FilterCascadeLevels>
-      {level => (level.depth === 0 ? <FilterCascadeItems /> : <><FilterCascadeParentItem /><FilterCascadeItems /></>)}
-    </FilterCascadeLevels>
-  </FilterCascadeContent>
-</FilterCascade>
+```story
+ScopeFilter
 ```
 
 A searchable select in a form, with the menu matching the trigger.
 
-```tsx
-const { searchValue, onSearchChange, filteredCollection } = useSelectSearch(timezones);
-
-<Field>
-  <FieldLabel>Time zone</FieldLabel>
-  <Select collection={timezones} value={[value]} positioning={{ sameWidth: true }}
-    onValueChange={details => onChange(details.value[0] ?? value)}>
-    <SelectInput placeholder='Choose a time zone' />
-    <SelectPositioner className='min-w-full max-w-full'>
-      <SelectHeader>
-        <SelectSearchInput value={searchValue} onChange={onSearchChange} />
-      </SelectHeader>
-      <SelectContent>
-        {filteredCollection.size === 0
-          ? <SelectEmptyState description={`No results for "${searchValue}"`} />
-          : filteredCollection.items.map(item => (
-              <SelectOption key={item.value} item={item}>
-                <SelectOptionText>{item.label}</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
-            ))}
-      </SelectContent>
-    </SelectPositioner>
-  </Select>
-</Field>
+```story
+SearchableSelect
 ```
 
-A picker dialog body and footer; the primary counts the selection.
+A picker dialog whose primary counts the selection: disabled "Add users", then "Add 2 users".
 
-```tsx
-<DialogBody>
-  <div className='flex flex-col gap-8'>
-    <div className='flex items-center gap-12'>
-      <SearchInput value={query} onChange={setQuery} placeholder='Search name or email' className='flex-1' />
-      <SegmentedTabs value={status} onChange={setStatus}>
-        <SegmentedTabsList>
-          <SegmentedTabsTrigger value='all'>All</SegmentedTabsTrigger>
-          <SegmentedTabsTrigger value='active'>Active <NumericBadge>{activeCount}</NumericBadge></SegmentedTabsTrigger>
-        </SegmentedTabsList>
-      </SegmentedTabs>
-    </div>
-    <Table aria-label='Users to add' data={rows} columns={columns} getRowId={row => row.id}
-      rowSelection={selection} onRowSelectionChange={setSelection} />
-  </div>
-</DialogBody>
-<DialogFooter>
-  <DialogClose asChild><Button variant='ghost' color='neutral'>Cancel</Button></DialogClose>
-  <Button disabled={count === 0} loading={pending} onClick={handleAdd}>
-    {count === 0 ? 'Add users' : `Add ${count} ${count === 1 ? 'user' : 'users'}`}
-  </Button>
-</DialogFooter>
+```story
+PickerDialog
 ```
 
 ## States

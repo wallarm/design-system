@@ -80,104 +80,32 @@ Form size picks the container.
 
 A dialog form with a 24px field stack.
 
-```tsx
-import { Button, Field, FieldLabel, Input, VStack } from '@wallarm-org/design-system';
-import { Dialog, DialogBody, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@wallarm-org/design-system/Dialog';
-import { FieldIndicator } from '@wallarm-org/design-system/Field';
-
-<Dialog open={open} onOpenChange={onOpenChange}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Create user</DialogTitle>
-    </DialogHeader>
-    <form onSubmit={handleSubmit} className='flex min-h-0 flex-1 flex-col'>
-      <DialogBody>
-        <VStack gap={24}>
-          <Field required>
-            <FieldLabel>Full name<FieldIndicator /></FieldLabel>
-            <Input value={name} onChange={handleNameChange} />
-          </Field>
-        </VStack>
-      </DialogBody>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant='ghost' color='neutral'>Cancel</Button>
-        </DialogClose>
-        <Button type='submit' disabled={!canSubmit} loading={pending}>Create user</Button>
-      </DialogFooter>
-    </form>
-  </DialogContent>
-</Dialog>
+```story
+CreateInDialog
 ```
 
 An invalid field: `error` goes on the control, `FieldError` renders only while invalid.
 
-```tsx
-<Field required>
-  <FieldLabel>Email<FieldIndicator /></FieldLabel>
-  <FieldDescription>The invitation link expires in 7 days.</FieldDescription>
-  <Input type='email' value={email} error={emailInvalid} onChange={handleEmailChange} onBlur={handleEmailBlur} />
-  {emailInvalid && <FieldError>Enter an email address.</FieldError>}
-</Field>
+```story
+InvalidField
 ```
 
-One numbered `Timeline` section inside a `Drawer width={700}` body.
+Edit reuses the create container. A field fixed after create is disabled, with a tooltip on a wrapping `span`.
 
-```tsx
-<Timeline>
-  <TimelineItem>
-    <TimelineConnector>
-      <TimelineIndicator>1</TimelineIndicator>
-      <TimelineSeparator />
-    </TimelineConnector>
-    <TimelineContent>
-      <TimelineTitle>Configure GitHub</TimelineTitle>
-      <VStack gap={12}>
-        <Field required>
-          <FieldLabel>Client ID<FieldIndicator /></FieldLabel>
-          <Input />
-        </Field>
-      </VStack>
-    </TimelineContent>
-  </TimelineItem>
-</Timeline>
+```story
+EditInDialog
 ```
 
-A Stepper footer that swaps Next for submit on the last step.
+Numbered `Timeline` sections, each a 12px field stack, inside a `Drawer width={700}` body.
 
-```tsx
-<DrawerFooter>
-  <DrawerFooterControls placement='left'>
-    <DrawerClose asChild>
-      <Button variant='ghost' color='neutral'>Cancel</Button>
-    </DrawerClose>
-  </DrawerFooterControls>
-  <DrawerFooterControls placement='right'>
-    <StepperPrevTrigger asChild>
-      <Button variant='outline' color='neutral'>Back</Button>
-    </StepperPrevTrigger>
-    {last ? (
-      <Button type='submit' loading={pending}>Create policy</Button>
-    ) : (
-      <StepperNextTrigger asChild>
-        <Button>Next</Button>
-      </StepperNextTrigger>
-    )}
-  </DrawerFooterControls>
-</DrawerFooter>
+```story
+CreateInDrawerWithSections
 ```
 
-A field fixed after create, explained by a tooltip on a wrapping `span`.
+A `Stepper` wrapping body and footer; submit replaces Next on the last step.
 
-```tsx
-<Tooltip>
-  <TooltipTrigger asChild>
-    <span>
-      <Input value={slug} disabled />
-    </span>
-  </TooltipTrigger>
-  <TooltipContent>The ID can't change after the provider is created.</TooltipContent>
-</Tooltip>
+```story
+CreateInDrawerWithSteps
 ```
 
 ## States

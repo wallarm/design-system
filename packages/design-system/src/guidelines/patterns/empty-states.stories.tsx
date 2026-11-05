@@ -28,7 +28,7 @@ import type { TableColumnDef } from '../../components/Table';
 import { Table, TableEmptyState } from '../../components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/Tabs';
 import { Text } from '../../components/Text';
-import { Bell, CheckCheck, FilterX, History, Link2, SearchX } from '../../icons';
+import { Bell, CheckCheck, FilterX, History, Link2, SearchX, Shapes } from '../../icons';
 
 interface Trigger {
   id: string;
@@ -58,9 +58,31 @@ const TRIGGERS: Trigger[] = [
   },
 ];
 
+const TRIGGER_COLUMNS: TableColumnDef<Trigger>[] = [
+  { accessorKey: 'name', header: 'Name', size: 280 },
+  { accessorKey: 'condition', header: 'Condition', size: 320 },
+  { accessorKey: 'action', header: 'Action', size: 280 },
+];
+
+interface MappingRule {
+  id: string;
+  claim: string;
+  grants: string;
+}
+
+// The identity provider has no mapping rules yet.
+const MAPPING_RULES: MappingRule[] = [];
+
+const MAPPING_RULE_COLUMNS: TableColumnDef<MappingRule>[] = [
+  { accessorKey: 'claim', header: 'Claim', size: 280 },
+  { accessorKey: 'grants', header: 'Grants', size: 280 },
+];
+
 const onCreateTrigger = fn().mockName('onCreateTrigger');
 
 const getTriggerId = (trigger: Trigger) => trigger.id;
+
+const getMappingRuleId = (rule: MappingRule) => rule.id;
 
 const meta = {
   title: 'Patterns/Empty states',
@@ -76,7 +98,7 @@ const meta = {
 } satisfies Meta;
 
 // The host shell gives a page its height; 640px stands in for it.
-const pageHeight: Meta['decorators'] = [
+const hostShell: StoryFn['decorators'] = [
   Story => (
     <div className='h-640'>
       <Story />
@@ -87,18 +109,11 @@ const pageHeight: Meta['decorators'] = [
 export default meta;
 
 /**
- * A page table with nothing yet. The header, toolbar and column headers stay; `PageActions`
- * has the one create button, so the empty state has none. Typing a search switches the copy
- * to "No results found" with "Reset filters" — the app passes its own flag for the cause.
+ * The header, toolbar and column headers stay visible. Typing a search switches the copy to
+ * "No results found" with "Reset filters": the app passes its own flag for the cause.
  */
 export const Default: StoryFn = () => {
   const [query, setQuery] = useState('');
-
-  const columns: TableColumnDef<Trigger>[] = [
-    { accessorKey: 'name', header: 'Name', size: 280 },
-    { accessorKey: 'condition', header: 'Condition', size: 320 },
-    { accessorKey: 'action', header: 'Action', size: 280 },
-  ];
 
   const isFiltered = query.trim() !== '';
 
@@ -134,7 +149,7 @@ export const Default: StoryFn = () => {
         <Table
           aria-label='Triggers'
           data={[]}
-          columns={columns}
+          columns={TRIGGER_COLUMNS}
           getRowId={getTriggerId}
           data-testid='triggers-table'
         >
@@ -178,18 +193,13 @@ export const Default: StoryFn = () => {
   );
 };
 
+Default.decorators = hostShell;
+
 /**
- * Search matched nothing in a table that has rows: "No results found" with "Reset filters",
- * never a create action. Reset clears the search and the rows come back.
+ * The table has rows: "Reset filters" clears the search and they come back.
  */
 export const NoResults: StoryFn = () => {
   const [query, setQuery] = useState('graphql');
-
-  const columns: TableColumnDef<Trigger>[] = [
-    { accessorKey: 'name', header: 'Name', size: 280 },
-    { accessorKey: 'condition', header: 'Condition', size: 320 },
-    { accessorKey: 'action', header: 'Action', size: 280 },
-  ];
 
   const search = query.trim().toLowerCase();
   const rows = TRIGGERS.filter(trigger => trigger.name.toLowerCase().includes(search));
@@ -226,7 +236,7 @@ export const NoResults: StoryFn = () => {
         <Table
           aria-label='Triggers'
           data={rows}
-          columns={columns}
+          columns={TRIGGER_COLUMNS}
           getRowId={getTriggerId}
           data-testid='triggers-table'
         >
@@ -253,12 +263,47 @@ export const NoResults: StoryFn = () => {
   );
 };
 
-Default.decorators = pageHeight;
-NoResults.decorators = pageHeight;
+NoResults.decorators = hostShell;
 
 /**
- * A missing dependency: the section header stays and the empty state names the choice that
- * unlocks it, with no action. **Never** "No operations yet".
+ * No `TableEmptyState` here: its 128px vertical padding is too tall for a section.
+ */
+export const SectionTable: StoryFn = () => {
+  const isLoading = false;
+
+  return (
+    <div className='flex w-640 flex-col gap-12 p-24' data-testid='mapping-rules-section'>
+      <Heading size='lg' weight='medium'>
+        Mapping rules
+      </Heading>
+      <Table
+        aria-label='Mapping rules'
+        data={MAPPING_RULES}
+        columns={MAPPING_RULE_COLUMNS}
+        getRowId={getMappingRuleId}
+        isLoading={isLoading}
+        data-testid='mapping-rules-table'
+      >
+        {MAPPING_RULES.length === 0 && !isLoading && (
+          <EmptyState data-testid='mapping-rules-empty-state'>
+            <EmptyStateIllustration>
+              <Shapes />
+            </EmptyStateIllustration>
+            <EmptyStateMessage>
+              <EmptyStateTitle>No rules yet</EmptyStateTitle>
+              <EmptyStateDescription>
+                Create one to grant a role or a group from a claim this provider sends.
+              </EmptyStateDescription>
+            </EmptyStateMessage>
+          </EmptyState>
+        )}
+      </Table>
+    </div>
+  );
+};
+
+/**
+ * The section header stays visible. **Never** "No operations yet".
  */
 export const Dependency: StoryFn = () => (
   <div className='flex w-640 flex-col gap-12 p-24' data-testid='operations-section'>
@@ -278,8 +323,7 @@ export const Dependency: StoryFn = () => (
 );
 
 /**
- * A notification panel where each tab is empty: per-tab copy and an icon that names the case,
- * no action. The tab stays visible.
+ * A notification panel: no action, and every tab stays visible.
  */
 export const EmptyTabs: StoryFn = () => {
   const [tab, setTab] = useState('unread');
@@ -323,8 +367,7 @@ export const EmptyTabs: StoryFn = () => {
 };
 
 /**
- * Small containers use `type='no-results'`: a kanban column gets a title only, centred in the
- * column; a chart card gets a description only. No illustration at this scale.
+ * `type='no-results'` has no illustration. Centre it in the column or the card body.
  */
 export const SmallContainers: StoryFn = () => (
   <div className='flex gap-16 p-24'>

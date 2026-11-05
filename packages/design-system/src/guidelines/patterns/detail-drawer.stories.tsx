@@ -30,10 +30,11 @@ import {
 } from '../../components/DropdownMenu';
 import { EmptyState, EmptyStateMessage, EmptyStateTitle } from '../../components/EmptyState';
 import { FormatDateTime } from '../../components/FormatDateTime';
+import { Heading } from '../../components/Heading';
 import { NumericBadge } from '../../components/NumericBadge';
 import { Page, PageContent, PageHeader, PageHeaderGroup, PageTitle } from '../../components/Page';
 import { Separator } from '../../components/Separator';
-import { VStack } from '../../components/Stack';
+import { HStack, VStack } from '../../components/Stack';
 import type { TableCellContext, TableColumnDef } from '../../components/Table';
 import { Table } from '../../components/Table';
 import { Tabs, TabsContent, TabsLineActions, TabsList, TabsTrigger } from '../../components/Tabs';
@@ -65,48 +66,50 @@ interface Provider {
   domains: Domain[];
 }
 
-const PROVIDERS: Provider[] = [
-  {
-    id: 'sso-okta',
-    name: 'Okta',
-    protocol: 'OpenID Connect',
-    issuer: 'https://acme-bank.okta.com/oauth2/default',
-    clientId: '0oa8f2k1x9QdLp7Zt5d7',
-    defaultRole: 'Read only',
-    createdAt: '2026-03-12T09:24:00Z',
-    rules: [
-      { id: 'r-1', claim: 'groups', value: 'secops-admins', role: 'Administrator' },
-      { id: 'r-2', claim: 'groups', value: 'secops-analysts', role: 'Security analyst' },
-      { id: 'r-3', claim: 'groups', value: 'platform-ci', role: 'Deploy' },
-    ],
-    domains: [
-      { id: 'd-1', name: 'acme-bank.com', verifiedAt: '2026-03-12T09:40:00Z' },
-      { id: 'd-2', name: 'acme-bank.co.uk', verifiedAt: '2026-04-02T14:05:00Z' },
-    ],
-  },
-  {
-    id: 'sso-entra',
-    name: 'Microsoft Entra ID',
-    protocol: 'SAML 2.0',
-    issuer: 'https://sts.windows.net/7c1f3e2a-55b0-4d8e-9a61-2f0d4b9c8e13/',
-    clientId: 'spn:4b1d7e90-2c3a-4f5e-8d6b-a0c9e1f2b3d4',
-    defaultRole: null,
-    createdAt: '2026-06-30T16:12:00Z',
-    rules: [{ id: 'r-4', claim: 'roles', value: 'Wallarm.Auditor', role: 'Read only' }],
-    domains: [{ id: 'd-3', name: 'acme-insurance.com', verifiedAt: '2026-07-01T08:30:00Z' }],
-  },
-  {
-    id: 'sso-google',
-    name: 'Google Workspace',
-    protocol: 'OpenID Connect',
-    issuer: 'https://accounts.google.com',
-    clientId: '381204779513-k2v9t0c8.apps.googleusercontent.com',
-    defaultRole: 'API developer',
-    createdAt: '2026-10-21T11:48:00Z',
-    rules: [],
-    domains: [],
-  },
-];
+const OKTA: Provider = {
+  id: 'sso-okta',
+  name: 'Okta',
+  protocol: 'OpenID Connect',
+  issuer: 'https://acme-bank.okta.com/oauth2/default',
+  clientId: '0oa8f2k1x9QdLp7Zt5d7',
+  defaultRole: 'Read only',
+  createdAt: '2026-03-12T09:24:00Z',
+  rules: [
+    { id: 'r-1', claim: 'groups', value: 'secops-admins', role: 'Administrator' },
+    { id: 'r-2', claim: 'groups', value: 'secops-analysts', role: 'Security analyst' },
+    { id: 'r-3', claim: 'groups', value: 'platform-ci', role: 'Deploy' },
+  ],
+  domains: [
+    { id: 'd-1', name: 'acme-bank.com', verifiedAt: '2026-03-12T09:40:00Z' },
+    { id: 'd-2', name: 'acme-bank.co.uk', verifiedAt: '2026-04-02T14:05:00Z' },
+  ],
+};
+
+const ENTRA: Provider = {
+  id: 'sso-entra',
+  name: 'Microsoft Entra ID',
+  protocol: 'SAML 2.0',
+  issuer: 'https://sts.windows.net/7c1f3e2a-55b0-4d8e-9a61-2f0d4b9c8e13/',
+  clientId: 'spn:4b1d7e90-2c3a-4f5e-8d6b-a0c9e1f2b3d4',
+  defaultRole: null,
+  createdAt: '2026-06-30T16:12:00Z',
+  rules: [{ id: 'r-4', claim: 'roles', value: 'Wallarm.Auditor', role: 'Read only' }],
+  domains: [{ id: 'd-3', name: 'acme-insurance.com', verifiedAt: '2026-07-01T08:30:00Z' }],
+};
+
+const GOOGLE: Provider = {
+  id: 'sso-google',
+  name: 'Google Workspace',
+  protocol: 'OpenID Connect',
+  issuer: 'https://accounts.google.com',
+  clientId: '381204779513-k2v9t0c8.apps.googleusercontent.com',
+  defaultRole: 'API developer',
+  createdAt: '2026-10-21T11:48:00Z',
+  rules: [],
+  domains: [],
+};
+
+const PROVIDERS: Provider[] = [OKTA, ENTRA, GOOGLE];
 
 const onEditProvider = fn().mockName('onEditProvider');
 const onDisableProvider = fn().mockName('onDisableProvider');
@@ -114,6 +117,7 @@ const onGoToAuditLog = fn().mockName('onGoToAuditLog');
 const onDeleteProvider = fn().mockName('onDeleteProvider');
 const onCreateRule = fn().mockName('onCreateRule');
 const onRestoreVersion = fn().mockName('onRestoreVersion');
+const onSaveDrawerWidth = fn().mockName('onSaveDrawerWidth');
 
 const getProviderId = (provider: Provider) => provider.id;
 const getItemId = (item: { id: string }) => item.id;
@@ -129,17 +133,18 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
+
+// The host shell gives a page its height; 640px stands in for it.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
 
 /**
  * Click a provider name: one shared, non-modal drawer opens and the row stays marked. The header
@@ -353,6 +358,234 @@ export const Default: StoryFn = () => {
   );
 };
 
+Default.decorators = hostShell;
+
+/**
+ * Drag the left edge to resize between 400 and 1130px; `onResizeEnd` gets the final width to
+ * persist. The close X comes built in, so there is no footer and no close button of your own.
+ */
+export const Header: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+
+  const handleEdit = () => onEditProvider(OKTA);
+  const handleDisable = () => onDisableProvider(OKTA);
+  const handleGoToAuditLog = () => onGoToAuditLog(OKTA);
+  const handleDelete = () => onDeleteProvider(OKTA);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerContent>
+        <DrawerResizeHandle onResizeEnd={onSaveDrawerWidth} />
+        <DrawerHeader>
+          <DrawerTitle>{OKTA.name}</DrawerTitle>
+          <DropdownMenu data-testid='provider-actions'>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' color='neutral' size='small'>
+                Actions <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={handleEdit}>
+                <DropdownMenuItemText>Edit provider</DropdownMenuItemText>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleDisable}>
+                <DropdownMenuItemText>Disable provider</DropdownMenuItemText>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleGoToAuditLog}>
+                <DropdownMenuItemText>Go to audit log</DropdownMenuItemText>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant='destructive' onSelect={handleDelete}>
+                <DropdownMenuItemText>Delete provider</DropdownMenuItemText>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </DrawerHeader>
+        <DrawerBody>
+          <VStack gap={6} className='pb-8'>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Protocol</AttributeLabel>
+              <AttributeValue>{OKTA.protocol}</AttributeValue>
+            </Attribute>
+          </VStack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+/**
+ * Every row is horizontal with the same 140px label. Entra ID has no default role, so that row
+ * stays and shows the empty marker; the codes copy on click.
+ */
+export const Attributes: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{ENTRA.name}</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
+          <VStack gap={6} className='pb-8' data-testid='provider-attributes'>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Client ID</AttributeLabel>
+              <AttributeValue>
+                <InlineCodeSnippet code={ENTRA.clientId} size='md' />
+              </AttributeValue>
+            </Attribute>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Client secret</AttributeLabel>
+              <AttributeValue>Set — never shown</AttributeValue>
+            </Attribute>
+            <Attribute orientation='horizontal' isEmpty={!ENTRA.defaultRole}>
+              <AttributeLabel width={140}>Default role</AttributeLabel>
+              <AttributeValue>{ENTRA.defaultRole && <Tag>{ENTRA.defaultRole}</Tag>}</AttributeValue>
+            </Attribute>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Created at</AttributeLabel>
+              <AttributeValue>
+                <FormatDateTime value={ENTRA.createdAt} format='datetime' layout='inline' />
+              </AttributeValue>
+            </Attribute>
+          </VStack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+/**
+ * The first group needs no title. Each later group starts with a `Separator` and a header row; the
+ * action applies to that section only.
+ */
+export const Section: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+
+  const handleEditDefaults = () => onEditProvider(OKTA);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{OKTA.name}</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
+          <VStack gap={6} className='pb-8'>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Protocol</AttributeLabel>
+              <AttributeValue>{OKTA.protocol}</AttributeValue>
+            </Attribute>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Issuer URL</AttributeLabel>
+              <AttributeValue>
+                <InlineCodeSnippet code={OKTA.issuer} size='md' />
+              </AttributeValue>
+            </Attribute>
+          </VStack>
+
+          <Separator spacing={4} />
+
+          <HStack
+            justify='between'
+            align='center'
+            className='py-8'
+            data-testid='provider-defaults-section'
+          >
+            <Heading as='h3' size='md' weight='medium'>
+              Defaults
+            </Heading>
+            <Button size='small' variant='outline' color='neutral' onClick={handleEditDefaults}>
+              Edit defaults
+            </Button>
+          </HStack>
+          <VStack gap={6} className='pb-8'>
+            <Attribute orientation='horizontal' isEmpty={!OKTA.defaultRole}>
+              <AttributeLabel width={140}>Default role</AttributeLabel>
+              <AttributeValue>{OKTA.defaultRole && <Tag>{OKTA.defaultRole}</Tag>}</AttributeValue>
+            </Attribute>
+            <Attribute orientation='horizontal'>
+              <AttributeLabel width={140}>Created at</AttributeLabel>
+              <AttributeValue>
+                <FormatDateTime value={OKTA.createdAt} format='datetime' layout='inline' />
+              </AttributeValue>
+            </Attribute>
+          </VStack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+/**
+ * Google Workspace has no rules yet: the table keeps its headers and shows a one-line empty state
+ * with no action, since "Create rule" already sits on the tab line.
+ */
+export const NestedTable: StoryFn = () => {
+  const [open, setOpen] = useState(true);
+  const [tab, setTab] = useState('rules');
+
+  const renderClaim = ({ row }: TableCellContext<RoleRule, unknown>) => (
+    <InlineCodeSnippet code={`${row.original.claim} = ${row.original.value}`} size='md' />
+  );
+  const renderRole = ({ row }: TableCellContext<RoleRule, unknown>) => (
+    <Tag>{row.original.role}</Tag>
+  );
+
+  const ruleColumns: TableColumnDef<RoleRule>[] = [
+    { id: 'claim', header: 'Claim', size: 300, cell: renderClaim },
+    { accessorKey: 'role', header: 'Role', size: 200, cell: renderRole },
+  ];
+
+  const handleCreateRule = () => onCreateRule(GOOGLE);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{GOOGLE.name}</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
+          <Tabs value={tab} onChange={setTab} data-testid='provider-tabs'>
+            <div className='-mx-24'>
+              <TabsList>
+                <TabsTrigger value='rules'>
+                  Role rules <NumericBadge>{GOOGLE.rules.length}</NumericBadge>
+                </TabsTrigger>
+                <TabsLineActions>
+                  <Button size='small' onClick={handleCreateRule}>
+                    <Plus /> Create rule
+                  </Button>
+                </TabsLineActions>
+              </TabsList>
+            </div>
+            <TabsContent value='rules'>
+              <div className='-mx-8 pt-8'>
+                <Table
+                  aria-label='Role rules'
+                  data={GOOGLE.rules}
+                  columns={ruleColumns}
+                  getRowId={getItemId}
+                  data-testid='provider-rules-table'
+                >
+                  {GOOGLE.rules.length === 0 && (
+                    <EmptyState type='collection-empty' data-testid='provider-rules-empty'>
+                      <EmptyStateMessage>
+                        <EmptyStateTitle>No role rules yet</EmptyStateTitle>
+                      </EmptyStateMessage>
+                    </EmptyState>
+                  )}
+                </Table>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
 /**
  * The entity is still loading: every `Attribute` shows its skeleton and the nested table shows
  * three skeleton rows. No `Loader` over the body, and the header keeps its title.
@@ -448,6 +681,8 @@ export const Loading: StoryFn = () => {
     </Page>
   );
 };
+
+Loading.decorators = hostShell;
 
 /**
  * Viewing an old version: an info `Alert` comes first in the body with "Back to current" and
@@ -575,3 +810,5 @@ export const OldVersion: StoryFn = () => {
     </Page>
   );
 };
+
+OldVersion.decorators = hostShell;

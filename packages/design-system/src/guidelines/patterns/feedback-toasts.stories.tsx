@@ -72,6 +72,8 @@ const CHANNELS: Channel[] = [
   },
 ];
 
+const ONCALL_LINK = 'https://my.wallarm.com/integrations/ch-oncall';
+
 const onOpenDestination = fn().mockName('onOpenDestination');
 const onDeleteChannel = fn().mockName('onDeleteChannel');
 
@@ -98,24 +100,22 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
 
+// The host shell gives a page its height; 640px stands in for it on whole-page stories.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
+
 /**
- * A notification channels page where every action reports its result with a toast from the one
- * app-root `Toaster`. "Create channel" fires a toast with one next step. "Send test" shows a
- * loading toast that changes in place to "Test delivered via Slack". "Copy link" reuses one id,
- * so repeated clicks update one toast. "Delete channel" closes its confirmation dialog first,
- * then fires a plain `type: 'default'` toast.
+ * The whole page, with every toast from the one app-root `Toaster`: create, then send test, copy
+ * link and delete from each row's menu. The parts below show each toast on its own.
  */
 export const Default: StoryFn = () => {
   const toast = useToast();
@@ -281,11 +281,95 @@ export const Default: StoryFn = () => {
   );
 };
 
-/**
- * A test that fails: the same loading toast turns into an error. The action goes in `title`,
- * the provider's cause in `description`, and the update passes `duration: 10000` because the
- * timer was fixed at `create` for a one-row toast.
- */
+Default.decorators = hostShell;
+
+/** The description switches the toast to the extended layout, so it stays 10000 ms. */
+export const NextStep: StoryFn = () => {
+  const toast = useToast();
+
+  const handleCreate = () => {
+    toast.create({
+      id: 'channel-created',
+      title: 'Channel created',
+      description: 'Route notifications through this channel in a destination.',
+      type: 'default',
+      actions: (
+        <ToastActions>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onOpenDestination}>
+            Go to destination
+          </Button>
+        </ToastActions>
+      ),
+    });
+  };
+
+  return (
+    <Page name='integrations-channels' data-testid='channels-page'>
+      <PageHeader data-testid='channels-header'>
+        <PageHeaderGroup className='flex-1'>
+          <PageTitle>Notification channels</PageTitle>
+          <PageDescription>
+            Where Wallarm sends attack, incident and system notifications.
+          </PageDescription>
+        </PageHeaderGroup>
+        <PageActions>
+          <Button size='medium' onClick={handleCreate} data-testid='channels-create'>
+            Create channel
+          </Button>
+        </PageActions>
+      </PageHeader>
+    </Page>
+  );
+};
+
+/** The loading toast has no timer; the 5000 ms timer starts when `update` resolves it. */
+export const TestDelivered: StoryFn = () => {
+  const toast = useToast();
+
+  const handleTest = async () => {
+    const id = toast.create({
+      id: 'test-ch-soc-alerts',
+      title: 'Testing channel…',
+      type: 'loading',
+    });
+    try {
+      await sendTestNotification();
+      toast.update({ id, title: 'Test delivered via Slack', type: 'success' });
+    } catch (error) {
+      toast.update({
+        id,
+        title: 'Test failed',
+        description: error instanceof Error ? error.message : undefined,
+        type: 'error',
+        duration: 10000,
+      });
+    }
+  };
+
+  return (
+    <Page name='integrations-channel' data-testid='channel-page'>
+      <PageHeader data-testid='channel-header'>
+        <PageHeaderGroup className='flex-1'>
+          <PageTitle>#soc-alerts</PageTitle>
+          <PageDescription>Slack channel. Receives attacks and vulnerabilities.</PageDescription>
+        </PageHeaderGroup>
+        <PageActions>
+          <Button
+            size='medium'
+            variant='outline'
+            color='neutral'
+            onClick={handleTest}
+            data-testid='channel-send-test'
+          >
+            Send test
+          </Button>
+        </PageActions>
+      </PageHeader>
+    </Page>
+  );
+};
+
+/** The action goes in `title` and the provider's cause in `description`. */
 export const TestFailed: StoryFn = () => {
   const toast = useToast();
 
@@ -306,8 +390,8 @@ export const TestFailed: StoryFn = () => {
   };
 
   return (
-    <Page name='integrations-channel' fullSize fixedHeight data-testid='channel-page'>
-      <PageHeader>
+    <Page name='integrations-channel' data-testid='channel-page'>
+      <PageHeader data-testid='channel-header'>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>SIEM ingest</PageTitle>
           <PageDescription>
@@ -323,6 +407,42 @@ export const TestFailed: StoryFn = () => {
             data-testid='channel-send-test'
           >
             Send test
+          </Button>
+        </PageActions>
+      </PageHeader>
+    </Page>
+  );
+};
+
+/** If the clipboard is blocked, the same id turns the toast into an error. */
+export const CopyLink: StoryFn = () => {
+  const toast = useToast();
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(ONCALL_LINK);
+      toast.create({ id: 'copy-link', title: 'Link copied', type: 'default' });
+    } catch {
+      toast.create({ id: 'copy-link', title: 'Copy failed', type: 'error' });
+    }
+  };
+
+  return (
+    <Page name='integrations-channel' data-testid='channel-page'>
+      <PageHeader data-testid='channel-header'>
+        <PageHeaderGroup className='flex-1'>
+          <PageTitle>Security on-call</PageTitle>
+          <PageDescription>PagerDuty service. Receives incidents.</PageDescription>
+        </PageHeaderGroup>
+        <PageActions>
+          <Button
+            size='medium'
+            variant='outline'
+            color='neutral'
+            onClick={handleCopyLink}
+            data-testid='channel-copy-link'
+          >
+            Copy link
           </Button>
         </PageActions>
       </PageHeader>

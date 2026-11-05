@@ -75,109 +75,26 @@ A confirmation dialog asks one question about one action, then runs that action 
 
 A delete confirmation with pending, success and failure handling.
 
-```tsx
-const handleDelete = async () => {
-  setPending(true);
-  try {
-    await onDelete();
-    onOpenChange(false);
-    toast.create({ title: 'User deleted', type: 'default' });
-  } catch {
-    toast.create({ title: "Couldn't delete user", type: 'error' });
-  } finally {
-    setPending(false);
-  }
-};
-
-<Dialog width={400} open={open} onOpenChange={next => !pending && onOpenChange(next)}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Delete user?</DialogTitle>
-      <DialogDescription>
-        This permanently deletes {userName} and all their access. You can't undo this.
-      </DialogDescription>
-    </DialogHeader>
-    <DialogFooter>
-      <DialogClose asChild>
-        <Button variant='ghost' color='neutral'>Cancel</Button>
-      </DialogClose>
-      <Button color='destructive' loading={pending} onClick={handleDelete}>Delete user</Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+```story
+Default
 ```
 
 A state change that grants access uses the default brand confirm.
 
-```tsx
-<DialogFooter>
-  <DialogClose asChild>
-    <Button variant='ghost' color='neutral'>Cancel</Button>
-  </DialogClose>
-  <Button loading={pending} onClick={handleActivate}>Activate user</Button>
-</DialogFooter>
+```story
+Activate
 ```
 
 Type-to-confirm omits `width` and keeps confirm disabled until the name matches.
 
-```tsx
-<Dialog open={open} onOpenChange={handleOpenChange /* resets value to '' on close */}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Delete identity provider?</DialogTitle>
-      <DialogDescription>
-        "{providerName}" is unlinked and deleted, along with its rules. You can't undo this.
-      </DialogDescription>
-    </DialogHeader>
-    <DialogBody>
-      <Input
-        aria-label='Provider name'
-        placeholder={`Enter "${providerName}" to confirm`}
-        value={value}
-        onChange={handleValueChange}
-      />
-    </DialogBody>
-    <DialogFooter>
-      <DialogClose asChild>
-        <Button variant='ghost' color='neutral'>Cancel</Button>
-      </DialogClose>
-      <Button color='destructive' disabled={value !== providerName} loading={pending} onClick={onDelete}>
-        Delete identity provider
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+```story
+TypeToConfirm
 ```
 
 An unsaved-changes guard intercepts the drawer's close and renders the dialog inside `DrawerContent`.
 
-```tsx
-const handleDrawerOpenChange = (next: boolean) => {
-  if (!next && isDirty) return setGuardOpen(true);
-  onOpenChange(next);
-};
-
-<Drawer open={open} onOpenChange={handleDrawerOpenChange}>
-  <DrawerContent>
-    <DrawerHeader><DrawerTitle>Edit identity provider</DrawerTitle></DrawerHeader>
-    <DrawerBody>{children}</DrawerBody>
-    <Dialog open={guardOpen} onOpenChange={setGuardOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Unsaved changes</DialogTitle>
-          <DialogDescription>You have unsaved changes. Leaving will lose them unless you save.</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant='ghost' color='neutral'>Keep editing</Button>
-          </DialogClose>
-          <Button variant='ghost' color='neutral' onClick={handleLeave}>Leave without saving</Button>
-          <Button loading={saving} onClick={handleSave}>Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  </DrawerContent>
-</Drawer>
+```story
+UnsavedChanges
 ```
 
 ## States

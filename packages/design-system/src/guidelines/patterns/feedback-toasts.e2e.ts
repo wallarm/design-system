@@ -3,7 +3,10 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const feedbackToastsStory = createStoryHelper('patterns-feedback-toasts', [
   'Default',
+  'Next Step',
+  'Test Delivered',
   'Test Failed',
+  'Copy Link',
 ] as const);
 
 test.describe('Pattern: Feedback toasts', () => {
@@ -14,9 +17,27 @@ test.describe('Pattern: Feedback toasts', () => {
       await expect(page).toHaveScreenshot();
     });
 
+    test('Should render the create header correctly', async ({ page }) => {
+      await feedbackToastsStory.goto(page, 'Next Step');
+      await expect(page.getByTestId('channels-header')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the test delivered header correctly', async ({ page }) => {
+      await feedbackToastsStory.goto(page, 'Test Delivered');
+      await expect(page.getByTestId('channel-header')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
     test('Should render the channel page correctly', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Test Failed');
       await expect(page.getByTestId('channel-send-test')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the copy link header correctly', async ({ page }) => {
+      await feedbackToastsStory.goto(page, 'Copy Link');
+      await expect(page.getByTestId('channel-header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
   });

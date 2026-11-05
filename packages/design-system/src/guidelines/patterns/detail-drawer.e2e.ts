@@ -3,6 +3,10 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const detailDrawerStory = createStoryHelper('patterns-detail-drawer', [
   'Default',
+  'Header',
+  'Attributes',
+  'Section',
+  'Nested Table',
   'Loading',
   'Old Version',
 ] as const);
@@ -13,6 +17,30 @@ test.describe('Pattern: Detail drawer', () => {
       await detailDrawerStory.goto(page, 'Default');
       await page.getByTestId('providers-table').getByText('Okta', { exact: true }).click();
       await expect(page.getByTestId('provider-rules-table--container--row')).toHaveCount(3);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the header correctly', async ({ page }) => {
+      await detailDrawerStory.goto(page, 'Header');
+      await expect(page.getByTestId('provider-drawer--header')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the attributes correctly', async ({ page }) => {
+      await detailDrawerStory.goto(page, 'Attributes');
+      await expect(page.getByTestId('provider-attributes')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the section correctly', async ({ page }) => {
+      await detailDrawerStory.goto(page, 'Section');
+      await expect(page.getByTestId('provider-defaults-section')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the nested table correctly', async ({ page }) => {
+      await detailDrawerStory.goto(page, 'Nested Table');
+      await expect(page.getByTestId('provider-rules-empty')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

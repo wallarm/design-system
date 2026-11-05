@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const formsStory = createStoryHelper('patterns-create-and-edit-forms', [
   'Create In Dialog',
+  'Invalid Field',
   'Edit In Dialog',
   'Create In Drawer With Sections',
   'Create In Drawer With Steps',
@@ -24,6 +25,12 @@ test.describe('Pattern: Create and edit forms', () => {
       await page.getByTestId('create-user-email').fill('maria.lopez');
       await page.getByTestId('create-user-email').blur();
       await expect(page.getByTestId('create-user-email-error')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the invalid field story correctly', async ({ page }) => {
+      await formsStory.goto(page, 'Invalid Field');
+      await expect(page.getByTestId('invalid-email-field')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

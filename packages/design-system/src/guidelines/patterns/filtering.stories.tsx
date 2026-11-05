@@ -33,6 +33,11 @@ import {
   createFilterCascadeCollection,
   FilterCascade,
   FilterCascadeContent,
+  FilterCascadeItems,
+  type FilterCascadeLevelData,
+  FilterCascadeLevels,
+  FilterCascadeParentItem,
+  FilterCascadeSearch,
   FilterCascadeTrigger,
   type FilterCascadeValueChangeDetails,
 } from '../../components/FilterCascade';
@@ -40,10 +45,16 @@ import {
   FilterDropdown,
   FilterDropdownAllOption,
   FilterDropdownContent,
+  FilterDropdownEmpty,
   FilterDropdownFooter,
+  FilterDropdownGroup,
+  FilterDropdownGroupLabel,
   FilterDropdownOption,
+  FilterDropdownSearch,
+  FilterDropdownSelected,
   FilterDropdownTrigger,
   type FilterDropdownValueChangeDetails,
+  useFilterDropdown,
 } from '../../components/FilterDropdown';
 import { NumericBadge } from '../../components/NumericBadge';
 import {
@@ -205,6 +216,57 @@ const SCOPES = [
   },
 ];
 
+interface Application {
+  value: string;
+  label: string;
+  deployment: string;
+  attacks: number;
+}
+
+const APPLICATIONS: Application[] = [
+  { value: 'eu-api', label: 'api-gateway', deployment: 'Production EU', attacks: 1986 },
+  { value: 'eu-checkout', label: 'checkout', deployment: 'Production EU', attacks: 412 },
+  { value: 'eu-billing', label: 'billing', deployment: 'Production EU', attacks: 87 },
+  { value: 'eu-auth', label: 'auth-service', deployment: 'Production EU', attacks: 264 },
+  { value: 'us-api', label: 'api-gateway', deployment: 'Production US', attacks: 96 },
+  { value: 'us-mobile', label: 'mobile-api', deployment: 'Production US', attacks: 398 },
+  { value: 'us-search', label: 'search', deployment: 'Production US', attacks: 141 },
+  { value: 'us-webhooks', label: 'webhooks', deployment: 'Production US', attacks: 12 },
+  { value: 'stg-checkout', label: 'checkout', deployment: 'Staging', attacks: 41 },
+  { value: 'stg-admin', label: 'admin-panel', deployment: 'Staging', attacks: 5 },
+];
+
+interface ScopeNode {
+  id: string;
+  name: string;
+  kind: 'deployment' | 'application';
+  policies: number;
+}
+
+const DEPLOYMENTS: ScopeNode[] = [
+  { id: 'prod-eu', name: 'Production EU', kind: 'deployment', policies: 4 },
+  { id: 'prod-us', name: 'Production US', kind: 'deployment', policies: 1 },
+  { id: 'staging', name: 'Staging', kind: 'deployment', policies: 0 },
+];
+
+const DEPLOYMENT_APPLICATIONS: Record<string, ScopeNode[]> = {
+  'prod-eu': [
+    { id: 'prod-eu-api', name: 'api-gateway', kind: 'application', policies: 2 },
+    { id: 'prod-eu-checkout', name: 'checkout', kind: 'application', policies: 0 },
+  ],
+  'prod-us': [
+    { id: 'prod-us-api', name: 'api-gateway', kind: 'application', policies: 1 },
+    { id: 'prod-us-mobile', name: 'mobile-api', kind: 'application', policies: 0 },
+  ],
+  staging: [{ id: 'staging-checkout', name: 'checkout', kind: 'application', policies: 0 }],
+};
+
+/** Stands in for the API: a deployment's applications arrive a moment after it is opened. */
+const fetchApplications = (deploymentId: string) =>
+  new Promise<ScopeNode[]>(resolve =>
+    setTimeout(() => resolve(DEPLOYMENT_APPLICATIONS[deploymentId] ?? []), 400),
+  );
+
 const TIME_ZONES = [
   { value: 'UTC', label: 'UTC' },
   { value: 'Europe/London', label: 'London (UTC+00:00)' },
@@ -259,6 +321,42 @@ const onAddUsers = fn().mockName('onAddUsers');
 const getAttackId = (attack: Attack) => attack.id;
 const getMemberId = (member: Member) => member.id;
 
+/**
+ * `useFilterDropdown().groups` is only readable inside `FilterDropdown`, so the menu is its own
+ * component; one per app serves every searchable filter.
+ */
+const ApplicationMenu = () => {
+  const { groups } = useFilterDropdown<Application>();
+
+  return (
+    <FilterDropdownContent>
+      <FilterDropdownSearch />
+      <FilterDropdownSelected<Application>>
+        {item => <FilterDropdownOption item={item} hint={item.attacks} />}
+      </FilterDropdownSelected>
+      {groups.map(([group, items]) => (
+        <FilterDropdownGroup key={group}>
+          {group && <FilterDropdownGroupLabel>{group}</FilterDropdownGroupLabel>}
+          {items.map(item => (
+            <FilterDropdownOption key={item.value} item={item} hint={item.attacks} />
+          ))}
+        </FilterDropdownGroup>
+      ))}
+      <FilterDropdownEmpty />
+      <FilterDropdownFooter />
+    </FilterDropdownContent>
+  );
+};
+
+// The host shell gives a page its height; 640px stands in for it.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
+
 const meta = {
   title: 'Patterns/Filtering',
   parameters: {
@@ -270,22 +368,13 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
 
 /**
- * A filter bar over a table: search, a multiple `FilterDropdown` with counts, a single one with
- * «All statuses», a `FilterCascade` scope and a view toggle last. Every pick applies at once; when
- * the filters match nothing, the table offers "Reset filters", which clears them all.
+ * Every pick applies at once. When the filters match nothing, the table offers "Reset filters",
+ * which clears the search and every filter.
  */
 export const Default: StoryFn = () => {
   const [query, setQuery] = useState('');
@@ -474,9 +563,101 @@ export const Default: StoryFn = () => {
   );
 };
 
+Default.decorators = hostShell;
+
 /**
- * A value in a form: `Select` + `SelectInput` in a `Field`, with `SelectSearchInput` in the header
- * and the menu matching the trigger width. A settings field saves on pick — no Save button.
+ * Options are grouped by deployment and carry attack counts. On reopen, picked options are
+ * pinned under «Selected»; a query with no match shows an empty message and keeps the menu open.
+ */
+export const SearchableFilter: StoryFn = () => {
+  const [applications, setApplications] = useState<string[]>([]);
+  const applicationOptions = createListCollection({
+    items: APPLICATIONS,
+    groupBy: item => item.deployment,
+  });
+
+  const handleApplicationsChange = (details: FilterDropdownValueChangeDetails) =>
+    setApplications(details.value);
+
+  return (
+    <div className='p-24'>
+      <FilterDropdown
+        label='Application'
+        multiple
+        collection={applicationOptions}
+        value={applications}
+        onValueChange={handleApplicationsChange}
+        data-testid='applications-filter'
+      >
+        <FilterDropdownTrigger />
+        <ApplicationMenu />
+      </FilterDropdown>
+    </div>
+  );
+};
+
+/**
+ * Each option shows its policy count, "No policies" for zero. ✕ on the trigger returns to every
+ * scope, not one level up.
+ */
+export const ScopeFilter: StoryFn = () => {
+  const [scope, setScope] = useState<string[]>([]);
+  const scopes = createFilterCascadeCollection(DEPLOYMENTS, {
+    getValue: node => node.id,
+    getLabel: node => node.name,
+    hasChildren: node => node.kind === 'deployment',
+    getIcon: node => (
+      <span
+        aria-hidden
+        className={
+          node.kind === 'deployment'
+            ? 'size-6 rounded-full bg-badge-sky-strong'
+            : 'size-6 rounded-full bg-badge-teal-strong'
+        }
+      />
+    ),
+    getDescription: node =>
+      node.policies === 0
+        ? 'No policies'
+        : `${node.policies} ${node.policies === 1 ? 'policy' : 'policies'}`,
+  });
+
+  const loadApplications = (deployment: ScopeNode) => fetchApplications(deployment.id);
+  const handleScopeChange = (details: FilterCascadeValueChangeDetails) => setScope(details.value);
+  const renderLevel = (level: FilterCascadeLevelData) =>
+    level.depth === 0 ? (
+      <FilterCascadeItems />
+    ) : (
+      <>
+        <FilterCascadeParentItem />
+        <FilterCascadeItems />
+      </>
+    );
+
+  return (
+    <div className='p-24'>
+      <FilterCascade
+        label='Scope'
+        collection={scopes}
+        loadChildren={loadApplications}
+        parentLabel='Deployment level'
+        value={scope}
+        onValueChange={handleScopeChange}
+        data-testid='scope-filter'
+      >
+        <FilterCascadeTrigger />
+        <FilterCascadeContent>
+          <FilterCascadeSearch placeholder='Search' />
+          <FilterCascadeLevels>{renderLevel}</FilterCascadeLevels>
+        </FilterCascadeContent>
+      </FilterCascade>
+    </div>
+  );
+};
+
+/**
+ * A settings field saves on pick, with no Save button. A query with no match shows
+ * `SelectEmptyState` and keeps the menu open.
  */
 export const SearchableSelect: StoryFn = () => {
   const [timeZone, setTimeZone] = useState('UTC');
@@ -528,9 +709,8 @@ export const SearchableSelect: StoryFn = () => {
 };
 
 /**
- * Picking rows from a large set: a 960px `Dialog` with search and status tabs over a selectable
- * `Table`. Selection survives search (`getRowId`), and the primary counts it — disabled
- * "Add users" until rows are picked, then "Add 2 users".
+ * Search and status tabs sit over a selectable `Table`. Picked rows stay picked while the search
+ * changes, because rows are keyed by `getRowId`.
  */
 export const PickerDialog: StoryFn = () => {
   const [open, setOpen] = useState(false);

@@ -65,90 +65,39 @@ An empty state is `EmptyState` placed where the content would be. The header aro
 
 A page table with nothing yet: `PageActions` has the create button, so the empty state has none.
 
-```tsx
-<Table aria-label='Users' data={users} columns={columns} isLoading={isLoading}>
-  <TableEmptyState>
-    <EmptyState>
-      <EmptyStateIllustration>
-        <Users />
-      </EmptyStateIllustration>
-      <EmptyStateMessage>
-        <EmptyStateTitle>No users yet</EmptyStateTitle>
-        <EmptyStateDescription>Invite people to give them access to this tenant.</EmptyStateDescription>
-      </EmptyStateMessage>
-    </EmptyState>
-  </TableEmptyState>
-</Table>
+```story
+Default
 ```
 
 Search or filters matched nothing: reset, never create.
 
-```tsx
-<EmptyState>
-  <EmptyStateIllustration>
-    <SearchX />
-  </EmptyStateIllustration>
-  <EmptyStateMessage>
-    <EmptyStateTitle>No results found</EmptyStateTitle>
-    <EmptyStateDescription>Try resetting your search or filters.</EmptyStateDescription>
-  </EmptyStateMessage>
-  <EmptyStateActions>
-    <Button size='medium' variant='outline' color='neutral' onClick={onReset}>
-      Reset filters
-    </Button>
-  </EmptyStateActions>
-</EmptyState>
+```story
+NoResults
 ```
 
-A drawer table: `EmptyState` is a direct `Table` child, hidden while loading.
+A drawer or section table: `EmptyState` is a direct `Table` child, hidden while loading.
 
-```tsx
-<Table aria-label='Rules' data={rules} columns={columns} isLoading={isLoading}>
-  {rules.length === 0 && !isLoading && (
-    <EmptyState>
-      <EmptyStateIllustration>
-        <Shapes />
-      </EmptyStateIllustration>
-      <EmptyStateMessage>
-        <EmptyStateTitle>No rules yet</EmptyStateTitle>
-        <EmptyStateDescription>Create one to grant a role or a group from a claim this provider sends.</EmptyStateDescription>
-      </EmptyStateMessage>
-    </EmptyState>
-  )}
-</Table>
+```story
+SectionTable
 ```
 
 A missing dependency: name the choice that unlocks the area, with no action.
 
-```tsx
-<EmptyState>
-  <EmptyStateIllustration>
-    <Link2 />
-  </EmptyStateIllustration>
-  <EmptyStateMessage>
-    <EmptyStateTitle>Select a service first</EmptyStateTitle>
-    <EmptyStateDescription>Choose a service to pick its operations.</EmptyStateDescription>
-  </EmptyStateMessage>
-</EmptyState>
+```story
+Dependency
+```
+
+Empty tabs: each tab gets its own copy and an icon that names the case.
+
+```story
+EmptyTabs
 ```
 
 Small containers: a kanban column gets a title only, a chart card a description only.
 
-```tsx
-<EmptyState type='no-results'>
-  <EmptyStateMessage>
-    <EmptyStateTitle>Nothing runs here yet</EmptyStateTitle>
-  </EmptyStateMessage>
-</EmptyState>
-
-<EmptyState type='no-results'>
-  <EmptyStateMessage>
-    <EmptyStateDescription>No data found for selected period</EmptyStateDescription>
-  </EmptyStateMessage>
-</EmptyState>
+```story
+SmallContainers
 ```
-
-Import parts from `@wallarm-org/design-system`, icons from `@wallarm-org/design-system/icons`.
 
 ## States
 

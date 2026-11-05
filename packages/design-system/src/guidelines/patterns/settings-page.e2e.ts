@@ -4,6 +4,9 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const settingsStory = createStoryHelper('patterns-settings-page', [
   'Default',
   'Invalid Value',
+  'Action Row',
+  'Locked Value',
+  'Read Only Value',
   'Saving',
 ] as const);
 
@@ -18,6 +21,24 @@ test.describe('Pattern: Settings page', () => {
     test('Should render the invalid value state correctly', async ({ page }) => {
       await settingsStory.goto(page, 'Invalid Value');
       await expect(page.getByTestId('profile-name')).toHaveAttribute('aria-invalid', 'true');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the action row correctly', async ({ page }) => {
+      await settingsStory.goto(page, 'Action Row');
+      await expect(page.getByTestId('profile-sidebar-style')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the locked value correctly', async ({ page }) => {
+      await settingsStory.goto(page, 'Locked Value');
+      await expect(page.getByTestId('profile-two-factor')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the read-only value correctly', async ({ page }) => {
+      await settingsStory.goto(page, 'Read Only Value');
+      await expect(page.getByTestId('profile-email')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

@@ -60,17 +60,18 @@ const meta = {
       },
     },
   },
-  // The browser window gives the auth page its height; 800px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-800'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
+
+// The browser window gives the auth page its height; 800px stands in for it on whole-page stories.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-800'>
+      <Story />
+    </div>
+  ),
+];
 
 /**
  * The sign-in flow: an email step, then a password step with "Forgot password?", the OR row and
@@ -235,6 +236,126 @@ export const Default: StoryFn = () => {
   );
 };
 
+Default.decorators = hostShell;
+
+/**
+ * The failed password step: the error names neither credential, the password stays in the field,
+ * and editing it clears the error.
+ */
+export const WrongCredentials: StoryFn = () => {
+  const [password, setPassword] = useState('Winter2026');
+  const [failed, setFailed] = useState(true);
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setFailed(false);
+  };
+  const handleSignIn = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onSignIn({ email: 'maria.lopez@acme-bank.com', password });
+    setFailed(true);
+  };
+
+  return (
+    <div
+      data-testid='wrong-credentials-card'
+      className='flex max-h-[calc(100dvh-64px)] w-[480px] flex-col gap-32 overflow-y-auto rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80'
+    >
+      <form onSubmit={handleSignIn}>
+        <VStack gap={16}>
+          <Field data-testid='wrong-credentials-password' invalid={failed}>
+            <FieldLabel>
+              Password
+              <FieldAction asChild>
+                <a href='#forgot-password'>Forgot password?</a>
+              </FieldAction>
+            </FieldLabel>
+            <PasswordInput
+              autoComplete='current-password'
+              placeholder='Enter'
+              error={failed}
+              value={password}
+              onChange={handlePasswordChange}
+            />
+            {failed && <FieldError>Email or password is incorrect.</FieldError>}
+          </Field>
+          <Button
+            data-testid='wrong-credentials-submit'
+            type='submit'
+            fullWidth
+            disabled={!password}
+          >
+            Sign in
+          </Button>
+        </VStack>
+      </form>
+    </div>
+  );
+};
+
+/** A clicked SSO button shows its spinner; the other buttons stay as they are. */
+export const SsoButtons: StoryFn = () => {
+  const [ssoPending, setSsoPending] = useState<SignInMethod | null>(null);
+
+  const handleAws = () => {
+    setSsoPending('aws');
+    onSsoContinue('aws');
+  };
+  const handleGoogle = () => {
+    setSsoPending('google');
+    onSsoContinue('google');
+  };
+
+  return (
+    <div
+      data-testid='sso-card'
+      className='flex max-h-[calc(100dvh-64px)] w-[480px] flex-col gap-32 overflow-y-auto rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80'
+    >
+      <HStack gap={12}>
+        <Separator className='flex-1' />
+        <span className='text-xs text-text-tertiary'>OR</span>
+        <Separator className='flex-1' />
+      </HStack>
+      <VStack gap={8} data-testid='sso-buttons'>
+        <div className='relative w-full'>
+          <Button
+            variant='secondary'
+            color='neutral'
+            fullWidth
+            loading={ssoPending === 'aws'}
+            onClick={handleAws}
+          >
+            <Aws />
+            Continue with AWS
+          </Button>
+          {LAST_METHOD === 'aws' && (
+            <Badge size='small' color='blue' className='absolute -top-6 -right-8 uppercase'>
+              Last
+            </Badge>
+          )}
+        </div>
+        <div className='relative w-full'>
+          <Button
+            variant='secondary'
+            color='neutral'
+            fullWidth
+            loading={ssoPending === 'google'}
+            onClick={handleGoogle}
+          >
+            <Google />
+            Continue with Google
+          </Button>
+          {LAST_METHOD === 'google' && (
+            <Badge size='small' color='blue' className='absolute -top-6 -right-8 uppercase'>
+              Last
+            </Badge>
+          )}
+        </div>
+      </VStack>
+    </div>
+  );
+};
+
 /**
  * Organization select for a user in 7 organizations: card radios collapsed to 5 rows, with a
  * ghost "Show more" button under the group.
@@ -300,6 +421,8 @@ export const SelectOrganization: StoryFn = () => {
     </AnimatedBackground>
   );
 };
+
+SelectOrganization.decorators = hostShell;
 
 /**
  * Password reset: a 6-digit code with a resend countdown, a new password with its confirmation,
@@ -433,3 +556,5 @@ export const ResetPassword: StoryFn = () => {
     </AnimatedBackground>
   );
 };
+
+ResetPassword.decorators = hostShell;

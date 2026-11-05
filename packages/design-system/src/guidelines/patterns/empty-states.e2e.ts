@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const emptyStatesStory = createStoryHelper('patterns-empty-states', [
   'Default',
   'No Results',
+  'Section Table',
   'Dependency',
   'Empty Tabs',
   'Small Containers',
@@ -20,6 +21,12 @@ test.describe('Pattern: Empty states', () => {
     test('Should render the no results state correctly', async ({ page }) => {
       await emptyStatesStory.goto(page, 'No Results');
       await expect(page.getByTestId('triggers-no-results')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the empty section table correctly', async ({ page }) => {
+      await emptyStatesStory.goto(page, 'Section Table');
+      await expect(page.getByTestId('mapping-rules-empty-state')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

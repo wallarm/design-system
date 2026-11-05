@@ -81,106 +81,34 @@ There is no `AuthCard`, `AuthPage`, `AuthLayout` or `LoginForm` component; copy 
 
 ## Examples
 
-The card shell every step renders inside.
+The sign-in flow in the card shell every step renders inside.
 
-```tsx
-import type { ReactNode } from 'react';
-import { AnimatedBackground, Heading, Logo, Text, VStack } from '@wallarm-org/design-system';
-
-export const AuthCard = ({ title, subtitle, children }: { title: string; subtitle: ReactNode; children: ReactNode }) => (
-  <AnimatedBackground className='min-h-screen w-full bg-component-app-shell-bg'>
-    <div className='flex max-h-[calc(100dvh-64px)] w-[480px] flex-col gap-32 overflow-y-auto rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80'>
-      <Logo type='full' size='md' className='mb-32 self-start' />
-      <VStack gap={0} align='start'>
-        <Heading size='2xl' weight='medium'>{title}</Heading>
-        <Text size='sm' color='secondary'>{subtitle}</Text>
-      </VStack>
-      {children}
-    </div>
-  </AnimatedBackground>
-);
+```story
+Default
 ```
 
 A password field with "Forgot password?" as a link and the failed state.
 
-```tsx
-<Field invalid={failed}>
-  <FieldLabel>
-    Password
-    <FieldAction asChild>
-      <a href={forgotPasswordHref}>Forgot password?</a>
-    </FieldAction>
-  </FieldLabel>
-  <PasswordInput autoComplete='current-password' placeholder='Enter' error={failed} value={password} onChange={handlePasswordChange} />
-  {failed && <FieldError>Email or password is incorrect.</FieldError>}
-</Field>
-<Button type='submit' fullWidth loading={pending}>Sign in</Button>
+```story
+WrongCredentials
 ```
 
-The OR row and an SSO button carrying the "LAST" badge.
+The OR row and SSO buttons with the "LAST" badge.
 
-```tsx
-<HStack gap={12}>
-  <Separator className='flex-1' />
-  <span className='text-xs text-text-tertiary'>OR</span>
-  <Separator className='flex-1' />
-</HStack>
-<VStack gap={8}>
-  <div className='relative w-full'>
-    <Button variant='secondary' color='neutral' fullWidth onClick={handleAws}>
-      <Aws />
-      Continue with AWS
-    </Button>
-    {lastMethod === 'aws' && (
-      <Badge size='small' color='blue' className='absolute -top-6 -right-8 uppercase'>Last</Badge>
-    )}
-  </div>
-</VStack>
+```story
+SsoButtons
 ```
 
 Organization select, collapsed to 5 rows with "Show more".
 
-```tsx
-<VStack gap={8}>
-  <RadioGroup variant='card' value={value} onValueChange={handleValueChange}>
-    {visible.map(org => (
-      <Radio key={org.id} value={org.id}>
-        <RadioIndicator />
-        <RadioLabel>{org.name}</RadioLabel>
-      </Radio>
-    ))}
-  </RadioGroup>
-  {organizations.length > 5 && (
-    <Button variant='ghost' color='neutral' onClick={handleToggle}>
-      {expanded ? 'Show less' : 'Show more'}
-    </Button>
-  )}
-</VStack>
+```story
+SelectOrganization
 ```
 
-The reset code field with a resend countdown, and the full password rule list from `passwordValidators`.
+The reset code with a resend countdown, and the password rules from `passwordValidators`.
 
-```tsx
-<Field required>
-  <FieldLabel>
-    Code
-    <FieldIndicator />
-    <Link asChild size='sm' weight='medium' disabled={secondsLeft > 0} onClick={onResend} className='ml-auto'>
-      <button type='button'>{secondsLeft > 0 ? `Resend in ${secondsLeft}s` : 'Resend code'}</button>
-    </Link>
-  </FieldLabel>
-  <OTPInput otp groupSize={3} onValueChange={handleCodeChange} />
-</Field>
-<PasswordComplexity
-  items={[
-    { id: 'length', label: 'At least 8 characters', met: passwordValidators.minLength(8)(password) },
-    { id: 'uppercase', label: 'One uppercase letter (A–Z)', met: passwordValidators.hasUppercase(password) },
-    { id: 'lowercase', label: 'One lowercase letter (a–z)', met: passwordValidators.hasLowercase(password) },
-    { id: 'number', label: 'One number (0–9)', met: passwordValidators.hasNumber(password) },
-    { id: 'symbol', label: 'One symbol (e.g. ! ? @ #)', met: passwordValidators.hasSymbol(password) },
-    { id: 'match', label: 'Both passwords match', met: passwordValidators.passwordsMatch(password, confirm) },
-  ]}
-/>
+```story
+ResetPassword
 ```
 
 ## States

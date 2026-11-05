@@ -3,6 +3,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const entityTableStory = createStoryHelper('patterns-entity-table', [
   'Default',
+  'Cells',
+  'Row Menu',
   'Loading',
   'Empty',
 ] as const);
@@ -11,6 +13,18 @@ test.describe('Pattern: Entity table', () => {
   test.describe('Visual', () => {
     test('Should render the full table correctly', async ({ page }) => {
       await entityTableStory.goto(page, 'Default');
+      await expect(page.getByTestId('users-table--container--row')).toHaveCount(6);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the cells correctly', async ({ page }) => {
+      await entityTableStory.goto(page, 'Cells');
+      await expect(page.getByTestId('users-table--container--row')).toHaveCount(6);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the row menu column correctly', async ({ page }) => {
+      await entityTableStory.goto(page, 'Row Menu');
       await expect(page.getByTestId('users-table--container--row')).toHaveCount(6);
       await expect(page).toHaveScreenshot();
     });

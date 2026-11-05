@@ -3,6 +3,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const authPageStory = createStoryHelper('patterns-auth-page', [
   'Default',
+  'Wrong Credentials',
+  'Sso Buttons',
   'Select Organization',
   'Reset Password',
 ] as const);
@@ -37,6 +39,18 @@ test.describe('Pattern: Auth page', () => {
       await page.getByTestId('sign-in-password').getByPlaceholder('Enter').fill('Winter2026');
       await page.getByTestId('sign-in-submit').click();
       await expect(page.getByTestId('sign-in-password--error')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the wrong credentials field correctly', async ({ page }) => {
+      await authPageStory.goto(page, 'Wrong Credentials');
+      await expect(page.getByTestId('wrong-credentials-password--error')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the SSO buttons correctly', async ({ page }) => {
+      await authPageStory.goto(page, 'Sso Buttons');
+      await expect(page.getByTestId('sso-buttons')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
