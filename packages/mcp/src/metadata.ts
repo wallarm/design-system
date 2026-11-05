@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   type DesignSystemMetadata,
   designSystemMetadataSchema,
@@ -14,7 +15,28 @@ import {
  * 1. --metadata-path CLI argument (explicit path)
  * 2. import.meta.resolve('@wallarm-org/design-system/metadata')
  * 3. Walk up from cwd looking for node_modules/@wallarm-org/design-system/dist/metadata/components.json
+ * 4. <cwd>/apps/* and <cwd>/packages/* node_modules (monorepos that install DS in one app only)
+ * 5. The snapshot bundled into this package's dist/metadata at build time
  */
+
+const DS_METADATA = path.join(
+  '@wallarm-org',
+  'design-system',
+  'dist',
+  'metadata',
+  'components.json',
+);
+
+export interface MetadataSource {
+  kind: 'installed' | 'bundled';
+  path: string;
+}
+
+/** One line naming where the metadata came from, for instructions and response footers. */
+export const describeSource = (source: MetadataSource, version: string): string =>
+  source.kind === 'installed'
+    ? `Source: installed @wallarm-org/design-system v${version}`
+    : `Source: bundled snapshot v${version} — may differ from your installed version (install @wallarm-org/design-system or pass --metadata-path)`;
 
 function parseMetadataPathArg(args: string[]): string | undefined {
   const idx = args.indexOf('--metadata-path');
@@ -29,15 +51,7 @@ function findMetadataInNodeModules(startDir: string): string | undefined {
   const root = path.parse(dir).root;
 
   while (dir !== root) {
-    const candidate = path.join(
-      dir,
-      'node_modules',
-      '@wallarm-org',
-      'design-system',
-      'dist',
-      'metadata',
-      'components.json',
-    );
+    const candidate = path.join(dir, 'node_modules', DS_METADATA);
     if (fs.existsSync(candidate)) {
       return candidate;
     }
@@ -46,6 +60,22 @@ function findMetadataInNodeModules(startDir: string): string | undefined {
 
   return undefined;
 }
+
+function findMetadataInWorkspaces(cwd: string): string | undefined {
+  for (const group of ['apps', 'packages']) {
+    const groupDir = path.join(cwd, group);
+    if (!fs.existsSync(groupDir)) continue;
+    for (const entry of fs.readdirSync(groupDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const candidate = path.join(groupDir, entry.name, 'node_modules', DS_METADATA);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  }
+  return undefined;
+}
+
+const defaultBundledPath = () =>
+  path.join(path.dirname(fileURLToPath(import.meta.url)), 'metadata', 'components.json');
 
 async function resolveViaImportMeta(): Promise<string | undefined> {
   try {
@@ -62,8 +92,14 @@ async function resolveViaImportMeta(): Promise<string | undefined> {
 
 export async function loadMetadata(
   args: string[] = process.argv,
-): Promise<{ metadata: DesignSystemMetadata; metadataPath: string }> {
+  {
+    cwd = process.cwd(),
+    bundledPath = defaultBundledPath(),
+    resolveInstalled = resolveViaImportMeta,
+  } = {},
+): Promise<{ metadata: DesignSystemMetadata; metadataPath: string; source: MetadataSource }> {
   let metadataPath: string | undefined;
+  let kind: MetadataSource['kind'] = 'installed';
 
   // 1. Check CLI arg
   metadataPath = parseMetadataPathArg(args);
@@ -73,12 +109,18 @@ export async function loadMetadata(
 
   // 2. Try import.meta.resolve
   if (!metadataPath) {
-    metadataPath = await resolveViaImportMeta();
+    metadataPath = await resolveInstalled();
   }
 
-  // 3. Walk up from cwd
+  // 3. Walk up from cwd, 4. apps/* and packages/*
   if (!metadataPath) {
-    metadataPath = findMetadataInNodeModules(process.cwd());
+    metadataPath = findMetadataInNodeModules(cwd) ?? findMetadataInWorkspaces(cwd);
+  }
+
+  // 5. Bundled snapshot
+  if (!metadataPath && fs.existsSync(bundledPath)) {
+    metadataPath = bundledPath;
+    kind = 'bundled';
   }
 
   if (!metadataPath) {
@@ -103,7 +145,7 @@ export async function loadMetadata(
     );
   }
 
-  return { metadata: result.data, metadataPath };
+  return { metadata: result.data, metadataPath, source: { kind, path: metadataPath } };
 }
 
 /**

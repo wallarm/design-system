@@ -15,8 +15,10 @@ The server runs locally over stdio and reads the metadata shipped with the insta
 
 :::warning Requirement
 Run the assistant in a project that has `@wallarm-org/design-system` installed: the server looks
-for it in `node_modules`, walking up from the working directory. Elsewhere, pass the metadata file
-explicitly with `--metadata-path <path-to>/components.json`.
+for it in `node_modules`, walking up from the working directory, then in `apps/*/node_modules` and
+`packages/*/node_modules`. Elsewhere, pass the metadata file explicitly with
+`--metadata-path <path-to>/components.json`. If nothing is found, the server uses the snapshot
+bundled into `@wallarm-org/mcp`, and every answer says so: it may differ from your installed version.
 :::
 
 ## Set up
@@ -70,17 +72,20 @@ Any MCP client with stdio transport works: register the command `npx` with the a
 
 | Tool | Input | Returns |
 | --- | --- | --- |
-| `search_component` | `{ query: string }` | Components matching a name, description, prop or variant, sorted by relevance (top 10), with import paths. |
-| `get_component` | `{ name: string }` | One component in full: props, variants, sub-components and import path. The name is case-insensitive; unknown names get suggestions. |
-| `search_token` | `{ query: string }` | Tokens matching a name (`spacing-8`), value (`#ff6633`) or category, sorted by relevance (top 20). |
-| `get_token_category` | `{ name: string }` | Every token in a category, such as `spacing`, `colors-primary` or `shadow`. Unknown names list the available categories. |
+| `search_component` | `{ query: string }` | Components matching the words of a name, description, prop name or variant, or a common alias (`modal` → `Dialog`, `date picker` → `DateInput`), sorted by relevance (top 10), with import paths. |
+| `get_component` | `{ name: string, section?: string, page?: number }` | Without `section`, an overview: import, props, variants, sub-component names, example names, usage docs and related guidelines. With `section`: `props`, `subcomponents`, `examples`, `docs/<Name>` or one sub-component (`TableColumnMenu`) in full. The name is case-insensitive; unknown names get suggestions. |
+| `get_example` | `{ component: string, example: string, page?: number }` | The code of one example from the overview, such as `WithPagination` or `AreaChart/Default`. Close names match; a miss lists every example. |
+| `search_token` | `{ query: string }` | Tokens matching a name (`spacing-8`), Tailwind class (`bg-bg-surface-2`), value (`#ff6633`) or category, with the classes to write, sorted by relevance (top 20). |
+| `get_token_category` | `{ name: string, page?: number }` | Every token in a category, such as `spacing`, `colors-primary` or `shadow`, with its Tailwind classes. Unknown names list the available categories. |
 | `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' }` | Foundations and patterns with slug, title, a one-line "use when" description and the components each uses. |
 | `get_guideline` | `{ slug: string, section?: string }` | One guideline as Markdown, such as `patterns/empty-states`, or a single section of it (`rules`, `example`). Unknown slugs get the nearest matches. |
 
-`get_component` also names the guidelines that use the component.
+`get_component` also names the guidelines that use the component. Every response stays under
+40,000 characters, below Claude Code's limit for MCP output; a longer one is split into pages, and
+its last line tells the assistant which `page` to ask for next.
 
-When a client connects, the server sends its instructions: the design-system rules digest and
-which tool to use for what. Clients such as Claude Code add them to the assistant's context.
+When a client connects, the server sends its instructions: the design-system rules digest,
+which tool to use for what, and where the metadata came from. Clients such as Claude Code add them to the assistant's context.
 
 ## Resources
 
@@ -88,7 +93,7 @@ which tool to use for what. Clients such as Claude Code add them to the assistan
 | --- | --- |
 | `ds://components` | All components with their import paths, as a Markdown table. |
 | `ds://tokens` | All design tokens, grouped by category. |
-| `ds://components/{name}` | The full metadata of one component. |
+| `ds://components/{name}` | The overview of one component, as `get_component` returns it. |
 
 ## Without MCP
 

@@ -1,15 +1,15 @@
 import type { Guideline, GuidelineKind, GuidelinesMetadata } from '@wallarm-org/mcp-core';
 
 export const ROUTING = [
-  'Tools: `search_component` / `get_component` for components (props, variants, sub-components, examples);',
+  "Tools: `search_component` / `get_component` for components — `get_component` returns an overview, pass `section` for full props, sub-components or examples, and `get_example` for one example's code;",
   '`search_token` / `get_token_category` for design tokens;',
   '`list_guidelines` / `get_guideline` for foundations (spacing, color, typography, …) and patterns (screens and flows).',
   'Read the matching pattern with `get_guideline` before composing a screen.',
 ].join(' ');
 
-/** Server instructions: the rules digest first (its first line must stand alone), then tool routing. */
-export function buildInstructions(rules: string): string {
-  return `${rules.trim()}\n\n${ROUTING}`;
+/** Server instructions: the rules digest first (its first line must stand alone), then tool routing and the metadata source. */
+export function buildInstructions(rules: string, source?: string): string {
+  return `${rules.trim()}\n\n${ROUTING}${source ? `\n\n${source}.` : ''}`;
 }
 
 export function listGuidelines(guidelines: GuidelinesMetadata, kind?: GuidelineKind): Guideline[] {
@@ -45,7 +45,7 @@ export function findGuideline(guidelines: GuidelinesMetadata, slug: string): Gui
   );
 }
 
-const levenshtein = (a: string, b: string): number => {
+export const levenshtein = (a: string, b: string): number => {
   let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
   for (let i = 1; i <= a.length; i++) {
     const row = [i];

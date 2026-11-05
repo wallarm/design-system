@@ -14,6 +14,11 @@ export default defineConfig({
   output: {
     target: 'node',
     externals: [/^node:/],
+    // Fallback snapshot for projects where the server can't find an installed design system.
+    copy: [
+      { from: '../design-system/dist/metadata/components.json', to: 'metadata/' },
+      { from: '../design-system/dist/metadata/guidelines.json', to: 'metadata/' },
+    ],
   },
   source: {
     entry: {
