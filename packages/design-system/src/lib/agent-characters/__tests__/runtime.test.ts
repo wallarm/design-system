@@ -188,3 +188,130 @@ describe('document runtime', () => {
     svg.remove();
   });
 });
+
+describe('runtime listeners (07 §6.4: start on the first live mount, stop after the last unmount)', () => {
+  beforeEach(fresh);
+  afterEach(fresh);
+
+  const track = () => {
+    const live = new Map<string, number>();
+    const ios: string[] = [];
+    const add = EventTarget.prototype.addEventListener;
+    const remove = EventTarget.prototype.removeEventListener;
+    const key = (t: EventTarget, type: string) =>
+      t === window || t === document || t === document.documentElement
+        ? `${t === window ? 'window' : t === document ? 'document' : 'html'}:${type}`
+        : null;
+    EventTarget.prototype.addEventListener = function (
+      this: EventTarget,
+      type: string,
+      ...rest: unknown[]
+    ) {
+      const k = key(this, type);
+      if (k) live.set(k, (live.get(k) ?? 0) + 1);
+      return (add as (...a: unknown[]) => void).call(this, type, ...rest);
+    } as typeof add;
+    EventTarget.prototype.removeEventListener = function (
+      this: EventTarget,
+      type: string,
+      ...rest: unknown[]
+    ) {
+      const k = key(this, type);
+      if (k) live.set(k, (live.get(k) ?? 0) - 1);
+      return (remove as (...a: unknown[]) => void).call(this, type, ...rest);
+    } as typeof remove;
+    const IO = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = class extends IO {
+      constructor(cb: IntersectionObserverCallback, o?: IntersectionObserverInit) {
+        super(cb, o);
+        ios.push('io');
+      }
+      disconnect() {
+        ios.push('disconnect');
+      }
+    } as typeof IO;
+    const mm: string[] = [];
+    const savedMM = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      matches: false,
+      media: q,
+      addEventListener: () => void mm.push(`+${q}`),
+      removeEventListener: () => void mm.push(`-${q}`),
+    })) as unknown as typeof window.matchMedia;
+    return {
+      active: () => [...live].filter(([, n]) => n > 0).map(([k]) => k),
+      ios,
+      mm,
+      restore() {
+        EventTarget.prototype.addEventListener = add;
+        EventTarget.prototype.removeEventListener = remove;
+        globalThis.IntersectionObserver = IO;
+        window.matchMedia = savedMM;
+      },
+    };
+  };
+
+  it('adds nothing until a character goes live, and removes everything after the last', () => {
+    const T = track();
+    try {
+      const rt = getRuntime();
+      rt.nextId();
+      expect(T.active()).toEqual([]);
+      expect(T.ios).toEqual([]);
+      expect(T.mm).toEqual([]);
+      const svg = document.body.appendChild(
+        document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+      );
+      const a = fakeChar(svg);
+      const b = fakeChar(svg);
+      rt.register(a);
+      rt.register(b);
+      expect(T.active().length).toBeGreaterThan(0);
+      expect(T.ios).toEqual(['io']);
+      rt.unregister(a);
+      expect(T.active().length).toBeGreaterThan(0);
+      rt.unregister(b);
+      expect(T.active()).toEqual([]);
+      expect(T.ios).toEqual(['io', 'disconnect']);
+      svg.remove();
+    } finally {
+      T.restore();
+    }
+  });
+
+  it('listens to the reduced-motion setting only while subscribed', () => {
+    const T = track();
+    try {
+      const rt = getRuntime();
+      const off = rt.subscribe(() => undefined);
+      expect(T.mm.filter(x => x.startsWith('+'))).toHaveLength(1);
+      off();
+      expect(T.mm.filter(x => x.startsWith('-'))).toHaveLength(1);
+    } finally {
+      T.restore();
+    }
+  });
+
+  it('bumps the rect epoch on a scroll inside a container (capture)', () => {
+    const rt = getRuntime();
+    const svg = document.body.appendChild(
+      document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+    );
+    const ch = fakeChar(svg);
+    rt.register(ch);
+    const box = document.body.appendChild(document.createElement('div'));
+    const e0 = rt.rectEpoch;
+    box.dispatchEvent(new Event('scroll')); // scroll events do not bubble
+    expect(rt.rectEpoch).toBe(e0 + 1);
+    rt.unregister(ch);
+    box.remove();
+    svg.remove();
+  });
+
+  it('has no cursor-follow or occlusion surface (D10)', () => {
+    const rt = getRuntime() as unknown as Record<string, unknown>;
+    expect('ptr' in rt).toBe(false);
+    expect('occluded' in rt).toBe(false);
+    expect('fine' in (rt.motion as object)).toBe(false);
+  });
+});

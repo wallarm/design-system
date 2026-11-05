@@ -1,9 +1,10 @@
 // The reference page's character engine (look v14, `makeChar` tail and `class Char`, lines 1658–2002), ported line
 // for line onto the SVG React rendered from charTree(): the page's `.class` lookups are `[data-part~=…]`, its root
-// classes are data attributes (st-* → data-state, ghosting, veiled), and its page globals (LIVE, ACT, INV, PTR,
-// rectEpoch, RM, FINE) live on the document runtime. Same constants, easings, springs, RNG streams and draw order,
-// same attribute strings. Additions, none of which the page's own flows reach: explicit dispose(), tracked timers,
-// `returnTo` for the one-shots (D27) and `requestVeil` as a callback.
+// classes are data attributes (st-* → data-state, ghosting, veiled), and its page globals (LIVE, ACT, INV,
+// rectEpoch, RM) live on the document runtime. Same constants, easings, springs, RNG streams and draw order, same
+// attribute strings. Left out: cursor follow (`o.follow`, PTR, FINE; D10, no follow in the product). Additions, none
+// of which the page's own flows reach: explicit dispose(), tracked timers, `returnTo` for the one-shots (D27),
+// `requestVeil` and `onCoverEnd` as callbacks.
 import { hexOf } from './color';
 import type { AgentLook } from './data.gen';
 import { type EyePose, eyesPath, eyeTargets, helloPop, type StateId } from './eyes';
@@ -60,7 +61,6 @@ export interface CharacterOptions {
   salt: string;
   /** Done and Hello return on their timers; required for greet() */
   autoReturn?: boolean;
-  follow?: boolean;
   /** false disables the idle repertoire */
   rep?: boolean;
   /** the Set up control: an element or a function returning one */
@@ -71,6 +71,8 @@ export interface CharacterOptions {
   returnTo?: () => StateId;
   /** the grey veil layers are needed (Not set up, Inviting, the landing, the crown) */
   requestVeil?: () => void;
+  /** Cover all's fill has ended and dropped the crown */
+  onCoverEnd?: () => void;
 }
 
 interface Clip {
@@ -269,7 +271,7 @@ export class Character implements LiveChar {
       this.E[k].p = k === 'bright' ? P_BRIGHT : pop ? P_POP : P_SHAPE;
     }
     this.gy.t = t.gy;
-    if (!this.isFollow()) this.gx.t = 0;
+    this.gx.t = 0; // the page keeps gx while following the cursor; the DS never follows (D10)
   }
   private snap() {
     for (const k of EYE_KEYS) {
@@ -279,10 +281,6 @@ export class Character implements LiveChar {
     this.gx.x = this.gx.t;
     this.gy.x = this.gy.t;
     this.gx.v = this.gy.v = 0;
-  }
-  private isFollow() {
-    const P = this.rt.ptr;
-    return !!(this.o.follow && this.rt.motion.fine && P.t && performance.now() - P.t < 2500);
   }
   private startBlink(now: number, dur?: number) {
     this.blink = { t0: now, dur: dur || 170 + this.r() * 90 };
@@ -499,7 +497,10 @@ export class Character implements LiveChar {
         [0, 0, 1, 0, null, { cv: y0 }],
         [480, 0, 1, 0, E_INOUT, { cv: -(this.covY - this.covT + 3) }],
       ],
-      onEnd: () => this.setCover(false),
+      onEnd: () => {
+        this.setCover(false);
+        this.o.onCoverEnd?.();
+      },
     });
     this.later(() => {
       if (this.topping && this.svg.isConnected && this.st === 'idle') {
@@ -568,8 +569,7 @@ export class Character implements LiveChar {
   private invTick(now: number) {
     if (this.clips.some(c => (c.inv || c.perk) && !c.rel)) return true;
     const I = this.inv;
-    if (!I || I.done || I.n >= 3 || now < I.next || !this.repOn() || this.isFollow() || this.blink)
-      return false;
+    if (!I || I.done || I.n >= 3 || now < I.next || !this.repOn() || this.blink) return false;
     const c = this.cueDir(now);
     // only from a settled rest gaze
     if (!c || Math.abs(this.gx.x) > 0.05 || Math.abs(this.gy.x) > 0.05) return false;
@@ -775,7 +775,6 @@ export class Character implements LiveChar {
     if (cur) return !!cur.gaze;
     if (!this.repOn() || now < this.nextAct) return false;
     if (!this.pv) {
-      if (this.isFollow()) return false;
       let n = 0;
       for (const c of this.rt.live)
         if (c !== this && c.visible && c.clips.some(k => k.act && !k.rel)) n++;
@@ -841,36 +840,6 @@ export class Character implements LiveChar {
     if (this.dbl && now >= this.dbl && !this.blink && !ip) {
       this.startBlink(now);
       this.dbl = 0;
-    }
-    if (
-      !owns &&
-      this.isFollow() &&
-      (st === 'idle' || st === 'needs' || st === 'done' || st === 'hello' || st === 'invite')
-    ) {
-      if (!this.rect || this.rectE !== this.rt.rectEpoch || this.rectDirty) {
-        this.rect = this.svg.getBoundingClientRect();
-        this.rectE = this.rt.rectEpoch;
-        this.rectDirty = false;
-      }
-      const r = this.rect;
-      const ex = r.left + (r.width * (this.S.v[0] + this.S.v[2] / 2 + 8)) / 136;
-      const ey = r.top + (r.height * (this.S.v[1] + this.S.v[3] / 2 + 14)) / 128;
-      const dx = this.rt.ptr.x - ex;
-      const dy = this.rt.ptr.y - ey;
-      const d = Math.hypot(dx, dy) || 1;
-      const g = d / (d + 250);
-      let tx = (0.85 * g * dx) / d;
-      let ty = (0.6 * g * dy) / d;
-      if (d < r.width * 0.35) {
-        tx = 0;
-        ty = 0;
-      }
-      const jump = Math.abs(tx - this.gx.t) + Math.abs(ty - this.gy.t) > 0.35;
-      this.gx.p = this.gy.p = jump ? P_DART : P_PURSUIT;
-      this.gx.t = tx;
-      this.gy.t = ty + this.targets(st).gy;
-      if (jump && this.r() < 0.25 && !this.blink) this.startBlink(now);
-      return;
     }
     if (st === 'invite') {
       // at rest it looks straight ahead; no glances, no acts

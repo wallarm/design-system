@@ -15,6 +15,7 @@ import { layerKey, useBakedLayers } from './useBakedLayers';
 import {
   type AgentAvatarBeat,
   type AgentAvatarHandle,
+  NO_DONE,
   useAgentMotion,
   useCharacter,
 } from './useCharacter';
@@ -66,8 +67,13 @@ export type AgentAvatarProps = Omit<
   };
 
 const lookOf = (id: string | undefined) => CAST.find(p => p.id === id) ?? defaultLook(id ?? '');
-// The ids carry this bundle's number from the document runtime, so two DS copies on a page never share one.
-const COPY = getRuntime().nextId();
+// The ids carry this bundle's number from the document runtime, so two DS copies on a page never share one. Taken
+// on the first mount, not at import: importing the package creates nothing.
+let COPY: string | undefined;
+const copyId = () => {
+  COPY ??= getRuntime().nextId();
+  return COPY;
+};
 
 type SvgRest = Omit<
   AgentAvatarProps,
@@ -182,7 +188,8 @@ const StaticAvatar: FC<InnerProps> = ({
   svgRef,
   rest,
 }) => {
-  const ids = `agent-avatar-${COPY}-${useId().replace(/[^\w-]/g, '')}-`;
+  const [copy] = useState(copyId);
+  const ids = `agent-avatar-${copy}-${useId().replace(/[^\w-]/g, '')}-`;
   const [beat, setBeat] = useState<{ kind: AgentAvatarBeat; ms: number; covered: boolean } | null>(
     null,
   );
@@ -197,24 +204,36 @@ const StaticAvatar: FC<InnerProps> = ({
     () => ({
       play(kind) {
         if (kind === 'hello' && state !== 'idle') return; // Hello plays only from On duty
+        if (kind === 'done' && NO_DONE.has(state)) return; // nothing to finish when off or a ghost
         setBeat({ kind, ms: kind === 'hello' ? 1200 : 1600 + r() * 600, covered: false });
       },
-      // under reduced motion Cover all jumps to its end: Done, without the crown
+      // under reduced motion Cover all jumps to its end: Done without the crown, from On duty only (as live)
       coverAll() {
-        if (cover) setBeat({ kind: 'done', ms: 1600 + r() * 600, covered: true });
+        if (cover && state === 'idle')
+          setBeat({ kind: 'done', ms: 1600 + r() * 600, covered: true });
       },
       cueHover: () => undefined,
     }),
     [state, cover, r],
   );
   const onEnd = useRef(onBeatEnd);
+  const playing = useRef(beat);
   useEffect(() => {
     onEnd.current = onBeatEnd;
+    playing.current = beat;
   });
+  // a beat cut short (unmount, or motion switched on) still ends for the host
+  useEffect(
+    () => () => {
+      if (playing.current) onEnd.current?.(playing.current.kind);
+    },
+    [],
+  );
   useEffect(() => {
     if (!beat) return;
     const id = setTimeout(() => {
       setBeat(null);
+      playing.current = null;
       onEnd.current?.(beat.kind);
     }, beat.ms);
     return () => clearTimeout(id);
@@ -252,7 +271,8 @@ const LiveAvatar: FC<InnerProps> = ({
   svgRef,
   rest,
 }) => {
-  const ids = `agent-avatar-${COPY}-${useId().replace(/[^\w-]/g, '')}-`;
+  const [copy] = useState(copyId);
+  const ids = `agent-avatar-${copy}-${useId().replace(/[^\w-]/g, '')}-`;
   const [init] = useState({ state, cover });
   const t = charTree(c, { size, state: init.state, shadow, cover: init.cover, ids });
   const [veil, setVeil] = useState(t.ghosting);
@@ -315,7 +335,7 @@ export const AgentAvatar: FC<AgentAvatarProps> = ({
   const c = look ?? lookOf(agent);
   // the crown stays in every state but Deactivated (04 §4.11; charTree drops it when off)
   const cover = hasApplications && coverage === 'partial';
-  const motion = useAgentMotion();
+  const motion = useAgentMotion(live);
   const inner: InnerProps = {
     c,
     agent,

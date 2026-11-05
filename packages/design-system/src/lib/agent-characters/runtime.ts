@@ -1,9 +1,10 @@
 // The document runtime (07 §6.5, D7): the reference page's page-level state — the frame loop and `LIVE`, the
-// behaviour budget `ACT`, the inviter slot `INV`, the pointer `PTR`, the rect epoch, the IntersectionObserver, the
+// behaviour budget `ACT`, the inviter slot `INV`, the rect epoch, the IntersectionObserver, the
 // bake queue and caches, the id counter — gathered in one object per document. It sits on
 // `globalThis[Symbol.for('wallarm.agent-characters')]`, so every bundled copy of the design system on the page
 // (a Module Federation remote inside the host) joins the same loop, budget and caches. It holds DOM nodes and data,
-// never React objects. `frame()` is the page's `frame` (reference lines 2003–2007), line for line.
+// never React objects. `frame()` is the page's `frame` (reference lines 2003–2007), line for line. No cursor follow
+// (D10) and so no pointer tracking; listeners and the observer exist only while a character is live.
 import type { Baked, BakeRunner } from './bake';
 import { createQueue, Lru } from './queue';
 
@@ -29,12 +30,9 @@ export interface Runtime {
   act: { last: number; cap: number };
   /** one inviter per document, at least 6 s between invites */
   inv: { last: number; owner: LiveChar | null };
-  ptr: { x: number; y: number; t: number };
   rectEpoch: number;
-  /** reduced: the system setting, followed live; enabled: the off switch (P7) */
-  motion: { reduced: boolean; enabled: boolean; fine: boolean };
-  /** containers under an opaque layer (a drawer): characters inside them do not tick */
-  occluded: Set<Element>;
+  /** reduced: the system setting (followed live while subscribed); enabled: the off switch (P7) */
+  motion: { reduced: boolean; enabled: boolean };
   queue: ReturnType<typeof createQueue>;
   caches: {
     /** height fields per outline */
@@ -49,7 +47,8 @@ export interface Runtime {
   };
   /** the bake worker runner, created on first use */
   worker: BakeRunner | null;
-  /** dev and test timing hook (03 §10.5): the loop's JavaScript per frame, in ms */
+  /** Dev and test timing hook (03 §10.5): the loop's JavaScript per frame, in ms. One slot, not a public API:
+   *  only measurement code (tests, the Storybook frame meter) sets it. */
   onFrame?: (jsMs: number) => void;
   motionOn(): boolean;
   setMotionEnabled(on: boolean): void;
@@ -64,10 +63,10 @@ export interface Runtime {
 
 function createRuntime(): Runtime {
   const hasDom = typeof document !== 'undefined';
-  const mq = (q: string) =>
-    hasDom && typeof window.matchMedia === 'function' ? window.matchMedia(q) : null;
-  const RM = mq('(prefers-reduced-motion: reduce)');
-  const FINE = mq('(hover:hover) and (pointer:fine)');
+  const RM =
+    hasDom && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
   const subs = new Set<() => void>();
   const notify = () => {
     for (const fn of [...subs]) fn();
@@ -78,22 +77,6 @@ function createRuntime(): Runtime {
   let looping = false;
   let raf = 0;
   const retain = new Map<string, number>();
-  const io =
-    hasDom && typeof IntersectionObserver !== 'undefined'
-      ? new IntersectionObserver(
-          es => {
-            for (const e of es) {
-              const c = byNode.get(e.target);
-              if (c) {
-                c.visible = e.isIntersecting;
-                c.rectDirty = true;
-                if (e.isIntersecting) rt.kick();
-              }
-            }
-          },
-          { rootMargin: '100px' },
-        )
-      : null;
   const byNode = new WeakMap<Element, LiveChar>();
   const stop = () => {
     looping = false;
@@ -101,9 +84,60 @@ function createRuntime(): Runtime {
     if (raf && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
     raf = 0;
   };
-  const occludedNode = (n: Element) => {
-    for (const o of rt.occluded) if (o.contains(n)) return true;
-    return false;
+
+  // Document listeners and the IntersectionObserver exist only while a character is live (07 §6.4).
+  let io: IntersectionObserver | null = null;
+  const bump = () => {
+    rt.rectEpoch++;
+  };
+  const onVisibility = () => {
+    lastT = 0;
+    lastBeat = 0;
+    if (!document.hidden) rt.kick();
+  };
+  // capture: a scroll inside a container (a list, a drawer) moves the characters too
+  const scrollOpts: AddEventListenerOptions = { capture: true, passive: true };
+  const attach = () => {
+    if (!hasDom) return;
+    if (typeof IntersectionObserver !== 'undefined')
+      io = new IntersectionObserver(
+        es => {
+          for (const e of es) {
+            const c = byNode.get(e.target);
+            if (c) {
+              c.visible = e.isIntersecting;
+              c.rectDirty = true;
+              if (e.isIntersecting) rt.kick();
+            }
+          }
+        },
+        { rootMargin: '100px' },
+      );
+    window.addEventListener('scroll', bump, scrollOpts);
+    window.addEventListener('resize', bump, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+  };
+  const detach = () => {
+    stop();
+    if (!hasDom) return;
+    io?.disconnect();
+    io = null;
+    window.removeEventListener('scroll', bump, scrollOpts);
+    window.removeEventListener('resize', bump);
+    document.removeEventListener('visibilitychange', onVisibility);
+  };
+  const drop = (ch: LiveChar) => {
+    rt.live.delete(ch);
+    io?.unobserve(ch.svg);
+    if (rt.inv.owner === ch) rt.inv.owner = null;
+    if (!rt.live.size) detach();
+  };
+  // The system setting is followed only while someone subscribes; otherwise it is read when asked.
+  const onReduced = (e: MediaQueryListEvent) => {
+    rt.motion.reduced = e.matches;
+    if (rt.motionOn()) rt.kick();
+    else stop();
+    notify();
   };
 
   const rt: Runtime = {
@@ -111,10 +145,8 @@ function createRuntime(): Runtime {
     live: new Set(),
     act: { last: 0, cap: 2 },
     inv: { last: -1e9, owner: null },
-    ptr: { x: 0, y: 0, t: 0 },
     rectEpoch: 0,
-    motion: { reduced: !!RM?.matches, enabled: true, fine: !!FINE?.matches },
-    occluded: new Set(),
+    motion: { reduced: !!RM?.matches, enabled: true },
     queue: createQueue(),
     caches: {
       hc: new Lru<Float32Array>(64),
@@ -129,7 +161,10 @@ function createRuntime(): Runtime {
       measure: null,
     },
     worker: null,
-    motionOn: () => rt.motion.enabled && !rt.motion.reduced,
+    motionOn: () => {
+      if (!subs.size && RM) rt.motion.reduced = RM.matches;
+      return rt.motion.enabled && !rt.motion.reduced;
+    },
     setMotionEnabled(on) {
       if (rt.motion.enabled === on) return;
       rt.motion.enabled = on;
@@ -138,22 +173,26 @@ function createRuntime(): Runtime {
       notify();
     },
     subscribe(fn) {
+      if (!subs.size && RM) {
+        rt.motion.reduced = RM.matches;
+        RM.addEventListener?.('change', onReduced);
+      }
       subs.add(fn);
       return () => {
-        subs.delete(fn);
+        if (subs.delete(fn) && !subs.size) RM?.removeEventListener?.('change', onReduced);
       };
     },
     register(ch) {
+      if (rt.live.has(ch)) return;
+      if (!rt.live.size) attach();
       rt.live.add(ch);
       byNode.set(ch.svg, ch);
       io?.observe(ch.svg);
       rt.kick();
     },
     unregister(ch) {
-      rt.live.delete(ch);
-      io?.unobserve(ch.svg);
-      if (rt.inv.owner === ch) rt.inv.owner = null;
-      if (!rt.live.size) stop();
+      if (rt.live.has(ch)) drop(ch);
+      else if (rt.inv.owner === ch) rt.inv.owner = null;
     },
     /** the loop runs only while a live character is in view */
     kick() {
@@ -179,11 +218,10 @@ function createRuntime(): Runtime {
       let any = false;
       for (const c of rt.live) {
         if (!c.svg.isConnected) {
-          rt.live.delete(c);
-          io?.unobserve(c.svg);
+          drop(c);
           continue;
         }
-        if (c.visible && !occludedNode(c.svg)) {
+        if (c.visible) {
           any = true;
           if (!document.hidden) c.tick(t, dt, beat);
         }
@@ -194,43 +232,6 @@ function createRuntime(): Runtime {
     },
     nextId: () => `k${(++uid).toString(36)}`,
   };
-
-  if (hasDom) {
-    RM?.addEventListener?.('change', e => {
-      rt.motion.reduced = e.matches;
-      if (rt.motionOn()) rt.kick();
-      else stop();
-      notify();
-    });
-    FINE?.addEventListener?.('change', e => {
-      rt.motion.fine = e.matches;
-    });
-    document.addEventListener(
-      'pointermove',
-      e => {
-        rt.ptr.x = e.clientX;
-        rt.ptr.y = e.clientY;
-        rt.ptr.t = performance.now();
-      },
-      { passive: true },
-    );
-    document.documentElement.addEventListener('pointerleave', () => {
-      rt.ptr.t = 0;
-    });
-    window.addEventListener('blur', () => {
-      rt.ptr.t = 0;
-    });
-    const bump = () => {
-      rt.rectEpoch++;
-    };
-    window.addEventListener('scroll', bump, { passive: true });
-    window.addEventListener('resize', bump, { passive: true });
-    document.addEventListener('visibilitychange', () => {
-      lastT = 0;
-      lastBeat = 0;
-      if (!document.hidden) rt.kick();
-    });
-  }
   return rt;
 }
 

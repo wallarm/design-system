@@ -29,12 +29,31 @@ export interface AgentAvatarHandle {
 export const setAgentMotion = (enabled: boolean) => getRuntime().setMotionEnabled(enabled);
 
 /** Whether characters may move: the off switch and the system's reduced-motion setting, followed live. */
-export function useAgentMotion() {
+export function useAgentMotion(follow = true) {
   const rt = getRuntime();
-  return useSyncExternalStore(rt.subscribe, rt.motionOn, () => false);
+  // a static avatar does not follow the setting: no listener for it
+  return useSyncExternalStore(follow ? rt.subscribe : noSubscribe, rt.motionOn, () => false);
+}
+const noSubscribe = () => () => undefined;
+
+interface CueBinding {
+  el: HTMLElement | null;
+  off: (() => void) | null;
+  hv: boolean;
+  fc: boolean;
+}
+/** unbinds the cue; one that was hovered or focused is released first */
+function releaseCue(C: CueBinding, ch: Character | null) {
+  C.off?.();
+  if (C.hv || C.fc) ch?.cueHover(false);
+  C.el = null;
+  C.off = null;
+  C.hv = C.fc = false;
 }
 
 const ACTIVE = new Set<StateId>(['idle', 'working', 'needs', 'failed']);
+/** states Done never plays from: Deactivated, Not set up, Inviting and the landing */
+export const NO_DONE = new Set<StateId>(['off', 'box', 'invite', 'power']);
 
 export interface CharacterParams {
   look: Pick<AgentLook, 'shape' | 'color' | 'eyes' | 'prop'>;
@@ -64,11 +83,17 @@ export function useCharacter(
   useLayoutEffect(() => {
     latest.current = p;
   });
+  /** the beat playing (to report it once, even when cut short), and a crown owed after Cover all */
+  const run = useRef<{ beat: AgentAvatarBeat | null; recover: boolean }>({
+    beat: null,
+    recover: false,
+  });
 
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const L = latest.current;
+    const R = run.current;
     const ch = createCharacter(svg, L.look, {
       size: L.size,
       state: L.state,
@@ -79,8 +104,21 @@ export function useCharacter(
       cue: () => latest.current.cueRef?.current,
       // D27: a one-shot returns to the data's state, whatever it is by then
       returnTo: () => latest.current.state,
-      onState: (_st, from) => {
-        if (from === 'hello' || from === 'done') latest.current.onBeatEnd?.(from);
+      onState: (st, from) => {
+        if (st === 'done' && from === 'idle') R.beat = 'done'; // Cover all's Done
+        if (st === from || (from !== 'hello' && from !== 'done') || R.beat !== from) return;
+        R.beat = null;
+        // the crown comes back after the Done if the data still says partial, as the static avatar draws it
+        if (R.recover) {
+          R.recover = false;
+          if (latest.current.cover) ch.setCover(true);
+        }
+        latest.current.onBeatEnd?.(from);
+      },
+      // the fill has dropped the crown; the data decides whether it comes back
+      onCoverEnd: () => {
+        if (R.beat === 'done') R.recover = true;
+        else if (latest.current.cover) ch.setCover(true);
       },
       requestVeil: () => latest.current.requestVeil(),
     });
@@ -90,6 +128,11 @@ export function useCharacter(
       ch.dispose();
       chRef.current = null;
       leave?.();
+      // a beat cut short (unmount, or motion switched off) still ends for the host
+      const cut = R.beat;
+      R.beat = null;
+      R.recover = false;
+      if (cut) latest.current.onBeatEnd?.(cut);
     };
   }, [svgRef]);
 
@@ -111,42 +154,57 @@ export function useCharacter(
     ch.setCover(p.cover);
   }, [p.cover]);
 
-  // hover or keyboard focus on the cue; touch gets no preview (the page's cueBind). Re-bound after every render, so
-  // a cue that mounts later is picked up on the avatar's next render.
+  // Hover or keyboard focus on the cue; touch gets no preview (the page's cueBind). Checked after every render, so a
+  // cue that mounts later is picked up; the hover and focus flags survive re-renders, and a cue that goes away while
+  // hovered or focused is released.
+  const cue = useRef<{
+    el: HTMLElement | null;
+    off: (() => void) | null;
+    hv: boolean;
+    fc: boolean;
+  }>({
+    el: null,
+    off: null,
+    hv: false,
+    fc: false,
+  });
   useEffect(() => {
-    const el = latest.current.cueRef?.current;
+    const el = latest.current.cueRef?.current ?? null;
+    const C = cue.current;
+    if (el === C.el) return;
+    releaseCue(C, chRef.current);
     if (!el) return;
-    let hv = false;
-    let fc = false;
-    const up = () => chRef.current?.cueHover(hv || fc);
+    const up = () => chRef.current?.cueHover(C.hv || C.fc);
     const enter = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return;
-      hv = true;
+      C.hv = true;
       up();
     };
     const leave = () => {
-      hv = false;
+      C.hv = false;
       up();
     };
     const focusIn = () => {
-      fc = true;
+      C.fc = true;
       up();
     };
     const focusOut = (e: FocusEvent) => {
-      fc = el.contains(e.relatedTarget as Node | null);
+      C.fc = el.contains(e.relatedTarget as Node | null);
       up();
     };
     el.addEventListener('pointerenter', enter);
     el.addEventListener('pointerleave', leave);
     el.addEventListener('focusin', focusIn);
     el.addEventListener('focusout', focusOut);
-    return () => {
+    C.el = el;
+    C.off = () => {
       el.removeEventListener('pointerenter', enter);
       el.removeEventListener('pointerleave', leave);
       el.removeEventListener('focusin', focusIn);
       el.removeEventListener('focusout', focusOut);
     };
   });
+  useEffect(() => () => releaseCue(cue.current, chRef.current), []);
 
   useImperativeHandle(
     handleRef,
@@ -155,7 +213,9 @@ export function useCharacter(
         const ch = chRef.current;
         if (!ch) return;
         if (beat === 'hello') ch.greet();
-        else ch.setState('done');
+        // a Deactivated or ghost agent has nothing to finish; the landing is never interrupted
+        else if (!NO_DONE.has(ch.st)) ch.setState('done');
+        if (ch.st === beat) run.current.beat = beat;
       },
       coverAll() {
         chRef.current?.coverAll();

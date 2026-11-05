@@ -51,7 +51,10 @@ const build = (n: SvgNode): Element => {
   for (const c of n.children ?? []) e.appendChild(build(c));
   return e;
 };
+/** the rects stubbed in the current scenario, to check against the page's measured ones */
+let stubbed: number[][] = [];
 const rectAt = (el: Element, x: number, y: number, w: number, h: number) => {
+  stubbed.push([x, y, w, h]);
   el.getBoundingClientRect = () =>
     ({ left: x, top: y, width: w, height: h, x, y, right: x + w, bottom: y + h }) as DOMRect;
 };
@@ -135,7 +138,11 @@ describe('engine motion parity with the reference page (look v14)', () => {
     it(`matches the page frame for frame: ${sc.name}`, () => {
       const ref = page.scenarios[sc.name];
       if (!ref) throw new Error(`no capture for ${sc.name}`);
+      stubbed = [];
       const mine = H.run(sc, C, adapter);
+      // the geometry the port sees (cue, neighbours) is the geometry the page measured
+      const sorted = (r: number[][]) => r.map(x => x.join(',')).sort();
+      expect(sorted(stubbed)).toEqual(sorted(ref.rects));
       expect(firstDiff(mine, ref.rows)).toBe(null);
       expect(mine.length).toBe(ref.rows.length);
     });

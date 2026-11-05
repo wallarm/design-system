@@ -3,12 +3,12 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { defaultLook } from '../../lib/agent-characters/look';
 import { PLACES } from '../../lib/agent-characters/places';
-import { getRuntime } from '../../lib/agent-characters/runtime';
 import { Button } from '../Button';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { AgentAvatar, type AgentAvatarProps, type AgentAvatarState } from './AgentAvatar';
 import { AgentAvatarGroup } from './AgentAvatarGroup';
+import { FrameMeter } from './stories/FrameMeter';
 import { type AgentAvatarHandle, setAgentMotion, useAgentMotion } from './useCharacter';
 
 const DESCRIPTION = [
@@ -373,60 +373,25 @@ export const Coverage: StoryFn = () => {
 };
 
 /** Fifteen live agents at 120 px, as on a full team page, with the engine's frame rate and JavaScript per frame. */
-export const ManyOnScreen: StoryFn = () => {
-  const [meter, setMeter] = useState({ fps: 0, js: 0, max: 0 });
-  useEffect(() => {
-    const rt = getRuntime();
-    let n = 0;
-    let sum = 0;
-    let max = 0;
-    // the hook is one slot on the document runtime: chain whatever holds it
-    const prev = rt.onFrame;
-    rt.onFrame = js => {
-      prev?.(js);
-      n++;
-      sum += js;
-      max = Math.max(max, js);
-    };
-    const id = setInterval(() => {
-      setMeter({ fps: n, js: n ? sum / n : 0, max });
-      n = 0;
-      sum = 0;
-      max = 0;
-    }, 1000);
-    return () => {
-      clearInterval(id);
-      rt.onFrame = prev;
-    };
-  }, []);
-  return (
-    <VStack gap={16}>
-      <span
-        className='sb-annotation'
-        data-testid='agent-avatar-meter'
-        data-fps={meter.fps}
-        data-js={meter.js.toFixed(3)}
-        data-max={meter.max.toFixed(3)}
-      >
-        {`${meter.fps} fps · ${meter.js.toFixed(2)} ms JS per frame (max ${meter.max.toFixed(2)})`}
-      </span>
-      <AgentAvatarGroup>
-        <div className='grid grid-cols-5 gap-16'>
-          {TEAM.slice(0, 15).map(m => (
-            <AgentAvatar
-              key={m.id}
-              data-testid={`agent-avatar-many-${m.id}`}
-              look={m.look}
-              seed={m.id}
-              size={120}
-              live
-            />
-          ))}
-        </div>
-      </AgentAvatarGroup>
-    </VStack>
-  );
-};
+export const ManyOnScreen: StoryFn = () => (
+  <VStack gap={16}>
+    <FrameMeter />
+    <AgentAvatarGroup>
+      <div className='grid grid-cols-5 gap-16'>
+        {TEAM.slice(0, 15).map(m => (
+          <AgentAvatar
+            key={m.id}
+            data-testid={`agent-avatar-many-${m.id}`}
+            look={m.look}
+            seed={m.id}
+            size={120}
+            live
+          />
+        ))}
+      </div>
+    </AgentAvatarGroup>
+  </VStack>
+);
 
 /** With motion off (the user's setting, or reduced motion in the system) every live agent shows its static frame. */
 export const ReducedMotion: StoryFn = () => {
