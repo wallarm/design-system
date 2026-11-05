@@ -70,6 +70,16 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
+      - name: Setup GitLab SSH access
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -145,6 +155,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup GitLab SSH access
+        if: steps.guard.outputs.enabled == 'true'
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: steps.guard.outputs.enabled == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
 
       - name: Install dependencies
         if: steps.guard.outputs.enabled == 'true'
