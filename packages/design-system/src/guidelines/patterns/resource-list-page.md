@@ -65,104 +65,35 @@ There is no breadcrumbs prop or slot on `Page` or `PageHeader`, no `PageBreadcru
 
 ## Examples
 
+The page frame: a fixed-height `Page` with the table directly in `PageContent`.
+
+```story
+Default
+```
+
 A header with breadcrumbs, a title block and one create action.
 
-```tsx
-<PageHeader className='flex-wrap gap-y-6'>
-  <Breadcrumbs className='basis-full -ml-4'>
-    <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-    <BreadcrumbsItem>Users</BreadcrumbsItem>
-  </Breadcrumbs>
-  <PageHeaderGroup className='flex-1'>
-    <PageTitle>Users</PageTitle>
-    <PageDescription>
-      People who can sign in to your organization, with access set by roles and groups.
-    </PageDescription>
-  </PageHeaderGroup>
-  <PageActions>
-    <Button size='medium' onClick={onCreate}>
-      Create user
-    </Button>
-  </PageActions>
-</PageHeader>
+```story
+Header
 ```
 
 A toolbar with search and status tabs that carry counts.
 
-```tsx
-<PageToolbar>
-  <SearchInput
-    value={query}
-    onChange={setQuery}
-    placeholder='Search name or email'
-    className='w-[320px]'
-  />
-  <SegmentedTabs value={status} onChange={handleStatusChange}>
-    <SegmentedTabsList>
-      <SegmentedTabsTrigger value='all'>
-        All <NumericBadge>{counts.all}</NumericBadge>
-      </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value='active'>
-        Active <NumericBadge>{counts.active}</NumericBadge>
-      </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value='invited'>
-        Invited <NumericBadge>{counts.invited}</NumericBadge>
-      </SegmentedTabsTrigger>
-    </SegmentedTabsList>
-  </SegmentedTabs>
-</PageToolbar>
+```story
+Toolbar
 ```
 
-The page frame: a fixed-height `Page` with the table directly in `PageContent`.
+No results: `type='collection-empty'` with a button that resets filters.
 
-```tsx
-<Page name='settings-users' fullSize fixedHeight>
-  {/* PageHeader, PageToolbar as above */}
-  <PageContent>
-    <Table
-      aria-label='Users'
-      data={rows}
-      columns={columns}
-      getRowId={row => row.id}
-      isLoading={isLoading}
-    >
-      <TableEmptyState>{isFiltered ? noResults : nothingYet}</TableEmptyState>
-    </Table>
-  </PageContent>
-</Page>
+```story
+NoResults
 ```
 
-Empty versus no results: both use `type='collection-empty'`; only no results has a button, and it resets filters.
+Nothing exists yet: the same `type='collection-empty'`, with no button.
 
-```tsx
-const nothingYet = (
-  <EmptyState type='collection-empty'>
-    <EmptyStateIllustration><Users /></EmptyStateIllustration>
-    <EmptyStateMessage>
-      <EmptyStateTitle>No users yet</EmptyStateTitle>
-      <EmptyStateDescription>Invite people so they can sign in.</EmptyStateDescription>
-    </EmptyStateMessage>
-  </EmptyState>
-);
-
-const noResults = (
-  <EmptyState type='collection-empty'>
-    <EmptyStateIllustration><SearchX /></EmptyStateIllustration>
-    <EmptyStateMessage>
-      <EmptyStateTitle>No results found</EmptyStateTitle>
-      <EmptyStateDescription>No users match your search or status.</EmptyStateDescription>
-    </EmptyStateMessage>
-    <EmptyStateActions>
-      <Button size='medium' variant='outline' color='neutral' onClick={handleReset}>
-        <FilterX />
-        Reset filters
-      </Button>
-    </EmptyStateActions>
-  </EmptyState>
-);
+```story
+Empty
 ```
-
-Icons (`Users`, `SearchX`, `FilterX`) import from `@wallarm-org/design-system/icons`.
 
 ## States
 

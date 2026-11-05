@@ -3,6 +3,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const resourceListStory = createStoryHelper('patterns-resource-list-page', [
   'Default',
+  'Header',
+  'Toolbar',
   'No Results',
   'Empty',
 ] as const);
@@ -12,6 +14,18 @@ test.describe('Pattern: Resource list page', () => {
     test('Should render the full page correctly', async ({ page }) => {
       await resourceListStory.goto(page, 'Default');
       await expect(page.getByTestId('users-table--container--row')).toHaveCount(6);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the header correctly', async ({ page }) => {
+      await resourceListStory.goto(page, 'Header');
+      await expect(page.getByTestId('users-header')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the toolbar correctly', async ({ page }) => {
+      await resourceListStory.goto(page, 'Toolbar');
+      await expect(page.getByTestId('users-toolbar')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

@@ -35,7 +35,6 @@ const UNCONVERTED_PATTERNS = new Set([
   'patterns/entity-table',
   'patterns/feedback-toasts',
   'patterns/filtering',
-  'patterns/resource-list-page',
   'patterns/settings-page',
 ]);
 

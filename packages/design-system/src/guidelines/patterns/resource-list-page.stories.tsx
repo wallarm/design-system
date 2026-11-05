@@ -129,17 +129,18 @@ const meta = {
       },
     },
   },
-  // The host shell gives a page its height; 640px stands in for it.
-  decorators: [
-    Story => (
-      <div className='h-640'>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta;
 
 export default meta;
+
+// The host shell gives a page its height; 640px stands in for it on whole-page stories.
+const hostShell: StoryFn['decorators'] = [
+  Story => (
+    <div className='h-640'>
+      <Story />
+    </div>
+  ),
+];
 
 /**
  * The whole page: breadcrumbs, title, description and one create action in the header; search
@@ -318,6 +319,69 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
+Default.decorators = hostShell;
+
+/** Breadcrumbs start at the 2nd-rail section; the title repeats the last crumb. */
+export const Header: StoryFn = () => (
+  <Page name='settings-users' data-testid='users-page'>
+    <PageHeader className='flex-wrap gap-y-6' data-testid='users-header'>
+      <Breadcrumbs className='basis-full -ml-4'>
+        <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
+        <BreadcrumbsItem>Users</BreadcrumbsItem>
+      </Breadcrumbs>
+      <PageHeaderGroup className='flex-1'>
+        <PageTitle>Users</PageTitle>
+        <PageDescription>
+          People who can sign in to your organization, with access set by roles and groups.
+        </PageDescription>
+      </PageHeaderGroup>
+      <PageActions>
+        <Button size='medium' onClick={onCreateUser} data-testid='users-create'>
+          Create user
+        </Button>
+      </PageActions>
+    </PageHeader>
+  </Page>
+);
+
+/** Search clears with its built-in button; the tabs filter the one table, with no tab panels. */
+export const Toolbar: StoryFn = () => {
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+
+  const counts = {
+    all: USERS.length,
+    active: USERS.filter(user => user.status === 'active').length,
+    invited: USERS.filter(user => user.status === 'invited').length,
+  };
+
+  return (
+    <Page name='settings-users' data-testid='users-page'>
+      <PageToolbar data-testid='users-toolbar'>
+        <SearchInput
+          value={query}
+          onChange={setQuery}
+          placeholder='Search name or email'
+          className='w-[320px]'
+          data-testid='users-search'
+        />
+        <SegmentedTabs value={status} onChange={setStatus} data-testid='users-status-tabs'>
+          <SegmentedTabsList>
+            <SegmentedTabsTrigger value='all'>
+              All <NumericBadge>{counts.all}</NumericBadge>
+            </SegmentedTabsTrigger>
+            <SegmentedTabsTrigger value='active'>
+              Active <NumericBadge>{counts.active}</NumericBadge>
+            </SegmentedTabsTrigger>
+            <SegmentedTabsTrigger value='invited'>
+              Invited <NumericBadge>{counts.invited}</NumericBadge>
+            </SegmentedTabsTrigger>
+          </SegmentedTabsList>
+        </SegmentedTabs>
+      </PageToolbar>
+    </Page>
+  );
+};
 
 /**
  * Search or a tab matched nothing: "No results found" with a "Reset filters" button that clears
@@ -420,6 +484,7 @@ export const NoResults: StoryFn = () => {
     </Page>
   );
 };
+NoResults.decorators = hostShell;
 
 /**
  * Nothing exists yet: the real header with its create button, the toolbar, and an empty state
@@ -485,3 +550,4 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
+Empty.decorators = hostShell;
