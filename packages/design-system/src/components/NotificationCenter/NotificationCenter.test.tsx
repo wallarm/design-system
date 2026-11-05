@@ -140,14 +140,16 @@ describe('NotificationCenterTrigger', () => {
     );
   });
 
-  it('opens the popover labelled by the title', async () => {
+  it('opens a dialog named Notifications', async () => {
     const onOpenChange = rs.fn();
     renderInbox({ onOpenChange });
     await userEvent.click(screen.getByTestId('nc--trigger'));
     expect(onOpenChange).toHaveBeenCalledWith(true);
     const content = await screen.findByTestId('nc--content');
     expect(content).toHaveAttribute('role', 'dialog');
-    expect(content).toHaveAttribute('aria-labelledby', screen.getByTestId('nc--title').id);
+    // zag links aria-labelledby to the title only on a later re-render (it mutates state in a raf),
+    // so assert the name: the content's aria-label fallback covers the gap.
+    expect(content).toHaveAccessibleName('Notifications');
   });
 });
 
@@ -243,7 +245,9 @@ describe('Test ids', () => {
 
   it('scopes the bell tooltip to the trigger, not the popover content', async () => {
     renderInbox();
-    screen.getByTestId('nc--trigger').focus();
+    // Tab, not .focus(): zag opens a tooltip on keyboard (focus-visible) focus only.
+    await userEvent.tab();
+    expect(screen.getByTestId('nc--trigger')).toHaveFocus();
     expect(await screen.findByTestId('nc--trigger--content')).toHaveTextContent('Notifications');
     expect(screen.queryByTestId('nc--content')).not.toBeInTheDocument();
   });

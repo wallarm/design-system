@@ -124,6 +124,10 @@ describe.skipIf(!hasRealMetadata)('response budget (real metadata)', () => {
     expect(metadata.components.map(c => c.name)).not.toContain('NavPanel');
   });
 
+  it('a spaced component name ("notification center") finds that component first', () => {
+    expect(searchComponents(metadata, 'notification center')[0]?.name).toBe('NotificationCenter');
+  });
+
   it('every search alias points at a real component', () => {
     const names = new Set(metadata.components.map(c => c.name));
     const missing = Object.values(ALIASES)

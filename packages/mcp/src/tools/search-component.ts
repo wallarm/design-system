@@ -26,7 +26,7 @@ export const ALIASES: Record<string, string[]> = {
   layout: ['Page', 'AppShell', 'Stack', 'Flex'],
   toast: ['Toast'],
   snackbar: ['Toast'],
-  notification: ['Toast', 'Alert', 'Banner'],
+  notification: ['Toast', 'Alert', 'Banner', 'NotificationCenter'],
   callout: ['Alert', 'Banner'],
   dropdown: ['Select', 'DropdownMenu'],
   combobox: ['Select'],
@@ -123,7 +123,7 @@ function scoreComponent(
   const q = query.trim().toLowerCase();
   const name = component.name.toLowerCase();
 
-  if (name === q) return 100;
+  if (name === q || words(component.name).join(' ') === words(query).join(' ')) return 100;
   if (aliasHits.has(component.name)) return 90;
   if (q && name.startsWith(q)) return 80;
   if (q.length >= 3 && name.includes(q)) return 60;
