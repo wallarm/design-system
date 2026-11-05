@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const panelStory = createStoryHelper('ai-wallyassistant', [
   'Empty',
@@ -40,21 +41,12 @@ const openDrawer = async (page: Page) => {
   await expect(byId(page, 'wally')).toBeVisible();
 };
 
-// The empty chat's Wally is a live character: shoot its static frame (reduced motion), once its bakes are in.
-const stillWally = (page: Page) => page.emulateMedia({ reducedMotion: 'reduce' });
-const waitForWally = (page: Page) =>
-  page.waitForFunction(() =>
-    [...document.querySelectorAll('[data-slot="agent-avatar"] [data-part~="ly"]')]
-      .filter(g => !g.closest('[data-part~="veil"]'))
-      .every(g => g.hasAttribute('data-ready')),
-  );
-
 test.describe('Component: WallyAssistant', () => {
   test.describe('Visual', () => {
     test('Should render empty panel correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Empty');
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('wally'));
       await expect(page).toHaveScreenshot();
     });
 

@@ -41,4 +41,15 @@ describe('propOf (WDS-204)', () => {
     const S = shapeOf('kettle');
     expect(propOf('periscope', S, hexOf('plum'))).toEqual(propDef('periscope', S, hexOf('plum')));
   });
+
+  // 07 §6.5: one registry per document, so a host's enableAgentLookLibrary() reaches a remote's DS copy.
+  it('shares the registered library across module copies', async () => {
+    setPropLibrary(propDef);
+    rstest.resetModules();
+    const other = await import('../propOf');
+    const S = shapeOf('mug');
+    expect(other.propOf('sprout', S, hexOf('olive'))).toEqual(propDef('sprout', S, hexOf('olive')));
+    other.setPropLibrary(null);
+    expect(propOf('sprout', S, hexOf('olive'))).toBeNull();
+  });
 });

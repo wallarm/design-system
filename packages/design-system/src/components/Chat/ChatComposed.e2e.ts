@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const panelStory = createStoryHelper('ai-chat', [
   'Empty Panel',
@@ -19,21 +20,12 @@ const openDrawer = async (page: Page) => {
   await expect(page.getByTestId('chat')).toBeVisible();
 };
 
-// The empty chat's Wally is a live character: shoot its static frame (reduced motion), once its bakes are in.
-const stillWally = (page: Page) => page.emulateMedia({ reducedMotion: 'reduce' });
-const waitForWally = (page: Page) =>
-  page.waitForFunction(() =>
-    [...document.querySelectorAll('[data-slot="agent-avatar"] [data-part~="ly"]')]
-      .filter(g => !g.closest('[data-part~="veil"]'))
-      .every(g => g.hasAttribute('data-ready')),
-  );
-
 test.describe('Component: ChatComposed', () => {
   test.describe('Visual', () => {
     test('Should render empty panel correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Empty Panel');
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
 
@@ -58,11 +50,11 @@ test.describe('Component: ChatComposed', () => {
     });
 
     test('Should render permissions popover inside the input correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await panelStory.goto(page, 'Permissions');
       await page.getByTestId('chat--input--permissions--trigger').click();
       await expect(page.getByTestId('chat--input--permissions--content')).toBeVisible();
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 

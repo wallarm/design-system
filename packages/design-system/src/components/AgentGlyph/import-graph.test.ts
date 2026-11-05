@@ -31,8 +31,13 @@ describe('AgentGlyph import graph', () => {
   });
 
   // WDS-204: the full prop library (props.ts) loads only with the builder entry.
-  it('reaches no prop library from either component entry', () => {
-    for (const entry of ['index.ts', '../AgentAvatar/index.ts']) {
+  it('reaches no prop library from the component entries, the chat or the root barrel', () => {
+    for (const entry of [
+      'index.ts',
+      '../AgentAvatar/index.ts',
+      '../Chat/index.ts',
+      '../../index.ts',
+    ]) {
       const files = graph(path.resolve(__dirname, entry));
       expect(
         files.filter(f => /agent-characters\/props\.ts$/.test(f)),

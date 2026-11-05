@@ -15,7 +15,12 @@ import {
 import { setPropLibrary } from '../../lib/agent-characters/propOf';
 import { propDef } from '../../lib/agent-characters/props';
 
-/** Draws any look's prop (15 props on any shape). Call once before rendering looks outside the six presets. */
+/**
+ * Loads the full prop library (15 props on any shape) for every DS copy on the page. Any app that renders stored
+ * custom looks calls it once at start-up — the cards, rows and tables that show them, not only the picker.
+ * Without it only the six presets' props are drawn. Mounted glyphs pick it up on their next render; a mounted 3D
+ * character keeps what it drew until its look changes or it remounts, so call it before the first render.
+ */
 export function enableAgentLookLibrary() {
   setPropLibrary(propDef);
 }
@@ -49,6 +54,7 @@ export const AGENT_SHAPES: readonly AgentShapeOption[] = SHAPES.map(s => ({
   name: s.name,
   family: s.fam,
 }));
+/** The full palette. Filter `brand` (coral, Wally only) out of pickers (D22). */
 export const AGENT_COLORS: readonly AgentColorOption[] = COLORS.map(c => ({
   id: c.id,
   name: c.name,

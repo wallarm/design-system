@@ -80,7 +80,8 @@ describe('AgentLookBuilder kit', () => {
 describe('enableAgentLookLibrary', () => {
   afterAll(() => setPropLibrary(null));
 
-  it('draws the prop for characters rendered after it, and mounted ones keep working', () => {
+  it('draws the prop for characters rendered after it, and mounted ones keep working (glyphs update)', () => {
+    setPropLibrary(null);
     const warn = rstest.spyOn(console, 'warn').mockImplementation(() => {});
     const look = { v: 1, shape: 'kettle', color: 'butter', eyes: 'oval', prop: 'beanie' } as const;
     const paths = (id: string) => document.querySelectorAll(`[data-testid="${id}"] path`).length;
@@ -103,7 +104,10 @@ describe('enableAgentLookLibrary', () => {
     );
     expect(paths('g2')).toBeGreaterThan(before.g);
     expect(paths('a2')).toBeGreaterThan(before.a);
-    expect(paths('g1')).toBeGreaterThanOrEqual(before.g);
+    // a mounted glyph picks it up on its next render; a mounted 3D character keeps its drawing until its look
+    // changes or it remounts
+    expect(paths('g1')).toBe(paths('g2'));
+    expect(paths('a1')).toBe(before.a);
     warn.mockRestore();
   });
 });

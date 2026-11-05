@@ -4,16 +4,21 @@ import { type AgentShapeDef, PRESET_PROPS, type PropDef } from './data.gen';
 
 type PropLibrary = (kind: string, S: AgentShapeDef, col: string) => PropDef;
 
-let library: PropLibrary | null = null;
+// One registry per document, like the runtime (07 §6.5): a host that enables the library also enables it for a
+// Module Federation remote's copy of the DS. Not on the runtime object: runtime.ts pulls the bake queue, which the
+// glyph path must not load.
+const KEY = Symbol.for('@wallarm-org/design-system/agent-characters/prop-library');
+const registry = globalThis as typeof globalThis & { [KEY]?: PropLibrary | null };
 const warned = new Set<string>();
 
 /** Registers the full prop library (AgentLookBuilder's enableAgentLookLibrary); null unregisters (tests). */
 export function setPropLibrary(lib: PropLibrary | null) {
-  library = lib;
+  registry[KEY] = lib;
 }
 
 /** propDef() for a look: the library when registered, else the preset table, else no prop. Never throws. */
 export function propOf(kind: string, S: AgentShapeDef, col: string): PropDef | null {
+  const library = registry[KEY];
   if (library) return library(kind, S, col);
   const key = `${S.id}|${col}|${kind}`;
   const hit = PRESET_PROPS[key];

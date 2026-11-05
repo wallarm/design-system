@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const chatStory = createStoryHelper('ai-chat', [
   'Header Default',
@@ -10,15 +11,6 @@ const chatStory = createStoryHelper('ai-chat', [
   'Trigger',
   'Trigger With Drawer',
 ] as const);
-
-// The empty chat's Wally is a live character: shoot its static frame (reduced motion), once its bakes are in.
-const stillWally = (page: Page) => page.emulateMedia({ reducedMotion: 'reduce' });
-const waitForWally = (page: Page) =>
-  page.waitForFunction(() =>
-    [...document.querySelectorAll('[data-slot="agent-avatar"] [data-part~="ly"]')]
-      .filter(g => !g.closest('[data-part~="veil"]'))
-      .every(g => g.hasAttribute('data-ready')),
-  );
 
 test.describe('Component: Chat', () => {
   test.describe('Visual', () => {
@@ -33,16 +25,16 @@ test.describe('Component: Chat', () => {
     });
 
     test('Should render empty greeting state correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await chatStory.goto(page, 'Greeting');
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render footer and greeting suggestions correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await chatStory.goto(page, 'Suggestions');
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat-greeting-suggestions'));
       await expect(page).toHaveScreenshot();
     });
 
@@ -59,10 +51,10 @@ test.describe('Component: Chat', () => {
     });
 
     test('Should render suggestion hover state correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await chatStory.goto(page, 'Greeting');
       await page.getByTestId('chat--suggestion-0').hover();
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
   });
@@ -74,10 +66,13 @@ test.describe('Component: Chat', () => {
       await expect(wally).toHaveAttribute('data-live', 'true');
       await expect(wally).toHaveAttribute('data-state', 'hello');
       await expect(wally).toHaveAttribute('data-state', 'idle', { timeout: 5000 });
+      // once: the chat stays in view, and no second Hello follows
+      await page.waitForTimeout(1000);
+      await expect(wally).toHaveAttribute('data-state', 'idle');
     });
 
     test('Should show the static Wally with no Hello under reduced motion', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await chatStory.goto(page, 'Greeting');
       const wally = page.getByTestId('chat--greeting--wally');
       await expect(wally).not.toHaveAttribute('data-live', /.*/);

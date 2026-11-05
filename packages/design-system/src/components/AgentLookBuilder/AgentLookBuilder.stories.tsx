@@ -27,12 +27,9 @@ import {
   lookIssues,
 } from './index';
 
-// A product's look picker calls this once, before it renders any look outside the six presets.
-enableAgentLookLibrary();
-
 const DESCRIPTION = [
   'The builder entry: everything a product needs to let admins pick an agent’s look. It holds the kit with display names (`AGENT_SHAPES`, `AGENT_COLORS`, `AGENT_EYES`, `AGENT_PROPS`), `lookIssues` for the combinations to avoid and `defaultLook` for a first look.',
-  '`enableAgentLookLibrary()` loads the full prop library: without it `AgentAvatar` and `AgentGlyph` draw only the six presets’ props, and any other prop is left out with a warning in development.',
+  '`enableAgentLookLibrary()` loads the full prop library. Any app that renders stored custom looks calls it once at start-up — the cards, rows and tables that show them, not only the picker. Without it `AgentAvatar` and `AgentGlyph` draw only the six presets’ props, and any other prop is left out with a warning in development. Mounted glyphs pick it up on their next render; a mounted 3D character keeps what it drew until its look changes or it remounts, so call it before the first render.',
   'It ships no picker UI; the stories build one from DS `Select`s. `lookIssues` only warns, never blocks; coral is Wally’s and is not offered.',
 ].join(' ');
 
@@ -82,6 +79,8 @@ export default meta;
  * `lookIssues` warnings. Random draws a look with no issue from the whole prop library.
  */
 export const AnyLook: StoryFn = () => {
+  // In an app: once at start-up, before any stored custom look renders (here, before this story's first render).
+  enableAgentLookLibrary();
   const [look, setLook] = useState<AgentLook>(FIRST_LOOK);
   const [draws, setDraws] = useState(0);
   const issues = lookIssues(look, { isWally: false, others: [] });
@@ -199,8 +198,13 @@ export const AnyLook: StoryFn = () => {
   );
 };
 
-/** Every shape in the first colour of each palette group (coral, Wally's, aside), static, with no prop. */
+/**
+ * Every shape in the first colour of each palette group (coral, Wally's, aside), static, with no prop; the last
+ * column wears the magnifier, a library prop that shows only on the 3D character.
+ */
 export const Library: StoryFn = () => {
+  // In an app: once at start-up, before any stored custom look renders.
+  enableAgentLookLibrary();
   const groups = [...new Set(AGENT_COLORS.filter(c => !c.brand).map(c => c.group))];
   const firstColors = groups.map(g => AGENT_COLORS.find(c => c.group === g)?.id ?? 'cobalt');
 
@@ -220,6 +224,12 @@ export const Library: StoryFn = () => {
               data-testid={`library--${s.id}-${color}`}
             />
           ))}
+          <AgentAvatar
+            look={{ v: 1, shape: s.id, color: 'sky', eyes: 'oval', prop: 'magnifier' }}
+            size={48}
+            seed={`${s.id}-magnifier`}
+            data-testid={`library--${s.id}-magnifier`}
+          />
         </HStack>
       ))}
     </VStack>

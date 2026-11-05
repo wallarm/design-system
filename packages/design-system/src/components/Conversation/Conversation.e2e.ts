@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const conversationStory = createStoryHelper('ai-conversation', [
   'Default',
@@ -60,15 +61,6 @@ const resetFrames = (page: Page) =>
     (window as unknown as { __frames: number[][] }).__frames.length = 0;
   });
 
-// The empty chat's Wally is a live character: shoot its static frame (reduced motion), once its bakes are in.
-const stillWally = (page: Page) => page.emulateMedia({ reducedMotion: 'reduce' });
-const waitForWally = (page: Page) =>
-  page.waitForFunction(() =>
-    [...document.querySelectorAll('[data-slot="agent-avatar"] [data-part~="ly"]')]
-      .filter(g => !g.closest('[data-part~="veil"]'))
-      .every(g => g.hasAttribute('data-ready')),
-  );
-
 test.describe('Component: Conversation', () => {
   test.describe('Visual', () => {
     test('Should render a long history pinned to the bottom correctly', async ({ page }) => {
@@ -79,10 +71,10 @@ test.describe('Component: Conversation', () => {
     });
 
     test('Should render the empty state correctly', async ({ page }) => {
-      await stillWally(page);
+      await holdAgentsStill(page);
       await conversationStory.goto(page, 'Empty');
       await expect(page.getByTestId('chat--empty-state')).toBeVisible();
-      await waitForWally(page);
+      await waitForAgentBakes(page.getByTestId('chat'));
       await expect(page).toHaveScreenshot();
     });
   });
