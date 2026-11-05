@@ -20,6 +20,6 @@ Before composing a screen, call get_guideline for the pattern (app shell, list p
 - size, DIALOG_SIZES, DRAWER_SIZES → width: Dialog 400 confirm, 560 default, 960 picker; Drawer 640 default, 700 Timeline form
 - Dialog, useToast from the root → @wallarm-org/design-system/Dialog, /Toast
 - Field invalid → error on the control + FieldError
-- NavPanel, Sidebar → RemoteShell config={NavConfig}
+- Hand-built side menu → RemoteShell config={NavConfig}
 - ConfirmDialog, FilterBar, Combobox → compose Dialog parts, PageToolbar + FilterDropdown, Select + useSelectSearch
 - data-slot in tests → data-testid
