@@ -17,7 +17,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Patterns/FilterInput/FilterInputChip',
+  title: 'Inputs/FilterInput/FilterInputChip',
   component: FilterInputChip,
   parameters: {
     docs: {

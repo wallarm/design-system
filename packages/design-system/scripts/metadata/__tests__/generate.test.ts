@@ -5,6 +5,7 @@ import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { INTERNAL_COMPONENTS } from '../internal.js';
 import { parseComponentDescription } from '../parse-description.js';
 import { parseExamples } from '../parse-examples.js';
 import { parseComponentProps } from '../parse-props.js';
@@ -22,7 +23,7 @@ describe('metadata generation (integration)', () => {
 
   const componentDirs = fs
     .readdirSync(componentsDir, { withFileTypes: true })
-    .filter(d => d.isDirectory())
+    .filter(d => d.isDirectory() && !INTERNAL_COMPONENTS.has(d.name))
     .map(d => d.name);
 
   const components: ComponentMetadata[] = componentDirs.map(name => {
@@ -62,6 +63,15 @@ describe('metadata generation (integration)', () => {
   it('contains all component directories', () => {
     expect(components.length).toBe(componentDirs.length);
     expect(components.length).toBeGreaterThanOrEqual(40);
+  });
+
+  it('omits internal components, none of which the root barrel exports', () => {
+    const barrel = fs.readFileSync(path.join(ROOT, 'src/index.ts'), 'utf-8');
+    for (const name of INTERNAL_COMPONENTS) {
+      expect(fs.existsSync(path.join(componentsDir, name)), name).toBe(true);
+      expect(componentDirs).not.toContain(name);
+      expect(barrel, name).not.toContain(`components/${name}'`);
+    }
   });
 
   it('Button component has props and variants', () => {

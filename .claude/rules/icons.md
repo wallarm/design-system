@@ -9,7 +9,7 @@ Icons in `packages/design-system/src/icons/` are generated from the [WADS-Iconog
 3. If it's there, run `icons:sync --category '<gallery category>'` (categories live in `src/icons/module/const.ts`) and commit with `[update-screenshots]`.
 4. If it's not in Figma, stop and ask the user — the designers add it to Figma first.
 
-`icons:sync` needs `FIGMA_ACCESS_TOKEN` in the repo-root `.env.local`. If it's missing, ask the user to add it — never write it yourself.
+`icons:sync` needs `FIGMA_ACCESS_TOKEN` in the repo-root `.env.local` (template: `.env.example`). If it's missing, ask the user to add it — never write it yourself.
 
 ## Never
 

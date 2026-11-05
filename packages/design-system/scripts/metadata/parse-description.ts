@@ -59,6 +59,13 @@ const getNamedJsDoc = (sourceFile: SourceFile | undefined, name: string): string
   return docs.at(0)?.getDescription().trim() || undefined;
 };
 
+/** A `/** … *\/` comment opening the file — for a folder of parts with no root component (BulkBar). */
+const leadingDoc = (sourceFile: SourceFile | undefined): string | undefined => {
+  const comment = sourceFile?.getStatements()[0]?.getLeadingCommentRanges()[0]?.getText();
+  const body = comment?.match(/^\/\*\*([\s\S]*?)\*\/$/)?.[1];
+  return body?.replace(/^\s*\* ?/gm, '').trim() || undefined;
+};
+
 const storiesProject = new Project();
 
 export const parseComponentDescription = (
@@ -81,6 +88,7 @@ export const parseComponentDescription = (
   const get = (file: string) => project.getSourceFile(path.join(componentDir, file));
   return (
     getNamedJsDoc(get(`${componentName}.tsx`), componentName) ??
-    getNamedJsDoc(get(`${componentName}Root.tsx`), componentName)
+    getNamedJsDoc(get(`${componentName}Root.tsx`), componentName) ??
+    leadingDoc(get('index.ts'))
   );
 };

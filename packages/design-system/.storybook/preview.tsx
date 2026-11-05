@@ -54,7 +54,8 @@ const preview: Preview = {
       storySort: {
         order: [
           'Documentation',
-          ['Patterns', { FilterInput: ['Composition', '*'] }],
+          // Real screens from src/guidelines/patterns/<slug>.stories.tsx, right after the docs.
+          'Patterns',
           'Components',
           'Data Display',
           // Chart is pinned last: it's the foundational card frame the other charts compose,

@@ -20,7 +20,6 @@ These components support `asChild` for routing:
 | --- | --- |
 | `Link` | `<a>` |
 | `Button` | `<button>` |
-| `NavPanelItem`, `NavPanelGroupItem` | `<a>` |
 | `NavRailItem` | `<a>` |
 | `TopHeaderLogo` | `<a>` |
 | `Card` | `<div>` |
@@ -41,22 +40,26 @@ export const DocsLink = () => (
 
 ### React Router
 
-`NavLink` knows whether it matches the current URL, so pass that to `active`:
+`useMatch` knows whether the current URL is under a route, so pass that to `active`:
 
 ```tsx
 import { NavLink, useMatch } from 'react-router';
-import { NavPanelItem } from '@wallarm-org/design-system/NavPanel';
+import { ShieldCheck } from '@wallarm-org/design-system/icons';
+import { NavRailItem } from '@wallarm-org/design-system/NavRail';
 
-export const RulesItem = () => {
+export const RulesRailItem = () => {
   const match = useMatch('/rules/*');
 
   return (
-    <NavPanelItem asChild active={!!match}>
-      <NavLink to='/rules'>Rules</NavLink>
-    </NavPanelItem>
+    <NavRailItem asChild icon={ShieldCheck} label='Rules' active={!!match}>
+      <NavLink to='/rules' />
+    </NavRailItem>
   );
 };
 ```
+
+A product's own menu is not composed from links: `RemoteShell` builds it from a `NavConfig`
+(see [RemoteShell](#remoteshell) below).
 
 ### Next.js
 

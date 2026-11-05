@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const filterCascadeStory = createStoryHelper('patterns-filtercascade', [
+const filterCascadeStory = createStoryHelper('inputs-filtercascade', [
   'Default',
   'Scope Filter',
   'Picked',

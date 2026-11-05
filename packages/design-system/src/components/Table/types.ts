@@ -205,7 +205,7 @@ export interface TableProps<T> extends TestableProps {
    * `isLoading`). Pair with `onStartReached`.
    */
   isLoadingPrevious?: boolean;
-  /** Number of skeleton rows to display when loading (default: 6) */
+  /** Number of skeleton rows to display when loading (default: 12, `TABLE_SKELETON_ROWS`) */
   skeletonCount?: number;
   /** Slot for TableActionBar, TableEmptyState, and other compound components */
   children?: ReactNode;

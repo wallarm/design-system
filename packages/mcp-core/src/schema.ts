@@ -40,6 +40,14 @@ export const exampleMetadataSchema = z.object({
 
 export type ExampleMetadata = z.infer<typeof exampleMetadataSchema>;
 
+export const componentDocSchema = z.object({
+  /** File name without `.md`, e.g. `LineChart` or `TABLE_DESIGN`. */
+  name: z.string(),
+  markdown: z.string(),
+});
+
+export type ComponentDoc = z.infer<typeof componentDocSchema>;
+
 export const componentMetadataSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -48,6 +56,8 @@ export const componentMetadataSchema = z.object({
   variants: z.array(variantMetadataSchema),
   subComponents: z.array(subComponentMetadataSchema),
   examples: z.array(exampleMetadataSchema),
+  /** Usage docs from the component folder (`docs/*.md`, `*_DESIGN.md`); optional — older DS versions lack it. */
+  docs: z.array(componentDocSchema).optional(),
 });
 
 export type ComponentMetadata = z.infer<typeof componentMetadataSchema>;
@@ -75,3 +85,56 @@ export const designSystemMetadataSchema = z.object({
 });
 
 export type DesignSystemMetadata = z.infer<typeof designSystemMetadataSchema>;
+
+export const guidelineSectionSchema = z.object({
+  /** Kebab-case of the H2 text, e.g. `what-your-app-owns`. */
+  id: z.string(),
+  heading: z.string(),
+  markdown: z.string(),
+});
+
+export type GuidelineSection = z.infer<typeof guidelineSectionSchema>;
+
+export const guidelineStorySchema = z.object({
+  /** Story export name, e.g. `Default`, `NoResults`. */
+  name: z.string(),
+  /** Paste-ready source: public imports plus the story function. */
+  code: z.string(),
+  description: z.string().optional(),
+});
+
+export type GuidelineStory = z.infer<typeof guidelineStorySchema>;
+
+export const guidelineKindSchema = z.enum(['foundation', 'pattern']);
+
+export type GuidelineKind = z.infer<typeof guidelineKindSchema>;
+
+export const guidelineSchema = z.object({
+  /** `foundations/spacing` | `patterns/entity-table`. */
+  slug: z.string(),
+  kind: guidelineKindSchema,
+  title: z.string(),
+  description: z.string(),
+  components: z.array(z.string()),
+  keywords: z.array(z.string()),
+  order: z.number(),
+  /** Body without frontmatter; a pattern's ```story refs are resolved to `tsx story=<Name>` code fences. */
+  markdown: z.string(),
+  sections: z.array(guidelineSectionSchema),
+  /**
+   * Live stories of a pattern (`src/guidelines/patterns/<slug>.stories.tsx`, Storybook
+   * `Patterns/<title>`), in file order. Absent in older design-system versions.
+   */
+  stories: z.array(guidelineStorySchema).optional(),
+});
+
+export type Guideline = z.infer<typeof guidelineSchema>;
+
+export const guidelinesMetadataSchema = z.object({
+  version: z.string(),
+  /** Contents of `src/guidelines/rules.md` — the agent digest. */
+  rules: z.string(),
+  guidelines: z.array(guidelineSchema),
+});
+
+export type GuidelinesMetadata = z.infer<typeof guidelinesMetadataSchema>;

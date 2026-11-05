@@ -4,9 +4,64 @@ description: Prototype with the real Wallarm components, tokens, fonts and icons
 
 # Claude Design
 
-Choose **Wallarm Design System** when creating a Design canvas in Claude Design. The
-[system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7) contains the components,
-light and dark tokens, Geist fonts, icons and live examples generated from this repository.
+## Set up from a prompt
+
+Paste this prompt into a new Claude Design chat. Claude installs the system for you; nothing
+to download or configure.
+
+```text
+Install Wallarm Design System in Claude Design.
+
+1. Run this command in your sandbox:
+   npx -y @wallarm-org/claude-design@latest export
+2. Read wallarm-design-system/SETUP.md and follow every step in it, in order. It publishes
+   the system, installs it on a canvas and checks it with a sampler artboard.
+3. When the sampler passes its checks, tell me the system is ready and give me its link.
+   Then wait for my design request.
+
+If the command fails or writes no wallarm-design-system/SETUP.md, show me its output and
+stop. Don't build the system by hand.
+```
+
+What you will see:
+
+1. Claude runs the command, which writes `wallarm-design-system/` with the system files and a
+   `SETUP.md` written for that release.
+2. A new **Wallarm Design System** artifact in your account, with the icon and logo galleries.
+   Claude uploads the SVGs in batches of 25 (about 24 calls), then publishes the index. Claude
+   gives you its link, `https://claude.ai/artifact/<id>`. **Save it**: you need it to install the
+   system on other canvases and to update it.
+3. A Design canvas with the system installed and a **Wallarm sampler** board: a Users settings
+   screen with the app shell, a table, status tabs and an open drawer. Claude checks that it
+   renders without `[WallarmDS]` warnings, then waits for your request.
+
+On a canvas, icons come with the components (`WallarmDS.Icons.*`); the galleries are for
+browsing them on the system's page. The package `@wallarm-org/claude-design` is published with every stable release and
+its version matches the design-system version.
+
+### Update to a new release
+
+Paste this into a chat, with your system's link in place of `<link>`:
+
+```text
+Run `npx -y @wallarm-org/claude-design@latest update` and follow wallarm-design-system/UPDATE.md to update my Wallarm Design System: <link>
+```
+
+Replace `<link>` with your system's link. It starts with `https://claude.ai/artifact/` and Claude
+gave it to you when the install finished. Lost it? Open claude.ai, go to your artifacts, open
+**Wallarm Design System** and copy the address from the browser bar. Use your own copy, not
+Wallarm's shared system below: Claude can't update that one and will tell you so.
+
+Claude publishes the new files to the same link, uploads only the new and changed icons, asks you
+before removing the files the release dropped, and reinstalls the system on your canvases.
+
+## Use Wallarm's shared system
+
+Wallarm's own copy is the
+[system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7): choose **Wallarm Design
+System** when creating a Design canvas. It contains the components, light and dark tokens,
+Geist fonts, icons and live examples generated from this repository, and maintainers sync it
+by hand (see [Request a change](#request-a-change)).
 
 Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
 prototype a rules list with a primary Create rule action, environment filter, empty state and
@@ -51,10 +106,16 @@ Set `theme="dark"` on `WallarmDS.Root` to switch the artboard's semantic tokens.
 Root for Dialog, DropdownMenu, Select and other overlay compositions so their portal content
 inherits the theme. Follow each component's guide for its required parts.
 
-For an overlay shown in a static design, use `default-open="{{shown}}"` and return
-`shown: true` from `renderVals()`. Controlled `open` values need callbacks if the prototype
-should also close. Root scopes the theme; ThemeProvider changes the whole page and should
-not be used as the canvas wrapper.
+For an overlay shown in a static design, return `shown: true` from `renderVals()` and pass
+it to the prop the component has: `default-open="{{shown}}"` on DropdownMenu, Select,
+Tooltip, Calendar and FilterDropdown; `open="{{shown}}"` on Dialog, Drawer, Popover and
+SearchModal, which have no `default-open`. Controlled `open` values need an `on-open-change`
+callback if the prototype should also close. Root scopes the theme; ThemeProvider changes
+the whole page and should not be used as the canvas wrapper.
+
+The canvas CSS is precompiled: only the classes in `components/UTILITIES.md` exist, and every
+numeric utility means N px (`p-16` is 16px). The project README has the Tailwind-to-ours
+translation, and Root warns in the console about classes that have no CSS.
 
 The bundle also exposes components available through npm component subpaths, such as the
 Dialog family. Root is a canvas-only helper; the package's npm exports stay unchanged.

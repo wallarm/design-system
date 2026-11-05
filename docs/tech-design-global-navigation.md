@@ -1,6 +1,6 @@
 # Tech Design: Global Navigation
 
-> **Historical design record.** This document captures the original design and is not kept up to date. The current API lives in the `AppShell` and `RemoteShell` source and stories (`packages/design-system/src/components/AppShell/`, `packages/design-system/src/components/RemoteShell/`).
+> **Historical design record.** This document captures the original design and is not kept up to date. The current API lives in the `AppShell` and `RemoteShell` source and stories (`packages/design-system/src/components/AppShell/`, `packages/design-system/src/components/RemoteShell/`). The `NavPanel*` parts below shipped as internals of `RemoteShellPanel`: products configure the panel only through `RemoteShell`'s `NavConfig`.
 
 > **Figma**: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9257-100
 > **Prototype**: https://artem-desing.github.io/global-navigation-prototype/v/v8/
@@ -14,7 +14,7 @@ Global Navigation is the Wallarm Console navigation system, split between MFE Ho
 | Zone | Owner | Description |
 |------|-------|-------------|
 | **Top Header** | Host | Logo, global search, tenant switcher, limits, docs, notifications, AI assistant |
-| **L1 Sidebar** | Host | Product-level navigation. Has two modes: **expanded** (icon + text, ~200px) on the Home page, and **collapsed** (icons only, ~64px) when a product is active |
+| **L1 Sidebar** | Host | Product-level navigation. Has two modes: **expanded** (icon + text, 184px) on the Home page, and **collapsed** (icons only, 48px) when a product is active |
 | **Remote Area** | Remote | Single opaque slot. Remote owns its internal layout: L2+ navigation panel, breadcrumb, and content area. Host has no knowledge of this subdivision |
 
 **Mode with L2 (product page) — L1 collapsed:**
@@ -55,7 +55,7 @@ Global Navigation is the Wallarm Console navigation system, split between MFE Ho
 │ ic  Settings │                                               │
 │ AV  User     │                                               │
 ├──────────────┴───────────────────────────────────────────────┤
-│ Host: L1 (expanded, ~200px)  │  Content (no Remote area)     │
+│ Host: L1 (expanded, 184px)   │  Content (no Remote area)     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -65,12 +65,12 @@ Global Navigation is the Wallarm Console navigation system, split between MFE Ho
 
 ### 2.1. L1 — Product Sidebar (Host)
 
-L1 has **two display modes** that switch automatically:
+L1 has **two display modes** that switch automatically. *(As shipped: `NavRail mode` is set by the host — `expanded`, `collapsed` or a third `compact` mode at 78px — and the automatic switch is the host's own logic.)*
 
 | Mode | Width | Content | When active |
 |------|-------|---------|-------------|
-| **Expanded** | ~200px | Icon + text label | Home page (no product active) |
-| **Collapsed** | ~64px | Icon only | Any product page (Remote area is active) |
+| **Expanded** | 184px | Icon + text label | Home page (no product active) |
+| **Collapsed** | 48px | Icon only | Any product page (Remote area is active) |
 
 **L1 elements (examples):**
 - Home (link to root page)
@@ -93,7 +93,7 @@ Each L1 element has a bound keyboard shortcut in chord-sequence format (e.g., `G
 
 ### 2.2. L2 — Product Menu (Remote)
 
-Panel ~240px wide, rendered by Remote inside the Remote area. Contains:
+Panel 216px wide (164–256px when resizable), rendered by Remote inside the Remote area. Contains:
 - **Heading** (product name)
 - **Flat list** of navigation elements
 
@@ -660,13 +660,13 @@ interface BreadcrumbsScopeSwitcherProps {
 
 | Element | Value |
 |---------|-------|
-| Top Header height | 48px |
-| L1 Sidebar width (expanded) | ~200px |
-| L1 Sidebar width (collapsed) | ~64px |
-| L2+ Panel width | 256px |
+| Top Header height | 36px |
+| L1 Sidebar width (expanded) | 184px |
+| L1 Sidebar width (collapsed) | 48px |
+| L2+ Panel width | 216px (164–256px when resizable) |
 | NavRailItem icon size | 20px |
 | NavRailItem padding | 12px |
-| NavPanelItem height | 36px |
+| NavPanelItem height | 32px |
 | NavPanelItem padding-left | 16px |
 | NavPanelGroupItem indent | 32px (16px + 16px) |
 | Back button height | 32px |
@@ -704,7 +704,7 @@ All colors via design tokens (Tailwind), no hardcoded values:
 
 | Requirement | Implementation |
 |-------------|---------------|
-| Landmarks | `<header>` for TopHeader, `<nav aria-label="Global root navigation">` for L1, `<aside aria-label="{Product} navigation">` for L2+, `<nav aria-label="Breadcrumb">` for breadcrumbs |
+| Landmarks | `<header>` for TopHeader, `<nav aria-label="Global navigation">` for L1, `<aside aria-label="Product navigation">` for L2+, `<nav aria-label="Breadcrumb">` for breadcrumbs |
 | Keyboard nav (L1) | `Tab` / `Shift+Tab` to move between rail items. `Enter` / `Space` to activate |
 | Keyboard nav (L2+) | `Tab` to move between items. `Enter` to activate. `Escape` for back (optional) |
 | Accordion groups | `aria-expanded` on trigger. Content `role="group"`. `aria-controls` links trigger and group |

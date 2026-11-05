@@ -17,6 +17,7 @@ import {
   Shield,
   Trash2,
 } from '../../icons';
+import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
 import { Badge } from '../Badge';
 import {
   BulkBarSummaryClear,
@@ -26,7 +27,7 @@ import {
 } from '../BulkBar';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
-import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
+import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerTitle } from '../Drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -141,12 +142,62 @@ export default meta;
  * put as the body scrolls.
  */
 export const Basic: StoryFn<typeof meta> = () => {
-  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'firstDetected', desc: true }]);
+  interface Endpoint {
+    id: string;
+    path: string;
+    method: string;
+    requests: number;
+    status: 'Active' | 'Deprecated';
+  }
+
+  const endpoints: Endpoint[] = [
+    { id: '1', path: '/api/v1/users', method: 'GET', requests: 12840, status: 'Active' },
+    { id: '2', path: '/api/v1/users/{id}', method: 'PATCH', requests: 3120, status: 'Active' },
+    { id: '3', path: '/api/v1/orders', method: 'POST', requests: 8410, status: 'Active' },
+    { id: '4', path: '/api/v0/login', method: 'POST', requests: 96, status: 'Deprecated' },
+  ];
+
+  const columns: TableColumnDef<Endpoint>[] = [
+    {
+      accessorKey: 'path',
+      header: 'Endpoint',
+      size: 320,
+      cell: ({ row }) => (
+        <HStack gap={8}>
+          <HttpMethod method={row.original.method} />
+          <Text size='sm'>{row.original.path}</Text>
+        </HStack>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      size: 140,
+      cell: ({ row }) => (
+        <Badge
+          variant='dotted'
+          type='secondary'
+          color={row.original.status === 'Active' ? 'green' : 'gray'}
+        >
+          {row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: 'requests',
+      header: 'Requests',
+      size: 120,
+      meta: { description: { type: 'tooltip', content: 'Requests in the last 24 hours' } },
+    },
+  ];
+
+  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'requests', desc: true }]);
 
   return (
     <Table
-      data={securityEvents}
-      columns={securityColumns}
+      aria-label='Endpoints'
+      data={endpoints}
+      columns={columns}
       getRowId={row => row.id}
       sorting={sorting}
       onSortingChange={setSorting}
@@ -587,7 +638,7 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
           <Copy /> Duplicate
         </Button>
         <Button
-          color='brand'
+          color='destructive'
           data-analytics-id='SECURITY_BULK_DELETE'
           data-analytics-props={`{"count":${Object.keys(rowSelection).length}}`}
           onClick={() =>
@@ -634,26 +685,39 @@ export const LoadingWithData: StoryFn<typeof meta> = () => (
  * `TableEmptyState` holding an `EmptyState` of `type='collection-empty'`: nothing exists yet,
  * so the action creates the first thing.
  */
-export const EmptyCollection: StoryFn<typeof meta> = () => (
-  <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
-    <TableEmptyState>
-      <EmptyState type='collection-empty'>
-        <EmptyStateIllustration>
-          <Database />
-        </EmptyStateIllustration>
-        <EmptyStateMessage>
-          <EmptyStateTitle>No events yet</EmptyStateTitle>
-          <EmptyStateDescription>
-            Security events will appear here as soon as Wallarm detects traffic.
-          </EmptyStateDescription>
-        </EmptyStateMessage>
-        <EmptyStateActions>
-          <Button size='medium'>Configure source</Button>
-        </EmptyStateActions>
-      </EmptyState>
-    </TableEmptyState>
-  </Table>
-);
+export const EmptyCollection: StoryFn<typeof meta> = () => {
+  interface Source {
+    id: string;
+    name: string;
+    events: number;
+  }
+
+  const columns: TableColumnDef<Source>[] = [
+    { accessorKey: 'name', header: 'Source', size: 320 },
+    { accessorKey: 'events', header: 'Events', size: 120 },
+  ];
+
+  return (
+    <Table aria-label='Event sources' data={[]} columns={columns} getRowId={row => row.id}>
+      <TableEmptyState>
+        <EmptyState type='collection-empty'>
+          <EmptyStateIllustration>
+            <Database />
+          </EmptyStateIllustration>
+          <EmptyStateMessage>
+            <EmptyStateTitle>No events yet</EmptyStateTitle>
+            <EmptyStateDescription>
+              Security events will appear here as soon as Wallarm detects traffic.
+            </EmptyStateDescription>
+          </EmptyStateMessage>
+          <EmptyStateActions>
+            <Button size='medium'>Configure source</Button>
+          </EmptyStateActions>
+        </EmptyState>
+      </TableEmptyState>
+    </Table>
+  );
+};
 
 /**
  * When data exists but the current filters or search matched nothing, stay at
@@ -842,21 +906,70 @@ export const ColumnHeaderMenu: StoryFn<typeof meta> = () => {
  * carries the verbs that apply to the whole selection.
  */
 export const RowSelection: StoryFn<typeof meta> = () => {
+  interface Rule {
+    id: string;
+    name: string;
+    mode: 'Block' | 'Monitor';
+  }
+
+  const columns: TableColumnDef<Rule>[] = [
+    { accessorKey: 'name', header: 'Rule', size: 320 },
+    {
+      accessorKey: 'mode',
+      header: 'Mode',
+      size: 140,
+      cell: ({ row }) => (
+        <Badge
+          variant='dotted'
+          type='secondary'
+          color={row.original.mode === 'Block' ? 'red' : 'yellow'}
+        >
+          {row.original.mode}
+        </Badge>
+      ),
+    },
+  ];
+
+  const [rules, setRules] = useState<Rule[]>([
+    { id: '1', name: 'Block SQL injection', mode: 'Block' },
+    { id: '2', name: 'Rate limit /login', mode: 'Block' },
+    { id: '3', name: 'Watch admin endpoints', mode: 'Monitor' },
+    { id: '4', name: 'Mask card numbers', mode: 'Monitor' },
+  ]);
   const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  const handleDuplicate = () => {
+    const copies = rules
+      .filter(rule => rowSelection[rule.id])
+      .map(rule => ({
+        ...rule,
+        id: `${rule.id}-copy-${rules.length}`,
+        name: `${rule.name} (copy)`,
+      }));
+    setRules([...rules, ...copies]);
+    setRowSelection({});
+  };
+
+  const handleDelete = () => {
+    // A real app confirms first — see the confirmation-dialogs guideline.
+    setRules(rules.filter(rule => !rowSelection[rule.id]));
+    setRowSelection({});
+  };
 
   return (
     <Table
-      data={securityEvents}
-      columns={securityColumns}
+      aria-label='Rules'
+      data={rules}
+      columns={columns}
       getRowId={row => row.id}
       rowSelection={rowSelection}
       onRowSelectionChange={setRowSelection}
     >
       <TableActionBar>
-        <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
+        <Button variant='ghost' color='neutral-alt' onClick={handleDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={onDelete}>
+        <Button color='destructive' onClick={handleDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
@@ -898,7 +1011,7 @@ export const SelectAllRowsGesture: StoryFn<typeof meta> = () => {
           </BulkBarSummaryCount>
           <BulkBarSummaryClear />
         </TableActionBarSelection>
-        <Button color='brand' onClick={onDelete}>
+        <Button color='destructive' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
@@ -949,7 +1062,7 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
           <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
             <Copy /> Duplicate
           </Button>
-          <Button color='brand' onClick={onDelete}>
+          <Button color='destructive' onClick={onDelete}>
             <Trash2 /> Delete
           </Button>
         </TableActionBar>
@@ -1783,6 +1896,8 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
 export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  // The last opened row stays rendered while the drawer animates closed.
+  const [shownRowId, setShownRowId] = useState<string | null>(null);
 
   const data = useMemo(
     () =>
@@ -1813,9 +1928,14 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
 
   const handleMasterCellClick = useCallback((rowId: string) => {
     setActiveRowId(prev => (prev === rowId ? null : rowId));
+    setShownRowId(rowId);
   }, []);
 
-  const activeRow = useMemo(() => data.find(d => d.id === activeRowId), [data, activeRowId]);
+  const handleOpenChange = (open: boolean) => {
+    if (!open) setActiveRowId(null);
+  };
+
+  const shownRow = data.find(d => d.id === shownRowId);
 
   return (
     <>
@@ -1830,25 +1950,40 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
         activeRowId={activeRowId}
       />
       <Drawer
-        open={!!activeRow}
-        onOpenChange={open => {
-          if (!open) setActiveRowId(null);
-        }}
+        open={activeRowId !== null}
+        onOpenChange={handleOpenChange}
         modal={false}
         overlay={false}
         closeOnOutsideClick={false}
-        width={960}
+        width={640}
       >
         <DrawerContent>
-          {activeRow ? (
-            renderSecurityPreviewHeader({ original: activeRow })
-          ) : (
-            <DrawerHeader>
-              <span />
-            </DrawerHeader>
-          )}
+          <DrawerHeader>
+            <DrawerTitle>{shownRow?.objectName}</DrawerTitle>
+          </DrawerHeader>
           <DrawerBody>
-            {activeRow && renderSecurityPreviewContent({ original: activeRow })}
+            <VStack gap={6}>
+              <Attribute orientation='horizontal'>
+                <AttributeLabel width={140}>Status</AttributeLabel>
+                <AttributeValue>
+                  <Badge
+                    variant='dotted'
+                    type='secondary'
+                    color={shownRow?.status === 'Blocked' ? 'red' : 'yellow'}
+                  >
+                    {shownRow?.status}
+                  </Badge>
+                </AttributeValue>
+              </Attribute>
+              <Attribute orientation='horizontal'>
+                <AttributeLabel width={140}>Requests</AttributeLabel>
+                <AttributeValue>{shownRow?.requests.toLocaleString()}</AttributeValue>
+              </Attribute>
+              <Attribute orientation='horizontal'>
+                <AttributeLabel width={140}>First detected</AttributeLabel>
+                <AttributeValue>{shownRow?.firstDetected}</AttributeValue>
+              </Attribute>
+            </VStack>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -1864,6 +1999,8 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
 export const MasterCellWithActionsAndDrawer: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  // The last opened row stays rendered while the drawer animates closed.
+  const [shownRowId, setShownRowId] = useState<string | null>(null);
 
   const data = useMemo(() => multiplySecurityEvents(), []);
 
@@ -1920,9 +2057,14 @@ export const MasterCellWithActionsAndDrawer: StoryFn<typeof meta> = () => {
 
   const handleMasterCellClick = useCallback((rowId: string) => {
     setActiveRowId(prev => (prev === rowId ? null : rowId));
+    setShownRowId(rowId);
   }, []);
 
-  const activeRow = useMemo(() => data.find(d => d.id === activeRowId), [data, activeRowId]);
+  const handleOpenChange = (open: boolean) => {
+    if (!open) setActiveRowId(null);
+  };
+
+  const shownRow = data.find(d => d.id === shownRowId);
 
   return (
     <>
@@ -1937,25 +2079,17 @@ export const MasterCellWithActionsAndDrawer: StoryFn<typeof meta> = () => {
         activeRowId={activeRowId}
       />
       <Drawer
-        open={!!activeRow}
-        onOpenChange={open => {
-          if (!open) setActiveRowId(null);
-        }}
+        open={activeRowId !== null}
+        onOpenChange={handleOpenChange}
         modal={false}
         overlay={false}
         closeOnOutsideClick={false}
         width={960}
       >
         <DrawerContent>
-          {activeRow ? (
-            renderSecurityPreviewHeader({ original: activeRow })
-          ) : (
-            <DrawerHeader>
-              <span />
-            </DrawerHeader>
-          )}
+          {shownRow && renderSecurityPreviewHeader({ original: shownRow })}
           <DrawerBody>
-            {activeRow && renderSecurityPreviewContent({ original: activeRow })}
+            {shownRow && renderSecurityPreviewContent({ original: shownRow })}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -2020,7 +2154,7 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
         <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={onDelete}>
+        <Button color='destructive' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>

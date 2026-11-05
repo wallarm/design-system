@@ -632,6 +632,16 @@ jobs:
       - name: Verify Claude Design build
         run: pnpm turbo run verify test:export --filter=@wallarm-org/claude-design
 
+      # The real prepack and bin, so a release never finds a broken npm package first
+      - name: Pack and smoke-test the npm package
+        run: |
+          pnpm --filter @wallarm-org/claude-design pack --pack-destination "$RUNNER_TEMP/pack"
+          cd "$RUNNER_TEMP"
+          npx -y --package="$(ls "$RUNNER_TEMP"/pack/*.tgz)" claude-design export --dir out
+          test -f out/SETUP.md && test -f out/project/design-system.json
+          npx -y --package="$(ls "$RUNNER_TEMP"/pack/*.tgz)" claude-design update --dir out
+          test -f out/UPDATE.md
+
   release:
     name: Release
     runs-on: ubuntu-latest

@@ -113,7 +113,7 @@ const regions = createFilterCascadeCollection([
 type Region = (typeof regions.items)[number];
 
 const meta = {
-  title: 'Patterns/FilterCascade',
+  title: 'Inputs/FilterCascade',
   component: FilterCascade,
   parameters: {
     layout: 'padded',

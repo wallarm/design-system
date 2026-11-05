@@ -1,6 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { type DesignSystemMetadata, designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { fileURLToPath } from 'url';
+import {
+  type DesignSystemMetadata,
+  designSystemMetadataSchema,
+  type GuidelinesMetadata,
+  guidelineKindSchema,
+  guidelinesMetadataSchema,
+} from '@wallarm-org/mcp-core';
 
 /**
  * Resolve and load design system metadata.
@@ -9,7 +16,28 @@ import { type DesignSystemMetadata, designSystemMetadataSchema } from '@wallarm-
  * 1. --metadata-path CLI argument (explicit path)
  * 2. import.meta.resolve('@wallarm-org/design-system/metadata')
  * 3. Walk up from cwd looking for node_modules/@wallarm-org/design-system/dist/metadata/components.json
+ * 4. <cwd>/apps/* and <cwd>/packages/* node_modules (monorepos that install DS in one app only)
+ * 5. The snapshot bundled into this package's dist/metadata at build time
  */
+
+const DS_METADATA = path.join(
+  '@wallarm-org',
+  'design-system',
+  'dist',
+  'metadata',
+  'components.json',
+);
+
+export interface MetadataSource {
+  kind: 'installed' | 'bundled';
+  path: string;
+}
+
+/** One line naming where the metadata came from, for instructions and response footers. */
+export const describeSource = (source: MetadataSource, version: string): string =>
+  source.kind === 'installed'
+    ? `Source: installed @wallarm-org/design-system v${version}`
+    : `Source: bundled snapshot v${version} — may differ from your installed version (install @wallarm-org/design-system or pass --metadata-path)`;
 
 function parseMetadataPathArg(args: string[]): string | undefined {
   const idx = args.indexOf('--metadata-path');
@@ -24,15 +52,7 @@ function findMetadataInNodeModules(startDir: string): string | undefined {
   const root = path.parse(dir).root;
 
   while (dir !== root) {
-    const candidate = path.join(
-      dir,
-      'node_modules',
-      '@wallarm-org',
-      'design-system',
-      'dist',
-      'metadata',
-      'components.json',
-    );
+    const candidate = path.join(dir, 'node_modules', DS_METADATA);
     if (fs.existsSync(candidate)) {
       return candidate;
     }
@@ -41,6 +61,22 @@ function findMetadataInNodeModules(startDir: string): string | undefined {
 
   return undefined;
 }
+
+function findMetadataInWorkspaces(cwd: string): string | undefined {
+  for (const group of ['apps', 'packages']) {
+    const groupDir = path.join(cwd, group);
+    if (!fs.existsSync(groupDir)) continue;
+    for (const entry of fs.readdirSync(groupDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const candidate = path.join(groupDir, entry.name, 'node_modules', DS_METADATA);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  }
+  return undefined;
+}
+
+const defaultBundledPath = () =>
+  path.join(path.dirname(fileURLToPath(import.meta.url)), 'metadata', 'components.json');
 
 async function resolveViaImportMeta(): Promise<string | undefined> {
   try {
@@ -55,8 +91,16 @@ async function resolveViaImportMeta(): Promise<string | undefined> {
   return undefined;
 }
 
-export async function loadMetadata(args: string[] = process.argv): Promise<DesignSystemMetadata> {
+export async function loadMetadata(
+  args: string[] = process.argv,
+  {
+    cwd = process.cwd(),
+    bundledPath = defaultBundledPath(),
+    resolveInstalled = resolveViaImportMeta,
+  } = {},
+): Promise<{ metadata: DesignSystemMetadata; metadataPath: string; source: MetadataSource }> {
   let metadataPath: string | undefined;
+  let kind: MetadataSource['kind'] = 'installed';
 
   // 1. Check CLI arg
   metadataPath = parseMetadataPathArg(args);
@@ -66,12 +110,18 @@ export async function loadMetadata(args: string[] = process.argv): Promise<Desig
 
   // 2. Try import.meta.resolve
   if (!metadataPath) {
-    metadataPath = await resolveViaImportMeta();
+    metadataPath = await resolveInstalled();
   }
 
-  // 3. Walk up from cwd
+  // 3. Walk up from cwd, 4. apps/* and packages/*
   if (!metadataPath) {
-    metadataPath = findMetadataInNodeModules(process.cwd());
+    metadataPath = findMetadataInNodeModules(cwd) ?? findMetadataInWorkspaces(cwd);
+  }
+
+  // 5. Bundled snapshot
+  if (!metadataPath && fs.existsSync(bundledPath)) {
+    metadataPath = bundledPath;
+    kind = 'bundled';
   }
 
   if (!metadataPath) {
@@ -96,5 +146,41 @@ export async function loadMetadata(args: string[] = process.argv): Promise<Desig
     );
   }
 
-  return result.data;
+  return { metadata: result.data, metadataPath, source: { kind, path: metadataPath } };
 }
+
+/**
+ * Load `guidelines.json` from the directory of the resolved `components.json`.
+ * Best-effort: design-system versions before guidelines shipped lack the file, and a malformed
+ * or incompatible file must not take the component and token tools down — it is reported to
+ * stderr and treated as absent. Guidelines of a kind this server does not know (added by a newer
+ * design system) are dropped instead of failing the whole file.
+ */
+export function loadGuidelines(
+  metadataPath: string,
+  warn: (message: string) => void = message => console.error('[wallarm-ds-mcp]', message),
+): GuidelinesMetadata | undefined {
+  const guidelinesPath = path.join(path.dirname(metadataPath), 'guidelines.json');
+  if (!fs.existsSync(guidelinesPath)) return undefined;
+
+  try {
+    const raw = JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8'));
+    if (raw && Array.isArray(raw.guidelines)) {
+      raw.guidelines = raw.guidelines.filter(
+        (g: { kind?: unknown }) => guidelineKindSchema.safeParse(g?.kind).success,
+      );
+    }
+    const result = guidelinesMetadataSchema.safeParse(raw);
+    if (!result.success) throw new Error(result.error.message);
+    return result.data;
+  } catch (err) {
+    warn(
+      `Ignoring ${guidelinesPath} (guidelines unavailable): ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return undefined;
+  }
+}
+
+/** `guidelines.json` bundled into this package's dist at build time (fallback for older design systems). */
+export const loadBundledGuidelines = (bundledPath = defaultBundledPath()) =>
+  loadGuidelines(bundledPath);

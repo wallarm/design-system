@@ -6,7 +6,7 @@ import { SearchInput } from './SearchInput';
 
 const DESCRIPTION =
   'A search field with a magnifying-glass icon and a clear button that appears once there is a value. ' +
-  'Controlled only — pass `value` and `onChange`, and optionally `onClear` to react to the clear button specifically.';
+  'Controlled with `value` + `onChange`, or uncontrolled with `defaultValue`; pass `onClear` to react to the clear button specifically.';
 
 const meta = {
   title: 'Inputs/SearchInput',

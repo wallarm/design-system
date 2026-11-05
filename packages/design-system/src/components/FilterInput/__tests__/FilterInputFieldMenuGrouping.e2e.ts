@@ -1,11 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const fieldMenuStory = createStoryHelper('patterns-filterinput-filterinputfieldmenu', [
+const fieldMenuStory = createStoryHelper('inputs-filterinput-filterinputfieldmenu', [
   'With Groups',
 ] as const);
 
-const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
+const filterInputStory = createStoryHelper('inputs-filterinput-filterinput', [
   'With Field Groups',
 ] as const);
 

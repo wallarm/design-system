@@ -27,79 +27,99 @@ export const parseExamples = (
   const dir = path.resolve(componentDir);
   const componentsRoot = path.dirname(dir);
   const srcDir = path.dirname(componentsRoot);
-  const examples: ExampleMetadata[] = [];
 
-  for (const storiesPath of findStoryFiles(project, dir)) {
+  return findStoryFiles(project, dir).flatMap(storiesPath => {
     const sourceFile =
       project.getSourceFile(storiesPath) ?? storiesProject.addSourceFileAtPathIfExists(storiesPath);
-    if (!sourceFile) continue;
-
-    const descriptions = collectDescriptions(sourceFile);
-    const assignedTags = collectAssignedTags(sourceFile);
+    if (!sourceFile) return [];
     const storyFile = path.relative(componentsRoot, storiesPath).split(path.sep).join('/');
-    const storyTitle = readStoryTitle(sourceFile);
+    return parseStoryFile(sourceFile, { componentName, storyFile, srcDir });
+  });
+};
 
-    for (const varStatement of sourceFile.getVariableStatements()) {
-      if (!varStatement.hasExportKeyword()) continue;
+/**
+ * Every named story export of one stories file, as paste-ready examples. Shared by component
+ * examples and pattern guideline stories, so both get the same extraction.
+ */
+export const parseStoryFile = (
+  sourceFile: SourceFile,
+  {
+    componentName,
+    storyFile,
+    srcDir,
+  }: {
+    /** Tag used when a StoryObj has to be rebuilt from its args. */
+    componentName: string;
+    /** `storyFile` of each example, e.g. `Button/Button.stories.tsx`. */
+    storyFile: string;
+    /** The package `src/`, to map relative imports to public ones. */
+    srcDir: string;
+  },
+): ExampleMetadata[] => {
+  const examples: ExampleMetadata[] = [];
+  const descriptions = collectDescriptions(sourceFile);
+  const assignedTags = collectAssignedTags(sourceFile);
+  const storyTitle = readStoryTitle(sourceFile);
 
-      for (const decl of varStatement.getDeclarations()) {
-        const name = decl.getName();
-        // Skip default meta export (handled as `export default meta` usually, but just in case)
-        if (name === 'meta' || name === 'default') continue;
+  for (const varStatement of sourceFile.getVariableStatements()) {
+    if (!varStatement.hasExportKeyword()) continue;
 
-        const initializer = decl.getInitializer();
-        if (!initializer) continue;
+    for (const decl of varStatement.getDeclarations()) {
+      const name = decl.getName();
+      // Skip default meta export (handled as `export default meta` usually, but just in case)
+      if (name === 'meta' || name === 'default') continue;
 
-        const kind = initializer.getKind();
-        let code: string;
+      const initializer = decl.getInitializer();
+      if (!initializer) continue;
 
-        if (kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.FunctionExpression) {
-          // StoryFn pattern — extract the function source
-          code = initializer.getText();
-        } else if (kind === SyntaxKind.ObjectLiteralExpression) {
-          // StoryObj pattern — keep the render body; reconstruct JSX from args otherwise
-          const render = initializer
-            .getProperty('render')
-            ?.asKind(SyntaxKind.PropertyAssignment)
-            ?.getInitializer();
-          code =
-            render?.isKind(SyntaxKind.ArrowFunction) ||
-            render?.isKind(SyntaxKind.FunctionExpression)
-              ? render.getText()
-              : reconstructJsxFromStoryObj(initializer.getText(), componentName);
-        } else {
-          // `Template.bind({})` — the bound template's function source, as for StoryFn
-          const template = boundTemplate(sourceFile, initializer);
-          if (!template) continue;
-          code = template.getText();
-        }
+      const kind = initializer.getKind();
+      let code: string;
 
-        const example: ExampleMetadata = {
-          name,
-          code: toCopyableCode(sourceFile, name, code, srcDir),
-          storyFile,
-        };
-        if (storyTitle) example.storyTitle = storyTitle;
-
-        const tags =
-          assignedTags.get(name) ??
-          (initializer.isKind(SyntaxKind.ObjectLiteralExpression)
-            ? readStringArray(
-                initializer
-                  .getProperty('tags')
-                  ?.asKind(SyntaxKind.PropertyAssignment)
-                  ?.getInitializer(),
-              )
-            : undefined);
-        if (tags) example.tags = tags;
-
-        const description = descriptions.get(name);
-        if (description) {
-          example.description = description;
-        }
-
-        examples.push(example);
+      if (kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.FunctionExpression) {
+        // StoryFn pattern — extract the function source
+        code = initializer.getText();
+      } else if (kind === SyntaxKind.ObjectLiteralExpression) {
+        // StoryObj pattern — keep the render body; reconstruct JSX from args otherwise
+        const render = initializer
+          .getProperty('render')
+          ?.asKind(SyntaxKind.PropertyAssignment)
+          ?.getInitializer();
+        code =
+          render?.isKind(SyntaxKind.ArrowFunction) || render?.isKind(SyntaxKind.FunctionExpression)
+            ? render.getText()
+            : reconstructJsxFromStoryObj(initializer.getText(), componentName);
+      } else {
+        // `Template.bind({})` — the bound template's function source, as for StoryFn
+        const template = boundTemplate(sourceFile, initializer);
+        if (!template) continue;
+        code = template.getText();
       }
+
+      const example: ExampleMetadata = {
+        name,
+        code: toCopyableCode(sourceFile, name, code, srcDir),
+        storyFile,
+      };
+      if (storyTitle) example.storyTitle = storyTitle;
+
+      const tags =
+        assignedTags.get(name) ??
+        (initializer.isKind(SyntaxKind.ObjectLiteralExpression)
+          ? readStringArray(
+              initializer
+                .getProperty('tags')
+                ?.asKind(SyntaxKind.PropertyAssignment)
+                ?.getInitializer(),
+            )
+          : undefined);
+      if (tags) example.tags = tags;
+
+      const description = descriptions.get(name);
+      if (description) {
+        example.description = description;
+      }
+
+      examples.push(example);
     }
   }
 
@@ -244,3 +264,27 @@ const reconstructJsxFromStoryObj = (objText: string, componentName: string): str
   if (props.length === 0) return `<${componentName} />`;
   return `<${componentName} ${props.join(' ')} />`;
 };
+
+/** Stories of a pattern guideline (`src/guidelines/patterns/<slug>.stories.tsx`), in file order. */
+export const parsePatternStories = (storiesPath: string, srcDir: string): ExampleMetadata[] => {
+  const sourceFile = storiesProject.addSourceFileAtPathIfExists(storiesPath);
+  if (!sourceFile) return [];
+  const storyFile = path.relative(srcDir, storiesPath).split(path.sep).join('/');
+  return parseStoryFile(sourceFile, { componentName: 'Story', storyFile, srcDir });
+};
+
+/** Import declarations of a pattern stories file: specifier plus imported names (`default`, `*`). */
+export const patternStoryImports = (storiesPath: string): { spec: string; names: string[] }[] =>
+  (
+    storiesProject.getSourceFile(storiesPath) ??
+    storiesProject.addSourceFileAtPathIfExists(storiesPath)
+  )
+    ?.getImportDeclarations()
+    .map(decl => ({
+      spec: decl.getModuleSpecifierValue(),
+      names: [
+        ...decl.getNamedImports().map(n => n.getName()),
+        ...(decl.getDefaultImport() ? ['default'] : []),
+        ...(decl.getNamespaceImport() ? ['*'] : []),
+      ],
+    })) ?? [];

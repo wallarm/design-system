@@ -54,6 +54,7 @@ const onConfirm = fn().mockName('onConfirm');
 const DESCRIPTION = [
   'Turns a set of anything — cards, rows, list items — into a selectable collection: a checkbox on each one, shift-click for a range, and a bulk-action bar that arrives once something is ticked.',
   "The selection is controlled and ordered by `items`, so what comes back follows the list rather than the order of clicks, and ids no longer present in `items` are kept rather than dropped — a selection can outlive a page change, and clearing it is the caller's decision.",
+  'Not for Table rows — a `Table` has its own checkbox column: pass `rowSelection` + `onRowSelectionChange` and put bulk actions in `TableActionBar`.',
 ].join(' ');
 
 const meta = {

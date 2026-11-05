@@ -32,6 +32,11 @@
     --text-sm: 14px;
     --text-sm--line-height: 20px;
 
+    /* Text size="md" and CardContent's step. Same metrics as sm: both render inside
+       Card's text-sm today, so the alias keeps them unchanged where they are used. */
+    --text-md: 14px;
+    --text-md--line-height: 20px;
+
     --text-base: 16px;
     --text-base--line-height: 24px;
 

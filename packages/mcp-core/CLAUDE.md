@@ -15,13 +15,18 @@ src/
 | Type | Description |
 |---|---|
 | `DesignSystemMetadata` | Root: version, generatedAt, components[], tokens[] |
-| `ComponentMetadata` | Component: name, description, importPath, props, variants, subComponents, examples |
+| `ComponentMetadata` | Component: name, description, importPath, props, variants, subComponents, examples, docs? |
+| `ComponentDoc` | Usage doc from the component folder (`docs/*.md`, `*_DESIGN.md`): name, markdown |
 | `PropMetadata` | Prop: name, type, required, description?, defaultValue? |
 | `VariantMetadata` | CVA variant: name, options[], defaultValue? |
 | `SubComponentMetadata` | Sub-component: name, description?, props[] |
 | `ExampleMetadata` | Usage example: name, code, description? |
 | `TokenCategory` | Token group: name, description?, tokens[] |
 | `TokenMetadata` | Single token: name, value |
+| `GuidelinesMetadata` | Root of `guidelines.json`: version, rules (rules.md digest), guidelines[] |
+| `Guideline` | Foundation/pattern: slug, kind, title, description, components[], keywords[], order, markdown, sections[], stories? |
+| `GuidelineSection` | H2 section: id (kebab-case), heading, markdown |
+| `GuidelineStory` | Pattern story (`patterns/<slug>.stories.tsx`): name, code, description? |
 
 ## Design Decisions
 

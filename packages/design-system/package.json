@@ -43,6 +43,11 @@
       "require": "./dist/metadata/components.json",
       "default": "./dist/metadata/components.json"
     },
+    "./guidelines": {
+      "import": "./dist/metadata/guidelines.json",
+      "require": "./dist/metadata/guidelines.json",
+      "default": "./dist/metadata/guidelines.json"
+    },
     "./utils/*": {
       "development": "./src/utils/*.ts",
       "types": "./dist/utils/*.d.ts",

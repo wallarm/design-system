@@ -56,7 +56,7 @@ export const drawerPositionerVariants = cva(
   cn(
     'flex w-full',
     'origin-[right center]',
-    'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
+    'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
   ),
   {
     variants: {

@@ -448,7 +448,7 @@ Not findings — decisions worth remembering so they are not rediscovered.
   `packages/design-system/src/components/FilterInput/stories/`, against the
   "self-contained UI / exported only for rare custom builds" rule in the
   component's usage guide.
-- **Why it matters** — A reader browsing `Patterns/` cannot tell which of the
+- **Why it matters** — A reader browsing `Inputs/FilterInput/` cannot tell which of the
   five pages they are meant to use, and the sub-pages carry the most
   implementation-flavoured stories in the library.
 - **Suggested action** — Decide whether the three internal pages belong in the

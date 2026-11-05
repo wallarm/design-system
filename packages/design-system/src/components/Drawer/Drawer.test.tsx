@@ -4,6 +4,8 @@ import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@test
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
 import { Dialog, DialogBody, DialogContent } from '../Dialog';
+import { Overlay } from '../Overlay';
+import { drawerPositionerVariants } from './classes';
 import { Drawer } from './Drawer';
 import { DrawerBody } from './DrawerBody';
 import { DrawerClose } from './DrawerClose';
@@ -719,5 +721,15 @@ describe('Non-modal focus return', () => {
 
     expect(screen.getByText('Body')).toBeTruthy();
     expect(document.activeElement).toBe(screen.getByRole('button', { name: /close/i }));
+  });
+});
+
+describe('Stacking without a zag layer', () => {
+  // zag sets --layer-index only on registered layers; without the ,0 fallback the whole
+  // calc() is invalid and z-index falls back to auto, so the drawer renders under tables.
+  it('keeps the positioner and overlay z-index valid when --layer-index is unset', () => {
+    expect(drawerPositionerVariants()).toContain('var(--layer-index,0)');
+    render(<Overlay data-testid='overlay' />);
+    expect(screen.getByTestId('overlay').className).toContain('var(--layer-index,0)');
   });
 });

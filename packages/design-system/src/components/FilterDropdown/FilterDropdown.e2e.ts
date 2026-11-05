@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const filterDropdownStory = createStoryHelper('patterns-filterdropdown', [
+const filterDropdownStory = createStoryHelper('inputs-filterdropdown', [
   'Default',
   'Multi',
   'Label Forms',

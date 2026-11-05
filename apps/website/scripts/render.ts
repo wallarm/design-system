@@ -1,9 +1,11 @@
 import type {
   ComponentMetadata,
   ExampleMetadata,
+  Guideline,
   PropMetadata,
   TokenCategory,
 } from '@wallarm-org/mcp-core';
+import path from 'node:path';
 
 const CATEGORY_ORDER = [
   'Actions',
@@ -18,7 +20,6 @@ const CATEGORY_ORDER = [
   'Loading',
   'Typography',
   'Primitives',
-  'Patterns',
   'Pages',
   'AI',
   'Brand',
@@ -233,3 +234,94 @@ export function renderTokensPage(tokens: TokenCategory[]): string {
 
 export const renderChangelogPage = (changelogMd: string): string =>
   `---\ntitle: "Changelog"\ndescription: "Release notes for every @wallarm-org/design-system version."\n---\n\n# Changelog\n\n${changelogMd}`;
+
+/** Maps a component name to its docs page; sub-components (`AvatarName`, `Toaster`) go to their owner's page. */
+export function componentPageResolver(
+  components: ComponentMetadata[],
+): (name: string) => string | undefined {
+  const pages = new Set(components.filter(c => c.examples.length).map(c => c.name));
+  const owners = new Map(components.flatMap(c => c.subComponents.map(s => [s.name, c.name])));
+  const byLength = [...pages].sort((a, b) => b.length - a.length);
+  return name => {
+    const owner = pages.has(name)
+      ? name
+      : (owners.get(name) ?? byLength.find(p => name.startsWith(p)));
+    return owner && pages.has(owner) ? `/components/${kebab(owner)}` : undefined;
+  };
+}
+
+const componentLinks = (names: string[], link: (name: string) => string | undefined): string =>
+  names
+    .map(n => {
+      const href = link(n);
+      return href ? `[\`${n}\`](${href})` : `\`${n}\``;
+    })
+    .join(', ');
+
+/** `../foundations/spacing.md#rules` in guideline `patterns/x` → `/foundations/spacing#rules`. */
+export const rewriteGuidelineLinks = (markdown: string, slug: string): string =>
+  markdown.replace(
+    /\]\((?![a-z]+:|\/|#)([^)\s#]+)\.md(#[^)\s]*)?\)/g,
+    (_, target: string, hash = '') =>
+      `](${path.posix.join('/', path.posix.dirname(slug), target)}${hash})`,
+  );
+
+/** escapeMdx for prose lines only; fenced code renders as code and is left as written. */
+export const escapeMarkdown = (markdown: string): string => {
+  let fence = '';
+  return markdown
+    .split('\n')
+    .map(line => {
+      const [, run = '', info = ''] = line.match(/^\s*(`{3,}|~{3,})\s*(\S*)/) ?? [];
+      if (!fence) {
+        fence = run;
+        return fence ? line : escapeMdx(line);
+      }
+      // Closes on the same character, at least as long, with no info string.
+      if (run[0] === fence[0] && run.length >= fence.length && !info) fence = '';
+      return line;
+    })
+    .join('\n');
+};
+
+const byOrder = (guidelines: Guideline[]): Guideline[] =>
+  [...guidelines].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+
+const pageName = (g: Guideline): string => g.slug.split('/').at(-1) ?? g.slug;
+
+/** A story the guideline embeds: `tsx story=<Name>` fences (resolved ```story refs). */
+const STORY_FENCE = /^(`{3,})tsx story=(\S+)\n([\s\S]*?)\n\1$/gm;
+
+/** Each embedded story fence becomes a full-bleed live preview with its code. */
+export const embedStories = (markdown: string, storyFile: string, base: string): string =>
+  markdown.replace(
+    STORY_FENCE,
+    (_, _ticks: string, name: string, code: string) =>
+      `<StoryPreview load={${loader(base, storyFile)}} name='${name}' fullscreen>\n\n${fence(code)}\n\n</StoryPreview>`,
+  );
+
+export function renderGuidelinePage(
+  g: Guideline,
+  link: (name: string) => string | undefined,
+  opts: { storyImportBase?: string } = {},
+): string {
+  const base = opts.storyImportBase;
+  const escaped = escapeMarkdown(rewriteGuidelineLinks(g.markdown.trim(), g.slug));
+  const body = base ? embedStories(escaped, `${pageName(g)}.stories.tsx`, base) : escaped;
+  const components = g.components.length
+    ? `**Components:** ${componentLinks(g.components, link)}`
+    : '';
+  // The components line goes right under the H1, which the body always starts with.
+  const [h1, ...rest] = body.split('\n');
+  const content = h1?.startsWith('# ')
+    ? [h1, components, rest.join('\n').trim()]
+    : [`# ${escapeMdx(g.title)}`, components, body];
+  return `---\ntitle: ${JSON.stringify(g.title)}\ndescription: ${JSON.stringify(g.description)}\n---\n\n${content.filter(Boolean).join('\n\n')}\n`;
+}
+
+/** Sidebar order: guideline pages by `order`, around the fixed pages of the section. */
+export const renderGuidelinesMeta = (
+  guidelines: Guideline[],
+  opts: { before?: string[]; after?: string[] } = {},
+): string =>
+  `${JSON.stringify([...(opts.before ?? []), ...byOrder(guidelines).map(pageName), ...(opts.after ?? [])])}\n`;

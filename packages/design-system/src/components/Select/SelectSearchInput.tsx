@@ -5,7 +5,7 @@ import { SearchInput } from '../SearchInput';
 export interface SelectSearchInputProps
   extends Omit<
       InputHTMLAttributes<HTMLInputElement>,
-      'children' | 'onChange' | 'color' | 'size' | 'type' | 'value'
+      'children' | 'onChange' | 'color' | 'size' | 'type' | 'value' | 'defaultValue'
     >,
     TestableProps {
   value: string;

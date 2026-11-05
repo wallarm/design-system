@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -48,6 +48,37 @@ expect(
   Array.isArray(manifest.components) && manifest.components.length > 0,
   'components.json has no components',
 );
+
+// Guideline pages: listed in llms.txt, keep their tsx code, and every site link resolves.
+const llms = read('llms.txt');
+const guidelineMd = ['foundations', 'patterns'].flatMap(dir =>
+  readdirSync(resolve(out, dir))
+    .filter(f => f.endsWith('.md') && f !== 'tokens.md' && f !== 'icons.md')
+    .map(f => `${dir}/${f}`),
+);
+expect(guidelineMd.length > 0, 'no guideline pages were built');
+const sitePath = new URL(llms.match(/https?:\/\/\S+?\/design-system\//)?.[0] ?? 'x:/').pathname;
+for (const file of guidelineMd) {
+  expect(llms.includes(`/${file})`), `llms.txt does not list ${file}`);
+  const md = read(file);
+  if (file.startsWith('patterns/')) {
+    expect(md.includes('```tsx'), `${file} has no tsx code fence`);
+    // The built .md flattens previews to code, so count them in the generated page source.
+    const mdx = readFileSync(resolve(root, 'docs', file.replace(/\.md$/, '.mdx')), 'utf8');
+    const embedded = mdx.match(/<StoryPreview /g)?.length ?? 0;
+    expect(
+      embedded >= 2,
+      `${file} embeds ${embedded} stories (min 2): reference stories with \`\`\`story blocks in packages/design-system/src/guidelines/${file}`,
+    );
+  }
+  for (const [, href] of md.matchAll(/\]\((https?:\/\/[^)\s#]+)/g)) {
+    const { pathname } = new URL(href ?? '');
+    // Storybook is deployed next to the site, not inside it.
+    if (!pathname.startsWith(sitePath) || pathname.startsWith(`${sitePath}storybook/`)) continue;
+    const target = pathname.slice(sitePath.length);
+    expect(!target || existsSync(resolve(out, target)), `${file} links to missing ${target}`);
+  }
+}
 
 expect(read('index.html').includes('dataset.theme'), 'index.html lacks the theme script');
 read('404.html');

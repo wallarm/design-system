@@ -1,3 +1,8 @@
+/** Overlay roots with a \`defaultOpen\` prop; build-docs.test.ts checks both lists against metadata. */
+export const DEFAULT_OPEN = ['DropdownMenu', 'Select', 'Tooltip', 'Calendar', 'FilterDropdown'];
+/** Overlay roots that open only through a controlled \`open\` prop. */
+export const CONTROLLED_OPEN = ['Dialog', 'Drawer', 'Popover', 'SearchModal'];
+
 export const consuming = `## Consuming this system
 
 The namespace is **WallarmDS**. Read a component's guide before using its props and composition. Names are flat: \`WallarmDS.DialogContent\`, not \`WallarmDS.Dialog.Content\`.
@@ -16,7 +21,12 @@ On a Design canvas, choose **Wallarm Design System** and mount a component with 
 
 Wrap each artboard with \`WallarmDS.Root\`. It scopes semantic tokens and portal content without changing the page's \`html\` theme or localStorage. Set \`theme="dark"\` on it for a dark artboard (\`theme="light"\` is the default).
 
-Keep Dialog, DropdownMenu, Popover and other overlay parts inside that Root. To show an overlay in a static composition, supply \`default-open="{{shown}}"\` with \`shown: true\`; use the component's full composition from its guide. A controlled \`open\` value also needs an update callback when the prototype should close. Do not substitute ThemeProvider: it changes the page-level theme.
+Keep Dialog, DropdownMenu, Popover and other overlay parts inside that Root. To show an overlay in a static composition, use the component's full composition from its guide and open it by the prop it has:
+
+- ${DEFAULT_OPEN.join(', ')}: \`default-open="{{shown}}"\` with \`shown: true\`.
+- ${CONTROLLED_OPEN.join(', ')}: no \`default-open\`; pass \`open="{{shown}}"\` with \`shown: true\`, plus \`on-open-change\` from \`DCLogic\` state when the prototype should close.
+
+Do not substitute ThemeProvider: it changes the page-level theme.
 
 ### Icons
 

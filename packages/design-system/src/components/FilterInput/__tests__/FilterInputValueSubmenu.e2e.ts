@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const story = createStoryHelper('patterns-filterinput-filterinput', [
+const story = createStoryHelper('inputs-filterinput-filterinput', [
   'Nested Value Submenu',
 ] as const);
 

@@ -54,7 +54,7 @@ const SAMPLE_TEXT = 'Hello, clipboard!';
 const SAMPLE_CODE = 'npx wasd-new@latest add code-snippet';
 
 const meta = {
-  title: 'Patterns/Click to Copy',
+  title: 'Data Display/Click to Copy',
   component: Copyable,
   subcomponents: { CopyableIcon, CopyableLabel },
   parameters: {

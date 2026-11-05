@@ -1,3 +1,9 @@
+const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', '2xl'];
+const CONTAINERS = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl'];
+const FRACTIONS = ['1/2', '1/3', '2/3', '1/4', '3/4'];
+const PADDING = ['p', 'px', 'py', 'pt', 'pr', 'pb', 'pl'];
+const LAYOUT = ['hidden', 'block', 'flex', 'grid', 'flex-row', 'flex-col', 'flex-wrap'];
+
 /** Utilities used by canvas-authored markup, in addition to scanned components. */
 export function canvasSafelist(tokenNames: Set<string>): string[] {
   const classes = new Set([
@@ -96,6 +102,47 @@ export function canvasSafelist(tokenNames: Set<string>): string[] {
     classes.add(`grid-cols-${index}`);
     classes.add(`col-span-${index}`);
     classes.add(`row-span-${index}`);
+  }
+  for (const fraction of FRACTIONS) classes.add(`w-${fraction}`);
+  for (const size of CONTAINERS) classes.add(`max-w-${size}`);
+  for (const size of BREAKPOINTS) classes.add(`max-w-screen-${size}`);
+  classes.add('divide-x');
+  classes.add('divide-y');
+  const spacing: string[] = ['0'];
+  const borders: string[] = [];
+  const surfaces: string[] = [];
+  for (const property of tokenNames) {
+    const name = property.replace(/^--/, '');
+    if (name.startsWith('spacing-')) spacing.push(name.slice(8));
+    if (name.startsWith('color-border-')) borders.push(name.slice(6));
+    if (/^color-bg-(surface-|page-bg$|light-)/.test(name)) surfaces.push(name.slice(6));
+  }
+  // The author layout kit: what page structure needs, on our scale only.
+  for (const size of spacing) {
+    classes.add(`space-x-${size}`);
+    classes.add(`space-y-${size}`);
+  }
+  for (const color of borders) classes.add(`divide-${color}`);
+  const responsive = [
+    ...LAYOUT,
+    ...Array.from({ length: 12 }, (_, index) => [
+      `grid-cols-${index + 1}`,
+      `col-span-${index + 1}`,
+    ]).flat(),
+    ...spacing.flatMap(size =>
+      [...PADDING, 'gap', 'gap-x', 'gap-y'].map(prefix => `${prefix}-${size}`),
+    ),
+  ];
+  for (const breakpoint of BREAKPOINTS.slice(0, 4))
+    for (const name of responsive) classes.add(`${breakpoint}:${name}`);
+  const edges = ['border-0', 'border-t-0', 'border-r-0', 'border-b-0', 'border-l-0'];
+  for (const variant of ['hover', 'first', 'last']) {
+    for (const color of surfaces) classes.add(`${variant}:bg-${color}`);
+    for (const color of borders) classes.add(`${variant}:border-${color}`);
+    if (variant === 'hover') continue;
+    for (const edge of edges) classes.add(`${variant}:${edge}`);
+    for (const size of spacing)
+      for (const prefix of ['pt', 'pr', 'pb', 'pl']) classes.add(`${variant}:${prefix}-${size}`);
   }
   for (const property of tokenNames) {
     const name = property.replace(/^--/, '');

@@ -15,7 +15,6 @@ No `*.stories.tsx` exists in the component folder for any of these.
 | Component | Kind | What Storybook should show |
 |---|---|---|
 | `src/components/BulkBar` | public | A selection bar with `BulkBarSummary*` parts (count, clear, select-all, separator). |
-| `src/components/NavPanel` | public | The panel with header, groups, items, back, skeleton and resize handle. Only mentioned in AppShell prose (`AppShell.stories.tsx:69`). |
 | `src/components/NavRail` | public | Rail with body, items, separator, footer, skeleton. Appears only inside AppShell stories (`AppShell.stories.tsx:21`). |
 | `src/components/TopHeader` | public | Header with logo, actions, separator. Appears only inside AppShell stories (`AppShell.stories.tsx:160`). |
 | `src/components/ThemeProvider` | public provider | `ThemeProvider` / `useTheme` (theme, frame style). `useTheme` is used only in `AppShell.stories.tsx:33`. Listed in the README as "provider; use WallarmDS.Root on the canvas". |
@@ -24,6 +23,7 @@ No `*.stories.tsx` exists in the component folder for any of these.
 | `src/components/Checkmark` | internal | Internal primitive (`Checkmark.tsx`); shown through Checkbox. |
 | `src/components/Polymorphic` | internal | Internal primitive (`Polymorphic.tsx`). |
 | `src/components/TemporalCore` | internal | Internal segments for DateInput / TimeInput. |
+| `src/components/NavPanel` | internal | Rendered by `RemoteShellPanel`; consumers configure it only through `RemoteShell`'s `NavConfig`, shown in the RemoteShell stories and Patterns/Application layout. |
 
 ## Table props and features with no story
 

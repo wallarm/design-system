@@ -119,8 +119,10 @@ The command writes the component files, `src/icons/index.ts`, the gallery catego
 
 Choose **Wallarm Design System** in Claude Design to prototype with the generated component
 bundle, tokens, fonts and icons. See the [designer guide](https://wallarm.github.io/design-system/ai/claude-design).
-The export is built by the private [`@wallarm-org/claude-design`](../claude-design/README.md)
-package; its README lists the build, test and verify commands. The repository's
+The export is built by [`@wallarm-org/claude-design`](../claude-design/README.md), which
+`deploy-site.yml` publishes to npm at each stable release so anyone can install the system from one
+prompt (`npx -y @wallarm-org/claude-design@latest export`); its README lists the build, test and
+verify commands. The repository's
 `/claude-design-sync` skill previews and manually publishes release changes; the first sync and
 remote deletions require confirmation. The npm package remains React 19; the separate canvas
 bundle uses React 18.

@@ -37,7 +37,11 @@
   },
   "overrides": [
     {
-      "includes": ["packages/claude-design/src/css/entry.css"],
+      "includes": [
+        "packages/claude-design/src/css/entry.css",
+        "packages/design-system/.storybook/preview.css",
+        "apps/website/styles/global.css"
+      ],
       "css": {
         "parser": {
           "tailwindDirectives": true

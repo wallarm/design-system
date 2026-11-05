@@ -16,7 +16,7 @@ export const Overlay: FC<OverlayProps> = props => (
       'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
       'transition-opacity duration-200',
       'backdrop-blur-xs bg-component-dialog-overlay',
-      'z-[calc(var(--drawer-overlay-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
+      'z-[calc(var(--drawer-overlay-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
     )}
   />
 );

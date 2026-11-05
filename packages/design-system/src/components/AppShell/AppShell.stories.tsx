@@ -12,7 +12,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Bell, Home, X } from '../../icons';
+import { Home, X } from '../../icons';
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
 import { ChatTrigger } from '../Chat';
@@ -31,7 +31,6 @@ import { Skeleton } from '../Skeleton';
 import { SplashScreen } from '../SplashScreen';
 import { Text } from '../Text';
 import { useTheme } from '../ThemeProvider';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { TopHeader, TopHeaderActions, TopHeaderLogo, TopHeaderSeparator } from '../TopHeader';
 import {
   type ChatAssistantMessage,
@@ -50,6 +49,7 @@ import {
   HeaderActions,
   HomeContent,
   NavRailFooterContent,
+  NotificationsInbox,
   PRODUCT_CONFIGS,
   type Product,
   ProductNavItems,
@@ -66,7 +66,7 @@ import {
 
 const DESCRIPTION = [
   'The platform’s outermost frame — global top bar, product rail, and the content surface products mount into, with an optional `AppShellAside` panel docked to its right. There is exactly one, at the app root, and it persists while the content swaps.',
-  'Do not wrap a page in it: a single product screen renders `RemoteShell` and its own content, blind to the shell. In-product navigation is `NavPanel`, and laying out a page’s insides is `Stack` and `Flex`.',
+  'Do not wrap a page in it: a single product screen renders `RemoteShell` and its own content, blind to the shell. In-product navigation is `RemoteShell`, configured with a `NavConfig`, and laying out a page’s insides is `Stack` and `Flex`.',
   'The gray surround — header bar plus rail, everything that is not the canvas — is the **Frame**. It carries **Ambient**, a faint still layer of soft blooms, grain and a dot cluster pooled bottom-left, painted under everything. Ambient is on by default; `ambient={false}` leaves the flat Frame fill.',
   'The Frame comes in two styles, **Neutral** and **Branded**: a user preference next to light/dark, set with `useTheme().setFrameStyle` (from `ThemeProvider`) and written on `<html>` so every micro-frontend follows it. Branded warms the Frame and turns active navigation to the brand colour; try it from the account item → Appearance.',
 ].join(' ');
@@ -169,19 +169,7 @@ const Shell = ({
                 <TopHeaderSeparator />
                 <Skeleton width='150px' height='20px' rounded={6} />
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='small'
-                      color='neutral'
-                      aria-label='Wallarm Updates'
-                    >
-                      <Bell />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Wallarm updates</TooltipContent>
-                </Tooltip>
+                <NotificationsInbox loading />
 
                 <QuickHelpDropdown />
               </>

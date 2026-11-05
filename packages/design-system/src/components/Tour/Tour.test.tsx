@@ -5,6 +5,7 @@ import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Tour } from './Tour';
 import { TourClose } from './TourClose';
+import { tourPositionerVariants } from './TourPositioner';
 import type { TourStepDetails } from './types';
 import { useTour } from './useTour';
 
@@ -185,5 +186,13 @@ describe('Auto-start lifecycle', () => {
     render(<Harness />);
     await screen.findByText('First step');
     expect(onMount).toHaveBeenCalled();
+  });
+});
+
+describe('Stacking', () => {
+  // The backdrop paints at --drawer-overlay-z-index (40); both positioner types must sit above it.
+  it('raises the positioner above the backdrop for dialog and tooltip steps', () => {
+    expect(tourPositionerVariants({ type: 'dialog' })).toContain('z-50');
+    expect(tourPositionerVariants({ type: 'tooltip' })).toContain('z-50');
   });
 });

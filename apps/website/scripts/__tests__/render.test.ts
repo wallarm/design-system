@@ -58,7 +58,7 @@ const empty: ComponentMetadata = { ...button, name: 'ButtonBase', examples: [] }
 describe('toStoryId', () => {
   it('slugs story titles', () => {
     expect(toStoryId('Data Display/Selection')).toBe('data-display-selection');
-    expect(toStoryId('Patterns/Click to Copy')).toBe('patterns-click-to-copy');
+    expect(toStoryId('Data Display/Click to Copy')).toBe('data-display-click-to-copy');
   });
 });
 
@@ -108,12 +108,12 @@ describe('renderComponentPage', () => {
         {
           ...basic,
           storyFile: 'FilterInput/stories/FilterInput.stories.tsx',
-          storyTitle: 'Patterns/FilterInput/FilterInput',
+          storyTitle: 'Inputs/FilterInput/FilterInput',
         },
         {
           ...withIcon,
           storyFile: 'FilterInput/stories/Composition.stories.tsx',
-          storyTitle: 'Patterns/FilterInput/Composition',
+          storyTitle: 'Inputs/FilterInput/Composition',
         },
       ],
     };

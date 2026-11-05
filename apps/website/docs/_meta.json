@@ -21,6 +21,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "patterns",
+    "label": "Patterns"
+  },
+  {
+    "type": "dir-section-header",
     "name": "components",
     "label": "Components"
   }

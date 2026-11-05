@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { assertStoriesShipped, buildDocs } from './build-docs';
+import { CONTROLLED_OPEN, DEFAULT_OPEN } from './consuming';
 import { storyGuide } from './story-guide';
 
 const guideName = (storyFile: string): string => path.basename(storyFile, '.stories.tsx');
@@ -59,6 +60,32 @@ describe('Claude Design documentation', () => {
     }
     expect(readme).not.toContain('components/lib/react');
     expect(readme).not.toContain('TableCells');
+  });
+
+  it('embeds rules.md verbatim and points to the sampler and pattern guides', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    const rules = await readFile(path.join(DESIGN_SYSTEM_DIR, 'src/guidelines/rules.md'), 'utf8');
+    expect(readme).toContain(rules.trim());
+    expect(readme).not.toContain('<!-- rules.md -->');
+    for (const required of ['sampler.dc.html', 'dist/guidelines/', 'get_guideline'])
+      expect(readme).toContain(required);
+  });
+
+  it('only advertises default-open for overlays that have defaultOpen', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    const props = (name: string) =>
+      new Set(
+        metadata.components.find(component => component.name === name)?.props.map(p => p.name),
+      );
+    for (const name of DEFAULT_OPEN) {
+      expect(props(name).has('defaultOpen'), name).toBe(true);
+      expect(readme).toContain(name);
+    }
+    for (const name of CONTROLLED_OPEN) {
+      expect(props(name).has('defaultOpen'), name).toBe(false);
+      expect(props(name).has('open') && props(name).has('onOpenChange'), name).toBe(true);
+    }
+    expect(readme).toContain(`- ${DEFAULT_OPEN.join(', ')}: \`default-open="{{shown}}"\``);
   });
 
   it('corrects CVA booleans, reads current source defaults and kebab-cases attributes', async () => {
@@ -170,7 +197,7 @@ describe('Claude Design documentation', () => {
       expect(readme).toContain(`- ${name}: no Storybook story; props only.`);
     expect(readme).toContain('- ThemeProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- DateFormatProvider: provider; use WallarmDS.Root on the canvas.');
-    expect(readme).toContain('- ButtonBase: internal primitive; no guide.');
+    expect(readme).toContain('- Checkmark: internal primitive; no guide.');
   });
 
   it('ships barrel re-export targets', async () => {
@@ -189,7 +216,7 @@ describe('Claude Design documentation', () => {
       expect(components).not.toContain(name);
       await expect(stat(path.join(outDir, `components/${name}/README.md`))).rejects.toThrow();
     }
-    for (const name of ['BulkBar', 'NavPanel']) expect(components).toContain(name);
+    expect(components).toContain('BulkBar');
     const declarations = await readFile(path.join(outDir, 'components/index.d.ts'), 'utf8');
     expect(declarations).toContain('ButtonProps');
     expect(Buffer.byteLength(declarations)).toBeLessThanOrEqual(1_500_000);

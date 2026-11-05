@@ -2,11 +2,19 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../../../packages/design-system/src/theme/index.css';
+/* Pattern guideline stories render on the patterns pages; theme/index.css only scans components. */
+@source '../../../packages/design-system/src/guidelines';
 
 /* Rspress chrome on DS tokens. Rspress declares its vars under :where(), so :root wins; the DS
    tokens themselves flip on <html data-theme>, which themeScript/ThemeSync keep in step with the
    Rspress appearance toggle. */
 :root {
+    /* DS overlays portal to <body> at 40/50; the Rspress chrome stacks up to 70 (nav-screen), so
+       drawers, dialogs and menus slid under the sticky nav. Lift their base tier above it; nested
+       levels still step by overlay / 2 and stay under toasts (900) and tooltips (1000). */
+    --drawer-overlay-z-index: 80;
+    --drawer-positioner-z-index: 90;
+
     --rp-c-brand: var(--color-w-orange-600);
     --rp-c-brand-light: var(--color-w-orange-500);
     --rp-c-brand-lighter: var(--color-w-orange-200);

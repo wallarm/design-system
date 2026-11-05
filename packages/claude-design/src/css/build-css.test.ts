@@ -5,14 +5,14 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens } from '../tokens/build-tokens';
-import { buildCss, stripTokenDeclarations } from './build-css';
+import { buildCss, definedClasses, stripTokenDeclarations } from './build-css';
 
 const outDir = mkdtempSync(path.join(tmpdir(), 'claude-design-css-'));
 afterAll(() => rmSync(outDir, { recursive: true, force: true }));
 
 describe('buildCss', () => {
   let css: string;
-  let result: { bytes: number };
+  let result: Awaited<ReturnType<typeof buildCss>>;
   let tokenNames: Set<string>;
   beforeAll(async () => {
     ({ tokenNames } = buildTokens({
@@ -45,6 +45,89 @@ describe('buildCss', () => {
       '.border-border-danger',
     ])
       expect(selectors.has(selector)).toBe(true);
+  });
+
+  it('ships the author layout kit on the token scale', () => {
+    const classes = new Set(definedClasses(css));
+    for (const name of [
+      'space-y-16',
+      'space-x-8',
+      'divide-y',
+      'divide-x',
+      'divide-border-primary-light',
+      'md:grid-cols-3',
+      'lg:col-span-6',
+      'sm:flex-row',
+      'md:hidden',
+      'xl:block',
+      'md:p-24',
+      'lg:gap-32',
+      'w-1/2',
+      'w-1/3',
+      'w-2/3',
+      'w-1/4',
+      'w-3/4',
+      'max-w-sm',
+      'max-w-7xl',
+      'max-w-screen-lg',
+      'hover:bg-bg-surface-2',
+      'hover:border-border-strong-primary',
+      'first:pt-0',
+      'last:pb-0',
+      'last:border-b-0',
+      'text-md',
+    ])
+      expect(classes.has(name), name).toBe(true);
+  });
+
+  it('declares every theme token bundle.css reads in tokens.css', () => {
+    const tokens = readFileSync(path.join(outDir, 'tokens.css'), 'utf8');
+    const declared = new Set(
+      [...`${tokens}\n${css}`.matchAll(/(--[\w\\.-]+)\s*:/g)].map(([, name]) => name),
+    );
+    // Runtime variables (zag positioning, inline styles) are set by components, not tokens.
+    const theme =
+      /^--(?:color|spacing|text|radius|shadow|font|leading|tracking|blur|icon|container|breakpoint)-/;
+    const undeclared = [...css.matchAll(/var\(\s*(--[\w\\.-]+)\s*\)/g)]
+      .map(([, name = '']) => name)
+      .filter(name => theme.test(name) && !declared.has(name));
+    expect([...new Set(undeclared)]).toEqual([]);
+  });
+
+  it('lets layout-kit and component structural selectors reach through canvas wrappers', () => {
+    expect(css).toContain(':where(.sc-host-x) { border-radius: inherit; }');
+    expect(css).toMatch(/\.last\\:pb-0:last-child:where\(:not\(\.sc-host-x > \*\)\)/);
+    // Forms with no wrapper-tolerant rewrite keep their selector; none may be a layout-kit class.
+    expect(result.wrapperSkipped.length).toBeLessThanOrEqual(30);
+    for (const reason of result.wrapperSkipped)
+      expect(reason).not.toMatch(
+        /`\.(?:space-|divide-|(?:first|last)\\:(?:p|border)|hover\\:(?:bg|border)-)/,
+      );
+  });
+
+  it('writes UTILITIES.md listing exactly the authorable classes', () => {
+    const utilities = readFileSync(path.join(outDir, 'components/UTILITIES.md'), 'utf8');
+    expect(utilities).toContain('**No other class exists**');
+    expect(utilities).toContain('no JIT');
+    for (const name of definedClasses(css)) expect(utilities).toContain(`\`${name}\``);
+    expect(utilities).not.toContain('`p-5`');
+    expect(utilities).not.toContain('sc-host-x`');
+  });
+
+  it('defines every class the root README tells authors to write', () => {
+    const readme = readFileSync(new URL('../docs/readme-root.md', import.meta.url), 'utf8');
+    const advertised = [
+      // The "Here" column of the Tailwind-habit translation table.
+      ...readme.split('\n').flatMap(line => (/^\| `/.test(line) ? [line.split('|')[2] ?? ''] : [])),
+      readme.split('## Layout on a canvas')[1]?.split('\n## ')[0] ?? '',
+    ]
+      .flatMap(text => [...text.matchAll(/`([^`]+)`/g)].map(([, code = '']) => code))
+      .flatMap(code => code.split(' '))
+      .filter(name => /^[a-z0-9:/-]+$/.test(name) && /[-:]/.test(name) && !name.endsWith(':'))
+      .filter(name => name !== 'w-384'); // named as the class that does not exist
+    expect(advertised.length).toBeGreaterThan(20);
+    const classes = new Set(definedClasses(css));
+    expect(advertised.filter(name => !classes.has(name))).toEqual([]);
   });
 
   it('uses exported tokens without replacing component styles or ambient frame colors', () => {

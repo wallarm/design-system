@@ -153,7 +153,7 @@ After a stable design-system release, the `release` job dispatches the separate 
 4. **Changelog Update** - Updates `CHANGELOG.md` (only on `main`)
 5. **NPM Publish** - Publishes with `latest` tag
 6. **GitHub Release** - Creates release with notes
-7. **Site Deploy** - On a stable design-system release, dispatches `deploy-site.yml`, which deploys the docs site and Storybook to GitHub Pages
+7. **Site Deploy** - On a stable design-system release, dispatches `deploy-site.yml`, which deploys the docs site and Storybook to GitHub Pages. Its `claude-design` job builds the Claude Design export from the tag, publishes `@wallarm-org/claude-design` at the tag's version (skipped when that version is already on npm; `continue-on-error`, so it never fails the deploy) and attaches `claude-design-vX.Y.Z.tgz` to the GitHub release
 
 `@wallarm-org/mcp` and `@wallarm-org/migrator` are released by the same job only when needed: mcp when `packages/mcp`/`packages/mcp-core` changed or the branch has a breaking change; migrator when `packages/migrator` changed since its last stable tag or the design-system release stamped `packages/migrator/versions.json`. See the job list in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
 
@@ -179,7 +179,7 @@ npm install modal-rc@npm:@wallarm-org/design-system@1.1.0-rc-feat-modal.1
 
 ### Required Secrets
 
-- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish)
+- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator`, and by `deploy-site.yml` to publish `@wallarm-org/claude-design` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish)
 - `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by repository rulesets that `GITHUB_TOKEN` cannot bypass (see Branch Rules), so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
 - `FIGMA_ACCESS_TOKEN`: Figma personal access token (scopes: File content read, Code Connect write), used by `publish-code-connect`
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions

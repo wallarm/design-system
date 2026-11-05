@@ -4,6 +4,16 @@ Generated from wallarm/design-system — change it in code and run /claude-desig
 
 Wallarm's product UI system uses the real library components, semantic tokens and Geist fonts. Build with components first, style with semantic tokens second, and reach for primitives last. The generated canvas bundle uses the page's React 18 runtime.
 
+## Rules
+
+These are the design system's own rules (`src/guidelines/rules.md`), embedded at build time. On the canvas, read `get_guideline` as "the pattern guide": they ship in the npm package under `dist/guidelines/` (`rules.md`, `foundations/`, `patterns/`) and through the MCP server's `get_guideline` tool.
+
+<!-- rules.md -->
+
+## Screen sampler
+
+[`sampler.dc.html`](sampler.dc.html) is one canonical 1440-wide screen built only from this system through `x-import`: `AppShell`, a resource list `Page` with `PageHeader` and its create action, a `PageToolbar` with search and status tabs, an entity `Table` with a status `Badge` column and an always-visible actions column, a no-results `EmptyState`, and a detail `Drawer` opened by `open` with an empty nested table. It follows the `resource-list-page`, `entity-table` and `detail-drawer` pattern guides. Start a screen from it rather than from raw `div`s; the export checks that every class it uses exists in `components/bundle.css`.
+
 ## Content
 
 - Use sentence case for buttons, labels, titles, menu items and column headers.
@@ -26,17 +36,34 @@ Wallarm's product UI system uses the real library components, semantic tokens an
 ## Type
 
 - Geist Variable is the UI font; Geist Mono is for code and identifiers. Geist Pixel is reserved for display moments and splash art.
+- The bundle's reset leaves raw `h1`–`h6`, `p`, `ul`, `ol` and `li` with no size, margin or list style; use `List` where one fits, and `Code` for code.
 - Prefer `Text`, `Heading` and `Code` over raw typography classes. Use the size and weight choices documented on their cards.
-- The UI weight scale is normal 400, medium 450, semibold 600 and bold 700.
-- Use paired size and line-height tokens. Token typography classes use `body-*`, `heading-*`, `display-*` and `code-*`; Tailwind's `text-*` utilities retain their normal meaning.
+- Use paired size and line-height tokens. `body-*`, `heading-*`, `display-*` and `code-*` are type-style names in the token document, not CSS classes — `class="body-sm"` renders nothing. Use `Text`, `Heading` or `Code`, or the `text-<size>` utility named in each style's usage ("Tailwind: text-sm font-sans-display"). The `text-<size>` utilities (`text-xs`, `text-sm`, `text-md`, `text-base`, `text-lg`…) use this system's type tokens, not Tailwind's defaults, and `text-<colour>` takes a semantic token such as `text-text-secondary`.
 
 ## Spacing, radius, elevation
 
-- Numeric spacing utilities use a 1px base. Stay on the scale: 1, 2, 4, 6, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 80, 96, 112, 128, 144.
-- Use `gap-8`, `px-12`, `py-6` and the matching token utilities. Avoid hardcoded values when the system already names one.
-- Follow the component's radius: compact items typically use `rounded-6`, controls and cards `rounded-8`, overlays `rounded-12`, and pills `rounded-full`.
-- Use the shadow scale for elevation. Let overlay components handle their layering.
+- The 1px base covers sizing too: `w-`, `h-`, `size-`, `min-/max-w-`, `inset-`, `top-`/`right-`/`bottom-`/`left-`. The full scale: 0, 1, 2, 4, 6, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 80, 96, 112, 128, 144.
+- The CSS is precompiled: only the classes listed in [`components/UTILITIES.md`](components/UTILITIES.md) exist. There is no JIT and no arbitrary values (`p-[13px]`, `w-[420px]`), and a missing class silently renders nothing. For any other value use an inline style with a token: `style="gap: var(--spacing-16)"`.
+
+| Tailwind habit | Here |
+| --- | --- |
+| `p-1` / `p-2` / `p-3` / `p-4` | `p-4` / `p-8` / `p-12` / `p-16` |
+| `p-6` / `p-8` / `p-12` | `p-24` / `p-32` / `p-48` |
+| `gap-2` / `gap-4` / `gap-6` / `gap-8` | `gap-8` / `gap-16` / `gap-24` / `gap-32` |
+| `mt-6` | `mt-24` |
+| `w-64` / `w-80` / `w-96` | `w-256` / `w-320` / `style="width: 384px"` (`w-384` is not compiled) |
+| `h-10` / `size-8` | `h-40` / `size-32` |
+| `rounded-md` | `rounded-6` (compact items; pills `rounded-full`) |
+- Use the shadow scale for elevation on your own elements.
 - Components supply motion; respect `prefers-reduced-motion`.
+
+## Layout on a canvas
+
+- Start from the [screen sampler](#screen-sampler). `AppShell` is the frame; `Card` → `CardHeader` / `CardContent` / `CardFooter` groups content.
+- A number prop such as `gap` is a `{{hole}}` from `renderVals()`: `gap="{{rowGap}}"` with `rowGap: 6`.
+- When a raw grid is unavoidable, use the layout kit: `grid grid-cols-4 gap-16`, `md:grid-cols-2`, `col-span-2`, `w-1/3`, `max-w-7xl`, `divide-y divide-border-primary-light`, `first:`/`last:` padding and border resets. Give flex and grid children `min-w-0` so they can shrink.
+- Responsive variants (`sm:`, `md:`, `lg:`, `xl:`) follow the viewport, not the artboard.
+- Check the console: in development the canvas warns once for each class that has no CSS.
 
 ## Iconography
 
