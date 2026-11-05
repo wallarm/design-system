@@ -39,7 +39,8 @@ What does not exist:
 - If your app has its own fixed element (chat widget), keep its z-index below 40. At 40 or higher it paints over the drawer backdrop.
 - If your app has its own sticky element inside a scroll area, use `z-10`.
 - **Never** add a `z-*` class or `style={{ zIndex }}` to `DrawerContent`, `DropdownMenuContent`, `SelectPositioner`, `PopoverContent`, `CalendarContent` or `TooltipContent`.
-- **Never** override `--drawer-overlay-z-index`, `--drawer-positioner-z-index`, `--tooltip-z-index` or `--toast-z-index` in app CSS.
+- If chrome you can't change (a framework or docs-site header) sits at z-index 40 or higher, raise `--drawer-overlay-z-index` and `--drawer-positioner-z-index` together on `:root` above it, positioner 10 higher. Keep both under 900.
+- **Never** override `--tooltip-z-index` or `--toast-z-index`, and never change only one of the two drawer variables.
 - **Never** wrap an overlay trigger in `transform`, `filter` or `isolation: isolate` to fix stacking. Overlay content is portaled to `document.body`.
 - **Never** open `SearchModal` from inside a `Drawer` or `Dialog`. The backdrops cover the search box.
 - **Never** start a `Tour` while a `Drawer` or `Dialog` is open. The drawer ties with or covers the tour.
