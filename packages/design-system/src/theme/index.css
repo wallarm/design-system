@@ -31,6 +31,7 @@
 @import './components/animated-background.css';
 @import './components/app-shell.css';
 @import './components/chart.css';
+@import './components/agent-avatar.css';
 
 /* Frame style (WDS-182): styles that apply only while the user has picked the Branded Frame.
    ThemeProvider writes `data-frame-style` on <html>, so this reaches every micro-frontend. */
