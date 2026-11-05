@@ -110,6 +110,7 @@ An app-owned floating widget stays below the drawer backdrop.
 | `SelectionBulkBar` (`placement='floating'`) | 200 |
 | `TableActionBar`, `Tour`, `FeedbackPulse` | 50 |
 | `SearchModal` | 41 |
+| `Tour` backdrop | 40 |
 
 ### Variables
 
