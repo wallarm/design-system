@@ -62,6 +62,15 @@ describe('Claude Design documentation', () => {
     expect(readme).not.toContain('TableCells');
   });
 
+  it('embeds rules.md verbatim and points to the sampler and pattern guides', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    const rules = await readFile(path.join(DESIGN_SYSTEM_DIR, 'src/guidelines/rules.md'), 'utf8');
+    expect(readme).toContain(rules.trim());
+    expect(readme).not.toContain('<!-- rules.md -->');
+    for (const required of ['sampler.dc.html', 'dist/guidelines/', 'get_guideline'])
+      expect(readme).toContain(required);
+  });
+
   it('only advertises default-open for overlays that have defaultOpen', async () => {
     const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
     const props = (name: string) =>

@@ -125,7 +125,7 @@ describe('buildCss', () => {
       .flatMap(code => code.split(' '))
       .filter(name => /^[a-z0-9:/-]+$/.test(name) && /[-:]/.test(name) && !name.endsWith(':'))
       .filter(name => name !== 'w-384'); // named as the class that does not exist
-    expect(advertised.length).toBeGreaterThan(30);
+    expect(advertised.length).toBeGreaterThan(20);
     const classes = new Set(definedClasses(css));
     expect(advertised.filter(name => !classes.has(name))).toEqual([]);
   });

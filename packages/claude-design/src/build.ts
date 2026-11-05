@@ -9,6 +9,7 @@ import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from './config';
 import { buildCss } from './css/build-css';
 import { buildDocs } from './docs/build-docs';
 import { buildPreviews } from './previews/build-previews';
+import { buildSampler } from './sampler/sampler';
 import { buildTokens } from './tokens/build-tokens';
 
 const git = (...args: string[]) =>
@@ -50,11 +51,11 @@ async function buildInto(root: string, outDir: string) {
   const css = await buildCss({ outDir, tokenNames: tokens.tokenNames });
   const previews = await buildPreviews({ outDir });
   const assets = await buildAssets({ outDir });
+  await buildSampler({ outDir });
   const notSynced = [
     ...tokens.skipped,
     ...previews.omitted,
     'Shiki and highlight.js adapters are excluded; use the Prism adapter.',
-    'Screen templates are deferred.',
   ];
   const docs = await buildDocs({
     outDir,

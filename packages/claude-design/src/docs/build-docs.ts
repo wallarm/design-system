@@ -10,6 +10,7 @@ import { consuming } from './consuming';
 import { README_CAP_BYTES, storyGuide } from './story-guide';
 
 const packageRoot = DESIGN_SYSTEM_DIR;
+const RULES_MARKER = '<!-- rules.md -->';
 const componentsDir = path.join(packageRoot, 'src/components');
 const fromComponents = (file: string): string =>
   path.relative(componentsDir, file).split(path.sep).join('/');
@@ -312,7 +313,11 @@ export const buildDocs = async ({
   }
   await writeFile(path.join(outDir, 'components/index.d.ts'), declarations);
 
-  const brandBook = await readFile(new URL('./readme-root.md', import.meta.url), 'utf8');
+  // rules.md is the one source of the rules; readme-root.md keeps only the canvas prose.
+  const rules = await readFile(path.join(packageRoot, 'src/guidelines/rules.md'), 'utf8');
+  const template = await readFile(new URL('./readme-root.md', import.meta.url), 'utf8');
+  if (!template.includes(RULES_MARKER)) throw new Error(`readme-root.md has no ${RULES_MARKER}`);
+  const brandBook = template.replace(RULES_MARKER, () => rules.trim());
   const omissions = [...new Set([...notSynced, ...omitted])].sort();
   const readme =
     `${brandBook.trim()}\n\n${consuming}\n\n## Not synced\n\n` +

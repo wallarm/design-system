@@ -17,8 +17,9 @@ All under `src/`.
 | `bundle/` | Rslib IIFE bundle (`WallarmDS` namespace, SWC React Compiler targeting React 18) |
 | `css/` | Tailwind CSS for the canvas: the author layout kit (`safelist.ts`), wrapper-tolerant structural selectors (`wrapper-css.ts`) and the generated `components/UTILITIES.md` class list |
 | `tokens/` | Design tokens |
-| `docs/` | Component guides, prop types and the project README |
+| `docs/` | Component guides, prop types and the project README (embeds `design-system/src/guidelines/rules.md`) |
 | `previews/` | Story previews |
+| `sampler/` | The canonical screen `sampler.dc.html`, checked against the built CSS, tokens and exports, and shipped at the project root |
 | `assets/` | Icons, fonts and the cover |
 | `harness/` | React 18 tests that mount the built bundle and previews |
 | `config.ts` | Artifact identity, namespace, budgets |

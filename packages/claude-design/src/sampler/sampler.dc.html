@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wallarm sampler</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components/bundle.css">
+<script src="components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.AppShell">
+    <x-import component-from-global-scope="WallarmDS.AppShellHeader">
+      <x-import component-from-global-scope="WallarmDS.TopHeader">
+        <x-import component-from-global-scope="WallarmDS.TopHeaderLogo" href="#">
+          <x-import component-from-global-scope="WallarmDS.Logo" type="full"></x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+    <x-import component-from-global-scope="WallarmDS.AppShellRail">
+      <x-import component-from-global-scope="WallarmDS.NavRail">
+        <x-import component-from-global-scope="WallarmDS.NavRailBody">
+          <x-import component-from-global-scope="WallarmDS.NavRailItem" icon="{{homeIcon}}" label="Home" href="#"></x-import>
+          <x-import component-from-global-scope="WallarmDS.NavRailSeparator"></x-import>
+          <x-import component-from-global-scope="WallarmDS.NavRailItem" icon="{{shieldIcon}}" label="Security" href="#"></x-import>
+          <x-import component-from-global-scope="WallarmDS.NavRailItem" icon="{{settingsIcon}}" label="Settings" href="#" active="{{yes}}"></x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+    <x-import component-from-global-scope="WallarmDS.AppShellRemote">
+      <!-- Resource list page: Page owns the 24px gutter; never pad Page, PageToolbar or PageContent. -->
+      <x-import component-from-global-scope="WallarmDS.Page" name="settings-users" full-size="{{yes}}" fixed-height="{{yes}}">
+        <x-import component-from-global-scope="WallarmDS.PageHeader">
+          <x-import component-from-global-scope="WallarmDS.PageHeaderGroup">
+            <x-import component-from-global-scope="WallarmDS.PageTitle">Users</x-import>
+            <x-import component-from-global-scope="WallarmDS.PageDescription">People who can sign in to your organization, with access set by roles.</x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.PageActions">
+            <x-import component-from-global-scope="WallarmDS.Button" size="medium">Create user</x-import>
+          </x-import>
+        </x-import>
+        <x-import component-from-global-scope="WallarmDS.PageToolbar">
+          <x-import component-from-global-scope="WallarmDS.SearchInput" value="{{query}}" on-change="{{onQueryChange}}" placeholder="Search name or email" class-name="w-[320px]"></x-import>
+          <x-import component-from-global-scope="WallarmDS.SegmentedTabs" value="{{status}}" on-change="{{onStatusChange}}">
+            <x-import component-from-global-scope="WallarmDS.SegmentedTabsList">
+              <x-import component-from-global-scope="WallarmDS.SegmentedTabsTrigger" value="all">All <x-import component-from-global-scope="WallarmDS.NumericBadge">5</x-import></x-import>
+              <x-import component-from-global-scope="WallarmDS.SegmentedTabsTrigger" value="active">Active <x-import component-from-global-scope="WallarmDS.NumericBadge">2</x-import></x-import>
+              <x-import component-from-global-scope="WallarmDS.SegmentedTabsTrigger" value="invited">Invited <x-import component-from-global-scope="WallarmDS.NumericBadge">1</x-import></x-import>
+              <x-import component-from-global-scope="WallarmDS.SegmentedTabsTrigger" value="deactivated">Deactivated <x-import component-from-global-scope="WallarmDS.NumericBadge">1</x-import></x-import>
+            </x-import>
+          </x-import>
+        </x-import>
+        <x-import component-from-global-scope="WallarmDS.PageContent">
+          <!-- Entity table: Table draws its own frame and padding; the actions column is always visible. -->
+          <x-import component-from-global-scope="WallarmDS.Table" aria-label="Users" data="{{rows}}" columns="{{columns}}" get-row-id="{{getRowId}}" active-row-id="{{activeRowId}}">
+            <x-import component-from-global-scope="WallarmDS.TableEmptyState">
+              <!-- No results: collection-empty inside a table, a reset action, never a create action. -->
+              <x-import component-from-global-scope="WallarmDS.EmptyState" type="collection-empty">
+                <x-import component-from-global-scope="WallarmDS.EmptyStateIllustration">
+                  <x-import component-from-global-scope="WallarmDS.Icons.SearchX"></x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.EmptyStateMessage">
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateTitle">No results found</x-import>
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateDescription">No users match your search or status. Try resetting them.</x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.EmptyStateActions">
+                  <x-import component-from-global-scope="WallarmDS.Button" size="medium" variant="outline" color="neutral" on-click="{{onReset}}">Reset filters</x-import>
+                </x-import>
+              </x-import>
+            </x-import>
+          </x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+  </x-import>
+  <!-- Detail drawer: one controlled Drawer, open by the open prop (Drawer has no default-open). -->
+  <x-import component-from-global-scope="WallarmDS.Drawer" open="{{drawerOpen}}" on-open-change="{{onDrawerOpenChange}}" width="{{drawerWidth}}" modal="{{no}}" overlay="{{no}}" close-on-outside-click="{{no}}">
+    <x-import component-from-global-scope="WallarmDS.DrawerContent">
+      <x-import component-from-global-scope="WallarmDS.DrawerHeader">
+        <x-import component-from-global-scope="WallarmDS.DrawerTitle">Ana Ruiz</x-import>
+        <x-import component-from-global-scope="WallarmDS.DropdownMenu">
+          <x-import component-from-global-scope="WallarmDS.DropdownMenuTrigger" as-child="{{yes}}">
+            <x-import component-from-global-scope="WallarmDS.Button" variant="outline" color="neutral" size="small">Actions <x-import component-from-global-scope="WallarmDS.Icons.ChevronDown"></x-import></x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.DropdownMenuContent">
+            <x-import component-from-global-scope="WallarmDS.DropdownMenuItem">Edit user</x-import>
+            <x-import component-from-global-scope="WallarmDS.DropdownMenuSeparator"></x-import>
+            <x-import component-from-global-scope="WallarmDS.DropdownMenuItem" variant="destructive">Delete user</x-import>
+          </x-import>
+        </x-import>
+      </x-import>
+      <x-import component-from-global-scope="WallarmDS.DrawerBody">
+        <x-import component-from-global-scope="WallarmDS.VStack" gap="{{rowGap}}" class-name="pb-8">
+          <x-import component-from-global-scope="WallarmDS.Attribute" orientation="horizontal">
+            <x-import component-from-global-scope="WallarmDS.AttributeLabel" width="{{labelWidth}}">Email</x-import>
+            <x-import component-from-global-scope="WallarmDS.AttributeValue">ana.ruiz@example.com</x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.Attribute" orientation="horizontal">
+            <x-import component-from-global-scope="WallarmDS.AttributeLabel" width="{{labelWidth}}">Status</x-import>
+            <x-import component-from-global-scope="WallarmDS.AttributeValue">
+              <x-import component-from-global-scope="WallarmDS.Badge" variant="dotted" type="secondary" color="green">Active</x-import>
+            </x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.Attribute" orientation="horizontal">
+            <x-import component-from-global-scope="WallarmDS.AttributeLabel" width="{{labelWidth}}">Role</x-import>
+            <x-import component-from-global-scope="WallarmDS.AttributeValue">
+              <x-import component-from-global-scope="WallarmDS.Tag">Administrator</x-import>
+            </x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.Attribute" orientation="horizontal">
+            <x-import component-from-global-scope="WallarmDS.AttributeLabel" width="{{labelWidth}}">User ID</x-import>
+            <x-import component-from-global-scope="WallarmDS.AttributeValue">
+              <x-import component-from-global-scope="WallarmDS.InlineCodeSnippet" code="usr_8f2a91" size="md"></x-import>
+            </x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.Attribute" orientation="horizontal" is-empty="{{yes}}">
+            <x-import component-from-global-scope="WallarmDS.AttributeLabel" width="{{labelWidth}}">Phone</x-import>
+            <x-import component-from-global-scope="WallarmDS.AttributeValue"></x-import>
+          </x-import>
+        </x-import>
+        <x-import component-from-global-scope="WallarmDS.Separator" spacing="{{separatorSpacing}}"></x-import>
+        <x-import component-from-global-scope="WallarmDS.HStack" justify="between" align="center" class-name="py-8">
+          <x-import component-from-global-scope="WallarmDS.Heading" as="h3" size="md" weight="medium">API tokens</x-import>
+          <x-import component-from-global-scope="WallarmDS.Button" size="small">Create token</x-import>
+        </x-import>
+        <div class="-mx-8">
+          <x-import component-from-global-scope="WallarmDS.Table" aria-label="API tokens" data="{{noTokens}}" columns="{{tokenColumns}}" get-row-id="{{getRowId}}">
+            <x-import component-from-global-scope="WallarmDS.TableEmptyState">
+              <!-- Empty nested table with the action in the section header: title and description only. -->
+              <x-import component-from-global-scope="WallarmDS.EmptyState">
+                <x-import component-from-global-scope="WallarmDS.EmptyStateMessage">
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateTitle">No API tokens yet</x-import>
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateDescription">Create one to call the Wallarm API as this user.</x-import>
+                </x-import>
+              </x-import>
+            </x-import>
+          </x-import>
+        </div>
+      </x-import>
+    </x-import>
+  </x-import>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+var USERS = [
+  { id: 'u1', name: 'Ana Ruiz', email: 'ana.ruiz@example.com', status: 'active', role: 'Administrator', lastActiveAt: '2026-11-04T09:12:00Z' },
+  { id: 'u2', name: 'Wei Chen', email: 'wei.chen@example.com', status: 'active', role: 'Analyst', lastActiveAt: '2026-11-02T16:40:00Z' },
+  { id: 'u3', name: 'Priya Nair', email: 'priya.nair@example.com', status: 'invited', role: 'Analyst', lastActiveAt: null },
+  { id: 'u4', name: 'Tom Becker', email: 'tom.becker@example.com', status: 'expired', role: 'Read only', lastActiveAt: null },
+  { id: 'u5', name: 'Lena Fox', email: 'lena.fox@example.com', status: 'deactivated', role: 'Read only', lastActiveAt: '2026-08-19T11:05:00Z' }
+];
+var STATUS = {
+  active: { label: 'Active', color: 'green' },
+  invited: { label: 'Invited', color: 'yellow' },
+  expired: { label: 'Invite expired', color: 'red' },
+  deactivated: { label: 'Deactivated', color: 'gray' }
+};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { query: '', status: 'all', drawerOpen: true, activeRowId: 'u1' };
+  }
+  renderVals() {
+    var h = React.createElement;
+    var DS = WallarmDS;
+    var self = this;
+    var needle = this.state.query.trim().toLowerCase();
+    var status = this.state.status;
+    var rows = USERS.filter(function (user) {
+      return (status === 'all' || user.status === status) &&
+        (user.name.toLowerCase().includes(needle) || user.email.toLowerCase().includes(needle));
+    });
+    // Always-visible row menu: a trailing display column, not meta.renderMenuAction.
+    var rowMenu = function (user) {
+      return h(DS.DropdownMenu, null,
+        h(DS.DropdownMenuTrigger, { asChild: true },
+          h(DS.Button, { variant: 'ghost', color: 'neutral', size: 'small', 'aria-label': 'Actions for ' + user.name },
+            h(DS.Icons.Ellipsis))),
+        h(DS.DropdownMenuContent, null,
+          h(DS.DropdownMenuItem, null, 'Edit user'),
+          h(DS.DropdownMenuSeparator),
+          h(DS.DropdownMenuItem, { variant: 'destructive' }, 'Delete user')));
+    };
+    var columns = [
+      { accessorKey: 'name', header: 'Name', size: 320, cell: function (ctx) {
+        var user = ctx.row.original;
+        return h(DS.Avatar, { size: 'md' },
+          h(DS.AvatarFallback, { name: user.name }),
+          h(DS.AvatarContent, null, h(DS.AvatarName, null, user.name), h(DS.AvatarDescription, null, user.email)));
+      } },
+      { accessorKey: 'status', header: 'Status', size: 140, cell: function (ctx) {
+        var s = STATUS[ctx.row.original.status];
+        return h(DS.Badge, { variant: 'dotted', type: 'secondary', color: s.color }, s.label);
+      } },
+      { accessorKey: 'role', header: 'Role', size: 200, cell: function (ctx) {
+        return h(DS.Tag, null, ctx.row.original.role);
+      } },
+      { accessorKey: 'lastActiveAt', header: 'Last active', size: 200, cell: function (ctx) {
+        return h(DS.FormatDateTime, { value: ctx.row.original.lastActiveAt, format: 'relative' });
+      } },
+      { id: 'actions', header: '', size: 60, minSize: 60, enableHiding: false, enableSorting: false, cell: function (ctx) {
+        return rowMenu(ctx.row.original);
+      } }
+    ];
+    return {
+      yes: true,
+      no: false,
+      homeIcon: DS.Icons.Home,
+      shieldIcon: DS.Icons.Shield,
+      settingsIcon: DS.Icons.Settings,
+      query: this.state.query,
+      status: status,
+      rows: rows,
+      columns: columns,
+      getRowId: function (row) { return row.id; },
+      activeRowId: this.state.drawerOpen ? this.state.activeRowId : null,
+      onQueryChange: function (value) { self.setState({ query: value }); },
+      onStatusChange: function (value) { self.setState({ status: value }); },
+      onReset: function () { self.setState({ query: '', status: 'all' }); },
+      drawerOpen: this.state.drawerOpen,
+      drawerWidth: 640,
+      onDrawerOpenChange: function (open) { self.setState({ drawerOpen: open }); },
+      rowGap: 6,
+      labelWidth: 140,
+      separatorSpacing: 4,
+      noTokens: [],
+      tokenColumns: [
+        { accessorKey: 'name', header: 'Name', size: 240 },
+        { accessorKey: 'createdAt', header: 'Created', size: 200 }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
