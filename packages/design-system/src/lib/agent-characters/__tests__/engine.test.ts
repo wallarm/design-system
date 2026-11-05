@@ -204,3 +204,89 @@ describe('engine lifecycle', () => {
     });
   }
 });
+
+describe('two bundled copies on one page', () => {
+  afterAll(() => {
+    rs.useRealTimers();
+    stage.remove();
+    delete (globalThis as Record<symbol, unknown>)[RUNTIME_KEY];
+  });
+
+  it('share one loop and one behaviour budget for the document', async () => {
+    rs.useFakeTimers({
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'requestAnimationFrame',
+        'cancelAnimationFrame',
+        'performance',
+      ],
+    });
+    delete (globalThis as Record<symbol, unknown>)[RUNTIME_KEY];
+    stage.replaceChildren();
+    document.body.appendChild(stage);
+    rs.resetModules();
+    const a = await import('../engine');
+    rs.resetModules();
+    const b = await import('../engine');
+    const rt = (await import('../runtime')).getRuntime();
+    expect(a.createCharacter).not.toBe(b.createCharacter);
+    const ids = ['radar', 'wally', 'trim', 'sift', 'probe', 'mend'];
+    const raf = window.requestAnimationFrame;
+    let requested = 0;
+    window.requestAnimationFrame = cb => {
+      requested++;
+      return raf(cb);
+    };
+    ids.forEach((id, i) => {
+      const look = CAST.find(p => p.id === id);
+      if (!look) throw new Error(id);
+      const t = charTree(look, {
+        size: 120,
+        state: 'idle',
+        shadow: true,
+        cover: false,
+        ids: `c${i}`,
+      });
+      const svg = document.createElementNS(NS, 'svg');
+      for (const n of t.children) svg.appendChild(build(n));
+      stage.appendChild(svg);
+      (i % 2 ? b : a).createCharacter(svg, look, {
+        size: 120,
+        state: 'idle',
+        live: true,
+        salt: `copy-${i}`,
+      });
+    });
+    expect(rt.live.size).toBe(6);
+    let most = 0;
+    const starts: number[] = [];
+    const seen = new Set<unknown>();
+    let frames = 0;
+    rt.onFrame = () => {
+      frames++;
+      let running = 0;
+      for (const c of rt.live)
+        for (const k of c.clips as readonly { act?: number; rel?: number; t0: number }[])
+          if (k.act && !k.rel) {
+            running++;
+            if (!seen.has(k)) {
+              seen.add(k);
+              starts.push(k.t0);
+            }
+          }
+      most = Math.max(most, running);
+    };
+    rs.advanceTimersByTime(60_000);
+    rt.onFrame = undefined;
+    window.requestAnimationFrame = raf;
+    expect(requested).toBe(frames + 1); // one loop: one frame request per frame
+    expect(most).toBeLessThanOrEqual(2);
+    expect(starts.length).toBeGreaterThan(10);
+    starts.sort((x, y) => x - y);
+    for (let i = 1; i < starts.length; i++)
+      expect((starts[i] as number) - (starts[i - 1] as number)).toBeGreaterThanOrEqual(700);
+    for (const c of [...rt.live]) (c as Character).dispose();
+    expect(rs.getTimerCount()).toBe(0);
+  });
+});

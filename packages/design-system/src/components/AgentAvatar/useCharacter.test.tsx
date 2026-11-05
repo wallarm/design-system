@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render } from '@testing-library/react';
 import { getRuntime, RUNTIME_KEY } from '../../lib/agent-characters/runtime';
 import { AgentAvatar } from './AgentAvatar';
+import { AgentAvatarGroup } from './AgentAvatarGroup';
 import type { AgentAvatarHandle } from './useCharacter';
 
 const fresh = () => {
@@ -168,6 +169,153 @@ describe('AgentAvatar live', () => {
     expect(stateOf(container)).toBe('hello');
     advance(1200);
     expect(ended).toEqual(['hello']);
+    expect(stateOf(container)).toBe('idle');
+  });
+});
+
+type Clip = { act?: number; inv?: number; rel?: number; t0: number };
+const clipsOf = () => [...getRuntime().live].map(c => c.clips as readonly Clip[]);
+
+describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
+  it('runs at most two idle behaviours at once across the document, starts at least 700 ms apart', () => {
+    render(
+      <AgentAvatarGroup>
+        <AgentAvatar agent='radar' seed='a' size={72} live />
+        <AgentAvatar agent='wally' seed='b' size={72} live />
+        <AgentAvatar agent='trim' seed='c' size={72} live />
+        <AgentAvatar agent='sift' seed='d' size={120} live />
+        <AgentAvatar agent='probe' seed='e' size={120} live />
+      </AgentAvatarGroup>,
+    );
+    const rt = getRuntime();
+    const seen = new Set<Clip>();
+    const starts: number[] = [];
+    let most = 0;
+    rt.onFrame = () => {
+      let running = 0;
+      for (const cs of clipsOf())
+        for (const k of cs)
+          if (k.act && !k.rel) {
+            running++;
+            if (!seen.has(k)) {
+              seen.add(k);
+              starts.push(k.t0);
+            }
+          }
+      most = Math.max(most, running);
+    };
+    advance(120_000);
+    rt.onFrame = undefined;
+    expect(starts.length).toBeGreaterThan(20);
+    expect(most).toBe(2);
+    starts.sort((a, b) => a - b);
+    for (let i = 1; i < starts.length; i++)
+      expect((starts[i] as number) - (starts[i - 1] as number)).toBeGreaterThanOrEqual(700);
+  });
+
+  it('lets one agent invite at a time, glancing at the cue', () => {
+    const cueRef = createRef<HTMLButtonElement>();
+    const Inviting = () => (
+      <div>
+        <AgentAvatar agent='mend' seed='i1' size={72} live state='invite' cueRef={cueRef} />
+        <AgentAvatar agent='sift' seed='i2' size={72} live state='invite' cueRef={cueRef} />
+        <button ref={cueRef} type='button'>
+          Set up
+        </button>
+      </div>
+    );
+    render(<Inviting />);
+    const cue = cueRef.current as HTMLButtonElement;
+    cue.getBoundingClientRect = () =>
+      ({ left: 300, top: 200, width: 96, height: 32, right: 396, bottom: 232 }) as DOMRect;
+    const rt = getRuntime();
+    const inviters = new Set<unknown>();
+    let invites = 0;
+    const seen = new Set<Clip>();
+    rt.onFrame = () => {
+      for (const c of rt.live)
+        for (const k of c.clips as readonly Clip[])
+          if (k.inv && !seen.has(k)) {
+            seen.add(k);
+            inviters.add(c);
+            invites++;
+          }
+    };
+    advance(40_000);
+    rt.onFrame = undefined;
+    expect(invites).toBeGreaterThanOrEqual(2);
+    expect(inviters.size).toBe(1);
+  });
+
+  it('Cover all: Done at 360 ms, no grey after 480 ms, then the data state', () => {
+    const handle = createRef<AgentAvatarHandle>();
+    const { container } = render(
+      <AgentAvatar
+        agent='radar'
+        seed='c1'
+        size={72}
+        live
+        hasApplications
+        coverage='partial'
+        handleRef={handle}
+      />,
+    );
+    const svg = container.querySelector('svg') as SVGSVGElement;
+    advance(500);
+    expect(svg.hasAttribute('data-ghosting')).toBe(true);
+    act(() => handle.current?.coverAll());
+    advance(350);
+    expect(stateOf(container)).toBe('idle');
+    advance(20);
+    expect(stateOf(container)).toBe('done');
+    advance(95); // 465 ms: the line is still travelling
+    expect(svg.hasAttribute('data-ghosting')).toBe(true);
+    advance(35); // 500 ms
+    expect(svg.hasAttribute('data-ghosting')).toBe(false);
+    advance(2500);
+    expect(stateOf(container)).toBe('idle');
+  });
+
+  it('follows hover and focus on the cue for the crown', () => {
+    const cueRef = createRef<HTMLButtonElement>();
+    const { container } = render(
+      <div>
+        <AgentAvatar
+          agent='sift'
+          seed='h1'
+          size={72}
+          live
+          hasApplications
+          coverage='partial'
+          cueRef={cueRef}
+        />
+        <button ref={cueRef} type='button'>
+          Cover all
+        </button>
+      </div>,
+    );
+    const veilr = container.querySelector('[data-part~="veilr"]') as Element;
+    advance(500);
+    const rest = Number(veilr.getAttribute('height'));
+    act(() => {
+      cueRef.current?.dispatchEvent(new Event('focusin', { bubbles: true }));
+    });
+    advance(1500);
+    const up = Number(veilr.getAttribute('height'));
+    expect(up).toBeLessThan(rest - 5); // the line rose 35% of the crown
+    act(() => {
+      cueRef.current?.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    });
+    advance(2500);
+    expect(Number(veilr.getAttribute('height'))).toBeCloseTo(rest, 0);
+  });
+
+  it('never lands on mount: a card that mounts active draws its state at once', () => {
+    const { container } = render(
+      <AgentAvatar agent='radar' seed='m1' size={72} live state='idle' />,
+    );
+    expect(stateOf(container)).toBe('idle');
+    advance(50);
     expect(stateOf(container)).toBe('idle');
   });
 });

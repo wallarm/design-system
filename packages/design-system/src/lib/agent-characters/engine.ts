@@ -469,6 +469,10 @@ export class Character implements LiveChar {
     this.lastV = null;
     if (!this.isLive()) this.render(now);
   }
+  /** Cover all is filling the crown (it ends partial coverage on its own at 480 ms) */
+  get filling() {
+    return this.topping;
+  }
   /** "Cover all applications": the line rises to the top in 480 ms; Done at 360 ms, no grey after 480 ms */
   coverAll() {
     if (!this.cover || this.topping) return;

@@ -105,7 +105,10 @@ export function useCharacter(
   }, [p.state]);
 
   useEffect(() => {
-    chRef.current?.setCover(p.cover);
+    const ch = chRef.current;
+    // data that drops the crown while Cover all fills lets the fill finish (it drops the crown at 480 ms)
+    if (!ch || (!p.cover && ch.filling)) return;
+    ch.setCover(p.cover);
   }, [p.cover]);
 
   // hover or keyboard focus on the cue; touch gets no preview (the page's cueBind). Re-bound after every render, so
