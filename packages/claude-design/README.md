@@ -14,7 +14,8 @@ The command writes `wallarm-design-system/` and never prompts:
 | --- | --- |
 | `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Its index lists no asset groups until `index` adds them |
 | `assets/`, `assets.json` | The icon and logo SVGs for the system's galleries, uploaded as assets (not files), and their manifest (group, name, path, sha256, size, type, in gallery order) |
-| `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler, update |
+| `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler |
+| `UPDATE.md` | Claude's steps to update an installed system to this release (also written alone by `update`) |
 | `wallarm-sampler.dc.html` | The sampler artboard, linked to the canvas's `ds/wallarm-design-system/` copy |
 | `files.json` | Each written file with its sha256 |
 | `removed.json` | With `--existing`: the paths an update drops |
@@ -41,6 +42,18 @@ and `assetGroups` (`{name, blob, size, type, sha256}` per file) into `project/de
 Exit `3`: it wrote the local paths still to upload, one per unique sha256, to `upload.json` and left the
 index alone.
 
+To update an installed system, Claude runs `update` and follows the `UPDATE.md` it writes:
+
+```bash
+npx -y @wallarm-org/claude-design@latest update [--dir wallarm-design-system] [--json]
+```
+
+It writes `<dir>/UPDATE.md` (replacing an older one), deletes `blobs.json` and `upload.json` (their
+ids may belong to another artifact) and exits `0`. It doesn't touch the artifact: `UPDATE.md` has
+Claude save the system's file list, run `export --overwrite --existing` pinned to the same version,
+publish the files, upload only new SVGs with `index --index` (which also merges the release into
+the index read right before publishing), then remove dropped files and reinstall.
+
 The package version is the design-system version it was built from.
 
 ## Maintainers
@@ -50,14 +63,14 @@ and `dist/` from `../design-system` (`DESIGN_SYSTEM_DIR` in `src/config.ts`); th
 `@wallarm-org/design-system` package is not affected. Each stable release publishes this package
 from `deploy-site.yml` (job `claude-design`): it runs `export`, sets the version to the tag and
 runs `pnpm publish`, whose `prepack` (`src/pack.ts`) packs `.claude-design/` into `dist/` with
-the rendered `content/SETUP.md` and the canvas sampler. Wallarm's own artifact is synced by hand
+the rendered `content/SETUP.md` and `content/UPDATE.md` and the canvas sampler. Wallarm's own artifact is synced by hand
 with the [`claude-design-sync`](../../.claude/skills/claude-design-sync/SKILL.md) skill; the
 designer guide is `apps/website/docs/ai/claude-design.mdx`. What Storybook does not show, and
 so Claude Design cannot learn: [CLAUDE_DESIGN_GAP.md](./CLAUDE_DESIGN_GAP.md).
 
 ### Folders
 
-All under `src/`. Outside it: `bin/claude-design.js` (the npm CLI, plain Node ESM) and `content/SETUP.md` (the guide template).
+All under `src/`. Outside it: `bin/claude-design.js` (the npm CLI, plain Node ESM) and `content/SETUP.md`, `content/UPDATE.md` (the guide templates).
 
 | Folder | Does |
 | --- | --- |
@@ -70,7 +83,7 @@ All under `src/`. Outside it: `bin/claude-design.js` (the npm CLI, plain Node ES
 | `assets/` | Icons, fonts and the cover |
 | `harness/` | React 18 tests that mount the built bundle and previews |
 | `config.ts` | Artifact identity, namespace, budgets |
-| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (SVGs moved to `dist/assets/` with `assets.json`, rendered `SETUP.md`, canvas sampler) |
+| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (SVGs moved to `dist/assets/` with `assets.json`, rendered `SETUP.md` and `UPDATE.md`, canvas sampler) |
 | `build.ts`, `verify.ts` | Builder and repeatability check |
 
 ### Commands

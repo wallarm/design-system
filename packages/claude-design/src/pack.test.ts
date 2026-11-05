@@ -12,6 +12,7 @@ import {
 } from './pack';
 
 const template = readFileSync(new URL('../content/SETUP.md', import.meta.url), 'utf8');
+const updateTemplate = readFileSync(new URL('../content/UPDATE.md', import.meta.url), 'utf8');
 const sampler = canvasSampler(
   readFileSync(new URL('./sampler/sampler.dc.html', import.meta.url), 'utf8'),
 );
@@ -31,10 +32,43 @@ describe('renderSetup', () => {
     );
   });
 
+  it('fills UPDATE.md, pinning its version, and SETUP.md keeps no copy of its steps', () => {
+    const guide = renderSetup({
+      name: 'UPDATE.md',
+      template: updateTemplate,
+      readme,
+      sampler,
+      version: '9.8.7',
+      files: 362,
+    });
+    expect(guide).not.toMatch(/\{\{\w+\}\}/);
+    expect(guide).toContain('# Update Wallarm Design System to 9.8.7 in Claude Design');
+    expect(guide).toContain(
+      'npx -y @wallarm-org/claude-design@9.8.7 export --overwrite --existing current-files.json\n',
+    );
+    expect(guide).toContain('https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7');
+    expect(guide).toContain(
+      'npx -y @wallarm-org/claude-design@9.8.7 index --blobs wallarm-design-system/blobs.json --index current-index.json',
+    );
+    expect(guide).not.toContain('@latest');
+    expect(template).not.toContain('current-files.json');
+    expect(template).toContain('claude-design@latest update');
+  });
+
   it('fails on a placeholder without a value or a renamed README section', () => {
     expect(() =>
       renderSetup({ template: '{{nope}}', readme, sampler, version: '1.0.0', files: 1 }),
-    ).toThrow('no value for {{nope}}');
+    ).toThrow('SETUP.md: no value for {{nope}}');
+    expect(() =>
+      renderSetup({
+        name: 'UPDATE.md',
+        template: '{{nope}}',
+        readme,
+        sampler,
+        version: '1',
+        files: 1,
+      }),
+    ).toThrow('UPDATE.md: no value for {{nope}}');
     expect(() =>
       renderSetup({ template, readme: '## Rules\n', sampler, version: '1.0.0', files: 1 }),
     ).toThrow('README.md has no section');
@@ -79,6 +113,9 @@ describe('pack', () => {
       expect(setup).toContain(`(${files} files)`);
       expect(setup).toContain(`${assets} SVG files`);
       expect(setup).toContain('<script src="./support.js"></script>');
+      const update = readFileSync(join(out, 'UPDATE.md'), 'utf8');
+      expect(update).not.toMatch(/\{\{\w+\}\}/);
+      expect(update).toContain(`(${files} files)`);
     } finally {
       rmSync(out, { recursive: true, force: true });
     }

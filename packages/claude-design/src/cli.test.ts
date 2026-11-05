@@ -59,6 +59,7 @@ beforeEach(() => {
   );
   writeFileSync(join(root, 'dist/project/components/index.d.ts'), 'export {};');
   writeFileSync(join(root, 'dist/SETUP.md'), '# Setup');
+  writeFileSync(join(root, 'dist/UPDATE.md'), '# Update to 9.8.7');
   writeFileSync(join(root, 'dist/wallarm-sampler.dc.html'), '<x-dc></x-dc>');
   cwd = join(root, 'work');
   mkdirSync(cwd);
@@ -79,6 +80,7 @@ describe('claude-design export', () => {
     expect(existsSync(join(out, 'removed.json'))).toBe(false);
     expect(Object.keys(JSON.parse(readFileSync(join(out, 'files.json'), 'utf8')))).toEqual([
       'SETUP.md',
+      'UPDATE.md',
       'assets.json',
       'assets/Icons/a.svg',
       'assets/Icons/b.svg',
@@ -121,6 +123,7 @@ describe('claude-design export', () => {
     const { code, stdout } = run('export', '--existing', 'current-files.json');
     expect(code).toBe(3);
     expect(stdout).toContain('Remove the 1 files');
+    expect(stdout).toContain('Carry on with wallarm-design-system/UPDATE.md from step 3');
     expect(
       JSON.parse(readFileSync(join(cwd, 'wallarm-design-system/removed.json'), 'utf8')),
     ).toEqual(['project/old.md']);
@@ -141,7 +144,11 @@ describe('claude-design export', () => {
       join(cwd, 'current-index.json'),
       JSON.stringify({ content: JSON.stringify(current) }),
     );
-    expect(run('export', '--index', 'current-index.json').code).toBe(0);
+    const { code, stdout } = run('export', '--index', 'current-index.json');
+    expect(code).toBe(0);
+    // Mid-update or mid-install, never "Read SETUP.md": that would start a fresh install.
+    expect(stdout).toContain('run the index command with --index');
+    expect(stdout).not.toContain('SETUP.md');
     const out = join(cwd, 'wallarm-design-system');
     const index = readFileSync(join(out, 'project/design-system.json'), 'utf8');
     expect(JSON.parse(index)).toEqual({
@@ -184,6 +191,53 @@ describe('claude-design export', () => {
   it('exits 2 on an unknown command or flag', () => {
     expect(run('publish').code).toBe(2);
     expect(run('export', '--nope').stderr).toContain('Usage:');
+  });
+});
+
+describe('claude-design update', () => {
+  it('writes UPDATE.md into a fresh folder and points at it', () => {
+    const { code, stdout } = run('update');
+    expect(code).toBe(0);
+    expect(stdout).toBe(
+      'Read wallarm-design-system/UPDATE.md and follow it to update the system to Wallarm Design System 9.8.7.\n',
+    );
+    expect(readFileSync(join(cwd, 'wallarm-design-system/UPDATE.md'), 'utf8')).toBe(
+      '# Update to 9.8.7',
+    );
+  });
+
+  it('replaces UPDATE.md and drops blobs.json and upload.json, and the export then takes --overwrite', () => {
+    expect(run('export').code).toBe(0);
+    const out = join(cwd, 'wallarm-design-system');
+    writeFileSync(join(out, 'UPDATE.md'), 'old');
+    // Ids from another artifact's asset store would break this system's gallery.
+    writeFileSync(join(out, 'blobs.json'), '{}');
+    writeFileSync(join(out, 'upload.json'), '[]');
+    expect(run('update').code).toBe(0);
+    expect(readFileSync(join(out, 'UPDATE.md'), 'utf8')).toBe('# Update to 9.8.7');
+    expect(existsSync(join(out, 'project/design-system.json'))).toBe(true);
+    expect(existsSync(join(out, 'blobs.json'))).toBe(false);
+    expect(existsSync(join(out, 'upload.json'))).toBe(false);
+    // UPDATE.md's export runs with --overwrite: without it the folder is refused, as for export.
+    expect(run('export').code).toBe(2);
+    expect(run('export', '--overwrite').code).toBe(0);
+  });
+
+  it('prints {ok, exitCode, data} with --json and --dir', () => {
+    const { code, stdout } = run('update', '--dir', 'out', '--json');
+    expect(code).toBe(0);
+    expect(JSON.parse(stdout)).toEqual({
+      ok: true,
+      exitCode: 0,
+      data: { version: '9.8.7', dir: join(cwd, 'out'), file: join(cwd, 'out/UPDATE.md') },
+    });
+  });
+
+  it('exits 1 when the package has no UPDATE.md', () => {
+    rmSync(join(root, 'dist/UPDATE.md'));
+    const { code, stderr } = run('update');
+    expect(code).toBe(1);
+    expect(stderr).toContain('has no UPDATE.md');
   });
 });
 
@@ -311,5 +365,18 @@ describe('claude-design index', () => {
     expect(code).toBe(0);
     expect(stdout).toContain('(1 unchanged since the current index)');
     expect(readIndex().assetGroups.Logos.files['wallarm.svg'].blob).toBe(ID_W);
+  });
+
+  it('merges the release into the --index it is given, keeping the page keys', () => {
+    writeBlobs({ 'assets/Icons/a.svg': ID_A, 'assets/Logos/wallarm.svg': ID_W });
+    writeFileSync(
+      join(cwd, 'current-index.json'),
+      JSON.stringify({ sections: { saved: 'later' }, createdOnFiles: { at: 2 }, groups: ['x'] }),
+    );
+    expect(run('index', '--index', 'current-index.json').code).toBe(0);
+    const index = readIndex();
+    expect(index.sections).toEqual({ saved: 'later' });
+    expect(index.createdOnFiles).toEqual({ at: 2 });
+    expect(index.groups).toEqual(['Icons', 'Logos']);
   });
 });

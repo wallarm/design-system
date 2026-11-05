@@ -10,12 +10,13 @@ The export wrote `wallarm-design-system/`:
 | `assets/` | The icon and logo galleries: {{assets}} SVG files in {{assetGroups}} | As assets, in step 1 |
 | `assets.json` | Each SVG's group, name, path and sha256 | No |
 | `SETUP.md` | This guide | No |
+| `UPDATE.md` | The update guide, for a later release | No |
 | `{{samplerFile}}` | The sampler artboard, for step 4 | To the canvas, in step 4 |
 | `files.json` | Every file the export wrote, with its sha256 | No |
 | `removed.json` | Paths an update drops. Written only with `--existing` | No |
-| `blobs.json` | You write it in step 1: each SVG's path and the url its upload returned. The `index` command rewrites it keyed by sha256; an update keeps it | No |
+| `blobs.json` | You write it in step 1: each SVG's path and the url its upload returned. The `index` command rewrites it keyed by sha256. The `update` command deletes it | No |
 
-If the person already has a Wallarm Design System artifact and gave you its link, skip to [Update to a new release](#update-to-a-new-release).
+If the person already has a Wallarm Design System artifact and gave you its link, don't install a new one: [update it](#update-to-a-new-release).
 
 ## 1. Publish the system
 
@@ -99,29 +100,7 @@ When every check passes, tell the person the Wallarm Design System is ready, giv
 
 ## Update to a new release
 
-If the link is Wallarm's shared system, {{sharedArtifact}}, stop. Its maintainers update it from the repository; tell the person to ask them, or to install their own copy from step 1.
-
-1. From the person's system artifact, save its file paths as a JSON array in `current-files.json`, and its `project/design-system.json` unchanged in `current-index.json`.
-2. Export again:
-
-   ```bash
-   npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json --index current-index.json
-   ```
-
-   `--index` keeps what the system's page added to its index and replaces only what the release owns. If the command exits 3, carry on: the output names the manual step, which is removing the paths in `wallarm-design-system/removed.json`. `--overwrite` keeps `blobs.json`: its ids are keyed by sha256, so they only attach to unchanged SVGs.
-3. Read the new `wallarm-design-system/SETUP.md`; it belongs to the new release.
-4. If `wallarm-design-system/removed.json` lists any path, show the person the list and ask them to confirm the removal. Remove nothing they don't confirm.
-5. Publish `wallarm-design-system/project/` to the same artifact link: every file except `project/design-system.json`, in batches as in step 1, {{textPlainFiles}} as `text/plain`. Then remove each confirmed path from `wallarm-design-system/removed.json`.
-6. Upload only the new and changed SVGs, as step 1's "Icons and logos" says, but run the `index` command with the current index:
-
-   ```bash
-   npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json
-   ```
-
-   It reuses the blob id of every SVG whose sha256 the current index already has, so `upload.json` lists only what changed. If it exits 0 straight away, nothing needs uploading. Then publish `project/design-system.json` last, alone.
-7. Check: every `project/` path in `wallarm-design-system/files.json` ({{files}} files) is in the artifact, no confirmed removed path is, `project/design-system.json` has a `lastChange.note` that starts with `v{{version}}:`, and the page shows {{assetGroups}} with no broken image. `project/manifest.json` and files under `project/api/` are written by the system's page: they don't count and stay.
-8. Install the system again on every canvas that uses it, then run the checks in step 2 there. A canvas keeps its old copy until you do.
-9. On one canvas, replace `project/{{samplerFile}}` with the new release's sampler as step 4 says. Keep its board's `x` and `y` and its place in `order`. Then run the checks in step 5.
+To update a system the person already has, run `npx -y @wallarm-org/claude-design@latest update` and follow the `wallarm-design-system/UPDATE.md` it writes.
 
 ## When something looks wrong
 
@@ -130,7 +109,7 @@ If the link is Wallarm's shared system, {{sharedArtifact}}, stop. Its maintainer
 | The publish is refused for `index.d.ts` | Send `project/components/index.d.ts` as `text/plain`. |
 | The publish is refused for too many files | Send smaller batches, as step 1 says. |
 | The `index` command exits 3 | Upload the paths in `upload.json`, add their urls to `blobs.json` and run it again. An entry it names as invalid has a key that matches no SVG or a value that isn't a 32-character blob id or `/_blob/<id>` url: copy it again from `upload.json` and the upload result. |
-| Publishing `project/design-system.json` is refused as stale | The system's page saved a newer index. Save the version the refusal hands back as `current-index.json`, run `npx -y @wallarm-org/claude-design@{{version}} export --overwrite --index current-index.json`, then `npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json`, and publish the index again. Nothing needs uploading again. |
+| Publishing `project/design-system.json` is refused as stale | The system's page saved a newer index. Save the version the refusal hands back as `current-index.json` (copy it; don't retype it), run `npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json`, and publish the index again. Nothing needs uploading again. |
 | The gallery is empty or shows broken images | `project/design-system.json` was published before the `index` command exited 0, or with a wrong url. Fix `blobs.json`, run `index` again and publish the index again. |
 | No sampler board shows | The file isn't at `project/{{samplerFile}}`, or `project/canvas.json` has no `"{{samplerFile}}"` in `boards` or `order`. |
 | Components render unstyled | The link lines don't reach `project/ds/{{folder}}/`. The artboard must sit directly in `project/`, and the folder name must match step 2. |
@@ -138,7 +117,6 @@ If the link is Wallarm's shared system, {{sharedArtifact}}, stop. Its maintainer
 | Nothing renders and the console is empty | The sampler was changed. Publish the export's copy again, as step 4 says. |
 | A `[WallarmDS] class "…" has no CSS` warning | The class doesn't exist on the canvas. Use one from `components/UTILITIES.md`; numeric utilities are in px (`p-16` is 16px). |
 | A prop has no control | `project/ds/{{folder}}/components/index.d.ts` is missing. Copy it as step 2 says. |
-| A canvas shows an older version | Install the system again on that canvas. |
 | Text shows in the system font | The fonts in `project/fonts/` weren't published or installed. Check step 1's file check and step 2. |
 | The export command fails or can't reach npm | Show the person its output and stop. |
 

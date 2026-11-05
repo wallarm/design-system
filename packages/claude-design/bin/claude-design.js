@@ -1,9 +1,18 @@
 #!/usr/bin/env node
 // `export` copies the packaged Claude Design export (../dist) into a folder for Claude to
-// publish; `index` writes the asset groups into its index once the SVGs are uploaded.
+// publish; `index` writes the asset groups into its index once the SVGs are uploaded; `update`
+// writes UPDATE.md, the steps to update an installed system to this release.
 // Never prompts. Exit codes: 0 done, 1 error, 2 usage, 3 done with manual steps.
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -13,6 +22,7 @@ const { version } = JSON.parse(readFileSync(new URL('../package.json', import.me
 const USAGE = [
   'Usage: npx -y @wallarm-org/claude-design@latest export [--dir wallarm-design-system] [--overwrite] [--existing current-files.json] [--index current-index.json] [--json]',
   '       npx -y @wallarm-org/claude-design@latest index [--dir wallarm-design-system] [--blobs <dir>/blobs.json] [--index current-index.json] [--json]',
+  '       npx -y @wallarm-org/claude-design@latest update [--dir wallarm-design-system] [--json]',
 ].join('\n');
 // Files the Design System page writes itself; an update never removes them.
 const PAGE_PATHS = ['project/manifest.json', 'project/api/'];
@@ -29,7 +39,8 @@ const RELEASE_KEYS = [
 ];
 const INDEX = 'project/design-system.json';
 // What `export` writes beside project/; --overwrite replaces it. blobs.json stays: `index` keys
-// it by sha256, so an id never attaches to a changed SVG.
+// it by sha256, so an id never attaches to a changed SVG. `update` deletes it: its ids belong to
+// the artifact the folder was exported for, which may not be the one being updated.
 const OWNED = ['project', 'assets', 'assets.json', 'upload.json'];
 // An uploaded asset's blob id, alone or at the end of its `/_blob/<id>` url.
 const BLOB_ID = /^[0-9a-f]{32}$/;
@@ -182,8 +193,11 @@ function writeAssetIndex(values, cwd) {
       ];
     }),
   );
-  const index = readJson(join(out, INDEX), 'the export');
   const packed = JSON.parse(readFileSync(join(SOURCE, INDEX), 'utf8'));
+  // With --index, the index read right before publishing: the page's keys stay current.
+  const index = values.index
+    ? mergeIndex(resolve(cwd, values.index), packed)
+    : readJson(join(out, INDEX), 'the export');
   index.createdOnFiles ??= packed.createdOnFiles;
   writeFileSync(
     join(out, INDEX),
@@ -196,6 +210,26 @@ function writeAssetIndex(values, cwd) {
       `Wrote ${assets.length} assets in ${groups.join(', ')} to ${join(shown, INDEX)}${reusedCount ? ` (${reusedCount} unchanged since the current index)` : ''}. Publish it last.`,
     ],
     data: { assets: assets.length, groups, reused: reusedCount, missing: [], invalid: [] },
+  };
+}
+
+/** Writes <dir>/UPDATE.md for this release and deletes blobs.json and upload.json: an update starts with nothing uploaded. */
+function writeUpdateGuide(values, cwd) {
+  const guide = join(SOURCE, 'UPDATE.md');
+  if (!existsSync(guide))
+    throw new Failure(
+      `This @wallarm-org/claude-design ${version} has no UPDATE.md. Run the command again with @latest, or report it at https://github.com/wallarm/design-system/issues.`,
+      1,
+    );
+  const out = resolve(cwd, values.dir);
+  mkdirSync(out, { recursive: true });
+  cpSync(guide, join(out, 'UPDATE.md'));
+  for (const file of ['blobs.json', 'upload.json']) rmSync(join(out, file), { force: true });
+  const file = join(relative(cwd, out) || '.', 'UPDATE.md');
+  return {
+    exitCode: 0,
+    lines: [`Read ${file} and follow it to update the system to Wallarm Design System ${version}.`],
+    data: { version, dir: out, file: join(out, 'UPDATE.md') },
   };
 }
 
@@ -219,6 +253,7 @@ function run(argv, cwd) {
   }
   const { values, positionals } = parsed;
   if (positionals.length === 1 && positionals[0] === 'index') return writeAssetIndex(values, cwd);
+  if (positionals.length === 1 && positionals[0] === 'update') return writeUpdateGuide(values, cwd);
   if (positionals.length !== 1 || positionals[0] !== 'export')
     throw new Failure(`Unknown command ${positionals.join(' ') || '(none)'}.\n${USAGE}`, 2);
   if (!existsSync(join(SOURCE, 'project/design-system.json')))
@@ -280,7 +315,11 @@ function run(argv, cwd) {
       `Remove the ${removed.length} files the system has and this release doesn't: they're listed in ${join(shown, 'removed.json')}.`,
     );
   lines.push(
-    `Read ${join(shown, 'SETUP.md')} and follow it. It publishes the system, installs it on a canvas and checks it.`,
+    existing
+      ? `Carry on with ${join(shown, 'UPDATE.md')} from step 3; it points into ${join(shown, 'SETUP.md')}.`
+      : values.index
+        ? `Carry on where you were: run the index command with --index, then publish ${join(shown, INDEX)}.`
+        : `Read ${join(shown, 'SETUP.md')} and follow it. It publishes the system, installs it on a canvas and checks it.`,
   );
   return {
     exitCode: removed.length ? 3 : 0,

@@ -639,6 +639,8 @@ jobs:
           cd "$RUNNER_TEMP"
           npx -y --package="$(ls "$RUNNER_TEMP"/pack/*.tgz)" claude-design export --dir out
           test -f out/SETUP.md && test -f out/project/design-system.json
+          npx -y --package="$(ls "$RUNNER_TEMP"/pack/*.tgz)" claude-design update --dir out
+          test -f out/UPDATE.md
 
   release:
     name: Release

@@ -91,8 +91,9 @@ export function boardEntry(html: string) {
   };
 }
 
-/** SETUP.md for this release; throws on a placeholder left without a value or a missing README section. */
+/** A guide (SETUP.md, UPDATE.md) for this release; throws on a placeholder left without a value or a missing README section. */
 export function renderSetup({
+  name = 'SETUP.md',
   template,
   readme,
   sampler,
@@ -100,6 +101,7 @@ export function renderSetup({
   files,
   assets = [],
 }: {
+  name?: string;
   template: string;
   readme: string;
   sampler: string;
@@ -134,7 +136,7 @@ export function renderSetup({
   };
   const guide = template.replace(/\{\{(\w+)\}\}/g, (match, name: string) => values[name] ?? match);
   const left = [...new Set(guide.match(/\{\{\w+\}\}/g))];
-  if (left.length) throw new Error(`SETUP.md: no value for ${left.join(', ')}`);
+  if (left.length) throw new Error(`${name}: no value for ${left.join(', ')}`);
   return guide;
 }
 
@@ -175,7 +177,7 @@ export function packAssets(
   });
 }
 
-/** Writes `<outDir>/{project,assets,assets.json,SETUP.md,wallarm-sampler.dc.html}` from a built `.claude-design/`. */
+/** Writes `<outDir>/{project,assets,assets.json,SETUP.md,UPDATE.md,wallarm-sampler.dc.html}` from a built `.claude-design/`. */
 export function pack(
   source = resolve(PACKAGE_DIR, '.claude-design'),
   outDir = resolve(PACKAGE_DIR, 'dist'),
@@ -221,15 +223,19 @@ export function pack(
   }).filter(file => file.isFile()).length;
   const sampler = canvasSampler(readFileSync(join(project, SAMPLER_FILE), 'utf8'));
   writeFileSync(join(outDir, CANVAS_SAMPLER), sampler);
-  const setup = renderSetup({
-    template: readFileSync(join(PACKAGE_DIR, 'content/SETUP.md'), 'utf8'),
-    readme: readFileSync(readmePath, 'utf8'),
-    sampler,
-    version,
-    files,
-    assets,
-  });
-  writeFileSync(join(outDir, 'SETUP.md'), setup);
+  for (const name of ['SETUP.md', 'UPDATE.md'])
+    writeFileSync(
+      join(outDir, name),
+      renderSetup({
+        name,
+        template: readFileSync(join(PACKAGE_DIR, 'content', name), 'utf8'),
+        readme: readFileSync(readmePath, 'utf8'),
+        sampler,
+        version,
+        files,
+        assets,
+      }),
+    );
   return { version, files, assets: assets.length };
 }
 
