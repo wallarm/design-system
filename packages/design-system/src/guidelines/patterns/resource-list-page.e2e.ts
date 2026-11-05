@@ -19,13 +19,13 @@ test.describe('Pattern: Resource list page', () => {
 
     test('Should render the header correctly', async ({ page }) => {
       await resourceListStory.goto(page, 'Header');
-      await expect(page.getByTestId('users-header')).toBeVisible();
+      await expect(page.getByTestId('users-page--header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the toolbar correctly', async ({ page }) => {
       await resourceListStory.goto(page, 'Toolbar');
-      await expect(page.getByTestId('users-toolbar')).toBeVisible();
+      await expect(page.getByTestId('users-page--toolbar')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

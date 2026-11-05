@@ -19,13 +19,13 @@ test.describe('Pattern: Feedback toasts', () => {
 
     test('Should render the create header correctly', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Next Step');
-      await expect(page.getByTestId('channels-header')).toBeVisible();
+      await expect(page.getByTestId('channels-page--header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the test delivered header correctly', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Test Delivered');
-      await expect(page.getByTestId('channel-header')).toBeVisible();
+      await expect(page.getByTestId('channel-page--header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -37,7 +37,7 @@ test.describe('Pattern: Feedback toasts', () => {
 
     test('Should render the copy link header correctly', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Copy Link');
-      await expect(page.getByTestId('channel-header')).toBeVisible();
+      await expect(page.getByTestId('channel-page--header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
   });

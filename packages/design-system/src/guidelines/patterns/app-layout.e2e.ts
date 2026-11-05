@@ -84,9 +84,11 @@ test.describe('Pattern: Application layout', () => {
     test('Should expand a group when its label is clicked', async ({ page }) => {
       await appLayoutStory.goto(page, 'Default');
       const panel = page.getByTestId('product-shell--panel');
-      await expect(panel.getByText('API Discovery', { exact: true })).toBeHidden();
+      // A collapsed group clips its items to zero height instead of hiding them,
+      // so toBeHidden/toBeVisible can't tell the states apart; the viewport check can.
+      await expect(panel.getByText('API Discovery', { exact: true })).not.toBeInViewport();
       await panel.getByRole('button', { name: 'API Security' }).click();
-      await expect(panel.getByText('API Discovery', { exact: true })).toBeVisible();
+      await expect(panel.getByText('API Discovery', { exact: true })).toBeInViewport();
     });
 
     test('Should open the notifications when the bell is clicked', async ({ page }) => {

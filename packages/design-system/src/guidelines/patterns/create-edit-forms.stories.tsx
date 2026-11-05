@@ -151,7 +151,7 @@ export const CreateInDialog: StoryFn = () => {
                     data-testid='create-user-name'
                   />
                 </Field>
-                <Field required>
+                <Field required data-testid='create-user-email-field'>
                   <FieldLabel>
                     Email
                     <FieldIndicator />
@@ -166,11 +166,7 @@ export const CreateInDialog: StoryFn = () => {
                     placeholder='maria.lopez@acme-bank.com'
                     data-testid='create-user-email'
                   />
-                  {emailInvalid && (
-                    <FieldError data-testid='create-user-email-error'>
-                      Enter an email address.
-                    </FieldError>
-                  )}
+                  {emailInvalid && <FieldError>Enter an email address.</FieldError>}
                 </Field>
                 <Field>
                   <FieldLabel>

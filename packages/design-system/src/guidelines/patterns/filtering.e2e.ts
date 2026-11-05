@@ -87,8 +87,9 @@ test.describe('Pattern: Filtering', () => {
       await page.getByTestId('members-add').click();
       await expect(page.getByTestId('members-confirm')).toBeDisabled();
       const rows = page.getByTestId('members-table--container--row');
-      await rows.nth(0).getByRole('checkbox').check();
-      await rows.nth(1).getByRole('checkbox').check();
+      // The checkbox's real <input> sits under its styled control, so pick a row by its select cell.
+      await rows.nth(0).getByTestId('members-table--container--body-cell').first().click();
+      await rows.nth(1).getByTestId('members-table--container--body-cell').first().click();
       await expect(page.getByTestId('members-confirm')).toHaveText('Add 2 users');
     });
   });

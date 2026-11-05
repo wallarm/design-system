@@ -319,7 +319,7 @@ Default.decorators = hostShell;
 /** The title repeats the last crumb of the product's trail; one create action sits on the right. */
 export const Header: StoryFn = () => (
   <Page name='settings-users' data-testid='users-page'>
-    <PageHeader data-testid='users-header'>
+    <PageHeader>
       <PageHeaderGroup className='flex-1'>
         <PageTitle>Users</PageTitle>
         <PageDescription>
@@ -348,7 +348,7 @@ export const Toolbar: StoryFn = () => {
 
   return (
     <Page name='settings-users' data-testid='users-page'>
-      <PageToolbar data-testid='users-toolbar'>
+      <PageToolbar>
         <SearchInput
           value={query}
           onChange={setQuery}

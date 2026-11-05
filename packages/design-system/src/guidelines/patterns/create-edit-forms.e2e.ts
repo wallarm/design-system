@@ -24,7 +24,7 @@ test.describe('Pattern: Create and edit forms', () => {
       await page.getByTestId('create-user-name').fill('Maria Lopez');
       await page.getByTestId('create-user-email').fill('maria.lopez');
       await page.getByTestId('create-user-email').blur();
-      await expect(page.getByTestId('create-user-email-error')).toBeVisible();
+      await expect(page.getByTestId('create-user-email-field--error')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -51,7 +51,7 @@ test.describe('Pattern: Create and edit forms', () => {
     test('Should render the drawer with steps correctly', async ({ page }) => {
       await formsStory.goto(page, 'Create In Drawer With Steps');
       await page.getByTestId('create-policy-drawer--trigger').click();
-      await expect(page.getByTestId('create-policy-stepper--content-0')).toBeVisible();
+      await expect(page.getByTestId('create-policy-stepper--body--content-0')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
   });
@@ -103,7 +103,7 @@ test.describe('Pattern: Create and edit forms', () => {
       const next = page.getByTestId('create-policy-stepper--next-trigger');
       await next.click();
       await next.click();
-      await expect(page.getByTestId('create-policy-stepper--content-2')).toBeVisible();
+      await expect(page.getByTestId('create-policy-stepper--body--content-2')).toBeVisible();
       await expect(page.getByTestId('create-policy-submit')).toBeVisible();
       await expect(next).toHaveCount(0);
     });

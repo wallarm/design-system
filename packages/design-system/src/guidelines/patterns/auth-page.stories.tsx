@@ -20,7 +20,7 @@ import { Radio, RadioGroup, RadioIndicator, RadioLabel } from '../../components/
 import { Separator } from '../../components/Separator';
 import { HStack, VStack } from '../../components/Stack';
 import { Text } from '../../components/Text';
-import { Toaster, useToast } from '../../components/Toast';
+import { useToast } from '../../components/Toast';
 import { Aws, Google } from '../../icons';
 
 type SignInMethod = 'password' | 'aws' | 'google';
@@ -552,7 +552,6 @@ export const ResetPassword: StoryFn = () => {
           </VStack>
         </form>
       </div>
-      <Toaster />
     </AnimatedBackground>
   );
 };

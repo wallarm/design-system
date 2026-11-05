@@ -70,7 +70,10 @@ test.describe('Pattern: Empty states', () => {
 
     test('Should show per-tab copy when another tab is selected', async ({ page }) => {
       await emptyStatesStory.goto(page, 'Empty Tabs');
-      await page.getByTestId('notifications-tabs').getByRole('tab', { name: 'Read' }).click();
+      await page
+        .getByTestId('notifications-tabs')
+        .getByRole('tab', { name: 'Read', exact: true })
+        .click();
       await expect(page.getByTestId('notifications-read-empty')).toBeVisible();
     });
   });

@@ -414,6 +414,8 @@ export const Header: StoryFn = () => {
   );
 };
 
+Header.decorators = hostShell;
+
 /**
  * Every row is horizontal with the same 140px label. Entra ID has no default role, so that row
  * stays and shows the empty marker; the codes copy on click.
@@ -455,6 +457,8 @@ export const Attributes: StoryFn = () => {
     </Drawer>
   );
 };
+
+Attributes.decorators = hostShell;
 
 /**
  * The first group needs no title. Each later group starts with a `Separator` and a header row; the
@@ -517,6 +521,8 @@ export const Section: StoryFn = () => {
     </Drawer>
   );
 };
+
+Section.decorators = hostShell;
 
 /**
  * Google Workspace has no rules yet: the table keeps its headers and shows a one-line empty state
@@ -585,6 +591,8 @@ export const NestedTable: StoryFn = () => {
     </Drawer>
   );
 };
+
+NestedTable.decorators = hostShell;
 
 /**
  * The entity is still loading: every `Attribute` shows its skeleton and the nested table shows

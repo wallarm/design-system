@@ -305,7 +305,7 @@ export const NextStep: StoryFn = () => {
 
   return (
     <Page name='integrations-channels' data-testid='channels-page'>
-      <PageHeader data-testid='channels-header'>
+      <PageHeader>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>Notification channels</PageTitle>
           <PageDescription>
@@ -348,7 +348,7 @@ export const TestDelivered: StoryFn = () => {
 
   return (
     <Page name='integrations-channel' data-testid='channel-page'>
-      <PageHeader data-testid='channel-header'>
+      <PageHeader>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>#soc-alerts</PageTitle>
           <PageDescription>Slack channel. Receives attacks and vulnerabilities.</PageDescription>
@@ -391,7 +391,7 @@ export const TestFailed: StoryFn = () => {
 
   return (
     <Page name='integrations-channel' data-testid='channel-page'>
-      <PageHeader data-testid='channel-header'>
+      <PageHeader>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>SIEM ingest</PageTitle>
           <PageDescription>
@@ -429,7 +429,7 @@ export const CopyLink: StoryFn = () => {
 
   return (
     <Page name='integrations-channel' data-testid='channel-page'>
-      <PageHeader data-testid='channel-header'>
+      <PageHeader>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>Security on-call</PageTitle>
           <PageDescription>PagerDuty service. Receives incidents.</PageDescription>
