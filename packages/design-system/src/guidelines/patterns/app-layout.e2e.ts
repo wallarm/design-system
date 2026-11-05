@@ -4,6 +4,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const appLayoutStory = createStoryHelper('patterns-application-layout', [
   'Default',
   'Home',
+  'Notifications Open',
+  'Account Menu Open',
   'Grouped Product',
   'Settings Section',
   'Drill Down',
@@ -26,6 +28,19 @@ test.describe('Pattern: Application layout', () => {
     test('Should render the home page correctly', async ({ page }) => {
       await appLayoutStory.goto(page, 'Home');
       await expect(page.getByTestId('home-page')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the open notifications correctly', async ({ page }) => {
+      await appLayoutStory.goto(page, 'Notifications Open');
+      await expect(page.getByTestId('notifications--content')).toBeVisible();
+      await expect(page.getByTestId('notifications--item')).toHaveCount(2);
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the open account menu correctly', async ({ page }) => {
+      await appLayoutStory.goto(page, 'Account Menu Open');
+      await expect(page.getByTestId('account-menu--content')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
@@ -72,6 +87,20 @@ test.describe('Pattern: Application layout', () => {
       await expect(panel.getByText('API Discovery', { exact: true })).toBeHidden();
       await panel.getByRole('button', { name: 'API Security' }).click();
       await expect(panel.getByText('API Discovery', { exact: true })).toBeVisible();
+    });
+
+    test('Should open the notifications when the bell is clicked', async ({ page }) => {
+      await appLayoutStory.goto(page, 'Default');
+      await page.getByTestId('notifications--trigger').click();
+      await expect(page.getByTestId('notifications--content')).toBeVisible();
+      await expect(page.getByTestId('notifications--item')).toHaveCount(2);
+    });
+
+    test('Should open the account menu when the avatar item is clicked', async ({ page }) => {
+      await appLayoutStory.goto(page, 'Default');
+      await expect(page.getByTestId('nav-rail-settings')).toBeVisible();
+      await page.getByTestId('nav-rail-account').click();
+      await expect(page.getByTestId('account-menu--content')).toBeVisible();
     });
 
     test('Should show the parent level without navigating when back is clicked', async ({

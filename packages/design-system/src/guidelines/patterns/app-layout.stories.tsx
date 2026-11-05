@@ -4,15 +4,47 @@ import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { AppShell, AppShellHeader, AppShellRail, AppShellRemote } from '../../components/AppShell';
 import { Button } from '../../components/Button';
+import { ChatTrigger } from '../../components/Chat';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuItemIcon,
+  DropdownMenuItemText,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuTriggerItem,
+} from '../../components/DropdownMenu';
 import { Logo } from '../../components/Logo';
 import {
   NavRail,
   NavRailBody,
   NavRailFooter,
   NavRailItem,
+  type NavRailMode,
   NavRailSeparator,
   NavRailSkeleton,
 } from '../../components/NavRail';
+import {
+  NotificationCenter,
+  NotificationCenterBody,
+  NotificationCenterContent,
+  NotificationCenterHeader,
+  NotificationCenterHeaderAction,
+  NotificationCenterHeaderActions,
+  NotificationCenterItem,
+  NotificationCenterItemDescription,
+  NotificationCenterItemTime,
+  NotificationCenterItemTitle,
+  NotificationCenterList,
+  NotificationCenterTabs,
+  NotificationCenterTabsList,
+  NotificationCenterTitle,
+  NotificationCenterTrigger,
+} from '../../components/NotificationCenter';
+import { NumericBadge } from '../../components/NumericBadge';
 import {
   Page,
   PageActions,
@@ -32,7 +64,9 @@ import {
 import { Skeleton } from '../../components/Skeleton';
 import type { TableColumnDef } from '../../components/Table';
 import { Table } from '../../components/Table';
+import { TabsContent, TabsTrigger } from '../../components/Tabs';
 import { Text } from '../../components/Text';
+import { type Theme, useTheme } from '../../components/ThemeProvider';
 import {
   TopHeader,
   TopHeaderActions,
@@ -41,7 +75,6 @@ import {
 } from '../../components/TopHeader';
 import {
   Activity,
-  Bell,
   Bot,
   ChevronUpDown,
   CircleHelp,
@@ -51,10 +84,15 @@ import {
   Home as HomeIcon,
   Layers,
   ListFilter,
+  LogOut,
+  Paintbrush,
+  PanelLeftDashed,
+  Search,
   Server,
   Settings,
   ShieldCheck,
   User,
+  UserRound,
   Users,
   Zap,
 } from '../../icons';
@@ -212,9 +250,58 @@ const REPLAY_RUNS: ReplayRun[] = [
   { id: 'r2', target: 'Mobile banking', attacks: 87, status: 'Running' },
 ];
 
+interface InboxNotification {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: Date;
+  unread: boolean;
+}
+
+const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+
+// The host's inbox (from the notifications API in a real app).
+const NOTIFICATIONS: InboxNotification[] = [
+  {
+    id: 'attack',
+    title: 'New attack detected on api.example.com',
+    description: '214 SQL injection attempts from 12 IPs in the last 10 minutes.',
+    createdAt: minutesAgo(3),
+    unread: true,
+  },
+  {
+    id: 'node',
+    title: 'Node wallarm-node-3 is offline',
+    description: 'No heartbeat for 15 minutes. Traffic fails over to wallarm-node-1.',
+    createdAt: minutesAgo(22),
+    unread: true,
+  },
+  {
+    id: 'report',
+    title: 'Weekly API discovery report is ready',
+    description: '38 new endpoints this week, 5 of them handling sensitive data.',
+    createdAt: minutesAgo(60 * 24),
+    unread: false,
+  },
+];
+
+const RAIL_MODES: NavRailMode[] = ['expanded', 'collapsed', 'compact'];
+const RAIL_MODE_LABELS: Record<NavRailMode, string> = {
+  expanded: 'Expanded',
+  collapsed: 'Collapsed',
+  compact: 'Compact',
+};
+const THEMES: Theme[] = ['light', 'dark'];
+const THEME_LABELS: Record<Theme, string> = { light: 'Light', dark: 'Dark' };
+
 const onNavigate = fn().mockName('onNavigate');
 const onRailNavigate = fn().mockName('onRailNavigate');
 const onCreateUser = fn().mockName('onCreateUser');
+const onOpenAssistant = fn().mockName('onOpenAssistant');
+const onMarkAllRead = fn().mockName('onMarkAllRead');
+const onOpenNotification = fn().mockName('onOpenNotification');
+const onOpenProfile = fn().mockName('onOpenProfile');
+const onSignOut = fn().mockName('onSignOut');
 
 const meta = {
   title: 'Patterns/Application layout',
@@ -239,6 +326,10 @@ export default meta;
  */
 export const Default: StoryFn = () => {
   const [pathname, setPathname] = useState('/edge/api-sessions');
+  const [railMode, setRailMode] = useState<NavRailMode>('collapsed');
+  const { theme, setTheme } = useTheme();
+  const unread = NOTIFICATIONS.filter(item => item.unread);
+  const read = NOTIFICATIONS.filter(item => !item.unread);
 
   const handleRailClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
@@ -247,6 +338,14 @@ export const Default: StoryFn = () => {
   const handleNavigate = (to: string) => {
     onNavigate(to);
     setPathname(to);
+  };
+  const handleRailModeChange = ({ value }: { value: string }) => {
+    const next = RAIL_MODES.find(mode => mode === value);
+    if (next) setRailMode(next);
+  };
+  const handleThemeChange = ({ value }: { value: string }) => {
+    const next = THEMES.find(option => option === value);
+    if (next) setTheme(next);
   };
 
   const columns: TableColumnDef<ApiSession>[] = [
@@ -264,14 +363,75 @@ export const Default: StoryFn = () => {
             <Logo size='md' />
           </TopHeaderLogo>
           <TopHeaderActions>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Search'>
+              <Search />
+            </Button>
+            <TopHeaderSeparator />
             <Button variant='ghost' color='neutral' size='small'>
               Acme Bank
               <ChevronUpDown />
             </Button>
-            <TopHeaderSeparator />
-            <Button variant='ghost' color='neutral' size='small' aria-label='Wallarm updates'>
-              <Bell />
-            </Button>
+            <ChatTrigger onClick={onOpenAssistant} />
+            <NotificationCenter data-testid='notifications'>
+              <NotificationCenterTrigger count={unread.length} />
+              <NotificationCenterContent>
+                <NotificationCenterHeader>
+                  <NotificationCenterTitle />
+                  <NotificationCenterHeaderActions>
+                    <NotificationCenterHeaderAction onClick={onMarkAllRead}>
+                      Mark all as read
+                    </NotificationCenterHeaderAction>
+                    <NotificationCenterHeaderAction asChild aria-label='Notification settings'>
+                      <a href='/settings/notifications' onClick={handleRailClick}>
+                        <Settings />
+                      </a>
+                    </NotificationCenterHeaderAction>
+                  </NotificationCenterHeaderActions>
+                </NotificationCenterHeader>
+                <NotificationCenterTabs defaultValue='new'>
+                  <NotificationCenterTabsList>
+                    <TabsTrigger value='new'>
+                      New <NumericBadge size='small'>{unread.length}</NumericBadge>
+                    </TabsTrigger>
+                    <TabsTrigger value='read'>Read</TabsTrigger>
+                  </NotificationCenterTabsList>
+                  <TabsContent value='new'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {unread.map(item => (
+                          <NotificationCenterItem key={item.id} unread>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                  <TabsContent value='read'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {read.map(item => (
+                          <NotificationCenterItem key={item.id}>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                </NotificationCenterTabs>
+              </NotificationCenterContent>
+            </NotificationCenter>
             <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
               <CircleHelp />
             </Button>
@@ -280,7 +440,7 @@ export const Default: StoryFn = () => {
       </AppShellHeader>
 
       <AppShellRail>
-        <NavRail mode='collapsed' data-testid='nav-rail'>
+        <NavRail mode={railMode} data-testid='nav-rail'>
           <NavRailBody>
             <NavRailItem
               href='/'
@@ -314,14 +474,68 @@ export const Default: StoryFn = () => {
               onClick={handleRailClick}
               data-testid='nav-rail-settings'
             />
-            <NavRailItem
-              href='/account'
-              icon={User}
-              label='Maria Lopez'
-              avatar
-              onClick={handleRailClick}
-              data-testid='nav-rail-account'
-            />
+            <DropdownMenu
+              data-testid='account-menu'
+              positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}
+            >
+              <DropdownMenuTrigger>
+                <NavRailItem
+                  icon={UserRound}
+                  label='Maria Lopez'
+                  avatar
+                  data-testid='nav-rail-account'
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-200'>
+                <DropdownMenuItem onSelect={onOpenProfile}>
+                  <DropdownMenuItemIcon>
+                    <Settings />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Profile settings</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <Paintbrush />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Appearance</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={theme} onValueChange={handleThemeChange}>
+                      {THEMES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{THEME_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <PanelLeftDashed />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={railMode} onValueChange={handleRailModeChange}>
+                      {RAIL_MODES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{RAIL_MODE_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onSignOut}>
+                  <DropdownMenuItemIcon>
+                    <LogOut />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Sign out</DropdownMenuItemText>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </NavRailFooter>
         </NavRail>
       </AppShellRail>
@@ -362,9 +576,21 @@ export const Default: StoryFn = () => {
  * `RemoteShell`, no panel and no breadcrumbs. The rail is expanded at the top level.
  */
 export const Home: StoryFn = () => {
+  const [railMode, setRailMode] = useState<NavRailMode>('expanded');
+  const { theme, setTheme } = useTheme();
+  const unread = NOTIFICATIONS.filter(item => item.unread);
+  const read = NOTIFICATIONS.filter(item => !item.unread);
   const handleRailClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     onRailNavigate(event.currentTarget.getAttribute('href'));
+  };
+  const handleRailModeChange = ({ value }: { value: string }) => {
+    const next = RAIL_MODES.find(mode => mode === value);
+    if (next) setRailMode(next);
+  };
+  const handleThemeChange = ({ value }: { value: string }) => {
+    const next = THEMES.find(option => option === value);
+    if (next) setTheme(next);
   };
 
   return (
@@ -375,14 +601,75 @@ export const Home: StoryFn = () => {
             <Logo size='md' />
           </TopHeaderLogo>
           <TopHeaderActions>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Search'>
+              <Search />
+            </Button>
+            <TopHeaderSeparator />
             <Button variant='ghost' color='neutral' size='small'>
               Acme Bank
               <ChevronUpDown />
             </Button>
-            <TopHeaderSeparator />
-            <Button variant='ghost' color='neutral' size='small' aria-label='Wallarm updates'>
-              <Bell />
-            </Button>
+            <ChatTrigger onClick={onOpenAssistant} />
+            <NotificationCenter data-testid='notifications'>
+              <NotificationCenterTrigger count={unread.length} />
+              <NotificationCenterContent>
+                <NotificationCenterHeader>
+                  <NotificationCenterTitle />
+                  <NotificationCenterHeaderActions>
+                    <NotificationCenterHeaderAction onClick={onMarkAllRead}>
+                      Mark all as read
+                    </NotificationCenterHeaderAction>
+                    <NotificationCenterHeaderAction asChild aria-label='Notification settings'>
+                      <a href='/settings/notifications' onClick={handleRailClick}>
+                        <Settings />
+                      </a>
+                    </NotificationCenterHeaderAction>
+                  </NotificationCenterHeaderActions>
+                </NotificationCenterHeader>
+                <NotificationCenterTabs defaultValue='new'>
+                  <NotificationCenterTabsList>
+                    <TabsTrigger value='new'>
+                      New <NumericBadge size='small'>{unread.length}</NumericBadge>
+                    </TabsTrigger>
+                    <TabsTrigger value='read'>Read</TabsTrigger>
+                  </NotificationCenterTabsList>
+                  <TabsContent value='new'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {unread.map(item => (
+                          <NotificationCenterItem key={item.id} unread>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                  <TabsContent value='read'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {read.map(item => (
+                          <NotificationCenterItem key={item.id}>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                </NotificationCenterTabs>
+              </NotificationCenterContent>
+            </NotificationCenter>
             <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
               <CircleHelp />
             </Button>
@@ -391,7 +678,7 @@ export const Home: StoryFn = () => {
       </AppShellHeader>
 
       <AppShellRail>
-        <NavRail mode='expanded' data-testid='nav-rail'>
+        <NavRail mode={railMode} data-testid='nav-rail'>
           <NavRailBody>
             <NavRailItem
               href='/'
@@ -425,14 +712,522 @@ export const Home: StoryFn = () => {
               onClick={handleRailClick}
               data-testid='nav-rail-settings'
             />
+            <DropdownMenu
+              data-testid='account-menu'
+              positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}
+            >
+              <DropdownMenuTrigger>
+                <NavRailItem
+                  icon={UserRound}
+                  label='Maria Lopez'
+                  avatar
+                  data-testid='nav-rail-account'
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-200'>
+                <DropdownMenuItem onSelect={onOpenProfile}>
+                  <DropdownMenuItemIcon>
+                    <Settings />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Profile settings</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <Paintbrush />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Appearance</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={theme} onValueChange={handleThemeChange}>
+                      {THEMES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{THEME_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <PanelLeftDashed />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={railMode} onValueChange={handleRailModeChange}>
+                      {RAIL_MODES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{RAIL_MODE_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onSignOut}>
+                  <DropdownMenuItemIcon>
+                    <LogOut />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Sign out</DropdownMenuItemText>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </NavRailFooter>
+        </NavRail>
+      </AppShellRail>
+
+      <AppShellRemote role='main'>
+        <Page name='home' data-testid='home-page'>
+          <PageHeader>
+            <PageTitle>Good morning, Maria</PageTitle>
+          </PageHeader>
+          <PageContent>
+            <Text size='sm' color='secondary'>
+              3 new incidents and 1 node update since your last visit.
+            </Text>
+          </PageContent>
+        </Page>
+      </AppShellRemote>
+    </AppShell>
+  );
+};
+
+/**
+ * The notifications inbox open from the bell in `TopHeaderActions`: unread count on the bell,
+ * New and Read tabs. The app owns the list and the unread count.
+ */
+export const NotificationsOpen: StoryFn = () => {
+  const [railMode, setRailMode] = useState<NavRailMode>('expanded');
+  const [notificationsOpen, setNotificationsOpen] = useState(true);
+  const { theme, setTheme } = useTheme();
+  const unread = NOTIFICATIONS.filter(item => item.unread);
+  const read = NOTIFICATIONS.filter(item => !item.unread);
+  const handleRailClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    onRailNavigate(event.currentTarget.getAttribute('href'));
+  };
+  const handleRailModeChange = ({ value }: { value: string }) => {
+    const next = RAIL_MODES.find(mode => mode === value);
+    if (next) setRailMode(next);
+  };
+  const handleThemeChange = ({ value }: { value: string }) => {
+    const next = THEMES.find(option => option === value);
+    if (next) setTheme(next);
+  };
+
+  return (
+    <AppShell data-testid='app-shell'>
+      <AppShellHeader>
+        <TopHeader data-testid='top-header'>
+          <TopHeaderLogo href='/' onClick={handleRailClick}>
+            <Logo size='md' />
+          </TopHeaderLogo>
+          <TopHeaderActions>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Search'>
+              <Search />
+            </Button>
+            <TopHeaderSeparator />
+            <Button variant='ghost' color='neutral' size='small'>
+              Acme Bank
+              <ChevronUpDown />
+            </Button>
+            <ChatTrigger onClick={onOpenAssistant} />
+            <NotificationCenter
+              data-testid='notifications'
+              open={notificationsOpen}
+              onOpenChange={setNotificationsOpen}
+            >
+              <NotificationCenterTrigger count={unread.length} />
+              <NotificationCenterContent>
+                <NotificationCenterHeader>
+                  <NotificationCenterTitle />
+                  <NotificationCenterHeaderActions>
+                    <NotificationCenterHeaderAction onClick={onMarkAllRead}>
+                      Mark all as read
+                    </NotificationCenterHeaderAction>
+                    <NotificationCenterHeaderAction asChild aria-label='Notification settings'>
+                      <a href='/settings/notifications' onClick={handleRailClick}>
+                        <Settings />
+                      </a>
+                    </NotificationCenterHeaderAction>
+                  </NotificationCenterHeaderActions>
+                </NotificationCenterHeader>
+                <NotificationCenterTabs defaultValue='new'>
+                  <NotificationCenterTabsList>
+                    <TabsTrigger value='new'>
+                      New <NumericBadge size='small'>{unread.length}</NumericBadge>
+                    </TabsTrigger>
+                    <TabsTrigger value='read'>Read</TabsTrigger>
+                  </NotificationCenterTabsList>
+                  <TabsContent value='new'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {unread.map(item => (
+                          <NotificationCenterItem key={item.id} unread>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                  <TabsContent value='read'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {read.map(item => (
+                          <NotificationCenterItem key={item.id}>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                </NotificationCenterTabs>
+              </NotificationCenterContent>
+            </NotificationCenter>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
+              <CircleHelp />
+            </Button>
+          </TopHeaderActions>
+        </TopHeader>
+      </AppShellHeader>
+
+      <AppShellRail>
+        <NavRail mode={railMode} data-testid='nav-rail'>
+          <NavRailBody>
             <NavRailItem
-              href='/account'
-              icon={User}
-              label='Maria Lopez'
-              avatar
+              href='/'
+              icon={HomeIcon}
+              label='Home'
+              shortcut={['G', 'H']}
+              active
               onClick={handleRailClick}
-              data-testid='nav-rail-account'
+              data-testid='nav-rail-home'
             />
+            <NavRailItem href='/recent' icon={History} label='Recent' onClick={handleRailClick} />
+            <NavRailSeparator />
+            {PRODUCTS.map(product => (
+              <NavRailItem
+                key={product.id}
+                href={`/${product.id}`}
+                icon={product.icon}
+                label={product.label}
+                shortcut={product.shortcut}
+                onClick={handleRailClick}
+                data-testid={`nav-rail-${product.id}`}
+              />
+            ))}
+          </NavRailBody>
+          <NavRailFooter>
+            <NavRailItem
+              href='/settings'
+              icon={Settings}
+              label='Settings'
+              shortcut={['G', 'S']}
+              onClick={handleRailClick}
+              data-testid='nav-rail-settings'
+            />
+            <DropdownMenu
+              data-testid='account-menu'
+              positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}
+            >
+              <DropdownMenuTrigger>
+                <NavRailItem
+                  icon={UserRound}
+                  label='Maria Lopez'
+                  avatar
+                  data-testid='nav-rail-account'
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-200'>
+                <DropdownMenuItem onSelect={onOpenProfile}>
+                  <DropdownMenuItemIcon>
+                    <Settings />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Profile settings</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <Paintbrush />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Appearance</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={theme} onValueChange={handleThemeChange}>
+                      {THEMES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{THEME_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <PanelLeftDashed />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={railMode} onValueChange={handleRailModeChange}>
+                      {RAIL_MODES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{RAIL_MODE_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onSignOut}>
+                  <DropdownMenuItemIcon>
+                    <LogOut />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Sign out</DropdownMenuItemText>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </NavRailFooter>
+        </NavRail>
+      </AppShellRail>
+
+      <AppShellRemote role='main'>
+        <Page name='home' data-testid='home-page'>
+          <PageHeader>
+            <PageTitle>Good morning, Maria</PageTitle>
+          </PageHeader>
+          <PageContent>
+            <Text size='sm' color='secondary'>
+              3 new incidents and 1 node update since your last visit.
+            </Text>
+          </PageContent>
+        </Page>
+      </AppShellRemote>
+    </AppShell>
+  );
+};
+
+/**
+ * The user menu open from the avatar item at the foot of `NavRailFooter`: profile settings,
+ * appearance, sidebar mode and sign out.
+ */
+export const AccountMenuOpen: StoryFn = () => {
+  const [railMode, setRailMode] = useState<NavRailMode>('expanded');
+  const [accountMenuOpen, setAccountMenuOpen] = useState(true);
+  const { theme, setTheme } = useTheme();
+  const unread = NOTIFICATIONS.filter(item => item.unread);
+  const read = NOTIFICATIONS.filter(item => !item.unread);
+  const handleRailClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    onRailNavigate(event.currentTarget.getAttribute('href'));
+  };
+  const handleRailModeChange = ({ value }: { value: string }) => {
+    const next = RAIL_MODES.find(mode => mode === value);
+    if (next) setRailMode(next);
+  };
+  const handleThemeChange = ({ value }: { value: string }) => {
+    const next = THEMES.find(option => option === value);
+    if (next) setTheme(next);
+  };
+
+  return (
+    <AppShell data-testid='app-shell'>
+      <AppShellHeader>
+        <TopHeader data-testid='top-header'>
+          <TopHeaderLogo href='/' onClick={handleRailClick}>
+            <Logo size='md' />
+          </TopHeaderLogo>
+          <TopHeaderActions>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Search'>
+              <Search />
+            </Button>
+            <TopHeaderSeparator />
+            <Button variant='ghost' color='neutral' size='small'>
+              Acme Bank
+              <ChevronUpDown />
+            </Button>
+            <ChatTrigger onClick={onOpenAssistant} />
+            <NotificationCenter data-testid='notifications'>
+              <NotificationCenterTrigger count={unread.length} />
+              <NotificationCenterContent>
+                <NotificationCenterHeader>
+                  <NotificationCenterTitle />
+                  <NotificationCenterHeaderActions>
+                    <NotificationCenterHeaderAction onClick={onMarkAllRead}>
+                      Mark all as read
+                    </NotificationCenterHeaderAction>
+                    <NotificationCenterHeaderAction asChild aria-label='Notification settings'>
+                      <a href='/settings/notifications' onClick={handleRailClick}>
+                        <Settings />
+                      </a>
+                    </NotificationCenterHeaderAction>
+                  </NotificationCenterHeaderActions>
+                </NotificationCenterHeader>
+                <NotificationCenterTabs defaultValue='new'>
+                  <NotificationCenterTabsList>
+                    <TabsTrigger value='new'>
+                      New <NumericBadge size='small'>{unread.length}</NumericBadge>
+                    </TabsTrigger>
+                    <TabsTrigger value='read'>Read</TabsTrigger>
+                  </NotificationCenterTabsList>
+                  <TabsContent value='new'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {unread.map(item => (
+                          <NotificationCenterItem key={item.id} unread>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                  <TabsContent value='read'>
+                    <NotificationCenterBody>
+                      <NotificationCenterList>
+                        {read.map(item => (
+                          <NotificationCenterItem key={item.id}>
+                            <NotificationCenterItemTitle onClick={onOpenNotification}>
+                              {item.title}
+                            </NotificationCenterItemTitle>
+                            <NotificationCenterItemTime value={item.createdAt} />
+                            <NotificationCenterItemDescription>
+                              {item.description}
+                            </NotificationCenterItemDescription>
+                          </NotificationCenterItem>
+                        ))}
+                      </NotificationCenterList>
+                    </NotificationCenterBody>
+                  </TabsContent>
+                </NotificationCenterTabs>
+              </NotificationCenterContent>
+            </NotificationCenter>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
+              <CircleHelp />
+            </Button>
+          </TopHeaderActions>
+        </TopHeader>
+      </AppShellHeader>
+
+      <AppShellRail>
+        <NavRail mode={railMode} data-testid='nav-rail'>
+          <NavRailBody>
+            <NavRailItem
+              href='/'
+              icon={HomeIcon}
+              label='Home'
+              shortcut={['G', 'H']}
+              active
+              onClick={handleRailClick}
+              data-testid='nav-rail-home'
+            />
+            <NavRailItem href='/recent' icon={History} label='Recent' onClick={handleRailClick} />
+            <NavRailSeparator />
+            {PRODUCTS.map(product => (
+              <NavRailItem
+                key={product.id}
+                href={`/${product.id}`}
+                icon={product.icon}
+                label={product.label}
+                shortcut={product.shortcut}
+                onClick={handleRailClick}
+                data-testid={`nav-rail-${product.id}`}
+              />
+            ))}
+          </NavRailBody>
+          <NavRailFooter>
+            <NavRailItem
+              href='/settings'
+              icon={Settings}
+              label='Settings'
+              shortcut={['G', 'S']}
+              onClick={handleRailClick}
+              data-testid='nav-rail-settings'
+            />
+            <DropdownMenu
+              data-testid='account-menu'
+              positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}
+              open={accountMenuOpen}
+              onOpenChange={setAccountMenuOpen}
+            >
+              <DropdownMenuTrigger>
+                <NavRailItem
+                  icon={UserRound}
+                  label='Maria Lopez'
+                  avatar
+                  data-testid='nav-rail-account'
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-200'>
+                <DropdownMenuItem onSelect={onOpenProfile}>
+                  <DropdownMenuItemIcon>
+                    <Settings />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Profile settings</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <Paintbrush />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Appearance</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={theme} onValueChange={handleThemeChange}>
+                      {THEMES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{THEME_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <DropdownMenuItemIcon>
+                      <PanelLeftDashed />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={railMode} onValueChange={handleRailModeChange}>
+                      {RAIL_MODES.map(option => (
+                        <DropdownMenuRadioItem key={option} value={option}>
+                          <DropdownMenuItemText>{RAIL_MODE_LABELS[option]}</DropdownMenuItemText>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onSignOut}>
+                  <DropdownMenuItemIcon>
+                    <LogOut />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Sign out</DropdownMenuItemText>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </NavRailFooter>
         </NavRail>
       </AppShellRail>
@@ -487,10 +1282,6 @@ export const GroupedProduct: StoryFn = () => {
               Acme Bank
               <ChevronUpDown />
             </Button>
-            <TopHeaderSeparator />
-            <Button variant='ghost' color='neutral' size='small' aria-label='Wallarm updates'>
-              <Bell />
-            </Button>
             <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
               <CircleHelp />
             </Button>
@@ -532,14 +1323,6 @@ export const GroupedProduct: StoryFn = () => {
               shortcut={['G', 'S']}
               onClick={handleRailClick}
               data-testid='nav-rail-settings'
-            />
-            <NavRailItem
-              href='/account'
-              icon={User}
-              label='Maria Lopez'
-              avatar
-              onClick={handleRailClick}
-              data-testid='nav-rail-account'
             />
           </NavRailFooter>
         </NavRail>
@@ -610,10 +1393,6 @@ export const SettingsSection: StoryFn = () => {
               Acme Bank
               <ChevronUpDown />
             </Button>
-            <TopHeaderSeparator />
-            <Button variant='ghost' color='neutral' size='small' aria-label='Wallarm updates'>
-              <Bell />
-            </Button>
             <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
               <CircleHelp />
             </Button>
@@ -655,14 +1434,6 @@ export const SettingsSection: StoryFn = () => {
               active
               onClick={handleRailClick}
               data-testid='nav-rail-settings'
-            />
-            <NavRailItem
-              href='/account'
-              icon={User}
-              label='Maria Lopez'
-              avatar
-              onClick={handleRailClick}
-              data-testid='nav-rail-account'
             />
           </NavRailFooter>
         </NavRail>
@@ -743,10 +1514,6 @@ export const DrillDown: StoryFn = () => {
               Acme Bank
               <ChevronUpDown />
             </Button>
-            <TopHeaderSeparator />
-            <Button variant='ghost' color='neutral' size='small' aria-label='Wallarm updates'>
-              <Bell />
-            </Button>
             <Button variant='ghost' color='neutral' size='small' aria-label='Help'>
               <CircleHelp />
             </Button>
@@ -788,14 +1555,6 @@ export const DrillDown: StoryFn = () => {
               shortcut={['G', 'S']}
               onClick={handleRailClick}
               data-testid='nav-rail-settings'
-            />
-            <NavRailItem
-              href='/account'
-              icon={User}
-              label='Maria Lopez'
-              avatar
-              onClick={handleRailClick}
-              data-testid='nav-rail-account'
             />
           </NavRailFooter>
         </NavRail>
