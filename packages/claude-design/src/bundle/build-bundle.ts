@@ -51,7 +51,13 @@ export async function buildBundle({ outDir }: { outDir: string }) {
   });
   const components = exports.filter(name => /^[A-Z]/.test(name) && name !== 'Icons');
   const header = `/* @ds-bundle: ${JSON.stringify({ format: 4, namespace: CLAUDE_DESIGN.namespace, components: components.map(name => ({ name })) })} */`;
-  const code = `${header}\n${await readInlineScript(join(outDir, 'components/bundle.js'))}\n`;
+  // A literal U+FFFD (an entity decoder's replacement char) is refused by the artifact upload;
+  // the minifier only emits it inside string or regex literals, where the escape means the same.
+  const code =
+    `${header}\n${await readInlineScript(join(outDir, 'components/bundle.js'))}\n`.replaceAll(
+      String.fromCharCode(0xfffd),
+      '\\uFFFD',
+    );
   const bytes = Buffer.byteLength(code);
   if (bytes > CLAUDE_DESIGN.bundleBudgetBytes)
     throw new Error(`bundle.js ${bytes} bytes exceeds ${CLAUDE_DESIGN.bundleBudgetBytes}`);
