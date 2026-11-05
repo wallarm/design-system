@@ -99,7 +99,7 @@ describe('queuedRunner', () => {
       }
       return new Blob(['x']);
     };
-    const run = queuedRunner(heavy);
+    const run = queuedRunner(heavy, createQueue());
     const job = {
       d: 'M0 0Z',
       col: '#000',

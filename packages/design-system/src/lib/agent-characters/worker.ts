@@ -4,6 +4,7 @@
 // moves the pending jobs and every later job to the main thread.
 import { type BakeRunner, bakeOnMain, shade, solveField } from './bake';
 import { queuedRunner } from './queue';
+import { getRuntime } from './runtime';
 
 export const WORKER_SRC = `
 const solveField = ${solveField.toString()};
@@ -91,5 +92,10 @@ export function createWorkerRunner(
   };
 }
 
-/** Bakes in the worker; falls back to the main thread when it is unavailable or fails. */
-export const bakeInWorker: BakeRunner = createWorkerRunner(queuedRunner(bakeOnMain));
+/** Bakes in the document's one worker; falls back to the main thread (the runtime's queue) when it is unavailable
+ *  or fails. */
+export const bakeInWorker: BakeRunner = job => {
+  const rt = getRuntime();
+  rt.worker ??= createWorkerRunner(queuedRunner(bakeOnMain, rt.queue));
+  return rt.worker(job);
+};

@@ -71,12 +71,9 @@ export class Lru<V> {
   }
 }
 
-/** The document's main-thread bake queue. */
-export const mainQueue = createQueue();
-
 /** Runs a runner's jobs through the queue, so main-thread bakes come in 14 ms slices instead of one long task. */
 export const queuedRunner =
-  <J, R>(run: (job: J) => Promise<R>, q: ReturnType<typeof createQueue> = mainQueue) =>
+  <J, R>(run: (job: J) => Promise<R>, q: ReturnType<typeof createQueue>) =>
   (job: J): Promise<R> =>
     new Promise((ok, fail) =>
       q.enqueue({

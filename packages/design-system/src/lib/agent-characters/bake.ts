@@ -2,7 +2,7 @@
 // solveField() and shade() are ported line for line and are self-contained (no module references), so the worker
 // can run the very same functions from their source text.
 import { createCanvas } from './canvas';
-import { Lru } from './queue';
+import { getRuntime } from './runtime';
 
 export type Material = 'felt' | 'vinyl';
 /** Coverage alpha (0–255), N × N, of the path over its square region. */
@@ -145,15 +145,16 @@ export function shade(
 }
 
 // ── Browser side: region, masks, caches. Not reachable in jsdom (no canvas, no getBBox): checked side by side. ──
+// The caches belong to the document runtime, shared by every bundled copy on the page.
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-let measurePath: SVGPathElement | null = null;
-const REG = new Map<string, [number, number, number]>();
 
 /** Square region around the path's bbox, 2 units of padding, as on the page (SVG getBBox, main thread only). */
 export function region(d: string): [number, number, number] {
-  const cached = REG.get(d);
+  const C = getRuntime().caches;
+  const cached = C.reg.get(d);
   if (cached) return cached;
+  let measurePath = C.measure;
   if (!measurePath?.isConnected) {
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('width', '0');
@@ -161,6 +162,7 @@ export function region(d: string): [number, number, number] {
     svg.setAttribute('aria-hidden', 'true');
     svg.style.position = 'absolute';
     measurePath = document.createElementNS(SVG_NS, 'path');
+    C.measure = measurePath;
     svg.appendChild(measurePath);
     document.body.appendChild(svg);
   }
@@ -173,7 +175,7 @@ export function region(d: string): [number, number, number] {
     Math.floor(b.y + b.height / 2 - R / 2),
     R,
   ];
-  REG.set(d, r);
+  C.reg.set(d, r);
   return r;
 }
 
@@ -198,19 +200,21 @@ export interface Baked {
   R: number;
 }
 
-// 64 height fields and 256 baked layers (06 §9); evicted object URLs are revoked.
-const HC = new Lru<Float32Array>(64);
-const RETAIN = new Map<string, number>();
+// 64 height fields and 256 baked layers (06 §9) on the runtime; evicted object URLs are revoked.
+const caches = () => getRuntime().caches;
 /** Marks a bake as shown: its object URL is not revoked until every retain is released. */
-export const retain = (key: string) => void RETAIN.set(key, (RETAIN.get(key) ?? 0) + 1);
-export const release = (key: string) => {
-  const n = (RETAIN.get(key) ?? 0) - 1;
-  if (n > 0) RETAIN.set(key, n);
-  else RETAIN.delete(key);
+export const retain = (key: string) => {
+  const R = caches().retain;
+  R.set(key, (R.get(key) ?? 0) + 1);
 };
-export const isRetained = (key: string) => RETAIN.has(key);
-export const retainedCount = () => RETAIN.size;
-const BC = new Lru<Baked>(256, b => URL.revokeObjectURL(b.url), isRetained);
+export const release = (key: string) => {
+  const R = caches().retain;
+  const n = (R.get(key) ?? 0) - 1;
+  if (n > 0) R.set(key, n);
+  else R.delete(key);
+};
+export const isRetained = (key: string) => caches().retain.has(key);
+export const retainedCount = () => caches().retain.size;
 
 /** Bump with any change to the shading or the shapes, so copies with different shading never share bitmaps. */
 export const LOOK_VERSION = 'v14.1';
@@ -218,10 +222,11 @@ export const bakeKey = (d: string, col: string, P: number, mat: Material) =>
   `${LOOK_VERSION}|${d}|${col}|${P}|${mat}`;
 
 export function solveCached(d: string, x0: number, y0: number, R: number) {
-  let u = HC.get(d);
+  const { hc } = caches();
+  let u = hc.get(d);
   if (!u) {
     u = solveField(N => rmaskAlpha(d, x0, y0, R, N), R);
-    HC.set(d, u);
+    hc.set(d, u);
   }
   return u;
 }
@@ -244,8 +249,6 @@ export type BakeRunner = (job: {
 export const bakeOnMain: BakeRunner = async ({ d, col, P, mat, region: [x0, y0, R] }) =>
   encode(shade(solveCached(d, x0, y0, R), rmaskAlpha(d, x0, y0, R, P), col, P, mat, y0, R), P);
 
-const INFLIGHT = new Map<string, Promise<Baked>>();
-
 /** One layer, cached by look version, path, colour, pixel size and material. Overlapping calls share one bake;
  *  a failed bake is forgotten so the next call retries. */
 export function bake(
@@ -256,6 +259,7 @@ export function bake(
   run: BakeRunner = bakeOnMain,
 ): Promise<Baked> {
   const key = bakeKey(d, col, P, mat);
+  const { bc: BC, inflight: INFLIGHT } = caches();
   const hit = BC.get(key);
   if (hit) return Promise.resolve(hit);
   const pending = INFLIGHT.get(key);
