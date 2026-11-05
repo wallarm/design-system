@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC, InputHTMLAttributes, Ref } from 'react';
+import { type ChangeEvent, type FC, type InputHTMLAttributes, type Ref, useState } from 'react';
 import { Search, X } from '../../icons';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
@@ -9,12 +9,17 @@ import { InputGroupAddon } from '../InputGroup/InputGroupAddon';
 type SearchInputSize = 'default' | 'medium' | 'small';
 
 export interface SearchInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'onChange'>,
+  extends Omit<
+      InputHTMLAttributes<HTMLInputElement>,
+      'size' | 'type' | 'value' | 'defaultValue' | 'onChange'
+    >,
     TestableProps {
-  /** Current search value (controlled). */
-  value: string;
+  /** Current search value (controlled). Omit it to let the input keep its own value. */
+  value?: string;
+  /** Initial value when `value` is omitted (uncontrolled). @default '' */
+  defaultValue?: string;
   /** Called when the value changes (typing or clearing). */
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   /** Called when the clear button is clicked. Fires before onChange(''). */
   onClear?: () => void;
   /** Input size variant. @default 'default' */
@@ -25,7 +30,8 @@ export interface SearchInputProps
 }
 
 export const SearchInput: FC<SearchInputProps> = ({
-  value,
+  value: controlledValue,
+  defaultValue = '',
   onChange,
   onClear,
   size = 'default',
@@ -36,13 +42,21 @@ export const SearchInput: FC<SearchInputProps> = ({
   'data-testid': testId,
   ...rest
 }) => {
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
+  const value = controlledValue ?? uncontrolledValue;
+
+  const setValue = (next: string) => {
+    if (controlledValue === undefined) setUncontrolledValue(next);
+    onChange?.(next);
+  };
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
+    setValue(event.target.value);
   };
 
   const handleClear = () => {
     onClear?.();
-    onChange('');
+    setValue('');
   };
 
   const showClear = value.length > 0 && !disabled;

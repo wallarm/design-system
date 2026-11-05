@@ -49,15 +49,14 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
 const SIZES = [
   { size: 'xl', metrics: '18 / 28' },
   { size: 'lg', metrics: '16 / 24' },
-  { size: 'md', metrics: 'inherits from its container — see the note above' },
+  { size: 'md', metrics: '14 / 20' },
   { size: 'sm', metrics: '14 / 20' },
   { size: 'xs', metrics: '12 / 16' },
 ] as const;
 
 /**
  * The ramp, for density rather than hierarchy — step down in a dense table, not to signal that
- * something matters less. Note that `md` sets no size of its own and inherits from its
- * container, so prefer an explicit step until that is fixed.
+ * something matters less. `md` matches `sm` (14 / 20); it is the step Card's body text uses.
  */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack gap={24} align='start'>
