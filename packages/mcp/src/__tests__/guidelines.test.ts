@@ -109,12 +109,12 @@ describe('get_guideline', () => {
     expect(getGuidelineText(guidelines, 'empty-states', 'What your app owns')).toMatch(
       /^# Empty states — What your app owns\n\nCopy text/,
     );
-    expect(getGuidelineText(guidelines, 'empty-states', 'layout-and-spacing')).toContain('Center');
+    expect(getGuidelineText(guidelines, 'empty-states', 'rules')).toContain('Center');
   });
 
   it('lists sections for an unknown section', () => {
     expect(getGuidelineText(guidelines, 'spacing', 'nope')).toContain(
-      'Available sections: what-you-use, rules, reference',
+      'Available sections: what-you-use, rules, examples, reference',
     );
   });
 

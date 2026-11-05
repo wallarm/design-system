@@ -16,18 +16,17 @@ const KIND_DIRS: Record<string, GuidelineKind> = {
 };
 
 const REQUIRED_SECTIONS: Record<GuidelineKind, string[]> = {
-  foundation: ['What you use', 'Rules', 'Reference'],
-  pattern: [
-    'When to use',
-    'Anatomy',
-    'Layout and spacing',
-    'States',
-    'Rules',
-    'Example',
-    'What your app owns',
-    'Related',
-  ],
+  foundation: ['What you use', 'Rules', 'Examples', 'Reference'],
+  pattern: ['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'],
 };
+
+/** Max prose words per guideline body (code fences excluded). */
+const WORD_BUDGET: Record<GuidelineKind, number> = { foundation: 700, pattern: 1000 };
+
+/** Words in a markdown body, not counting fenced code blocks. */
+export const countProseWords = (body: string) =>
+  body.replace(/^\s*(```|~~~)[\s\S]*?^\s*\1.*$/gm, '').match(/[\p{L}\p{N}][\p{L}\p{N}'’_-]*/gu)
+    ?.length ?? 0;
 
 type FrontmatterValue = string | number | string[];
 
@@ -167,6 +166,9 @@ const parseGuidelineFile = (
   for (const required of REQUIRED_SECTIONS[kind]) {
     if (!headings.has(required)) fail(`missing required section "## ${required}"`);
   }
+
+  const words = countProseWords(body);
+  if (words > WORD_BUDGET[kind]) fail(`${words} words, budget ${WORD_BUDGET[kind]}`);
 
   for (const target of findBrokenLinks(body, path.dirname(filePath))) {
     fail(`broken relative link "${target}"`);

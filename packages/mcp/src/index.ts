@@ -252,7 +252,7 @@ async function main() {
         section: z
           .string()
           .optional()
-          .describe('Section id or heading, e.g. "rules", "example", "layout-and-spacing"'),
+          .describe('Section id or heading, e.g. "rules", "examples", "states"'),
       },
     },
     async ({ slug, section }) => ({

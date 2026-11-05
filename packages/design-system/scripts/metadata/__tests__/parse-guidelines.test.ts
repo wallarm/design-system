@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
 import {
+  countProseWords,
   parseFrontmatter,
   parseGuidelines,
   splitSections,
@@ -31,6 +32,14 @@ Stack.
 ## Rules
 
 - Use gap. See [Empty](../patterns/empty.md#rules).
+
+## Examples
+
+Rows of fields use a gap.
+
+\`\`\`tsx
+<Stack gap={12} />
+\`\`\`
 
 ## Reference
 
@@ -59,7 +68,7 @@ order: 1
 
 # Empty
 
-${['When to use', 'Anatomy', 'Layout and spacing', 'States', 'Rules', 'Example', 'What your app owns', 'Related'].map(h => `## ${h}\n\nText.`).join('\n\n')}
+${['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'].map(h => `## ${h}\n\nText.`).join('\n\n')}
 `;
 
 const parse = (files: Record<string, string>) =>
@@ -92,15 +101,25 @@ describe('parseFrontmatter', () => {
 describe('splitSections', () => {
   it('splits on H2 and ignores headings inside code fences', () => {
     const { h1, sections } = splitSections(
-      '# T\n\nintro\n\n## Layout and spacing\n\n```md\n## not a heading\n```\n\n## Rules\n\nx',
+      '# T\n\nintro\n\n## What you use\n\n```md\n## not a heading\n```\n\n## Rules\n\nx',
     );
     expect(h1).toBe('T');
-    expect(sections.map(s => s.id)).toEqual(['layout-and-spacing', 'rules']);
+    expect(sections.map(s => s.id)).toEqual(['what-you-use', 'rules']);
     expect(sections[0]?.markdown).toContain('## not a heading');
   });
 
   it('kebab-cases headings', () => {
     expect(toSectionId('What your app owns')).toBe('what-your-app-owns');
+  });
+});
+
+describe('countProseWords', () => {
+  it('counts prose words and skips fenced code', () => {
+    expect(
+      countProseWords(
+        "# Title\n\n| Need | Use |\n|---|---|\n| a gap | `gap-12` |\n\n```tsx\n<Stack gap={12} />\n```\n\nDon't stop.",
+      ),
+    ).toBe(8);
   });
 });
 
@@ -120,8 +139,36 @@ describe('parseGuidelines', () => {
     expect(result.guidelines[0]?.sections.map(s => s.id)).toEqual([
       'what-you-use',
       'rules',
+      'examples',
       'reference',
     ]);
+  });
+
+  it('requires every pattern section', () => {
+    expect(() =>
+      parse({ 'rules.md': 'ok', 'patterns/empty.md': PATTERN.replace('## States', '## Other') }),
+    ).toThrow(/patterns\/empty\.md: missing required section "## States"/);
+  });
+
+  it('enforces the word budget per kind, ignoring code fences', () => {
+    const words = (n: number) => Array.from({ length: n }, () => 'word').join(' ');
+    const code = `\n\n\`\`\`tsx\n${words(2000)}\n\`\`\`\n`;
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'foundations/spacing.md': `${FOUNDATION}\n${words(700)}\n`,
+        'patterns/empty.md': `${PATTERN}\n${words(1000)}\n`,
+      }),
+    ).toThrow(
+      /foundations\/spacing\.md: \d+ words, budget 700[\s\S]*patterns\/empty\.md: \d+ words, budget 1000/,
+    );
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'foundations/spacing.md': `${FOUNDATION}${code}`,
+        'patterns/empty.md': `${PATTERN}${code}`,
+      }),
+    ).not.toThrow();
   });
 
   it('collects every problem into one error', () => {

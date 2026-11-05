@@ -87,7 +87,7 @@ export const designSystemMetadataSchema = z.object({
 export type DesignSystemMetadata = z.infer<typeof designSystemMetadataSchema>;
 
 export const guidelineSectionSchema = z.object({
-  /** Kebab-case of the H2 text, e.g. `layout-and-spacing`. */
+  /** Kebab-case of the H2 text, e.g. `what-your-app-owns`. */
   id: z.string(),
   heading: z.string(),
   markdown: z.string(),
