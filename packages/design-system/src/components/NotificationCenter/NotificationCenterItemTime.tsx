@@ -31,7 +31,7 @@ export const NotificationCenterItemTime: FC<NotificationCenterItemTimeProps> = (
   const valid = isValid(date);
 
   return (
-    <Tooltip disabled={!valid}>
+    <Tooltip disabled={!valid} data-testid={testId}>
       <TooltipTrigger asChild data-testid={testId}>
         <time
           {...props}

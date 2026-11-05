@@ -34,7 +34,8 @@ export const NotificationCenterTrigger: FC<NotificationCenterTriggerProps> = ({
   const testId = useTestId('trigger', testIdProp);
 
   return (
-    <Tooltip ids={{ trigger: triggerId }}>
+    // Scope the tooltip to the bell, or its content would inherit the root id and clash with `--content`.
+    <Tooltip ids={{ trigger: triggerId }} data-testid={testId}>
       <PopoverTrigger asChild data-testid={testId}>
         <TooltipTrigger asChild data-testid={testId}>
           <Button

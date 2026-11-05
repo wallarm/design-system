@@ -9,6 +9,7 @@ const notificationCenterStory = createStoryHelper('overlay-notificationcenter', 
   'Error State',
   'Many Items',
   'In Top Header',
+  'Controlled',
 ] as const);
 
 const getTrigger = (page: Page) => page.getByTestId('notification-center--trigger');
@@ -21,6 +22,12 @@ const openInbox = async (page: Page) => {
 
 test.describe('Component: NotificationCenter', () => {
   test.describe('Visual', () => {
+    test('Should render the closed bell with the unread count correctly', async ({ page }) => {
+      await notificationCenterStory.goto(page, 'Basic');
+      await expect(getContent(page)).toBeHidden();
+      await expect(getTrigger(page)).toHaveScreenshot();
+    });
+
     test('Should render the new tab correctly', async ({ page }) => {
       await notificationCenterStory.goto(page, 'Basic');
       await openInbox(page);
@@ -85,6 +92,16 @@ test.describe('Component: NotificationCenter', () => {
       await expect(getContent(page)).toBeHidden();
     });
 
+    test('Should clear the unread badge when Mark all as read is clicked', async ({ page }) => {
+      await notificationCenterStory.goto(page, 'Controlled');
+      await expect(getTrigger(page)).toHaveAccessibleName('Notifications, 1 unread');
+      await openInbox(page);
+      const markAll = page.getByTestId('notification-center--header-action');
+      await markAll.click();
+      await expect(markAll).toBeDisabled();
+      await expect(getTrigger(page)).toHaveAccessibleName('Notifications');
+    });
+
     test('Should keep the header in place when the list scrolls', async ({ page }) => {
       await notificationCenterStory.goto(page, 'Many Items');
       await openInbox(page);
@@ -101,6 +118,22 @@ test.describe('Component: NotificationCenter', () => {
     test('Should be named with the unread count via aria-label', async ({ page }) => {
       await notificationCenterStory.goto(page, 'Basic');
       await expect(getTrigger(page)).toHaveAccessibleName('Notifications, 5 unread');
+    });
+
+    test('Should be openable via keyboard Enter key', async ({ page }) => {
+      await notificationCenterStory.goto(page, 'Basic');
+      await getTrigger(page).focus();
+      await page.keyboard.press('Enter');
+      await expect(getContent(page)).toBeVisible();
+      await expect(getContent(page)).toHaveAccessibleName('Notifications');
+    });
+
+    test('Should be navigable between tabs via ArrowRight key', async ({ page }) => {
+      await notificationCenterStory.goto(page, 'Basic');
+      await openInbox(page);
+      await page.getByRole('tab', { name: /New/ }).focus();
+      await page.keyboard.press('ArrowRight');
+      await expect(page.getByRole('tab', { name: 'Read' })).toBeFocused();
     });
 
     test('Should be closable via Escape with focus back on the bell', async ({ page }) => {

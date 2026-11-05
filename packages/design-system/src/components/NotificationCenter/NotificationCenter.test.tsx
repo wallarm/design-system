@@ -5,11 +5,13 @@ import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { formatCompactRelativeTime } from '../../utils/formatDateTime';
 import { Button } from '../Button';
+import { EmptyStateMessage, EmptyStateTitle } from '../EmptyState';
 import { TabsContent, TabsTrigger } from '../Tabs';
 import {
   NotificationCenter,
   NotificationCenterBody,
   NotificationCenterContent,
+  NotificationCenterEmpty,
   NotificationCenterHeader,
   NotificationCenterHeaderAction,
   NotificationCenterHeaderActions,
@@ -19,6 +21,7 @@ import {
   NotificationCenterItemTime,
   NotificationCenterItemTitle,
   NotificationCenterList,
+  NotificationCenterSkeleton,
   NotificationCenterTabs,
   NotificationCenterTabsList,
   NotificationCenterTitle,
@@ -31,6 +34,7 @@ interface RenderOptions {
   onOpenChange?: (open: boolean) => void;
   onTitleClick?: (event: MouseEvent<HTMLButtonElement>) => void;
   onActionClick?: () => void;
+  onMarkAllRead?: () => void;
 }
 
 const renderInbox = ({
@@ -39,6 +43,7 @@ const renderInbox = ({
   onOpenChange,
   onTitleClick,
   onActionClick,
+  onMarkAllRead,
 }: RenderOptions = {}) =>
   render(
     <NotificationCenter data-testid='nc' open={open} onOpenChange={onOpenChange}>
@@ -47,7 +52,11 @@ const renderInbox = ({
         <NotificationCenterHeader>
           <NotificationCenterTitle />
           <NotificationCenterHeaderActions>
-            <NotificationCenterHeaderAction data-analytics-id='inbox-mark-all'>
+            <NotificationCenterHeaderAction
+              data-testid='mark-all'
+              data-analytics-id='inbox-mark-all'
+              onClick={onMarkAllRead}
+            >
               Mark all as read
             </NotificationCenterHeaderAction>
             <NotificationCenterHeaderAction asChild aria-label='Notification settings'>
@@ -91,7 +100,18 @@ const renderInbox = ({
               </NotificationCenterList>
             </NotificationCenterBody>
           </TabsContent>
-          <TabsContent value='read'>Read items</TabsContent>
+          <TabsContent value='read'>
+            <NotificationCenterBody>
+              <NotificationCenterList>
+                <NotificationCenterItem data-testid='nc--item-node'>
+                  <NotificationCenterItemTitle>
+                    Node wallarm-node-2 is back online
+                  </NotificationCenterItemTitle>
+                  <NotificationCenterItemTime value={new Date()} />
+                </NotificationCenterItem>
+              </NotificationCenterList>
+            </NotificationCenterBody>
+          </TabsContent>
         </NotificationCenterTabs>
       </NotificationCenterContent>
     </NotificationCenter>,
@@ -221,6 +241,13 @@ describe('Test ids', () => {
     }
   });
 
+  it('scopes the bell tooltip to the trigger, not the popover content', async () => {
+    renderInbox();
+    screen.getByTestId('nc--trigger').focus();
+    expect(await screen.findByTestId('nc--trigger--content')).toHaveTextContent('Notifications');
+    expect(screen.queryByTestId('nc--content')).not.toBeInTheDocument();
+  });
+
   it('renders no derived test ids without a root test id', () => {
     const { baseElement } = render(
       <NotificationCenter open>
@@ -231,6 +258,193 @@ describe('Test ids', () => {
       </NotificationCenter>,
     );
     expect(baseElement.querySelector('[data-testid]')).toBeNull();
+  });
+});
+
+describe('Keyboard', () => {
+  it('opens with Enter and closes with Escape, returning focus to the bell', async () => {
+    renderInbox();
+    const trigger = screen.getByTestId('nc--trigger');
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(await screen.findByTestId('nc--content')).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByTestId('nc--content')).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+  });
+});
+
+describe('Controlled', () => {
+  it('follows the open prop and reports Escape through onOpenChange', async () => {
+    const onOpenChange = rs.fn();
+    const { rerender } = renderInbox({ open: true, onOpenChange });
+    expect(screen.getByTestId('nc--content')).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(screen.getByTestId('nc--content')).toBeInTheDocument();
+
+    rerender(
+      <NotificationCenter data-testid='nc' open={false}>
+        <NotificationCenterTrigger />
+        <NotificationCenterContent>
+          <NotificationCenterTitle />
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    await waitFor(() => expect(screen.queryByTestId('nc--content')).not.toBeInTheDocument());
+  });
+});
+
+describe('NotificationCenterHeaderAction', () => {
+  it('calls onClick for "Mark all as read"', async () => {
+    const onMarkAllRead = rs.fn();
+    renderInbox({ open: true, onMarkAllRead });
+    await userEvent.click(screen.getByTestId('mark-all'));
+    expect(onMarkAllRead).toHaveBeenCalledOnce();
+  });
+
+  it('does not call onClick when disabled', async () => {
+    const onClick = rs.fn();
+    render(
+      <NotificationCenter open>
+        <NotificationCenterContent>
+          <NotificationCenterHeaderAction data-testid='mark-all' disabled onClick={onClick}>
+            Mark all as read
+          </NotificationCenterHeaderAction>
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    await userEvent.click(screen.getByTestId('mark-all'));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+
+describe('NotificationCenterTabs', () => {
+  it('switches from New to Read', async () => {
+    renderInbox({ open: true });
+    expect(screen.getByTestId('nc--item-attack')).toBeVisible();
+    await userEvent.click(screen.getByRole('tab', { name: 'Read' }));
+    expect(screen.getByRole('tab', { name: 'Read' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('nc--item-node')).toBeVisible();
+    await waitFor(() => expect(screen.queryByTestId('nc--item-attack')).not.toBeInTheDocument());
+  });
+});
+
+describe('NotificationCenterItem', () => {
+  it('marks unread items and shows their dot', () => {
+    renderInbox({ open: true });
+    const unreadTime = screen.getByTestId('nc--item-attack--time');
+    expect(screen.getByTestId('nc--item-attack')).toHaveAttribute('data-unread', 'true');
+    expect(unreadTime.tagName).toBe('TIME');
+    expect(unreadTime.querySelector('[aria-hidden]')).not.toBeNull();
+    expect(unreadTime).toHaveTextContent('now');
+  });
+
+  it('leaves read items unmarked, without the dot or the Unread prefix', async () => {
+    renderInbox({ open: true });
+    await userEvent.click(screen.getByRole('tab', { name: 'Read' }));
+    const item = screen.getByTestId('nc--item-node');
+    expect(item).not.toHaveAttribute('data-unread');
+    expect(screen.getByTestId('nc--item-node--time').querySelector('[aria-hidden]')).toBeNull();
+    expect(screen.getByTestId('nc--item-node--title')).toHaveAccessibleName(
+      'Node wallarm-node-2 is back online',
+    );
+  });
+
+  it('sets an ISO dateTime, and none for an invalid value', () => {
+    const value = new Date('2026-06-15T12:00:00Z');
+    render(
+      <NotificationCenter open data-testid='nc'>
+        <NotificationCenterContent>
+          <NotificationCenterList>
+            <NotificationCenterItem data-testid='nc--ok'>
+              <NotificationCenterItemTime value={value} />
+            </NotificationCenterItem>
+            <NotificationCenterItem data-testid='nc--bad'>
+              <NotificationCenterItemTime value='nope' />
+            </NotificationCenterItem>
+          </NotificationCenterList>
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    expect(screen.getByTestId('nc--ok--time')).toHaveAttribute('dateTime', value.toISOString());
+    expect(screen.getByTestId('nc--bad--time')).not.toHaveAttribute('dateTime');
+    expect(screen.getByTestId('nc--bad--time')).toHaveTextContent('—');
+  });
+});
+
+describe('Empty and loading', () => {
+  it('renders the empty state in the body', () => {
+    render(
+      <NotificationCenter open data-testid='nc'>
+        <NotificationCenterContent>
+          <NotificationCenterBody>
+            <NotificationCenterEmpty>
+              <EmptyStateMessage>
+                <EmptyStateTitle>You're all caught up</EmptyStateTitle>
+              </EmptyStateMessage>
+            </NotificationCenterEmpty>
+          </NotificationCenterBody>
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    expect(screen.getByTestId('nc--empty')).toHaveTextContent("You're all caught up");
+  });
+
+  it('renders busy placeholder rows while loading', () => {
+    render(
+      <NotificationCenter open data-testid='nc'>
+        <NotificationCenterContent>
+          <NotificationCenterBody>
+            <NotificationCenterSkeleton rows={3} />
+          </NotificationCenterBody>
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    const skeleton = screen.getByTestId('nc--skeleton');
+    expect(skeleton).toHaveAttribute('aria-busy', 'true');
+    expect(skeleton.children).toHaveLength(3);
+  });
+});
+
+describe('Analytics (more)', () => {
+  it('forwards data-analytics-id to an asChild title link', () => {
+    render(
+      <NotificationCenter open>
+        <NotificationCenterContent>
+          <NotificationCenterList>
+            <NotificationCenterItem>
+              <NotificationCenterItemTitle asChild>
+                <a href='/attacks' data-analytics-id='inbox-item-link'>
+                  New attack
+                </a>
+              </NotificationCenterItemTitle>
+            </NotificationCenterItem>
+          </NotificationCenterList>
+        </NotificationCenterContent>
+      </NotificationCenter>,
+    );
+    const link = screen.getByRole('link', { name: 'New attack' });
+    expect(link.tagName).toBe('A');
+    expect(link).toHaveAttribute('data-analytics-id', 'inbox-item-link');
+  });
+
+  it('does not strand the title id on the non-clickable item, list or body (negative)', () => {
+    renderInbox({ open: true });
+    for (const id of ['nc--item-attack', 'nc--list', 'nc--body', 'nc--content']) {
+      expect(screen.getByTestId(id)).not.toHaveAttribute('data-analytics-id');
+    }
+  });
+
+  it('keeps the title analytics attributes across a tab switch', async () => {
+    renderInbox({ open: true });
+    await userEvent.click(screen.getByRole('tab', { name: 'Read' }));
+    await userEvent.click(screen.getByRole('tab', { name: 'New' }));
+    expect(screen.getByTestId('nc--item-attack--title')).toHaveAttribute(
+      'data-analytics-id',
+      'inbox-item',
+    );
   });
 });
 
