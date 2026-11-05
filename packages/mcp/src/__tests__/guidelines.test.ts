@@ -155,6 +155,28 @@ describe('get_guideline', () => {
     expect(getGuidelineText(guidelines, 'empty-states')).not.toContain('Live stories');
   });
 
+  it('paginates a long overview and section (examples carry story code)', () => {
+    const examples = `## Examples\n\n\`\`\`tsx story=Default\n${'x\n'.repeat(25_000)}\`\`\``;
+    const long = {
+      ...guidelines,
+      guidelines: guidelines.guidelines.map(g =>
+        g.slug === 'patterns/empty-states'
+          ? {
+              ...g,
+              markdown: `# Empty states\n\n${examples}`,
+              sections: [{ id: 'examples', heading: 'Examples', markdown: examples }],
+            }
+          : g,
+      ),
+    };
+    const first = getGuidelineText(long, 'empty-states');
+    expect(first).toContain("`{ slug: 'patterns/empty-states', page: 2 }`");
+    expect(first.length).toBeLessThanOrEqual(40_000);
+    const section = getGuidelineText(long, 'empty-states', 'examples', 2);
+    expect(section).toContain('Page 2/');
+    expect(section.length).toBeLessThanOrEqual(40_000);
+  });
+
   it('suggests nearest slugs for an unknown slug', () => {
     expect(nearestSlugs(guidelines, 'empty-state')[0]).toBe('patterns/empty-states');
     expect(nearestSlugs(guidelines, 'gap')[0]).toBe('foundations/spacing');

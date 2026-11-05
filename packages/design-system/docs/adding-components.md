@@ -377,7 +377,7 @@ Use the appropriate category for the `title` field:
 | `Status Indication` | Status display                         | Badge, Tag, Indicator            |
 | `Typography`        | Text display                           | Heading, Text, Code              |
 
-`Patterns/` is reserved for pattern guideline stories (`src/guidelines/patterns/<slug>.stories.tsx`); never file a component under it.
+`Patterns/` is reserved for pattern guideline stories (`src/guidelines/patterns/<slug>.stories.tsx`, each one embedded in its guideline's `## Examples` by a ```` ```story ```` ref); never file a component under it.
 
 ## Step 9: Write E2E Tests
 

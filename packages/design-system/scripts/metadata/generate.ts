@@ -7,7 +7,7 @@ import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 import { parseComponentDescription } from './parse-description.js';
 import { parseComponentDocs } from './parse-docs.js';
 import { parseExamples } from './parse-examples.js';
-import { parseGuidelines } from './parse-guidelines.js';
+import { parseGuidelines, resolveStoryRefs } from './parse-guidelines.js';
 import { parseComponentProps } from './parse-props.js';
 import { parseTokens } from './parse-tokens.js';
 import { parseVariantsForComponent } from './parse-variants.js';
@@ -129,6 +129,13 @@ const main = () => {
     filter: src =>
       (fs.statSync(src).isDirectory() && !src.endsWith('-snapshots')) || src.endsWith('.md'),
   });
+  // ```story refs ship as the story's code, as in guidelines.json.
+  for (const g of guidelines.guidelines) {
+    if (!g.stories) continue;
+    const file = `${g.slug}.md`;
+    const source = fs.readFileSync(path.join(guidelinesDir, file), 'utf-8');
+    fs.writeFileSync(path.join(ROOT, 'dist/guidelines', file), resolveStoryRefs(source, g.stories));
+  }
 
   console.log(`Guidelines written to ${guidelinesPath}`);
   console.log(

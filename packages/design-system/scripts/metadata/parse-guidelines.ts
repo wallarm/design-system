@@ -22,6 +22,78 @@ const REQUIRED_SECTIONS: Record<GuidelineKind, string[]> = {
   pattern: ['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'],
 };
 
+/**
+ * Patterns whose `## Examples` are still tsx snippets. They skip the story-ref rules below.
+ * ponytail: transitional; drop each slug as its examples become stories, then the set itself.
+ */
+const UNCONVERTED_PATTERNS = new Set([
+  'patterns/auth-page',
+  'patterns/confirmation-dialogs',
+  'patterns/create-edit-forms',
+  'patterns/detail-drawer',
+  'patterns/empty-states',
+  'patterns/entity-table',
+  'patterns/feedback-toasts',
+  'patterns/filtering',
+  'patterns/resource-list-page',
+  'patterns/settings-page',
+]);
+
+/** A story reference: a ```story fence holding one export name of the sibling `.stories.tsx`. */
+const STORY_REF = /^```story[ \t]*\r?\n[ \t]*(\S+)[ \t]*\r?\n```[ \t]*$/gm;
+
+// Longer than any backtick run in the code, so the code can't close the fence.
+const fence = (code: string, info: string) => {
+  const longest = Math.max(0, ...[...code.matchAll(/`+/g)].map(m => m[0].length));
+  const ticks = '`'.repeat(Math.max(3, longest + 1));
+  return `${ticks}${info}\n${code}\n${ticks}`;
+};
+
+/**
+ * Replace every ```story ref with the story's description and its code as a
+ * ```tsx story=<Name> fence (the docs site turns those into live previews).
+ * Unknown names stay as written.
+ */
+export const resolveStoryRefs = (markdown: string, stories: GuidelineStory[]) =>
+  markdown.replace(STORY_REF, (ref, name: string) => {
+    const story = stories.find(s => s.name === name);
+    if (!story) return ref;
+    const code = fence(story.code, `tsx story=${name}`);
+    return story.description ? `${story.description}\n\n${code}` : code;
+  });
+
+/** Pattern examples are story refs: no tsx fences, at least two, every story used once. */
+const checkStoryRefs = (
+  body: string,
+  sections: GuidelineSection[],
+  stories: GuidelineStory[],
+  storiesFile: string,
+  fail: (message: string) => void,
+) => {
+  const examples = sections.find(s => s.heading === 'Examples')?.markdown ?? '';
+  if (/^\s*(```|~~~)/m.test(examples.replace(STORY_REF, ''))) {
+    fail(
+      '"## Examples" may hold only ```story refs and their captions; move the code into a story',
+    );
+  }
+  const exampleRefs = [...examples.matchAll(STORY_REF)].length;
+  if (exampleRefs < 2) fail(`"## Examples" has ${exampleRefs} \`\`\`story refs (min 2)`);
+
+  const refs = [...body.matchAll(STORY_REF)].map(m => m[1] ?? '');
+  const names = stories.map(s => s.name);
+  for (const ref of refs) {
+    if (!names.includes(ref)) {
+      fail(`unknown story "${ref}" (exports of ${storiesFile}: ${names.join(', ') || 'none'})`);
+    }
+  }
+  for (const name of names) {
+    const count = refs.filter(ref => ref === name).length;
+    if (count !== 1) {
+      fail(`story "${name}" of ${storiesFile} is referenced ${count} times (exactly 1 expected)`);
+    }
+  }
+};
+
 /** Max prose words per guideline body (code fences excluded). */
 const WORD_BUDGET: Record<GuidelineKind, number> = { foundation: 700, pattern: 1000 };
 
@@ -177,6 +249,15 @@ const parseGuidelineFile = (
   }
 
   const stories = kind === 'pattern' ? parseStories(filePath, title, fail) : undefined;
+  if (kind === 'pattern') {
+    const storiesFile = path.basename(filePath).replace(/\.md$/, '.stories.tsx');
+    if (!UNCONVERTED_PATTERNS.has(slug)) {
+      checkStoryRefs(body, sections, stories ?? [], storiesFile, fail);
+    } else if (body.match(STORY_REF)) {
+      fail('uses ```story refs: remove it from UNCONVERTED_PATTERNS in parse-guidelines.ts');
+    }
+  }
+  const markdown = resolveStoryRefs(body, stories ?? []).trim();
 
   if (
     typeof title !== 'string' ||
@@ -196,8 +277,8 @@ const parseGuidelineFile = (
     components,
     keywords,
     order,
-    markdown: body.trim(),
-    sections,
+    markdown,
+    sections: splitSections(markdown).sections,
     ...(stories?.length ? { stories } : {}),
   };
 };

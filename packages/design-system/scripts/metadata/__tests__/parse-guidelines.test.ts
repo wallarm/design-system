@@ -68,7 +68,37 @@ order: 1
 
 # Empty
 
-${['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'].map(h => `## ${h}\n\nText.`).join('\n\n')}
+## When to use
+
+Text.
+
+## Rules
+
+Text.
+
+## Examples
+
+The main case.
+
+\`\`\`story
+Default
+\`\`\`
+
+Search matched nothing.
+
+\`\`\`story
+NoResults
+\`\`\`
+
+${['States', 'What your app owns', 'Related'].map(h => `## ${h}\n\nText.`).join('\n\n')}
+`;
+
+const STORIES = `const meta = { title: 'Patterns/Empty' };
+export default meta;
+
+/** Nothing exists yet. */
+export const Default = () => <p>Empty</p>;
+export const NoResults = () => <p>No results</p>;
 `;
 
 const parse = (files: Record<string, string>) =>
@@ -129,6 +159,7 @@ describe('parseGuidelines', () => {
       'rules.md': 'Rules first line.\n- a -> b',
       'foundations/spacing.md': FOUNDATION,
       'patterns/empty.md': PATTERN,
+      'patterns/empty.stories.tsx': STORIES,
     });
     expect(guidelinesMetadataSchema.safeParse(result).success).toBe(true);
     expect(result.guidelines.map(g => [g.slug, g.kind])).toEqual([
@@ -146,7 +177,11 @@ describe('parseGuidelines', () => {
 
   it('requires every pattern section', () => {
     expect(() =>
-      parse({ 'rules.md': 'ok', 'patterns/empty.md': PATTERN.replace('## States', '## Other') }),
+      parse({
+        'rules.md': 'ok',
+        'patterns/empty.md': PATTERN.replace('## States', '## Other'),
+        'patterns/empty.stories.tsx': STORIES,
+      }),
     ).toThrow(/patterns\/empty\.md: missing required section "## States"/);
   });
 
@@ -158,6 +193,7 @@ describe('parseGuidelines', () => {
         'rules.md': 'ok',
         'foundations/spacing.md': `${FOUNDATION}\n${words(700)}\n`,
         'patterns/empty.md': `${PATTERN}\n${words(1000)}\n`,
+        'patterns/empty.stories.tsx': STORIES,
       }),
     ).toThrow(
       /foundations\/spacing\.md: \d+ words, budget 700[\s\S]*patterns\/empty\.md: \d+ words, budget 1000/,
@@ -167,6 +203,7 @@ describe('parseGuidelines', () => {
         'rules.md': 'ok',
         'foundations/spacing.md': `${FOUNDATION}${code}`,
         'patterns/empty.md': `${PATTERN}${code}`,
+        'patterns/empty.stories.tsx': STORIES,
       }),
     ).not.toThrow();
   });
@@ -194,17 +231,10 @@ describe('parseGuidelines', () => {
   });
 
   it('attaches a pattern story file in export order and checks its title', () => {
-    const stories = (title: string) => `const meta = { title: '${title}' };
-export default meta;
-
-/** Nothing exists yet. */
-export const Default = () => <p>Empty</p>;
-export const NoResults = () => <p>No results</p>;
-`;
     const result = parse({
       'rules.md': 'ok',
       'patterns/empty.md': PATTERN,
-      'patterns/empty.stories.tsx': stories('Patterns/Empty'),
+      'patterns/empty.stories.tsx': STORIES,
     });
     expect(result.guidelines[0]?.stories).toEqual([
       {
@@ -218,9 +248,58 @@ export const NoResults = () => <p>No results</p>;
       parse({
         'rules.md': 'ok',
         'patterns/empty.md': PATTERN,
-        'patterns/empty.stories.tsx': stories('Inputs/Empty'),
+        'patterns/empty.stories.tsx': STORIES.replace('Patterns/Empty', 'Inputs/Empty'),
       }),
     ).toThrow(/empty\.stories\.tsx meta title must be "Patterns\/Empty" \(found "Inputs\/Empty"\)/);
+  });
+
+  it('resolves story refs to their description and code in markdown and sections', () => {
+    const [g] = parse({
+      'rules.md': 'ok',
+      'patterns/empty.md': PATTERN,
+      'patterns/empty.stories.tsx': STORIES,
+    }).guidelines;
+    const examples = g?.sections.find(s => s.id === 'examples')?.markdown;
+    expect(examples).toBe(
+      [
+        'The main case.',
+        'Nothing exists yet.',
+        '```tsx story=Default\nexport const Default = () => <p>Empty</p>;\n```',
+        'Search matched nothing.',
+        '```tsx story=NoResults\nexport const NoResults = () => <p>No results</p>;\n```',
+      ].join('\n\n'),
+    );
+    expect(g?.markdown).toContain(examples);
+    expect(g?.markdown).not.toContain('```story');
+  });
+
+  it('rejects tsx in pattern examples, too few refs, unknown and unused stories', () => {
+    const md = PATTERN.replace(
+      '```story\nNoResults\n```',
+      '```story\nMissing\n```\n\n```tsx\n<p />\n```',
+    );
+    expect(() =>
+      parse({ 'rules.md': 'ok', 'patterns/empty.md': md, 'patterns/empty.stories.tsx': STORIES }),
+    ).toThrow(
+      /"## Examples" may hold only ```story refs[\s\S]*unknown story "Missing" \(exports of empty\.stories\.tsx: Default, NoResults\)[\s\S]*story "NoResults" of empty\.stories\.tsx is referenced 0 times/,
+    );
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'patterns/empty.md': PATTERN.replace('```story\nNoResults\n```', ''),
+        'patterns/empty.stories.tsx': STORIES,
+      }),
+    ).toThrow(/"## Examples" has 1 ```story refs \(min 2\)/);
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'patterns/empty.md': PATTERN.replace(
+          '## States\n\nText.',
+          '## States\n\n```story\nDefault\n```',
+        ),
+        'patterns/empty.stories.tsx': STORIES,
+      }),
+    ).toThrow(/story "Default" of empty\.stories\.tsx is referenced 2 times/);
   });
 
   it('validates the real guidelines directory', () => {

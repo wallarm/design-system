@@ -5,7 +5,6 @@ import {
   escapeMarkdown,
   renderGuidelinePage,
   renderGuidelinesMeta,
-  renderPatternsIndex,
   rewriteGuidelineLinks,
 } from '../render';
 
@@ -95,7 +94,32 @@ describe('renderGuidelinePage', () => {
     );
   });
 
-  it('embeds every story as a live example right before the first H2', () => {
+  it('turns each resolved story fence into a full-bleed live preview in place', () => {
+    const g = pattern('resource-list-page', 1, {
+      title: 'Resource list page',
+      markdown:
+        '# Resource list page\n\n## Examples\n\nThe whole page.\n\nMain.\n\n```tsx story=Default\nexport const Default = () => <Page />;\n```\n\n## States',
+      stories: [
+        { name: 'Default', code: 'export const Default = () => <Page />;', description: 'Main.' },
+      ],
+    });
+    const page = renderGuidelinePage(g, link, { storyImportBase: '../../src/guidelines/patterns' });
+    expect(page).toContain(
+      [
+        '## Examples',
+        'The whole page.',
+        'Main.',
+        "<StoryPreview load={() => import('../../src/guidelines/patterns/resource-list-page.stories.tsx')} name='Default' fullscreen>",
+        '```tsx\nexport const Default = () => <Page />;\n```',
+        '</StoryPreview>',
+        '## States',
+      ].join('\n\n'),
+    );
+    expect(page).not.toContain('Live example');
+    expect(page).not.toContain('story=');
+  });
+
+  it('embeds every story as a live example for a pattern without story fences', () => {
     const g = pattern('resource-list-page', 1, {
       title: 'Resource list page',
       markdown: '# Resource list page\n\nIntro.\n\n## When to use\n\nTable.',
@@ -119,24 +143,6 @@ describe('renderGuidelinePage', () => {
     );
     expect(page.indexOf('### No results')).toBeLessThan(page.indexOf('## When to use'));
     expect(renderGuidelinePage(g, link)).not.toContain('Live example');
-  });
-});
-
-describe('renderPatternsIndex', () => {
-  it('lists patterns by order with use-when text and key components', () => {
-    const page = renderPatternsIndex(
-      [
-        pattern('b', 20, { description: 'Use when a | b.' }),
-        pattern('a', 10, {
-          components: ['Table', 'Avatar', 'Toast', 'Toaster', 'AvatarName', 'Extra'],
-        }),
-      ],
-      link,
-    );
-    expect(page).toContain('| Pattern | Use when | Key components |');
-    expect(page.indexOf('[a](/patterns/a)')).toBeLessThan(page.indexOf('[b](/patterns/b)'));
-    expect(page).toContain('| [b](/patterns/b) | A \\| b. |  |');
-    expect(page).not.toContain('Extra');
   });
 });
 

@@ -289,11 +289,22 @@ const byOrder = (guidelines: Guideline[]): Guideline[] =>
 
 const pageName = (g: Guideline): string => g.slug.split('/').at(-1) ?? g.slug;
 
+/** A story the guideline embeds: `tsx story=<Name>` fences (resolved ```story refs). */
+const STORY_FENCE = /^(`{3,})tsx story=(\S+)\n([\s\S]*?)\n\1$/gm;
+
+/** Each embedded story fence becomes a full-bleed live preview with its code. */
+export const embedStories = (markdown: string, storyFile: string, base: string): string =>
+  markdown.replace(
+    STORY_FENCE,
+    (_, _ticks: string, name: string, code: string) =>
+      `<StoryPreview load={${loader(base, storyFile)}} name='${name}' fullscreen>\n\n${fence(code)}\n\n</StoryPreview>`,
+  );
+
 /**
- * `## Live example`: every story of `patterns/<slug>.stories.tsx`, full-bleed, in file order.
- * `storyImportBase` is the stories folder relative to the generated page.
+ * `## Live example`: every story, for a pattern whose examples are not stories yet.
+ * ponytail: transitional; delete with UNCONVERTED_PATTERNS in parse-guidelines.ts.
  */
-export function renderLiveExample(g: Guideline, storyImportBase: string): string {
+function renderLiveExample(g: Guideline, storyImportBase: string): string {
   const stories = g.stories ?? [];
   if (!stories.length) return '';
   const file = `${pageName(g)}.stories.tsx`;
@@ -317,11 +328,13 @@ export function renderGuidelinePage(
   link: (name: string) => string | undefined,
   opts: { storyImportBase?: string } = {},
 ): string {
-  const body = escapeMarkdown(rewriteGuidelineLinks(g.markdown.trim(), g.slug));
+  const base = opts.storyImportBase;
+  const escaped = escapeMarkdown(rewriteGuidelineLinks(g.markdown.trim(), g.slug));
+  const body = base ? embedStories(escaped, `${pageName(g)}.stories.tsx`, base) : escaped;
   const components = g.components.length
     ? `**Components:** ${componentLinks(g.components, link)}`
     : '';
-  const live = opts.storyImportBase ? renderLiveExample(g, opts.storyImportBase) : '';
+  const live = base && body === escaped ? renderLiveExample(g, base) : '';
   // The components line goes right under the H1, which the body always starts with; the live
   // example closes the intro, right before the first H2.
   const withLive = (md: string): string => {
@@ -334,27 +347,6 @@ export function renderGuidelinePage(
     ? [h1, components, withLive(rest.join('\n').trim())]
     : [`# ${escapeMdx(g.title)}`, components, withLive(body)];
   return `---\ntitle: ${JSON.stringify(g.title)}\ndescription: ${JSON.stringify(g.description)}\n---\n\n${content.filter(Boolean).join('\n\n')}\n`;
-}
-
-export function renderPatternsIndex(
-  patterns: Guideline[],
-  link: (name: string) => string | undefined,
-): string {
-  const useWhen = (d: string): string => {
-    const s = d.replace(/^use when\s+/i, '');
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-  const rows = byOrder(patterns).map(
-    g =>
-      `| [${escapeCell(g.title)}](/${g.slug}) | ${escapeCell(useWhen(g.description))} | ${componentLinks(g.components.slice(0, 5), link)} |`,
-  );
-  const page = [
-    '---\ntitle: "Patterns"\ndescription: "Recipes for whole screens and flows built from design-system components: list pages, tables, dialogs, drawers, forms, settings, empty states, filtering and auth."\n---',
-    '# Patterns',
-    'Each pattern names the components for a screen or flow, how to lay them out, their states and the rules to follow. AI assistants read the same pages through the [MCP server](/ai/mcp).',
-    ['| Pattern | Use when | Key components |', '| --- | --- | --- |', ...rows].join('\n'),
-  ].join('\n\n');
-  return `${page}\n`;
 }
 
 /** Sidebar order: guideline pages by `order`, around the fixed pages of the section. */

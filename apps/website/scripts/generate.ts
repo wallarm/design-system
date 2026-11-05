@@ -11,7 +11,6 @@ import {
   renderComponentsMeta,
   renderGuidelinePage,
   renderGuidelinesMeta,
-  renderPatternsIndex,
   renderTokensPage,
 } from './render';
 
@@ -77,11 +76,7 @@ for (const g of guidelines)
     path.join(docs, `${g.slug}.mdx`),
     renderGuidelinePage(g, link, g.kind === 'pattern' ? { storyImportBase: patternStoryBase } : {}),
   );
-writeFileSync(path.join(patternsDir, 'index.mdx'), renderPatternsIndex(patterns, link));
-writeFileSync(
-  path.join(patternsDir, '_meta.json'),
-  renderGuidelinesMeta(patterns, { before: ['index'] }),
-);
+writeFileSync(path.join(patternsDir, '_meta.json'), renderGuidelinesMeta(patterns));
 writeFileSync(
   path.join(docs, 'foundations/_meta.json'),
   renderGuidelinesMeta(foundations, { before: ['tokens'], after: ['icons'] }),

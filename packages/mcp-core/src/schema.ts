@@ -118,7 +118,7 @@ export const guidelineSchema = z.object({
   components: z.array(z.string()),
   keywords: z.array(z.string()),
   order: z.number(),
-  /** Body without frontmatter. */
+  /** Body without frontmatter; a pattern's ```story refs are resolved to `tsx story=<Name>` code fences. */
   markdown: z.string(),
   sections: z.array(guidelineSectionSchema),
   /**

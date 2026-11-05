@@ -61,11 +61,14 @@ const sitePath = new URL(llms.match(/https?:\/\/\S+?\/design-system\//)?.[0] ?? 
 for (const file of guidelineMd) {
   expect(llms.includes(`/${file})`), `llms.txt does not list ${file}`);
   const md = read(file);
-  if (file.startsWith('patterns/') && file !== 'patterns/index.md') {
+  if (file.startsWith('patterns/')) {
     expect(md.includes('```tsx'), `${file} has no tsx code fence`);
+    // The built .md flattens previews to code, so count them in the generated page source.
+    const mdx = readFileSync(resolve(root, 'docs', file.replace(/\.md$/, '.mdx')), 'utf8');
+    const embedded = mdx.match(/<StoryPreview /g)?.length ?? 0;
     expect(
-      md.includes('## Live example'),
-      `${file} has no live example: add packages/design-system/src/guidelines/${file.replace(/\.md$/, '.stories.tsx')}`,
+      embedded >= 2,
+      `${file} embeds ${embedded} stories (min 2): reference stories with \`\`\`story blocks in packages/design-system/src/guidelines/${file}`,
     );
   }
   for (const [, href] of md.matchAll(/\]\((https?:\/\/[^)\s#]+)/g)) {

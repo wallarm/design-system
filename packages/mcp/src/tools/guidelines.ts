@@ -117,7 +117,12 @@ export function getGuidelineText(
   }
   // A link's `#anchor` selects the section unless one is passed.
   section ??= splitLink(slug).anchor;
-  if (!section) return `${guideline.markdown}${storiesFooter(guideline)}`;
+  // Pattern examples carry their stories' code, so long pages paginate.
+  const pageCall = (next: number) =>
+    `\`{ slug: '${guideline.slug}'${section ? `, section: '${section}'` : ''}, page: ${next} }\``;
+  if (!section) {
+    return `${paginate(guideline.markdown, page, pageCall)}${storiesFooter(guideline)}`;
+  }
 
   const id = section
     .trim()
@@ -133,7 +138,7 @@ export function getGuidelineText(
     ];
     return `Section "${section}" not found in ${guideline.slug}.\n\nAvailable sections: ${ids.join(', ')}`;
   }
-  return `# ${guideline.title} — ${match.heading}\n\n${match.markdown}`;
+  return paginate(`# ${guideline.title} — ${match.heading}\n\n${match.markdown}`, page, pageCall);
 }
 
 /** Guidelines whose `components` reference the component (case-insensitive). */
