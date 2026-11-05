@@ -1,0 +1,57 @@
+/**
+ * Proton SDK wrapper
+ *
+ * Provides TypeScript types and initialization helpers for proton-new-js WebAssembly SDK.
+ * @packageDocumentation
+ */
+
+export { initProton, useProton } from './init';
+export type {
+  AltsSegment,
+  AttrNameSegment,
+  AttrSegment,
+  Category,
+  CheckError,
+  CheckOptions,
+  CheckResult,
+  Choice,
+  Choices,
+  CompleteOptions,
+  Completion,
+  CompletionItem,
+  ContentName,
+  ContentSegment,
+  DupAllSegment,
+  DupAnySegment,
+  DupSegment,
+  EncodingName,
+  Fix,
+  FormatName,
+  IndexSegment,
+  JoinedSegment,
+  KeySegment,
+  Kind,
+  Layer,
+  NameSegment,
+  Native,
+  NativeSegment,
+  Parsed,
+  Profile,
+  Proton,
+  ProtonPoint,
+  Quant,
+  Role,
+  RootSegment,
+  RuleContext,
+  Segment,
+  SegmentCheck,
+  SegmentConstructors,
+  SegmentVerdict,
+  Step,
+  StepError,
+  Verdict,
+  VersionInfo,
+  Vocabulary,
+  WildSegment,
+  Words,
+} from './types';

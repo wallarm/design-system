@@ -1,6 +1,7 @@
-import { afterEach, expect } from '@rstest/core';
+import { afterEach, expect, rs } from '@rstest/core';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
+import type { Proton } from '@wallarm-org/rules-lib';
 
 // jest-dom ships a Vitest-only entry (`@testing-library/jest-dom/vitest`), so
 // register its matchers on Rstest's `expect` directly. Their types come from
@@ -12,6 +13,224 @@ expect.extend(matchers);
 afterEach(() => {
   cleanup();
 });
+
+// Mock Proton SDK globally for all tests - uses mock implementation instead of WASM.
+// This lightweight mock returns canonical form without actual WASM compilation.
+// NOTE: Must be sync factory - rstest doesn't support async factories
+rs.mock('@wallarm-org/rules-lib', () => {
+  // Inline mock Proton instance - basic validation and canonicalization
+  // Segment kinds and field names match real SDK (proton-new-js/index.d.ts).
+  const renderSeg = (s: any): string => {
+    switch (s.kind) {
+      case 'native':
+        return `[${s.value}]`;
+      case 'key':
+        return `['${s.value}']`;
+      case 'name':
+        return `['${s.value}'][role:name]`;
+      case 'typed':
+        return `[attr:'${s.value}']`;
+      case 'typed_name':
+        return `[attr:'${s.value}'][role:name]`;
+      case 'content':
+        return `[format:${s.name}]`;
+      case 'combined_key':
+        return `['${s.value}'][dup,joined:'${s.separator}']`;
+      case 'wildcard': {
+        const kinds = s.kinds?.join('|') ?? '';
+        const q =
+          { one: '*', zero_or_one: '?', zero_or_more: '**', one_or_more: '+' }[s.quant as string] ??
+          '*';
+        return `[${kinds ? `${kinds}:` : ''}${q}]${s.role ? `[role:${s.role}]` : ''}`;
+      }
+      case 'index':
+        return `[${s.index}]`;
+      case 'dup_index':
+        return `[dup:${s.index}]`;
+      case 'dup_all':
+        return '[dup:all]';
+      case 'dup_any':
+        return '[dup:any]';
+      case 'alts':
+        return `[${(s.alts as any[]).map((a: any) => renderSeg(a.segment)).join('|')}]`;
+      case 'root':
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const mockProton: Proton = {
+    point: {
+      check: (point: string) => {
+        const trimmed = point.trim();
+        if (!trimmed) {
+          return {
+            ok: false,
+            error: {
+              message: 'Empty point',
+              layer: 'grammar',
+              span: [0, 0],
+              code: 'empty_point',
+              params: {},
+              fixes: [],
+              incomplete: true,
+            },
+          };
+        }
+        const canonical = trimmed.replace(/\s+/g, '');
+        return { ok: true, canonical, exact: !canonical.includes('*') };
+      },
+      complete: () => ({
+        replace: [0, 0],
+        items: [],
+        parent: '',
+        keySlot: false,
+        query: null,
+        truncated: false,
+        error: null,
+      }),
+      parse: () => [],
+      render: (segments: any[]) => {
+        if (segments.length === 0) return 'flow';
+        return segments.map(renderSeg).join('');
+      },
+      checkSegments: (segments: any[]) => {
+        const canonical = segments.map(renderSeg).join('');
+        return { ok: true, canonical, exact: true };
+      },
+      next: () => ({ items: [], parent: null, keySlot: false, truncated: false, error: null }),
+      steps: () => ({ steps: [], error: null }),
+      vocabulary: () => ({
+        natives: ['method', 'proto', 'url', 'path', 'query', 'header', 'body'],
+        formats: ['json', 'xml', 'form', 'multipart', 'cookie', 'auth', 'jwt', 'protobuf'],
+        encodings: ['base64', 'percent', 'gzip', 'deflate', 'brotli'],
+        kinds: ['arr', 'attr', 'encoding', 'format', 'http', 'key'],
+        quantifiers: ['*', '**', '?', '+'],
+        roles: ['name', 'value'],
+        dups: ['all', 'any'],
+      }),
+    },
+    version: () => ({
+      crate: '0.0.0-mock',
+      ruleset_format: '0.10.3',
+      canonical: 1,
+      commit: 'mock',
+    }),
+  };
+
+  return {
+    // Proton SDK
+    useProton: () => [mockProton, null, rs.fn()],
+    initProton: async () => mockProton,
+
+    // Sample message generation
+    sampleMessage: () => [],
+
+    // Point utilities
+    PARSER_VOCABULARY: {},
+    STATIC_KEYS: {},
+    staticKeysProvider: () => [],
+
+    // Segment helpers
+    ENCODINGS: {},
+    FORMATS: {},
+    headerSeg: (value: string) => ({ kind: 'key', value }),
+    keySeg: (value: string) => ({ kind: 'key', value }),
+    nativeSeg: (value: string) => ({ kind: 'native', value }),
+    seg: (text: string, kind: string, label: string, props?: any) => ({
+      kind,
+      text,
+      label,
+      ...props,
+    }),
+
+    // UI helpers
+    describe: (segments: any[]) => {
+      // Build human-readable sentence from segment labels with › separator
+      if (!segments || segments.length === 0) return '';
+      return segments
+        .map(s => s.label || s.value || '')
+        .filter(Boolean)
+        .join(' › ');
+    },
+    checkOf: () => null,
+    isCaseFixed: () => false,
+    isKeyStep: () => false,
+    isPositionStep: () => false,
+    listTitle: () => '',
+    nameRows: () => [],
+    nounOf: () => '',
+    fuzzyScore: () => 0,
+    pickByNumber: () => [],
+    takesValue: () => false,
+    conditionLabel: () => '',
+    CONDITIONS: [],
+    PICK_LABELS: {},
+
+    // Point validation
+    canonicalizePoint: (point: string) => point,
+    isExactPoint: () => false,
+    validatePoint: () => ({ ok: true, canonical: '', exact: true }),
+
+    // RuleBuilder models
+    ACTION_KINDS: [],
+    ATTACK_TYPES: [],
+    SIGNAL_TYPES: [],
+    DUPLICATE_CONTAINERS: [],
+    EMPTY_FIELD_VALUE: '',
+    LIMITS: {},
+    TARGET_FOR: {},
+    actionProblems: () => [],
+    conditionProblems: () => [],
+    fieldComplete: () => false,
+    fromProtonAction: (action: any) => action,
+    fromProtonCondition: (condition: any) => condition,
+    labelOf: () => '',
+    newAction: (kind: string) => ({ kind }),
+    newField: () => ({ type: 'point' }),
+    newGroup: (operator: string) => ({ type: 'group', operator, children: [] }),
+    nodeId: () => 'mock-id',
+    toProtonAction: (action: any) => action,
+    toProtonCondition: (condition: any) => condition,
+
+    // Check helpers
+    isPairingCheck: () => false,
+    isPointCheck: () => false,
+    isSampleCheck: () => false,
+
+    // Rule validation
+    validateRule: () => ({ ok: true, errors: [] }),
+  };
+});
+
+// Mock UI helpers from '@wallarm-org/rules-lib/ui'
+rs.mock('@wallarm-org/rules-lib/ui', () => ({
+  // Re-export types
+  CONDITIONS: [],
+  PICK_LABELS: {},
+
+  // UI helper functions
+  describe: (segments: any[]) => {
+    // Build human-readable sentence from segment labels with › separator
+    if (!segments || segments.length === 0) return '';
+    return segments
+      .map(s => s.label || s.value || '')
+      .filter(Boolean)
+      .join(' › ');
+  },
+  checkOf: () => null,
+  isCaseFixed: () => false,
+  isKeyStep: () => false,
+  isPositionStep: () => false,
+  listTitle: () => '',
+  nameRows: () => [],
+  nounOf: () => '',
+  fuzzyScore: () => 0,
+  pickByNumber: () => [],
+  takesValue: () => false,
+  conditionLabel: () => '',
+}));
 
 // Element is absent under `@rstest-environment node` (SSR tests).
 if (typeof Element !== 'undefined') {
