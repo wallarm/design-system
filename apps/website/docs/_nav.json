@@ -20,6 +20,11 @@
     "activeMatch": "^/foundations/"
   },
   {
+    "text": "Patterns",
+    "link": "/patterns/",
+    "activeMatch": "^/patterns/"
+  },
+  {
     "text": "Components",
     "link": "/components/button",
     "activeMatch": "^/components/"

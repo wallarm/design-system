@@ -1,6 +1,8 @@
 doc_build
 docs/components/
-docs/foundations/tokens.mdx
+docs/foundations/*
+!docs/foundations/icons.mdx
+docs/patterns/
 docs/get-started/changelog.md
 docs/public/components.json
 doc_build_local

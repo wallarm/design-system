@@ -20,7 +20,7 @@ describe('SearchSections', () => {
     expect(links.map(l => l.querySelector('.rp-suggest-item__statement')?.textContent)).toEqual(
       nav.map(n => n.text),
     );
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(nav.length);
     expect(links[1]?.getAttribute('href')).toBe('/design-system/ai/mcp');
   });
 
@@ -91,7 +91,7 @@ describe('SearchSectionsHost', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
 
     const first = mountModal();
-    await waitFor(() => expect(first.querySelectorAll('a')).toHaveLength(6));
+    await waitFor(() => expect(first.querySelectorAll('a')).toHaveLength(nav.length));
     const order = [...first.children].map(c => c.className || c.tagName);
     expect(order.indexOf('rp-search-panel__header')).toBeLessThan(order.indexOf('DIV'));
     expect(first.children[1]?.querySelector('nav')).not.toBeNull();
@@ -101,7 +101,7 @@ describe('SearchSectionsHost', () => {
     await waitFor(() => expect(screen.queryByRole('navigation')).toBeNull());
 
     const second = mountModal();
-    await waitFor(() => expect(second.querySelectorAll('a')).toHaveLength(6));
+    await waitFor(() => expect(second.querySelectorAll('a')).toHaveLength(nav.length));
     act(() => second.remove());
   });
 });

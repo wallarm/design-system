@@ -1,24 +1,29 @@
-import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
+import type { DesignSystemMetadata, GuidelinesMetadata } from '@wallarm-org/mcp-core';
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { findNewComponents } from './newComponents';
 import {
+  componentPageResolver,
   kebab,
   renderChangelogPage,
   renderComponentPage,
   renderComponentsMeta,
+  renderGuidelinePage,
+  renderGuidelinesMeta,
+  renderPatternsIndex,
   renderTokensPage,
 } from './render';
 
 const app = path.resolve(import.meta.dirname, '..');
 const ds = path.resolve(app, '../../packages/design-system');
 const metadataPath = path.join(ds, 'dist/metadata/components.json');
+const guidelinesPath = path.join(ds, 'dist/metadata/guidelines.json');
 const componentsSrc = path.join(ds, 'src/components');
 const docs = path.join(app, 'docs');
 const outDir = path.join(docs, 'components');
 
-if (!existsSync(metadataPath)) {
+if (!existsSync(metadataPath) || !existsSync(guidelinesPath)) {
   execSync('pnpm --filter @wallarm-org/design-system generate-metadata', { stdio: 'inherit' });
 }
 
@@ -55,8 +60,26 @@ writeFileSync(
   path.join(docs, 'get-started/changelog.md'),
   renderChangelogPage(readFileSync(path.join(ds, 'CHANGELOG.md'), 'utf8')),
 );
+const { guidelines }: GuidelinesMetadata = JSON.parse(readFileSync(guidelinesPath, 'utf8'));
+const link = componentPageResolver(metadata.components);
+const foundations = guidelines.filter(g => g.kind === 'foundation');
+const patterns = guidelines.filter(g => g.kind === 'pattern');
+const patternsDir = path.join(docs, 'patterns');
+rmSync(patternsDir, { recursive: true, force: true });
+mkdirSync(patternsDir, { recursive: true });
+for (const g of guidelines)
+  writeFileSync(path.join(docs, `${g.slug}.mdx`), renderGuidelinePage(g, link));
+writeFileSync(path.join(patternsDir, 'index.mdx'), renderPatternsIndex(patterns, link));
+writeFileSync(
+  path.join(patternsDir, '_meta.json'),
+  renderGuidelinesMeta(patterns, { before: ['index'] }),
+);
+writeFileSync(
+  path.join(docs, 'foundations/_meta.json'),
+  renderGuidelinesMeta(foundations, { before: ['tokens'], after: ['icons'] }),
+);
 copyFileSync(metadataPath, path.join(docs, 'public/components.json'));
 
 process.stdout.write(
-  `docs: generated ${pages} component pages, ${newComponents.size} marked new\n`,
+  `docs: generated ${pages} component pages, ${newComponents.size} marked new, ${guidelines.length} guidelines\n`,
 );
