@@ -4,10 +4,42 @@ description: Prototype with the real Wallarm components, tokens, fonts and icons
 
 # Claude Design
 
-## Set up from a prompt
+## Use the Wallarm system
 
-Paste this prompt into a new Claude Design chat. Claude installs the system for you; nothing
-to download or configure.
+Wallarm's [system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7) is shared with
+the whole Wallarm organisation. It contains the components, light and dark tokens, Geist fonts,
+icons and live examples generated from this repository, and maintainers sync it by hand after each
+release (see [Request a change](#request-a-change)).
+
+1. Open Claude Design and start a new design.
+2. Pick **Wallarm Design System** as the design system.
+3. Describe what you need.
+
+Claude reads the system's README first. It puts the app skeleton on the canvas (the console
+header, the product rail, a product menu and an empty page), sets the product and menu from
+your request and designs the screen inside the skeleton's page. Name groups and section
+headers in the menu too. For example:
+
+- “Design the Attacks list for API Security. Menu: Overview, API Discovery, API
+  Specifications, Sessions; group Detect & Respond: Attacks, Incidents. Add a severity filter,
+  an empty state and a detail drawer.”
+- “Now add the Incidents screen.” Claude adds it as another board on the same canvas, with the
+  same skeleton and its own menu link highlighted.
+- “Design a standalone Create rule dialog, without the app frame.” Asking for a component or a
+  screen without the frame skips the skeleton.
+
+What you will see: a **Wallarm app** board with the skeleton and your screen in its page, one
+board per screen. Clicking a menu item moves the highlight, the breadcrumb and the page title.
+Without a product in the request, the skeleton shows a sample product you can rename later.
+
+Lead with the screen's purpose, content and states, and ask for the existing components and
+semantic tokens. The component guides show the intended composition.
+
+## Your own copy
+
+Install your own copy when you are outside the Wallarm organisation or need a system you pin
+or fork. Paste this prompt into a new Claude Design chat. Claude installs the system for you;
+nothing to download or configure.
 
 ```text
 Install Wallarm Design System in Claude Design.
@@ -60,28 +92,10 @@ Run `npx -y @wallarm-org/claude-design@latest update` and follow wallarm-design-
 Replace `<link>` with your system's link. It starts with `https://claude.ai/artifact/` and Claude
 gave it to you when the install finished. Lost it? Open claude.ai, go to your artifacts, open
 **Wallarm Design System** and copy the address from the browser bar. Use your own copy, not
-Wallarm's shared system below: Claude can't update that one and will tell you so.
+Wallarm's shared system: Claude can't update that one and will tell you so.
 
 Claude publishes the new files to the same link, uploads only the new and changed icons, asks you
 before removing the files the release dropped, and reinstalls the system on your canvases.
-
-## Use Wallarm's shared system
-
-Wallarm's own copy is the
-[system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7): choose **Wallarm Design
-System** when creating a Design canvas. It contains the components, light and dark tokens,
-Geist fonts, icons and live examples generated from this repository, and maintainers sync it
-by hand (see [Request a change](#request-a-change)).
-
-Choosing the system on a new canvas is enough: Claude starts from the system's README, which
-has it put the app skeleton on the canvas first and design every screen inside it. Name your
-product and menu in the prompt to set up the skeleton, or ask for a standalone component to
-skip it.
-
-Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
-prototype a rules list with a primary Create rule action, environment filter, empty state and
-dark theme.” Ask for the existing components and semantic tokens, then check the component
-guides for the intended composition.
 
 ## Mount components
 

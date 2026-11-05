@@ -1,7 +1,7 @@
 # Wallarm Design System for Claude Design
 
 Install [Wallarm Design System](https://github.com/wallarm/design-system) in Claude Design from
-one prompt. Paste the prompt from the [Claude Design guide](https://wallarm.github.io/design-system/ai/claude-design)
+one prompt. Paste the prompt from the [Claude Design guide](https://wallarm.github.io/design-system/ai/claude-design#your-own-copy)
 into a Claude Design chat; Claude runs:
 
 ```bash
