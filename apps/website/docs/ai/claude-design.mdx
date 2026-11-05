@@ -29,7 +29,8 @@ What you will see:
    `SETUP.md` written for that release.
 2. A new **Wallarm Design System** artifact in your account, with the icon and logo galleries.
    Claude uploads the SVGs in batches of 25 (about 24 calls), then publishes the index. Claude
-   gives you its link: keep it to install the system on other canvases and to update it.
+   gives you its link, `https://claude.ai/artifact/<id>`. **Save it**: you need it to install the
+   system on other canvases and to update it.
 3. A Design canvas with the system installed and a **Wallarm sampler** board: a Users settings
    screen with the app shell, a table, status tabs and an open drawer. Claude checks that it
    renders without `[WallarmDS]` warnings, then waits for your request.
@@ -40,19 +41,19 @@ its version matches the design-system version.
 
 ### Update to a new release
 
-Paste this into a chat, with your system's link:
+Paste this into a chat, with your system's link in place of `<link>`:
 
 ```text
-Update my Wallarm Design System <link> to the latest release. Save its file paths as a JSON
-array in current-files.json and its project/design-system.json in current-index.json, run
-npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json --index current-index.json
-and follow "Update to a new release" in wallarm-design-system/SETUP.md.
+Run `npx -y @wallarm-org/claude-design@latest update` and follow wallarm-design-system/UPDATE.md to update my Wallarm Design System: <link>
 ```
 
+Replace `<link>` with your system's link. It starts with `https://claude.ai/artifact/` and Claude
+gave it to you when the install finished. Lost it? Open claude.ai, go to your artifacts, open
+**Wallarm Design System** and copy the address from the browser bar. Use your own copy, not
+Wallarm's shared system below: Claude can't update that one and will tell you so.
+
 Claude publishes the new files to the same link, uploads only the new and changed icons, asks you
-before removing the files the release dropped, and reinstalls the system on your canvases. Use it only on a system you installed from the
-prompt: Wallarm's shared system below is updated by its maintainers, and Claude stops if you give
-it that link.
+before removing the files the release dropped, and reinstalls the system on your canvases.
 
 ## Use Wallarm's shared system
 
