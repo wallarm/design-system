@@ -1,12 +1,12 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
-import { WallyIcon } from '../WallyIcon';
+import { AgentGlyph } from '../AgentGlyph';
 import { chatHeaderTitleVariants } from './classes';
 
 /**
  * Without children: the Figma Default title, "Ask Wally". With children (e.g. a thread `Select`):
- * Figma Variant2, the Wally mark, a "/" joint, then the children.
+ * Figma Variant2, the Wally glyph, a "/" joint, then the children.
  */
 export interface ChatHeaderTitleProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
@@ -32,7 +32,13 @@ export const ChatHeaderTitle: FC<ChatHeaderTitleProps> = ({
       data-testid={testId}
       className={cn(chatHeaderTitleVariants(), className)}
     >
-      <WallyIcon variant='simple' size='md' aria-hidden className='shrink-0' />
+      {/* Wally's character glyph at 24 px (D4), lifted to the text line */}
+      <AgentGlyph
+        agent='wally'
+        size={24}
+        align='optical'
+        data-testid={testId && `${testId}--wally`}
+      />
       {children == null ? (
         <span className='ml-8 truncate text-sm text-text-primary'>
           {label ?? (
