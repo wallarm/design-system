@@ -11,6 +11,7 @@ export {
   settingsNavConfig,
 } from './_storyNavConfigs';
 export { NavRailFooterContent } from './_storyNavRailFooter';
+export { NotificationsInbox } from './_storyNotificationsInbox';
 export { ProductNavItems } from './_storyProductNavItems';
 export { QuickHelpDropdown } from './_storyQuickHelpDropdown';
 export { RecentDropdown } from './_storyRecentDropdown';

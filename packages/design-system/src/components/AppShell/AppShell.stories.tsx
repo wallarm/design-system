@@ -12,7 +12,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Bell, Home, X } from '../../icons';
+import { Home, X } from '../../icons';
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
 import { ChatTrigger } from '../Chat';
@@ -31,7 +31,6 @@ import { Skeleton } from '../Skeleton';
 import { SplashScreen } from '../SplashScreen';
 import { Text } from '../Text';
 import { useTheme } from '../ThemeProvider';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { TopHeader, TopHeaderActions, TopHeaderLogo, TopHeaderSeparator } from '../TopHeader';
 import {
   type ChatAssistantMessage,
@@ -50,6 +49,7 @@ import {
   HeaderActions,
   HomeContent,
   NavRailFooterContent,
+  NotificationsInbox,
   PRODUCT_CONFIGS,
   type Product,
   ProductNavItems,
@@ -169,19 +169,7 @@ const Shell = ({
                 <TopHeaderSeparator />
                 <Skeleton width='150px' height='20px' rounded={6} />
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='small'
-                      color='neutral'
-                      aria-label='Wallarm Updates'
-                    >
-                      <Bell />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Wallarm updates</TooltipContent>
-                </Tooltip>
+                <NotificationsInbox loading />
 
                 <QuickHelpDropdown />
               </>
