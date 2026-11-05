@@ -18,7 +18,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Patterns/FilterInput/FilterInputFieldMenu',
+  title: 'Inputs/FilterInput/FilterInputFieldMenu',
   component: FilterInputFieldMenu,
   parameters: {
     layout: 'padded',

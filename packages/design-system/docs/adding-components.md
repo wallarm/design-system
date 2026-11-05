@@ -365,7 +365,7 @@ Use the appropriate category for the `title` field:
 | `AI`                | Wally assistant                        | Chat, AssistantMessage, ChainOfThought |
 | `Brand`             | Brand marks                            | Logo, WallyIcon                  |
 | `Data Display`      | Displaying data                        | Table, Card, Avatar, CodeSnippet |
-| `Inputs`            | Form controls                          | Input, Checkbox, Select          |
+| `Inputs`            | Form controls and filters              | Input, Select, FilterInput       |
 | `Inputs Date`       | Date and time controls                 | Calendar, DateInput, TimeInput   |
 | `Layout`            | Structural components                  | Stack, Flex, ScrollArea          |
 | `Loading`           | Loading states                         | Loader, Skeleton, Progress       |
@@ -373,10 +373,11 @@ Use the appropriate category for the `title` field:
 | `Navigation`        | Navigation elements                    | Tabs, Breadcrumbs, Pagination    |
 | `Overlay`           | Floating elements                      | Dialog, Drawer, Tooltip          |
 | `Pages`             | Full-page states                       | EmptyState, UtilityPage          |
-| `Patterns`          | Composite patterns built from components | FilterInput, FilterDropdown    |
 | `Primitives`        | Low-level building blocks              | Separator, Kbd, Icons            |
 | `Status Indication` | Status display                         | Badge, Tag, Indicator            |
 | `Typography`        | Text display                           | Heading, Text, Code              |
+
+`Patterns/` is reserved for pattern guideline stories (`src/guidelines/patterns/<slug>.stories.tsx`); never file a component under it.
 
 ## Step 9: Write E2E Tests
 

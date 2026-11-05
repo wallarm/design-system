@@ -20,7 +20,6 @@ const CATEGORY_ORDER = [
   'Loading',
   'Typography',
   'Primitives',
-  'Patterns',
   'Pages',
   'AI',
   'Brand',

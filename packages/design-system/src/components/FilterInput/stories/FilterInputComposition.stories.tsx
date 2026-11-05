@@ -21,7 +21,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Patterns/FilterInput/Composition',
+  title: 'Inputs/FilterInput/Composition',
   component: FilterInput,
   parameters: {
     layout: 'fullscreen',

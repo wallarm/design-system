@@ -95,7 +95,7 @@ const Menu = ({ withHint = false }: { withHint?: boolean }) => {
 };
 
 const meta = {
-  title: 'Patterns/FilterDropdown',
+  title: 'Inputs/FilterDropdown',
   component: FilterDropdown,
   subcomponents: {
     FilterDropdownTrigger,

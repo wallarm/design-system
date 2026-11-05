@@ -70,6 +70,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/Attribute | 19 | 19 | `components/Attribute/Attribute.stories.tsx` |
 | ✅ | Data Display/Avatar | 10 | 10 | `components/Avatar/Avatar.stories.tsx` |
 | ✅ | Data Display/Card | 3 | 3 | `components/Card/Card.stories.tsx` |
+| ☐ | Data Display/Click to Copy | 8 | 8 | `components/Copyable/stories/ClickToCopy.stories.tsx` |
 | ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
 | ✅ | Data Display/FormatDateTime | 8 | 8 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
@@ -101,6 +102,13 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Inputs Date/TimeInput | 8 | 8 | `components/TimeInput/TimeInput.stories.tsx` |
 | ✅ | Inputs/Checkbox | 8 | 8 | `components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `components/Field/Field.stories.tsx` |
+| ☐ | Inputs/FilterCascade | 6 | 5 | `components/FilterCascade/FilterCascade.stories.tsx` |
+| ☐ | Inputs/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
+| ✅ | Inputs/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
+| ✅ | Inputs/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
+| ✅ | Inputs/FilterInput/FilterInputChip | 22 | 22 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
+| ✅ | Inputs/FilterInput/FilterInputFieldMenu | 11 | 11 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
+| ✅ | Inputs/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
 | ✅ | Inputs/FileUpload | 13 | 13 | `components/FileUpload/FileUpload.stories.tsx` |
 | ✅ | Inputs/InlineEdit | 14 | 14 | `components/InlineEdit/InlineEdit.stories.tsx` |
 | ✅ | Inputs/Input | 6 | 6 | `components/Input/Input.stories.tsx` |
@@ -148,14 +156,6 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
 | ✅ | Pages/EmptyState | 5 | 5 | `components/EmptyState/EmptyState.stories.tsx` |
 | ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
-| ☐ | Patterns/Click to Copy | 8 | 8 | `components/Copyable/stories/ClickToCopy.stories.tsx` |
-| ☐ | Patterns/FilterCascade | 6 | 5 | `components/FilterCascade/FilterCascade.stories.tsx` |
-| ☐ | Patterns/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
-| ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
-| ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
-| ✅ | Patterns/FilterInput/FilterInputChip | 22 | 22 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
-| ✅ | Patterns/FilterInput/FilterInputFieldMenu | 11 | 11 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
-| ✅ | Patterns/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
 | ✅ | Primitives/Icons | 3 | 3 | `icons/module/Icons.stories.tsx` |
 | ✅ | Primitives/Kbd | 4 | 4 | `components/Kbd/Kbd.stories.tsx` |
 | ✅ | Primitives/Overlay | 1 | 1 | `components/Overlay/Overlay.stories.tsx` |

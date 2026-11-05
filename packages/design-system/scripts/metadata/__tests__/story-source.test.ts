@@ -117,11 +117,11 @@ import { cn } from '../../utils/cn';`;
 describe('readStoryTitle', () => {
   it('reads meta title', () => {
     const project = setup({
-      '/a.stories.tsx': `const meta = { title: 'Patterns/FilterInput/Composition' } satisfies Meta<unknown>;
+      '/a.stories.tsx': `const meta = { title: 'Inputs/FilterInput/Composition' } satisfies Meta<unknown>;
 export default meta;`,
     });
     expect(readStoryTitle(project.getSourceFileOrThrow('/a.stories.tsx'))).toBe(
-      'Patterns/FilterInput/Composition',
+      'Inputs/FilterInput/Composition',
     );
   });
 });

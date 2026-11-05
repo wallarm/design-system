@@ -150,7 +150,7 @@ export const HasNeither: StoryFn = () => null;
     fixtureProject.createSourceFile(
       '/src/components/Foo/stories/Extra.stories.tsx',
       `import { Foo } from '../Foo';
-const meta = { title: 'Patterns/Foo/Extra' };
+const meta = { title: 'Inputs/Foo/Extra' };
 export default meta;
 export const Second = () => <Foo />;
 export const Third = () => <Foo />;`,
@@ -168,8 +168,8 @@ export const First = () => <Foo />;`,
         const examples = parseExamples(fixtureProject, dir, 'Foo');
         expect(examples.map(e => [e.name, e.storyFile, e.storyTitle])).toEqual([
           ['First', 'Foo/Foo.stories.tsx', 'Components/Foo'],
-          ['Second', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
-          ['Third', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
+          ['Second', 'Foo/stories/Extra.stories.tsx', 'Inputs/Foo/Extra'],
+          ['Third', 'Foo/stories/Extra.stories.tsx', 'Inputs/Foo/Extra'],
         ]);
         expect(examples[1]!.code).toContain("from '@wallarm-org/design-system/Foo'");
       });

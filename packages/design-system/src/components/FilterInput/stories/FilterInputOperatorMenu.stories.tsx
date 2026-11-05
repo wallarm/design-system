@@ -12,7 +12,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Patterns/FilterInput/FilterInputOperatorMenu',
+  title: 'Inputs/FilterInput/FilterInputOperatorMenu',
   component: FilterInputOperatorMenu,
   parameters: {
     layout: 'padded',

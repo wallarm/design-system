@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
+const filterFieldStory = createStoryHelper('inputs-filterinput-filterinput', [
   'Default',
   'With Keyboard Hint',
   'Error Empty',
