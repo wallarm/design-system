@@ -21,4 +21,10 @@ export default defineConfig({
     },
     tsconfigPath: './tsconfig.json',
   },
+  tools: {
+    rspack: {
+      // `rules.md?raw` (bundled fallback guidelines digest) is inlined as a string.
+      module: { rules: [{ test: /\.md$/, resourceQuery: /raw/, type: 'asset/source' }] },
+    },
+  },
 });

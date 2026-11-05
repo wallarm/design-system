@@ -7,17 +7,21 @@ Standalone MCP (Model Context Protocol) server for Wallarm Design System. Provid
 ```
 src/
 ├── index.ts              # Entry point: McpServer setup, tools & resources registration, stdio transport
-├── metadata.ts           # Metadata resolver: CLI arg → import.meta.resolve → node_modules walk
+├── metadata.ts           # Metadata resolver: CLI arg → import.meta.resolve → node_modules walk; guidelines.json from the same dir
+├── env.d.ts              # `*.md?raw` module type (bundled rules.md fallback)
 ├── tools/
 │   ├── search-component.ts   # search_component tool: substring search with scoring
 │   ├── get-component.ts      # get_component tool: full details + markdown formatting
 │   ├── search-token.ts       # search_token tool: token search by name, value, or category
-│   └── get-token-category.ts # get_token_category tool: full category details as markdown
+│   ├── get-token-category.ts # get_token_category tool: full category details as markdown
+│   └── guidelines.ts         # list_guidelines / get_guideline tools, server instructions, related guidelines
 ├── resources/
 │   ├── components.ts     # ds://components resource: markdown table of all components
 │   └── tokens.ts         # ds://tokens resource: all design tokens by category
 └── __tests__/
     ├── fixtures/components.json  # Minimal test fixture (Button, Alert, Badge)
+    ├── fixtures/guidelines.json  # Minimal guidelines fixture (one foundation, one pattern)
+    ├── guidelines.test.ts
     ├── metadata.test.ts
     ├── tools.test.ts
     └── resources.test.ts
@@ -62,5 +66,5 @@ Uses `@modelcontextprotocol/sdk` v1.12+. The server uses the **non-deprecated** 
 
 - `@modelcontextprotocol/sdk` — MCP server SDK
 - `@wallarm-org/mcp-core` — devDependency (not published to npm), shared Zod schemas and types, bundled into `dist/index.js`
-- `@wallarm-org/design-system` — peerDependency (optional), source of `components.json`
+- `@wallarm-org/design-system` — peerDependency (optional), source of `components.json` and `guidelines.json`; its `guidelines/rules.md` is also bundled (`?raw`) as the instructions fallback for DS versions without `guidelines.json`
 - `zod` — devDependency, used for tool input schemas in `index.ts`

@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { type DesignSystemMetadata, designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import {
+  type DesignSystemMetadata,
+  designSystemMetadataSchema,
+  type GuidelinesMetadata,
+  guidelinesMetadataSchema,
+} from '@wallarm-org/mcp-core';
 
 /**
  * Resolve and load design system metadata.
@@ -55,7 +60,9 @@ async function resolveViaImportMeta(): Promise<string | undefined> {
   return undefined;
 }
 
-export async function loadMetadata(args: string[] = process.argv): Promise<DesignSystemMetadata> {
+export async function loadMetadata(
+  args: string[] = process.argv,
+): Promise<{ metadata: DesignSystemMetadata; metadataPath: string }> {
   let metadataPath: string | undefined;
 
   // 1. Check CLI arg
@@ -96,5 +103,22 @@ export async function loadMetadata(args: string[] = process.argv): Promise<Desig
     );
   }
 
+  return { metadata: result.data, metadataPath };
+}
+
+/**
+ * Load `guidelines.json` from the directory of the resolved `components.json`.
+ * Optional: design-system versions before guidelines shipped lack the file.
+ */
+export function loadGuidelines(metadataPath: string): GuidelinesMetadata | undefined {
+  const guidelinesPath = path.join(path.dirname(metadataPath), 'guidelines.json');
+  if (!fs.existsSync(guidelinesPath)) return undefined;
+
+  const result = guidelinesMetadataSchema.safeParse(
+    JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8')),
+  );
+  if (!result.success) {
+    throw new Error(`Invalid guidelines format in ${guidelinesPath}:\n${result.error.message}`);
+  }
   return result.data;
 }

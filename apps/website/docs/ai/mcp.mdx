@@ -1,13 +1,14 @@
 ---
-description: Connect Claude Code, Cursor or VS Code to the design-system MCP server for component and token metadata.
+description: Connect Claude Code, Cursor or VS Code to the design-system MCP server for component and token metadata and design guidelines.
 ---
 
 # MCP server
 
 `@wallarm-org/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server that
 gives AI coding assistants the design system's component and token metadata: props, variants,
-sub-components, import paths and token values. With it, an assistant looks components up instead
-of guessing their API.
+sub-components, import paths and token values, plus the design guidelines: foundations
+(spacing, color, typography) and patterns for whole screens. With it, an assistant looks
+components up instead of guessing their API, and reads the pattern before composing a screen.
 
 The server runs locally over stdio and reads the metadata shipped with the installed
 `@wallarm-org/design-system` package, so the answers match the version your project uses.
@@ -73,6 +74,13 @@ Any MCP client with stdio transport works: register the command `npx` with the a
 | `get_component` | `{ name: string }` | One component in full: props, variants, sub-components and import path. The name is case-insensitive; unknown names get suggestions. |
 | `search_token` | `{ query: string }` | Tokens matching a name (`spacing-8`), value (`#ff6633`) or category, sorted by relevance (top 20). |
 | `get_token_category` | `{ name: string }` | Every token in a category, such as `spacing`, `colors-primary` or `shadow`. Unknown names list the available categories. |
+| `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' }` | Foundations and patterns with slug, title, a one-line "use when" description and the components each uses. |
+| `get_guideline` | `{ slug: string, section?: string }` | One guideline as Markdown, such as `patterns/empty-states`, or a single section of it (`rules`, `example`). Unknown slugs get the nearest matches. |
+
+`get_component` also names the guidelines that use the component.
+
+When a client connects, the server sends its instructions: the design-system rules digest and
+which tool to use for what. Clients such as Claude Code add them to the assistant's context.
 
 ## Resources
 
@@ -85,5 +93,7 @@ Any MCP client with stdio transport works: register the command `npx` with the a
 ## Without MCP
 
 The same metadata is published as JSON at
-<a href="/design-system/components.json"><code>components.json</code></a>, and every page of
+<a href="/design-system/components.json"><code>components.json</code></a>; the installed package
+also ships the guidelines as Markdown in `dist/guidelines/` and as JSON at
+`@wallarm-org/design-system/guidelines`, and every page of
 this site is available as Markdown; see [llms.txt](/ai/llms).

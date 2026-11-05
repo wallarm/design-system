@@ -1,11 +1,21 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { loadMetadata } from './metadata';
+// Fallback digest for design-system versions that predate guidelines.json.
+import bundledRules from '../../design-system/guidelines/rules.md?raw';
+import { loadGuidelines, loadMetadata } from './metadata';
 import { getComponentListContent } from './resources/components';
 import { getTokensContent } from './resources/tokens';
 import { formatComponentDetails, getComponent } from './tools/get-component';
 import { formatTokenCategory, getTokenCategory } from './tools/get-token-category';
+import {
+  buildInstructions,
+  formatGuidelineList,
+  formatRelatedGuidelines,
+  getGuidelineText,
+  listGuidelines,
+  relatedGuidelines,
+} from './tools/guidelines';
 import { searchComponents } from './tools/search-component';
 import { searchTokens } from './tools/search-token';
 
@@ -14,15 +24,17 @@ async function main() {
   const log = (...args: unknown[]) => console.error('[wallarm-ds-mcp]', ...args);
 
   log('Loading metadata...');
-  const metadata = await loadMetadata();
+  const { metadata, metadataPath } = await loadMetadata();
+  const guidelines = loadGuidelines(metadataPath);
   log(
-    `Loaded v${metadata.version}: ${metadata.components.length} components, ${metadata.tokens.length} token categories`,
+    `Loaded v${metadata.version}: ${metadata.components.length} components, ${metadata.tokens.length} token categories, ${guidelines ? `${guidelines.guidelines.length} guidelines` : 'no guidelines.json (bundled rules)'}`,
   );
+  const noGuidelines = `Guidelines are not available: @wallarm-org/design-system v${metadata.version} ships no guidelines.json. Upgrade the design system to get foundations and patterns.`;
 
-  const server = new McpServer({
-    name: 'wallarm-design-system',
-    version: metadata.version,
-  });
+  const server = new McpServer(
+    { name: 'wallarm-design-system', version: metadata.version },
+    { instructions: buildInstructions(guidelines?.rules ?? bundledRules) },
+  );
 
   // ── Tools ──
 
@@ -72,7 +84,10 @@ async function main() {
             : '';
         return { content: [{ type: 'text', text: `Component "${name}" not found.${hint}` }] };
       }
-      return { content: [{ type: 'text', text: formatComponentDetails(component) }] };
+      const related = guidelines
+        ? formatRelatedGuidelines(relatedGuidelines(guidelines, component.name))
+        : '';
+      return { content: [{ type: 'text', text: formatComponentDetails(component) + related }] };
     },
   );
 
@@ -128,6 +143,55 @@ async function main() {
       }
       return { content: [{ type: 'text', text: formatTokenCategory(category) }] };
     },
+  );
+
+  server.registerTool(
+    'list_guidelines',
+    {
+      description:
+        'List design guidelines: foundations (spacing, color, typography, …) and patterns (how to compose screens and flows). Returns slug, title, description and components for each.',
+      inputSchema: {
+        kind: z
+          .enum(['foundation', 'pattern'])
+          .optional()
+          .describe('Only list foundations or only patterns; omit for both'),
+      },
+    },
+    async ({ kind }) => ({
+      content: [
+        {
+          type: 'text',
+          text: guidelines ? formatGuidelineList(listGuidelines(guidelines, kind)) : noGuidelines,
+        },
+      ],
+    }),
+  );
+
+  server.registerTool(
+    'get_guideline',
+    {
+      description:
+        'Get a design guideline as markdown — read the matching pattern before composing a screen. Pass `section` to get one section only.',
+      inputSchema: {
+        slug: z
+          .string()
+          .describe(
+            'Guideline slug from list_guidelines, e.g. "patterns/entity-table" or "foundations/spacing"',
+          ),
+        section: z
+          .string()
+          .optional()
+          .describe('Section id or heading, e.g. "rules", "example", "layout-and-spacing"'),
+      },
+    },
+    async ({ slug, section }) => ({
+      content: [
+        {
+          type: 'text',
+          text: guidelines ? getGuidelineText(guidelines, slug, section) : noGuidelines,
+        },
+      ],
+    }),
   );
 
   // ── Resources ──
