@@ -4,6 +4,7 @@ import { CAST } from '../data.gen';
 import type { StateId } from '../eyes';
 import { type SvgNode, toSvgString } from '../svg';
 import fixture from './__fixtures__/char-v14.json';
+import { normalise } from './normaliseSvg';
 
 type Case = {
   id: string;
@@ -15,26 +16,6 @@ type Case = {
   jobs: { d: string; col: string; mat: string; P: number; veil: boolean }[];
 };
 const regions = fixture.regions as Record<string, [number, number, number]>;
-
-// Both sides through the same DOM serializer; ids by position; the bake's <image> attributes and the `ready` class
-// (a cached bake lands synchronously on the page) are not markup and are dropped.
-const normalise = (svg: string) => {
-  const host = document.createElement('div');
-  host.innerHTML = svg.replace(/>\s+</g, '><');
-  const root = host.querySelector('svg') as SVGSVGElement;
-  for (const im of root.querySelectorAll('image'))
-    for (const a of [...im.attributes])
-      if (a.name !== 'class' && a.name !== 'preserveAspectRatio') im.removeAttribute(a.name);
-  for (const g of root.querySelectorAll('.ly')) g.classList.remove('ready');
-  const seen = new Map<string, string>();
-  return root.innerHTML.replace(
-    /(id="|url\(#)([a-z]+\d+)([a-z]*)/g,
-    (_, pre: string, base: string, suf: string) => {
-      if (!seen.has(base)) seen.set(base, `i${seen.size}`);
-      return `${pre}${seen.get(base)}${suf}`;
-    },
-  );
-};
 
 describe('charTree (static 3D character)', () => {
   for (const k of fixture.cases as Case[]) {
