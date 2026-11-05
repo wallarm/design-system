@@ -13,6 +13,7 @@ import { RemoteShellPanel } from './RemoteShellPanel';
 
 const DESCRIPTION = [
   'The frame of one product inside `AppShell` — its navigation panel, breadcrumbs and content area, all driven by a single `NavConfig`.',
+  'The panel is configured only through `config`: `link`, `group`, `section-header` and `drill` nodes, with `dividerAfter` for a line. Its parts are internal; never compose the panel by hand.',
   'The URL is the state: the active item, the drill level and the breadcrumbs are matched from the pathname. When a router owns the URL, hand the shell the router’s pathname through `pathname` and take its navigations back through `onNavigate` — then links in the page, the host rail or `router.navigate` keep the menu in sync. Without `pathname` the shell reads `window.location` and only notices `popstate` and its own navigations.',
 ].join(' ');
 

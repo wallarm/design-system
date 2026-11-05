@@ -21,6 +21,8 @@ export const CLAUDE_DESIGN = {
     'Polymorphic',
     'TemporalCore',
     'Checkmark',
+    // RemoteShellPanel renders it; products configure it through RemoteShell's NavConfig.
+    'NavPanel',
   ]) as ReadonlySet<string>,
   /** One metadata entry, one guide per Storybook story file. */
   splitByStoryFile: new Set(['SimpleCharts']) as ReadonlySet<string>,

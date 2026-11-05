@@ -118,6 +118,12 @@ describe.skipIf(!hasRealMetadata)('response budget (real metadata)', () => {
     },
   );
 
+  it('"sidebar" finds the shells, never the internal NavPanel', () => {
+    const names = searchComponents(metadata, 'sidebar').map(c => c.name);
+    expect(names).toEqual(expect.arrayContaining(['RemoteShell', 'NavRail', 'AppShell']));
+    expect(metadata.components.map(c => c.name)).not.toContain('NavPanel');
+  });
+
   it('every search alias points at a real component', () => {
     const names = new Set(metadata.components.map(c => c.name));
     const missing = Object.values(ALIASES)

@@ -197,7 +197,7 @@ describe('Claude Design documentation', () => {
       expect(readme).toContain(`- ${name}: no Storybook story; props only.`);
     expect(readme).toContain('- ThemeProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- DateFormatProvider: provider; use WallarmDS.Root on the canvas.');
-    expect(readme).toContain('- ButtonBase: internal primitive; no guide.');
+    expect(readme).toContain('- Checkmark: internal primitive; no guide.');
   });
 
   it('ships barrel re-export targets', async () => {
@@ -216,7 +216,7 @@ describe('Claude Design documentation', () => {
       expect(components).not.toContain(name);
       await expect(stat(path.join(outDir, `components/${name}/README.md`))).rejects.toThrow();
     }
-    for (const name of ['BulkBar', 'NavPanel']) expect(components).toContain(name);
+    expect(components).toContain('BulkBar');
     const declarations = await readFile(path.join(outDir, 'components/index.d.ts'), 'utf8');
     expect(declarations).toContain('ButtonProps');
     expect(Buffer.byteLength(declarations)).toBeLessThanOrEqual(1_500_000);

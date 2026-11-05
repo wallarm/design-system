@@ -4,6 +4,7 @@ import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { INTERNAL_COMPONENTS } from './internal.js';
 import { parseComponentDescription } from './parse-description.js';
 import { parseComponentDocs } from './parse-docs.js';
 import { parseExamples } from './parse-examples.js';
@@ -26,7 +27,7 @@ const main = () => {
   const componentsDir = path.join(ROOT, 'src/components');
   const componentDirs = fs
     .readdirSync(componentsDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
+    .filter(dirent => dirent.isDirectory() && !INTERNAL_COMPONENTS.has(dirent.name))
     .map(dirent => dirent.name);
 
   console.log(`Found ${componentDirs.length} component directories`);
