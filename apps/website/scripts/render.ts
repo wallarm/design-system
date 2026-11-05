@@ -300,29 +300,6 @@ export const embedStories = (markdown: string, storyFile: string, base: string):
       `<StoryPreview load={${loader(base, storyFile)}} name='${name}' fullscreen>\n\n${fence(code)}\n\n</StoryPreview>`,
   );
 
-/**
- * `## Live example`: every story, for a pattern whose examples are not stories yet.
- * ponytail: transitional; delete with UNCONVERTED_PATTERNS in parse-guidelines.ts.
- */
-function renderLiveExample(g: Guideline, storyImportBase: string): string {
-  const stories = g.stories ?? [];
-  if (!stories.length) return '';
-  const file = `${pageName(g)}.stories.tsx`;
-  const preview = (name: string, code: string) =>
-    `<StoryPreview load={${loader(storyImportBase, file)}} name='${name}' fullscreen>\n\n${fence(code)}\n\n</StoryPreview>`;
-  const storybook = `[Open in Storybook](${STORYBOOK_ROOT}?path=/story/${toStoryId(`Patterns/${g.title}`)}--${kebab(stories[0]?.name ?? '')})`;
-  const blocks = stories.map((s, i) =>
-    [
-      i === 0 ? '' : `### ${humanize(s.name)}`,
-      s.description ? escapeMdx(s.description) : '',
-      preview(s.name, s.code),
-    ]
-      .filter(Boolean)
-      .join('\n\n'),
-  );
-  return ['## Live example', storybook, ...blocks].join('\n\n');
-}
-
 export function renderGuidelinePage(
   g: Guideline,
   link: (name: string) => string | undefined,
@@ -334,18 +311,11 @@ export function renderGuidelinePage(
   const components = g.components.length
     ? `**Components:** ${componentLinks(g.components, link)}`
     : '';
-  const live = base && body === escaped ? renderLiveExample(g, base) : '';
-  // The components line goes right under the H1, which the body always starts with; the live
-  // example closes the intro, right before the first H2.
-  const withLive = (md: string): string => {
-    if (!live) return md;
-    const at = md.search(/^## /m);
-    return at === -1 ? `${md}\n\n${live}` : `${md.slice(0, at)}${live}\n\n${md.slice(at)}`;
-  };
+  // The components line goes right under the H1, which the body always starts with.
   const [h1, ...rest] = body.split('\n');
   const content = h1?.startsWith('# ')
-    ? [h1, components, withLive(rest.join('\n').trim())]
-    : [`# ${escapeMdx(g.title)}`, components, withLive(body)];
+    ? [h1, components, rest.join('\n').trim()]
+    : [`# ${escapeMdx(g.title)}`, components, body];
   return `---\ntitle: ${JSON.stringify(g.title)}\ndescription: ${JSON.stringify(g.description)}\n---\n\n${content.filter(Boolean).join('\n\n')}\n`;
 }
 

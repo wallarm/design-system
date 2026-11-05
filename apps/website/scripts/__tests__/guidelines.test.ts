@@ -118,32 +118,6 @@ describe('renderGuidelinePage', () => {
     expect(page).not.toContain('Live example');
     expect(page).not.toContain('story=');
   });
-
-  it('embeds every story as a live example for a pattern without story fences', () => {
-    const g = pattern('resource-list-page', 1, {
-      title: 'Resource list page',
-      markdown: '# Resource list page\n\nIntro.\n\n## When to use\n\nTable.',
-      stories: [
-        { name: 'Default', code: 'export const Default = () => <Page />;', description: 'Main.' },
-        { name: 'NoResults', code: 'export const NoResults = () => <Page />;' },
-      ],
-    });
-    const page = renderGuidelinePage(g, link, { storyImportBase: '../../src/guidelines/patterns' });
-    expect(page).toContain(
-      [
-        'Intro.',
-        '## Live example',
-        '[Open in Storybook](https://wallarm.github.io/design-system/storybook/?path=/story/patterns-resource-list-page--default)',
-        'Main.',
-        "<StoryPreview load={() => import('../../src/guidelines/patterns/resource-list-page.stories.tsx')} name='Default' fullscreen>",
-      ].join('\n\n'),
-    );
-    expect(page).toContain(
-      "### No results\n\n<StoryPreview load={() => import('../../src/guidelines/patterns/resource-list-page.stories.tsx')} name='NoResults' fullscreen>",
-    );
-    expect(page.indexOf('### No results')).toBeLessThan(page.indexOf('## When to use'));
-    expect(renderGuidelinePage(g, link)).not.toContain('Live example');
-  });
 });
 
 describe('renderGuidelinesMeta', () => {
