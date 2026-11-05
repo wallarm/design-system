@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '../../components/Avatar';
-import { Breadcrumbs, BreadcrumbsItem } from '../../components/Breadcrumbs';
 import { Button } from '../../components/Button';
 import { Field, FieldError, FieldLabel } from '../../components/Field';
 import { FileUpload, FileUploadTrigger, useFilePreviewUrl } from '../../components/FileUpload';
@@ -167,11 +166,7 @@ export const Default: StoryFn = () => {
 
   return (
     <Page name='settings-profile' fullSize fixedHeight data-testid='profile-page'>
-      <PageHeader className='flex-wrap gap-y-6'>
-        <Breadcrumbs className='basis-full -ml-4'>
-          <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-          <BreadcrumbsItem>Profile</BreadcrumbsItem>
-        </Breadcrumbs>
+      <PageHeader>
         <PageHeaderGroup>
           <PageTitle>Profile</PageTitle>
         </PageHeaderGroup>
@@ -605,11 +600,7 @@ export const Saving: StoryFn = () => {
 
   return (
     <Page name='settings-profile' fullSize fixedHeight data-testid='profile-page'>
-      <PageHeader className='flex-wrap gap-y-6'>
-        <Breadcrumbs className='basis-full -ml-4'>
-          <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-          <BreadcrumbsItem>Profile</BreadcrumbsItem>
-        </Breadcrumbs>
+      <PageHeader>
         <PageHeaderGroup>
           <PageTitle>Profile</PageTitle>
         </PageHeaderGroup>

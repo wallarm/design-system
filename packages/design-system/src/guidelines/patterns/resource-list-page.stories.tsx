@@ -9,7 +9,6 @@ import {
   AvatarName,
 } from '../../components/Avatar';
 import { Badge } from '../../components/Badge';
-import { Breadcrumbs, BreadcrumbsItem } from '../../components/Breadcrumbs';
 import { Button } from '../../components/Button';
 import {
   DropdownMenu,
@@ -143,7 +142,7 @@ const hostShell: StoryFn['decorators'] = [
 ];
 
 /**
- * The whole page: breadcrumbs, title, description and one create action in the header; search
+ * The whole page: title, description and one create action in the header; search
  * and status tabs with counts in the toolbar; a user table with a status badge and an
  * always-visible actions column. Search and tabs filter the rows.
  */
@@ -245,11 +244,7 @@ export const Default: StoryFn = () => {
 
   return (
     <Page name='settings-users' fullSize fixedHeight data-testid='users-page'>
-      <PageHeader className='flex-wrap gap-y-6'>
-        <Breadcrumbs className='basis-full -ml-4'>
-          <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-          <BreadcrumbsItem>Users</BreadcrumbsItem>
-        </Breadcrumbs>
+      <PageHeader>
         <PageHeaderGroup className='flex-1'>
           <PageTitle>Users</PageTitle>
           <PageDescription>
@@ -321,14 +316,10 @@ export const Default: StoryFn = () => {
 };
 Default.decorators = hostShell;
 
-/** Breadcrumbs start at the 2nd-rail section; the title repeats the last crumb. */
+/** The title repeats the last crumb of the product's trail; one create action sits on the right. */
 export const Header: StoryFn = () => (
   <Page name='settings-users' data-testid='users-page'>
-    <PageHeader className='flex-wrap gap-y-6' data-testid='users-header'>
-      <Breadcrumbs className='basis-full -ml-4'>
-        <BreadcrumbsItem href='/settings'>Settings</BreadcrumbsItem>
-        <BreadcrumbsItem>Users</BreadcrumbsItem>
-      </Breadcrumbs>
+    <PageHeader data-testid='users-header'>
       <PageHeaderGroup className='flex-1'>
         <PageTitle>Users</PageTitle>
         <PageDescription>

@@ -1,7 +1,7 @@
 ---
 title: Settings page
 description: Use when building a page of independent settings (profile, preferences, appearance) where each value saves on its own and a toast confirms it.
-components: [Page, PageHeader, PageHeaderGroup, PageContent, PageTitle, Breadcrumbs, Heading, Text, Field, FieldLabel, FieldError, Input, Select, SelectInput, SegmentedControl, RadioGroup, Radio, Switch, Button, Avatar, FileUpload, Separator, Tooltip, Toast, Dialog, PasswordInput, PasswordComplexity, ThemeProvider, ImageCropper, Slider, NavRail]
+components: [Page, PageHeader, PageHeaderGroup, PageContent, PageTitle, RemoteShellBreadcrumb, Heading, Text, Field, FieldLabel, FieldError, Input, Select, SelectInput, SegmentedControl, RadioGroup, Radio, Switch, Button, Avatar, FileUpload, Separator, Tooltip, Toast, Dialog, PasswordInput, PasswordComplexity, ThemeProvider, ImageCropper, Slider, NavRail]
 keywords: [settings, settings page, profile, preferences, account settings, user settings, appearance, theme picker, label value row, settings row, settings section, autosave, save on blur, danger zone, delete account, change password, change email, timezone, date format, time format, sidebar style, form page]
 order: 70
 ---
@@ -35,7 +35,7 @@ Pick the row kind by the control:
 **Layout and spacing** (spacing counts in pixels, `gap-16` = 16px):
 
 - Use `Page fullSize fixedHeight` › `PageHeader` › `PageContent`. **Never** add `PageActions`, `PageToolbar` or `PageDescription`.
-- Put `Breadcrumbs className='basis-full -ml-4'` first in `PageHeader className='flex-wrap gap-y-6'`, then `PageHeaderGroup` › `PageTitle`.
+- `PageHeader` › `PageHeaderGroup` › `PageTitle`. The trail is the Settings section's `RemoteShellBreadcrumb` ([Application layout](./app-layout.md)); **never** put `Breadcrumbs` in `PageHeader`.
 - `PageContent` owns the 24px gutter. **Never** add padding around it.
 - Put the sections in one `div className='flex max-w-[640px] flex-col gap-16'`. **Never** wrap it in a `Card` or padded box. **Never** give it `mx-auto`; it stays left-aligned.
 - Section: `flex flex-col gap-16` › `Heading as='h2' size='xl' weight='medium' color='primary'` + a `flex flex-col` row list.
@@ -67,7 +67,7 @@ There is no `SettingsPage`, `SettingsSection` or `SettingsRow`, no `className` o
 
 ## Examples
 
-The page frame: breadcrumbs and a title in the header, sections straight in `PageContent`.
+The page frame: a title in the header, sections straight in `PageContent`.
 
 ```story
 Default
@@ -135,6 +135,7 @@ Saving
 
 ## Related
 
+- [Application layout](./app-layout.md)
 - [Spacing](../foundations/spacing.md)
 - [Typography](../foundations/typography.md)
 - [Resource list page](./resource-list-page.md)

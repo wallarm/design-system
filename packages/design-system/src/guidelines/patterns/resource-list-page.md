@@ -1,14 +1,14 @@
 ---
 title: Resource list page
 description: Use when building a page that lists one kind of entity (users, roles, SSO providers, channels) with a create action, search, status tabs and a table.
-components: [Page, PageHeader, PageHeaderGroup, PageTitle, PageDescription, PageActions, PageToolbar, PageContent, Breadcrumbs, BreadcrumbsItem, Button, SearchInput, SegmentedTabs, SegmentedTabsList, SegmentedTabsTrigger, NumericBadge, Table, TableEmptyState, EmptyState, EmptyStateIllustration, EmptyStateMessage, EmptyStateTitle, EmptyStateDescription, EmptyStateActions, AppShell, NavPanel]
+components: [Page, PageHeader, PageHeaderGroup, PageTitle, PageDescription, PageActions, PageToolbar, PageContent, RemoteShellBreadcrumb, Button, SearchInput, SegmentedTabs, SegmentedTabsList, SegmentedTabsTrigger, NumericBadge, Table, TableEmptyState, EmptyState, EmptyStateIllustration, EmptyStateMessage, EmptyStateTitle, EmptyStateDescription, EmptyStateActions]
 keywords: [list page, index page, resource list, entity list, collection page, settings list, page header, breadcrumbs, toolbar, search, status tabs, segmented tabs, counts, create button, table page, CRUD]
 order: 10
 ---
 
 # Resource list page
 
-A resource list page is `Page` with a header, a filter toolbar and one `Table`. All parts import from `@wallarm-org/design-system`, except `NavPanel` (`@wallarm-org/design-system/NavPanel`).
+A resource list page is `Page` with a header, a filter toolbar and one `Table`. All parts import from `@wallarm-org/design-system`.
 
 ## When to use
 
@@ -19,7 +19,7 @@ A resource list page is `Page` with a header, a filter toolbar and one `Table`. 
 | One record with its fields | [Detail drawer](./detail-drawer.md) | A one-row table |
 | Many filter dimensions, chips, scope | [Filtering](./filtering.md) in `PageToolbar` | Several `SegmentedTabs` side by side |
 | Column, cell, row menu and bulk bar rules | [Entity table](./entity-table.md) | Rules from this page |
-| Shell, top header, rails | Host shell (`AppShell`, `NavPanel`) | Rendering them inside the page |
+| Shell, rails, product menu, breadcrumbs | [Application layout](./app-layout.md) | Rendering them inside the page |
 
 ## Rules
 
@@ -35,11 +35,9 @@ Spacing counts in pixels: `px-24` is 24px. See [Spacing](../foundations/spacing.
 
 **Header**
 
-- If the page shows breadcrumbs, render `<Breadcrumbs className='basis-full -ml-4'>` as the first child of `<PageHeader className='flex-wrap gap-y-6'>`, and give `PageHeaderGroup` `className='flex-1'`.
-- **Never** drop `flex-1` from `PageHeaderGroup` in a wrapping header: a long description pushes the buttons onto a third line.
-- If the page has no breadcrumbs, do not add `flex-wrap` to `PageHeader`.
-- Start breadcrumbs at the 2nd-rail section ("Settings › Users"). The title repeats the last crumb.
-- Give `Breadcrumbs` only `BreadcrumbsItem` children, with `href` on every item except the last. **Never** add `BreadcrumbsSeparator` or set `isCurrent`; `Breadcrumbs` does both.
+- The trail ("Settings › Users") is `RemoteShellBreadcrumb`, above the page; see [Application layout](./app-layout.md). **Never** put `Breadcrumbs` in `PageHeader`.
+- The title repeats the last crumb.
+- Give `PageHeaderGroup` `className='flex-1'` so a long description never pushes the buttons down.
 - Write `PageDescription` as one plain sentence: what the entity is and how it relates to sibling pages.
 - Show one primary button in `PageActions`, labelled "Create" plus the entity: "Create user".
 - Use `Button size='medium'` (32px) in `PageActions`. The default `large` is 36px.
@@ -71,7 +69,7 @@ The page frame: a fixed-height `Page` with the table directly in `PageContent`.
 Default
 ```
 
-A header with breadcrumbs, a title block and one create action.
+A header with a title block and one create action.
 
 ```story
 Header
@@ -110,7 +108,7 @@ Empty
 
 | Concern | Recipe |
 | --- | --- |
-| Shell and rails | `AppShell` and `NavPanel` in the host; the page renders `Page` only |
+| Shell and rails | The page renders `Page` only, inside `RemoteShellContent`. See [Application layout](./app-layout.md) |
 | Fetching, search, status filter | Pass the filtered array as `data`; set `isLoading` while fetching |
 | Status counts | Compute from the server or the full array |
 | Create flow | Short form: `Dialog` from `@wallarm-org/design-system/Dialog`. Long form: `Drawer`. See [Create and edit forms](./create-edit-forms.md) |
@@ -120,6 +118,7 @@ Empty
 
 ## Related
 
+- [Application layout](./app-layout.md)
 - [Spacing](../foundations/spacing.md)
 - [Entity table](./entity-table.md)
 - [Filtering](./filtering.md)

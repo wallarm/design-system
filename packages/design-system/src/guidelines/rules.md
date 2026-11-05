@@ -1,6 +1,6 @@
 Every numeric utility is in px, not 4px steps: p-16 is 16px, p-4 is 4px. Translate Tailwind habits (p-4 → p-16, gap-6 → gap-24, w-64 → w-256).
 
-Before composing a screen, call get_guideline for the pattern (list page, table, drawer, form, dialog, filters, empty state, settings, auth). Wrong → right:
+Before composing a screen, call get_guideline for the pattern (app shell, list page, table, drawer, form, dialog, filters, empty state, settings, auth). Wrong → right:
 
 - p-5, gap-3, p-10 → stay on the scale: 1, 2, 4, 6, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64…
 - space-y-4, margins per child → <VStack gap={16}>, <HStack gap={8}>
@@ -20,5 +20,6 @@ Before composing a screen, call get_guideline for the pattern (list page, table,
 - size, DIALOG_SIZES, DRAWER_SIZES → width: Dialog 400 confirm, 560 default, 960 picker; Drawer 640 default, 700 Timeline form
 - Dialog, useToast from the root → @wallarm-org/design-system/Dialog, /Toast
 - Field invalid → error on the control + FieldError
+- NavPanel, Sidebar → RemoteShell config={NavConfig}
 - ConfirmDialog, FilterBar, Combobox → compose Dialog parts, PageToolbar + FilterDropdown, Select + useSelectSearch
 - data-slot in tests → data-testid
