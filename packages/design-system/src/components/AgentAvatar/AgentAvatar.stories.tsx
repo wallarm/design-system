@@ -1,14 +1,20 @@
+import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { defaultLook } from '../../lib/agent-characters/look';
 import { PLACES } from '../../lib/agent-characters/places';
+import { getRuntime } from '../../lib/agent-characters/runtime';
+import { Button } from '../Button';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { AgentAvatar, type AgentAvatarProps, type AgentAvatarState } from './AgentAvatar';
+import { AgentAvatarGroup } from './AgentAvatarGroup';
+import { type AgentAvatarHandle, setAgentMotion, useAgentMotion } from './useCharacter';
 
 const DESCRIPTION = [
   'The character of an AI agent from 40 px up: a soft felt body baked in the browser from its silhouette, a glass visor and two light eyes that carry its state, and the prop that tells its job. Below 40 px use `AgentGlyph`.',
-  'The body is baked once per outline, colour and size, off the main thread, and cached; until a layer is ready its flat fill shows. This page shows the static frame of each state.',
+  'The body is baked once per outline, colour and size, off the main thread, and cached; until a layer is ready its flat fill shows.',
+  'With `live` the character moves as the reference does: it blinks, glances, breathes and, on duty, now and then plays with its prop or looks at its neighbours (at most two on the page at once). Hello and Done are beats played through `handleRef`; they play in full, then the character shows `state` again. Reduced motion, or `setAgentMotion(false)` for the user’s setting, shows every state’s static frame.',
   'Size, liveness and the contact shadow are set by the place the character sits in (Overview rows 40 px, headers and toasts 48, beside people 56, the team card and the drawer 72, the empty chat 120); only the drawer header, the empty chat and 96 px and up get the shadow. Next to the agent’s visible name the character is decorative; give it a `label` only when it stands alone.',
 ].join(' ');
 
@@ -69,6 +75,7 @@ const meta = {
       description: 'Set only when the character stands alone without its name.',
     },
     seed: { control: 'text', description: 'The agent’s uid.' },
+    live: { control: 'boolean', description: 'Animated; set by the place the character sits in.' },
   },
 } satisfies Meta<typeof AgentAvatar>;
 
@@ -195,3 +202,265 @@ export const Team: StoryFn = () => (
     ))}
   </div>
 );
+
+const LIVE_STATES: AgentAvatarState[] = [
+  'idle',
+  'working',
+  'needs',
+  'failed',
+  'off',
+  'box',
+  'invite',
+];
+
+/** Every persistent state, live. On duty plays its idle repertoire; Needs you is the only one that hops. */
+export const LiveStates: StoryFn = () => (
+  <HStack gap={24} align='end' wrap='wrap'>
+    {LIVE_STATES.map(state => (
+      <VStack key={state} gap={8} align='center'>
+        <AgentAvatar
+          data-testid={`agent-avatar-live-${state}`}
+          agent='radar'
+          seed={`radar-${state}`}
+          size={72}
+          state={state}
+          live
+        />
+        <Text size='sm'>{STATE_LABELS[state]}</Text>
+      </VStack>
+    ))}
+  </HStack>
+);
+
+/** Hello (from On duty) and Done are one-shots: they play in full, then the character shows its state again. */
+export const Beats: StoryFn = () => {
+  const handle = useRef<AgentAvatarHandle>(null);
+  const [ended, setEnded] = useState('');
+  const sayHello = () => handle.current?.play('hello');
+  const finishRun = () => handle.current?.play('done');
+  const onBeatEnd = (beat: string) => setEnded(beat);
+  return (
+    <VStack gap={16} align='center'>
+      <AgentAvatar
+        data-testid='agent-avatar-beats'
+        agent='wally'
+        seed='wally'
+        size={120}
+        shadow
+        live
+        handleRef={handle}
+        onBeatEnd={onBeatEnd}
+      />
+      <HStack gap={8}>
+        <Button
+          data-testid='agent-avatar-beats-hello'
+          variant='outline'
+          size='small'
+          onClick={sayHello}
+        >
+          Hello
+        </Button>
+        <Button
+          data-testid='agent-avatar-beats-done'
+          variant='outline'
+          size='small'
+          onClick={finishRun}
+        >
+          Done
+        </Button>
+      </HStack>
+      <span className='sb-annotation' data-testid='agent-avatar-beats-ended'>
+        {ended ? `${ended} ended` : ' '}
+      </span>
+    </VStack>
+  );
+};
+
+/** Not set up, inviting: one agent on the page invites at a time, glancing at Set up; hover or focus on it and the
+ *  agent turns to it. */
+export const Inviting: StoryFn = () => {
+  const cue = useRef<HTMLButtonElement>(null);
+  return (
+    <VStack gap={24} align='center'>
+      <HStack gap={24}>
+        <AgentAvatar
+          data-testid='agent-avatar-invite-mend'
+          agent='mend'
+          seed='mend'
+          size={72}
+          state='invite'
+          live
+          cueRef={cue}
+        />
+        <AgentAvatar
+          data-testid='agent-avatar-invite-sift'
+          agent='sift'
+          seed='sift'
+          size={72}
+          state='invite'
+          live
+          cueRef={cue}
+        />
+      </HStack>
+      <Button ref={cue} data-testid='agent-avatar-invite-setup' size='small'>
+        Set up
+      </Button>
+    </VStack>
+  );
+};
+
+/** Activate: from Not set up the ghost lands, the colour fills from the floor and the eyes power on (1.15 s). */
+export const Activation: StoryFn = () => {
+  const [state, setState] = useState<AgentAvatarState>('box');
+  const toggle = () => setState(state === 'box' ? 'idle' : 'box');
+  return (
+    <VStack gap={16} align='center'>
+      <AgentAvatar
+        data-testid='agent-avatar-activation'
+        agent='probe'
+        seed='probe'
+        size={120}
+        shadow
+        live
+        state={state}
+      />
+      <Button data-testid='agent-avatar-activation-toggle' size='small' onClick={toggle}>
+        {state === 'box' ? 'Activate' : 'Reset'}
+      </Button>
+    </VStack>
+  );
+};
+
+/** Cover all applications: the grey crown fills to the top in 480 ms and the agent plays Done. Hover or focus on the
+ *  button raises the line first. */
+export const Coverage: StoryFn = () => {
+  const handle = useRef<AgentAvatarHandle>(null);
+  const cue = useRef<HTMLButtonElement>(null);
+  const [coverage, setCoverage] = useState<'full' | 'partial'>('partial');
+  const coverAll = () => handle.current?.coverAll();
+  const onBeatEnd = () => setCoverage('full');
+  const reset = () => setCoverage('partial');
+  return (
+    <VStack gap={16} align='center'>
+      <AgentAvatar
+        data-testid='agent-avatar-coverage'
+        agent='radar'
+        seed='radar'
+        size={120}
+        shadow
+        live
+        hasApplications
+        coverage={coverage}
+        handleRef={handle}
+        cueRef={cue}
+        onBeatEnd={onBeatEnd}
+      />
+      <HStack gap={8}>
+        <Button ref={cue} data-testid='agent-avatar-coverage-all' size='small' onClick={coverAll}>
+          Cover all applications
+        </Button>
+        <Button
+          data-testid='agent-avatar-coverage-reset'
+          variant='outline'
+          size='small'
+          onClick={reset}
+        >
+          Reset
+        </Button>
+      </HStack>
+    </VStack>
+  );
+};
+
+/** Fifteen live agents at 120 px, as on a full team page, with the engine's frame rate and JavaScript per frame. */
+export const ManyOnScreen: StoryFn = () => {
+  const [meter, setMeter] = useState({ fps: 0, js: 0, max: 0 });
+  useEffect(() => {
+    const rt = getRuntime();
+    let n = 0;
+    let sum = 0;
+    let max = 0;
+    // the hook is one slot on the document runtime: chain whatever holds it
+    const prev = rt.onFrame;
+    rt.onFrame = js => {
+      prev?.(js);
+      n++;
+      sum += js;
+      max = Math.max(max, js);
+    };
+    const id = setInterval(() => {
+      setMeter({ fps: n, js: n ? sum / n : 0, max });
+      n = 0;
+      sum = 0;
+      max = 0;
+    }, 1000);
+    return () => {
+      clearInterval(id);
+      rt.onFrame = prev;
+    };
+  }, []);
+  return (
+    <VStack gap={16}>
+      <span
+        className='sb-annotation'
+        data-testid='agent-avatar-meter'
+        data-fps={meter.fps}
+        data-js={meter.js.toFixed(3)}
+        data-max={meter.max.toFixed(3)}
+      >
+        {`${meter.fps} fps · ${meter.js.toFixed(2)} ms JS per frame (max ${meter.max.toFixed(2)})`}
+      </span>
+      <AgentAvatarGroup>
+        <div className='grid grid-cols-5 gap-16'>
+          {TEAM.slice(0, 15).map(m => (
+            <AgentAvatar
+              key={m.id}
+              data-testid={`agent-avatar-many-${m.id}`}
+              look={m.look}
+              seed={m.id}
+              size={120}
+              live
+            />
+          ))}
+        </div>
+      </AgentAvatarGroup>
+    </VStack>
+  );
+};
+
+/** With motion off (the user's setting, or reduced motion in the system) every live agent shows its static frame. */
+export const ReducedMotion: StoryFn = () => {
+  const motion = useAgentMotion();
+  const [off, setOff] = useState(false);
+  useEffect(() => {
+    setAgentMotion(!off);
+    return () => setAgentMotion(true);
+  }, [off]);
+  const toggle = () => setOff(!off);
+  return (
+    <VStack gap={16} align='center'>
+      <HStack gap={24}>
+        {LIVE_STATES.slice(0, 4).map(state => (
+          <AgentAvatar
+            key={state}
+            data-testid={`agent-avatar-motion-${state}`}
+            agent='trim'
+            seed={`trim-${state}`}
+            size={72}
+            state={state}
+            live
+          />
+        ))}
+      </HStack>
+      <Button
+        data-testid='agent-avatar-motion-toggle'
+        variant='outline'
+        size='small'
+        onClick={toggle}
+      >
+        {off ? 'Turn motion on' : 'Turn motion off'}
+      </Button>
+      <span className='sb-annotation'>{motion ? 'Motion on' : 'Motion off (static frames)'}</span>
+    </VStack>
+  );
+};
