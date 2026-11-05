@@ -108,6 +108,19 @@ describe('parseComponentProps', () => {
     expect(mainProps.map(p => p.name)).toContain('size');
   });
 
+  it('detects sub-components that export no *Props type', () => {
+    const sub = (name: string) =>
+      parseComponentProps(project, path.join(COMPONENTS_DIR, name), name).subComponents.map(
+        s => s.name,
+      );
+    expect(sub('Dialog')).toEqual(
+      expect.arrayContaining(['DialogContent', 'DialogHeader', 'DialogFooter']),
+    );
+    expect(sub('Table')).toEqual(expect.arrayContaining(['TableActionBar', 'TableEmptyState']));
+    expect(sub('Toast')).toEqual(expect.arrayContaining(['Toaster', 'ToastActions']));
+    expect(sub('Toast')).not.toContain('toast');
+  });
+
   it('keeps wrapped-element attributes and own props that share a DOM name', () => {
     const link = parseComponentProps(project, path.join(COMPONENTS_DIR, 'Link'), 'Link');
     expect(link.mainProps.map(p => p.name)).toContain('download');

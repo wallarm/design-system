@@ -8,7 +8,8 @@ import type { PropMetadata } from '@wallarm-org/mcp-core';
  * 1. Load the component's barrel index.ts
  * 2. Find all exported type aliases matching *Props pattern
  * 3. For each Props type, resolve all properties via Type.getProperties()
- * 4. Extract default values from the component function's destructuring pattern
+ * 4. Other exported components (no `*Props` export): props from their call signature
+ * 5. Extract default values from the component function's destructuring pattern
  */
 
 // Props to skip — inherited from HTMLElement or React internal
@@ -215,21 +216,30 @@ export function parseComponentProps(
       .map(e => e.getAliasNode()?.getText() ?? e.getName()),
   );
 
+  const exportedNames = new Set(
+    indexFile
+      .getExportDeclarations()
+      .flatMap(d => d.getNamedExports())
+      .map(e => e.getAliasNode()?.getText() ?? e.getName()),
+  );
+
+  // Props from the first parameter of an exported component's call signature;
+  // `undefined` when the export is not callable (a constant, a context value).
+  const propsFromCallSignature = (
+    exportName: string,
+    defaults: Record<string, string>,
+  ): PropMetadata[] | undefined => {
+    const sym = indexFile.getExportSymbols().find(s => s.getName() === exportName);
+    const decl = sym?.getAliasedSymbol()?.getDeclarations()[0] ?? sym?.getDeclarations()[0];
+    const signature = decl?.getType().getCallSignatures()[0];
+    if (!signature) return undefined;
+    const param = signature.getParameters()[0];
+    return param ? parsePropsFromType(param.getTypeAtLocation(indexFile), defaults) : [];
+  };
+
   // Fallback when `<Name>Props` isn't exported: first parameter of the component's call signature.
-  const hasMainPropsExport = indexFile
-    .getExportDeclarations()
-    .some(d =>
-      d
-        .getNamedExports()
-        .some(e => (e.getAliasNode()?.getText() ?? e.getName()) === `${componentName}Props`),
-    );
-  if (!hasMainPropsExport) {
-    const componentSym = indexFile.getExportSymbols().find(sym => sym.getName() === componentName);
-    const decl =
-      componentSym?.getAliasedSymbol()?.getDeclarations()[0] ?? componentSym?.getDeclarations()[0];
-    const param = decl?.getType().getCallSignatures()[0]?.getParameters()[0];
-    if (param)
-      mainProps.push(...parsePropsFromType(param.getTypeAtLocation(indexFile), mainDefaults));
+  if (!exportedNames.has(`${componentName}Props`)) {
+    mainProps.push(...(propsFromCallSignature(componentName, mainDefaults) ?? []));
   }
 
   // Iterate over exported types from index.ts
@@ -276,6 +286,21 @@ export function parseComponentProps(
         });
       }
     }
+  }
+
+  // Sub-components without an exported `*Props` type (Dialog*, Toaster, TableActionBar):
+  // every other callable PascalCase value export, props read from its call signature.
+  const found = new Set(subComponents.map(sc => sc.name));
+  for (const subName of valueExports) {
+    if (subName === componentName || found.has(subName)) continue;
+    if (!/^[A-Z][A-Za-z0-9]*[a-z][A-Za-z0-9]*$/.test(subName)) continue; // skip CONSTANTS, hooks
+    if (/(Context|Provider)$/.test(subName)) continue;
+    const subFile = project.getSourceFile(`${componentDir}/${subName}.tsx`);
+    const props = propsFromCallSignature(
+      subName,
+      subFile ? extractDefaultValues(subFile, subName) : {},
+    );
+    if (props) subComponents.push({ name: subName, props });
   }
 
   return { mainProps, subComponents };

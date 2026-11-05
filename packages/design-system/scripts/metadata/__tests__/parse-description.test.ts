@@ -61,6 +61,15 @@ describe('parseComponentDescription', () => {
     expect(parseComponentDescription(memory, '/c/Foo', 'Foo')).toBeUndefined();
   });
 
+  it('falls back to the doc comment opening index.ts', () => {
+    memory.createSourceFile(
+      '/c/Parts/index.ts',
+      "/**\n * Parts of a bar.\n */\nexport { PartA } from './PartA';",
+      { overwrite: true },
+    );
+    expect(parseComponentDescription(memory, '/c/Parts', 'Parts')).toBe('Parts of a bar.');
+  });
+
   it('uses the JSDoc of the component itself', () => {
     memory.createSourceFile('/c/Bar/Bar.tsx', '/** The bar. */\nexport const Bar = () => null;', {
       overwrite: true,
