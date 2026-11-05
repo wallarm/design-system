@@ -5,9 +5,9 @@ const agentGlyphStory = createStoryHelper('ai-agentglyph', [
   'Basic',
   'Cast',
   'Sizes',
-  'InlineWithText',
-  'PartialCoverage',
-  'CustomAgent',
+  'Inline With Text',
+  'Partial Coverage',
+  'Custom Agent',
 ] as const);
 
 test.describe('Component: AgentGlyph', () => {
@@ -28,17 +28,17 @@ test.describe('Component: AgentGlyph', () => {
     });
 
     test('Should render glyphs inline with text correctly', async ({ page }) => {
-      await agentGlyphStory.goto(page, 'InlineWithText');
+      await agentGlyphStory.goto(page, 'Inline With Text');
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the partial coverage crown correctly', async ({ page }) => {
-      await agentGlyphStory.goto(page, 'PartialCoverage');
+      await agentGlyphStory.goto(page, 'Partial Coverage');
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render default looks for custom agents correctly', async ({ page }) => {
-      await agentGlyphStory.goto(page, 'CustomAgent');
+      await agentGlyphStory.goto(page, 'Custom Agent');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -48,7 +48,7 @@ test.describe('Component: AgentGlyph', () => {
     test('Should center each body on its row within 0.13 px via optical alignment', async ({
       page,
     }) => {
-      await agentGlyphStory.goto(page, 'InlineWithText');
+      await agentGlyphStory.goto(page, 'Inline With Text');
       const offsets = await page
         .locator('[data-testid^="agent-glyph-inline-optical-"]')
         .evaluateAll(svgs =>

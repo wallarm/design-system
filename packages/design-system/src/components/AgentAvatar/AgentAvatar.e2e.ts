@@ -6,26 +6,26 @@ const agentAvatarStory = createStoryHelper('ai-agentavatar', [
   'Cast',
   'States',
   'Places',
-  'PartialCoverage',
-  'CustomAgent',
+  'Partial Coverage',
+  'Custom Agent',
   'Team',
-  'LiveStates',
+  'Live States',
   'Beats',
   'Inviting',
   'Activation',
   'Coverage',
-  'ManyOnScreen',
-  'ReducedMotion',
+  'Many On Screen',
+  'Reduced Motion',
 ] as const);
 
 const LIVE_STORIES = [
-  'LiveStates',
+  'Live States',
   'Beats',
   'Inviting',
   'Activation',
   'Coverage',
-  'ManyOnScreen',
-  'ReducedMotion',
+  'Many On Screen',
+  'Reduced Motion',
 ] as const;
 
 // Counts animation frames the page requests, from before the story loads.
@@ -64,8 +64,8 @@ test.describe('Component: AgentAvatar', () => {
       'Cast',
       'States',
       'Places',
-      'PartialCoverage',
-      'CustomAgent',
+      'Partial Coverage',
+      'Custom Agent',
     ] as const) {
       test(`Should render the ${story} story correctly`, async ({ page }) => {
         await agentAvatarStory.goto(page, story);
@@ -98,7 +98,7 @@ test.describe('Component: AgentAvatar', () => {
     // WDS-201: live characters run one frame loop, and it stops when reduced motion is switched on.
     test('Should stop requesting frames when reduced motion is switched on', async ({ page }) => {
       await countFrames(page);
-      await agentAvatarStory.goto(page, 'LiveStates');
+      await agentAvatarStory.goto(page, 'Live States');
       await expect(page.getByTestId('agent-avatar-live-idle')).toHaveAttribute('data-live', 'true');
       expect(await framesIn(page, 1000)).toBeGreaterThan(30);
       await page.emulateMedia({ reducedMotion: 'reduce' });
