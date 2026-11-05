@@ -12,7 +12,7 @@ The command writes `wallarm-design-system/` and never prompts:
 
 | Path | Contents |
 | --- | --- |
-| `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Icons are inside the bundle (`WallarmDS.Icons.*`), so there are no asset uploads |
+| `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Icons are inside the bundle (`WallarmDS.Icons.*`), so there are no asset uploads and no `assets/` folder |
 | `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler, update |
 | `wallarm-sampler.dc.html` | The sampler artboard, linked to the canvas's `ds/wallarm-design-system/` copy |
 | `files.json` | Each written file with its sha256 |
@@ -20,7 +20,9 @@ The command writes `wallarm-design-system/` and never prompts:
 
 Options: `--dir <folder>` (default `wallarm-design-system`), `--overwrite` (required when the
 folder has files), `--existing <file>` (a JSON array of the artifact's current paths; writes
-`removed.json`), `--json` (prints `{ ok, exitCode, data | error }`). Exit codes: `0` done,
+`removed.json`), `--index <file>` (the artifact's current `project/design-system.json`; the
+written index keeps its keys and takes only the release's `title`, `namespace`, `libraries`,
+`editing`, `groups`, `assetGroups` and `lastChange`, as `publish-plan.ts` does), `--json` (prints `{ ok, exitCode, data | error }`). Exit codes: `0` done,
 `1` error, `2` usage, `3` done with a manual step (remove the paths in `removed.json`).
 
 The package version is the design-system version it was built from.

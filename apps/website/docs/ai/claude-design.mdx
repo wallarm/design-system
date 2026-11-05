@@ -43,13 +43,15 @@ Paste this into a chat, with your system's link:
 
 ```text
 Update my Wallarm Design System <link> to the latest release. Save its file paths as a JSON
-array in current-files.json, run
-npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json
+array in current-files.json and its project/design-system.json in current-index.json, run
+npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json --index current-index.json
 and follow "Update to a new release" in wallarm-design-system/SETUP.md.
 ```
 
-Claude publishes the new files to the same link, removes the files the release dropped, and
-reinstalls the system on your canvases.
+Claude publishes the new files to the same link, asks you before removing the files the release
+dropped, and reinstalls the system on your canvases. Use it only on a system you installed from the
+prompt: Wallarm's shared system below is updated by its maintainers, and Claude stops if you give
+it that link.
 
 ## Use Wallarm's shared system
 

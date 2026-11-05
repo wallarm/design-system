@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   cpSync,
   existsSync,
@@ -84,6 +85,38 @@ describe('claude-design export', () => {
     expect(
       JSON.parse(readFileSync(join(cwd, 'wallarm-design-system/removed.json'), 'utf8')),
     ).toEqual(['project/old.md']);
+  });
+
+  it('merges the release keys into the current index with --index', () => {
+    writeFileSync(
+      join(root, 'dist/project/design-system.json'),
+      JSON.stringify({
+        title: 'New',
+        groups: [],
+        assetGroups: {},
+        lastChange: { note: 'v9.8.7:' },
+      }),
+    );
+    const current = { title: 'Old', sections: { a: 1 }, createdOnFiles: { at: 1 }, groups: ['x'] };
+    writeFileSync(
+      join(cwd, 'current-index.json'),
+      JSON.stringify({ content: JSON.stringify(current) }),
+    );
+    expect(run('export', '--index', 'current-index.json').code).toBe(0);
+    const out = join(cwd, 'wallarm-design-system');
+    const index = readFileSync(join(out, 'project/design-system.json'), 'utf8');
+    expect(JSON.parse(index)).toEqual({
+      title: 'New',
+      sections: { a: 1 },
+      createdOnFiles: { at: 1 },
+      groups: [],
+      assetGroups: {},
+      lastChange: { note: 'v9.8.7:' },
+    });
+    const hashes = JSON.parse(readFileSync(join(out, 'files.json'), 'utf8'));
+    expect(hashes['project/design-system.json']).toBe(
+      createHash('sha256').update(index).digest('hex'),
+    );
   });
 
   it('prints {ok, exitCode, data|error} with --json', () => {

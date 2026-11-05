@@ -1,6 +1,8 @@
 import { describe, expect, it } from '@rstest/core';
-import { readFileSync } from 'node:fs';
-import { CANVAS_SAMPLER, canvasSampler, README_SECTIONS, renderSetup } from './pack';
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { CANVAS_SAMPLER, canvasSampler, pack, README_SECTIONS, renderSetup } from './pack';
 
 const template = readFileSync(new URL('../content/SETUP.md', import.meta.url), 'utf8');
 const sampler = canvasSampler(
@@ -42,5 +44,26 @@ describe('canvasSampler', () => {
         '<script src="ds/wallarm-design-system/components/bundle.js"></script>',
       ].join('\n'),
     );
+  });
+});
+
+// test:export runs after `export`, so the real build is on disk.
+describe('pack', () => {
+  it('packs the real export with no assets/ and no reference to it', () => {
+    const out = mkdtempSync(join(tmpdir(), 'claude-design-pack-'));
+    try {
+      const { files } = pack(undefined, out);
+      const paths = readdirSync(join(out, 'project'), { recursive: true }).map(String);
+      expect(paths.filter(path => /^assets([/\\]|$)/.test(path))).toEqual([]);
+      const referencing = paths
+        .filter(path => /\.(md|json|html|css|ts)$/.test(path))
+        .filter(path => readFileSync(join(out, 'project', path), 'utf8').includes('assets/'));
+      expect(referencing).toEqual([]);
+      const setup = readFileSync(join(out, 'SETUP.md'), 'utf8');
+      expect(setup).toContain(`(${files} files)`);
+      expect(setup).toContain('<script src="./support.js"></script>');
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
   });
 });

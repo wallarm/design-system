@@ -177,8 +177,15 @@ jobs:
             echo "@wallarm-org/claude-design@$VERSION is already on npm"; exit 0
           fi
           npm pkg set version="$VERSION"
+          # A redeploy or rollback of an older tag must not move `latest` backwards
+          LATEST=$(npm view @wallarm-org/claude-design dist-tags.latest 2>/dev/null || true)
+          DIST_TAG=latest
+          if [ -n "$LATEST" ] && [ "$(printf '%s\n%s\n' "$LATEST" "$VERSION" | sort -V | tail -n1)" != "$VERSION" ]; then
+            DIST_TAG=previous
+          fi
           # pnpm rewrites workspace:/catalog: specs; prepack packs dist/ from the export above
-          pnpm publish --no-git-checks --access public
+          pnpm publish --no-git-checks --access public --tag "$DIST_TAG" \
+            || { echo "::error::npm publish of @wallarm-org/claude-design@$VERSION failed; Claude Design prompts install ${LATEST:-nothing}"; exit 1; }
 
       - name: Package and attach to the release
         if: steps.guard.outputs.enabled == 'true'

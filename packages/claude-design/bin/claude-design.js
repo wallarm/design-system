@@ -10,9 +10,21 @@ import { parseArgs } from 'node:util';
 const SOURCE = fileURLToPath(new URL('../dist/', import.meta.url));
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const USAGE =
-  'Usage: npx -y @wallarm-org/claude-design@latest export [--dir wallarm-design-system] [--overwrite] [--existing current-files.json] [--json]';
+  'Usage: npx -y @wallarm-org/claude-design@latest export [--dir wallarm-design-system] [--overwrite] [--existing current-files.json] [--index current-index.json] [--json]';
 // Files the Design System page writes itself; an update never removes them.
 const PAGE_PATHS = ['project/manifest.json', 'project/api/'];
+// Index keys a release owns; every other key stays as the Design System page wrote it.
+// Mirrors REPLACED in src/publish-plan.ts.
+const RELEASE_KEYS = [
+  'title',
+  'namespace',
+  'libraries',
+  'editing',
+  'groups',
+  'assetGroups',
+  'lastChange',
+];
+const INDEX = 'project/design-system.json';
 
 class Failure extends Error {
   constructor(message, exitCode) {
@@ -27,16 +39,27 @@ const filesUnder = dir =>
     .map(file => relative(dir, join(file.parentPath, file.name)).split('\\').join('/'))
     .sort();
 
-const readPaths = file => {
-  let value;
+const readJson = (file, what) => {
   try {
-    value = JSON.parse(readFileSync(file, 'utf8'));
+    return JSON.parse(readFileSync(file, 'utf8'));
   } catch (error) {
-    throw new Failure(
-      `Could not read ${file} (${error.message}). Save the system's file paths there as a JSON array.`,
-      2,
-    );
+    throw new Failure(`Could not read ${file} (${error.message}). Save ${what} there.`, 2);
   }
+};
+
+/** The system's current index (as saved, or wrapped in a `content` string) with this release's keys. */
+const mergeIndex = (file, packed) => {
+  let remote = readJson(file, `the system's ${INDEX} as JSON`);
+  if (typeof remote?.content === 'string') remote = JSON.parse(remote.content);
+  if (!remote || typeof remote !== 'object' || Array.isArray(remote))
+    throw new Failure(`${file} must be the system's ${INDEX}, a JSON object.`, 2);
+  const merged = { ...remote };
+  for (const key of RELEASE_KEYS) merged[key] = packed[key];
+  return merged;
+};
+
+const readPaths = file => {
+  const value = readJson(file, "the system's file paths as a JSON array");
   if (!Array.isArray(value) || !value.every(path => typeof path === 'string'))
     throw new Failure(
       `${file} must be a JSON array of the system's file paths, such as ["project/tokens.css"].`,
@@ -55,6 +78,7 @@ function run(argv, cwd) {
         dir: { type: 'string', default: 'wallarm-design-system' },
         overwrite: { type: 'boolean', default: false },
         existing: { type: 'string' },
+        index: { type: 'string' },
         json: { type: 'boolean', default: false },
       },
     });
@@ -77,9 +101,12 @@ function run(argv, cwd) {
       2,
     );
   const existing = values.existing ? readPaths(resolve(cwd, values.existing)) : undefined;
+  const packed = JSON.parse(readFileSync(join(SOURCE, INDEX), 'utf8'));
+  const index = values.index ? mergeIndex(resolve(cwd, values.index), packed) : undefined;
 
   rmSync(join(out, 'project'), { recursive: true, force: true });
   cpSync(SOURCE, out, { recursive: true });
+  if (index) writeFileSync(join(out, INDEX), `${JSON.stringify(index, null, 2)}\n`);
   const written = filesUnder(SOURCE);
   const hashes = Object.fromEntries(
     written.map(path => [

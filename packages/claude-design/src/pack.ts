@@ -1,6 +1,7 @@
 // Packs `.claude-design/` (from `export`) into `dist/` for the npm package: the bin
 // copies dist/ into a user's sandbox. Runs as `prepack`. A prompt-installed system has
-// no asset uploads: icons ship in bundle.js, so the static SVGs and asset groups are left out.
+// no asset uploads: icons ship in bundle.js, so `assets/`, the asset groups and the README's
+// pointers to static SVGs are left out.
 import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { CLAUDE_DESIGN, PACKAGE_DIR } from './config';
@@ -32,16 +33,34 @@ const SYSTEM_LINKS = [
   '<script src="components/bundle.js"></script>',
 ];
 
-/** The sampler as a canvas artboard: the canvas's support.js, then the system links under `ds/<folder>/`. */
+/** The head lines every artboard on a canvas needs: support.js, then the system under `ds/<folder>/`. */
+export const CANVAS_HEAD = [
+  '<script src="./support.js"></script>',
+  ...SYSTEM_LINKS.map(line => line.replace(/(href|src)="/, `$1="ds/${CANVAS_FOLDER}/`)),
+].join('\n');
+/** README lines that point at static SVGs, which the npm export doesn't ship. */
+const README_ASSET_LINES: [string, string][] = [
+  [' Exported single-ink SVG assets use slate ink; see `assets/Icons/README.md`.', ''],
+  [' Static versions live under `assets/Logos/`.', ''],
+  [" Use the group's static SVG assets when React is unnecessary.", ''],
+  ['see assets/Icons.', 'use `WallarmDS.Icons.<Name>`.'],
+];
+
+/** The sampler as a canvas artboard: its system links replaced by {@link CANVAS_HEAD}. */
 export function canvasSampler(html: string) {
   const at = html.indexOf(SYSTEM_LINKS.join('\n'));
   if (at === -1) throw new Error(`${SAMPLER_FILE}: head must link, in order: ${SYSTEM_LINKS}`);
-  const links = SYSTEM_LINKS.map(line => line.replace(/(href|src)="/, `$1="ds/${CANVAS_FOLDER}/`));
-  return (
-    html.slice(0, at) +
-    ['<script src="./support.js"></script>', ...links].join('\n') +
-    html.slice(at + SYSTEM_LINKS.join('\n').length)
-  );
+  return html.slice(0, at) + CANVAS_HEAD + html.slice(at + SYSTEM_LINKS.join('\n').length);
+}
+
+/** The system README without its pointers to `assets/`; throws if one of them changed. */
+export function packReadme(readme: string) {
+  const out = README_ASSET_LINES.reduce((text, [from, to]) => {
+    if (!text.includes(from)) throw new Error(`README.md no longer has "${from}"; update pack.ts`);
+    return text.replaceAll(from, to);
+  }, readme);
+  if (out.includes('assets/')) throw new Error('README.md still points at assets/; update pack.ts');
+  return out;
 }
 
 /** The canvas.json `boards` entry, from the sampler's title and `$preview` size. */
@@ -83,6 +102,8 @@ export function renderSetup({
     title: CLAUDE_DESIGN.title,
     description: DESCRIPTION,
     folder: CANVAS_FOLDER,
+    canvasHead: CANVAS_HEAD,
+    sharedArtifact: CLAUDE_DESIGN.artifactUrl,
     samplerFile: CANVAS_SAMPLER,
     boardTitle,
     boardEntry: JSON.stringify(entry),
@@ -120,8 +141,10 @@ export function pack(
   rmSync(outDir, { recursive: true, force: true });
   cpSync(project, join(outDir, 'project'), {
     recursive: true,
-    filter: path => !/^[/\\]assets[/\\].*\.svg$/i.test(path.slice(project.length)),
+    filter: path => !/^[/\\]assets([/\\]|$)/.test(path.slice(project.length)),
   });
+  const readmePath = join(outDir, 'project/README.md');
+  writeFileSync(readmePath, packReadme(readFileSync(readmePath, 'utf8')));
   const indexPath = join(outDir, 'project/design-system.json');
   const index = JSON.parse(readFileSync(indexPath, 'utf8')) as Record<string, unknown>;
   writeFileSync(
@@ -137,7 +160,7 @@ export function pack(
   writeFileSync(join(outDir, CANVAS_SAMPLER), sampler);
   const setup = renderSetup({
     template: readFileSync(join(PACKAGE_DIR, 'content/SETUP.md'), 'utf8'),
-    readme: readFileSync(join(project, 'README.md'), 'utf8'),
+    readme: readFileSync(readmePath, 'utf8'),
     sampler,
     version,
     files,
