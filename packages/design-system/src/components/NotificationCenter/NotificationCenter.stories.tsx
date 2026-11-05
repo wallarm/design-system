@@ -46,7 +46,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Overlay/NotificationCenter',
+  title: 'Messaging/NotificationCenter',
   component: NotificationCenter,
   subcomponents: {
     NotificationCenterTrigger,

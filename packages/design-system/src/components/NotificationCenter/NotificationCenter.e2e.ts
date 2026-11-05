@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const notificationCenterStory = createStoryHelper('overlay-notificationcenter', [
+const notificationCenterStory = createStoryHelper('messaging-notificationcenter', [
   'Basic',
   'Read Tab',
   'Empty',
