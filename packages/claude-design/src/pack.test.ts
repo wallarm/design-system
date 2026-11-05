@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import {
   type AssetEntry,
   CANVAS_SAMPLER,
+  CANVAS_SKELETON,
   canvasSampler,
   pack,
   README_SECTIONS,
@@ -16,11 +17,21 @@ const updateTemplate = readFileSync(new URL('../content/UPDATE.md', import.meta.
 const sampler = canvasSampler(
   readFileSync(new URL('./sampler/sampler.dc.html', import.meta.url), 'utf8'),
 );
+const skeleton = canvasSampler(
+  readFileSync(new URL('./sampler/app-skeleton.dc.html', import.meta.url), 'utf8'),
+);
 const readme = README_SECTIONS.map(name => `## ${name}\n`).join('\n');
 
 describe('renderSetup', () => {
   it('fills every placeholder of the shipped template', () => {
-    const guide = renderSetup({ template, readme, sampler, version: '9.8.7', files: 362 });
+    const guide = renderSetup({
+      template,
+      readme,
+      sampler,
+      skeleton,
+      version: '9.8.7',
+      files: 362,
+    });
     expect(guide).not.toMatch(/\{\{\w+\}\}/);
     expect(guide).toContain('# Install Wallarm Design System 9.8.7 in Claude Design');
     expect(guide).toContain('The design system: 362 files');
@@ -30,6 +41,11 @@ describe('renderSetup', () => {
     expect(guide).toContain(
       `{"${CANVAS_SAMPLER}":{"x":0,"y":0,"w":1440,"h":900,"title":"Wallarm sampler","expand":"fill"}}`,
     );
+    expect(guide).toContain('## 6. Build the app skeleton');
+    expect(guide).toContain(
+      `{"${CANVAS_SKELETON}":{"x":1520,"y":0,"w":1440,"h":900,"title":"Wallarm app","expand":"fill"}}`,
+    );
+    expect(guide).toContain('starts with `var APP = {`');
   });
 
   it('fills UPDATE.md, pinning its version, and SETUP.md keeps no copy of its steps', () => {
@@ -38,6 +54,7 @@ describe('renderSetup', () => {
       template: updateTemplate,
       readme,
       sampler,
+      skeleton,
       version: '9.8.7',
       files: 362,
     });
@@ -51,13 +68,14 @@ describe('renderSetup', () => {
       'npx -y @wallarm-org/claude-design@9.8.7 index --blobs wallarm-design-system/blobs.json --index current-index.json',
     );
     expect(guide).not.toContain('@latest');
+    expect(guide).toContain(`Never replace or edit \`project/${CANVAS_SKELETON}\` on an update`);
     expect(template).not.toContain('current-files.json');
     expect(template).toContain('claude-design@latest update');
   });
 
   it('fails on a placeholder without a value or a renamed README section', () => {
     expect(() =>
-      renderSetup({ template: '{{nope}}', readme, sampler, version: '1.0.0', files: 1 }),
+      renderSetup({ template: '{{nope}}', readme, sampler, skeleton, version: '1.0.0', files: 1 }),
     ).toThrow('SETUP.md: no value for {{nope}}');
     expect(() =>
       renderSetup({
@@ -65,12 +83,20 @@ describe('renderSetup', () => {
         template: '{{nope}}',
         readme,
         sampler,
+        skeleton,
         version: '1',
         files: 1,
       }),
     ).toThrow('UPDATE.md: no value for {{nope}}');
     expect(() =>
-      renderSetup({ template, readme: '## Rules\n', sampler, version: '1.0.0', files: 1 }),
+      renderSetup({
+        template,
+        readme: '## Rules\n',
+        sampler,
+        skeleton,
+        version: '1.0.0',
+        files: 1,
+      }),
     ).toThrow('README.md has no section');
   });
 });
@@ -113,6 +139,11 @@ describe('pack', () => {
       expect(setup).toContain(`(${files} files)`);
       expect(setup).toContain(`${assets} SVG files`);
       expect(setup).toContain('<script src="./support.js"></script>');
+      for (const file of [CANVAS_SAMPLER, CANVAS_SKELETON])
+        expect(readFileSync(join(out, file), 'utf8')).toContain(
+          '<script src="ds/wallarm-design-system/components/bundle.js"></script>',
+        );
+      expect(readFileSync(join(out, CANVAS_SKELETON), 'utf8')).toContain('var APP = {');
       const update = readFileSync(join(out, 'UPDATE.md'), 'utf8');
       expect(update).not.toMatch(/\{\{\w+\}\}/);
       expect(update).toContain(`(${files} files)`);

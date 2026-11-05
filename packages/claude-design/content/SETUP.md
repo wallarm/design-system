@@ -12,6 +12,7 @@ The export wrote `wallarm-design-system/`:
 | `SETUP.md` | This guide | No |
 | `UPDATE.md` | The update guide, for a later release | No |
 | `{{samplerFile}}` | The sampler artboard, for step 4 | To the canvas, in step 4 |
+| `{{skeletonFile}}` | The app skeleton, for step 6 | To the canvas, in step 6 |
 | `files.json` | Every file the export wrote, with its sha256 | No |
 | `removed.json` | Paths an update drops. Written only with `--existing` | No |
 | `blobs.json` | You write it in step 1: each SVG's path and the url its upload returned. The `index` command rewrites it keyed by sha256. The `update` command deletes it | No |
@@ -96,7 +97,31 @@ If you can't see the canvas or its console, ask the person to check each item an
 
 The sampler is light only. For a dark artboard, set `theme="dark"` on its `WallarmDS.Root`, as the README says.
 
-When every check passes, tell the person the Wallarm Design System is ready, give them the system link, and wait for their design request.
+## 6. Build the app skeleton
+
+`wallarm-design-system/{{skeletonFile}}` is the person's application frame: the console header, the product rail, a product menu and an empty page. They design their screens inside it. It is the same file as the system's `project/{{skeletonSystemFile}}`, with canvas link lines.
+
+1. Publish it to the canvas at `project/{{skeletonFile}}` exactly as step 4 publishes the sampler, with the same folder rule for its three link lines.
+2. Merge this key into `boards` in `project/canvas.json` and append `"{{skeletonFile}}"` to `order`, as in step 4. It sits right of the sampler; if the canvas has other boards, the step 4 placement rule applies.
+
+   ```json
+   {{skeletonEntry}}
+   ```
+
+3. If the person's message names their product, its menu items or its pages (for example "My product: API Security. Menu: Overview, API Discovery; group Detect & Respond: Attacks, Incidents"), edit the board's `APP` object, the block that starts with `{{skeletonData}}` at the top of its script, and change nothing else in the file:
+   - `nav.productLabel` is the product's name and `nav.productPath` is `/` plus its kebab-case id. Make the matching `rail` entry carry the same `label` and `path`; keep or replace the other rail products as they ask.
+   - `nav.items` follows the menu they gave, in their order: a page is `{ type: 'link', id, label, path }`; a named group of pages is `{ type: 'group', id, label, defaultExpanded: true, children: [links] }`; a label over a run of entries is `{ type: 'section-header', id, label }`. Use `type: 'drill'` only if they ask for an entity picker. `id` and `path` are the label in kebab-case with punctuation dropped (`API Discovery` → `api-discovery`, `Detect & Respond` → `detect-respond`), each path one segment and unique. Give every top-level link and group an `icon` (a `WallarmDS.Icons` name as a string), or give none: mixed icons misalign the menu.
+   - `start` is the first link's `path`. A link may take `action`, the label of its page's primary button, and `dividerAfter`, only when they name them; drop the sample's otherwise.
+
+   If the message names none of these, keep the sample product as it is.
+
+Check, as in step 5 (ask the person if you can't see the canvas):
+
+- A board titled `{{skeletonTitle}}` shows the header (logo, search, tenant, assistant, notification bell with 2 unread, help), the rail (Home, the products, and Settings and the account at the bottom), the product menu, the breadcrumb and a page titled after the first menu item with the `Ask Claude to design this screen` empty state.
+- The console has no `[WallarmDS]` warning and no error. `[WallarmDS] icon "…" is not in WallarmDS.Icons` means an `icon` in `APP` is misspelled: fix the name there.
+- Click another menu item: the menu highlights it, and the breadcrumb and the page title follow.
+
+When every check passes, tell the person the Wallarm Design System is ready, give them the system link, and say the canvas has two boards: the sampler, a reference screen, and their app skeleton. Ask for the screens they want and design each one inside the skeleton's `Page`, as the README's "Start here" step 3 says: title and action through `APP` (add a menu link for a screen that has none), `PageDescription` and a `PageToolbar` around a new `PageContent` as the pattern guide says, `fixed-height` on a list page, the screen's data in `renderVals()`, and the shell kept. Then wait for their design request.
 
 ## Update to a new release
 
@@ -111,6 +136,8 @@ To update a system the person already has, run `npx -y @wallarm-org/claude-desig
 | The `index` command exits 3 | Upload the paths in `upload.json`, add their urls to `blobs.json` and run it again. An entry it names as invalid has a key that matches no SVG or a value that isn't a 32-character blob id or `/_blob/<id>` url: copy it again from `upload.json` and the upload result. |
 | Publishing `project/design-system.json` is refused as stale | The system's page saved a newer index. Save the version the refusal hands back as `current-index.json` (copy it; don't retype it), run `npx -y @wallarm-org/claude-design@{{version}} index --blobs wallarm-design-system/blobs.json --index current-index.json`, and publish the index again. Nothing needs uploading again. |
 | The gallery is empty or shows broken images | `project/design-system.json` was published before the `index` command exited 0, or with a wrong url. Fix `blobs.json`, run `index` again and publish the index again. |
+| The skeleton shows no menu, or a click doesn't move the highlight | `APP.nav` is broken: every node needs `type`, `id` and `label`, every link a one-segment `path`, and `start` must be one of those paths. Fix the object; change nothing else. |
+| The rail's products, the page title or the tenant are empty | The canvas runtime ignores `children="{{…}}"` holes. Tell the person and report it with the version ({{version}}). |
 | No sampler board shows | The file isn't at `project/{{samplerFile}}`, or `project/canvas.json` has no `"{{samplerFile}}"` in `boards` or `order`. |
 | Components render unstyled | The link lines don't reach `project/ds/{{folder}}/`. The artboard must sit directly in `project/`, and the folder name must match step 2. |
 | `WallarmDS is not defined` | `components/bundle.js` isn't loaded: same cause as above. |

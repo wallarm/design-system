@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
-import { samplerProblems } from './sampler';
+import { SKELETON_DATA, SKELETON_FILE, samplerProblems } from './sampler';
 
 const head =
   '<link rel="stylesheet" href="tokens.css">\n<link rel="stylesheet" href="components/bundle.css">\n<script src="components/bundle.js"></script>';
@@ -31,6 +31,22 @@ describe('samplerProblems', () => {
       'var(--spacing-3) is not a token',
       'WallarmDS.Missing is not exported',
     ]);
+  });
+
+  it('checks names behind the DS alias too', () => {
+    expect(
+      samplerProblems(
+        `${head}<script>var DS = WallarmDS; h(DS.Button); h(DS.NavPanel)</script>`,
+        context,
+      ),
+    ).toEqual(['WallarmDS.NavPanel is not exported']);
+  });
+
+  it('the shipped skeleton has one APP data object, read by the script and never written', () => {
+    const html = readFileSync(new URL(`./${SKELETON_FILE}`, import.meta.url), 'utf8');
+    expect(html.split(SKELETON_DATA)).toHaveLength(2);
+    expect(html).toContain('data-testid="product-shell"');
+    expect(html).not.toMatch(/(?<!var )\bAPP(\.\w+)*\s*=[^=]/);
   });
 
   it('the shipped sampler links the system and mounts the Drawer by its open prop', () => {

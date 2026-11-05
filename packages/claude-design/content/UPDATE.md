@@ -69,6 +69,8 @@ On one canvas you reinstalled in step 7:
 2. Publish the new sampler to `project/{{samplerFile}}` as SETUP.md step 4 says. Read `project/canvas.json` right before merging into it (the canvas writes it when boards move), keep its board's `x` and `y` and its place in `order`.
 3. Run the checks in SETUP.md step 5.
 
+Never replace or edit `project/{{skeletonFile}}` on an update: the app skeleton is the person's own work (their product, menu and screens). Only the sampler is refreshed. Tell the person so; if they want the new release's skeleton too, add it as a new board as SETUP.md step 6 says, under another file name such as `wallarm-app-new.dc.html`.
+
 When every check passes, tell the person the system is on {{version}}, give them the system link, and wait for their request.
 
 ## When something looks wrong

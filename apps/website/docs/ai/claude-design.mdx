@@ -16,12 +16,20 @@ Install Wallarm Design System in Claude Design.
    npx -y @wallarm-org/claude-design@latest export
 2. Read wallarm-design-system/SETUP.md and follow every step in it, in order. It publishes
    the system, installs it on a canvas and checks it with a sampler artboard.
-3. When the sampler passes its checks, tell me the system is ready and give me its link.
-   Then wait for my design request.
+3. When the sampler and the app skeleton pass their checks, tell me the system is ready and
+   give me its link. Then wait for my design request.
 
 If the command fails or writes no wallarm-design-system/SETUP.md, show me its output and
 stop. Don't build the system by hand.
+
+My product: <name>. Menu: <item>, <item>, …
 ```
+
+The last line is optional. With it, Claude sets up the app skeleton for your product: the
+console header and rail, your product's menu and an empty page to design in. Name groups and
+section headers in the menu too, for example: `My product: API Security. Menu: Overview, API
+Discovery, API Specifications, Sessions; group Detect & Respond: Attacks, Incidents`. Without
+it, the skeleton shows a sample product you can rename later.
 
 What you will see:
 
@@ -31,9 +39,11 @@ What you will see:
    Claude uploads the SVGs in batches of 25 (about 24 calls), then publishes the index. Claude
    gives you its link, `https://claude.ai/artifact/<id>`. **Save it**: you need it to install the
    system on other canvases and to update it.
-3. A Design canvas with the system installed and a **Wallarm sampler** board: a Users settings
-   screen with the app shell, a table, status tabs and an open drawer. Claude checks that it
-   renders without `[WallarmDS]` warnings, then waits for your request.
+3. A Design canvas with the system installed and two boards: **Wallarm sampler**, a Users
+   settings screen with the app shell, a table, status tabs and an open drawer; and **Wallarm
+   app**, your app skeleton. Claude checks that both render without `[WallarmDS]` warnings,
+   then waits for your request. Ask for screens and Claude designs them inside the skeleton's
+   page. An update never replaces the skeleton: it is your work.
 
 On a canvas, icons come with the components (`WallarmDS.Icons.*`); the galleries are for
 browsing them on the system's page. The package `@wallarm-org/claude-design` is published with every stable release and
@@ -62,6 +72,11 @@ Wallarm's own copy is the
 System** when creating a Design canvas. It contains the components, light and dark tokens,
 Geist fonts, icons and live examples generated from this repository, and maintainers sync it
 by hand (see [Request a change](#request-a-change)).
+
+Choosing the system on a new canvas is enough: Claude starts from the system's README, which
+has it put the app skeleton on the canvas first and design every screen inside it. Name your
+product and menu in the prompt to set up the skeleton, or ask for a standalone component to
+skip it.
 
 Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
 prototype a rules list with a primary Create rule action, environment filter, empty state and

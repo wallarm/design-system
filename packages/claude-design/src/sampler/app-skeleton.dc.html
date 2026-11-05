@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wallarm app</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components/bundle.css">
+<script src="components/bundle.js"></script>
+</head>
+<body>
+<!-- App skeleton: the console frame (AppShell) with a product's RemoteShell. Customize it by
+     editing only the APP object at the top of the script; design screens inside its Page. -->
+<x-dc>
+<x-import component-from-global-scope="WallarmDS.Root" theme="light">
+  <x-import component-from-global-scope="WallarmDS.AppShell">
+    <x-import component-from-global-scope="WallarmDS.AppShellHeader">
+      <x-import component-from-global-scope="WallarmDS.TopHeader">
+        <x-import component-from-global-scope="WallarmDS.TopHeaderLogo" href="/" on-click="{{onRailClick}}">
+          <x-import component-from-global-scope="WallarmDS.Logo" size="md"></x-import>
+        </x-import>
+        <!-- Header actions, in this order: search, separator, tenant, assistant, notifications, help. -->
+        <x-import component-from-global-scope="WallarmDS.TopHeaderActions">
+          <x-import component-from-global-scope="WallarmDS.Button" variant="ghost" color="neutral" size="small" aria-label="Search">
+            <x-import component-from-global-scope="WallarmDS.Icons.Search"></x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.TopHeaderSeparator"></x-import>
+          <x-import component-from-global-scope="WallarmDS.Button" variant="ghost" color="neutral" size="small" children="{{tenantLabel}}"></x-import>
+          <x-import component-from-global-scope="WallarmDS.ChatTrigger"></x-import>
+          <x-import component-from-global-scope="WallarmDS.NotificationCenter" data-testid="notifications">
+            <x-import component-from-global-scope="WallarmDS.NotificationCenterTrigger" count="{{unreadCount}}"></x-import>
+            <x-import component-from-global-scope="WallarmDS.NotificationCenterContent">
+              <x-import component-from-global-scope="WallarmDS.NotificationCenterHeader">
+                <x-import component-from-global-scope="WallarmDS.NotificationCenterTitle"></x-import>
+                <x-import component-from-global-scope="WallarmDS.NotificationCenterHeaderActions">
+                  <x-import component-from-global-scope="WallarmDS.NotificationCenterHeaderAction">Mark all as read</x-import>
+                </x-import>
+              </x-import>
+              <x-import component-from-global-scope="WallarmDS.NotificationCenterTabs" default-value="new">
+                <x-import component-from-global-scope="WallarmDS.NotificationCenterTabsList">
+                  <x-import component-from-global-scope="WallarmDS.TabsTrigger" value="new">New <x-import component-from-global-scope="WallarmDS.NumericBadge" size="small">2</x-import></x-import>
+                  <x-import component-from-global-scope="WallarmDS.TabsTrigger" value="read">Read</x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.TabsContent" value="new">
+                  <x-import component-from-global-scope="WallarmDS.NotificationCenterBody">
+                    <x-import component-from-global-scope="WallarmDS.NotificationCenterList">
+                      <x-import component-from-global-scope="WallarmDS.NotificationCenterItem" unread="{{yes}}">
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTitle">New attack detected on api.example.com</x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTime" value="{{sentAt1}}"></x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemDescription">214 SQL injection attempts from 12 IPs in the last 10 minutes.</x-import>
+                      </x-import>
+                      <x-import component-from-global-scope="WallarmDS.NotificationCenterItem" unread="{{yes}}">
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTitle">Node wallarm-node-3 is offline</x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTime" value="{{sentAt2}}"></x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemDescription">No heartbeat for 15 minutes. Traffic fails over to wallarm-node-1.</x-import>
+                      </x-import>
+                    </x-import>
+                  </x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.TabsContent" value="read">
+                  <x-import component-from-global-scope="WallarmDS.NotificationCenterBody">
+                    <x-import component-from-global-scope="WallarmDS.NotificationCenterList">
+                      <x-import component-from-global-scope="WallarmDS.NotificationCenterItem">
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTitle">Weekly API discovery report is ready</x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemTime" value="{{sentAt3}}"></x-import>
+                        <x-import component-from-global-scope="WallarmDS.NotificationCenterItemDescription">38 new endpoints this week, 5 of them handling sensitive data.</x-import>
+                      </x-import>
+                    </x-import>
+                  </x-import>
+                </x-import>
+              </x-import>
+            </x-import>
+          </x-import>
+          <x-import component-from-global-scope="WallarmDS.Button" variant="ghost" color="neutral" size="small" aria-label="Help">
+            <x-import component-from-global-scope="WallarmDS.Icons.CircleHelp"></x-import>
+          </x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+    <x-import component-from-global-scope="WallarmDS.AppShellRail">
+      <x-import component-from-global-scope="WallarmDS.NavRail" data-testid="nav-rail">
+        <!-- Home, then the products from APP.rail; the one at APP.nav.productPath is active. -->
+        <x-import component-from-global-scope="WallarmDS.NavRailBody" children="{{railItems}}"></x-import>
+        <!-- Settings and the account menu always live in the rail footer. -->
+        <x-import component-from-global-scope="WallarmDS.NavRailFooter">
+          <x-import component-from-global-scope="WallarmDS.NavRailItem" href="/settings" icon="{{settingsIcon}}" label="Settings" on-click="{{onRailClick}}"></x-import>
+          <x-import component-from-global-scope="WallarmDS.DropdownMenu" positioning="{{accountMenuPositioning}}">
+            <x-import component-from-global-scope="WallarmDS.DropdownMenuTrigger">
+              <x-import component-from-global-scope="WallarmDS.NavRailItem" icon="{{userIcon}}" label="{{userName}}" avatar="{{yes}}"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="WallarmDS.DropdownMenuContent" class-name="w-200">
+              <x-import component-from-global-scope="WallarmDS.DropdownMenuItem">
+                <x-import component-from-global-scope="WallarmDS.DropdownMenuItemIcon">
+                  <x-import component-from-global-scope="WallarmDS.Icons.Settings"></x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.DropdownMenuItemText">Profile settings</x-import>
+              </x-import>
+              <x-import component-from-global-scope="WallarmDS.DropdownMenuSeparator"></x-import>
+              <x-import component-from-global-scope="WallarmDS.DropdownMenuItem">
+                <x-import component-from-global-scope="WallarmDS.DropdownMenuItemIcon">
+                  <x-import component-from-global-scope="WallarmDS.Icons.LogOut"></x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.DropdownMenuItemText">Sign out</x-import>
+              </x-import>
+            </x-import>
+          </x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+    <x-import component-from-global-scope="WallarmDS.AppShellRemote">
+      <!-- The product: RemoteShell builds the panel and the trail from APP.nav; the URL is its only state. -->
+      <x-import component-from-global-scope="WallarmDS.RemoteShell" config="{{navConfig}}" base-path="{{productPath}}" pathname="{{pathname}}" on-navigate="{{onNavigate}}" data-testid="product-shell">
+        <x-import component-from-global-scope="WallarmDS.RemoteShellPanel"></x-import>
+        <x-import component-from-global-scope="WallarmDS.RemoteShellBreadcrumb"></x-import>
+        <x-import component-from-global-scope="WallarmDS.RemoteShellContent">
+          <!-- Design the requested screen here: keep PageHeader, add PageDescription and a PageToolbar before PageContent, fixed-height on a list, and replace PageContent's EmptyState. -->
+          <x-import component-from-global-scope="WallarmDS.Page" name="{{pageName}}" full-size="{{yes}}" data-testid="page">
+            <x-import component-from-global-scope="WallarmDS.PageHeader">
+              <x-import component-from-global-scope="WallarmDS.PageHeaderGroup">
+                <x-import component-from-global-scope="WallarmDS.PageTitle" children="{{pageTitle}}"></x-import>
+              </x-import>
+              <x-import component-from-global-scope="WallarmDS.PageActions" children="{{pageActions}}"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="WallarmDS.PageContent">
+              <x-import component-from-global-scope="WallarmDS.EmptyState" type="collection-empty">
+                <x-import component-from-global-scope="WallarmDS.EmptyStateIllustration">
+                  <x-import component-from-global-scope="WallarmDS.Icons.PenTool"></x-import>
+                </x-import>
+                <x-import component-from-global-scope="WallarmDS.EmptyStateMessage">
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateTitle">Ask Claude to design this screen</x-import>
+                  <x-import component-from-global-scope="WallarmDS.EmptyStateDescription">Describe what this page shows and Claude builds it here, inside the app frame.</x-import>
+                </x-import>
+              </x-import>
+            </x-import>
+          </x-import>
+        </x-import>
+      </x-import>
+    </x-import>
+  </x-import>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+/* ===== APP: the person's product. Change the shell only here; everything below reads from it.
+   A screen's own data (rows, counts) goes in renderVals(), not here. =====
+   rail:  the Wallarm products in the 1st rail (label, path, icon). The one whose path is
+          nav.productPath is active; Home and Settings are always there.
+   nav:   the product's RemoteShell NavConfig. Node types: 'link' (id, label, path, icon?),
+          'group' (id, label, icon?, defaultExpanded?, children), 'section-header' (id, label),
+          'drill' only when asked. ids and paths are kebab-case; a path is one segment.
+          Icons are WallarmDS.Icons names as strings. A link may have `action`: the label of
+          its page's primary button.
+   start: the path of the link the board opens on: the first link, or the screen this board designs.
+   tenant, user: the header's tenant switcher and the account menu's name. */
+var APP = {
+  tenant: 'Acme Bank',
+  user: 'Maria Lopez',
+  rail: [
+    { label: 'API Security', path: '/api-security', icon: 'ShieldCheck' },
+    { label: 'Edge', path: '/edge', icon: 'Cloud' },
+    { label: 'Security Testing', path: '/security-testing', icon: 'FlaskConical' },
+    { label: 'AI Hypervisor', path: '/ai-hypervisor', icon: 'Bot' }
+  ],
+  nav: {
+    productLabel: 'API Security',
+    productPath: '/api-security',
+    items: [
+      { type: 'link', id: 'overview', label: 'Overview', path: 'overview', icon: 'Activity' },
+      { type: 'link', id: 'api-discovery', label: 'API Discovery', path: 'api-discovery', icon: 'Search' },
+      { type: 'link', id: 'api-specifications', label: 'API Specifications', path: 'api-specifications', icon: 'Layers', action: 'Upload specification', dividerAfter: true },
+      { type: 'section-header', id: 'detect', label: 'Detect & Respond' },
+      { type: 'group', id: 'events', label: 'Events', icon: 'Zap', defaultExpanded: true, children: [
+        { type: 'link', id: 'attacks', label: 'Attacks', path: 'attacks' },
+        { type: 'link', id: 'incidents', label: 'Incidents', path: 'incidents' },
+        { type: 'link', id: 'sessions', label: 'Sessions', path: 'sessions' }
+      ] }
+    ]
+  },
+  start: 'overview'
+};
+/* ===== End of APP. ===== */
+
+var minutesAgo = function (minutes) { return new Date(Date.now() - minutes * 60000); };
+var warned = {};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { pathname: APP.nav.productPath + '/' + (APP.start || firstLink(APP.nav.items).path) };
+  }
+  renderVals() {
+    var h = React.createElement;
+    var DS = WallarmDS;
+    var self = this;
+    var icon = function (name) {
+      if (!name) return undefined;
+      if (!DS.Icons[name] && !warned[name]) {
+        warned[name] = true;
+        console.warn('[WallarmDS] icon "' + name + '" is not in WallarmDS.Icons; fix it in APP.');
+      }
+      return DS.Icons[name];
+    };
+    // NavConfig with icon names resolved; `action` stays out of the config.
+    var toNode = function (node) {
+      var out = {};
+      for (var key in node) if (key !== 'action') out[key] = node[key];
+      if (node.icon) out.icon = icon(node.icon);
+      if (node.children) out.children = node.children.map(toNode);
+      return out;
+    };
+    var segments = this.state.pathname.split('/').filter(Boolean);
+    var page = findLink(APP.nav.items, segments[segments.length - 1]) || firstLink(APP.nav.items);
+    var onRailClick = function (event) { event.preventDefault(); };
+    var railItems = [
+      h(DS.NavRailItem, { key: 'home', href: '/', icon: DS.Icons.Home, label: 'Home', onClick: onRailClick }),
+      h(DS.NavRailSeparator, { key: 'separator' })
+    ].concat(APP.rail.map(function (product) {
+      return h(DS.NavRailItem, {
+        key: product.path,
+        href: product.path,
+        icon: icon(product.icon) || DS.Icons.Layers,
+        label: product.label,
+        active: product.path === APP.nav.productPath,
+        onClick: onRailClick
+      });
+    }));
+    return {
+      yes: true,
+      tenantLabel: [APP.tenant, h(DS.Icons.ChevronUpDown, { key: 'chevron' })],
+      unreadCount: 2,
+      sentAt1: minutesAgo(3),
+      sentAt2: minutesAgo(22),
+      sentAt3: minutesAgo(60 * 24),
+      railItems: railItems,
+      onRailClick: onRailClick,
+      settingsIcon: DS.Icons.Settings,
+      userIcon: DS.Icons.UserRound,
+      userName: APP.user,
+      accountMenuPositioning: { placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } },
+      navConfig: { productLabel: APP.nav.productLabel, productPath: APP.nav.productPath, items: APP.nav.items.map(toNode) },
+      productPath: APP.nav.productPath,
+      pathname: this.state.pathname,
+      onNavigate: function (to) { self.setState({ pathname: to }); },
+      pageName: page.id,
+      pageTitle: page.label,
+      pageActions: page.action ? h(DS.Button, { size: 'medium' }, page.action) : null
+    };
+  }
+}
+
+// The first link in menu order, and the link whose path is `path`, through groups and drills.
+function firstLink(items) {
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type === 'link') return items[i];
+    var inner = items[i].children && firstLink(items[i].children);
+    if (inner) return inner;
+  }
+  return null;
+}
+function findLink(items, path) {
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type === 'link' && items[i].path === path) return items[i];
+    var inner = items[i].children && findLink(items[i].children, path);
+    if (inner) return inner;
+  }
+  return null;
+}
+</script>
+</body>
+</html>

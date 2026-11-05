@@ -15,9 +15,11 @@ import {
 } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { CLAUDE_DESIGN, PACKAGE_DIR } from './config';
-import { SAMPLER_FILE } from './sampler/sampler';
+import { SAMPLER_FILE, SKELETON_DATA, SKELETON_FILE } from './sampler/sampler';
 
 export const CANVAS_SAMPLER = 'wallarm-sampler.dc.html';
+/** The app skeleton as a canvas board: the person's own work once installed; an update never replaces it. */
+export const CANVAS_SKELETON = 'wallarm-app.dc.html';
 /** The folder a canvas installs the system into, under `project/ds/`; SETUP has Claude confirm it. */
 export const CANVAS_FOLDER = 'wallarm-design-system';
 export const TEXT_PLAIN_FILES = ['components/index.d.ts'];
@@ -58,10 +60,10 @@ const README_ASSET_LINES: [string, string][] = [
   ['see assets/Icons.', 'use `WallarmDS.Icons.<Name>`.'],
 ];
 
-/** The sampler as a canvas artboard: its system links replaced by {@link CANVAS_HEAD}. */
-export function canvasSampler(html: string) {
+/** A system artboard (the sampler, the skeleton) for a canvas: its system links replaced by {@link CANVAS_HEAD}. */
+export function canvasSampler(html: string, file = SAMPLER_FILE) {
   const at = html.indexOf(SYSTEM_LINKS.join('\n'));
-  if (at === -1) throw new Error(`${SAMPLER_FILE}: head must link, in order: ${SYSTEM_LINKS}`);
+  if (at === -1) throw new Error(`${file}: head must link, in order: ${SYSTEM_LINKS}`);
   return html.slice(0, at) + CANVAS_HEAD + html.slice(at + SYSTEM_LINKS.join('\n').length);
 }
 
@@ -75,19 +77,18 @@ export function packReadme(readme: string) {
   return out;
 }
 
-/** The canvas.json `boards` entry, from the sampler's title and `$preview` size. */
-export function boardEntry(html: string) {
+/** The canvas.json `boards` entry for `file` at `x`, from the artboard's title and `$preview` size. */
+export function boardEntry(html: string, file = CANVAS_SAMPLER, x = 0) {
   const title = /<title>([^<]+)<\/title>/.exec(html)?.[1];
   const props = /data-props="([^"]*)"/.exec(html)?.[1]?.replaceAll('&quot;', '"');
   const preview = props
     ? (JSON.parse(props) as { $preview?: { width: number; height: number } }).$preview
     : undefined;
-  if (!title || !preview) throw new Error(`${SAMPLER_FILE}: needs a <title> and a $preview size`);
+  if (!title || !preview) throw new Error(`${file}: needs a <title> and a $preview size`);
   return {
     title,
-    entry: {
-      [CANVAS_SAMPLER]: { x: 0, y: 0, w: preview.width, h: preview.height, title, expand: 'fill' },
-    },
+    width: preview.width,
+    entry: { [file]: { x, y: 0, w: preview.width, h: preview.height, title, expand: 'fill' } },
   };
 }
 
@@ -97,6 +98,7 @@ export function renderSetup({
   template,
   readme,
   sampler,
+  skeleton,
   version,
   files,
   assets = [],
@@ -105,13 +107,16 @@ export function renderSetup({
   template: string;
   readme: string;
   sampler: string;
+  skeleton: string;
   version: string;
   files: number;
   assets?: AssetEntry[];
 }) {
   const missing = README_SECTIONS.filter(name => !readme.split('\n').includes(`## ${name}`));
   if (missing.length) throw new Error(`README.md has no section ${missing.join(', ')}`);
-  const { title: boardTitle, entry } = boardEntry(sampler);
+  const { title: boardTitle, width, entry } = boardEntry(sampler);
+  // The skeleton goes right of the sampler, 80px apart, as SETUP's placement rule says.
+  const app = boardEntry(skeleton, CANVAS_SKELETON, width + 80);
   const values: Record<string, string> = {
     version,
     files: String(files),
@@ -123,6 +128,11 @@ export function renderSetup({
     samplerFile: CANVAS_SAMPLER,
     boardTitle,
     boardEntry: JSON.stringify(entry),
+    skeletonFile: CANVAS_SKELETON,
+    skeletonSystemFile: SKELETON_FILE,
+    skeletonData: SKELETON_DATA,
+    skeletonTitle: app.title,
+    skeletonEntry: JSON.stringify(app.entry),
     textPlainFiles: TEXT_PLAIN_FILES.map(file => `\`project/${file}\``).join(' and '),
     canvasFiles: CANVAS_FILES.map(file => `- \`project/ds/${CANVAS_FOLDER}/${file}\``).join('\n'),
     readmeSections: README_SECTIONS.map(name => `"${name}"`).join(', '),
@@ -177,7 +187,7 @@ export function packAssets(
   });
 }
 
-/** Writes `<outDir>/{project,assets,assets.json,SETUP.md,UPDATE.md,wallarm-sampler.dc.html}` from a built `.claude-design/`. */
+/** Writes `<outDir>/{project,assets,assets.json,SETUP.md,UPDATE.md,wallarm-sampler.dc.html,wallarm-app.dc.html}` from a built `.claude-design/`. */
 export function pack(
   source = resolve(PACKAGE_DIR, '.claude-design'),
   outDir = resolve(PACKAGE_DIR, 'dist'),
@@ -223,6 +233,8 @@ export function pack(
   }).filter(file => file.isFile()).length;
   const sampler = canvasSampler(readFileSync(join(project, SAMPLER_FILE), 'utf8'));
   writeFileSync(join(outDir, CANVAS_SAMPLER), sampler);
+  const skeleton = canvasSampler(readFileSync(join(project, SKELETON_FILE), 'utf8'), SKELETON_FILE);
+  writeFileSync(join(outDir, CANVAS_SKELETON), skeleton);
   for (const name of ['SETUP.md', 'UPDATE.md'])
     writeFileSync(
       join(outDir, name),
@@ -231,6 +243,7 @@ export function pack(
         template: readFileSync(join(PACKAGE_DIR, 'content', name), 'utf8'),
         readme: readFileSync(readmePath, 'utf8'),
         sampler,
+        skeleton,
         version,
         files,
         assets,
