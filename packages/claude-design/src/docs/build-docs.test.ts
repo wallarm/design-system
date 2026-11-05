@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { assertStoriesShipped, buildDocs } from './build-docs';
+import { CONTROLLED_OPEN, DEFAULT_OPEN } from './consuming';
 import { storyGuide } from './story-guide';
 
 const guideName = (storyFile: string): string => path.basename(storyFile, '.stories.tsx');
@@ -59,6 +60,23 @@ describe('Claude Design documentation', () => {
     }
     expect(readme).not.toContain('components/lib/react');
     expect(readme).not.toContain('TableCells');
+  });
+
+  it('only advertises default-open for overlays that have defaultOpen', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    const props = (name: string) =>
+      new Set(
+        metadata.components.find(component => component.name === name)?.props.map(p => p.name),
+      );
+    for (const name of DEFAULT_OPEN) {
+      expect(props(name).has('defaultOpen'), name).toBe(true);
+      expect(readme).toContain(name);
+    }
+    for (const name of CONTROLLED_OPEN) {
+      expect(props(name).has('defaultOpen'), name).toBe(false);
+      expect(props(name).has('open') && props(name).has('onOpenChange'), name).toBe(true);
+    }
+    expect(readme).toContain(`- ${DEFAULT_OPEN.join(', ')}: \`default-open="{{shown}}"\``);
   });
 
   it('corrects CVA booleans, reads current source defaults and kebab-cases attributes', async () => {

@@ -51,10 +51,16 @@ Set `theme="dark"` on `WallarmDS.Root` to switch the artboard's semantic tokens.
 Root for Dialog, DropdownMenu, Select and other overlay compositions so their portal content
 inherits the theme. Follow each component's guide for its required parts.
 
-For an overlay shown in a static design, use `default-open="{{shown}}"` and return
-`shown: true` from `renderVals()`. Controlled `open` values need callbacks if the prototype
-should also close. Root scopes the theme; ThemeProvider changes the whole page and should
-not be used as the canvas wrapper.
+For an overlay shown in a static design, return `shown: true` from `renderVals()` and pass
+it to the prop the component has: `default-open="{{shown}}"` on DropdownMenu, Select,
+Tooltip, Calendar and FilterDropdown; `open="{{shown}}"` on Dialog, Drawer, Popover and
+SearchModal, which have no `default-open`. Controlled `open` values need an `on-open-change`
+callback if the prototype should also close. Root scopes the theme; ThemeProvider changes
+the whole page and should not be used as the canvas wrapper.
+
+The canvas CSS is precompiled: only the classes in `components/UTILITIES.md` exist, and every
+numeric utility means N px (`p-16` is 16px). The project README has the Tailwind-to-ours
+translation, and Root warns in the console about classes that have no CSS.
 
 The bundle also exposes components available through npm component subpaths, such as the
 Dialog family. Root is a canvas-only helper; the package's npm exports stay unchanged.
