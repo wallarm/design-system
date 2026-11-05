@@ -1,11 +1,29 @@
 {
   "name": "@wallarm-org/claude-design",
   "version": "0.0.0",
-  "description": "Builds the design system into a Claude Design project; never published",
-  "private": true,
+  "description": "Installs Wallarm Design System in Claude Design: `npx -y @wallarm-org/claude-design@latest export`",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "packages/claude-design"
+  },
   "license": "MIT",
   "author": "Wallarm",
   "type": "module",
+  "bin": {
+    "claude-design": "./bin/claude-design.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.12"
+  },
   "sideEffects": [
     "*.css"
   ],
@@ -19,7 +37,8 @@
     "fetch": "tsx src/fetch.ts",
     "lint": "biome check",
     "lint:fix": "biome check --fix",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "tsx src/pack.ts"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",

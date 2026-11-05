@@ -4,9 +4,60 @@ description: Prototype with the real Wallarm components, tokens, fonts and icons
 
 # Claude Design
 
-Choose **Wallarm Design System** when creating a Design canvas in Claude Design. The
-[system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7) contains the components,
-light and dark tokens, Geist fonts, icons and live examples generated from this repository.
+## Set up from a prompt
+
+Paste this prompt into a new Claude Design chat. Claude installs the system for you; nothing
+to download or configure.
+
+```text
+Install Wallarm Design System in Claude Design.
+
+1. Run this command in your sandbox:
+   npx -y @wallarm-org/claude-design@latest export
+2. Read wallarm-design-system/SETUP.md and follow every step in it, in order. It publishes
+   the system, installs it on a canvas and checks it with a sampler artboard.
+3. When the sampler passes its checks, tell me the system is ready and give me its link.
+   Then wait for my design request.
+
+If the command fails or writes no wallarm-design-system/SETUP.md, show me its output and
+stop. Don't build the system by hand.
+```
+
+What you will see:
+
+1. Claude runs the command, which writes `wallarm-design-system/` with the system files and a
+   `SETUP.md` written for that release.
+2. A new **Wallarm Design System** artifact in your account. Claude gives you its link: keep it
+   to install the system on other canvases and to update it.
+3. A Design canvas with the system installed and a **Wallarm sampler** board: a Users settings
+   screen with the app shell, a table, status tabs and an open drawer. Claude checks that it
+   renders without `[WallarmDS]` warnings, then waits for your request.
+
+Icons come with the components (`WallarmDS.Icons.*`), so the system's page shows no icon
+gallery. The package `@wallarm-org/claude-design` is published with every stable release and
+its version matches the design-system version.
+
+### Update to a new release
+
+Paste this into a chat, with your system's link:
+
+```text
+Update my Wallarm Design System <link> to the latest release. Save its file paths as a JSON
+array in current-files.json, run
+npx -y @wallarm-org/claude-design@latest export --overwrite --existing current-files.json
+and follow "Update to a new release" in wallarm-design-system/SETUP.md.
+```
+
+Claude publishes the new files to the same link, removes the files the release dropped, and
+reinstalls the system on your canvases.
+
+## Use Wallarm's shared system
+
+Wallarm's own copy is the
+[system artifact](https://claude.ai/artifact/FXWSxmN7zfnpsyMemE5VD7): choose **Wallarm Design
+System** when creating a Design canvas. It contains the components, light and dark tokens,
+Geist fonts, icons and live examples generated from this repository, and maintainers sync it
+by hand (see [Request a change](#request-a-change)).
 
 Start a prompt with the screen's purpose, content and states: “Use Wallarm Design System to
 prototype a rules list with a primary Create rule action, environment filter, empty state and

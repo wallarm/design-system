@@ -100,10 +100,11 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
 
-  # Attaches the Claude Design export to the release; publishing stays manual
-  # (.claude/skills/claude-design-sync). No-ops on tags without the build.
+  # Publishes @wallarm-org/claude-design (the one-prompt Claude Design install) to
+  # npm and attaches the export to the release. Syncing Wallarm's own artifact stays
+  # manual (.claude/skills/claude-design-sync). No-ops on tags without the build.
   claude-design:
-    name: Attach Claude Design export
+    name: Publish Claude Design export
     runs-on: ubuntu-latest
     # The docs site is already deployed by its own job; a failed export must not turn the run red
     continue-on-error: true
@@ -143,6 +144,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         if: steps.guard.outputs.enabled == 'true'
@@ -158,6 +160,25 @@ jobs:
           else
             pnpm --filter @wallarm-org/design-system build:claude-design
           fi
+
+      # Before the release attach, so a missing GitHub release never blocks npm.
+      - name: Publish to npm
+        if: steps.guard.outputs.enabled == 'true'
+        working-directory: packages/claude-design
+        env:
+          TAG: ${{ inputs.tag }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -f bin/claude-design.js || { echo "::notice::$TAG predates the npm package; nothing to publish"; exit 0; }
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::notice::$TAG is a pre-release; not publishing"; exit 0; }
+          VERSION="${TAG#v}"
+          if npm view "@wallarm-org/claude-design@$VERSION" version >/dev/null 2>&1; then
+            echo "@wallarm-org/claude-design@$VERSION is already on npm"; exit 0
+          fi
+          npm pkg set version="$VERSION"
+          # pnpm rewrites workspace:/catalog: specs; prepack packs dist/ from the export above
+          pnpm publish --no-git-checks --access public
 
       - name: Package and attach to the release
         if: steps.guard.outputs.enabled == 'true'

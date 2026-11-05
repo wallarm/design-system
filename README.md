@@ -102,6 +102,7 @@ design-system/
 - `@wallarm-org/mcp` - MCP server that gives AI assistants component metadata, props, variants, and design tokens
 - `@wallarm-org/mcp-core` - Shared types and Zod schemas for MCP metadata (bundled into `@wallarm-org/mcp`, not published)
 - `@wallarm-org/migrator` - Codemod CLI that migrates consumer apps across design-system breaking changes
+- `@wallarm-org/claude-design` - Builds the Claude Design export and installs it from one prompt (`npx -y @wallarm-org/claude-design@latest export`); published by `deploy-site.yml` at each stable release
 - `@wallarm-org/biome-config` - Shared Biome lint/format configuration
 - `@wallarm-org/publish-scripts` - Shared semantic-release configuration
 - `@wallarm-org/typescript-config` - Shared TypeScript configurations
