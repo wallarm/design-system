@@ -18,6 +18,15 @@ const getContent = (page: Page) => page.getByTestId('notification-center--conten
 const openInbox = async (page: Page) => {
   await getTrigger(page).click();
   await expect(getContent(page)).toBeVisible();
+  // Settle the popover's zoom-in so measured boxes are final.
+  await getContent(page).evaluate(el => Promise.all(el.getAnimations().map(a => a.finished)));
+};
+
+// The tab that was just left unmounts a frame later (Ark presence), so for one frame both panels share
+// the same test ids — wait for it to go before a strict locator hits two elements.
+const openReadTab = async (page: Page) => {
+  await page.getByRole('tab', { name: 'Read' }).click();
+  await expect(page.getByTestId('notification-center--tabs--content')).toHaveCount(1);
 };
 
 test.describe('Component: NotificationCenter', () => {
@@ -49,7 +58,7 @@ test.describe('Component: NotificationCenter', () => {
     test('Should render the empty read tab correctly', async ({ page }) => {
       await notificationCenterStory.goto(page, 'Empty');
       await openInbox(page);
-      await page.getByRole('tab', { name: 'Read' }).click();
+      await openReadTab(page);
       await expect(page.getByTestId('notification-center--empty')).toContainText(
         'Nothing read yet',
       );
@@ -79,7 +88,7 @@ test.describe('Component: NotificationCenter', () => {
     test('Should show read items when the Read tab is clicked', async ({ page }) => {
       await notificationCenterStory.goto(page, 'Basic');
       await openInbox(page);
-      await page.getByRole('tab', { name: 'Read' }).click();
+      await openReadTab(page);
       await expect(page.getByTestId('notification-center--tabs--content')).toContainText(
         'Node wallarm-node-2 is back online',
       );
@@ -108,7 +117,8 @@ test.describe('Component: NotificationCenter', () => {
       const header = page.getByTestId('notification-center--header');
       const before = await header.boundingBox();
       await page.getByTestId('notification-center--body').hover();
-      await page.mouse.wheel(0, 600);
+      // 24 items are ~2000px tall in a ~570px viewport: scroll well past the end.
+      await page.mouse.wheel(0, 3000);
       await expect(page.getByTestId('notification-center--item').last()).toBeInViewport();
       expect(await header.boundingBox()).toEqual(before);
     });
