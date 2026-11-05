@@ -22,6 +22,9 @@ src/
 | `ExampleMetadata` | Usage example: name, code, description? |
 | `TokenCategory` | Token group: name, description?, tokens[] |
 | `TokenMetadata` | Single token: name, value |
+| `GuidelinesMetadata` | Root of `guidelines.json`: version, rules (rules.md digest), guidelines[] |
+| `Guideline` | Foundation/pattern: slug, kind, title, description, components[], keywords[], order, markdown, sections[] |
+| `GuidelineSection` | H2 section: id (kebab-case), heading, markdown |
 
 ## Design Decisions
 

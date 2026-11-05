@@ -75,3 +75,41 @@ export const designSystemMetadataSchema = z.object({
 });
 
 export type DesignSystemMetadata = z.infer<typeof designSystemMetadataSchema>;
+
+export const guidelineSectionSchema = z.object({
+  /** Kebab-case of the H2 text, e.g. `layout-and-spacing`. */
+  id: z.string(),
+  heading: z.string(),
+  markdown: z.string(),
+});
+
+export type GuidelineSection = z.infer<typeof guidelineSectionSchema>;
+
+export const guidelineKindSchema = z.enum(['foundation', 'pattern']);
+
+export type GuidelineKind = z.infer<typeof guidelineKindSchema>;
+
+export const guidelineSchema = z.object({
+  /** `foundations/spacing` | `patterns/entity-table`. */
+  slug: z.string(),
+  kind: guidelineKindSchema,
+  title: z.string(),
+  description: z.string(),
+  components: z.array(z.string()),
+  keywords: z.array(z.string()),
+  order: z.number(),
+  /** Body without frontmatter. */
+  markdown: z.string(),
+  sections: z.array(guidelineSectionSchema),
+});
+
+export type Guideline = z.infer<typeof guidelineSchema>;
+
+export const guidelinesMetadataSchema = z.object({
+  version: z.string(),
+  /** Contents of `guidelines/rules.md` — the agent digest. */
+  rules: z.string(),
+  guidelines: z.array(guidelineSchema),
+});
+
+export type GuidelinesMetadata = z.infer<typeof guidelinesMetadataSchema>;

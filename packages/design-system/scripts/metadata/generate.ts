@@ -6,6 +6,7 @@ import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-c
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 import { parseComponentDescription } from './parse-description.js';
 import { parseExamples } from './parse-examples.js';
+import { parseGuidelines } from './parse-guidelines.js';
 import { parseComponentProps } from './parse-props.js';
 import { parseTokens } from './parse-tokens.js';
 import { parseVariantsForComponent } from './parse-variants.js';
@@ -93,6 +94,26 @@ const main = () => {
   console.log(`  Components: ${components.length}`);
   console.log(`  Token categories: ${tokens.length}`);
   console.log(`  Total tokens: ${tokens.reduce((sum, cat) => sum + cat.tokens.length, 0)}`);
+
+  // Guidelines: validate, emit guidelines.json, and ship the raw markdown
+  const guidelinesDir = path.join(ROOT, 'guidelines');
+  const knownComponents = new Set(
+    project.getSourceFileOrThrow(path.join(ROOT, 'src/index.ts')).getExportedDeclarations().keys(),
+  );
+  let guidelines: ReturnType<typeof parseGuidelines>;
+  try {
+    guidelines = parseGuidelines({ dir: guidelinesDir, version, knownComponents });
+  } catch (error) {
+    console.error((error as Error).message);
+    process.exit(1);
+  }
+  const guidelinesPath = path.join(outDir, 'guidelines.json');
+  fs.writeFileSync(guidelinesPath, JSON.stringify(guidelines, null, 2));
+  fs.rmSync(path.join(ROOT, 'dist/guidelines'), { recursive: true, force: true });
+  fs.cpSync(guidelinesDir, path.join(ROOT, 'dist/guidelines'), { recursive: true });
+
+  console.log(`Guidelines written to ${guidelinesPath}`);
+  console.log(`  Guidelines: ${guidelines.guidelines.length}`);
 };
 
 main();
