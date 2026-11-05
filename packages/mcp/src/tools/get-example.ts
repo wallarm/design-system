@@ -27,19 +27,29 @@ export function getExampleText(c: ComponentMetadata, example: string, page = 1):
     return `"${example}" matches several ${c.name} examples: ${candidates.map(e => `\`${e.key}\``).join(', ')}. Pass one of them.`;
   }
 
-  const match =
-    candidates[0] ??
-    entries
-      .map(e => {
-        const key = normalize(e.key);
-        return { e, d: Math.min(levenshtein(q, key), levenshtein(q, key.split('/').at(-1) ?? '')) };
-      })
-      .filter(({ d }) => d <= Math.max(2, Math.floor(q.length / 4)))
-      .sort((a, b) => a.d - b.d)[0]?.e;
+  // Short queries ("xl") are within edit distance 2 of any short name — no fuzzy match for them.
+  const fuzzy =
+    candidates[0] || q.length < 4
+      ? undefined
+      : entries
+          .map(e => {
+            const key = normalize(e.key);
+            return {
+              e,
+              d: Math.min(levenshtein(q, key), levenshtein(q, key.split('/').at(-1) ?? '')),
+            };
+          })
+          .filter(({ d }) => d <= Math.max(2, Math.floor(q.length / 4)))
+          .sort((a, b) => a.d - b.d)[0]?.e;
+  const match = candidates[0] ?? fuzzy;
 
   if (!match) return `Example "${example}" not found in ${c.name}.\n\nAvailable examples: ${keys}`;
 
-  return paginate(formatExample(match.key, match.example), page, next =>
-    call({ component: c.name, example: match.key, page: next }),
+  const closest = fuzzy ? `Closest match for "${example}": \`${fuzzy.key}\`.\n\n` : '';
+  return (
+    closest +
+    paginate(formatExample(match.key, match.example), page, next =>
+      call({ component: c.name, example: match.key, page: next }),
+    )
   );
 }

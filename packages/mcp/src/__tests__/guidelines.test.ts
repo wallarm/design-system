@@ -32,6 +32,32 @@ describe('loading', () => {
     expect(loadGuidelines(metadataPath)?.guidelines.length).toBe(guidelines.guidelines.length);
   });
 
+  it('ignores a malformed or incompatible guidelines.json instead of throwing', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-'));
+    const file = path.join(dir, 'guidelines.json');
+    const warnings: string[] = [];
+    const warn = (m: string) => warnings.push(m);
+    fs.writeFileSync(file, '{ truncated');
+    expect(loadGuidelines(path.join(dir, 'components.json'), warn)).toBeUndefined();
+    fs.writeFileSync(file, JSON.stringify({ version: '1.0.0' }));
+    expect(loadGuidelines(path.join(dir, 'components.json'), warn)).toBeUndefined();
+    expect(warnings).toHaveLength(2);
+    fs.rmSync(dir, { recursive: true });
+  });
+
+  it('drops guidelines of an unknown kind (newer design-system)', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-'));
+    const recipe = { ...guidelines.guidelines[0], slug: 'recipes/x', kind: 'recipe' };
+    fs.writeFileSync(
+      path.join(dir, 'guidelines.json'),
+      JSON.stringify({ ...guidelines, guidelines: [...guidelines.guidelines, recipe] }),
+    );
+    expect(loadGuidelines(path.join(dir, 'components.json'))?.guidelines.map(g => g.slug)).toEqual(
+      guidelines.guidelines.map(g => g.slug),
+    );
+    fs.rmSync(dir, { recursive: true });
+  });
+
   it('returns undefined when guidelines.json is absent (older design-system)', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-'));
     expect(loadGuidelines(path.join(dir, 'components.json'))).toBeUndefined();
@@ -68,6 +94,15 @@ describe('get_guideline', () => {
     for (const slug of ['patterns/empty-states', 'empty-states', 'patterns/empty-states.md']) {
       expect(getGuidelineText(guidelines, slug).startsWith('# Empty states')).toBe(true);
     }
+  });
+
+  it('accepts relative markdown links, with the #anchor as the section', () => {
+    expect(getGuidelineText(guidelines, './empty-states.md').startsWith('# Empty states')).toBe(
+      true,
+    );
+    expect(getGuidelineText(guidelines, '../foundations/spacing.md#rules')).toMatch(
+      /^# Spacing — Rules/,
+    );
   });
 
   it('returns one section by id or heading', () => {

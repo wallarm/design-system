@@ -4,10 +4,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 import { paginate, RESPONSE_LIMIT } from '../tools/format';
-import { componentSections, exampleEntries, formatComponent } from '../tools/get-component';
+import {
+  componentSections,
+  exampleEntries,
+  findSubComponentOwner,
+  formatComponent,
+  getComponent,
+} from '../tools/get-component';
 import { getExampleText } from '../tools/get-example';
 import { formatTokenCategory } from '../tools/get-token-category';
-import { ALIASES } from '../tools/search-component';
+import { ALIASES, searchComponents } from '../tools/search-component';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_METADATA = path.resolve(
@@ -67,6 +73,28 @@ describe.skipIf(!fs.existsSync(REAL_METADATA))('response budget (real metadata)'
       }
     }
   });
+
+  it('every component a guideline lists resolves through get_component', () => {
+    const guidelinesPath = path.join(path.dirname(REAL_METADATA), 'guidelines.json');
+    if (!fs.existsSync(guidelinesPath)) return;
+    const { guidelines } = JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8')) as {
+      guidelines: { slug: string; components: string[] }[];
+    };
+    const missing = guidelines.flatMap(g =>
+      g.components
+        .filter(n => /^[A-Z]/.test(n))
+        .filter(n => !getComponent(metadata, n) && !findSubComponentOwner(metadata, n))
+        .map(n => `${g.slug}: ${n}`),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it.each(['bulk delete', 'bulk actions', 'row selection', 'action bar'])(
+    '"%s" finds Table first',
+    query => {
+      expect(searchComponents(metadata, query)[0]?.name).toBe('Table');
+    },
+  );
 
   it('every search alias points at a real component', () => {
     const names = new Set(metadata.components.map(c => c.name));

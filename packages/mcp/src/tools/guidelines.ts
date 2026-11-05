@@ -27,16 +27,22 @@ export function formatGuidelineList(list: Guideline[]): string {
     .join('\n');
 }
 
+/** `../foundations/spacing.md#rules` → `{ slug: 'foundations/spacing', anchor: 'rules' }`. */
+const splitLink = (link: string) => {
+  const [path = '', anchor] = link.trim().split('#');
+  return { path, anchor: anchor || undefined };
+};
+
 const normalizeSlug = (slug: string) =>
-  slug
-    .trim()
-    .toLowerCase()
+  splitLink(slug)
+    .path.toLowerCase()
+    .replace(/^(\.{1,2}\/)+/, '')
     .replace(/\.md$/, '')
     .replace(/^\/+|\/+$/g, '');
 
 const baseName = (slug: string) => slug.slice(slug.lastIndexOf('/') + 1);
 
-/** Accepts `patterns/empty-states`, `empty-states` or `patterns/empty-states.md`. */
+/** Accepts `patterns/empty-states`, `empty-states`, `patterns/empty-states.md` or a relative link (`../patterns/empty-states.md#rules`). */
 export function findGuideline(guidelines: GuidelinesMetadata, slug: string): Guideline | undefined {
   const s = normalizeSlug(slug);
   return (
@@ -83,6 +89,8 @@ export function getGuidelineText(
     const hint = nearestSlugs(guidelines, slug);
     return `Guideline "${slug}" not found.${hint.length > 0 ? `\n\nDid you mean: ${hint.join(', ')}?` : ''}`;
   }
+  // A link's `#anchor` selects the section unless one is passed.
+  section ??= splitLink(slug).anchor;
   if (!section) return guideline.markdown;
 
   const id = section

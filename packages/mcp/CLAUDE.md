@@ -7,7 +7,7 @@ Standalone MCP (Model Context Protocol) server for Wallarm Design System. Provid
 ```
 src/
 ├── index.ts              # Entry point: McpServer setup, tools & resources registration, stdio transport
-├── metadata.ts           # Metadata resolver: CLI arg → import.meta.resolve → node_modules walk → apps/*, packages/* → bundled snapshot; guidelines.json from the same dir
+├── metadata.ts           # Metadata resolver: CLI arg → import.meta.resolve → node_modules walk → apps/*, packages/* → bundled snapshot; guidelines.json from the same dir (best-effort, bundled fallback)
 ├── env.d.ts              # `*.md?raw` module type (bundled rules.md fallback)
 ├── tools/
 │   ├── format.ts             # Compact props tables, union collapsing, RESPONSE_LIMIT pagination

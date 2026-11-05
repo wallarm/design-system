@@ -5,6 +5,7 @@ import {
   type DesignSystemMetadata,
   designSystemMetadataSchema,
   type GuidelinesMetadata,
+  guidelineKindSchema,
   guidelinesMetadataSchema,
 } from '@wallarm-org/mcp-core';
 
@@ -150,17 +151,36 @@ export async function loadMetadata(
 
 /**
  * Load `guidelines.json` from the directory of the resolved `components.json`.
- * Optional: design-system versions before guidelines shipped lack the file.
+ * Best-effort: design-system versions before guidelines shipped lack the file, and a malformed
+ * or incompatible file must not take the component and token tools down — it is reported to
+ * stderr and treated as absent. Guidelines of a kind this server does not know (added by a newer
+ * design system) are dropped instead of failing the whole file.
  */
-export function loadGuidelines(metadataPath: string): GuidelinesMetadata | undefined {
+export function loadGuidelines(
+  metadataPath: string,
+  warn: (message: string) => void = message => console.error('[wallarm-ds-mcp]', message),
+): GuidelinesMetadata | undefined {
   const guidelinesPath = path.join(path.dirname(metadataPath), 'guidelines.json');
   if (!fs.existsSync(guidelinesPath)) return undefined;
 
-  const result = guidelinesMetadataSchema.safeParse(
-    JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8')),
-  );
-  if (!result.success) {
-    throw new Error(`Invalid guidelines format in ${guidelinesPath}:\n${result.error.message}`);
+  try {
+    const raw = JSON.parse(fs.readFileSync(guidelinesPath, 'utf-8'));
+    if (raw && Array.isArray(raw.guidelines)) {
+      raw.guidelines = raw.guidelines.filter(
+        (g: { kind?: unknown }) => guidelineKindSchema.safeParse(g?.kind).success,
+      );
+    }
+    const result = guidelinesMetadataSchema.safeParse(raw);
+    if (!result.success) throw new Error(result.error.message);
+    return result.data;
+  } catch (err) {
+    warn(
+      `Ignoring ${guidelinesPath} (guidelines unavailable): ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return undefined;
   }
-  return result.data;
 }
+
+/** `guidelines.json` bundled into this package's dist at build time (fallback for older design systems). */
+export const loadBundledGuidelines = (bundledPath = defaultBundledPath()) =>
+  loadGuidelines(bundledPath);

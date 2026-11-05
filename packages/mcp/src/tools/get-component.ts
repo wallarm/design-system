@@ -14,6 +14,19 @@ export function getComponent(
   return metadata.components.find(c => c.name.toLowerCase() === name.toLowerCase());
 }
 
+/** The component that exports `name` as a sub-component (case-insensitive). */
+export function findSubComponentOwner(
+  metadata: DesignSystemMetadata,
+  name: string,
+): { component: ComponentMetadata; sub: SubComponentMetadata } | undefined {
+  const n = name.toLowerCase();
+  for (const component of metadata.components) {
+    const sub = component.subComponents.find(s => s.name.toLowerCase() === n);
+    if (sub) return { component, sub };
+  }
+  return undefined;
+}
+
 const storyName = (example: ExampleMetadata) => example.storyTitle?.split('/').at(-1) ?? 'Story';
 
 /** Example keys for `get_example`: the story name, qualified with the story file when ambiguous. */
@@ -56,6 +69,18 @@ export const call = (args: Record<string, string | number>) =>
     .map(([k, v]) => `${k}: ${typeof v === 'number' ? v : `'${v}'`}`)
     .join(', ')} }\``;
 
+const formatVariantList = (c: ComponentMetadata) =>
+  c.variants
+    .map(v => {
+      const def = v.defaultValue ? ` (default: \`${v.defaultValue}\`)` : '';
+      const options =
+        v.options.length > 0
+          ? v.options.map(o => `\`${o}\``).join(', ')
+          : '_dynamically generated_';
+      return `- **${v.name}**: ${options}${def}`;
+    })
+    .join('\n');
+
 function formatOverview(c: ComponentMetadata): string {
   const lines = [`# ${c.name}`];
   if (c.description) lines.push('', c.description);
@@ -72,17 +97,7 @@ function formatOverview(c: ComponentMetadata): string {
   if (c.props.length > 0)
     lines.push('', '## Props', '', formatPropsTable(c.props, { brief: true }));
 
-  if (c.variants.length > 0) {
-    lines.push('', '## Variants', '');
-    for (const v of c.variants) {
-      const def = v.defaultValue ? ` (default: \`${v.defaultValue}\`)` : '';
-      const options =
-        v.options.length > 0
-          ? v.options.map(o => `\`${o}\``).join(', ')
-          : '_dynamically generated_';
-      lines.push(`- **${v.name}**: ${options}${def}`);
-    }
-  }
+  if (c.variants.length > 0) lines.push('', '## Variants', '', formatVariantList(c));
 
   if (c.subComponents.length > 0) {
     lines.push('', `## Sub-components (${c.subComponents.length})`, '');
@@ -180,6 +195,7 @@ function formatProps(c: ComponentMetadata): string {
     `# ${c.name} — props`,
     '',
     c.props.length > 0 ? formatPropsTable(c.props) : '_No props._',
+    ...(c.variants.length > 0 ? ['', '## Variants', '', formatVariantList(c)] : []),
   ].join('\n');
 }
 

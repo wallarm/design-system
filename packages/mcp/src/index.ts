@@ -3,11 +3,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 // Fallback digest for design-system versions that predate guidelines.json.
 import bundledRules from '../../design-system/src/guidelines/rules.md?raw';
-import { describeSource, loadGuidelines, loadMetadata } from './metadata';
+import { describeSource, loadBundledGuidelines, loadGuidelines, loadMetadata } from './metadata';
 import { getComponentListContent } from './resources/components';
 import { getTokensContent } from './resources/tokens';
 import { paginate } from './tools/format';
-import { formatComponent, getComponent } from './tools/get-component';
+import { findSubComponentOwner, formatComponent, getComponent } from './tools/get-component';
 import { getExampleText } from './tools/get-example';
 import { formatTokenCategory, getTokenCategory } from './tools/get-token-category';
 import {
@@ -27,8 +27,16 @@ async function main() {
 
   log('Loading metadata...');
   const { metadata, metadataPath, source } = await loadMetadata();
-  const guidelines = loadGuidelines(metadataPath);
   const sourceLine = describeSource(source, metadata.version);
+  // An installed design system without guidelines.json falls back to the bundled snapshot,
+  // so the instructions' "read the pattern with get_guideline" stays answerable.
+  let guidelines = loadGuidelines(metadataPath);
+  let guidelinesSource = '';
+  if (!guidelines && source.kind === 'installed') {
+    guidelines = loadBundledGuidelines();
+    if (guidelines)
+      guidelinesSource = `\n\n_Guidelines: bundled snapshot v${guidelines.version} — your installed @wallarm-org/design-system v${metadata.version} ships no guidelines.json._`;
+  }
   log(sourceLine, `(${metadataPath})`);
   log(
     `Loaded v${metadata.version}: ${metadata.components.length} components, ${metadata.tokens.length} token categories, ${guidelines ? `${guidelines.guidelines.length} guidelines` : 'no guidelines.json (bundled rules)'}`,
@@ -37,7 +45,9 @@ async function main() {
 
   const server = new McpServer(
     { name: 'wallarm-design-system', version: metadata.version },
-    { instructions: buildInstructions(guidelines?.rules ?? bundledRules, sourceLine) },
+    {
+      instructions: `${buildInstructions(guidelines?.rules ?? bundledRules, sourceLine)}${guidelinesSource}`,
+    },
   );
 
   // ── Tools ──
@@ -98,7 +108,17 @@ async function main() {
     },
     async ({ name, section, page }) => {
       const component = getComponent(metadata, name);
-      if (!component) return notFound(name);
+      if (!component) {
+        // A sub-component name (PageHeader, TableActionBar) resolves to its section of the parent.
+        const owner = findSubComponentOwner(metadata, name);
+        if (!owner) return notFound(name);
+        const text = formatComponent(owner.component, {
+          section: owner.sub.name,
+          page,
+          source: sourceLine,
+        });
+        return { content: [{ type: 'text', text }] };
+      }
       const related = guidelines
         ? formatRelatedGuidelines(relatedGuidelines(guidelines, component.name))
         : '';
@@ -123,7 +143,8 @@ async function main() {
       },
     },
     async ({ component: name, example, page }) => {
-      const component = getComponent(metadata, name);
+      const component =
+        getComponent(metadata, name) ?? findSubComponentOwner(metadata, name)?.component;
       if (!component) return notFound(name);
       return { content: [{ type: 'text', text: getExampleText(component, example, page) }] };
     },
@@ -209,7 +230,9 @@ async function main() {
       content: [
         {
           type: 'text',
-          text: guidelines ? formatGuidelineList(listGuidelines(guidelines, kind)) : noGuidelines,
+          text: guidelines
+            ? `${formatGuidelineList(listGuidelines(guidelines, kind))}${guidelinesSource}`
+            : noGuidelines,
         },
       ],
     }),
@@ -236,7 +259,9 @@ async function main() {
       content: [
         {
           type: 'text',
-          text: guidelines ? getGuidelineText(guidelines, slug, section) : noGuidelines,
+          text: guidelines
+            ? `${getGuidelineText(guidelines, slug, section)}${guidelinesSource}`
+            : noGuidelines,
         },
       ],
     }),

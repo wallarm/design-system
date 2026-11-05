@@ -4,7 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { formatPropsTable, formatType, paginate } from '../tools/format';
-import { exampleEntries, formatComponent, getComponent } from '../tools/get-component';
+import {
+  exampleEntries,
+  findSubComponentOwner,
+  formatComponent,
+  getComponent,
+} from '../tools/get-component';
 import { getExampleText } from '../tools/get-example';
 import { formatTokenCategory, getTokenCategory } from '../tools/get-token-category';
 import { searchComponents } from '../tools/search-component';
@@ -175,6 +180,26 @@ describe('paginate', () => {
   });
 });
 
+describe('findSubComponentOwner', () => {
+  it('finds the parent of a sub-component, case-insensitively', () => {
+    const owner = findSubComponentOwner(metadata, 'alerttitle');
+    expect(owner?.component.name).toBe('Alert');
+    expect(owner?.sub.name).toBe('AlertTitle');
+    expect(formatComponent(owner!.component, { section: owner!.sub.name })).toContain(
+      '# Alert › AlertTitle',
+    );
+    expect(findSubComponentOwner(metadata, 'Nope')).toBeUndefined();
+  });
+});
+
+describe('variants section', () => {
+  it('lists variant options with the props', () => {
+    const text = formatComponent(getComponent(metadata, 'Button')!, { section: 'variants' });
+    expect(text).toContain('## Variants');
+    expect(text).toContain('- **size**: `small`, `medium`, `large` (default: `large`)');
+  });
+});
+
 describe('getExampleText', () => {
   const button = getComponent(metadata, 'Button')!;
 
@@ -185,8 +210,14 @@ describe('getExampleText', () => {
     expect(text).not.toContain('### Basic');
   });
 
-  it('matches a near miss', () => {
-    expect(getExampleText(button, 'Basci')).toContain('### Basic');
+  it('matches a near miss and says so', () => {
+    const text = getExampleText(button, 'Basci');
+    expect(text).toContain('### Basic');
+    expect(text.startsWith('Closest match for "Basci": `Basic`.')).toBe(true);
+  });
+
+  it('does not fuzzy-match short queries', () => {
+    expect(getExampleText(button, 'xl')).toContain('not found');
   });
 
   it('lists names on a miss', () => {
