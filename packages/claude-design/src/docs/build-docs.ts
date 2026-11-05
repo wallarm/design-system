@@ -119,6 +119,7 @@ export const assertStoriesShipped = (
 const NON_COMPONENT_STORIES: Record<string, string> = {
   'theme/': 'theme gallery story, not a component; see tokens.css',
   'icons/': 'icon gallery story, not a component; see assets/Icons',
+  'guidelines/': 'pattern story, not a component; the screen sampler covers the patterns on a canvas',
 };
 
 /** Public providers with no guide: the canvas wraps every artboard in `WallarmDS.Root`. */
