@@ -41,7 +41,7 @@
     "prepack": "tsx src/pack.ts"
   },
   "devDependencies": {
-    "@babel/core": "7.29.7",
+    "@babel/core": "8.0.10",
     "@rsbuild/plugin-react": "catalog:",
     "@rslib/core": "catalog:",
     "@rstest/core": "catalog:",
