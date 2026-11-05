@@ -43,9 +43,15 @@ export {
 } from './components/Accordion';
 export {
   AgentAvatar,
+  type AgentAvatarBeat,
+  AgentAvatarGroup,
+  type AgentAvatarGroupProps,
+  type AgentAvatarHandle,
   type AgentAvatarProps,
   type AgentAvatarSize,
   type AgentAvatarState,
+  setAgentMotion,
+  useAgentMotion,
 } from './components/AgentAvatar';
 export {
   type AgentCharacterId,

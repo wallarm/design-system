@@ -1258,9 +1258,31 @@ export function createCharacter(svg: SVGSVGElement, c: Look, o: CharacterOptions
   const ch = new Character(svg, c, o);
   const P = c.prop && c.prop !== 'none' ? propDef(c.prop, ch.S, hexOf(c.color)) : null;
   ch.fid = P ? P.fid : null;
-  if (o.cover) ch.setCover(true); // "Partial coverage": the crown is there from the first frame
+  if (o.cover)
+    ch.setCover(true); // "Partial coverage": the crown is there from the first frame
+  else {
+    // the ghost's order, as the page's markup has it (a remount may find the crown's)
+    const veil = svg.querySelector('[data-part~="veil"]');
+    const visor = svg.querySelector('[data-part~="visor"]');
+    if (veil && visor && veil.nextElementSibling !== visor) visor.before(veil);
+  }
   const rt = getRuntime();
   if (o.live && rt.motionOn()) rt.register(ch);
   ch.render(performance.now());
   return ch;
+}
+
+/** Adds a character to a row of neighbours (the page sets `peers` per row); returns how to leave it. */
+export function joinPeers(row: Set<Character>, ch: Character) {
+  const sync = () => {
+    const all = [...row];
+    for (const o of row) o.peers = all;
+  };
+  row.add(ch);
+  sync();
+  return () => {
+    row.delete(ch);
+    ch.peers = null;
+    sync();
+  };
 }
