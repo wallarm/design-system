@@ -1,0 +1,32 @@
+{
+ "$about": {
+  "run": "2026-11-04T18:45:18.108Z",
+  "ids": 5000,
+  "idSeed": 20261104,
+  "others": "the six presets (data/cast.json)",
+  "propPool": [
+   "none"
+  ],
+  "note": "fallbacks counts ids (x2 calls) where 200 draws all had an issue"
+ },
+ "unstable": 0,
+ "withIssue": 0,
+ "fallbacks": 0,
+ "pairsPossible": 252,
+ "pairsUsed": 240,
+ "pairsMissing": [
+  "gumdrop/cobalt",
+  "cushion/lilac",
+  "pebble/sand",
+  "pebble/mint",
+  "pebble/sage",
+  "capsule/sky",
+  "capsule/cyan",
+  "capsule/mint",
+  "capsule/sage",
+  "egg/mint",
+  "egg/sage",
+  "egg/olive"
+ ],
+ "eyesUsed": 4
+}

@@ -1,0 +1,428 @@
+{
+  "$about": {
+    "source": "reference/agent-characters.html",
+    "what": "COLORS and CGROUPS as the page holds them, the prop tones, the fixed colors of the visor and the ghost, and the per-color values the page derives with mix().",
+    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "lines": {
+      "COLORS": 1318,
+      "CGROUPS": 1333,
+      "TONE": 1335,
+      "HARD": 1341,
+      "makeChar": 1658,
+      "glyph": 2011,
+      "MAT": 1532
+    },
+    "keys": {
+      "id": "color id, used in configs",
+      "name": "label (coral reads \"coral, Wally only\")",
+      "hex": "body color",
+      "g": "group id",
+      "brand": "true only for coral"
+    }
+  },
+  "groups": [
+    {
+      "id": "brand",
+      "label": "Wally"
+    },
+    {
+      "id": "cool",
+      "label": "cool"
+    },
+    {
+      "id": "warm",
+      "label": "warm"
+    },
+    {
+      "id": "pastel",
+      "label": "pastel"
+    },
+    {
+      "id": "deep",
+      "label": "deep"
+    },
+    {
+      "id": "neutral",
+      "label": "neutral"
+    }
+  ],
+  "colors": [
+    {
+      "id": "coral",
+      "name": "coral, Wally only",
+      "hex": "#FF4D2E",
+      "g": "brand",
+      "brand": true
+    },
+    {
+      "id": "cobalt",
+      "name": "cobalt",
+      "hex": "#3F63DB",
+      "g": "cool"
+    },
+    {
+      "id": "sky",
+      "name": "sky",
+      "hex": "#62AEEB",
+      "g": "cool"
+    },
+    {
+      "id": "cyan",
+      "name": "teal",
+      "hex": "#2BA6BF",
+      "g": "cool"
+    },
+    {
+      "id": "lilac",
+      "name": "lilac",
+      "hex": "#9A7FE0",
+      "g": "cool"
+    },
+    {
+      "id": "heather",
+      "name": "heather",
+      "hex": "#9E86A8",
+      "g": "cool"
+    },
+    {
+      "id": "pink",
+      "name": "pink",
+      "hex": "#E373A8",
+      "g": "warm"
+    },
+    {
+      "id": "sand",
+      "name": "sand",
+      "hex": "#D8B68A",
+      "g": "warm"
+    },
+    {
+      "id": "toffee",
+      "name": "toffee",
+      "hex": "#A87A62",
+      "g": "warm"
+    },
+    {
+      "id": "powder",
+      "name": "powder",
+      "hex": "#B9D7F0",
+      "g": "pastel"
+    },
+    {
+      "id": "lavender",
+      "name": "lavender",
+      "hex": "#D3C6F3",
+      "g": "pastel"
+    },
+    {
+      "id": "blush",
+      "name": "blush",
+      "hex": "#F2B8C8",
+      "g": "pastel"
+    },
+    {
+      "id": "butter",
+      "name": "butter",
+      "hex": "#F2D57E",
+      "g": "pastel"
+    },
+    {
+      "id": "mint",
+      "name": "mint",
+      "hex": "#A8DCC8",
+      "g": "pastel"
+    },
+    {
+      "id": "sage",
+      "name": "sage",
+      "hex": "#9BAE8C",
+      "g": "pastel"
+    },
+    {
+      "id": "petrol",
+      "name": "petrol",
+      "hex": "#2D6E8E",
+      "g": "deep"
+    },
+    {
+      "id": "plum",
+      "name": "plum",
+      "hex": "#7C4485",
+      "g": "deep"
+    },
+    {
+      "id": "cocoa",
+      "name": "cocoa",
+      "hex": "#6B4C3F",
+      "g": "deep"
+    },
+    {
+      "id": "olive",
+      "name": "olive",
+      "hex": "#7E7C48",
+      "g": "deep"
+    },
+    {
+      "id": "graphite",
+      "name": "graphite",
+      "hex": "#4C5463",
+      "g": "neutral"
+    },
+    {
+      "id": "stone",
+      "name": "stone",
+      "hex": "#A9A59D",
+      "g": "neutral"
+    },
+    {
+      "id": "oat",
+      "name": "oat",
+      "hex": "#E9E0D0",
+      "g": "neutral"
+    }
+  ],
+  "tones": {
+    "$about": "TONE: fixed colors for prop and part layers. A layer whose tone is in hardTones is lit as vinyl and every other layer as felt, unless propDef() sets the material (the glasses and the headlamp lens are vinyl). The body is always felt: let MAT = 'felt' (line 1532) and nothing on the page changes it.",
+    "values": {
+      "metal": "#A3ABBB",
+      "ink": "#262A36",
+      "leaf": "#7F9E66",
+      "wood": "#8E6447",
+      "oat": "#EEE5D6",
+      "honey": "#E8B54E",
+      "brass": "#C8A35E",
+      "cocoa": "#5B3E33",
+      "glass": "#CFE3F2",
+      "beige": "#E9D2B5"
+    },
+    "hardTones": [
+      "metal",
+      "brass",
+      "ink",
+      "glass"
+    ]
+  },
+  "fixed": {
+    "$about": "Colors written as literals in makeChar() and glyph().",
+    "visorGradient": [
+      "#3A4258",
+      "#1B2030",
+      "#11141E"
+    ],
+    "visorInnerShadow": "#04060B",
+    "visorGlint": "#ffffff at opacity 0.2",
+    "coralEye": "#FF7A5E",
+    "darkMix": "#0d0b0c",
+    "ghostFelt": "#C2C7CF",
+    "glyphGhost": "#C9CED6",
+    "glyphVisor": "#16181D",
+    "glyphOffMix": "#B8BCC4",
+    "shadowTint": "#2A2838",
+    "stitch": "#F4EEE4",
+    "monocleChain": "#B08D4C",
+    "beam": "#FFF6D6"
+  },
+  "derived": {
+    "$about": "Per body color, computed with the page's mix(a, b, t) (linear in sRGB, rounded per channel) and luma() (0.299 R + 0.587 G + 0.114 B). eye = mix(hex, white, 0.62), coral uses #FF7A5E. bodyDark = mix(hex, #0d0b0c, 0.34): the gradient's dark stop and the visor outline. bodyLight = mix(hex, white, 0.4): the gradient's light stop. visorLip = mix(hex, white, 0.6) at opacity 0.5, under the visor. glyphRim = mix(hex, #0d0b0c, 0.28): the 1 px glyph outline. glyphOffFill = mix(hex, #B8BCC4, 0.6): the glyph fill when Deactivated.",
+    "byColor": {
+      "coral": {
+        "eye": "#FF7A5E",
+        "bodyDark": "#ad3722",
+        "bodyLight": "#ff9482",
+        "visorLip": "#ffb8ab",
+        "glyphRim": "#bb3b24",
+        "glyphOffFill": "#d49088",
+        "luma": 126.688
+      },
+      "cobalt": {
+        "eye": "#b6c4f1",
+        "bodyDark": "#2e4595",
+        "bodyLight": "#8ca1e9",
+        "visorLip": "#b2c1f1",
+        "glyphRim": "#314aa1",
+        "glyphOffFill": "#8898cd",
+        "luma": 101.916
+      },
+      "sky": {
+        "eye": "#c3e0f7",
+        "bodyDark": "#45779f",
+        "bodyLight": "#a1cef3",
+        "visorLip": "#c0dff7",
+        "glyphRim": "#4a80ad",
+        "glyphOffFill": "#96b6d4",
+        "luma": 158.23
+      },
+      "cyan": {
+        "eye": "#aedde7",
+        "bodyDark": "#217182",
+        "bodyLight": "#80cad9",
+        "visorLip": "#aadbe5",
+        "glyphRim": "#237b8d",
+        "glyphOffFill": "#80b3c2",
+        "luma": 132.073
+      },
+      "lilac": {
+        "eye": "#d9cef3",
+        "bodyDark": "#6a5898",
+        "bodyLight": "#c2b2ec",
+        "visorLip": "#d7ccf3",
+        "glyphRim": "#735fa5",
+        "glyphOffFill": "#aca4cf",
+        "luma": 146.131
+      },
+      "heather": {
+        "eye": "#dad1de",
+        "bodyDark": "#6d5c73",
+        "bodyLight": "#c5b6cb",
+        "visorLip": "#d8cfdc",
+        "glyphRim": "#75647c",
+        "glyphOffFill": "#aea6b9",
+        "luma": 145.052
+      },
+      "pink": {
+        "eye": "#f4cade",
+        "bodyDark": "#9a5073",
+        "bodyLight": "#eeabcb",
+        "visorLip": "#f4c7dc",
+        "glyphRim": "#a7567c",
+        "glyphOffFill": "#c99fb9",
+        "luma": 154.53
+      },
+      "sand": {
+        "eye": "#f0e3d3",
+        "bodyDark": "#937c5f",
+        "bodyLight": "#e8d3b9",
+        "visorLip": "#efe2d0",
+        "glyphRim": "#9f8667",
+        "glyphOffFill": "#c5baad",
+        "luma": 187.15
+      },
+      "toffee": {
+        "eye": "#deccc3",
+        "bodyDark": "#735445",
+        "bodyLight": "#cbafa1",
+        "visorLip": "#dccac0",
+        "glyphRim": "#7d5b4a",
+        "glyphOffFill": "#b2a29d",
+        "luma": 133.018
+      },
+      "powder": {
+        "eye": "#e4f0f9",
+        "bodyDark": "#7f92a2",
+        "bodyLight": "#d5e7f6",
+        "visorLip": "#e3eff9",
+        "glyphRim": "#899eb0",
+        "glyphOffFill": "#b8c7d6",
+        "luma": 208.88
+      },
+      "lavender": {
+        "eye": "#eee9fa",
+        "bodyDark": "#9086a4",
+        "bodyLight": "#e5ddf8",
+        "visorLip": "#ede8fa",
+        "glyphRim": "#9c92b2",
+        "glyphOffFill": "#c3c0d7",
+        "luma": 207.017
+      },
+      "blush": {
+        "eye": "#fae4ea",
+        "bodyDark": "#a47d88",
+        "bodyLight": "#f7d4de",
+        "visorLip": "#fae3e9",
+        "glyphRim": "#b28893",
+        "glyphOffFill": "#cfbac6",
+        "luma": 203.166
+      },
+      "butter": {
+        "eye": "#faefce",
+        "bodyDark": "#a49057",
+        "bodyLight": "#f7e6b2",
+        "visorLip": "#faeecb",
+        "glyphRim": "#b29c5e",
+        "glyphOffFill": "#cfc6a8",
+        "luma": 211.753
+      },
+      "mint": {
+        "eye": "#def2ea",
+        "bodyDark": "#739588",
+        "bodyLight": "#cbeade",
+        "visorLip": "#dcf1e9",
+        "glyphRim": "#7da193",
+        "glyphOffFill": "#b2c9c6",
+        "luma": 202.172
+      },
+      "sage": {
+        "eye": "#d9e0d3",
+        "bodyDark": "#6b7760",
+        "bodyLight": "#c3ceba",
+        "visorLip": "#d7dfd1",
+        "glyphRim": "#738068",
+        "glyphOffFill": "#acb6ae",
+        "luma": 164.443
+      },
+      "petrol": {
+        "eye": "#afc8d4",
+        "bodyDark": "#224c62",
+        "bodyLight": "#81a8bb",
+        "visorLip": "#abc5d2",
+        "glyphRim": "#24526a",
+        "glyphOffFill": "#809dae",
+        "luma": 94.213
+      },
+      "plum": {
+        "eye": "#cdb8d1",
+        "bodyDark": "#56315c",
+        "bodyLight": "#b08fb6",
+        "visorLip": "#cbb4ce",
+        "glyphRim": "#5d3463",
+        "glyphOffFill": "#a08cab",
+        "luma": 92.154
+      },
+      "cocoa": {
+        "eye": "#c7bbb6",
+        "bodyDark": "#4b362e",
+        "bodyLight": "#a6948c",
+        "visorLip": "#c4b7b2",
+        "glyphRim": "#513a31",
+        "glyphOffFill": "#998f8f",
+        "luma": 83.787
+      },
+      "olive": {
+        "eye": "#cecdb9",
+        "bodyDark": "#585634",
+        "bodyLight": "#b2b091",
+        "visorLip": "#cbcbb6",
+        "glyphRim": "#5e5c37",
+        "glyphOffFill": "#a1a292",
+        "luma": 118.67
+      },
+      "graphite": {
+        "eye": "#bbbec4",
+        "bodyDark": "#373b45",
+        "bodyLight": "#9498a1",
+        "visorLip": "#b7bbc1",
+        "glyphRim": "#3a404b",
+        "glyphOffFill": "#8d929d",
+        "luma": 83.318
+      },
+      "stone": {
+        "eye": "#deddda",
+        "bodyDark": "#74716c",
+        "bodyLight": "#cbc9c4",
+        "visorLip": "#dddbd8",
+        "glyphRim": "#7d7a74",
+        "glyphOffFill": "#b2b3b4",
+        "luma": 165.284
+      },
+      "oat": {
+        "eye": "#f7f3ed",
+        "bodyDark": "#9e988d",
+        "bodyLight": "#f2ece3",
+        "visorLip": "#f6f3ec",
+        "glyphRim": "#aba499",
+        "glyphOffFill": "#cccac9",
+        "luma": 224.867
+      }
+    }
+  }
+}
