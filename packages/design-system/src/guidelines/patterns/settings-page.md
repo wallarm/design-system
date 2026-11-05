@@ -149,7 +149,7 @@ A read-only email opens its dialog on click or Enter.
 | Saved | Success toast "<Label> updated" | `useToast().create({ type: 'success' })` |
 | Save failed | Error toast; keep the typed value | `useToast().create({ type: 'error' })` |
 | Invalid value | Message inside the 320 wrapper; no save, no toast | `Input error` + `FieldError` |
-| Saving a select | Loading trigger | `Select loading` |
+| Saving a select | Disabled until the request ends | `Select disabled` |
 | Saving a button action | Loading button; never disable the page | `Button loading` |
 | Saving a switch | Disabled until the request ends | `Switch disabled` |
 | Locked by the org | Disabled control + `Lock` tooltip; keep the row | `Tooltip` › `TooltipTrigger` |
