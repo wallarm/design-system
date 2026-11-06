@@ -12,12 +12,6 @@ import { MetricSparkline, type MetricSparklinePoint } from './MetricSparkline';
 import { MetricTotal } from './MetricTotal';
 import { MetricValue } from './MetricValue';
 
-const figmaUrl =
-  'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11437-11939';
-
-const sparklineFigmaUrl =
-  'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10640';
-
 const DESCRIPTION = [
   "The family's compact stat — one number, optionally against a total and a change — for a card with no breakdown to draw; reach for `HorizontalBarStack` once that number splits into named parts.",
   'It is a brick set rather than a set of props: `MetricHeader` holds `MetricValue`, `MetricTotal` and `MetricDelta`, with `MetricCaption` beneath. On the delta, `sentiment` picks the colour and `trend` picks the arrow, on purpose independently — a number going up is not always good news.',
@@ -29,7 +23,6 @@ const meta = {
   component: Metric,
   parameters: {
     layout: 'padded',
-    design: { type: 'figma', url: figmaUrl },
     docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof Metric>;
@@ -186,7 +179,6 @@ export const Sparkline: StoryFn = () => (
     </Chart>
   </div>
 );
-Sparkline.parameters = { design: { type: 'figma', url: sparklineFigmaUrl } };
 
 /**
  * The sparkline's `color` is set per chart, on purpose apart from the delta's `sentiment`:
@@ -256,4 +248,3 @@ export const SparklineColors: StoryFn = () => (
     </div>
   </div>
 );
-SparklineColors.parameters = { design: { type: 'figma', url: sparklineFigmaUrl } };

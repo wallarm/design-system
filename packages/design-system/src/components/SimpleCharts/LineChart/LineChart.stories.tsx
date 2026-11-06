@@ -74,10 +74,6 @@ const meta = {
   },
   parameters: {
     layout: 'padded',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-123142&m=dev',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
@@ -109,13 +105,6 @@ export const Default: StoryFn<typeof meta> = () => {
       </Chart>
     </div>
   );
-};
-
-Default.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-123143&m=dev',
-  },
 };
 
 /**
@@ -157,13 +146,6 @@ export const DefaultMulti: StoryFn<typeof meta> = () => {
       </Chart>
     </div>
   );
-};
-
-DefaultMulti.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7509-2355&m=dev',
-  },
 };
 
 const MultiLegend = ({ series = multiSeries }: { series?: LineChartSeries[] }) => (
@@ -211,13 +193,6 @@ export const WithMetric: StoryFn<typeof meta> = () => {
       </Chart>
     </div>
   );
-};
-
-WithMetric.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11626-37312',
-  },
 };
 
 /**
@@ -863,13 +838,6 @@ export const Loading: StoryFn<typeof meta> = () => (
   </div>
 );
 
-Loading.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7519-2617&m=dev',
-  },
-};
-
 type RefreshingPlacement = 'none' | 'top' | 'bottom' | 'left' | 'right';
 
 const RefreshingChart = ({
@@ -1013,13 +981,6 @@ export const Empty: StoryFn<typeof meta> = () => (
     </Chart>
   </div>
 );
-
-Empty.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=8670-2594&m=dev',
-  },
-};
 
 const LongTimeRangeChart = () => {
   const { formatDate, formatDateTime, formatDateTimeWithTimezone } = useChartTimeFormatters();

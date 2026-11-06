@@ -93,7 +93,7 @@ RequestsTab
 | Event loading | `loading` on each `Attribute`; `LineChartEmpty` with no text; `BarListSkeleton`, `PieChartSkeleton`. Card titles stay | `Chart` |
 | No data for a card | `ChartEmpty` inside the card | `Chart` |
 | Nothing selected | Secondary text centred in the detail pane | `Text` |
-| A request failed | Your own error message | App-rendered |
+| A list failed to load | `EmptyState` in place of the list, with "Try again" | `EmptyState` |
 
 Loading.
 

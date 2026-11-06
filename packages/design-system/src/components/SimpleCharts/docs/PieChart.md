@@ -8,13 +8,6 @@ The root accepts `data` as the single source of truth. The donut renders the sli
 
 Use it whenever a chart needs the same "small chart card" frame as `BarList` but the data reads naturally as parts of a whole.
 
-## Figma
-
-- Root: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-122167&m=dev
-- Hover state (legend ↔ slice sync): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-122445&m=dev
-- Filtered (single slice): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-122941&m=dev
-- Loading skeleton: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7519-2618&m=dev
-
 ## API
 
 Compound component:

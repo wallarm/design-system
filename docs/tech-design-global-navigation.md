@@ -2,7 +2,7 @@
 
 > **Historical design record.** This document captures the original design and is not kept up to date. The current API lives in the `AppShell` and `RemoteShell` source and stories (`packages/design-system/src/components/AppShell/`, `packages/design-system/src/components/RemoteShell/`). The `NavPanel*` parts below shipped as internals of `RemoteShellPanel`: products configure the panel only through `RemoteShell`'s `NavConfig`.
 
-> **Figma**: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9257-100
+> **Figma**: WADS-Components, node 9257:100
 > **Prototype**: https://artem-desing.github.io/global-navigation-prototype/v/v8/
 
 ---

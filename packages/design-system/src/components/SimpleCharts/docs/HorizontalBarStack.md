@@ -4,12 +4,6 @@
 
 `HorizontalBarStack` is a compact distribution stat: an optional composed header (the shared `Metric` bricks — `MetricValue` + `MetricDelta`, passed as `children`), a single proportional segmented bar (colored segments + an optional grey remainder tail), and a horizontal legend. It renders the body only — the card frame and "Title" header are composed with the existing `Chart` / `ChartHeader` / `ChartTitle`, like every other member of the family. The legend is interactive: hovering an item or segment fades the rest (hover-sync), and passing `onSelect` turns items into click-to-filter controls. Use it when one total reads naturally as a few named parts shown as a single band; when each part needs its own row, use `BarList`; when there is no breakdown (just the number), use `Metric`.
 
-## Figma
-
-- Root: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9667-10883
-- States (hover / filter / disabled): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11520-4054
-- Loading states board: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11580-9211
-
 ## Data model
 
 - `data` (required, `HorizontalBarStackDatum[]`) — drives both the bar segments and the legend, so their colors always match. Order is preserved (the caller sorts). Non-finite / negative values are coerced to `0`. No aggregation or "Other" bucketing.

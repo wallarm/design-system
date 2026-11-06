@@ -23,10 +23,6 @@ const meta = {
   },
   parameters: {
     layout: 'padded',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7470-917&m=dev',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],

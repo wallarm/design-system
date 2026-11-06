@@ -12,10 +12,6 @@ const meta = {
   component: InlineCodeSnippet,
   parameters: {
     layout: 'centered',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],

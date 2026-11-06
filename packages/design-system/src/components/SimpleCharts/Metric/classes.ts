@@ -1,4 +1,6 @@
-export const metricRootClasses = 'flex flex-col items-start px-16 py-8 w-full';
+// `mt-auto` pins the metric (and a sparkline after it) to the bottom of a card stretched taller
+// than its content, e.g. by a grid row.
+export const metricRootClasses = 'mt-auto flex flex-col items-start px-16 py-8 w-full';
 
 // Baseline row: value + optional total + optional delta. Value↔total read as one unit
 // (MetricTotal tucks in via `-ml-2` → 6px), delta sits 8px off the group.
@@ -21,9 +23,9 @@ export const metricCaptionClasses = 'text-xs text-text-secondary';
 // Skeleton: the thin caption-line placeholder under the value block.
 export const metricSkeletonLineClasses = 'w-full py-4';
 
-// Sparkline: a sibling after `Metric` inside `Chart`. `mt-auto` pins it to the card's bottom
-// edge; `px-px` is the Figma 1px inset from the card border.
-export const metricSparklineClasses = 'mt-auto w-full px-px';
+// Sparkline: a sibling right after `Metric` inside `Chart`; the metric's `mt-auto` already pins
+// both to the card's bottom edge. `px-px` is the Figma 1px inset from the card border.
+export const metricSparklineClasses = 'w-full px-px';
 export const metricSparklinePlotClasses = 'relative h-48';
 // The ruler is an <svg>: `h-full`, since `inset-y-0` leaves a replaced element at its 150px default.
 export const metricSparklineRulerClasses =

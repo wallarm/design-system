@@ -1,7 +1,7 @@
 # FileUpload — design spec (WDS-185 + WDS-186)
 
 - **Tickets:** [WDS-185 File upload](https://wallarm.atlassian.net/browse/WDS-185), [WDS-186 File upload item](https://wallarm.atlassian.net/browse/WDS-186) — shipped together in one branch/PR.
-- **Figma:** [WADS-Components → File upload](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12395-8543)
+- **Figma:** WADS-Components → File upload
 - **Base:** `@ark-ui/react/file-upload` (Ark 5.38.0 / `@zag-js/file-upload` 1.43.0)
 - **First consumer:** flow-management-frontend `PolicyFileField` (WASM / Plugin / Lua artifact, one file per policy)
 

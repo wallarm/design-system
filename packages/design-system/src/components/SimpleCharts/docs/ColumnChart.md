@@ -6,11 +6,9 @@
 
 It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` model — so the legend, grid, Y axis and hover popover are the `LineChart` slots, unchanged. It adds only what columns need: its own root, body, the stack, and an X axis that centres every label under its column.
 
-## Figma
+## Code Connect
 
-- Component: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12612-31838
-- Documentation (states, hover, fade, widths): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10640
-- Code Connect: the `Type=Vertical stacked columns` branch of `Chart/Chart.figma.ts`.
+The `Type=Vertical stacked columns` branch of `Chart/Chart.figma.ts`.
 
 ## API
 

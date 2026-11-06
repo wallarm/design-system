@@ -95,7 +95,7 @@ pnpm build
 
 ### Icons from Figma
 
-Icons in `src/icons/` are generated from the [WADS-Iconography](https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/WADS-Iconography?node-id=5702-845) Figma page — don't edit them by hand.
+Icons in `src/icons/` are generated from the WADS-Iconography Figma page — don't edit them by hand.
 
 To get a `FIGMA_ACCESS_TOKEN`:
 

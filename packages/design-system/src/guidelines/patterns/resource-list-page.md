@@ -102,7 +102,7 @@ Empty
 | Nothing exists yet | Header with its create button, toolbar, empty state with no button (one create action per screen) | `TableEmptyState` › `EmptyState type='collection-empty'` |
 | Search or tab matched nothing | "No results found" and a "Reset filters" button. **Never** a create CTA, **never** `type='no-results'` (that is for cards and menus) | `TableEmptyState` › `EmptyState type='collection-empty'` |
 | Search active | The typed value stays in the field | `SearchInput` |
-| Request failed | Your own message; the table has no error state | App-rendered, in `PageContent` |
+| Request failed | "Couldn't load {items}" + "Try again" in place of the rows; header and toolbar stay | `TableEmptyState` › `EmptyState` |
 
 ## What your app owns
 
@@ -114,7 +114,7 @@ Empty
 | Create flow | Short form: `Dialog` from `@wallarm-org/design-system/Dialog`. Long form: `Drawer`. See [Create and edit forms](./create-edit-forms.md) |
 | Detail drawer width | Presets are 640, 960 and 1130. Figma uses 700; pass `width={640}` unless design confirms 700. See [Detail drawer](./detail-drawer.md) |
 | URL state | Sync `query` and `status` to the URL yourself; there is no router integration |
-| Error state | Render your own message in `PageContent` |
+| Error state | Pass the failure and the retry yourself; see [Empty states](./empty-states.md) |
 
 ## Related
 

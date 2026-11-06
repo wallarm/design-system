@@ -6,12 +6,6 @@
 
 Use it for compact "top N" breakdowns inside a `Chart` card — endpoints, status codes, tags, regions — whenever the chart must be small, read fast, and optionally become a filter control.
 
-## Figma
-
-- Root (states: default / hovered / filtered): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121720&m=dev
-- Row/bar anatomy: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-31781&m=dev
-- Loading skeleton: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7519-2600&m=dev
-
 ## API
 
 Compound component:

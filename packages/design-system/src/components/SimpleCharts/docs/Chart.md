@@ -6,12 +6,6 @@
 
 Use it whenever a chart needs the standard Wallarm "simple chart" frame: a rounded surface with a 32px title bar and an optional actions cluster in the top-right that appears on hover.
 
-## Figma
-
-- Root (container + annotations): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-118206&m=dev
-- Header: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-31783&m=dev
-- Actions block: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-31786&m=dev
-
 ## API
 
 Compound component:
@@ -27,7 +21,7 @@ Compound component:
 `Chart` is a **block-level** element by default:
 
 - width: `w-full` (fills the parent's content area).
-- height: content-sized, no minimum — a metric card can be shorter than a chart card. Give a fixed height through `className` (`h-196`) when cards in a row must match; a CSS grid row already stretches them.
+- height: content-sized, no minimum — a metric card can be shorter than a chart card. Give a fixed height through `className` (`h-196`) when cards in a row must match; a CSS grid row already stretches them. In a stretched card `Metric` and `HorizontalBarStack` sit at the bottom (`mt-auto`); `ColumnChart` grows to fill it.
 
 Consumers customise size through `className`, not dedicated props. This keeps the API small and lets Tailwind utilities compose naturally (`w-[640px]`, `h-320`, `max-w-lg`, `aspect-[16/9]`, …). If you need something rigid, prefer a wrapper:
 

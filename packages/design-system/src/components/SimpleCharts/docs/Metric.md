@@ -14,15 +14,6 @@ Add `MetricSparkline` after it to show how that number moved over the period (Fi
 Use it when one number is the whole story. When that number breaks into a few named parts shown
 as one band, use `HorizontalBarStack`; when each part needs its own row, use `BarList`.
 
-## Figma
-
-- Root: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11437-11939
-- Options (brick set): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11520-4054
-- Loading states board: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11580-9211
-- Sparkline — docs: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10640
-- Sparkline — colour variants: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10644
-- Sparkline — component (`Type=Metric and sparkline`): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10548
-
 ## Composition
 
 ```tsx
@@ -49,7 +40,7 @@ as one band, use `HorizontalBarStack`; when each part needs its own row, use `Ba
 | `MetricTotal` | The denominator. `connector` = `slash` (`/120`, default) · `of` (`of 120`) · `total` (`120 total`). Numeric child locale-formatted; number in primary text, connector word muted. |
 | `MetricDelta` | Trend chip — a thin wrapper over the shared `ChartDelta`. `sentiment` sets the colour (positive → green, **negative → red**, neutral → slate; default neutral) independently of the `trend` arrow. |
 | `MetricCaption` | Muted secondary subline under the header. |
-| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, `mt-auto` pins the sparkline to the card's bottom edge, `px-px` is the 1px inset from the border. |
+| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, the metric's `mt-auto` pins both to the card's bottom edge, `px-px` is the 1px inset from the border. |
 
 All bricks are optional; only `MetricValue` is expected in practice.
 

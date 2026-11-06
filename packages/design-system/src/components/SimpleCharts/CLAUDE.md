@@ -4,11 +4,7 @@ Rules for developing chart components inside `packages/design-system/src/compone
 
 ## Figma Source
 
-All chart designs live in the WADS-Components Figma file:
-
-- **Root node**: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121720&m=dev
-
-Always reference this file (or a child node of it) when implementing or updating a chart. Put the specific child node URL into the story's `parameters.design.url` and, when the chart has a Code Connect template, into its `*.figma.ts` `// url=` header.
+All chart designs live in the internal WADS-Components Figma file (open it through the Figma MCP). Figma is not public: **never** put a Figma URL in a story, a doc or a comment. The only place for a node URL is a Code Connect template's `*.figma.ts` `// url=` header.
 
 ## Folder Layout
 
@@ -65,7 +61,6 @@ Optional, added only when needed:
 ## Stories Rules
 
 - `title: 'Data Display/SimpleCharts/<ChartName>'`.
-- Include `parameters.design = { type: 'figma', url: <figma node url> }`.
 - Use `satisfies Meta<typeof Component>` and `StoryFn<typeof meta>`.
 - Cover every visual state the chart supports: default, hover, selected/active, focused, empty, loading/skeleton, filtered (if applicable), with-data-variants.
 - Keep story data in the file — small, readable, self-contained. Do not fetch or randomize.
@@ -105,7 +100,6 @@ Each chart has a living doc file at `SimpleCharts/docs/<ChartName>.md`. This is 
 ### What each doc must contain
 
 - **Overview** — one paragraph: what the chart shows, when to use it.
-- **Figma** — link to the specific Figma node.
 - **Data model** — expected input shape, required/optional fields, constraints (max rows, value ranges, sort order).
 - **States** — every supported visual/interaction state (default, hover, selected, focus, filtered, empty, loading, error) and what triggers each.
 - **Interactions** — click/keyboard/hover behaviour. What happens on select? On filter? Is the filter controlled or uncontrolled?
