@@ -77,8 +77,8 @@ Any MCP client with stdio transport works: register the command `npx` with the a
 | `get_example` | `{ component: string, example: string, page?: number }` | The code of one example from the overview, such as `WithPagination` or `AreaChart/Default`. Close names match; a miss lists every example. |
 | `search_token` | `{ query: string }` | Tokens matching a name (`spacing-8`), Tailwind class (`bg-bg-surface-2`), value (`#ff6633`) or category, with the classes to write, sorted by relevance (top 20). |
 | `get_token_category` | `{ name: string, page?: number }` | Every token in a category, such as `spacing`, `colors-primary` or `shadow`, with its Tailwind classes. Unknown names list the available categories. |
-| `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' }` | Foundations and patterns with slug, title, a one-line "use when" description and the components each uses. |
-| `get_guideline` | `{ slug: string, section?: string, page?: number }` | One guideline as Markdown, such as `patterns/empty-states`, or a single section of it (`rules`, `example`). A pattern's overview lists its live stories; `section: 'stories'` returns their full code, paginated. Unknown slugs get the nearest matches. |
+| `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' \| 'template' }` | Foundations, patterns and templates (complete example screens) with slug, title, a one-line "use when" description and the components each uses. |
+| `get_guideline` | `{ slug: string, section?: string, page?: number }` | One guideline as Markdown, such as `patterns/empty-states`, or a single section of it (`rules`, `example`). A pattern's or template's overview lists its live stories; `section: 'stories'` returns their full code, paginated. Unknown slugs get the nearest matches. |
 
 `get_component` also names the guidelines that use the component. Every response stays under
 40,000 characters, below Claude Code's limit for MCP output; a longer one is split into pages, and

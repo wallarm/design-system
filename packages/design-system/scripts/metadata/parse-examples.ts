@@ -265,7 +265,7 @@ const reconstructJsxFromStoryObj = (objText: string, componentName: string): str
   return `<${componentName} ${props.join(' ')} />`;
 };
 
-/** Stories of a pattern guideline (`src/guidelines/patterns/<slug>.stories.tsx`), in file order. */
+/** Stories of a pattern or template guideline (`src/guidelines/<patterns|templates>/<slug>.stories.tsx`), in file order. */
 export const parsePatternStories = (storiesPath: string, srcDir: string): ExampleMetadata[] => {
   const sourceFile = storiesProject.addSourceFileAtPathIfExists(storiesPath);
   if (!sourceFile) return [];

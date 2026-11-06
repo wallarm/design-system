@@ -12,13 +12,10 @@ interface ColorClassesMap {
   solid: string;
   solidMuted?: string;
   secondary: string;
-  secondaryMuted?: string;
   outline: string;
   outlineMuted?: string;
   text: string;
-  textMuted?: string;
   textColor: string;
-  textColorMuted?: string;
 }
 
 export const badgeColorsMuted: BadgeColor[] = [
@@ -41,66 +38,42 @@ export const generateBadgeVariants = (): ColorVariant[] => {
       solid: 'bg-badge-slate-strong text-badge-on-solid',
       solidMuted: 'bg-badge-slate-dark-alt text-badge-on-solid',
       secondary: 'bg-badge-slate-light text-badge-slate-dark',
-      secondaryMuted: 'bg-badge-slate-light text-badge-slate-muted',
       outline: 'border-badge-slate-dark text-badge-slate-dark',
       outlineMuted: 'border-border-primary text-badge-slate-dark',
       text: 'text-badge-label-primary [&_svg]:text-badge-slate-strong before:bg-badge-slate-strong',
-      textMuted:
-        'text-badge-label-primary [&_svg]:text-badge-slate-muted before:bg-badge-slate-muted',
       textColor: 'text-badge-slate-strong',
-      textColorMuted: 'text-badge-slate-muted',
     },
     gray: {
       solid: 'bg-badge-gray-strong text-badge-on-solid',
       solidMuted: 'bg-badge-gray-dark-alt text-badge-on-solid',
       secondary: 'bg-badge-gray-light text-badge-gray-dark',
-      secondaryMuted: 'bg-badge-gray-light text-badge-gray-muted',
       outline: 'border-badge-gray-dark text-badge-gray-dark',
-      outlineMuted: 'border-badge-gray-muted text-badge-gray-muted',
       text: 'text-badge-label-primary [&_svg]:text-badge-gray-strong before:bg-badge-gray-strong',
-      textMuted:
-        'text-badge-label-primary [&_svg]:text-badge-gray-muted before:bg-badge-gray-muted',
       textColor: 'text-badge-gray-strong',
-      textColorMuted: 'text-badge-gray-muted',
     },
     zinc: {
       solid: 'bg-badge-zinc-strong text-badge-on-solid',
       solidMuted: 'bg-badge-zinc-dark-alt text-badge-on-solid',
       secondary: 'bg-badge-zinc-light text-badge-zinc-dark',
-      secondaryMuted: 'bg-badge-zinc-light text-badge-zinc-muted',
       outline: 'border-badge-zinc-dark text-badge-zinc-dark',
-      outlineMuted: 'border-badge-zinc-muted text-badge-zinc-muted',
       text: 'text-badge-label-primary [&_svg]:text-badge-zinc-strong before:bg-badge-zinc-strong',
-      textMuted:
-        'text-badge-label-primary [&_svg]:text-badge-zinc-muted before:bg-badge-zinc-muted',
       textColor: 'text-badge-zinc-strong',
-      textColorMuted: 'text-badge-zinc-muted',
     },
     neutral: {
       solid: 'bg-badge-neutral-strong text-badge-on-solid',
       solidMuted: 'bg-badge-neutral-dark-alt text-badge-on-solid',
       secondary: 'bg-badge-neutral-light text-badge-neutral-dark',
-      secondaryMuted: 'bg-badge-neutral-light text-badge-neutral-muted',
       outline: 'border-badge-neutral-dark text-badge-neutral-dark',
-      outlineMuted: 'border-badge-neutral-muted text-badge-neutral-muted',
       text: 'text-badge-label-primary [&_svg]:text-badge-neutral-strong before:bg-badge-neutral-strong',
-      textMuted:
-        'text-badge-label-primary [&_svg]:text-badge-neutral-muted before:bg-badge-neutral-muted',
       textColor: 'text-badge-neutral-strong',
-      textColorMuted: 'text-badge-neutral-muted',
     },
     stone: {
       solid: 'bg-badge-stone-strong text-badge-on-solid',
       solidMuted: 'bg-badge-stone-dark-alt text-badge-on-solid',
       secondary: 'bg-badge-stone-light text-badge-stone-dark',
-      secondaryMuted: 'bg-badge-stone-light text-badge-stone-muted',
       outline: 'border-badge-stone-dark text-badge-stone-dark',
-      outlineMuted: 'border-badge-stone-muted text-badge-stone-muted',
       text: 'text-badge-label-primary [&_svg]:text-badge-stone-strong before:bg-badge-stone-strong',
-      textMuted:
-        'text-badge-label-primary [&_svg]:text-badge-stone-muted before:bg-badge-stone-muted',
       textColor: 'text-badge-stone-strong',
-      textColorMuted: 'text-badge-stone-muted',
     },
     // Colors without muted support
     red: {
@@ -240,21 +213,22 @@ export const generateBadgeVariants = (): ColorVariant[] => {
     variants.push(createVariant('solid', color, classes.solid, false));
     variants.push(createVariant('solid', color, classes.solidMuted ?? '', true));
 
+    // Figma has muted only for solid and the slate outline; other types ignore `muted`
     // Secondary variants
     variants.push(createVariant('secondary', color, classes.secondary, false));
-    variants.push(createVariant('secondary', color, classes.secondaryMuted ?? '', true));
+    variants.push(createVariant('secondary', color, classes.secondary, true));
 
     // Outline variants
     variants.push(createVariant('outline', color, classes.outline, false));
-    variants.push(createVariant('outline', color, classes.outlineMuted ?? '', true));
+    variants.push(createVariant('outline', color, classes.outlineMuted ?? classes.outline, true));
 
     // Text variants
     variants.push(createVariant('text', color, classes.text, false));
-    variants.push(createVariant('text', color, classes.textMuted ?? '', true));
+    variants.push(createVariant('text', color, classes.text, true));
 
     // Text-color variants
     variants.push(createVariant('text-color', color, classes.textColor, false));
-    variants.push(createVariant('text-color', color, classes.textColorMuted ?? '', true));
+    variants.push(createVariant('text-color', color, classes.textColor, true));
   });
 
   // Process colors without muted support

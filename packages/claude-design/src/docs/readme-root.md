@@ -25,7 +25,7 @@ Skip the skeleton only when the person asks for a standalone component or a scre
 
 ## Rules
 
-These are the design system's own rules (`src/guidelines/rules.md`), embedded at build time. On the canvas, read `get_guideline` as "the pattern guide": they ship in the npm package under `dist/guidelines/` (`rules.md`, `foundations/`, `patterns/`) and through the MCP server's `get_guideline` tool.
+These are the design system's own rules (`src/guidelines/rules.md`), embedded at build time. On the canvas, read `get_guideline` as "the pattern guide": they ship in the npm package under `dist/guidelines/` (`rules.md`, `foundations/`, `patterns/`, `templates/`) and through the MCP server's `get_guideline` tool.
 
 <!-- rules.md -->
 

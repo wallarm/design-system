@@ -51,7 +51,7 @@ expect(
 
 // Guideline pages: listed in llms.txt, keep their tsx code, and every site link resolves.
 const llms = read('llms.txt');
-const guidelineMd = ['foundations', 'patterns'].flatMap(dir =>
+const guidelineMd = ['foundations', 'patterns', 'templates'].flatMap(dir =>
   readdirSync(resolve(out, dir))
     .filter(f => f.endsWith('.md') && f !== 'tokens.md' && f !== 'icons.md')
     .map(f => `${dir}/${f}`),
@@ -61,7 +61,7 @@ const sitePath = new URL(llms.match(/https?:\/\/\S+?\/design-system\//)?.[0] ?? 
 for (const file of guidelineMd) {
   expect(llms.includes(`/${file})`), `llms.txt does not list ${file}`);
   const md = read(file);
-  if (file.startsWith('patterns/')) {
+  if (file.startsWith('patterns/') || file.startsWith('templates/')) {
     expect(md.includes('```tsx'), `${file} has no tsx code fence`);
     // The built .md flattens previews to code, so count them in the generated page source.
     const mdx = readFileSync(resolve(root, 'docs', file.replace(/\.md$/, '.mdx')), 'utf8');

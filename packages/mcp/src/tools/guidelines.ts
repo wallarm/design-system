@@ -4,8 +4,8 @@ import { paginate } from './format';
 export const ROUTING = [
   "Tools: `search_component` / `get_component` for components — `get_component` returns an overview, pass `section` for full props, sub-components or examples, and `get_example` for one example's code;",
   '`search_token` / `get_token_category` for design tokens;',
-  '`list_guidelines` / `get_guideline` for foundations (spacing, color, typography, …) and patterns (screens and flows).',
-  'Read the matching pattern with `get_guideline` before composing a screen.',
+  '`list_guidelines` / `get_guideline` for foundations (spacing, color, typography, …), patterns (screens and flows) and templates (complete example screens to start from).',
+  'Read the matching pattern with `get_guideline` before composing a screen; for a whole page, start from the closest template.',
 ].join(' ');
 
 /** Server instructions: the rules digest first (its first line must stand alone), then tool routing and the metadata source. */
@@ -82,13 +82,13 @@ export function nearestSlugs(guidelines: GuidelinesMetadata, slug: string, limit
 
 const STORIES = 'stories';
 
-/** Overview footer: the pattern's live stories and how to read their code. */
+/** Overview footer: the pattern's or template's live stories and how to read their code. */
 const storiesFooter = (g: Guideline): string =>
   g.stories?.length
     ? `\n\n---\nLive stories (Storybook \`Patterns/${g.title}\`): ${g.stories.map(s => s.name).join(', ')}. Full, runnable code: \`get_guideline({ slug: '${g.slug}', section: '${STORIES}' })\`.`
     : '';
 
-/** Every story of a pattern as `## Name`, description and a tsx block; paginated. */
+/** Every story of a pattern or template as `## Name`, description and a tsx block; paginated. */
 const storiesText = (g: Guideline, page: number): string => {
   const body = (g.stories ?? [])
     .map(s =>

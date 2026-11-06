@@ -1,6 +1,6 @@
 # @wallarm-org/mcp
 
-MCP (Model Context Protocol) server for Wallarm Design System. Provides component metadata, props, variants, design tokens, design guidelines (foundations and patterns), and search capabilities to AI assistants via stdio transport.
+MCP (Model Context Protocol) server for Wallarm Design System. Provides component metadata, props, variants, design tokens, design guidelines (foundations, patterns and templates), and search capabilities to AI assistants via stdio transport.
 
 Full guide: [wallarm.github.io/design-system/ai/mcp](https://wallarm.github.io/design-system/ai/mcp).
 
@@ -58,7 +58,7 @@ For local development or custom setups:
 | `get_example` | `{ component: string, example: string, page?: number }` | One example's code. Keys are story names, `<Story file>/<name>` when a name repeats; fuzzy match (4+ characters, flagged as "Closest match"), lists names on a miss |
 | `search_token` | `{ query: string }` | Search design tokens by name, Tailwind class, value, or category; results include the utility classes. Top 20 by relevance |
 | `get_token_category` | `{ name: string, page?: number }` | All tokens in a category (case-insensitive) with Tailwind classes, e.g. `spacing`, `colors-primary` |
-| `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' }` | Guidelines with slug, title, description and the components they use |
+| `list_guidelines` | `{ kind?: 'foundation' \| 'pattern' \| 'template' }` | Guidelines with slug, title, description and the components they use |
 | `get_guideline` | `{ slug: string, section?: string, page?: number }` | A guideline as markdown, or one section (`rules`, `example`, …). A pattern's examples carry its stories' code, and the overview ends with their names; `section: 'stories'` returns all story code. Long pages and sections are paginated. Also accepts a guideline's own relative links (`../foundations/spacing.md#rules`, the anchor picks the section). Unknown slugs get the nearest slugs |
 
 `get_component` also lists the guidelines that use the component.

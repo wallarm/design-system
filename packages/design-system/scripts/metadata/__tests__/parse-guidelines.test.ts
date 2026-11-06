@@ -263,6 +263,30 @@ describe('parseGuidelines', () => {
     ).toThrow(/empty\.stories\.tsx meta title must be "Patterns\/Empty" \(found "Inputs\/Empty"\)/);
   });
 
+  it('parses a template: its own sections and a Templates/<title> stories file', () => {
+    const template = PATTERN.replace(
+      /## When to use[\s\S]*?## Examples/,
+      '## What it shows\n\nText.\n\n## Examples',
+    ).replace('## States\n\nText.\n\n## What your app owns\n\nText.\n\n', '');
+    const [g] = parse({
+      'rules.md': 'ok',
+      'templates/empty.md': template,
+      'templates/empty.stories.tsx': STORIES.replace('Patterns/Empty', 'Templates/Empty'),
+    }).guidelines;
+    expect([g?.slug, g?.kind, g?.stories?.map(s => s.name)]).toEqual([
+      'templates/empty',
+      'template',
+      ['Default', 'NoResults'],
+    ]);
+    expect(() =>
+      parse({
+        'rules.md': 'ok',
+        'templates/empty.md': template,
+        'templates/empty.stories.tsx': STORIES,
+      }),
+    ).toThrow(/meta title must be "Templates\/Empty" \(found "Patterns\/Empty"\)/);
+  });
+
   it('resolves story refs to their description and code in markdown and sections', () => {
     const [g] = parse({
       'rules.md': 'ok',

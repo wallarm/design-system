@@ -105,12 +105,12 @@ export const guidelineStorySchema = z.object({
 
 export type GuidelineStory = z.infer<typeof guidelineStorySchema>;
 
-export const guidelineKindSchema = z.enum(['foundation', 'pattern']);
+export const guidelineKindSchema = z.enum(['foundation', 'pattern', 'template']);
 
 export type GuidelineKind = z.infer<typeof guidelineKindSchema>;
 
 export const guidelineSchema = z.object({
-  /** `foundations/spacing` | `patterns/entity-table`. */
+  /** `foundations/spacing` | `patterns/entity-table` | `templates/security-dashboard`. */
   slug: z.string(),
   kind: guidelineKindSchema,
   title: z.string(),
@@ -118,12 +118,12 @@ export const guidelineSchema = z.object({
   components: z.array(z.string()),
   keywords: z.array(z.string()),
   order: z.number(),
-  /** Body without frontmatter; a pattern's ```story refs are resolved to `tsx story=<Name>` code fences. */
+  /** Body without frontmatter; a pattern's or template's ```story refs are resolved to `tsx story=<Name>` code fences. */
   markdown: z.string(),
   sections: z.array(guidelineSectionSchema),
   /**
-   * Live stories of a pattern (`src/guidelines/patterns/<slug>.stories.tsx`, Storybook
-   * `Patterns/<title>`), in file order. Absent in older design-system versions.
+   * Live stories of a pattern or template (`src/guidelines/<patterns|templates>/<slug>.stories.tsx`,
+   * Storybook `Patterns/<title>` | `Templates/<title>`), in file order. Absent in older design-system versions.
    */
   stories: z.array(guidelineStorySchema).optional(),
 });

@@ -1,6 +1,10 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import nav from '../../docs/_nav.json';
+
+// The nav sections, then Storybook (a header icon, not a nav item).
+const sections = [...nav.map(n => n.text), 'Storybook'];
+
 import { SearchSections, SearchSectionsHost } from '../SearchSections';
 
 rs.mock('@rspress/core/runtime', () => ({
@@ -18,9 +22,9 @@ describe('SearchSections', () => {
     render(<SearchSections onNavigate={() => undefined} />);
     const links = screen.getAllByRole('link');
     expect(links.map(l => l.querySelector('.rp-suggest-item__statement')?.textContent)).toEqual(
-      nav.map(n => n.text),
+      sections,
     );
-    expect(links).toHaveLength(nav.length);
+    expect(links).toHaveLength(sections.length);
     expect(links[1]?.getAttribute('href')).toBe('/design-system/ai/mcp');
   });
 
@@ -91,7 +95,7 @@ describe('SearchSectionsHost', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
 
     const first = mountModal();
-    await waitFor(() => expect(first.querySelectorAll('a')).toHaveLength(nav.length));
+    await waitFor(() => expect(first.querySelectorAll('a')).toHaveLength(sections.length));
     const order = [...first.children].map(c => c.className || c.tagName);
     expect(order.indexOf('rp-search-panel__header')).toBeLessThan(order.indexOf('DIV'));
     expect(first.children[1]?.querySelector('nav')).not.toBeNull();
@@ -101,7 +105,7 @@ describe('SearchSectionsHost', () => {
     await waitFor(() => expect(screen.queryByRole('navigation')).toBeNull());
 
     const second = mountModal();
-    await waitFor(() => expect(second.querySelectorAll('a')).toHaveLength(nav.length));
+    await waitFor(() => expect(second.querySelectorAll('a')).toHaveLength(sections.length));
     act(() => second.remove());
   });
 });

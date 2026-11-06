@@ -2,7 +2,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../src/theme/index.css';
-/* Pattern guideline stories (src/guidelines/patterns/*.stories.tsx); theme/index.css only scans components. */
+/* Pattern and template stories (src/guidelines/{patterns,templates}); theme/index.css only scans components. */
 @source '../src/guidelines';
 
 html,

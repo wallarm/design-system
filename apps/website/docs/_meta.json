@@ -26,6 +26,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "templates",
+    "label": "Templates"
+  },
+  {
+    "type": "dir-section-header",
     "name": "components",
     "label": "Components"
   }
