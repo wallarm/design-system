@@ -25,7 +25,7 @@ in `CLAUDE.md` refer to the same shared workflows.
 pnpm install           # Dependencies, Git hooks and local Codex MCP config
 pnpm agents:sync       # Refresh config after editing .mcp.json
 codex mcp list         # Check that Codex loads the server definitions
-pnpm test:harness     # MCP adapter and PR-hook regression tests
+pnpm test:harness     # MCP adapter, PR-hook and release-notes regression tests
 pnpm lint:harness     # Agent tooling lint/format checks
 ```
 
