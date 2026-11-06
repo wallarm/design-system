@@ -146,7 +146,7 @@ OldVersion
 
 ## Related
 
-- [Entity table](./entity-table.md), [Resource list page](./resource-list-page.md)
+- [Event drawer](./event-drawer.md) for events with charts, [Entity table](./entity-table.md), [Resource list page](./resource-list-page.md)
 - [Create and edit forms](./create-edit-forms.md), [Confirmation dialogs](./confirmation-dialogs.md)
 - [Action-result toasts](./feedback-toasts.md), [Empty states](./empty-states.md)
 - [Spacing](../foundations/spacing.md), [Layering](../foundations/layering.md)
