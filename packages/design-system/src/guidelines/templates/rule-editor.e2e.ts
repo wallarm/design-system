@@ -56,7 +56,8 @@ test.describe('Template: Rule editor', () => {
       await openDrawer(page);
       await fillScope(page);
       await nextStep(page, 2);
-      await expect(page.getByTestId('rule-action')).toBeVisible();
+      // RadioGroup drops a consumer data-testid (it sets its own derived one), so find it by role.
+      await expect(page.getByRole('radio', { name: /Block/ })).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

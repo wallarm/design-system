@@ -556,7 +556,6 @@ const RuleEditor: StoryFn<RuleEditorArgs> = ({ isLoading }) => {
                         name='action'
                         value={action}
                         onValueChange={handleActionChange}
-                        data-testid='rule-action'
                       >
                         <Radio value='block'>
                           <RadioIndicator />
