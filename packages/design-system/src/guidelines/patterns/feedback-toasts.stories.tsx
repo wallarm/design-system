@@ -104,15 +104,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it on whole-page stories.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * The whole page, with every toast from the one app-root `Toaster`: create, then send test, copy
  * link and delete from each row's menu. The parts below show each toast on its own.
@@ -272,8 +263,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-
-Default.decorators = hostShell;
 
 /** The description switches the toast to the extended layout, so it stays 10000 ms. */
 export const NextStep: StoryFn = () => {

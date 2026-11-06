@@ -20,7 +20,7 @@ export interface StoryPreviewProps {
   load: StoryLoader;
   name: string;
   hideCode?: boolean;
-  /** Full-bleed frame for whole-page stories (pattern guidelines): no padding, no centring. */
+  /** Full-bleed frame for pattern stories: no padding; a page fills it, anything else is centred. */
   fullscreen?: boolean;
   /** The fenced code block of the story source. */
   children: ReactNode;
@@ -63,7 +63,15 @@ function Live({
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref);
   return (
-    <div ref={ref} className={fullscreen ? 'w-full' : 'flex w-full items-center justify-center'}>
+    <div
+      ref={ref}
+      className={
+        fullscreen
+          ? // Centre a trigger or a fixed-width block (start-aligned if wider); whole-page roots fill the frame.
+            'grid w-full grid-cols-1 [place-items:safe_center] [&>[data-slot=app-shell]]:w-full [&>[data-slot=page]]:w-full'
+          : 'flex w-full items-center justify-center'
+      }
+    >
       {inView ? <Loaded load={load} name={name} /> : <StoryPlaceholder />}
     </div>
   );

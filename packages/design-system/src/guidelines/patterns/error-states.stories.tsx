@@ -89,15 +89,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * The list failed to load. The header, the create action and the search stay; the table keeps
  * its columns and shows the error in place of the rows. "Try again" refetches; while it runs,
@@ -161,8 +152,6 @@ export const Default: StoryFn = () => {
   );
 };
 
-Default.decorators = hostShell;
-
 /**
  * No permission: retrying would fail the same way, so there is no button. The description names
  * the permission and who grants it. The create action goes too: the user can't use it.
@@ -203,8 +192,6 @@ export const NoAccess: StoryFn = () => (
     </PageContent>
   </Page>
 );
-
-NoAccess.decorators = hostShell;
 
 /**
  * A table inside a drawer or a section failed: `EmptyState` sits right in the `Table`, the

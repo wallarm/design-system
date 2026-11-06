@@ -67,7 +67,7 @@ export default meta;
 // The browser window gives the auth page its height; 800px stands in for it on whole-page stories.
 const hostShell: StoryFn['decorators'] = [
   Story => (
-    <div className='h-800'>
+    <div className='h-800 w-full'>
       <Story />
     </div>
   ),

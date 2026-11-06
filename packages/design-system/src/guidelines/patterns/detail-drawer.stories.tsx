@@ -138,15 +138,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * Click a provider name: one shared, non-modal drawer opens and the row stays marked. The header
  * has a single "Actions" menu; the body has horizontal attributes (a code value, a secret, a
@@ -293,8 +284,6 @@ export const Default: StoryFn = () => {
                   </Attribute>
                 </VStack>
 
-                <Separator spacing={4} />
-
                 <Tabs value={tab} onChange={setTab} data-testid='provider-tabs'>
                   <div className='-mx-24'>
                     <TabsList>
@@ -359,8 +348,6 @@ export const Default: StoryFn = () => {
   );
 };
 
-Default.decorators = hostShell;
-
 /**
  * Drag the left edge to resize between 400 and 1130px; `onResizeEnd` gets the final width to
  * persist. The close X comes built in, so there is no footer and no close button of your own.
@@ -420,8 +407,6 @@ export const Header: StoryFn = () => {
   );
 };
 
-Header.decorators = hostShell;
-
 /**
  * Every row is horizontal with the same 140px label. Entra ID has no default role, so that row
  * stays and shows the empty marker; the codes copy on click.
@@ -468,8 +453,6 @@ export const Attributes: StoryFn = () => {
     </Drawer>
   );
 };
-
-Attributes.decorators = hostShell;
 
 /**
  * The first group needs no title. Each later group starts with a `Separator` and a header row; the
@@ -537,8 +520,6 @@ export const Section: StoryFn = () => {
     </Drawer>
   );
 };
-
-Section.decorators = hostShell;
 
 /**
  * Google Workspace has no rules yet: the table keeps its headers and shows a one-line empty state
@@ -612,8 +593,6 @@ export const NestedTable: StoryFn = () => {
     </Drawer>
   );
 };
-
-NestedTable.decorators = hostShell;
 
 /**
  * The entity is still loading: every `Attribute` shows its skeleton and the nested table shows
@@ -710,8 +689,6 @@ export const Loading: StoryFn = () => {
     </Page>
   );
 };
-
-Loading.decorators = hostShell;
 
 /**
  * Viewing an old version: an info `Alert` comes first in the body with "Back to current" and
@@ -839,5 +816,3 @@ export const OldVersion: StoryFn = () => {
     </Page>
   );
 };
-
-OldVersion.decorators = hostShell;

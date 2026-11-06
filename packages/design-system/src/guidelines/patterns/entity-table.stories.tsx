@@ -32,6 +32,7 @@ import { Page, PageContent } from '../../components/Page';
 import type {
   TableCellContext,
   TableColumnDef,
+  TableRow,
   TableRowSelectionState,
   TableSortingState,
 } from '../../components/Table';
@@ -131,15 +132,6 @@ const meta = {
 } satisfies Meta;
 
 export default meta;
-
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
 
 /**
  * Adds an ID in `Code` and an exact time to the `Cells` vocabulary. Sort by any header; select
@@ -288,8 +280,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-
-Default.decorators = hostShell;
 
 /**
  * Tags collapse into "+N" when the column runs out of room; a user with no groups or no requests
@@ -467,7 +457,6 @@ export const Loading: StoryFn = () => {
     </Page>
   );
 };
-Loading.decorators = hostShell;
 
 /**
  * `EmptyState type='collection-empty'` inside `TableEmptyState`. It has no button when the page
@@ -510,4 +499,3 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
-Empty.decorators = hostShell;

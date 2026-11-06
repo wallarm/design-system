@@ -132,15 +132,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it on whole-page stories.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * The whole page: title, description and one create action in the header; search
  * and status tabs with counts in the toolbar; a user table with a status badge and a
@@ -312,7 +303,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-Default.decorators = hostShell;
 
 /** The title repeats the last crumb of the product's trail; one create action sits on the right. */
 export const Header: StoryFn = () => (
@@ -473,7 +463,6 @@ export const NoResults: StoryFn = () => {
     </Page>
   );
 };
-NoResults.decorators = hostShell;
 
 /**
  * Nothing exists yet: the real header with its create button, the toolbar, and an empty state
@@ -539,4 +528,3 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
-Empty.decorators = hostShell;

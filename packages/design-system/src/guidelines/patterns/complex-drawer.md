@@ -93,7 +93,7 @@ RequestsTab
 | Event loading | `loading` on each `Attribute`; `LineChartEmpty` with no text; `BarListSkeleton`, `PieChartSkeleton`. Card titles stay | `Chart` |
 | No data for a card | `ChartEmpty` inside the card | `Chart` |
 | Nothing selected | Secondary text centred in the detail pane | `Text` |
-| A request failed | See [Error states](./error-states.md) | `EmptyState` |
+| A request failed | Your own error message | App-rendered |
 
 Loading.
 
@@ -112,5 +112,5 @@ Loading
 
 ## Related
 
-- [Detail drawer](./detail-drawer.md), [Entity table](./entity-table.md), [Error states](./error-states.md)
+- [Detail drawer](./detail-drawer.md), [Entity table](./entity-table.md)
 - [Filtering](./filtering.md), [Empty states](./empty-states.md)

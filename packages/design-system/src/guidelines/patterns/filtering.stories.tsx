@@ -348,15 +348,6 @@ const ApplicationMenu = () => {
   );
 };
 
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 const meta = {
   title: 'Patterns/Filtering',
   parameters: {
@@ -562,8 +553,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-
-Default.decorators = hostShell;
 
 /**
  * Options are grouped by deployment and carry attack counts. On reopen, picked options are

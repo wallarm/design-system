@@ -263,15 +263,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 800px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-800'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * Click an attack: one shared, non-modal drawer opens. Its header carries the summary and the
  * tabs; Overview scrolls in `DrawerBody`, Requests splits into a list and a detail that scroll on
@@ -681,8 +672,6 @@ export const Default: StoryFn = () => {
   );
 };
 
-Default.decorators = hostShell;
-
 /**
  * The header is two lines: a truncated `Heading` with the event name, then the summary — status
  * `Badge`, then counts in secondary text split by middle dots. One icon button sits before the
@@ -756,8 +745,6 @@ export const Header: StoryFn = () => {
     </Drawer>
   );
 };
-
-Header.decorators = hostShell;
 
 /**
  * Overview: the attributes sit in one bordered card, two columns, with the long list (IPs) across
@@ -929,8 +916,6 @@ export const OverviewTab: StoryFn = () => {
     </Drawer>
   );
 };
-
-OverviewTab.decorators = hostShell;
 
 /**
  * Requests: a list and a detail side by side, each scrolling on its own, so this tab takes the
@@ -1127,8 +1112,6 @@ export const RequestsTab: StoryFn = () => {
   );
 };
 
-RequestsTab.decorators = hostShell;
-
 /**
  * Still loading: attributes show their skeletons and every card keeps its title over a skeleton of
  * its own shape. No `Loader` over the body.
@@ -1191,5 +1174,3 @@ export const Loading: StoryFn = () => (
     </DrawerContent>
   </Drawer>
 );
-
-Loading.decorators = hostShell;

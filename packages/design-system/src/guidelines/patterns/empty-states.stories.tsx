@@ -97,15 +97,6 @@ const meta = {
   },
 } satisfies Meta;
 
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 export default meta;
 
 /**
@@ -193,8 +184,6 @@ export const Default: StoryFn = () => {
   );
 };
 
-Default.decorators = hostShell;
-
 /**
  * The table has rows: "Reset filters" clears the search and they come back.
  */
@@ -262,8 +251,6 @@ export const NoResults: StoryFn = () => {
     </Page>
   );
 };
-
-NoResults.decorators = hostShell;
 
 /**
  * No `TableEmptyState` here: its 128px vertical padding is too tall for a section.
