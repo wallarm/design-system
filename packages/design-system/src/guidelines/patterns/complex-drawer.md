@@ -1,14 +1,14 @@
 ---
-title: Event drawer
+title: Complex drawer
 description: Use when a row click opens a wide drawer about one event — an attack, an incident, a session — with a status summary, pinned tabs, attributes and analytics charts.
-components: [Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody, DrawerResizeHandle, Tabs, TabsList, TabsTrigger, TabsContent, NumericBadge, Badge, Tooltip, TooltipTrigger, TooltipContent, Button, Attribute, AttributeLabel, AttributeValue, Tag, FormatDateTime, Ip, IpAddress, Chart, ChartHeader, ChartTitle, LineChart, LineChartBody, LineChartGrid, LineChartXAxis, LineChartYAxis, LineChartLine, LineChartTooltip, LineChartEmpty, BarList, BarListItem, BarListBar, BarListLabel, BarListValue, BarListPercent, BarListSkeleton, PieChart, PieChartDonut, PieChartCenter, PieChartCenterValue, PieChartCenterLabel, PieChartLegend, PieChartLegendItem, PieChartLegendValue, PieChartLegendPercent, LegendDot, PieChartSkeleton, ChartEmpty, DropdownMenu, Table, VStack, HStack]
-keywords: [event drawer, attack drawer, incident drawer, session drawer, analytics drawer, overview tab, requests tab, timeline, top 5, top hosts, top ips, status codes, charts in drawer, pinned tabs, status summary, blocked count, copy link, wide drawer, 960]
+components: [Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody, DrawerResizeHandle, Tabs, TabsList, TabsTrigger, TabsContent, NumericBadge, Badge, Tooltip, TooltipTrigger, TooltipContent, Button, Attribute, AttributeLabel, AttributeValue, Tag, FormatDateTime, Ip, IpAddress, Chart, ChartHeader, ChartTitle, LineChart, LineChartBody, LineChartGrid, LineChartXAxis, LineChartYAxis, LineChartLine, LineChartTooltip, LineChartEmpty, BarList, BarListItem, BarListBar, BarListLabel, BarListValue, BarListPercent, BarListSkeleton, PieChart, PieChartDonut, PieChartCenter, PieChartCenterValue, PieChartCenterLabel, PieChartLegend, PieChartLegendItem, PieChartLegendValue, PieChartLegendPercent, LegendDot, PieChartSkeleton, ChartEmpty, InlineCodeSnippet, EmptyState, EmptyStateMessage, EmptyStateTitle, DropdownMenu, Table, VStack, HStack]
+keywords: [complex drawer, columns in drawer, two columns, split view, list and detail, event drawer, attack drawer, incident drawer, session drawer, analytics drawer, overview tab, requests tab, timeline, top 5, top hosts, top ips, status codes, charts in drawer, pinned tabs, status summary, blocked count, copy link, wide drawer, 960]
 order: 55
 ---
 
-# Event drawer
+# Complex drawer
 
-An event drawer is a wide [Detail drawer](./detail-drawer.md) for something that happened many times: an attack, an incident, an API session. The header says how it ended, the tabs stay pinned, and the Overview tab mixes attributes with `Chart` cards.
+A complex drawer is a wide [Detail drawer](./detail-drawer.md) for something that happened many times: an attack, an incident, an API session. The header says how it ended, the tabs stay pinned, and the Overview tab mixes attributes with `Chart` cards.
 
 ## When to use
 
@@ -22,7 +22,8 @@ An event drawer is a wide [Detail drawer](./detail-drawer.md) for something that
 | Volume over time | `LineChart` in a full-width `Chart` | A table of hours |
 | Top N of something (hosts, IPs, users) | `BarList` in a `Chart` | A nested `Table` |
 | Share by class (status codes) | `PieChart` donut in a `Chart` | `BarList` |
-| The event's own records (requests) | A second tab with a nested `Table` and a `NumericBadge` count | A list under the charts |
+| The event's own records (requests) | A second tab with a `NumericBadge` count: records left, the selected one right | A list under the charts, a nested drawer |
+| Content side by side | A CSS grid of two columns inside `DrawerBody` | A second `Drawer`, `Flex` with fixed widths |
 
 ## Rules
 
@@ -31,7 +32,8 @@ An event drawer is a wide [Detail drawer](./detail-drawer.md) for something that
 - Everything in [Detail drawer](./detail-drawer.md) still applies: one controlled `Drawer` per list, opened from `onMasterCellClick`, `activeRowId`, non-modal, no footer.
 - Pass `width={960}`; put `DrawerResizeHandle` first and persist `onResizeEnd`.
 - Pin the header and tabs: `Tabs asChild` around `DrawerHeader`, `TabsList` and `DrawerBody`. **Never** put the tabs inside `DrawerBody` here; the body is long.
-- Reset the tab to Overview when another row opens the drawer.
+- Reset the tab to Overview and clear the selected record when another row opens the drawer.
+- Pass the `Drawer`'s `data-testid` to `Tabs` too: `Tabs` restarts the test id cascade.
 
 **Header**
 
@@ -50,10 +52,17 @@ An event drawer is a wide [Detail drawer](./detail-drawer.md) for something that
 - Status codes: `PieChart` with `PieChartCenterLabel pluralize`, legend `Badge textVariant='code'` coloured 2XX green, 3XX blue, 4XX amber, 5XX red.
 - IPs in attributes: `Ip` + `IpAddress` in `HStack gap={8}`, not `InlineCodeSnippet`.
 
+**Columns**
+
+- Two columns of attributes: `grid grid-cols-2 gap-x-8 gap-y-6`. Two columns of cards: `grid grid-cols-2 gap-12`.
+- List and detail: `grid grid-cols-[320px_1fr] gap-16 py-16`. The right column gets `border-l border-border-primary-light pl-16`.
+- **Never** more than two columns at 960px, and never a third column of cards.
+
 **Records tab**
 
 - Label it with the noun and the total: "Requests" + `NumericBadge`.
-- Inset the `Table` with `<div className='-mx-8 pt-16'>`, as in [Detail drawer](./detail-drawer.md).
+- Left: a one-column `Table` with `onMasterCellClick` and `activeRowId`; the cell stacks the request and its time.
+- Right: horizontal `Attribute` rows of the selected record. Nothing selected: `EmptyState type='no-results'` with the title "Select a request to view details".
 
 **Does not exist:** `DrawerStatus`, `DrawerSubtitle`, a `size` prop on `Chart`, `BarList` `limit`, a chart grid component.
 
@@ -75,6 +84,12 @@ The analytics block: a timeline and chart cards two per row.
 
 ```story
 Charts
+```
+
+List and detail in two columns.
+
+```story
+SplitView
 ```
 
 ## States

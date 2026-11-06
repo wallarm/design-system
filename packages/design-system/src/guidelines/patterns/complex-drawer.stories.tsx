@@ -4,6 +4,7 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Attribute, AttributeLabel, AttributeValue } from '../../components/Attribute';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
+import { InlineCodeSnippet } from '../../components/CodeSnippet';
 import {
   Drawer,
   DrawerBody,
@@ -14,6 +15,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '../../components/Drawer';
+import { EmptyState, EmptyStateMessage, EmptyStateTitle } from '../../components/EmptyState';
 import { FormatDateTime } from '../../components/FormatDateTime';
 import { Ip, IpAddress } from '../../components/Ip';
 import { NumericBadge } from '../../components/NumericBadge';
@@ -187,7 +189,7 @@ const sumValues = (rows: Share[]) => rows.reduce((sum, row) => sum + row.value, 
 const formatCount = (value: number) => value.toLocaleString('en-US');
 
 const meta = {
-  title: 'Patterns/Event drawer',
+  title: 'Patterns/Complex drawer',
   parameters: {
     layout: 'fullscreen',
     docs: {
@@ -219,6 +221,7 @@ export const Default: StoryFn = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('overview');
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
 
   const attack = ATTACKS.find(item => item.id === selectedId) ?? null;
@@ -234,24 +237,24 @@ export const Default: StoryFn = () => {
     { accessorKey: 'status', header: 'Status', size: 140 },
     { accessorKey: 'total', header: 'Requests', size: 120 },
   ];
+  const request = attack?.requests.find(item => item.id === selectedRequestId) ?? null;
+
   const renderRequest = ({ row }: TableCellContext<AttackRequest, unknown>) => (
-    <HStack gap={6} align='center'>
-      <Tag>{row.original.method}</Tag>
-      {row.original.path}
-    </HStack>
-  );
-  const renderTime = ({ row }: TableCellContext<AttackRequest, unknown>) => (
-    <FormatDateTime value={row.original.time} format='datetime' layout='inline' />
+    <VStack gap={4}>
+      <HStack gap={6} align='center'>
+        <Tag>{row.original.method}</Tag>
+        <span>{row.original.path}</span>
+      </HStack>
+      <FormatDateTime value={row.original.time} format='datetime' layout='inline' />
+    </VStack>
   );
   const requestColumns: TableColumnDef<AttackRequest>[] = [
-    { id: 'time', header: 'Time', size: 200, cell: renderTime },
-    { id: 'request', header: 'Request', size: 320, cell: renderRequest },
-    { accessorKey: 'status', header: 'Status', size: 100 },
-    { accessorKey: 'ip', header: 'IP', size: 160 },
+    { id: 'request', header: 'Request', size: 300, cell: renderRequest },
   ];
 
   const handleMasterCellClick = (id: string) => {
     setSelectedId(id);
+    setSelectedRequestId(null);
     setTab('overview');
     setOpen(true);
   };
@@ -288,7 +291,7 @@ export const Default: StoryFn = () => {
       >
         <DrawerContent>
           <DrawerResizeHandle onResizeEnd={onSaveDrawerWidth} />
-          <Tabs value={tab} onChange={setTab} asChild>
+          <Tabs value={tab} onChange={setTab} asChild data-testid='attack-drawer'>
             <DrawerHeader>
               <DrawerTitle>{attack?.name}</DrawerTitle>
               <DrawerDescription>
@@ -300,7 +303,9 @@ export const Default: StoryFn = () => {
                   >
                     {attack?.status}
                   </Badge>
-                  {attack?.blocked}/{attack?.total} blocked
+                  <span>
+                    {attack?.blocked}/{attack?.total} blocked
+                  </span>
                 </HStack>
               </DrawerDescription>
               <Tooltip>
@@ -409,14 +414,70 @@ export const Default: StoryFn = () => {
                 </VStack>
               </TabsContent>
               <TabsContent value='requests'>
-                <div className='-mx-8 pt-16'>
+                <div className='grid grid-cols-[320px_1fr] gap-16 py-16'>
                   <Table
                     aria-label='Requests'
                     data={attack?.requests ?? []}
                     columns={requestColumns}
                     getRowId={getRequestId}
+                    activeRowId={selectedRequestId}
+                    onMasterCellClick={setSelectedRequestId}
                     data-testid='attack-requests-table'
                   />
+                  <div
+                    className='border-l border-border-primary-light pl-16'
+                    data-testid='attack-request'
+                  >
+                    {request ? (
+                      <VStack gap={6}>
+                        <Attribute orientation='horizontal'>
+                          <AttributeLabel width={140}>Request</AttributeLabel>
+                          <AttributeValue>
+                            <InlineCodeSnippet
+                              code={`${request.method} ${request.path}`}
+                              size='md'
+                            />
+                          </AttributeValue>
+                        </Attribute>
+                        <Attribute orientation='horizontal'>
+                          <AttributeLabel width={140}>Status</AttributeLabel>
+                          <AttributeValue>
+                            <Badge
+                              color={request.status < 300 ? 'green' : 'amber'}
+                              type='secondary'
+                              textVariant='code'
+                            >
+                              {request.status}
+                            </Badge>
+                          </AttributeValue>
+                        </Attribute>
+                        <Attribute orientation='horizontal'>
+                          <AttributeLabel width={140}>IP</AttributeLabel>
+                          <AttributeValue>
+                            <Ip>
+                              <IpAddress>{request.ip}</IpAddress>
+                            </Ip>
+                          </AttributeValue>
+                        </Attribute>
+                        <Attribute orientation='horizontal'>
+                          <AttributeLabel width={140}>Time</AttributeLabel>
+                          <AttributeValue>
+                            <FormatDateTime
+                              value={request.time}
+                              format='datetime'
+                              layout='inline'
+                            />
+                          </AttributeValue>
+                        </Attribute>
+                      </VStack>
+                    ) : (
+                      <EmptyState type='no-results'>
+                        <EmptyStateMessage>
+                          <EmptyStateTitle>Select a request to view details</EmptyStateTitle>
+                        </EmptyStateMessage>
+                      </EmptyState>
+                    )}
+                  </div>
                 </div>
               </TabsContent>
             </DrawerBody>
@@ -451,7 +512,9 @@ export const Header: StoryFn = () => {
               <Badge variant='dotted' type='secondary' color='amber'>
                 {RCE.status}
               </Badge>
-              {RCE.blocked}/{RCE.total} blocked
+              <span>
+                {RCE.blocked}/{RCE.total} blocked
+              </span>
             </HStack>
           </DrawerDescription>
           <Tooltip>
@@ -637,6 +700,106 @@ export const Charts: StoryFn = () => {
 };
 
 Charts.decorators = hostShell;
+
+/**
+ * Two columns inside the drawer: the event's records on the left as a one-column `Table`, the
+ * selected record on the right. Nothing selected yet shows a one-line `EmptyState`.
+ */
+export const SplitView: StoryFn = () => {
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>('req-1');
+
+  const request = RCE.requests.find(item => item.id === selectedRequestId) ?? null;
+
+  const renderRequest = ({ row }: TableCellContext<AttackRequest, unknown>) => (
+    <VStack gap={4}>
+      <HStack gap={6} align='center'>
+        <Tag>{row.original.method}</Tag>
+        <span>{row.original.path}</span>
+      </HStack>
+      <FormatDateTime value={row.original.time} format='datetime' layout='inline' />
+    </VStack>
+  );
+  const requestColumns: TableColumnDef<AttackRequest>[] = [
+    { id: 'request', header: 'Request', size: 300, cell: renderRequest },
+  ];
+
+  return (
+    <Drawer width={960} data-testid='attack-drawer'>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View requests
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{RCE.name}</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
+          <div className='grid grid-cols-[320px_1fr] gap-16 py-16'>
+            <Table
+              aria-label='Requests'
+              data={RCE.requests}
+              columns={requestColumns}
+              getRowId={getRequestId}
+              activeRowId={selectedRequestId}
+              onMasterCellClick={setSelectedRequestId}
+              data-testid='attack-requests-table'
+            />
+            <div
+              className='border-l border-border-primary-light pl-16'
+              data-testid='attack-request'
+            >
+              {request ? (
+                <VStack gap={6}>
+                  <Attribute orientation='horizontal'>
+                    <AttributeLabel width={140}>Request</AttributeLabel>
+                    <AttributeValue>
+                      <InlineCodeSnippet code={`${request.method} ${request.path}`} size='md' />
+                    </AttributeValue>
+                  </Attribute>
+                  <Attribute orientation='horizontal'>
+                    <AttributeLabel width={140}>Status</AttributeLabel>
+                    <AttributeValue>
+                      <Badge
+                        color={request.status < 300 ? 'green' : 'amber'}
+                        type='secondary'
+                        textVariant='code'
+                      >
+                        {request.status}
+                      </Badge>
+                    </AttributeValue>
+                  </Attribute>
+                  <Attribute orientation='horizontal'>
+                    <AttributeLabel width={140}>IP</AttributeLabel>
+                    <AttributeValue>
+                      <Ip>
+                        <IpAddress>{request.ip}</IpAddress>
+                      </Ip>
+                    </AttributeValue>
+                  </Attribute>
+                  <Attribute orientation='horizontal'>
+                    <AttributeLabel width={140}>Time</AttributeLabel>
+                    <AttributeValue>
+                      <FormatDateTime value={request.time} format='datetime' layout='inline' />
+                    </AttributeValue>
+                  </Attribute>
+                </VStack>
+              ) : (
+                <EmptyState type='no-results'>
+                  <EmptyStateMessage>
+                    <EmptyStateTitle>Select a request to view details</EmptyStateTitle>
+                  </EmptyStateMessage>
+                </EmptyState>
+              )}
+            </div>
+          </div>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+SplitView.decorators = hostShell;
 
 /**
  * Still loading: attributes show their skeletons and every card keeps its title over a skeleton of
