@@ -1,3 +1,10 @@
+## [4.10.0](https://github.com/wallarm/design-system/compare/v4.9.0...v4.10.0) (2026-11-06)
+
+### Features
+
+* **claude-design:** app skeleton board and the shared system as the main path ([#449](https://github.com/wallarm/design-system/issues/449)) ([609774f](https://github.com/wallarm/design-system/commit/609774f983ea77b96f94bce536b5fa31865008cb))
+* **guidelines:** templates, release-notes fix and token guard ([#450](https://github.com/wallarm/design-system/issues/450)) ([644880b](https://github.com/wallarm/design-system/commit/644880b2c5f215467b7ff723225ba14d266e5f2f))
+
 ## [4.9.0](https://github.com/wallarm/design-system/compare/v4.8.0...v4.9.0) (2026-11-06)
 
 ## [4.8.0](https://github.com/wallarm/design-system/compare/v4.7.0...v4.8.0) (2026-11-05)
