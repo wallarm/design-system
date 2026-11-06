@@ -85,7 +85,8 @@ export const TableBodyCell = <T extends RowData>({
     if (isCut && hasActions) {
       return (
         <div className='flex items-center justify-between gap-2'>
-          {wrappedContent}
+          {/* Same as a master cell without actions: forcing `block` on rich content breaks it (Avatar is inline-grid). */}
+          <div className='min-w-0 overflow-hidden'>{tooltipText ? wrappedContent : content}</div>
           <TableMasterCellActions>{menuAction}</TableMasterCellActions>
         </div>
       );
