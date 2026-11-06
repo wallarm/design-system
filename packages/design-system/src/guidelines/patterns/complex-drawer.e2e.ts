@@ -4,8 +4,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const complexDrawerStory = createStoryHelper('patterns-complex-drawer', [
   'Default',
   'Header',
-  'Charts',
-  'Split View',
+  'Overview Tab',
+  'Requests Tab',
   'Loading',
 ] as const);
 
@@ -17,28 +17,28 @@ test.describe('Pattern: Complex drawer', () => {
         .getByTestId('attacks-table')
         .getByText(/^Remote code execution/)
         .click();
-      await expect(page.getByTestId('attack-drawer--title')).toBeVisible();
+      await expect(page.getByTestId('attack-info-card')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the header correctly', async ({ page }) => {
       await complexDrawerStory.goto(page, 'Header');
       await page.getByTestId('attack-drawer--trigger').click();
-      await expect(page.getByTestId('attack-attributes')).toBeVisible();
+      await expect(page.getByTestId('attack-summary')).toContainText('0/55 blocked');
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render the charts correctly', async ({ page }) => {
-      await complexDrawerStory.goto(page, 'Charts');
+    test('Should render the overview tab correctly', async ({ page }) => {
+      await complexDrawerStory.goto(page, 'Overview Tab');
       await page.getByTestId('attack-drawer--trigger').click();
-      await expect(page.getByTestId('attack-charts')).toBeVisible();
+      await expect(page.getByTestId('attack-overview')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render the split view correctly', async ({ page }) => {
-      await complexDrawerStory.goto(page, 'Split View');
+    test('Should render the requests tab correctly', async ({ page }) => {
+      await complexDrawerStory.goto(page, 'Requests Tab');
       await page.getByTestId('attack-drawer--trigger').click();
-      await expect(page.getByTestId('attack-request')).toContainText('/api/v1/accounts/sync');
+      await expect(page.getByTestId('attack-request')).toContainText('Full request');
       await expect(page).toHaveScreenshot();
     });
 
@@ -59,25 +59,25 @@ test.describe('Pattern: Complex drawer', () => {
         .click();
       await page.getByRole('tab', { name: /Requests/ }).click();
       await expect(page.getByTestId('attack-request')).toContainText('Select a request');
-      await page.getByTestId('attack-requests-table').getByText('/api/v1/accounts/export').click();
-      await expect(page.getByTestId('attack-request')).toContainText(
-        'POST /api/v1/accounts/export',
-      );
+      await page
+        .getByTestId('attack-request-list')
+        .getByRole('button', { name: /accounts\/export/ })
+        .click();
+      await expect(page.getByTestId('attack-request')).toContainText('req-3');
     });
 
-    test('Should switch to the requests tab and reset it for the next row', async ({ page }) => {
+    test('Should reset the tab when another attack opens', async ({ page }) => {
       await complexDrawerStory.goto(page, 'Default');
       await page
         .getByTestId('attacks-table')
         .getByText(/^Remote code execution/)
         .click();
       await page.getByRole('tab', { name: /Requests/ }).click();
-      await expect(page.getByTestId('attack-requests-table--container--row')).toHaveCount(3);
+      await expect(page.getByTestId('attack-request-list').getByRole('button')).toHaveCount(3);
       await page
         .getByTestId('attacks-table')
         .getByText(/^Path traversal from/)
         .click();
-      await expect(page.getByTestId('attack-drawer--title')).toHaveText(/^Path traversal from/);
       await expect(page.getByRole('tab', { name: 'Overview' })).toHaveAttribute(
         'aria-selected',
         'true',

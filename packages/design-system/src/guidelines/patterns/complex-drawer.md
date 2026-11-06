@@ -1,106 +1,99 @@
 ---
 title: Complex drawer
-description: Use when a row click opens a wide drawer about one event — an attack, an incident, a session — with a status summary, pinned tabs, attributes and analytics charts.
-components: [Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody, DrawerResizeHandle, Tabs, TabsList, TabsTrigger, TabsContent, NumericBadge, Badge, Tooltip, TooltipTrigger, TooltipContent, Button, Attribute, AttributeLabel, AttributeValue, Tag, FormatDateTime, Ip, IpAddress, Chart, ChartHeader, ChartTitle, LineChart, LineChartBody, LineChartGrid, LineChartXAxis, LineChartYAxis, LineChartLine, LineChartTooltip, LineChartEmpty, BarList, BarListItem, BarListBar, BarListLabel, BarListValue, BarListPercent, BarListSkeleton, PieChart, PieChartDonut, PieChartCenter, PieChartCenterValue, PieChartCenterLabel, PieChartLegend, PieChartLegendItem, PieChartLegendValue, PieChartLegendPercent, LegendDot, PieChartSkeleton, ChartEmpty, InlineCodeSnippet, EmptyState, EmptyStateMessage, EmptyStateTitle, DropdownMenu, Table, VStack, HStack]
-keywords: [complex drawer, columns in drawer, two columns, split view, list and detail, event drawer, attack drawer, incident drawer, session drawer, analytics drawer, overview tab, requests tab, timeline, top 5, top hosts, top ips, status codes, charts in drawer, pinned tabs, status summary, blocked count, copy link, wide drawer, 960]
+description: Use when a row click opens a wide drawer about one event — an attack, an incident, a session — with a summary header, tabs, an attribute card, chart cards and a list-and-detail split.
+components: [Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerResizeHandle, Heading, Text, Badge, Tabs, TabsList, TabsTrigger, Tooltip, TooltipTrigger, TooltipContent, Button, Attribute, AttributeLabel, AttributeValue, FormatDateTime, Ip, IpCountry, IpAddress, Chart, ChartHeader, ChartTitle, LineChart, LineChartBody, LineChartGrid, LineChartXAxis, LineChartYAxis, LineChartLine, LineChartTooltip, LineChartEmpty, BarList, BarListItem, BarListBar, BarListLabel, BarListValue, BarListPercent, BarListSkeleton, PieChart, PieChartDonut, PieChartCenter, PieChartCenterValue, PieChartCenterLabel, PieChartLegend, PieChartLegendItem, PieChartLegendValue, PieChartLegendPercent, LegendDot, PieChartSkeleton, FilterInput, ScrollArea, ScrollAreaViewport, ScrollAreaContent, ScrollAreaScrollbar, HttpMethod, ResponseCode, InlineCodeSnippet, CodeSnippetRoot, CodeSnippetContent, CodeSnippetLineNumbers, CodeSnippetCode, Separator, DropdownMenu, Table, HStack, VStack]
+keywords: [complex drawer, event drawer, attack drawer, incident drawer, session drawer, analytics drawer, overview tab, requests tab, list and detail, split view, two panes, columns in drawer, timeline, top 5, status codes, charts in drawer, summary header, blocked count, copy link, wide drawer, 1064, request card, full request]
 order: 55
 ---
 
 # Complex drawer
 
-A complex drawer is a wide [Detail drawer](./detail-drawer.md) for something that happened many times: an attack, an incident, an API session. The header says how it ended, the tabs stay pinned, and the Overview tab mixes attributes with `Chart` cards.
+A complex drawer is a wide [Detail drawer](./detail-drawer.md) for something that happened many times: an attack, an incident, an API session. The header summarises it, Overview shows attributes and charts, and a records tab splits into a list and a detail.
 
 ## When to use
 
 | Need | Use | Not |
 | --- | --- | --- |
 | One configured entity (a provider, a rule) | [Detail drawer](./detail-drawer.md), 640px | This pattern |
-| One event with counts over time | This pattern, 960px | A new page, a `Dialog` |
-| Status of the event | `Badge variant='dotted'` in `DrawerDescription` | A status `Attribute` row |
-| Totals like "0/55 blocked" | Text after the badge in `DrawerDescription` | A `Metric` card |
-| Copy a link to the event | Icon `Button` in a `Tooltip` in `DrawerHeader` | An "Actions" menu with one item |
+| One event with counts over time and many records | This pattern, 1064px | A new page, a `Dialog` |
+| How the event ended | Status `Badge variant='dotted'` on the summary line | A status row only in the body |
+| Counts ("0/55 blocked", "2 IPs across 1 country") | Secondary `Text` on the summary line, split by `·` | `Metric` cards |
+| Copy or share a link | Icon `Button` in a `Tooltip`, before the close X | An "Actions" menu with one item |
 | Volume over time | `LineChart` in a full-width `Chart` | A table of hours |
-| Top N of something (hosts, IPs, users) | `BarList` in a `Chart` | A nested `Table` |
+| Top N of something | `BarList` in a `Chart` | A nested `Table` |
 | Share by class (status codes) | `PieChart` donut in a `Chart` | `BarList` |
-| The event's own records (requests) | A second tab with a `NumericBadge` count: records left, the selected one right | A list under the charts, a nested drawer |
-| Content side by side | A CSS grid of two columns inside `DrawerBody` | A second `Drawer`, `Flex` with fixed widths |
+| The event's own records (requests, hits) | A tab with a list on the left and the selected record on the right | A `Table` under the charts, a nested drawer |
 
 ## Rules
 
+This page is about layout. Values inside it (dates, IPs, codes, badges) follow [Entity table](./entity-table.md) and [Detail drawer](./detail-drawer.md).
+
 **Drawer**
 
-- Everything in [Detail drawer](./detail-drawer.md) still applies: one controlled `Drawer` per list, opened from `onMasterCellClick`, `activeRowId`, non-modal, no footer.
-- Pass `width={960}`; put `DrawerResizeHandle` first and persist `onResizeEnd`.
-- Pin the header and tabs: `Tabs asChild` around `DrawerHeader`, `TabsList` and `DrawerBody`. **Never** put the tabs inside `DrawerBody` here; the body is long.
+- Everything in [Detail drawer](./detail-drawer.md) still applies: one controlled non-modal `Drawer`, opened from `onMasterCellClick`, `activeRowId`, no footer.
+- Pass `width={1064}`; put `DrawerResizeHandle` first and persist `onResizeEnd`.
 - Reset the tab to Overview and clear the selected record when another row opens the drawer.
-- Pass the `Drawer`'s `data-testid` to `Tabs` too: `Tabs` restarts the test id cascade.
 
 **Header**
 
-- `DrawerTitle` is the event name; it truncates, so keep the full name in the list too.
-- `DrawerDescription` holds `HStack gap={6} align='center'`: the status `Badge variant='dotted' type='secondary'`, then the counts as plain text.
-- Header icon buttons: `variant='ghost' color='neutral' size='small'` with `aria-label` and a `Tooltip`. One or two, before the built-in close X. More actions go in one "Actions" `DropdownMenu`.
+- `DrawerHeader` › `HStack align='start' justify='between' gap={16} fullWidth className='min-w-0'`: the title block, then icon buttons. `min-w-0` lets a long title truncate instead of pushing out the close X.
+- Title block: `VStack gap={4} className='min-w-0'` › `Heading as='h2' size='xl' weight='medium' truncate` › summary `HStack gap={4} align='center'`.
+- Summary: `Badge variant='dotted' type='secondary' size='medium'`, then `Text size='xs' color='secondary'` parts split by a `·` `Text`. Wrap every string in `Text`: `HStack` drops bare text.
+- Tabs follow `DrawerHeader` as their own strip: `Tabs` › `TabsList`, outside `DrawerBody`. The records tab shows its count as `Badge type='secondary' color='slate' size='medium' className='ml-4'`.
+- Render the active tab yourself (`tab === 'overview' && …`); there is no `TabsContent` here.
 
 **Overview tab**
 
-- Wrap the tab in `VStack gap={12} className='pt-16 pb-24'`.
-- Attributes first, in two columns: `grid grid-cols-2 gap-x-8 gap-y-6 pb-8`, default (vertical) `Attribute`.
-- Then one full-width `Chart` with the `LineChart` timeline.
-- Then cards two per row: `grid grid-cols-2 gap-12`. A grid row gives neighbours the same height; `Chart` has no minimum of its own.
-- Every card has a `ChartHeader` with a `ChartTitle`: "Top 5 hosts", "Status codes". Count words, not "Chart".
-- Show at most five rows per `BarList`. Show percents with `BarListPercent`, not raw counts, when the total is in the header.
-- Status codes: `PieChart` with `PieChartCenterLabel pluralize`, legend `Badge textVariant='code'` coloured 2XX green, 3XX blue, 4XX amber, 5XX red.
-- IPs in attributes: `Ip` + `IpAddress` in `HStack gap={8}`, not `InlineCodeSnippet`.
+- `DrawerBody` › `VStack gap={12} className='py-16'`.
+- Attributes go in one bordered card: `grid grid-cols-2 gap-x-8 gap-y-16 rounded-8 border border-border-primary-light p-16`, default (vertical) `Attribute`. A long list (IPs) spans both columns: `className='col-span-2'`.
+- Then one full-width `Chart` with the `LineChart` timeline, then cards two per row: `grid grid-cols-2 gap-12`. The grid row gives neighbours one height; `Chart` has no minimum of its own.
 
-**Columns**
+**Records tab: list and detail**
 
-- Two columns of attributes: `grid grid-cols-2 gap-x-8 gap-y-6`. Two columns of cards: `grid grid-cols-2 gap-12`.
-- List and detail: `grid grid-cols-[320px_1fr] gap-16 py-16`. The right column gets `border-l border-border-primary-light pl-16`.
-- **Never** more than two columns at 960px, and never a third column of cards.
+- This tab replaces `DrawerBody`: `<div className='flex min-h-0 flex-1 flex-col'>`. Each pane brings its own `ScrollArea`, so the list and the detail scroll apart. **Never** nest the panes in `DrawerBody` or reach into its `data-slot`s.
+- Filter bar across both panes: `HStack gap={8} className='shrink-0 border-b border-border-primary-light px-16 py-8'` › `FilterInput` in `min-w-0 flex-1`, then the sort `Button variant='ghost' size='small'`.
+- Panes: `flex min-h-0 flex-1` › list `w-320 shrink-0 border-r border-border-primary-light` › detail `min-w-0 flex-1`.
+- List item: a `button` with `value={id}` and `aria-pressed`, `w-full rounded-8 p-8 text-left`; selected `bg-states-primary-default-alt`, else `hover:bg-states-primary-hover`. Inside, `VStack gap={2}`: time and `ResponseCode` (`ml-auto`), attack type `Badge`s, `HttpMethod` + path, host.
+- Detail attributes: `grid grid-cols-2 gap-x-8 gap-y-6`, horizontal `Attribute`; a long value spans both columns.
+- Detail: sections, each a header row (`HStack justify='between' className='px-24 py-8'`, `Text size='md'`, optional "Actions" menu) and a body with `px-24`. Split sections with `<div className='px-24 py-4'><Separator /></div>`.
+- Nothing selected: centred `Text size='sm' color='secondary'` "Select a request to view details".
 
-**Records tab**
-
-- Label it with the noun and the total: "Requests" + `NumericBadge`.
-- Left: a one-column `Table` with `onMasterCellClick` and `activeRowId`; the cell stacks the request and its time.
-- Right: horizontal `Attribute` rows of the selected record. Nothing selected: `EmptyState type='no-results'` with the title "Select a request to view details".
-
-**Does not exist:** `DrawerStatus`, `DrawerSubtitle`, a `size` prop on `Chart`, `BarList` `limit`, a chart grid component.
+**Does not exist:** `DrawerStatus`, `DrawerSubtitle`, a split-pane or resizable-panel component, a `size` prop on `Chart`, `BarList` `limit`.
 
 ## Examples
 
-The list opens one shared, wide drawer with pinned tabs.
+The list opens one shared drawer; switch to Requests for the split.
 
 ```story
 Default
 ```
 
-The header: status, counts and a copy link button.
+The header: title, summary line, copy link, tabs.
 
 ```story
 Header
 ```
 
-The analytics block: a timeline and chart cards two per row.
+Overview: the attribute card, the timeline and chart cards.
 
 ```story
-Charts
+OverviewTab
 ```
 
-List and detail in two columns.
+Requests: filter bar, list and detail.
 
 ```story
-SplitView
+RequestsTab
 ```
 
 ## States
 
 | State | Show | Example component |
 | --- | --- | --- |
-| Event loading | `loading` on each `Attribute`; `LineChartEmpty` with no text; `BarListSkeleton`, `PieChartSkeleton`. Card titles stay. Not a `Loader` | `Chart` |
-| No data for a card | `ChartEmpty` inside the card, the title stays | `Chart` |
-| One value only (100%) | Keep the card; a single full bar or a full ring is fine | `BarList`, `PieChart` |
-| Records loading | `isLoading` with `skeletonCount={3}` | `Table` |
-| Event still running | The status badge, not a spinner | `Badge` |
+| Event loading | `loading` on each `Attribute`; `LineChartEmpty` with no text; `BarListSkeleton`, `PieChartSkeleton`. Card titles stay | `Chart` |
+| No data for a card | `ChartEmpty` inside the card | `Chart` |
+| Nothing selected | Secondary text centred in the detail pane | `Text` |
+| A request failed | See [Error states](./error-states.md) | `EmptyState` |
 
 Loading.
 
@@ -112,14 +105,12 @@ Loading
 
 | You own | The DS owns |
 | --- | --- |
-| Fetching the event, its series and top N | Card frame, chart drawing, tooltips |
-| Which cards and in what order | Bar, donut and line styling |
-| Status → badge colour, status code colours | Legend, percent maths |
+| Fetching the event, series, top N and records | Card frame, chart drawing, tooltips |
+| Tab state, the selected record, resets | Tabs strip, scroll areas |
+| List virtualisation and paging | Item styles via tokens |
 | The link being copied, the toast | Tooltip, button states |
-| Tab state, reset on open | Pinned header and tabs, scrolling |
 
 ## Related
 
-- [Detail drawer](./detail-drawer.md), [Entity table](./entity-table.md)
+- [Detail drawer](./detail-drawer.md), [Entity table](./entity-table.md), [Error states](./error-states.md)
 - [Filtering](./filtering.md), [Empty states](./empty-states.md)
-- [Layering](../foundations/layering.md), [Spacing](../foundations/spacing.md)
