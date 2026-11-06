@@ -10,8 +10,8 @@ export const SwitchLabel: FC<SwitchLabelProps> = ({ className, ...props }) => {
 
   return (
     <ArkUiSwitch.Label
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(
         'flex items-center gap-4',
         'font-sans text-sm font-normal text-text-primary',

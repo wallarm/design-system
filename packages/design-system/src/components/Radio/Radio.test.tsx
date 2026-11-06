@@ -8,6 +8,18 @@ import { RadioIndicator } from './RadioIndicator';
 import { RadioLabel } from './RadioLabel';
 
 describe('Attribute pass-through', () => {
+  it('keeps the data-testid passed to RadioGroup', () => {
+    render(
+      <RadioGroup name='framework' data-testid='framework'>
+        <Radio value='react'>
+          <RadioLabel>React</RadioLabel>
+        </Radio>
+      </RadioGroup>,
+    );
+
+    expect(screen.getByTestId('framework')).toHaveAttribute('role', 'radiogroup');
+  });
+
   it('forwards data-analytics-id to the <label> click target', () => {
     render(
       <RadioGroup name='framework'>

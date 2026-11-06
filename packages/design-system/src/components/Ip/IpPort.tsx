@@ -12,11 +12,11 @@ export const IpPort: FC<IpPortProps> = ({ children, ...props }) => {
 
   return (
     <Code
+      data-testid={testId}
       {...props}
       color='secondary'
       size='m'
       data-slot='ip-port'
-      data-testid={testId}
       className={cn('shrink ml-[-4]')}
     >
       {children}

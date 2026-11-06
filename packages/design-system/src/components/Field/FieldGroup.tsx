@@ -9,8 +9,8 @@ export const FieldGroup: FC<FieldGroupProps> = ({ ...props }) => {
 
   return (
     <div
-      {...props}
       data-testid={testId}
+      {...props}
       data-slot='field-group'
       className={cn(
         'group/field-group @container/field-group flex w-full flex-col gap-16 data-[slot=checkbox-group]:gap-3 [&>[data-slot=field-group]]:gap-4',

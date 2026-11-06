@@ -16,9 +16,9 @@ export const AttributeLabelInfo: FC<AttributeLabelInfoProps> = ({ ref, children,
     <Tooltip>
       <TooltipTrigger asChild>
         <span
+          data-testid={testId}
           {...props}
           ref={ref}
-          data-testid={testId}
           data-slot='attribute-label-info'
           className='inline-flex cursor-help'
         >

@@ -25,9 +25,9 @@ export const BannerClose: FC<BannerCloseProps> = ({ ref, onClick, ...props }) =>
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          data-testid={testId}
           {...props}
           ref={ref}
-          data-testid={testId}
           variant='outline'
           color='neutral'
           size='small'

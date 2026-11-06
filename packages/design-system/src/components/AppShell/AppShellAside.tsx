@@ -45,13 +45,13 @@ export const AppShellAside: FC<AppShellAsideProps> = ({
 
   return (
     <aside
+      data-testid={testId}
       {...props}
       ref={ref}
       hidden={!open}
       inert={!open}
       data-slot='app-shell-aside'
       data-state={open ? 'open' : 'closed'}
-      data-testid={testId}
       className={cn(
         // Display only while open, so the browser's own [hidden] rule hides the closed
         // region even where Tailwind preflight is not loaded.

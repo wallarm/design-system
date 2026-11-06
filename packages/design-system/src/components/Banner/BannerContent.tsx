@@ -16,10 +16,10 @@ export const BannerContent: FC<BannerContentProps> = ({ ref, className, children
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='banner-content'
-      data-testid={testId}
       className={cn('flex flex-1 flex-col justify-center gap-0 min-w-0', className)}
     >
       {children}

@@ -37,10 +37,10 @@ export const PieChartLegendPercent: FC<PieChartLegendPercentProps> = ({
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-legend-percent'
-      data-testid={testId}
       className={cn(
         pieChartLegendPercentClasses,
         pieChartLegendPercentValueVariants({ variant }),

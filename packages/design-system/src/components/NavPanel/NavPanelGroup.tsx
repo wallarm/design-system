@@ -62,10 +62,10 @@ export const NavPanelGroup: FC<NavPanelGroupProps> = ({
   return (
     <NavPanelGroupContext.Provider value={{ expanded, toggle, contentId }}>
       <div
+        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='nav-panel-group'
-        data-testid={testId}
         className={cn('flex flex-col', className)}
       >
         {children}

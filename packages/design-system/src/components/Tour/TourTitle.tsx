@@ -16,7 +16,7 @@ export const TourTitle: FC<TourTitleProps> = ({ ref, children, ...props }) => {
   return (
     <OverflowTooltip>
       <OverflowTooltipTrigger>
-        <ArkUiTour.Title {...props} data-testid={testId} ref={ref} asChild>
+        <ArkUiTour.Title data-testid={testId} {...props} ref={ref} asChild>
           <Heading size='lg' weight='medium' lineClamp={2}>
             {children}
           </Heading>

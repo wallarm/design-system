@@ -16,10 +16,10 @@ export const MetricHeader: FC<MetricHeaderProps> = ({ className, ref, ...props }
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='metric-header'
-      data-testid={testId}
       className={cn(metricHeaderClasses, className)}
     />
   );

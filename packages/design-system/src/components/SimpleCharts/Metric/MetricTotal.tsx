@@ -27,10 +27,10 @@ export const MetricTotal: FC<MetricTotalProps> = ({
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='metric-total'
-      data-testid={testId}
       className={cn(metricTotalClasses, className)}
     >
       {connector === 'of' && <span className={metricTotalWordClasses}>of</span>}

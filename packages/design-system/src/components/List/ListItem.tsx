@@ -13,10 +13,10 @@ export const ListItem: FC<ListItemProps> = ({ ref, className, children, ...props
 
   return (
     <li
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='list-item'
-      data-testid={testId}
       className={cn(listItemVariants(), className)}
     >
       <TestIdProvider value={testId}>{children}</TestIdProvider>

@@ -36,10 +36,10 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       style={isHorizontal ? { ...style, ...HORIZONTAL_CLAMP_STYLE, width: `${width}px` } : style}
-      data-testid={testId}
       data-slot='attribute-label'
       className={cn(
         'font-sans-display text-sm font-normal text-text-secondary',

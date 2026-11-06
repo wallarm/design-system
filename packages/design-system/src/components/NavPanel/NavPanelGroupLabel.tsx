@@ -27,13 +27,13 @@ export const NavPanelGroupLabel: FC<NavPanelGroupLabelProps> = ({
 
   return (
     <button
+      data-testid={testId}
       {...props}
       ref={ref}
       type='button'
       aria-expanded={expanded}
       aria-controls={contentId}
       data-slot='nav-panel-group-label'
-      data-testid={testId}
       onClick={toggle}
       style={{ paddingLeft: 8 + depth * indent }}
       className={cn(

@@ -20,9 +20,9 @@ export const TabsButton: FC<TabsButtonProps> = ({ children, size = 'medium', ref
 
   return (
     <ButtonBase
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       size={size}
       className={tabsTriggerVariants({ size })}
     >

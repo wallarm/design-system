@@ -18,10 +18,10 @@ export const NavPanelSkeleton: FC<NavPanelSkeletonProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='nav-panel-skeleton'
-      data-testid={testId}
       className={cn('flex flex-col gap-6', className)}
     >
       {Array.from({ length: count }, (_, i) => (

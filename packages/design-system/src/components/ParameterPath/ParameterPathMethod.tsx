@@ -16,9 +16,9 @@ export const ParameterPathMethod: FC<ParameterPathMethodProps> = ({
   const testId = useTestId('method');
   return (
     <span
+      data-testid={testId}
       {...rest}
       data-slot='parameter-path-method'
-      data-testid={testId}
       className={cn('flex items-center', className)}
     >
       <HttpMethod method={method} />

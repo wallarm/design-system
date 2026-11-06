@@ -45,10 +45,10 @@ export const HorizontalBarStackSkeleton: FC<HorizontalBarStackSkeletonProps> = (
   return (
     <TestIdProvider value={testId}>
       <div
+        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='horizontal-bar-stack-skeleton'
-        data-testid={testId}
         aria-busy='true'
         aria-live='polite'
         className={cn(horizontalBarStackRootClasses, className)}

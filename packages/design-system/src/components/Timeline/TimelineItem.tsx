@@ -13,10 +13,10 @@ export const TimelineItem: FC<TimelineItemProps> = ({ ref, className, children, 
 
   return (
     <li
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='timeline-item'
-      data-testid={testId}
       className={cn(timelineItemVariants(), className)}
     >
       <TestIdProvider value={testId}>{children}</TestIdProvider>

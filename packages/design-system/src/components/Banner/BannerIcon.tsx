@@ -42,10 +42,10 @@ export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, ...props }) => {
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='banner-icon'
-      data-testid={testId}
       className='flex items-center py-2 shrink-0'
     >
       {content}

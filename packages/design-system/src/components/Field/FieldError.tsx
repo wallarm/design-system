@@ -11,8 +11,8 @@ export const FieldError: FC<FieldErrorProps> = ({ children, ...props }) => {
 
   return (
     <div
-      {...props}
       data-testid={testId}
+      {...props}
       role='alert'
       data-slot='field-error'
       className={cn('flex gap-4 text-text-danger')}

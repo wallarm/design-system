@@ -9,8 +9,8 @@ export const FieldDescription: FC<FieldDescriptionProps> = props => {
 
   return (
     <p
-      {...props}
       data-testid={testId}
+      {...props}
       data-slot='field-description'
       className={cn(
         'text-text-secondary text-sm font-normal leading-normal group-has-[[data-orientation=horizontal]]/field:text-balance',

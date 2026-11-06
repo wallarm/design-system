@@ -15,10 +15,10 @@ export const NavRailFooter: FC<NavRailFooterProps> = ({ ref, className, children
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='nav-rail-footer'
-      data-testid={testId}
       className={cn(navRailFooterVariants({ mode }), className)}
     >
       {children}

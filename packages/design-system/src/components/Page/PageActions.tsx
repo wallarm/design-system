@@ -11,9 +11,9 @@ export const PageActions: FC<PageActionsProps> = ({ ref, children, className, ..
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-actions'
       className={cn('flex items-center gap-8 shrink-0 ml-auto', className)}
     >

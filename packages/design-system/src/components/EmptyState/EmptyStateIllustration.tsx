@@ -18,10 +18,10 @@ export const EmptyStateIllustration: FC<EmptyStateIllustrationProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='empty-state-illustration'
-      data-testid={testId}
       className={cn(emptyStateIllustrationVariants(), className)}
     >
       {children}

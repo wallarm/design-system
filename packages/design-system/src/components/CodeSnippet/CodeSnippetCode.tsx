@@ -66,7 +66,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
   if (isLoading || !tokens) {
     const codeLines = code.split('\n');
     return (
-      <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
+      <CodeContent wrapLines={wrapLines} className={className} data-testid={testId} {...props}>
         {visibleDisplayItems.map(item => {
           if (item.type === 'fold-summary') return renderFoldSummary(item);
           const line = codeLines[item.index] ?? '';
@@ -98,7 +98,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
   }
 
   return (
-    <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
+    <CodeContent wrapLines={wrapLines} className={className} data-testid={testId} {...props}>
       {visibleDisplayItems.map(item => {
         if (item.type === 'fold-summary') return renderFoldSummary(item);
         const lineTokens = tokens[item.index];

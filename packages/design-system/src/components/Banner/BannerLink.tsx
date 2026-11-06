@@ -18,8 +18,8 @@ export const BannerLink: FC<BannerLinkProps> = ({ weight = 'regular', ...props }
 
   return (
     <Link
-      {...props}
       data-testid={testId}
+      {...props}
       type={variant === 'primary' ? 'alt' : 'default'}
       size='md'
       weight={weight}

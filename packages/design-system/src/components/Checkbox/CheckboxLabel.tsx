@@ -10,8 +10,8 @@ export const CheckboxLabel: FC<CheckboxLabelProps> = props => {
 
   return (
     <ArkUiCheckbox.Label
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(
         // Layout
         'flex gap-4',

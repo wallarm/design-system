@@ -64,10 +64,10 @@ export const BarListItem: FC<BarListItemProps> = ({
   return (
     <BarListItemContext.Provider value={itemValue}>
       <div
+        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='bar-list-item'
-        data-testid={testId}
         data-selected={selected ? 'true' : undefined}
         role={interactive ? 'button' : undefined}
         tabIndex={interactive ? 0 : undefined}

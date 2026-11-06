@@ -155,9 +155,9 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={combinedRef}
-      data-testid={testId}
       data-slot='inline-edit-control'
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}

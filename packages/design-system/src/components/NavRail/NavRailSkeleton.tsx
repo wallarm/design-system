@@ -30,10 +30,10 @@ export const NavRailSkeleton: FC<NavRailSkeletonProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='nav-rail-skeleton'
-      data-testid={testId}
       className={cn(navRailSkeletonVariants({ mode }), className)}
     >
       {Array.from({ length: count }, (_, i) => (

@@ -11,9 +11,9 @@ export const PageTitle: FC<PageTitleProps> = ({ ref, children, className, ...pro
 
   return (
     <h1
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-title'
       className={cn(
         'font-sans-display text-xl font-medium leading-28 text-text-primary truncate',

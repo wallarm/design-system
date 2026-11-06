@@ -13,10 +13,10 @@ export const ChartTitle: FC<ChartTitleProps> = ({ className, ref, ...props }) =>
   return (
     <Text asChild size='xs' weight='medium' color='primary' truncate>
       <span
+        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='chart-title'
-        data-testid={testId}
         className={cn('min-w-0 flex-1', className)}
       />
     </Text>

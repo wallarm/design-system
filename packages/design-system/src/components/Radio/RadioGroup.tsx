@@ -43,8 +43,8 @@ export const RadioGroup: FC<RadioGroupProps> = ({ variant = 'default', ...props 
 
   return (
     <ArkUiRadioGroup.Root
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(radioGroupVariants({ variant }), 'flex flex-col gap-8')}
     />
   );

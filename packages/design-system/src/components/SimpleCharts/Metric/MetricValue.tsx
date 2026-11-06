@@ -17,10 +17,10 @@ export const MetricValue: FC<MetricValueProps> = ({ className, children, ref, ..
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='metric-value'
-      data-testid={testId}
       className={cn(metricValueClasses, className)}
     >
       {content}

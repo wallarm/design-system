@@ -11,10 +11,10 @@ export const TimelineSeparator: FC<TimelineSeparatorProps> = ({ className, ...pr
 
   return (
     <Separator
+      data-testid={testId}
       {...props}
       orientation='vertical'
       data-slot='timeline-separator'
-      data-testid={testId}
       className={cn(timelineSeparatorVariants(), className)}
     />
   );

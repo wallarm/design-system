@@ -24,10 +24,10 @@ export const CardFooter: FC<CardFooterProps> = ({
 
   return (
     <Comp
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='card-footer'
-      data-testid={testId}
       className={cn('mt-auto flex items-center gap-12 px-16', justifyClass, className)}
     >
       {children}

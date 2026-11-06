@@ -12,9 +12,9 @@ export const PageToolbar: FC<PageToolbarProps> = ({ ref, children, className, ..
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-toolbar'
       className={cn(
         'flex items-center gap-12 px-24 pb-8 has-[+[data-slot=page-content]]:pb-6',

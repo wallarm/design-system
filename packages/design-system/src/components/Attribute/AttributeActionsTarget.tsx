@@ -86,9 +86,9 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   return (
     <DropdownMenuTrigger asChild>
       <div
+        data-testid={testId}
         {...props}
         ref={ref}
-        data-testid={testId}
         data-slot='attribute-actions-target'
         onClick={handleClick}
         onKeyDown={handleKeyDown}

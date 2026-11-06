@@ -17,13 +17,13 @@ export const PaginationItem: FC<PaginationItemProps> = ({ value, className, ref,
 
   return (
     <ArkPagination.Item
+      data-testid={testId}
       {...props}
       ref={ref}
       type='page'
       value={value}
       className={cn(paginationItemVariants({ size }), className)}
       data-slot='pagination-item'
-      data-testid={testId}
     />
   );
 };

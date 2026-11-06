@@ -21,10 +21,10 @@ export const SearchModalFooter: FC<SearchModalFooterProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='search-modal-footer'
-      data-testid={testId}
       className={cn(searchModalFooterVariants(), className)}
     >
       {children ?? (

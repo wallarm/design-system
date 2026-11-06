@@ -18,12 +18,12 @@ export const PaginationNext: FC<PaginationNextProps> = ({ children, ...props }) 
   return (
     <ArkPagination.NextTrigger asChild>
       <Button
+        data-testid={testId}
         {...props}
         variant='ghost'
         color='neutral'
         size={size}
         data-slot='pagination-next'
-        data-testid={testId}
       >
         {children ?? PAGINATION_NEXT_LABEL}
         <ArrowRight />

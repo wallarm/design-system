@@ -48,8 +48,8 @@ export const CheckboxGroup: FC<CheckboxGroupProps> = ({ variant = 'default', ...
 
   return (
     <ArkUiCheckbox.Group
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(checkboxGroupVariants({ variant }))}
     />
   );

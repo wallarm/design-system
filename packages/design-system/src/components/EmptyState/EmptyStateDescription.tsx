@@ -16,9 +16,9 @@ export const EmptyStateDescription: FC<EmptyStateDescriptionProps> = ({
 
   return (
     <Text
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='empty-state-description'
       size='xs'
       color='secondary'

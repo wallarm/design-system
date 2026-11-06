@@ -39,10 +39,10 @@ export const AvatarFallback: FC<AvatarFallbackProps> = ({
       // The image's alt or the root's label names the person; initials read aloud are noise.
       // Before the spread, so a consumer can expose meaningful fallback text (aria-hidden={false}).
       aria-hidden
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='avatar-fallback'
-      data-testid={testId}
       // The fallback is the plate (tint + stroke). Initials are text (text-primary), the icon is an
       // icon (icon-primary); in the Branded frame both take the brand colour (Figma 12336:5504).
       className={cn(

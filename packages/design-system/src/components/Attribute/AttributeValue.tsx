@@ -26,9 +26,9 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='attribute-value'
       className={cn(
         'flex items-center',

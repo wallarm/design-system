@@ -12,10 +12,10 @@ export const BarListLabel: FC<BarListLabelProps> = ({ className, ref, ...props }
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='bar-list-label'
-      data-testid={testId}
       className={cn(barListLabelClasses, className)}
     />
   );

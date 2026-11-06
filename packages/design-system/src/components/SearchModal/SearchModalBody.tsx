@@ -21,10 +21,10 @@ export const SearchModalBody: FC<SearchModalBodyProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={mergeRefs(listRef, ref)}
       data-slot='search-modal-body'
-      data-testid={testId}
       role='listbox'
       className={cn(searchModalBodyVariants(), className)}
     >

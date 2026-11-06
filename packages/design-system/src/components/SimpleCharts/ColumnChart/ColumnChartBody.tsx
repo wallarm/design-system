@@ -34,10 +34,10 @@ export const ColumnChartBody: FC<ColumnChartBodyProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='column-chart-body'
-      data-testid={testId}
       aria-hidden='true'
       className={cn(columnChartBodyClasses, fill && columnChartBodyFillClasses, className)}
     >

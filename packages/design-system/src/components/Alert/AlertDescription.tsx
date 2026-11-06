@@ -33,9 +33,9 @@ export const AlertDescription: FC<AlertDescriptionProps> = ({
     <OverflowTooltip>
       <OverflowTooltipTrigger>
         <Text
+          data-testid={testId}
           {...props}
           ref={ref}
-          data-testid={testId}
           size='sm'
           color='secondary'
           lineClamp={lineClamp}

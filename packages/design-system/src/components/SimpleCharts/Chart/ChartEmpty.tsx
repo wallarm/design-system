@@ -13,10 +13,10 @@ export const ChartEmpty: FC<ChartEmptyProps> = ({ className, children, ref, ...p
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='chart-empty'
-      data-testid={testId}
       className={cn(chartEmptyClasses, className)}
     >
       <Text size='xs' color='secondary'>

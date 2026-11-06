@@ -16,9 +16,9 @@ export const AlertContent: FC<AlertContentProps> = ({ ref, children, ...props })
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       className={cn('flex-1 flex flex-col gap-0 py-2 **:data-[slot=alert-controls]:mt-8')}
     >
       {children}

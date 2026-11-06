@@ -31,11 +31,11 @@ export const NavPanelGroupItem: FC<NavPanelGroupItemProps> = ({
 
   return (
     <Comp
+      data-testid={testId}
       {...props}
       ref={ref}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-panel-group-item'
-      data-testid={testId}
       className={cn(navPanelGroupItemVariants({ active }), className)}
       style={{ paddingLeft: 8 + depth * indent }}
     >

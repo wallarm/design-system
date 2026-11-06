@@ -30,8 +30,8 @@ export const FieldAction: FC<FieldActionProps> = ({
 
   return (
     <Comp
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(
         linkVariants({ type, weight: 'medium', size: 'sm' }),
         'ml-auto hover:decoration-transparent active:decoration-transparent',

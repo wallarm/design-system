@@ -34,10 +34,10 @@ export const BarListPercent: FC<BarListPercentProps> = ({
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='bar-list-percent'
-      data-testid={testId}
       className={cn(barListPercentVariants({ variant }), className)}
     >
       {children ?? (

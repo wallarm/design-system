@@ -77,10 +77,10 @@ export const InputGroupAddon: FC<
 
   return (
     <div
+      data-testid={testId}
       {...props}
       role='group'
       data-slot='input-group-addon'
-      data-testid={testId}
       data-align={align}
       className={cn(inputGroupAddonVariants({ align, variant }))}
       onClick={handleClick}

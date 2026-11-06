@@ -9,7 +9,7 @@ export const TimelineIndicator: FC<TimelineIndicatorProps> = props => {
   const testId = useTestId('indicator');
 
   return (
-    <NumericBadge {...props} type='outline' data-slot='timeline-indicator' data-testid={testId} />
+    <NumericBadge data-testid={testId} {...props} type='outline' data-slot='timeline-indicator' />
   );
 };
 

@@ -22,9 +22,9 @@ export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick, ...props }) => {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          data-testid={testId}
           {...props}
           ref={ref}
-          data-testid={testId}
           variant='ghost'
           color='neutral'
           size='small'

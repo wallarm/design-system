@@ -18,10 +18,10 @@ export const SearchModalGroupLabel: FC<SearchModalGroupLabelProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='search-modal-group-label'
-      data-testid={testId}
       className={cn(searchModalGroupLabelVariants(), className)}
     >
       {children}

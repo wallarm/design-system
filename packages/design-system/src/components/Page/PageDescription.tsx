@@ -16,9 +16,9 @@ export const PageDescription: FC<PageDescriptionProps> = ({
 
   return (
     <p
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-description'
       className={cn('text-sm text-text-secondary', className)}
     >

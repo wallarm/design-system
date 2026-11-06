@@ -27,12 +27,12 @@ export const AvatarOverlay: FC<AvatarOverlayProps> = ({
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       aria-hidden
       data-slot='avatar-overlay'
       data-visible={visible ? '' : undefined}
-      data-testid={testId}
       className={cn(avatarPlateVariants({ size }), avatarOverlayClassNames, className)}
     >
       {children ?? <RefreshCcw size='md' />}

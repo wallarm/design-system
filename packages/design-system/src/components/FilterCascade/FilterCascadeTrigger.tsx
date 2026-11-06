@@ -65,9 +65,9 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
   const controlProps = api.getControlProps();
   const control = (
     <div
+      data-testid={controlTestId}
       {...controlProps}
       data-slot='filter-cascade-control'
-      data-testid={controlTestId}
       // A path is wider than one value: lift the 180px cap (`max-w-none` is the 0 spacing token
       // here), the segments truncate on their own.
       className={cn(

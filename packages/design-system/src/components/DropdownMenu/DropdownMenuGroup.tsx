@@ -10,7 +10,7 @@ export const DropdownMenuGroup: FC<DropdownMenuGroupProps> = props => {
   const id = useId();
   const testId = useTestId('group');
 
-  return <Menu.ItemGroup {...props} id={id} data-testid={testId} />;
+  return <Menu.ItemGroup data-testid={testId} {...props} id={id} />;
 };
 
 DropdownMenuGroup.displayName = 'DropdownMenuGroup';

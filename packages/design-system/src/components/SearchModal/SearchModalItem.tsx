@@ -62,11 +62,11 @@ export const SearchModalItem: FC<SearchModalItemProps> = ({
 
   return (
     <Comp
+      data-testid={testId}
       {...props}
       ref={mergeRefs(itemRef, ref)}
       type={asChild ? undefined : 'button'}
       data-slot='search-modal-item'
-      data-testid={testId}
       data-search-item=''
       role='option'
       aria-selected={active}

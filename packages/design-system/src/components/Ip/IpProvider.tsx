@@ -9,12 +9,12 @@ export const IpProvider: FC<IpProviderProps> = ({ children, ...props }) => {
 
   return (
     <Badge
+      data-testid={testId}
       {...props}
       size='medium'
       type='secondary'
       color='slate'
       data-slot='ip-provider'
-      data-testid={testId}
       className='shrink-0'
     >
       {children}

@@ -77,12 +77,12 @@ export const FilterCascadeLevel: FC<FilterCascadeLevelProps> = ({
   return (
     <CurrentLevel.Provider value={level}>
       <div
+        data-testid={testId}
         {...props}
         {...api.getListProps({ item: level.node, indexPath: level.indexPath, value: level.value })}
         ref={ref}
         data-slot='filter-cascade-level'
         data-level={level.depth}
-        data-testid={testId}
         className={cn(
           // Figma `select-menu`: the `DropdownMenu` panel, 320px wide.
           'flex w-320 shrink-0 flex-col gap-1 overflow-y-auto overscroll-none',
@@ -200,9 +200,9 @@ export const FilterCascadeGroupLabel: FC<FilterCascadeGroupLabelProps> = ({
   const testId = useTestId('group-label', testIdProp);
   return (
     <div
+      data-testid={testId}
       {...props}
       data-slot='filter-cascade-group-label'
-      data-testid={testId}
       className={cn(dropdownMenuLabelVariants({ inset: false }), className)}
     />
   );
@@ -224,9 +224,9 @@ export const FilterCascadeEmpty: FC<FilterCascadeEmptyProps> = ({
   const testId = useTestId('empty', testIdProp);
   return (
     <div
+      data-testid={testId}
       {...props}
       data-slot='filter-cascade-empty'
-      data-testid={testId}
       className={cn('px-8 py-10 text-center text-sm text-text-secondary', className)}
     >
       {children ?? 'No results'}

@@ -17,9 +17,9 @@ export const PageHeaderGroup: FC<PageHeaderGroupProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-header-group'
       className={cn('flex flex-col min-w-0', className)}
     >

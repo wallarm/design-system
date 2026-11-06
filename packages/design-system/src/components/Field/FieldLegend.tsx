@@ -15,8 +15,8 @@ export const FieldLegend: FC<FieldLegendProps> = ({ variant = 'legend', ...props
 
   return (
     <legend
-      {...props}
       data-testid={testId}
+      {...props}
       data-slot='field-legend'
       data-variant={variant}
       className={cn(

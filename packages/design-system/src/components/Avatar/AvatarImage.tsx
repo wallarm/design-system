@@ -21,11 +21,11 @@ export const AvatarImage: FC<AvatarImageProps> = ({ ref, alt = '', className, ..
 
   return (
     <ArkAvatar.Image
+      data-testid={testId}
       {...props}
       ref={ref}
       alt={alt}
       data-slot='avatar-image'
-      data-testid={testId}
       className={cn(avatarPlateVariants({ size }), avatarImageClassNames, className)}
     />
   );

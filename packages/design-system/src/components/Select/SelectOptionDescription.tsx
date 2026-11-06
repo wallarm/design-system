@@ -9,8 +9,8 @@ export const SelectOptionDescription: FC<SelectOptionDescriptionProps> = props =
 
   return (
     <ArkUiSelect.ItemText
-      {...props}
       data-testid={testId}
+      {...props}
       className='grow basis-full font-sans text-xs text-text-secondary'
     />
   );

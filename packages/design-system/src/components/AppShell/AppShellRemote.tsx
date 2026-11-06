@@ -12,10 +12,10 @@ export const AppShellRemote: FC<AppShellRemoteProps> = ({ ref, className, childr
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='app-shell-remote'
-      data-testid={testId}
       className={cn(
         '[grid-area:remote] relative overflow-auto overscroll-none rounded-tl-12 border-t border-l border-border-primary-light bg-bg-page-bg',
         // With an open AppShellAside after it, the canvas no longer runs to the window edge, so

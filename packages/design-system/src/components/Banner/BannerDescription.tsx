@@ -33,9 +33,9 @@ export const BannerDescription: FC<BannerDescriptionProps> = ({
     <OverflowTooltip>
       <OverflowTooltipTrigger>
         <p
+          data-testid={testId}
           {...props}
           ref={ref}
-          data-testid={testId}
           className={cn(bannerDescriptionVariants({ variant }), 'truncate', className)}
         >
           {children}

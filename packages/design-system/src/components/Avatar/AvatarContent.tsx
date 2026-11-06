@@ -13,10 +13,10 @@ export const AvatarContent: FC<AvatarContentProps> = ({ ref, className, ...props
 
   return (
     <span
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='avatar-content'
-      data-testid={testId}
       className={cn(avatarContentClassNames, className)}
     />
   );

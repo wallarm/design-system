@@ -14,11 +14,11 @@ export const NavPanelBack: FC<NavPanelBackProps> = ({ ref, className, children, 
 
   return (
     <button
+      data-testid={testId}
       {...props}
       ref={ref}
       type='button'
       data-slot='nav-panel-back'
-      data-testid={testId}
       className={cn(
         'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-10 p-8 text-sm text-text-primary transition-colors outline-none hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
         className,

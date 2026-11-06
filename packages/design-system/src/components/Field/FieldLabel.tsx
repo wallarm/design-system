@@ -10,8 +10,8 @@ export const FieldLabel: FC<LabelProps> = props => {
 
   return (
     <ArkUiField.Label
-      {...props}
       data-testid={testId}
+      {...props}
       data-slot='field-label'
       className={cn(
         'group/field-label flex w-fit gap-4 text-sm text-text-primary font-medium leading-snug group-data-[disabled=true]/field:opacity-50',

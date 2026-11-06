@@ -12,9 +12,9 @@ export const PageHeader: FC<PageHeaderProps> = ({ ref, sticky, children, classNa
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='page-header'
       className={cn(
         'flex items-center px-24 py-8 gap-12 has-[+[data-slot=page-content]]:pb-6',

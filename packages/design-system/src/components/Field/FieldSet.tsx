@@ -9,8 +9,8 @@ export const FieldSet: FC<FieldSetProps> = ({ className, ...props }) => {
 
   return (
     <fieldset
-      {...props}
       data-testid={testId}
+      {...props}
       data-slot='field-set'
       className={cn(
         'flex flex-col gap-16',

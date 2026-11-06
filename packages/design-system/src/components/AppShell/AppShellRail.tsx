@@ -14,10 +14,10 @@ export const AppShellRail: FC<AppShellRailProps> = ({ ref, className, children, 
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='app-shell-rail'
-      data-testid={testId}
       className={cn(
         '[grid-area:rail] transition-opacity duration-500 ease-in-out',
         !appeared && 'opacity-0',

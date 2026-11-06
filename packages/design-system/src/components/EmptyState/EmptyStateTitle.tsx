@@ -20,9 +20,9 @@ export const EmptyStateTitle: FC<EmptyStateTitleProps> = ({
 
   return (
     <p
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       data-slot='empty-state-title'
       className={cn(emptyStateTitleVariants({ type }), className)}
     >

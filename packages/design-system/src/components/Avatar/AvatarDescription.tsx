@@ -27,9 +27,9 @@ export const AvatarDescription: FC<AvatarDescriptionProps> = ({
     <OverflowTooltip>
       <OverflowTooltipTrigger ref={ref as Ref<HTMLElement>}>
         <span
+          data-testid={testId}
           {...props}
           data-slot='avatar-description'
-          data-testid={testId}
           className={cn(avatarDescriptionVariants({ size }), className)}
         >
           {children}

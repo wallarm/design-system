@@ -14,10 +14,10 @@ export const CardTitle: FC<CardTitleProps> = ({ ref, icon, className, children, 
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='card-title'
-      data-testid={testId}
       className={cn('flex items-center gap-8', className)}
     >
       {icon && <span className='shrink-0'>{icon}</span>}

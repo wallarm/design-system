@@ -20,9 +20,9 @@ export const AlertControls: FC<AlertControlsProps> = ({ ref, ...props }) => {
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
-      data-testid={testId}
       className={cn(alertControlsVariants())}
       data-slot='alert-controls'
     />

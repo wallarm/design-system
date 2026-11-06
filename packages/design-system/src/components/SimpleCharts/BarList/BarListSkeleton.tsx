@@ -36,10 +36,10 @@ export const BarListSkeleton: FC<BarListSkeletonProps> = ({
   return (
     <TestIdProvider value={testId}>
       <div
+        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='bar-list-skeleton'
-        data-testid={testId}
         aria-busy='true'
         aria-live='polite'
         className={cn(barListRootClasses, className)}

@@ -28,10 +28,10 @@ export const LineChartLegend: FC<LineChartLegendProps> = ({
 
   return (
     <div
+      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='line-chart-legend'
-      data-testid={testId}
       className={cn(lineChartLegendVariants({ orientation, align }), className)}
     />
   );
