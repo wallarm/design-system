@@ -74,10 +74,11 @@ test.describe('Pattern: Complex drawer', () => {
         .click();
       await page.getByRole('tab', { name: /Requests/ }).click();
       await expect(page.getByTestId('attack-request-list').getByRole('button')).toHaveCount(3);
+      // The open drawer covers the middle of the long name; click its visible start, as a user would.
       await page
         .getByTestId('attacks-table')
         .getByText(/^Path traversal from/)
-        .click();
+        .click({ position: { x: 8, y: 8 } });
       await expect(page.getByRole('tab', { name: 'Overview' })).toHaveAttribute(
         'aria-selected',
         'true',
