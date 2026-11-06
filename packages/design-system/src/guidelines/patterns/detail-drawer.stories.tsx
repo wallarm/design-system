@@ -19,6 +19,7 @@ import {
   DrawerHeader,
   DrawerResizeHandle,
   DrawerTitle,
+  DrawerTrigger,
 } from '../../components/Drawer';
 import {
   DropdownMenu,
@@ -365,7 +366,7 @@ Default.decorators = hostShell;
  * persist. The close X comes built in, so there is no footer and no close button of your own.
  */
 export const Header: StoryFn = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleEdit = () => onEditProvider(OKTA);
   const handleDisable = () => onDisableProvider(OKTA);
@@ -374,6 +375,11 @@ export const Header: StoryFn = () => {
 
   return (
     <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View {OKTA.name}
+        </Button>
+      </DrawerTrigger>
       <DrawerContent>
         <DrawerResizeHandle onResizeEnd={onSaveDrawerWidth} />
         <DrawerHeader>
@@ -421,10 +427,15 @@ Header.decorators = hostShell;
  * stays and shows the empty marker; the codes copy on click.
  */
 export const Attributes: StoryFn = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View {ENTRA.name}
+        </Button>
+      </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{ENTRA.name}</DrawerTitle>
@@ -465,12 +476,17 @@ Attributes.decorators = hostShell;
  * action applies to that section only.
  */
 export const Section: StoryFn = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleEditDefaults = () => onEditProvider(OKTA);
 
   return (
     <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View {OKTA.name}
+        </Button>
+      </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{OKTA.name}</DrawerTitle>
@@ -529,7 +545,7 @@ Section.decorators = hostShell;
  * with no action, since "Create rule" already sits on the tab line.
  */
 export const NestedTable: StoryFn = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('rules');
 
   const renderClaim = ({ row }: TableCellContext<RoleRule, unknown>) => (
@@ -548,6 +564,11 @@ export const NestedTable: StoryFn = () => {
 
   return (
     <Drawer open={open} onOpenChange={setOpen} width={640} data-testid='provider-drawer'>
+      <DrawerTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View {GOOGLE.name}
+        </Button>
+      </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{GOOGLE.name}</DrawerTitle>
