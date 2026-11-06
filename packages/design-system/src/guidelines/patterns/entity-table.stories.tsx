@@ -191,7 +191,7 @@ export const Default: StoryFn = () => {
 
   const renderRequests = ({ row }: TableCellContext<User, unknown>) => row.original.requests ?? '—';
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleEdit = () => onEditUser(user);
     const handleResend = () => onResendInvite(user);
@@ -232,7 +232,13 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      size: 320,
+      cell: renderUser,
+      meta: { renderMenuAction },
+    },
     { accessorKey: 'id', header: 'User ID', size: 160, cell: renderId },
     {
       accessorKey: 'groups',
@@ -249,14 +255,6 @@ export const Default: StoryFn = () => {
       size: 140,
       meta: { sortType: 'number', description: { type: 'tooltip', content: 'Last 24 hours' } },
       cell: renderRequests,
-    },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
     },
   ];
 
@@ -367,8 +365,8 @@ export const Cells: StoryFn = () => {
 };
 
 /**
- * The column has an `id` and no `accessorKey`, and can't be hidden, so the menu never disappears
- * behind the column settings.
+ * Hover a row: the `…` appears in the master cell, `meta.renderMenuAction` on the first column. The
+ * trigger names the row and the destructive item comes last.
  */
 export const RowMenu: StoryFn = () => {
   const renderUser = ({ row }: TableCellContext<User, unknown>) => (
@@ -381,7 +379,7 @@ export const RowMenu: StoryFn = () => {
     </Avatar>
   );
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleEdit = () => onEditUser(user);
     const handleDeactivate = () => onDeactivateUser(user);
@@ -416,14 +414,12 @@ export const RowMenu: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
     {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
+      accessorKey: 'name',
+      header: 'Name',
+      size: 320,
+      cell: renderUser,
+      meta: { renderMenuAction },
     },
   ];
 

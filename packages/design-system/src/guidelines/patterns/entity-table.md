@@ -2,13 +2,13 @@
 title: Entity table
 description: Use when you render a list of users, roles, providers, channels or policies as a Table, with status badges, tags, a row menu and bulk actions.
 components: [Table, TableActionBar, TableActionBarSelection, TableEmptyState, Badge, Tag, OverflowList, Avatar, AvatarContent, AvatarName, AvatarDescription, Code, FormatDateTime, DropdownMenu, DropdownMenuItem, Button, Tooltip, Switch, EmptyState]
-keywords: [table, data table, grid, list, rows, columns, entity list, users table, cell, status badge, tags, +N, overflow, row menu, row actions, kebab, ellipsis, three dots, bulk actions, bulk bar, selection, checkbox, sort, empty value, em dash, column description, reorder]
+keywords: [table, master cell, renderMenuAction, data table, grid, list, rows, columns, entity list, users table, cell, status badge, tags, +N, overflow, row menu, row actions, kebab, ellipsis, three dots, bulk actions, bulk bar, selection, checkbox, sort, empty value, em dash, column description, reorder]
 order: 20
 ---
 
 # Entity table
 
-One `Table` with a fixed cell vocabulary, a trailing row menu and a bulk bar.
+One `Table` with a fixed cell vocabulary, a row menu in the master cell and a bulk bar.
 
 ## When to use
 
@@ -16,7 +16,7 @@ One `Table` with a fixed cell vocabulary, a trailing row menu and a bulk bar.
 | --- | --- | --- |
 | A list of entities on a page | `Table` inside `PageContent` | A `div` grid, a `Card` per row |
 | A list in a drawer or dialog | The same `Table` inside `DrawerBody` or `DialogBody` (from `@wallarm-org/design-system/Dialog`) | A custom bordered list |
-| Actions on one row | A trailing `actions` column with a `DropdownMenu` | Buttons repeated in every row |
+| Actions on one row | `meta.renderMenuAction` on the master (first) column | A trailing actions column, buttons repeated in every row |
 | Actions on many rows | `onRowSelectionChange` plus `TableActionBar` | Your own floating bar |
 | Details of one entity | `Attribute` in a drawer | A two-column `Table` |
 | Kanban, preference matrix | Product code | This pattern |
@@ -44,14 +44,14 @@ Use only these cells.
 - The first column is pinned and never hideable: put the entity name there.
 - `Table` owns its frame, borders, padding and header. **Never** wrap it in a bordered `div` or restyle cells via `meta.cellClassName`.
 - `PageContent`, `DrawerBody` and `DialogBody` own the gutter. **Never** add `p-24` or any padding around `Table`.
-- Set widths with `size`: name `320`, email `240`, status `140`, timestamp `200`, actions `60` plus `minSize: 60` (the default minimum is 96px).
+- Set widths with `size`: name `320`, email `240`, status `140`, timestamp `200` (the default minimum is 96px).
 - If columns must keep their `size`, pass `stretch={false}`.
 - Two-line cell: add a `Text size='xs' color='secondary'` line; there is no `rowHeight`.
 
 **Row menu**
 
-- If rows have actions, add the trailing display column shown below (an `id`, no `accessorKey`, `enableHiding: false`).
-- **Never** use `meta.renderMenuAction` for entity actions: its menu shows only on hover. There is no `actions` column type, `alwaysShowMenu` or `TableRow`.
+- Every contextual row action goes through the master cell: `meta: { renderMenuAction }` on the first column. Its `…` shows on row hover, while the menu is open and on the previewed row.
+- **Never** add a trailing actions column or buttons in cells. There is no `actions` column type or `alwaysShowMenu`.
 - Trigger: `Button variant='ghost' color='neutral' size='small'`, `Ellipsis` icon, `aria-label` naming the row.
 - Order items: open, edit, reorder, state changes, `DropdownMenuSeparator`, destructive.
 - Use `variant='destructive'` and name the entity: "Delete user", not "Delete". Confirm before deleting.
@@ -77,7 +77,7 @@ Use only these cells.
 
 ## Examples
 
-The whole table: the cell vocabulary, an always-visible row menu, sorting and a bulk bar for selected rows.
+The whole table: the cell vocabulary, the row menu in the master cell, sorting and a bulk bar for selected rows.
 
 ```story
 Default

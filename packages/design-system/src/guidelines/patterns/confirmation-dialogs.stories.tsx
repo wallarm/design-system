@@ -40,7 +40,7 @@ import {
   PageHeaderGroup,
   PageTitle,
 } from '../../components/Page';
-import type { TableCellContext, TableColumnDef } from '../../components/Table';
+import type { TableCellContext, TableColumnDef, TableRow } from '../../components/Table';
 import { Table } from '../../components/Table';
 import { useToast } from '../../components/Toast';
 import { Ellipsis } from '../../icons';
@@ -145,7 +145,7 @@ export const Default: StoryFn = () => {
       </Badge>
     );
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleDeleteSelect = () => {
       setSelected(user);
@@ -179,18 +179,10 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 220 },
+    { accessorKey: 'name', header: 'Name', size: 220, meta: { renderMenuAction } },
     { accessorKey: 'email', header: 'Email', size: 280 },
     { accessorKey: 'role', header: 'Role', size: 180 },
     { accessorKey: 'status', header: 'Status', size: 140, cell: renderStatus },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
-    },
   ];
 
   const handleDeleteOpenChange = (next: boolean) => {

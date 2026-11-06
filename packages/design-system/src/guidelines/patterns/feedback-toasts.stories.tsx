@@ -28,7 +28,7 @@ import {
   PageHeaderGroup,
   PageTitle,
 } from '../../components/Page';
-import type { TableCellContext, TableColumnDef } from '../../components/Table';
+import type { TableCellContext, TableColumnDef, TableRow } from '../../components/Table';
 import { Table } from '../../components/Table';
 import { ToastActions, useToast } from '../../components/Toast';
 import { Ellipsis } from '../../icons';
@@ -147,7 +147,7 @@ export const Default: StoryFn = () => {
     toast.create({ id: `delete-${deleteTarget.id}`, title: 'Channel deleted', type: 'default' });
   };
 
-  const renderActions = ({ row }: TableCellContext<Channel, unknown>) => {
+  const renderMenuAction = (row: TableRow<Channel>) => {
     const channel = row.original;
 
     const handleTest = async () => {
@@ -213,17 +213,9 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<Channel>[] = [
-    { accessorKey: 'name', header: 'Name', size: 240 },
+    { accessorKey: 'name', header: 'Name', size: 240, meta: { renderMenuAction } },
     { accessorKey: 'provider', header: 'Provider', size: 160 },
     { accessorKey: 'events', header: 'Events', size: 320 },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
-    },
   ];
 
   return (

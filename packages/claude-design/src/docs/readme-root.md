@@ -31,7 +31,7 @@ These are the design system's own rules (`src/guidelines/rules.md`), embedded at
 
 ## Screen sampler
 
-[`sampler.dc.html`](sampler.dc.html) is one canonical 1440-wide screen built only from this system through `x-import`: `AppShell`, a resource list `Page` with `PageHeader` and its create action, a `PageToolbar` with search and status tabs, an entity `Table` with a status `Badge` column and an always-visible actions column, a no-results `EmptyState`, and a detail `Drawer` opened by `open` with an empty nested table. It follows the `resource-list-page`, `entity-table` and `detail-drawer` pattern guides. Start a screen from it rather than from raw `div`s; the export checks that every class it uses exists in `components/bundle.css`.
+[`sampler.dc.html`](sampler.dc.html) is one canonical 1440-wide screen built only from this system through `x-import`: `AppShell`, a resource list `Page` with `PageHeader` and its create action, a `PageToolbar` with search and status tabs, an entity `Table` with a status `Badge` column and the row menu in the master cell (`meta.renderMenuAction`), a no-results `EmptyState`, and a detail `Drawer` opened by `open` with an empty nested table. It follows the `resource-list-page`, `entity-table` and `detail-drawer` pattern guides. Start a screen from it rather than from raw `div`s; the export checks that every class it uses exists in `components/bundle.css`.
 
 ## Content
 

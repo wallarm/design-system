@@ -23,9 +23,10 @@ test.describe('Pattern: Entity table', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render the row menu column correctly', async ({ page }) => {
+    test('Should render the row menu in the master cell correctly', async ({ page }) => {
       await entityTableStory.goto(page, 'Row Menu');
       await expect(page.getByTestId('users-table--container--row')).toHaveCount(6);
+      await page.getByTestId('users-table--container--row').first().hover();
       await expect(page).toHaveScreenshot();
     });
 
@@ -57,11 +58,9 @@ test.describe('Pattern: Entity table', () => {
 
     test('Should open the row menu with the destructive action last', async ({ page }) => {
       await entityTableStory.goto(page, 'Default');
-      await page
-        .getByTestId('users-table--container--row')
-        .first()
-        .getByRole('button', { name: 'Actions for Maria Lopez' })
-        .click();
+      const row = page.getByTestId('users-table--container--row').first();
+      await row.hover();
+      await row.getByRole('button', { name: 'Actions for Maria Lopez' }).click();
       const menu = page.getByTestId('users-row-menu--content');
       await expect(menu).toBeVisible();
       await expect(menu.getByRole('menuitem').last()).toHaveText('Delete user');

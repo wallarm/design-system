@@ -55,7 +55,7 @@ Spacing counts in pixels: `px-24` is 24px. See [Spacing](../foundations/spacing.
 **Table**
 
 - Pass `getRowId` so selection and row state survive refetches.
-- **Never** use `meta.renderMenuAction` for entity actions you expect to be always visible: its `…` shows only on row hover, an open menu or preview. Add a trailing actions column; see [Entity table](./entity-table.md).
+- Row actions live in the master cell: `meta.renderMenuAction` on the first column. **Never** add a trailing actions column; see [Entity table](./entity-table.md).
 
 **What does not exist**
 
