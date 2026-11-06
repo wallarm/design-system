@@ -41,10 +41,6 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: { description: { component: DESCRIPTION } },
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
-    },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof CodeSnippetRoot>;

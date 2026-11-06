@@ -9,11 +9,9 @@ const confirmationStory = createStoryHelper('patterns-confirmation-dialogs', [
 ] as const);
 
 const openUserActions = async (page: Page, name: string) => {
-  await page
-    .getByTestId('users-table--container--row')
-    .filter({ hasText: name })
-    .getByTestId('users-actions')
-    .click();
+  const row = page.getByTestId('users-table--container--row').filter({ hasText: name });
+  await row.hover();
+  await row.getByTestId('users-actions').click();
 };
 
 const openUnsavedChangesGuard = async (page: Page) => {

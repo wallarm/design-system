@@ -1,6 +1,6 @@
 # Icon Rules
 
-Icons in `packages/design-system/src/icons/` are generated from the [WADS-Iconography](https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/WADS-Iconography?node-id=5702-845) Figma page by `pnpm icons:sync`. Full usage: [`packages/design-system/README.md`](../../packages/design-system/README.md) → "Icons from Figma".
+Icons in `packages/design-system/src/icons/` are generated from the WADS-Iconography Figma page by `pnpm icons:sync`. Full usage: [`packages/design-system/README.md`](../../packages/design-system/README.md) → "Icons from Figma".
 
 ## When an icon is missing
 

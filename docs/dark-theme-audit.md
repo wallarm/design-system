@@ -4,8 +4,8 @@ The Foundation values match the repository: 257 palette colours and 218 semantic
 colour tokens outside syntax highlighting. Component-level checks nevertheless
 found incorrect inheritance and example composition.
 
-Sources: [WADS Foundations](https://www.figma.com/design/AfxTvEJd0kugrKqpyVigN4/WADS-Foundations?node-id=2841-3722)
-and [WADS Components](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components).
+Sources: WADS Foundations
+and WADS Components.
 
 ## Confirmed fixes
 
@@ -16,21 +16,21 @@ and [WADS Components](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-C
 | OverflowTooltip example | Rich content used `text-text-secondary`, a pale colour on the inverted tooltip surface in dark mode. | Uses `text-text-secondary-alt`. |
 | Button examples | `neutral-alt` examples sat on the normal page surface, obscuring their inverted text. They also showed an Outline combination absent from the Figma set. | Ghost/Secondary examples now sit on an inverted surface in normal, disabled and loading stories. The public Button API is unchanged. |
 
-References: [Toast](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=1576-14412),
-[muted Slate Badge](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=1098-93215),
-[neutral-alt Ghost](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=1576-8723),
-[neutral-alt Secondary](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=1576-8730).
+References: Toast,
+muted Slate Badge,
+neutral-alt Ghost,
+neutral-alt Secondary.
 
 ## Design discrepancies left visible
 
-- **Tooltip opacity:** the [dark example frame](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7128-136544)
+- **Tooltip opacity:** the dark example frame
   contains two different fills. The plain instance `7128:136546` has an unbound
   `slate-100 / 80%` fill; the keyboard instance `7128:136542` uses
   `component/tooltip-bg`, resolving to `slate-100 / 93%`. The implementation follows
   the latter token for both variants. The main text, radius, and absence of
   border/shadow agree. Changing the global token to match the local override would
   make the keyboard example disagree. No opacity changes were made.
-- **Primary Banner:** the [source component](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7688-3742)
+- **Primary Banner:** the source component
   is marked “No dark-ui”. Its actual bindings combine the inverted toast surface
   with ordinary tertiary description text and ordinary neutral outline controls.
   Those bindings are reproduced in code, but in dark mode the description and

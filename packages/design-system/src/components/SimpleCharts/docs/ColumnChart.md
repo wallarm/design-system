@@ -6,11 +6,9 @@
 
 It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` model — so the legend, grid, Y axis and hover popover are the `LineChart` slots, unchanged. It adds only what columns need: its own root, body, the stack, and an X axis that centres every label under its column.
 
-## Figma
+## Code Connect
 
-- Component: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12612-31838
-- Documentation (states, hover, fade, widths): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12610-10640
-- Code Connect: the `Type=Vertical stacked columns` branch of `Chart/Chart.figma.ts`.
+The `Type=Vertical stacked columns` branch of `Chart/Chart.figma.ts`.
 
 ## API
 
@@ -64,7 +62,7 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 - **Clickable legend** — pass `onClick` to `LineChartLegendItem`: it becomes `role='button'`, tabbable, Enter / Space click. What a click does is the consumer's (the Agentic Overview opens the verdict's list); the chart has no filter state.
 - **Empty / Loading** — no chart-specific frame: compose `LineChartEmpty` (with a message, or bare under skeleton legend items) in place of `ColumnChart`, as the stories do.
 
-- **Card height** — the card is 220px by default and goes down to 128px (Figma, WDS-194): `<Chart>` lowers its 196px floor to 128px when it holds a `column-chart`. At 128px the plot keeps 70px (grid 54 + labels 16) with a one-line legend; a legend that wraps takes its second line from the plot.
+- **Card height** — the card is 220px by default and goes down to 128px (Figma, WDS-194): `<Chart>` has no minimum height of its own. At 128px the plot keeps 70px (grid 54 + labels 16) with a one-line legend; a legend that wraps takes its second line from the plot.
 
 ## Interactions
 

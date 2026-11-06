@@ -35,3 +35,5 @@ The full step-by-step guide (file structure, examples, Storybook categories, che
 - ❌ `React.forwardRef` — use `ref` prop directly (React 19+)
 - ❌ Default exports for components — use named exports only
 - ❌ `useEffect` for derived state — compute during render
+- ❌ Figma URLs in stories (`parameters.design`), docs or comments — Figma is not public; a node URL belongs only in a `*.figma.ts` Code Connect header
+- ❌ A table actions column — row actions go in the master cell via `meta.renderMenuAction`

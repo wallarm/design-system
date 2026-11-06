@@ -1,7 +1,7 @@
 # Wallarm Design System for Claude Design
 
 Install [Wallarm Design System](https://github.com/wallarm/design-system) in Claude Design from
-one prompt. Paste the prompt from the [Claude Design guide](https://wallarm.github.io/design-system/ai/claude-design)
+one prompt. Paste the prompt from the [Claude Design guide](https://wallarm.github.io/design-system/ai/claude-design#your-own-copy)
 into a Claude Design chat; Claude runs:
 
 ```bash
@@ -14,9 +14,10 @@ The command writes `wallarm-design-system/` and never prompts:
 | --- | --- |
 | `project/` | The system to publish as a Design System artifact: runtime bundle, tokens, CSS, fonts, component guides and previews. Its index lists no asset groups until `index` adds them |
 | `assets/`, `assets.json` | The icon and logo SVGs for the system's galleries, uploaded as assets (not files), and their manifest (group, name, path, sha256, size, type, in gallery order) |
-| `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler |
+| `SETUP.md` | Claude's steps: publish the system, install it on a canvas, add and check the sampler and the app skeleton |
 | `UPDATE.md` | Claude's steps to update an installed system to this release (also written alone by `update`) |
 | `wallarm-sampler.dc.html` | The sampler artboard, linked to the canvas's `ds/wallarm-design-system/` copy |
+| `wallarm-app.dc.html` | The app skeleton (the system's `app-skeleton.dc.html`), linked the same way; Claude edits only its `APP` object |
 | `files.json` | Each written file with its sha256 |
 | `removed.json` | With `--existing`: the paths an update drops |
 
@@ -63,7 +64,7 @@ and `dist/` from `../design-system` (`DESIGN_SYSTEM_DIR` in `src/config.ts`); th
 `@wallarm-org/design-system` package is not affected. Each stable release publishes this package
 from `deploy-site.yml` (job `claude-design`): it runs `export`, sets the version to the tag and
 runs `pnpm publish`, whose `prepack` (`src/pack.ts`) packs `.claude-design/` into `dist/` with
-the rendered `content/SETUP.md` and `content/UPDATE.md` and the canvas sampler. Wallarm's own artifact is synced by hand
+the rendered `content/SETUP.md` and `content/UPDATE.md` and the canvas sampler and skeleton. Wallarm's own artifact is synced by hand
 with the [`claude-design-sync`](../../.claude/skills/claude-design-sync/SKILL.md) skill; the
 designer guide is `apps/website/docs/ai/claude-design.mdx`. What Storybook does not show, and
 so Claude Design cannot learn: [CLAUDE_DESIGN_GAP.md](./CLAUDE_DESIGN_GAP.md).
@@ -79,11 +80,11 @@ All under `src/`. Outside it: `bin/claude-design.js` (the npm CLI, plain Node ES
 | `tokens/` | Design tokens |
 | `docs/` | Component guides, prop types and the project README (embeds `design-system/src/guidelines/rules.md`) |
 | `previews/` | Story previews |
-| `sampler/` | The canonical screen `sampler.dc.html`, checked against the built CSS, tokens and exports, and shipped at the project root |
+| `sampler/` | The canonical screen `sampler.dc.html` and the app skeleton `app-skeleton.dc.html` (the README's "Start here"), checked against the built CSS, tokens and exports, and shipped at the project root |
 | `assets/` | Icons, fonts and the cover |
 | `harness/` | React 18 tests that mount the built bundle and previews |
 | `config.ts` | Artifact identity, namespace, budgets |
-| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (SVGs moved to `dist/assets/` with `assets.json`, rendered `SETUP.md` and `UPDATE.md`, canvas sampler) |
+| `pack.ts` | `prepack`: `.claude-design/` → `dist/` for npm (SVGs moved to `dist/assets/` with `assets.json`, rendered `SETUP.md` and `UPDATE.md`, canvas sampler and skeleton) |
 | `build.ts`, `verify.ts` | Builder and repeatability check |
 
 ### Commands

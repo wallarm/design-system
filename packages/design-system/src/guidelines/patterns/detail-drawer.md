@@ -45,7 +45,7 @@ A detail drawer is a `Drawer` with no footer. It shows one entity as `Attribute`
 **Spacing**
 
 - `DrawerBody` owns the 24px gutter. **Never** pad inside it or pass `className` to `DrawerHeader`/`DrawerBody`.
-- Attribute rows: `VStack gap={6} className='pb-8'`. Sections: `Separator spacing={4}`.
+- Attribute rows: `VStack gap={6} className='pb-8'`. Sections: `Separator spacing={4}`. **Never** a `Separator` above `Tabs`: `TabsList` draws its own line.
 - Section header: `HStack justify='between' align='center' className='py-8'`, `Heading as='h3' size='md' weight='medium'`, optional `Button size='small'`.
 - Full-width tabs: `<div className='-mx-24'>` around `TabsList`, not its `className`. Table 16px from the edge: `<div className='-mx-8'>` around `Table`, never on it. No other negative margins.
 
@@ -146,7 +146,7 @@ OldVersion
 
 ## Related
 
-- [Entity table](./entity-table.md), [Resource list page](./resource-list-page.md)
+- [Complex drawer](./complex-drawer.md) for events with charts, [Entity table](./entity-table.md), [Resource list page](./resource-list-page.md)
 - [Create and edit forms](./create-edit-forms.md), [Confirmation dialogs](./confirmation-dialogs.md)
 - [Action-result toasts](./feedback-toasts.md), [Empty states](./empty-states.md)
 - [Spacing](../foundations/spacing.md), [Layering](../foundations/layering.md)

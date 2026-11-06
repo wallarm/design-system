@@ -44,7 +44,7 @@ import {
   SegmentedTabsList,
   SegmentedTabsTrigger,
 } from '../../components/SegmentedTabs';
-import type { TableCellContext, TableColumnDef } from '../../components/Table';
+import type { TableCellContext, TableColumnDef, TableRow } from '../../components/Table';
 import { Table, TableEmptyState } from '../../components/Table';
 import { Ellipsis, FilterX, SearchX, Users } from '../../icons';
 
@@ -132,19 +132,10 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it on whole-page stories.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * The whole page: title, description and one create action in the header; search
- * and status tabs with counts in the toolbar; a user table with a status badge and an
- * always-visible actions column. Search and tabs filter the rows.
+ * and status tabs with counts in the toolbar; a user table with a status badge and a
+ * row menu in the master cell. Search and tabs filter the rows.
  */
 export const Default: StoryFn = () => {
   const [query, setQuery] = useState('');
@@ -176,7 +167,7 @@ export const Default: StoryFn = () => {
     <FormatDateTime value={row.original.lastSignIn} format='date' />
   );
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleEdit = () => onEditUser(user);
     const handleDeactivate = () => onDeactivateUser(user);
@@ -211,18 +202,16 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      size: 320,
+      cell: renderUser,
+      meta: { renderMenuAction },
+    },
     { accessorKey: 'role', header: 'Role', size: 200 },
     { accessorKey: 'status', header: 'Status', size: 140, cell: renderStatus },
     { accessorKey: 'lastSignIn', header: 'Last sign-in', size: 200, cell: renderLastSignIn },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
-    },
   ];
 
   const search = query.trim().toLowerCase();
@@ -314,7 +303,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-Default.decorators = hostShell;
 
 /** The title repeats the last crumb of the product's trail; one create action sits on the right. */
 export const Header: StoryFn = () => (
@@ -475,7 +463,6 @@ export const NoResults: StoryFn = () => {
     </Page>
   );
 };
-NoResults.decorators = hostShell;
 
 /**
  * Nothing exists yet: the real header with its create button, the toolbar, and an empty state
@@ -541,4 +528,3 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
-Empty.decorators = hostShell;

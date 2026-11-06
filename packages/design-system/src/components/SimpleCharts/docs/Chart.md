@@ -6,12 +6,6 @@
 
 Use it whenever a chart needs the standard Wallarm "simple chart" frame: a rounded surface with a 32px title bar and an optional actions cluster in the top-right that appears on hover.
 
-## Figma
-
-- Root (container + annotations): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-118206&m=dev
-- Header: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-31783&m=dev
-- Actions block: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-31786&m=dev
-
 ## API
 
 Compound component:
@@ -27,7 +21,7 @@ Compound component:
 `Chart` is a **block-level** element by default:
 
 - width: `w-full` (fills the parent's content area).
-- min-height: `196px` (Figma spec); `128px` when the card holds a `ColumnChart` (WDS-194).
+- height: content-sized, no minimum — a metric card can be shorter than a chart card. Give a fixed height through `className` (`h-196`) when cards in a row must match; a CSS grid row already stretches them. In a stretched card `Metric` and `HorizontalBarStack` sit at the bottom (`mt-auto`); `ColumnChart` grows to fill it.
 
 Consumers customise size through `className`, not dedicated props. This keeps the API small and lets Tailwind utilities compose naturally (`w-[640px]`, `h-320`, `max-w-lg`, `aspect-[16/9]`, …). If you need something rigid, prefer a wrapper:
 
@@ -64,7 +58,7 @@ None — `Chart` is a presentational container. Chart content lives in its child
 
 | State               | Trigger                                      | Behaviour                                                                                                                                          |
 | ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Default             | —                                            | Surface + border + min-height only. `ChartActions` is collapsed (`w-0 opacity-0 pointer-events-none`), so `ChartTitle` has the full header width. Buttons remain focusable via Tab. |
+| Default             | —                                            | Surface + border only. `ChartActions` is collapsed (`w-0 opacity-0 pointer-events-none`), so `ChartTitle` has the full header width. Buttons remain focusable via Tab. |
 | Hover (card-hover)  | Pointer enters any part of the card          | `ChartActions` expands to `w-auto opacity-100` and the title shifts left / truncates to make room.                                                 |
 | Focus-within        | Keyboard focus lands on any child            | Same as hover — actions become visible so keyboard users can reach them.                                                                           |
 | Actions always-on   | `<ChartActions alwaysVisible />`             | Actions stay in the flow at full width regardless of hover/focus. Use this when the action itself represents an active state (filtered, selected, pinned). |

@@ -97,15 +97,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it on whole-page stories.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * Settings › Profile: About, Preferences, Appearance, Security and the danger zone in one
  * left-aligned 640px column. Text saves on blur, choices on change, and every save shows a
@@ -425,7 +416,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-Default.decorators = hostShell;
 
 /**
  * Starts invalid: the message sits under the input inside the 320px wrapper, and nothing saves
@@ -672,4 +662,3 @@ export const Saving: StoryFn = () => {
     </Page>
   );
 };
-Saving.decorators = hostShell;

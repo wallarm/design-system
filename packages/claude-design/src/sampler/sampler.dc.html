@@ -52,7 +52,7 @@
           </x-import>
         </x-import>
         <x-import component-from-global-scope="WallarmDS.PageContent">
-          <!-- Entity table: Table draws its own frame and padding; the actions column is always visible. -->
+          <!-- Entity table: Table draws its own frame and padding; row actions live in the master cell. -->
           <x-import component-from-global-scope="WallarmDS.Table" aria-label="Users" data="{{rows}}" columns="{{columns}}" get-row-id="{{getRowId}}" active-row-id="{{activeRowId}}">
             <x-import component-from-global-scope="WallarmDS.TableEmptyState">
               <!-- No results: collection-empty inside a table, a reset action, never a create action. -->
@@ -172,8 +172,9 @@ class Component extends DCLogic {
       return (status === 'all' || user.status === status) &&
         (user.name.toLowerCase().includes(needle) || user.email.toLowerCase().includes(needle));
     });
-    // Always-visible row menu: a trailing display column, not meta.renderMenuAction.
-    var rowMenu = function (user) {
+    // Row menu in the master cell: meta.renderMenuAction on the first column, never a trailing actions column.
+    var rowMenu = function (row) {
+      var user = row.original;
       return h(DS.DropdownMenu, null,
         h(DS.DropdownMenuTrigger, { asChild: true },
           h(DS.Button, { variant: 'ghost', color: 'neutral', size: 'small', 'aria-label': 'Actions for ' + user.name },
@@ -189,7 +190,7 @@ class Component extends DCLogic {
         return h(DS.Avatar, { size: 'md' },
           h(DS.AvatarFallback, { name: user.name }),
           h(DS.AvatarContent, null, h(DS.AvatarName, null, user.name), h(DS.AvatarDescription, null, user.email)));
-      } },
+      }, meta: { renderMenuAction: rowMenu } },
       { accessorKey: 'status', header: 'Status', size: 140, cell: function (ctx) {
         var s = STATUS[ctx.row.original.status];
         return h(DS.Badge, { variant: 'dotted', type: 'secondary', color: s.color }, s.label);
@@ -199,9 +200,6 @@ class Component extends DCLogic {
       } },
       { accessorKey: 'lastActiveAt', header: 'Last active', size: 200, cell: function (ctx) {
         return h(DS.FormatDateTime, { value: ctx.row.original.lastActiveAt, format: 'relative' });
-      } },
-      { id: 'actions', header: '', size: 60, minSize: 60, enableHiding: false, enableSorting: false, cell: function (ctx) {
-        return rowMenu(ctx.row.original);
       } }
     ];
     return {

@@ -12,9 +12,6 @@ import {
 } from './HorizontalBarStack';
 import { HorizontalBarStackSkeleton } from './HorizontalBarStackSkeleton';
 
-const figmaUrl =
-  'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9667-10883';
-
 const severityData: HorizontalBarStackDatum[] = [
   { name: 'Critical', value: 42, color: 'red' },
   { name: 'High', value: 31, color: 'brand' },
@@ -31,7 +28,6 @@ const meta = {
   component: HorizontalBarStack,
   parameters: {
     layout: 'centered',
-    design: { type: 'figma', url: figmaUrl },
     docs: { description: { component: DESCRIPTION } },
   },
   args: {

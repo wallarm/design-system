@@ -32,10 +32,6 @@ const meta = {
   subcomponents: { ColumnChartBody, ColumnChartStack, ColumnChartXAxis },
   parameters: {
     layout: 'centered',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12612-31838',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],

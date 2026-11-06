@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 
-export const horizontalBarStackRootClasses = ['flex flex-col w-full'].join(' ');
+// `mt-auto` pins the stack to the bottom of a card stretched taller than its content.
+export const horizontalBarStackRootClasses = ['mt-auto flex flex-col w-full'].join(' ');
 
 export const horizontalBarStackBarWrapperClasses = ['px-16 py-8 w-full'].join(' ');
 

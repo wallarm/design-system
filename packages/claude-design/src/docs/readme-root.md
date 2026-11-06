@@ -4,6 +4,25 @@ Generated from wallarm/design-system — change it in code and run /claude-desig
 
 Wallarm's product UI system uses the real library components, semantic tokens and Geist fonts. Build with components first, style with semantic tokens second, and reach for primitives last. The generated canvas bundle uses the page's React 18 runtime.
 
+## Start here
+
+On a Design canvas, every screen lives inside the app skeleton: [`app-skeleton.dc.html`](app-skeleton.dc.html), the console frame with the header, the product rail, a product menu (`RemoteShell` from a `NavConfig`) and an empty `Page`. Set it up before the first screen:
+
+1. If the canvas has `project/wallarm-app.dc.html`, that is the person's skeleton: use it and never replace it. Otherwise copy this system's `app-skeleton.dc.html` to `project/wallarm-app.dc.html`. On a canvas this system is installed in `project/ds/<folder>/`, the folder this README is in; boards sit directly in `project/`. If that folder has no `app-skeleton.dc.html`, read `project/app-skeleton.dc.html` from the design system artifact the canvas was installed from. In the copy, replace the three link lines in `<head>` with these four, `<folder>` being that folder's name, and change nothing else:
+
+   ```html
+   <script src="./support.js"></script>
+   <link rel="stylesheet" href="ds/<folder>/tokens.css">
+   <link rel="stylesheet" href="ds/<folder>/components/bundle.css">
+   <script src="ds/<folder>/components/bundle.js"></script>
+   ```
+
+   Add it as the first board: merge `"wallarm-app.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 900, "title": "Wallarm app", "expand": "fill"}` into `boards` in `project/canvas.json` (right of the other boards if there are any: `x` is their largest `x + w` plus 80) and append `"wallarm-app.dc.html"` to `order`.
+2. Set up the shell only through its `APP` object, the block that starts with `var APP = {` at the top of its script, from the person's request: the product's name and path, its menu (`link`, `group` and `section-header` nodes; `drill` only if asked; ids and paths in kebab-case with punctuation dropped, `Detect & Respond` → `detect-respond`), the rail's products and `start`, the first link's path. Give every top-level link and group an `icon` (a `WallarmDS.Icons` name), or give none. When you rebuild the menu, drop the sample's `action` and `dividerAfter` unless the person names them. The comment above the object describes each field. With no product named, keep the sample. Leave the header, rails and product menu markup as it is.
+3. Design each requested screen inside the skeleton's `Page`, following its pattern guide. Set `start` to the path of the screen's menu link; if the screen has no link, add one to `APP.nav.items`, in kebab-case like the others, and set `start` to it. The link's label is the page title and its `action` the primary button. Keep `PageHeader`; add `PageDescription` in its `PageHeaderGroup` and a `PageToolbar` (search, tabs, filters) between `PageHeader` and `PageContent`; on a page that lists rows, set `fixed-height="{{yes}}"` on `Page`. Replace the `EmptyState` in `PageContent` with the screen. The screen's own data (table rows, counts) goes in `renderVals()`, outside `APP`. For several screens, make one board per screen: a copy of the skeleton under a new file name, with its own `start`.
+
+Skip the skeleton only when the person asks for a standalone component or a screen without the app frame. The console must show no `[WallarmDS]` warning, and clicking a menu item moves the highlight, the breadcrumb and the page title.
+
 ## Rules
 
 These are the design system's own rules (`src/guidelines/rules.md`), embedded at build time. On the canvas, read `get_guideline` as "the pattern guide": they ship in the npm package under `dist/guidelines/` (`rules.md`, `foundations/`, `patterns/`) and through the MCP server's `get_guideline` tool.
@@ -12,7 +31,7 @@ These are the design system's own rules (`src/guidelines/rules.md`), embedded at
 
 ## Screen sampler
 
-[`sampler.dc.html`](sampler.dc.html) is one canonical 1440-wide screen built only from this system through `x-import`: `AppShell`, a resource list `Page` with `PageHeader` and its create action, a `PageToolbar` with search and status tabs, an entity `Table` with a status `Badge` column and an always-visible actions column, a no-results `EmptyState`, and a detail `Drawer` opened by `open` with an empty nested table. It follows the `resource-list-page`, `entity-table` and `detail-drawer` pattern guides. Start a screen from it rather than from raw `div`s; the export checks that every class it uses exists in `components/bundle.css`.
+[`sampler.dc.html`](sampler.dc.html) is one canonical 1440-wide screen built only from this system through `x-import`: `AppShell`, a resource list `Page` with `PageHeader` and its create action, a `PageToolbar` with search and status tabs, an entity `Table` with a status `Badge` column and the row menu in the master cell (`meta.renderMenuAction`), a no-results `EmptyState`, and a detail `Drawer` opened by `open` with an empty nested table. It follows the `resource-list-page`, `entity-table` and `detail-drawer` pattern guides. Start a screen from it rather than from raw `div`s; the export checks that every class it uses exists in `components/bundle.css`.
 
 ## Content
 
@@ -59,7 +78,7 @@ These are the design system's own rules (`src/guidelines/rules.md`), embedded at
 
 ## Layout on a canvas
 
-- Start from the [screen sampler](#screen-sampler). `AppShell` is the frame; `Card` → `CardHeader` / `CardContent` / `CardFooter` groups content.
+- Start inside the [app skeleton](#start-here); the [screen sampler](#screen-sampler) shows a finished screen. `AppShell` is the frame; `Card` → `CardHeader` / `CardContent` / `CardFooter` groups content.
 - A number prop such as `gap` is a `{{hole}}` from `renderVals()`: `gap="{{rowGap}}"` with `rowGap: 6`.
 - When a raw grid is unavoidable, use the layout kit: `grid grid-cols-4 gap-16`, `md:grid-cols-2`, `col-span-2`, `w-1/3`, `max-w-7xl`, `divide-y divide-border-primary-light`, `first:`/`last:` padding and border resets. Give flex and grid children `min-w-0` so they can shrink.
 - Responsive variants (`sm:`, `md:`, `lg:`, `xl:`) follow the viewport, not the artboard.

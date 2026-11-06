@@ -45,10 +45,6 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11973-4142&m=dev',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],

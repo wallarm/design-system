@@ -1,13 +1,17 @@
 import { beforeAll, describe, expect, it } from '@rstest/core';
 import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
+import { boardEntry, CANVAS_FOLDER, CANVAS_HEAD, CANVAS_SKELETON } from '../pack';
+import { SKELETON_DATA, SKELETON_FILE } from '../sampler/sampler';
 import { assertStoriesShipped, buildDocs } from './build-docs';
 import { CONTROLLED_OPEN, DEFAULT_OPEN } from './consuming';
 import { storyGuide } from './story-guide';
 
+const skeleton = readFileSync(new URL(`../sampler/${SKELETON_FILE}`, import.meta.url), 'utf8');
 const guideName = (storyFile: string): string => path.basename(storyFile, '.stories.tsx');
 
 describe('Claude Design documentation', () => {
@@ -69,6 +73,25 @@ describe('Claude Design documentation', () => {
     expect(readme).not.toContain('<!-- rules.md -->');
     for (const required of ['sampler.dc.html', 'dist/guidelines/', 'get_guideline'])
       expect(readme).toContain(required);
+  });
+
+  it('opens with a Start here section that sets up the skeleton the export ships', async () => {
+    const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
+    const sections = readme.split('\n').filter(line => line.startsWith('## '));
+    expect(sections[0]).toBe('## Start here');
+    const start = readme.slice(readme.indexOf('## Start here'), readme.indexOf(sections[1]!));
+    for (const required of [
+      `(${SKELETON_FILE})`,
+      `project/${CANVAS_SKELETON}`,
+      SKELETON_DATA,
+      ...CANVAS_HEAD.replaceAll(CANVAS_FOLDER, '<folder>').split('\n'),
+      JSON.stringify(boardEntry(skeleton, CANVAS_SKELETON).entry)
+        .slice(1, -1)
+        .replaceAll(/([:,])/g, '$1 '),
+    ])
+      expect(start).toContain(required);
+    // test:export runs after `export`, so the shipped project is on disk.
+    expect(existsSync(path.resolve('.claude-design/project', SKELETON_FILE))).toBe(true);
   });
 
   it('only advertises default-open for overlays that have defaultOpen', async () => {

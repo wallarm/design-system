@@ -1,8 +1,8 @@
 ---
 title: Empty states
-description: Use when a table, nested table, tab, section, column or menu has no content and you must pick the EmptyState scale, copy and action.
+description: Use when a table, nested table, tab, section, column or menu has no content or failed to load and you must pick the EmptyState scale, copy and action.
 components: [EmptyState, EmptyStateIllustration, EmptyStateMessage, EmptyStateTitle, EmptyStateDescription, EmptyStateActions, EmptyStateLink, TableEmptyState, Table, SelectEmptyState, FilterDropdownEmpty, FilterCascadeEmpty, Tabs, TabsContent, Button]
-keywords: [empty state, empty, no data, no results, nothing found, zero state, blank slate, no items yet, nothing yet, first use, onboarding, empty table, empty tab, empty column, empty list, dependency, select first, reset filters, caught up, placeholder]
+keywords: [empty state, failed to load, load error, try again, empty, no data, no results, nothing found, zero state, blank slate, no items yet, nothing yet, first use, onboarding, empty table, empty tab, empty column, empty list, dependency, select first, reset filters, caught up, placeholder]
 order: 90
 ---
 
@@ -25,7 +25,7 @@ An empty state is `EmptyState` placed where the content would be. The header aro
 | A `FilterCascade` search with no matches | Nothing: `FilterCascadeEmpty` shows itself | `EmptyState` |
 | One missing value in a cell or attribute | The em dash `'—'`. See [Entity table](./entity-table.md) | `EmptyState` |
 | Data is loading | `Table isLoading` (skeleton rows) | Any empty state |
-| A request failed | Your own error message | `EmptyState` |
+| A list or table failed to load | `EmptyState` in place of the rows, with "Try again" | An `Alert` above an empty table |
 
 `type` sets the scale, not the cause. If the empty area fills a page, table or panel, use `collection-empty` (the default). If it sits in a small container, use `no-results`.
 
@@ -55,6 +55,7 @@ An empty state is `EmptyState` placed where the content would be. The header aro
 - Show one create action per screen. If `PageActions` or a section header has the create button, the empty state has no button.
 - If no header has a create button, put `Button size='medium'` in `EmptyStateActions`.
 - If search or filters matched nothing, offer "Reset filters" as `Button variant='outline' color='neutral'`. **Never** a create action.
+- If a list failed to load, say what failed ("Couldn't load triggers") and offer "Try again" as `Button variant='outline' color='neutral'`. If access is denied, name the permission and add no button.
 - If a dependency is missing, name the choice that unlocks the area. **Never** say "No {items} yet".
 - If one area can be dependency-empty or nothing-yet, switch the copy.
 - If each tab can be empty, write copy per tab. **Never** reuse one sentence across tabs.
@@ -110,14 +111,14 @@ SmallContainers
 | Earlier choice missing | "Select a service first", no action | `EmptyState` |
 | Tab empty | Per-tab copy, no action: "You're all caught up" (`CheckCheck`), "Nothing read yet" (`History`) | `EmptyState` in `TabsContent` |
 | Column, card or chart empty | Title only, or description only in a chart | `EmptyState type='no-results'` |
-| Request failed | Your own message | App-rendered |
+| List failed to load | "Couldn't load {items}" + "Try again"; while retrying, skeleton rows | `EmptyState` › `EmptyStateActions` |
 
 ## What your app owns
 
 - **The cause.** The DS cannot tell nothing-yet, filtered and dependency-missing apart. Pass your own flag.
 - **Copy.** `EmptyState` has no default strings.
 - **Dependency gating.** Show the dependency state until the earlier field has a value. See [Create and edit forms](./create-edit-forms.md).
-- **Errors.** There is no error variant. Render your own message.
+- **Errors.** There is no error `type`: pass the failure and the retry yourself. A failed page, not a list, is your own message in `PageContent`.
 - **Notification center.** No popover block exists. Compose `Popover`, `Tabs` and `EmptyState`.
 - **Kanban.** No kanban component exists. Centre `EmptyState type='no-results'` in your column.
 - **Figma drift.** Figma flags the empty state component for an update. Follow the code scale until it changes.

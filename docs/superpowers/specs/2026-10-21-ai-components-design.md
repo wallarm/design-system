@@ -25,7 +25,7 @@
    - **Timestamps** are the app's job (`metadata.createdAt`). `WallyAssistant` formats it through `formatTimestamp`, which defaults to DS `formatRelativeTime`. *(Amended by v2 §14.)*
    - **Drawer-trigger mascot:** out of scope; use the existing `WallyIcon`.
    - **ChatInput `context` bar** is included, as in Figma Variant2.
-   - **Code Connect** uses Figma fileKey `bsqgrzkpIB2yPVlNpgU8jN` (Wally — AI Assistant). URL format: `https://www.figma.com/design/bsqgrzkpIB2yPVlNpgU8jN/Wally-%E2%80%94-AI-Assistnat?node-id=<id-with-dash>`.
+   - **Code Connect** uses Figma fileKey `bsqgrzkpIB2yPVlNpgU8jN` (Wally — AI Assistant). URL format: `https://www.figma.com/design/<fileKey>/<file>?node-id=<id-with-dash>`.
 
 6. **AI Assistant trigger button (Figma 101:1034, "button to trigger drawer")** is now **in scope**, as `ChatTrigger` in the `Chat` folder.
    - It is a ghost small icon `Button` (24px) that holds the Wally mascot (`WallyIcon`).

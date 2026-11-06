@@ -79,10 +79,6 @@ const meta = {
   title: 'Data Display/SimpleCharts/Overview',
   parameters: {
     layout: 'padded',
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121203&m=dev',
-    },
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],

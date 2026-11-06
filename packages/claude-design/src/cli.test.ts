@@ -61,13 +61,14 @@ beforeEach(() => {
   writeFileSync(join(root, 'dist/SETUP.md'), '# Setup');
   writeFileSync(join(root, 'dist/UPDATE.md'), '# Update to 9.8.7');
   writeFileSync(join(root, 'dist/wallarm-sampler.dc.html'), '<x-dc></x-dc>');
+  writeFileSync(join(root, 'dist/wallarm-app.dc.html'), '<x-dc></x-dc>');
   cwd = join(root, 'work');
   mkdirSync(cwd);
 });
 afterEach(() => rmSync(root, { recursive: true, force: true }));
 
 describe('claude-design export', () => {
-  it('writes the export, SETUP, sampler and files.json into a fresh folder', () => {
+  it('writes the export, SETUP, sampler, skeleton and files.json into a fresh folder', () => {
     const { code, stdout } = run('export');
     expect(code).toBe(0);
     expect(stdout).toContain(
@@ -77,6 +78,7 @@ describe('claude-design export', () => {
     const out = join(cwd, 'wallarm-design-system');
     expect(readFileSync(join(out, 'SETUP.md'), 'utf8')).toBe('# Setup');
     expect(existsSync(join(out, 'wallarm-sampler.dc.html'))).toBe(true);
+    expect(existsSync(join(out, 'wallarm-app.dc.html'))).toBe(true);
     expect(existsSync(join(out, 'removed.json'))).toBe(false);
     expect(Object.keys(JSON.parse(readFileSync(join(out, 'files.json'), 'utf8')))).toEqual([
       'SETUP.md',
@@ -87,6 +89,7 @@ describe('claude-design export', () => {
       'assets/Logos/wallarm.svg',
       'project/components/index.d.ts',
       'project/design-system.json',
+      'wallarm-app.dc.html',
       'wallarm-sampler.dc.html',
     ]);
   });

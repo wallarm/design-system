@@ -1,8 +1,8 @@
 # Avatar — design spec
 
 - **Figma:**
-  - [Platform → Profile → `user-avatar` instance](https://www.figma.com/design/A7sIomAIt44HIBqxdSfmxx/Platform?node-id=2156-1537)
-  - [Platform → Profile → avatar upload/edit examples](https://www.figma.com/design/A7sIomAIt44HIBqxdSfmxx/Platform?node-id=2159-1577)
+  - Platform → Profile → `user-avatar` instance
+  - Platform → Profile → avatar upload/edit examples
   - The library master is `user-avatar` (component set key `3c8ef35992934b2704efe50c848715e03a1820ea`) in **WADS Components** (`VKb5gW46uSGw0rqrhZsbXT`).
 - **Base:** `@ark-ui/react/avatar` (Ark 5.38.0). Chakra UI v3's Avatar is built on the same primitive.
 - **API reference:** [Chakra UI Avatar](https://chakra-ui.com/docs/components/avatar), adapted to DS naming (flat `AvatarImage` rather than `Avatar.Image`).
@@ -243,7 +243,7 @@ src/index.ts                                         (export Avatar)
 
 ## 12. Amendment 2026-10-20 — WDS-191: user item and compact sizes
 
-Figma: `user-avatar` [12336:5504](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12336-5504) (props `Size` Small | Medium, `Type` Photo | Nuetral | Branded) and `user-item` [12557:5856](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12557-5856) (prop `Size`).
+Figma: `user-avatar` 12336:5504 (props `Size` Small | Medium, `Type` Photo | Nuetral | Branded) and `user-item` 12557:5856 (prop `Size`).
 
 **Sizes (breaking rename).** Old `xs` → `md`, old `sm` → `lg`. `NavRailItem` now uses `md`.
 

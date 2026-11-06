@@ -32,6 +32,7 @@ import { Page, PageContent } from '../../components/Page';
 import type {
   TableCellContext,
   TableColumnDef,
+  TableRow,
   TableRowSelectionState,
   TableSortingState,
 } from '../../components/Table';
@@ -132,15 +133,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * Adds an ID in `Code` and an exact time to the `Cells` vocabulary. Sort by any header; select
  * rows to bring up the bulk bar.
@@ -191,7 +183,7 @@ export const Default: StoryFn = () => {
 
   const renderRequests = ({ row }: TableCellContext<User, unknown>) => row.original.requests ?? '—';
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleEdit = () => onEditUser(user);
     const handleResend = () => onResendInvite(user);
@@ -232,7 +224,13 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      size: 320,
+      cell: renderUser,
+      meta: { renderMenuAction },
+    },
     { accessorKey: 'id', header: 'User ID', size: 160, cell: renderId },
     {
       accessorKey: 'groups',
@@ -249,14 +247,6 @@ export const Default: StoryFn = () => {
       size: 140,
       meta: { sortType: 'number', description: { type: 'tooltip', content: 'Last 24 hours' } },
       cell: renderRequests,
-    },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
     },
   ];
 
@@ -290,8 +280,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-
-Default.decorators = hostShell;
 
 /**
  * Tags collapse into "+N" when the column runs out of room; a user with no groups or no requests
@@ -367,8 +355,8 @@ export const Cells: StoryFn = () => {
 };
 
 /**
- * The column has an `id` and no `accessorKey`, and can't be hidden, so the menu never disappears
- * behind the column settings.
+ * Hover a row: the `…` appears in the master cell, `meta.renderMenuAction` on the first column. The
+ * trigger names the row and the destructive item comes last.
  */
 export const RowMenu: StoryFn = () => {
   const renderUser = ({ row }: TableCellContext<User, unknown>) => (
@@ -381,7 +369,7 @@ export const RowMenu: StoryFn = () => {
     </Avatar>
   );
 
-  const renderActions = ({ row }: TableCellContext<User, unknown>) => {
+  const renderMenuAction = (row: TableRow<User>) => {
     const user = row.original;
     const handleEdit = () => onEditUser(user);
     const handleDeactivate = () => onDeactivateUser(user);
@@ -416,14 +404,12 @@ export const RowMenu: StoryFn = () => {
   };
 
   const columns: TableColumnDef<User>[] = [
-    { accessorKey: 'name', header: 'Name', size: 320, cell: renderUser },
     {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
+      accessorKey: 'name',
+      header: 'Name',
+      size: 320,
+      cell: renderUser,
+      meta: { renderMenuAction },
     },
   ];
 
@@ -471,7 +457,6 @@ export const Loading: StoryFn = () => {
     </Page>
   );
 };
-Loading.decorators = hostShell;
 
 /**
  * `EmptyState type='collection-empty'` inside `TableEmptyState`. It has no button when the page
@@ -514,4 +499,3 @@ export const Empty: StoryFn = () => {
     </Page>
   );
 };
-Empty.decorators = hostShell;

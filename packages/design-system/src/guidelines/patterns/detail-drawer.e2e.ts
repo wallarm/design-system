@@ -22,24 +22,28 @@ test.describe('Pattern: Detail drawer', () => {
 
     test('Should render the header correctly', async ({ page }) => {
       await detailDrawerStory.goto(page, 'Header');
+      await page.getByTestId('provider-drawer--trigger').click();
       await expect(page.getByTestId('provider-drawer--header')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the attributes correctly', async ({ page }) => {
       await detailDrawerStory.goto(page, 'Attributes');
+      await page.getByTestId('provider-drawer--trigger').click();
       await expect(page.getByTestId('provider-attributes')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the section correctly', async ({ page }) => {
       await detailDrawerStory.goto(page, 'Section');
+      await page.getByTestId('provider-drawer--trigger').click();
       await expect(page.getByTestId('provider-defaults-section')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render the nested table correctly', async ({ page }) => {
       await detailDrawerStory.goto(page, 'Nested Table');
+      await page.getByTestId('provider-drawer--trigger').click();
       await expect(page.getByTestId('provider-rules-empty')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });

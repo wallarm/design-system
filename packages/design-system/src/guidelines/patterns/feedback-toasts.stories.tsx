@@ -28,7 +28,7 @@ import {
   PageHeaderGroup,
   PageTitle,
 } from '../../components/Page';
-import type { TableCellContext, TableColumnDef } from '../../components/Table';
+import type { TableCellContext, TableColumnDef, TableRow } from '../../components/Table';
 import { Table } from '../../components/Table';
 import { ToastActions, useToast } from '../../components/Toast';
 import { Ellipsis } from '../../icons';
@@ -104,15 +104,6 @@ const meta = {
 
 export default meta;
 
-// The host shell gives a page its height; 640px stands in for it on whole-page stories.
-const hostShell: StoryFn['decorators'] = [
-  Story => (
-    <div className='h-640'>
-      <Story />
-    </div>
-  ),
-];
-
 /**
  * The whole page, with every toast from the one app-root `Toaster`: create, then send test, copy
  * link and delete from each row's menu. The parts below show each toast on its own.
@@ -147,7 +138,7 @@ export const Default: StoryFn = () => {
     toast.create({ id: `delete-${deleteTarget.id}`, title: 'Channel deleted', type: 'default' });
   };
 
-  const renderActions = ({ row }: TableCellContext<Channel, unknown>) => {
+  const renderMenuAction = (row: TableRow<Channel>) => {
     const channel = row.original;
 
     const handleTest = async () => {
@@ -213,17 +204,9 @@ export const Default: StoryFn = () => {
   };
 
   const columns: TableColumnDef<Channel>[] = [
-    { accessorKey: 'name', header: 'Name', size: 240 },
+    { accessorKey: 'name', header: 'Name', size: 240, meta: { renderMenuAction } },
     { accessorKey: 'provider', header: 'Provider', size: 160 },
     { accessorKey: 'events', header: 'Events', size: 320 },
-    {
-      id: 'actions',
-      header: '',
-      size: 60,
-      minSize: 60,
-      enableHiding: false,
-      cell: renderActions,
-    },
   ];
 
   return (
@@ -280,8 +263,6 @@ export const Default: StoryFn = () => {
     </Page>
   );
 };
-
-Default.decorators = hostShell;
 
 /** The description switches the toast to the extended layout, so it stays 10000 ms. */
 export const NextStep: StoryFn = () => {

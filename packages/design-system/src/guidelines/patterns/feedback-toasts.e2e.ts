@@ -53,10 +53,11 @@ test.describe('Pattern: Feedback toasts', () => {
 
     test('Should turn the loading toast into the result in place', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Default');
-      await page
-        .getByTestId('channels-table')
-        .getByRole('button', { name: 'Actions for #soc-alerts' })
-        .click();
+      const row = page.getByTestId('channels-table--container--row').filter({
+        has: page.getByRole('button', { name: 'Actions for #soc-alerts' }),
+      });
+      await row.hover();
+      await row.getByRole('button', { name: 'Actions for #soc-alerts' }).click();
       await page
         .getByTestId('channel-actions--content')
         .getByRole('menuitem', { name: 'Send test' })
@@ -68,10 +69,11 @@ test.describe('Pattern: Feedback toasts', () => {
 
     test('Should close the dialog, then toast and remove the deleted row', async ({ page }) => {
       await feedbackToastsStory.goto(page, 'Default');
-      await page
-        .getByTestId('channels-table')
-        .getByRole('button', { name: 'Actions for SIEM ingest' })
-        .click();
+      const row = page.getByTestId('channels-table--container--row').filter({
+        has: page.getByRole('button', { name: 'Actions for SIEM ingest' }),
+      });
+      await row.hover();
+      await row.getByRole('button', { name: 'Actions for SIEM ingest' }).click();
       await page
         .getByTestId('channel-actions--content')
         .getByRole('menuitem', { name: 'Delete channel' })
