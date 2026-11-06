@@ -3,9 +3,7 @@ import { cva } from 'class-variance-authority';
 export const chartRootClasses = [
   'group/chart',
   'relative flex flex-col',
-  'w-full min-h-196',
-  // A vertical stacked columns card shrinks further (Figma, WDS-194): its plot follows the card.
-  'has-[[data-slot=column-chart]]:min-h-128',
+  'w-full min-h-128',
   'bg-bg-surface-1',
   'border border-border-primary-light',
   'rounded-8',

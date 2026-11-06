@@ -64,7 +64,7 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 - **Clickable legend** — pass `onClick` to `LineChartLegendItem`: it becomes `role='button'`, tabbable, Enter / Space click. What a click does is the consumer's (the Agentic Overview opens the verdict's list); the chart has no filter state.
 - **Empty / Loading** — no chart-specific frame: compose `LineChartEmpty` (with a message, or bare under skeleton legend items) in place of `ColumnChart`, as the stories do.
 
-- **Card height** — the card is 220px by default and goes down to 128px (Figma, WDS-194): `<Chart>` lowers its 196px floor to 128px when it holds a `column-chart`. At 128px the plot keeps 70px (grid 54 + labels 16) with a one-line legend; a legend that wraps takes its second line from the plot.
+- **Card height** — the card is 220px by default and goes down to 128px (Figma, WDS-194): `<Chart>`'s floor is 128px. At 128px the plot keeps 70px (grid 54 + labels 16) with a one-line legend; a legend that wraps takes its second line from the plot.
 
 ## Interactions
 
