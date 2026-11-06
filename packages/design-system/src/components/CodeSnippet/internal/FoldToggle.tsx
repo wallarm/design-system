@@ -26,7 +26,7 @@ export const FoldToggle: FC<{
     <button
       type='button'
       className={cn(
-        'flex items-center justify-center w-16 h-16 rounded-2 text-text-secondary hover:text-text-primary hover:bg-bg-secondary-hover transition-colors cursor-pointer',
+        'flex items-center justify-center w-16 h-16 rounded-2 text-text-secondary hover:text-text-primary hover:bg-states-primary-hover transition-colors cursor-pointer',
         className,
       )}
       aria-expanded={!isCollapsed}

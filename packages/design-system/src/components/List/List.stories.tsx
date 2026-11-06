@@ -73,7 +73,7 @@ export const WithIcons: StoryFn<typeof meta> = () => (
       Pending review
     </ListItem>
     <ListItem>
-      <ListIcon className='text-text-error'>&#10007;</ListIcon>
+      <ListIcon className='text-text-danger'>&#10007;</ListIcon>
       Failed check
     </ListItem>
   </List>
