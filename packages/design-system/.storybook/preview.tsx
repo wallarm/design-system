@@ -54,8 +54,10 @@ const preview: Preview = {
       storySort: {
         order: [
           'Documentation',
-          // Real screens from src/guidelines/patterns/<slug>.stories.tsx, right after the docs.
+          // Real screens from src/guidelines/patterns/<slug>.stories.tsx, right after the docs,
+          // then whole example pages from src/guidelines/templates/<slug>.stories.tsx.
           'Patterns',
+          'Templates',
           'Components',
           'Data Display',
           // Chart is pinned last: it's the foundational card frame the other charts compose,

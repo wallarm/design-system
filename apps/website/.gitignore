@@ -3,6 +3,7 @@ docs/components/
 docs/foundations/*
 !docs/foundations/icons.mdx
 docs/patterns/
+docs/templates/
 docs/get-started/changelog.md
 docs/public/components.json
 doc_build_local

@@ -218,12 +218,12 @@ async function main() {
     'list_guidelines',
     {
       description:
-        'Use when starting a screen or flow, or unsure about spacing, colour or typography rules — lists foundations and patterns with slug, title, description and components.',
+        'Use when starting a screen or flow, or unsure about spacing, colour or typography rules — lists foundations, patterns and templates (complete example screens) with slug, title, description and components.',
       inputSchema: {
         kind: z
-          .enum(['foundation', 'pattern'])
+          .enum(['foundation', 'pattern', 'template'])
           .optional()
-          .describe('Only list foundations or only patterns; omit for both'),
+          .describe('Only list one kind; omit for all'),
       },
     },
     async ({ kind }) => ({
@@ -242,12 +242,12 @@ async function main() {
     'get_guideline',
     {
       description:
-        "Use when composing a screen (read the matching pattern first) or applying a foundation — returns the guideline as markdown. Pass `section` to get one section only; `section: 'stories'` returns a pattern's full live-story code (paginated — pass `page`).",
+        "Use when composing a screen (read the matching pattern first) or applying a foundation — returns the guideline as markdown. Pass `section` to get one section only; `section: 'stories'` returns a pattern's or template's full live-story code (paginated — pass `page`).",
       inputSchema: {
         slug: z
           .string()
           .describe(
-            'Guideline slug from list_guidelines, e.g. "patterns/entity-table" or "foundations/spacing"',
+            'Guideline slug from list_guidelines, e.g. "patterns/entity-table", "templates/security-dashboard" or "foundations/spacing"',
           ),
         section: z
           .string()

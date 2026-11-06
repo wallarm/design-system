@@ -62,21 +62,30 @@ writeFileSync(
 const { guidelines }: GuidelinesMetadata = JSON.parse(readFileSync(guidelinesPath, 'utf8'));
 const link = componentPageResolver(metadata.components);
 const foundations = guidelines.filter(g => g.kind === 'foundation');
-const patterns = guidelines.filter(g => g.kind === 'pattern');
-const patternsDir = path.join(docs, 'patterns');
-rmSync(patternsDir, { recursive: true, force: true });
-mkdirSync(patternsDir, { recursive: true });
-// Pattern stories live next to their markdown: src/guidelines/patterns/<slug>.stories.tsx.
-const patternStoryBase = path
-  .relative(patternsDir, path.join(ds, 'src/guidelines/patterns'))
-  .split(path.sep)
-  .join('/');
+// Pattern and template stories live next to their markdown: src/guidelines/<dir>/<slug>.stories.tsx.
+const STORY_DIRS = { pattern: 'patterns', template: 'templates' } as const;
+const storyBase = (dir: string) =>
+  path
+    .relative(path.join(docs, dir), path.join(ds, 'src/guidelines', dir))
+    .split(path.sep)
+    .join('/');
+for (const dir of Object.values(STORY_DIRS)) {
+  rmSync(path.join(docs, dir), { recursive: true, force: true });
+  mkdirSync(path.join(docs, dir), { recursive: true });
+}
 for (const g of guidelines)
   writeFileSync(
     path.join(docs, `${g.slug}.mdx`),
-    renderGuidelinePage(g, link, g.kind === 'pattern' ? { storyImportBase: patternStoryBase } : {}),
+    renderGuidelinePage(
+      g,
+      link,
+      g.kind === 'foundation' ? {} : { storyImportBase: storyBase(STORY_DIRS[g.kind]) },
+    ),
   );
-writeFileSync(path.join(patternsDir, '_meta.json'), renderGuidelinesMeta(patterns));
+const patterns = guidelines.filter(g => g.kind === 'pattern');
+const templates = guidelines.filter(g => g.kind === 'template');
+writeFileSync(path.join(docs, 'patterns/_meta.json'), renderGuidelinesMeta(patterns));
+writeFileSync(path.join(docs, 'templates/_meta.json'), renderGuidelinesMeta(templates));
 writeFileSync(
   path.join(docs, 'foundations/_meta.json'),
   renderGuidelinesMeta(foundations, { before: ['tokens'], after: ['icons'] }),

@@ -18,11 +18,20 @@ const DESCRIPTION_MAX_CHARS = 200;
 const KIND_DIRS: Record<string, GuidelineKind> = {
   foundations: 'foundation',
   patterns: 'pattern',
+  templates: 'template',
 };
 
 const REQUIRED_SECTIONS: Record<GuidelineKind, string[]> = {
   foundation: ['What you use', 'Rules', 'Examples', 'Reference'],
   pattern: ['When to use', 'Rules', 'Examples', 'States', 'What your app owns', 'Related'],
+  // A template is one complete screen; its rules live in the patterns it composes.
+  template: ['What it shows', 'Examples', 'Related'],
+};
+
+/** Storybook title prefix of the sibling `.stories.tsx` (foundations have none). */
+const STORY_TITLE: Partial<Record<GuidelineKind, string>> = {
+  pattern: 'Patterns',
+  template: 'Templates',
 };
 
 /** A story reference: a ```story fence holding one export name of the sibling `.stories.tsx`. */
@@ -48,7 +57,7 @@ export const resolveStoryRefs = (markdown: string, stories: GuidelineStory[]) =>
     return story.description ? `${story.description}\n\n${code}` : code;
   });
 
-/** Pattern examples are story refs: no tsx fences, at least two, every story used once. */
+/** Pattern and template examples are story refs: no tsx fences, at least two, every story used once. */
 const checkStoryRefs = (
   body: string,
   sections: GuidelineSection[],
@@ -166,7 +175,11 @@ export const findPrivateStoryImports = (
 };
 
 /** Max prose words per guideline body (code fences excluded). */
-const WORD_BUDGET: Record<GuidelineKind, number> = { foundation: 700, pattern: 1000 };
+const WORD_BUDGET: Record<GuidelineKind, number> = {
+  foundation: 700,
+  pattern: 1000,
+  template: 400,
+};
 
 /** Words in a markdown body, not counting fenced code blocks. */
 export const countProseWords = (body: string) =>
@@ -323,13 +336,13 @@ const parseGuidelineFile = (
 
   for (const problem of findInternalUsage(body, api.internal)) fail(problem);
 
-  const stories =
-    kind === 'pattern'
-      ? parseStories(filePath, title, fail, api, message =>
-          errors.push(`${slug}.stories.tsx: ${message}`),
-        )
-      : undefined;
-  if (kind === 'pattern') {
+  const storyTitle = STORY_TITLE[kind];
+  const stories = storyTitle
+    ? parseStories(filePath, `${storyTitle}/${title}`, fail, api, message =>
+        errors.push(`${slug}.stories.tsx: ${message}`),
+      )
+    : undefined;
+  if (storyTitle) {
     const storiesFile = path.basename(filePath).replace(/\.md$/, '.stories.tsx');
     checkStoryRefs(body, sections, stories ?? [], storiesFile, fail);
   }
@@ -360,22 +373,21 @@ const parseGuidelineFile = (
 };
 
 /**
- * `patterns/<slug>.stories.tsx` next to the guideline: its exported stories in file order.
- * Optional here; the docs site requires one per pattern (apps/website check-build).
+ * `<patterns|templates>/<slug>.stories.tsx` next to the guideline: its exported stories in file
+ * order. Optional here; the docs site requires one per pattern and template (apps/website check-build).
  */
 const parseStories = (
   filePath: string,
-  title: FrontmatterValue | undefined,
+  expected: string,
   fail: (message: string) => void,
   api: PublicApi,
   failStories: (message: string) => void,
 ): GuidelineStory[] | undefined => {
   const storiesPath = filePath.replace(/\.md$/, '.stories.tsx');
   if (!fs.existsSync(storiesPath)) return undefined;
-  // src/guidelines/patterns/x.stories.tsx → src/
+  // src/guidelines/<kind>/x.stories.tsx → src/
   const srcDir = path.resolve(path.dirname(storiesPath), '../..');
   const examples = parsePatternStories(storiesPath, srcDir);
-  const expected = `Patterns/${title}`;
   const found = examples[0]?.storyTitle;
   if (examples.length === 0) fail(`${path.basename(storiesPath)} exports no stories`);
   else if (found !== expected) {
@@ -393,7 +405,7 @@ const parseStories = (
 };
 
 /**
- * Read and validate `src/guidelines/` (rules.md + foundations/*.md + patterns/*.md).
+ * Read and validate `src/guidelines/` (rules.md + foundations/*.md + patterns/*.md + templates/*.md).
  * Throws one Error listing every problem so the build fails with all of them at once.
  */
 export const parseGuidelines = ({

@@ -25,6 +25,11 @@
     "activeMatch": "^/patterns/"
   },
   {
+    "text": "Templates",
+    "link": "/templates/security-dashboard",
+    "activeMatch": "^/templates/"
+  },
+  {
     "text": "Components",
     "link": "/components/button",
     "activeMatch": "^/components/"
