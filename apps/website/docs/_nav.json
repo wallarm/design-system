@@ -33,9 +33,5 @@
     "text": "Components",
     "link": "/components/button",
     "activeMatch": "^/components/"
-  },
-  {
-    "text": "Storybook",
-    "link": "https://wallarm.github.io/design-system/storybook/"
   }
 ]

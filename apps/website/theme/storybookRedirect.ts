@@ -1,3 +1,6 @@
+/** The deployed Storybook: a header icon (rspress.config.ts) and a search section (SearchSections). */
+export const STORYBOOK_URL = 'https://wallarm.github.io/design-system/storybook/';
+
 interface Loc {
   pathname: string;
   search: string;
