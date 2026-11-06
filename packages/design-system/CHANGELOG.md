@@ -1,3 +1,9 @@
+## [4.10.1](https://github.com/wallarm/design-system/compare/v4.10.0...v4.10.1) (2026-11-06)
+
+### Bug Fixes
+
+* keep the data-testid passed to RadioGroup and CheckboxGroup ([#452](https://github.com/wallarm/design-system/issues/452)) ([0171fc3](https://github.com/wallarm/design-system/commit/0171fc32cc4d4c101fc263a0826ffe7c34b1c361))
+
 ## [4.10.0](https://github.com/wallarm/design-system/compare/v4.9.0...v4.10.0) (2026-11-06)
 
 ### Features
