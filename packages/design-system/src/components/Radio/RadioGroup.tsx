@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react/radio-group';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
 const radioGroupVariants = cva('', {
   variants: {
@@ -36,10 +36,14 @@ export type RadioGroupNativeProps = Omit<ArkUiRadioGroup.RootProps, 'className'>
 
 export type RadioGroupVariantsProps = VariantProps<typeof radioGroupVariants>;
 
-export type RadioGroupProps = RadioGroupNativeProps & RadioGroupVariantsProps;
+export type RadioGroupProps = RadioGroupNativeProps & RadioGroupVariantsProps & TestableProps;
 
-export const RadioGroup: FC<RadioGroupProps> = ({ variant = 'default', ...props }) => {
-  const testId = useTestId('group');
+export const RadioGroup: FC<RadioGroupProps> = ({
+  variant = 'default',
+  'data-testid': testIdProp,
+  ...props
+}) => {
+  const testId = useTestId('group', testIdProp);
 
   return (
     <ArkUiRadioGroup.Root

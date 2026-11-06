@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Checkbox as ArkUiCheckbox } from '@ark-ui/react/checkbox';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
 const checkboxGroupVariants = cva('flex flex-col gap-8', {
   variants: {
@@ -41,10 +41,16 @@ type CheckboxGroupVariantsProps = VariantProps<typeof checkboxGroupVariants>;
 
 type CheckboxGroupNativeProps = Omit<ArkUiCheckbox.GroupProps, 'className'>;
 
-export type CheckboxGroupProps = CheckboxGroupNativeProps & CheckboxGroupVariantsProps;
+export type CheckboxGroupProps = CheckboxGroupNativeProps &
+  CheckboxGroupVariantsProps &
+  TestableProps;
 
-export const CheckboxGroup: FC<CheckboxGroupProps> = ({ variant = 'default', ...props }) => {
-  const testId = useTestId('group');
+export const CheckboxGroup: FC<CheckboxGroupProps> = ({
+  variant = 'default',
+  'data-testid': testIdProp,
+  ...props
+}) => {
+  const testId = useTestId('group', testIdProp);
 
   return (
     <ArkUiCheckbox.Group
