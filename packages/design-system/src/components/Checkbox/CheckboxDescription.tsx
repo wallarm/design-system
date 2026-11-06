@@ -9,8 +9,8 @@ export const CheckboxDescription: FC<CheckboxDescriptionProps> = props => {
 
   return (
     <Text
-      data-testid={testId}
       {...props}
+      data-testid={testId}
       size='sm'
       weight='regular'
       color='secondary'

@@ -41,10 +41,10 @@ export const PieChartSkeleton: FC<PieChartSkeletonProps> = ({
   return (
     <TestIdProvider value={testId}>
       <div
-        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='pie-chart-skeleton'
+        data-testid={testId}
         aria-busy='true'
         aria-live='polite'
         className={cn(pieChartRootClasses, className)}

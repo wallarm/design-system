@@ -16,7 +16,7 @@ export const TourDescription: FC<TourDescriptionProps> = ({ ref, children, ...pr
   return (
     <OverflowTooltip>
       <OverflowTooltipTrigger>
-        <ArkUiTour.Description data-testid={testId} {...props} ref={ref} asChild>
+        <ArkUiTour.Description {...props} data-testid={testId} ref={ref} asChild>
           <Text size='sm' lineClamp={4}>
             {children}
           </Text>

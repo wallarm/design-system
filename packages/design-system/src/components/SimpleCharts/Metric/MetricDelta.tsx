@@ -12,7 +12,7 @@ export type MetricDeltaProps = Pick<ChartDeltaProps, 'value' | 'trend' | 'sentim
  */
 export const MetricDelta: FC<MetricDeltaProps> = props => {
   const testId = useTestId('delta');
-  return <ChartDelta data-testid={testId} {...props} />;
+  return <ChartDelta {...props} data-testid={testId} />;
 };
 
 MetricDelta.displayName = 'MetricDelta';

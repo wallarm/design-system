@@ -60,10 +60,10 @@ export const SearchModalContent: FC<SearchModalContentProps> = ({
 
       <Dialog.Positioner className='fixed inset-0 z-[calc(var(--drawer-overlay-z-index)+1)] flex items-start justify-center pt-[10vh]'>
         <Dialog.Content
-          data-testid={testId}
           {...props}
           ref={ref}
           data-slot='search-modal-content'
+          data-testid={testId}
           className={cn(searchModalContentVariants(), className)}
           onKeyDown={handleKeyDown}
         >

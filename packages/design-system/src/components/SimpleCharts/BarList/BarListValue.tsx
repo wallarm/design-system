@@ -12,10 +12,10 @@ export const BarListValue: FC<BarListValueProps> = ({ className, ref, ...props }
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='bar-list-value'
+      data-testid={testId}
       className={cn(barListValueClasses, className)}
     />
   );

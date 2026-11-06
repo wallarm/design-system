@@ -22,9 +22,9 @@ export const AvatarName: FC<AvatarNameProps> = ({ ref, className, children, ...p
     <OverflowTooltip>
       <OverflowTooltipTrigger ref={ref as Ref<HTMLElement>}>
         <span
-          data-testid={testId}
           {...props}
           data-slot='avatar-name'
+          data-testid={testId}
           className={cn(avatarNameVariants({ size }), className)}
         >
           {children}

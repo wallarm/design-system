@@ -23,11 +23,11 @@ export const CountryFlag: FC<CountryFlagProps> = ({ className, ...props }) => {
 
   return (
     <img
-      data-testid={testId}
       {...props}
       src={countryData.flag}
       alt={countryData.name ?? code}
       data-slot='country-flag'
+      data-testid={testId}
       className={cn(countryFlagVariants({ size }), className)}
     />
   );

@@ -20,10 +20,10 @@ export const EmptyStateMessage: FC<EmptyStateMessageProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='empty-state-message'
+      data-testid={testId}
       className={cn(emptyStateMessageVariants({ type }), className)}
     >
       {children}

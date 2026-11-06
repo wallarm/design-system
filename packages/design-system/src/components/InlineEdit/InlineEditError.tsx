@@ -24,9 +24,9 @@ export const InlineEditError: FC<InlineEditErrorProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
+      data-testid={testId}
       data-slot='inline-edit-error'
       className={cn('flex items-center gap-4 pt-4', className)}
     >

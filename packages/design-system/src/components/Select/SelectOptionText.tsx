@@ -7,7 +7,7 @@ type SelectOptionTextProps = Omit<ArkUiSelect.ItemTextProps, 'className'>;
 export const SelectOptionText: FC<SelectOptionTextProps> = props => {
   const testId = useTestId('option-text');
 
-  return <ArkUiSelect.ItemText data-testid={testId} {...props} />;
+  return <ArkUiSelect.ItemText {...props} data-testid={testId} />;
 };
 
 SelectOptionText.displayName = 'SelectOptionText';

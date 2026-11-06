@@ -117,13 +117,13 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
 
       return (
         <Sector
-          data-testid={sliceTestId}
           {...sectorRest}
           fill={fill}
           opacity={opacity}
           stroke='none'
           className={cn('outline-none transition-opacity duration-150 ease-out', datum?.className)}
           data-slot='pie-chart-slice'
+          data-testid={sliceTestId}
           data-name={name}
           data-active={isActive ? 'true' : undefined}
         />
@@ -136,10 +136,10 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-donut'
+      data-testid={testId}
       aria-hidden='true'
       className={cn(pieChartDonutClasses, className)}
     >

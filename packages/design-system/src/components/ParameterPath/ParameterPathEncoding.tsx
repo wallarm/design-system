@@ -15,9 +15,9 @@ export const ParameterPathEncoding: FC<ParameterPathEncodingProps> = ({
   const testId = useTestId('encoding');
   return (
     <span
-      data-testid={testId}
       {...rest}
       data-slot='parameter-path-encoding'
+      data-testid={testId}
       className={cn(encodingVariants(), className)}
     >
       {children}

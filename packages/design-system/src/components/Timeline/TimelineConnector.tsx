@@ -18,10 +18,10 @@ export const TimelineConnector: FC<TimelineConnectorProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='timeline-connector'
+      data-testid={testId}
       className={cn(timelineConnectorVariants(), className)}
     >
       {children}

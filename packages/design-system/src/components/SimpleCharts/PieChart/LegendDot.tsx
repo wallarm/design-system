@@ -12,10 +12,10 @@ export const LegendDot: FC<LegendDotProps> = ({ className, children, ref, ...pro
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='legend-dot'
+      data-testid={testId}
       aria-hidden='true'
       className={cn(legendDotClasses, className)}
     >

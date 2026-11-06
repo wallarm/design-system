@@ -123,10 +123,10 @@ export const LineChartLegendItem: FC<LineChartLegendItemProps> = ({
   return (
     <LineChartItemContext.Provider value={itemValue}>
       <div
-        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='line-chart-legend-item'
+        data-testid={testId}
         data-key={seriesKey}
         data-active={active ? 'true' : undefined}
         data-selected={selected ? 'true' : undefined}

@@ -17,10 +17,10 @@ export const TopHeaderActions: FC<TopHeaderActionsProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='top-header-actions'
+      data-testid={testId}
       className={cn('flex items-center gap-8', className)}
     >
       {children}

@@ -9,8 +9,8 @@ export const FieldContent: FC<FieldContentProps> = props => {
 
   return (
     <div
-      data-testid={testId}
       {...props}
+      data-testid={testId}
       data-slot='field-content'
       className={cn('group/field-content flex flex-1 flex-col gap-4 leading-snug')}
     />

@@ -9,8 +9,8 @@ export const RadioLabel: FC<RadioLabelProps> = props => {
 
   return (
     <ArkUiRadioGroup.ItemText
-      data-testid={testId}
       {...props}
+      data-testid={testId}
       className='flex gap-4 font-sans text-sm font-normal text-text-primary'
     />
   );

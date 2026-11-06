@@ -139,10 +139,10 @@ export const PieChartLegendItem: FC<PieChartLegendItemProps> = ({
   return (
     <PieChartItemContext.Provider value={itemValue}>
       <div
-        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='pie-chart-legend-item'
+        data-testid={testId}
         data-name={name}
         data-active={active ? 'true' : undefined}
         data-selected={selected ? 'true' : undefined}

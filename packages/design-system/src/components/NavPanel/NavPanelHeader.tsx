@@ -13,10 +13,10 @@ export const NavPanelHeader: FC<NavPanelHeaderProps> = ({ ref, className, childr
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='nav-panel-header'
+      data-testid={testId}
       className={cn(
         'sticky top-0 z-10 flex shrink-0 items-center px-4 pt-2 pb-6 bg-bg-page-bg',
         className,

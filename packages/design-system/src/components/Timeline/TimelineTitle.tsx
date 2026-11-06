@@ -11,9 +11,9 @@ export const TimelineTitle: FC<TimelineTitleProps> = ({ children, ...props }) =>
 
   return (
     <Text
-      data-testid={testId}
       {...props}
       data-slot='timeline-title'
+      data-testid={testId}
       size='sm'
       weight='medium'
       color='primary'

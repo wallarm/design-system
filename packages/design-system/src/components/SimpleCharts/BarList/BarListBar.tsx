@@ -29,10 +29,10 @@ export const BarListBar: FC<BarListBarProps> = ({ color, className, style, ref, 
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='bar-list-bar'
+      data-testid={testId}
       data-color={color ?? 'slate'}
       style={mergedStyle}
       aria-hidden='true'

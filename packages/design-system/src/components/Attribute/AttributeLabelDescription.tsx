@@ -17,9 +17,9 @@ export const AttributeLabelDescription: FC<AttributeLabelDescriptionProps> = ({
 
   return (
     <p
-      data-testid={testId}
       {...props}
       ref={ref}
+      data-testid={testId}
       data-slot='attribute-label-description'
       className={cn('basis-full', className)}
     >

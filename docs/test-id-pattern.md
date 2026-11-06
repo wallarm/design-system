@@ -143,7 +143,7 @@ All compound components support `data-testid` cascading. Most receive it via the
 3. Root component: add `data-testid={testId}` to root element
 4. Root component: wrap children in `<TestIdProvider value={testId}>`
 5. Each sub-component: call `const testId = useTestId('slot-name')`
-6. Each sub-component: add `data-testid={testId}` to its root element, before `{...props}` so a consumer-passed `data-testid` wins
+6. Each sub-component: add `data-testid={testId}` to its root element
 
 ### Root component (e.g. `Alert`)
 
@@ -169,7 +169,6 @@ import { useTestId } from '../../utils/testId'
 export const AlertClose: FC<AlertCloseProps> = ({ ref, ...props }) => {
   const testId = useTestId('close')
 
-  // Derived ID first: a data-testid the consumer passes in props overrides it.
-  return <button data-testid={testId} {...props} ref={ref} />
+  return <button {...props} ref={ref} data-testid={testId} />
 }
 ```

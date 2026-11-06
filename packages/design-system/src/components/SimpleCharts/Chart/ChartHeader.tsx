@@ -12,10 +12,10 @@ export const ChartHeader: FC<ChartHeaderProps> = ({ className, ref, ...props }) 
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='chart-header'
+      data-testid={testId}
       className={cn(chartHeaderClasses, className)}
     />
   );

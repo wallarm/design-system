@@ -21,10 +21,10 @@ export const CardHeader: FC<CardHeaderProps> = ({
 
   return (
     <Comp
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='card-header'
+      data-testid={testId}
       className={cn('flex items-center justify-between gap-8 px-16 text-base', className)}
     >
       {children}

@@ -20,10 +20,10 @@ export const RemoteShellContent: FC<RemoteShellContentProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='remote-shell-content'
+      data-testid={testId}
       className={cn(
         '[grid-area:content] min-h-0 overflow-auto overscroll-none [scrollbar-width:thin]',
         isLoading && 'flex items-center justify-center',

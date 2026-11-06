@@ -22,10 +22,10 @@ export const ChartActions: FC<ChartActionsProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='chart-actions'
+      data-testid={testId}
       className={cn(chartActionsVariants({ alwaysVisible }), className)}
     />
   );

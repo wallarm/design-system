@@ -23,13 +23,13 @@ export const PaginationEllipsis: FC<PaginationEllipsisProps> = ({
 
   return (
     <ArkPagination.Ellipsis
-      data-testid={testId}
       {...props}
       ref={ref}
       index={index}
       aria-hidden
       className={cn(paginationEllipsisVariants({ size }), className)}
       data-slot='pagination-ellipsis'
+      data-testid={testId}
     >
       <Ellipsis size='md' />
     </ArkPagination.Ellipsis>

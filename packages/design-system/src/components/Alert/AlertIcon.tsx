@@ -79,7 +79,7 @@ export const AlertIcon: FC<AlertIconProps> = ({ ref, icon, ...props }) => {
   const IconComponent = iconMap[color];
 
   return (
-    <div data-testid={testId} {...props} ref={setRefs} className='flex py-2 shrink-0'>
+    <div {...props} ref={setRefs} data-testid={testId} className='flex py-2 shrink-0'>
       {icon || <IconComponent size='lg' className={alertIconVariants({ color })} />}
     </div>
   );

@@ -10,9 +10,9 @@ export const ParameterPathEllipsis: FC<ParameterPathEllipsisProps> = ({ classNam
   const testId = useTestId('ellipsis');
   return (
     <span
-      data-testid={testId}
       {...rest}
       data-slot='parameter-path-ellipsis'
+      data-testid={testId}
       aria-label='Collapsed segments'
       className={cn(ellipsisVariants(), className)}
     >

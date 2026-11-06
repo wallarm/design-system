@@ -85,10 +85,10 @@ export const LineChartBody: FC<LineChartBodyProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='line-chart-body'
+      data-testid={testId}
       aria-hidden='true'
       data-zoom-active={isZoomDragging ? 'true' : undefined}
       className={cn(

@@ -28,9 +28,9 @@ export const AlertTitle: FC<AlertTitleProps> = ({ ref, children, lineClamp, ...p
     <OverflowTooltip>
       <OverflowTooltipTrigger>
         <Text
-          data-testid={testId}
           {...props}
           ref={ref}
+          data-testid={testId}
           size='sm'
           weight='medium'
           color='primary'

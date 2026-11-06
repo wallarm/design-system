@@ -36,10 +36,10 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
   if (isLoading)
     return (
       <div
-        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='remote-shell-panel'
+        data-testid={testId}
         className={cn('[grid-area:panel] min-h-0', className)}
       >
         <NavPanel>
@@ -56,10 +56,10 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
 
     return (
       <div
-        data-testid={testId}
         {...props}
         ref={ref}
         data-slot='remote-shell-panel'
+        data-testid={testId}
         className={cn('[grid-area:panel] min-h-0', className)}
       >
         <NavPanel resizable={resizable}>
@@ -112,10 +112,10 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='remote-shell-panel'
+      data-testid={testId}
       className={cn('[grid-area:panel] min-h-0', className)}
     >
       <NavPanel resizable={resizable}>

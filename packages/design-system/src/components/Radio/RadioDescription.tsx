@@ -9,8 +9,8 @@ export const RadioDescription: FC<RadioDescriptionProps> = props => {
 
   return (
     <Text
-      data-testid={testId}
       {...props}
+      data-testid={testId}
       size='sm'
       weight='regular'
       color='secondary'

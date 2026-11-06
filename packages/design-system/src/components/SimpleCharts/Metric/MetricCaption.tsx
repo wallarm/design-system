@@ -13,10 +13,10 @@ export const MetricCaption: FC<MetricCaptionProps> = ({ className, ref, ...props
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='metric-caption'
+      data-testid={testId}
       className={cn(metricCaptionClasses, className)}
     />
   );

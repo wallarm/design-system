@@ -28,11 +28,11 @@ export const NavPanelItem: FC<NavPanelItemProps> = ({
 
   return (
     <Comp
-      data-testid={testId}
       {...props}
       ref={ref}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-panel-item'
+      data-testid={testId}
       className={cn(navPanelItemVariants({ active }), className)}
     >
       {Icon && (

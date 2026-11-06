@@ -12,10 +12,10 @@ export const PieChartLegend: FC<PieChartLegendProps> = ({ className, ref, ...pro
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-legend'
+      data-testid={testId}
       className={cn(pieChartLegendClasses, className)}
     />
   );

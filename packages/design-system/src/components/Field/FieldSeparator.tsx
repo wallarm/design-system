@@ -7,7 +7,7 @@ type FieldSeparatorProps = SeparatorProps;
 export const FieldSeparator: FC<FieldSeparatorProps> = props => {
   const testId = useTestId('separator');
 
-  return <Separator data-testid={testId} {...props} />;
+  return <Separator {...props} data-testid={testId} />;
 };
 
 FieldSeparator.displayName = 'FieldSeparator';

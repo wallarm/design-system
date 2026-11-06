@@ -15,9 +15,9 @@ export const PageContent: FC<PageContentProps> = ({ ref, children, className, ..
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
+      data-testid={testId}
       data-slot='page-content'
       className={cn(
         'flex-1 min-h-0 overflow-auto px-24 pt-8 pb-24',

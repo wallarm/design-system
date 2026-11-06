@@ -49,9 +49,9 @@ export const BannerTitle: FC<BannerTitleProps> = ({
       <OverflowTooltip>
         <OverflowTooltipTrigger>
           <p
-            data-testid={testId}
             {...props}
             ref={ref}
+            data-testid={testId}
             className={cn(bannerTitleVariants({ variant }), clampClass, className)}
           >
             {children}

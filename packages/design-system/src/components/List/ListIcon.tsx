@@ -13,10 +13,10 @@ export const ListIcon: FC<ListIconProps> = ({ ref, className, children, ...props
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='list-icon'
+      data-testid={testId}
       className={cn(listIconVariants(), className)}
     >
       {children}

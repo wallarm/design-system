@@ -20,10 +20,10 @@ export const RemoteShellBreadcrumb: FC<RemoteShellBreadcrumbProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='remote-shell-breadcrumb'
+      data-testid={testId}
       className={cn('[grid-area:breadcrumb] flex items-center gap-8 px-24 py-8', className)}
     >
       <Breadcrumbs data-slot='nav-breadcrumbs' className='-ml-4'>

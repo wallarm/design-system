@@ -77,10 +77,10 @@ export const AreaChartBody: FC<AreaChartBodyProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='area-chart-body'
+      data-testid={testId}
       aria-hidden='true'
       data-zoom-active={isZoomDragging ? 'true' : undefined}
       className={cn(

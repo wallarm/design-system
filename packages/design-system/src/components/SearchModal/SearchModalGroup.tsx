@@ -17,10 +17,10 @@ export const SearchModalGroup: FC<SearchModalGroupProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='search-modal-group'
+      data-testid={testId}
       role='group'
       className={cn('[&:not(:first-child)]:mt-4', className)}
     >

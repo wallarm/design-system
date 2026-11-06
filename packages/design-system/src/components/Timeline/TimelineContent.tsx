@@ -18,10 +18,10 @@ export const TimelineContent: FC<TimelineContentProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='timeline-content'
+      data-testid={testId}
       className={cn(timelineContentVariants(), className)}
     >
       {children}

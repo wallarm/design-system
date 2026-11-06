@@ -21,10 +21,10 @@ export const CardContent: FC<CardContentProps> = ({
 
   return (
     <Comp
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='card-content'
+      data-testid={testId}
       className={cn('px-16 text-md', className)}
     >
       {children}

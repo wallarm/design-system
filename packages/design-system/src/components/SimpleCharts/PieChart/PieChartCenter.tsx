@@ -17,10 +17,10 @@ export const PieChartCenter: FC<PieChartCenterProps> = ({ className, ref, ...pro
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-center'
+      data-testid={testId}
       aria-hidden='true'
       className={cn(pieChartCenterClasses, className)}
     />
@@ -67,10 +67,10 @@ export const PieChartCenterValue: FC<PieChartCenterValueProps> = ({
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-center-value'
+      data-testid={testId}
       data-hovered={hoveredDatum ? 'true' : undefined}
       className={cn(pieChartCenterValueClasses, className)}
     >
@@ -147,10 +147,10 @@ export const PieChartCenterLabel: FC<PieChartCenterLabelProps> = ({
 
   return (
     <span
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='pie-chart-center-label'
+      data-testid={testId}
       className={cn(pieChartCenterLabelClasses, className)}
     >
       {content}

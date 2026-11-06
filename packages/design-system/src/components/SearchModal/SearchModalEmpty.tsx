@@ -17,10 +17,10 @@ export const SearchModalEmpty: FC<SearchModalEmptyProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='search-modal-empty'
+      data-testid={testId}
       className={cn('px-8 py-8', className)}
     >
       {children}

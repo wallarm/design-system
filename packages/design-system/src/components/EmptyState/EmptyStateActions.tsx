@@ -17,10 +17,10 @@ export const EmptyStateActions: FC<EmptyStateActionsProps> = ({
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='empty-state-actions'
+      data-testid={testId}
       className={cn('flex items-center justify-center gap-12', className)}
     >
       {children}

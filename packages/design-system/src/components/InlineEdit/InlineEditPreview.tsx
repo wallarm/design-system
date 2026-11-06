@@ -125,9 +125,9 @@ export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
 
   const target = (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
+      data-testid={testId}
       data-slot='inline-edit-preview'
       role={activatable ? 'button' : undefined}
       tabIndex={activatable ? 0 : undefined}

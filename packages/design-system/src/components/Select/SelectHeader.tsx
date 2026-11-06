@@ -9,8 +9,8 @@ export const SelectHeader: FC<SelectHeaderProps> = props => {
 
   return (
     <div
-      data-testid={testId}
       {...props}
+      data-testid={testId}
       className={cn('bg-component-outline-button-bg pt-8 px-8 shrink-0')}
     />
   );

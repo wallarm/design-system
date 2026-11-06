@@ -22,10 +22,10 @@ export const SearchModalTrigger: FC<SearchModalTriggerProps> = ({
 
   return (
     <Dialog.Trigger
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='search-modal-trigger'
+      data-testid={testId}
       asChild={asChild}
     >
       {children}

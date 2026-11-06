@@ -15,10 +15,10 @@ export const NavRailBody: FC<NavRailBodyProps> = ({ ref, className, children, ..
 
   return (
     <div
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='nav-rail-body'
+      data-testid={testId}
       className={cn(navRailBodyVariants({ mode }), className)}
     >
       {children}

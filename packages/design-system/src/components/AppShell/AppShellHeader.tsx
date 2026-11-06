@@ -14,10 +14,10 @@ export const AppShellHeader: FC<AppShellHeaderProps> = ({ ref, className, childr
 
   return (
     <header
-      data-testid={testId}
       {...props}
       ref={ref}
       data-slot='app-shell-header'
+      data-testid={testId}
       className={cn(
         '[grid-area:header] transition-opacity duration-500 ease-in-out',
         !appeared && 'opacity-0',

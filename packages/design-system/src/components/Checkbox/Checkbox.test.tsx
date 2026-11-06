@@ -3,8 +3,22 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Checkbox } from './Checkbox';
+import { CheckboxGroup } from './CheckboxGroup';
+import { CheckboxLabel } from './CheckboxLabel';
 
 describe('Attribute pass-through', () => {
+  it('keeps the data-testid passed to CheckboxGroup', () => {
+    render(
+      <CheckboxGroup data-testid='frameworks'>
+        <Checkbox value='react'>
+          <CheckboxLabel>React</CheckboxLabel>
+        </Checkbox>
+      </CheckboxGroup>,
+    );
+
+    expect(screen.getByTestId('frameworks')).toBeInTheDocument();
+  });
+
   it('forwards arbitrary data-* to the root element', () => {
     render(
       <Checkbox data-testid='checkbox' data-analytics-id='ACCEPT_TOS'>

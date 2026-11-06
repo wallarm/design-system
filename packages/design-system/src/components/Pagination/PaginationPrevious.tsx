@@ -18,12 +18,12 @@ export const PaginationPrevious: FC<PaginationPreviousProps> = ({ children, ...p
   return (
     <ArkPagination.PrevTrigger asChild>
       <Button
-        data-testid={testId}
         {...props}
         variant='ghost'
         color='neutral'
         size={size}
         data-slot='pagination-previous'
+        data-testid={testId}
       >
         <ArrowLeft />
         {children ?? PAGINATION_PREVIOUS_LABEL}
