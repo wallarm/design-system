@@ -15,7 +15,7 @@ export const horizontalBarStackHeaderClasses = ['px-16 pt-8'].join(' ');
 export const horizontalBarStackSkeletonHeaderClasses = horizontalBarStackHeaderClasses;
 
 export const horizontalBarStackLegendClasses = [
-  'flex flex-row flex-wrap items-center gap-6 px-12 py-2',
+  'flex flex-row flex-wrap items-center gap-6 px-12 pt-2 pb-8',
 ].join(' ');
 
 export const horizontalBarStackLegendDotClasses = ['inline-block size-8 rounded-2 shrink-0'].join(
