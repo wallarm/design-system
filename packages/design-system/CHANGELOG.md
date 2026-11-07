@@ -1,3 +1,9 @@
+## [4.10.2](https://github.com/wallarm/design-system/compare/v4.10.1...v4.10.2) (2026-11-07)
+
+### Bug Fixes
+
+* **horizontal-bar-stack:** add bottom padding to the legend ([#454](https://github.com/wallarm/design-system/issues/454)) ([8c46e99](https://github.com/wallarm/design-system/commit/8c46e9964dd2768b5d00fd0c7f183a18800a14f1))
+
 ## [4.10.1](https://github.com/wallarm/design-system/compare/v4.10.0...v4.10.1) (2026-11-06)
 
 ### Bug Fixes
