@@ -25,6 +25,7 @@
     "**/mocks.tsx",
     "**/mocks/**",
     "src/testUtils",
+    "src/components/Rules/**",
     "node_modules",
     "dist",
     "storybook-static"

@@ -7,7 +7,7 @@ export const DropdownMenuItemDescription: FC<PropsWithChildren> = ({ children })
 
   return (
     <Text
-      size='sm'
+      size='xs'
       color='secondary'
       data-slot='dropdown-menu-item-description'
       data-testid={testId}

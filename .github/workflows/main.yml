@@ -172,6 +172,18 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
 
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -227,6 +239,18 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -298,8 +322,22 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
 
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts 2>/dev/null || true
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=accept-new"
 
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
@@ -433,8 +471,22 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
 
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts 2>/dev/null || true
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=accept-new"
 
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
@@ -626,6 +678,18 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
 
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -690,6 +754,18 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+
+      - name: Setup GitLab SSH access
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: ${{ secrets.GITLAB_SSH_KEY != '' }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -893,6 +969,18 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+
+      - name: Setup GitLab SSH access
+        if: steps.check.outputs.release == 'true'
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known_hosts
+        if: steps.check.outputs.release == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gl.wallarm.com >> ~/.ssh/known_hosts
 
       - name: Install dependencies
         if: steps.check.outputs.release == 'true'
