@@ -42,7 +42,7 @@ export const WallySkeleton: FC<WallySkeletonProps> = ({
       background='strong'
       aria-hidden='true'
       data-testid={testId && `${testId}--chat`}
-      className='[&_*]:animate-none! [&_[data-slot=skeleton]]:bg-bg-primary'
+      className='[&_*]:animate-none!'
     >
       <ChatHeader>
         <ChatHeaderTitle>
