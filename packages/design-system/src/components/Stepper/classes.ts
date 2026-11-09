@@ -29,12 +29,12 @@ export const stepperIndicatorVariants = cva(
       // Padding lives on each status, not the base: cva does not merge classes, so a base
       // `px-4 py-2` would beat upcoming's `px-3 py-1` in Tailwind's CSS order.
       status: {
-        active: 'px-4 py-2',
-        danger: 'px-4 py-2',
+        active: 'px-4 py-2 has-[svg]:px-2',
+        danger: 'px-4 py-2 has-[svg]:px-2',
         // Figma keeps the badge 16px wide: the 12px check sits 2px from each edge.
         completed: 'px-2 py-2 text-icon-primary',
         // 16×20 including the border: the 1px border takes the place of 1px of padding.
-        upcoming: 'px-3 py-1',
+        upcoming: 'px-3 py-1 has-[svg]:px-1',
       },
     },
     defaultVariants: { status: 'upcoming' },

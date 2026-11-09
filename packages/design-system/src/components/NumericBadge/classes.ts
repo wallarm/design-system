@@ -18,8 +18,8 @@ export const numericBadgeVariants = cva(
         info: '',
       },
       size: {
-        default: 'h-20 min-w-16 px-5 py-2 text-xs [&_svg]:icon-md',
-        small: 'h-16 min-w-12 px-3 py-2 text-2xs [&_svg]:icon-sm',
+        default: 'h-20 min-w-16 px-5 py-2 text-xs [&_svg]:icon-sm',
+        small: 'h-16 min-w-12 px-3 py-2 text-2xs [&_svg]:icon-xs',
       },
       iconOnly: {
         true: '',
