@@ -1206,4 +1206,5 @@ export {
   type WallyIconStyle,
 } from './components/WallyIcon';
 export { WallySkeleton, type WallySkeletonProps } from './components/WallySkeleton';
+export { cn } from './utils/cn';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';
