@@ -1,3 +1,9 @@
+## [4.12.0](https://github.com/wallarm/design-system/compare/v4.11.0...v4.12.0) (2026-11-09)
+
+### Features
+
+* **utils:** export cn, type DropdownMenu closeOnInteractOutside ([#458](https://github.com/wallarm/design-system/issues/458)) ([2a553cb](https://github.com/wallarm/design-system/commit/2a553cb356b05f1c8b228144164d5b9a2dfcea72))
+
 ## [4.11.0](https://github.com/wallarm/design-system/compare/v4.10.3...v4.11.0) (2026-11-09)
 
 ### Features
