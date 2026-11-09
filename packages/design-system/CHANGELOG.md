@@ -1,3 +1,9 @@
+## [4.10.3](https://github.com/wallarm/design-system/compare/v4.10.2...v4.10.3) (2026-11-09)
+
+### Bug Fixes
+
+* **review:** design review ([#455](https://github.com/wallarm/design-system/issues/455)) ([b37daf3](https://github.com/wallarm/design-system/commit/b37daf36bf215a6c32a8c51695dec130884b8321))
+
 ## [4.10.2](https://github.com/wallarm/design-system/compare/v4.10.1...v4.10.2) (2026-11-07)
 
 ### Bug Fixes
