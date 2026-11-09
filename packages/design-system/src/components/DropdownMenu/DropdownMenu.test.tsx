@@ -1,5 +1,5 @@
 import { describe, expect, it, rs } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
 import { DropdownMenu } from './DropdownMenu';
@@ -166,5 +166,45 @@ describe('Handler composition', () => {
     await userEvent.click(item);
 
     expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Interact outside', () => {
+  it('keeps the menu open on outside interaction when closeOnInteractOutside is false', async () => {
+    render(
+      <DropdownMenu defaultOpen closeOnInteractOutside={false}>
+        <DropdownMenuTrigger asChild>
+          <Button>Open</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem data-testid='item'>Edit</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+
+    expect(await screen.findByTestId('item')).toBeVisible();
+
+    await userEvent.click(document.body);
+
+    expect(screen.getByTestId('item')).toBeVisible();
+  });
+
+  it('closes the menu on outside interaction by default', async () => {
+    render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger asChild>
+          <Button>Open</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem data-testid='item'>Edit</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+
+    expect(await screen.findByTestId('item')).toBeVisible();
+
+    await userEvent.click(document.body);
+
+    await waitFor(() => expect(screen.queryByTestId('item')).not.toBeInTheDocument());
   });
 });
