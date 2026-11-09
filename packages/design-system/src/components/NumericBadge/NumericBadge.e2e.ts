@@ -60,8 +60,8 @@ test.describe('Component: NumericBadge', () => {
           .sort((a, b) => a[0]! - b[0]!),
       );
       expect(iconSizes).toEqual([
+        [10, 10],
         [12, 12],
-        [16, 16],
       ]);
     });
   });
