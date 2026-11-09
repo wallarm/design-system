@@ -1,3 +1,9 @@
+## [4.11.0](https://github.com/wallarm/design-system/compare/v4.10.3...v4.11.0) (2026-11-09)
+
+### Features
+
+* **website:** templates gallery, per-section sidebars and restored changelog ([#457](https://github.com/wallarm/design-system/issues/457)) ([3100af3](https://github.com/wallarm/design-system/commit/3100af3bf1fb2d6528ac32078c79d4524cfba0ee))
+
 ## [4.10.3](https://github.com/wallarm/design-system/compare/v4.10.2...v4.10.3) (2026-11-09)
 
 ### Bug Fixes
