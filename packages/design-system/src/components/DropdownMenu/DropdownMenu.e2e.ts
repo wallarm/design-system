@@ -229,6 +229,32 @@ test.describe('Component: DropdownMenu', () => {
       await expect(highlightedItem).toBeVisible();
     });
 
+    test('Should keep focus in the menu when opened via keyboard and select with Enter', async ({
+      page,
+    }) => {
+      await dropdownMenuStory.goto(page, 'With Radio Group');
+      const trigger = getMenuTrigger(page);
+      await trigger.focus();
+      await page.keyboard.press('Enter');
+
+      await expect(getMenuContent(page)).toBeVisible();
+      await expect(getMenuContent(page)).toBeFocused();
+
+      const listItem = page.getByTestId('dropdown-menu--radio-item').filter({ hasText: 'List' });
+      const gridItem = page.getByTestId('dropdown-menu--radio-item').filter({ hasText: 'Grid' });
+      await expect(listItem).toHaveAttribute('data-highlighted', '');
+
+      await page.keyboard.press('ArrowDown');
+      await expect(gridItem).toHaveAttribute('data-highlighted', '');
+
+      await page.keyboard.press('Enter');
+      await expect(getMenuContent(page)).toBeHidden();
+      await expect(trigger).toBeFocused();
+
+      await openMenu(page);
+      await expect(gridItem).toHaveAttribute('data-state', 'checked');
+    });
+
     test('Should navigate menu items via ArrowUp key', async ({ page }) => {
       await dropdownMenuStory.goto(page, 'Basic');
       await openMenu(page);

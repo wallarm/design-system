@@ -1,10 +1,11 @@
-import { describe, expect, it, rs } from '@rstest/core';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuCheckboxItem } from './DropdownMenuCheckboxItem';
 import { DropdownMenuContent } from './DropdownMenuContent';
+import { DropdownMenuInput } from './DropdownMenuInput';
 import { DropdownMenuItem } from './DropdownMenuItem';
 import { DropdownMenuRadioGroup } from './DropdownMenuRadioGroup';
 import { DropdownMenuRadioItem } from './DropdownMenuRadioItem';
@@ -206,5 +207,133 @@ describe('Interact outside', () => {
     await userEvent.click(document.body);
 
     await waitFor(() => expect(screen.queryByTestId('item')).not.toBeInTheDocument());
+  });
+});
+
+describe('Keyboard focus', () => {
+  // jsdom has no layout, so zag's tabbable check (offsetWidth/getClientRects) sees every
+  // element as hidden and never picks the ScrollArea viewport for initial focus. Report a
+  // width like a real browser does, so the menu's initial-focus logic runs as in production.
+  beforeEach(() => {
+    rs.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+  });
+  afterEach(() => {
+    rs.restoreAllMocks();
+  });
+
+  const renderMenu = (onSelectB = rs.fn()) =>
+    render(
+      <DropdownMenu data-testid='menu'>
+        <DropdownMenuTrigger asChild>
+          <Button>Open</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem value='a'>A</DropdownMenuItem>
+          <DropdownMenuItem value='b' data-testid='item-b' onSelect={onSelectB}>
+            B
+          </DropdownMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTriggerItem value='more' data-testid='sub-trigger'>
+              More
+            </DropdownMenuTriggerItem>
+            <DropdownMenuContent data-testid='sub-content'>
+              <DropdownMenuItem value='sub'>Sub item</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+
+  it('focuses the menu content when opened with Enter, then ArrowDown + Enter selects', async () => {
+    const user = userEvent.setup();
+    const onSelectB = rs.fn();
+    renderMenu(onSelectB);
+
+    screen.getByTestId('menu--trigger').focus();
+    await user.keyboard('{Enter}');
+
+    const content = await screen.findByTestId('menu--content');
+    await waitFor(() => expect(document.activeElement).toBe(content));
+
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByTestId('item-b')).toHaveAttribute('data-highlighted');
+
+    await user.keyboard('{Enter}');
+    expect(onSelectB).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByTestId('menu--content')).not.toBeInTheDocument());
+  });
+
+  it('focuses the menu content when opened with ArrowDown', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    screen.getByTestId('menu--trigger').focus();
+    await user.keyboard('{ArrowDown}');
+
+    const content = await screen.findByTestId('menu--content');
+    await waitFor(() => expect(document.activeElement).toBe(content));
+  });
+
+  it('returns focus to the trigger on Escape', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    const trigger = screen.getByTestId('menu--trigger');
+    trigger.focus();
+    await user.keyboard('{Enter}');
+    const content = await screen.findByTestId('menu--content');
+    await waitFor(() => expect(document.activeElement).toBe(content));
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByTestId('menu--content')).not.toBeInTheDocument());
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('opens on mouse click', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    await user.click(screen.getByTestId('menu--trigger'));
+
+    expect(await screen.findByTestId('menu--content')).toBeVisible();
+  });
+
+  it('still focuses a DropdownMenuInput when the menu opens', async () => {
+    const user = userEvent.setup();
+    render(
+      <DropdownMenu data-testid='menu'>
+        <DropdownMenuTrigger asChild>
+          <Button>Open</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuInput data-testid='search' />
+          <DropdownMenuItem value='a'>A</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+
+    screen.getByTestId('menu--trigger').focus();
+    await user.keyboard('{Enter}');
+
+    const search = await screen.findByTestId('search');
+    await waitFor(() => expect(document.activeElement).toBe(search));
+  });
+
+  it('moves focus into a nested submenu opened with ArrowRight', async () => {
+    const user = userEvent.setup();
+    renderMenu();
+
+    screen.getByTestId('menu--trigger').focus();
+    await user.keyboard('{Enter}');
+    const content = await screen.findByTestId('menu--content');
+    await waitFor(() => expect(document.activeElement).toBe(content));
+
+    await user.keyboard('{End}');
+    expect(screen.getByTestId('sub-trigger')).toHaveAttribute('data-highlighted');
+    await user.keyboard('{ArrowRight}');
+
+    const subContent = await screen.findByTestId('sub-content');
+    await waitFor(() => expect(document.activeElement).toBe(subContent));
   });
 });
