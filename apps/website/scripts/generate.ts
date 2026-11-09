@@ -6,11 +6,14 @@ import { findNewComponents } from './newComponents';
 import {
   componentPageResolver,
   kebab,
+  OVERVIEW,
   renderChangelogPage,
   renderComponentPage,
   renderComponentsMeta,
   renderGuidelinePage,
   renderGuidelinesMeta,
+  renderSectionIndex,
+  renderTemplatesIndex,
   renderTokensPage,
 } from './render';
 
@@ -51,6 +54,13 @@ writeFileSync(
   path.join(outDir, '_meta.json'),
   renderComponentsMeta(metadata.components, { newComponents }),
 );
+writeFileSync(
+  path.join(outDir, 'index.mdx'),
+  renderSectionIndex(
+    'Components',
+    'Every component by category, with live examples, usage and props.',
+  ),
+);
 
 for (const dir of ['foundations', 'get-started', 'public'])
   mkdirSync(path.join(docs, dir), { recursive: true });
@@ -84,13 +94,44 @@ for (const g of guidelines)
   );
 const patterns = guidelines.filter(g => g.kind === 'pattern');
 const templates = guidelines.filter(g => g.kind === 'template');
-writeFileSync(path.join(docs, 'patterns/_meta.json'), renderGuidelinesMeta(patterns));
-writeFileSync(path.join(docs, 'templates/_meta.json'), renderGuidelinesMeta(templates));
+writeFileSync(
+  path.join(docs, 'patterns/index.mdx'),
+  renderSectionIndex(
+    'Patterns',
+    'How the components combine into product screens: layouts, tables, drawers, forms, filters and feedback, with the rules behind them.',
+  ),
+);
+writeFileSync(
+  path.join(docs, 'patterns/_meta.json'),
+  renderGuidelinesMeta(patterns, { before: [OVERVIEW] }),
+);
+writeFileSync(path.join(docs, 'templates/index.mdx'), renderTemplatesIndex());
+writeFileSync(
+  path.join(docs, 'templates/_meta.json'),
+  renderGuidelinesMeta(templates, { before: [OVERVIEW] }),
+);
+writeFileSync(
+  path.join(docs, 'foundations/index.mdx'),
+  renderSectionIndex(
+    'Foundations',
+    'The tokens and rules every component is built on: spacing, color, typography, radius, elevation, layering, focus and icons.',
+  ),
+);
 writeFileSync(
   path.join(docs, 'foundations/_meta.json'),
-  renderGuidelinesMeta(foundations, { before: ['tokens'], after: ['icons'] }),
+  renderGuidelinesMeta(foundations, { before: [OVERVIEW, 'tokens'], after: ['icons'] }),
 );
 copyFileSync(metadataPath, path.join(docs, 'public/components.json'));
+// Story source by story name, one file per guideline, fetched by the preview dialog's "Copy code".
+const storyCode = path.join(docs, 'public/story-code');
+rmSync(storyCode, { recursive: true, force: true });
+for (const g of [...patterns, ...templates]) {
+  mkdirSync(path.dirname(path.join(storyCode, g.slug)), { recursive: true });
+  writeFileSync(
+    path.join(storyCode, `${g.slug}.json`),
+    JSON.stringify(Object.fromEntries((g.stories ?? []).map(s => [s.name, s.code]))),
+  );
+}
 
 process.stdout.write(
   `docs: generated ${pages} component pages, ${newComponents.size} marked new, ${guidelines.length} guidelines\n`,

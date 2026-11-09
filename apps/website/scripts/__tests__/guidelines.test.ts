@@ -3,6 +3,7 @@ import type { ComponentMetadata, Guideline } from '@wallarm-org/mcp-core';
 import {
   componentPageResolver,
   escapeMarkdown,
+  OVERVIEW,
   renderGuidelinePage,
   renderGuidelinesMeta,
   rewriteGuidelineLinks,
@@ -94,6 +95,21 @@ describe('renderGuidelinePage', () => {
     );
   });
 
+  it('folds the components past the first eight into a details block', () => {
+    const names = ['Table', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Toast', 'Avatar'];
+    const page = renderGuidelinePage(pattern('big', 1, { components: names }), link);
+    expect(page).toContain(
+      [
+        '# big',
+        '**Components:** [`Table`](/components/table), `A1`, `A2`, `A3`, `A4`, `A5`, `A6`, `A7`',
+        "<details data-slot='guideline-components'>\n<summary>+2 more</summary>",
+        '[`Toast`](/components/toast), [`Avatar`](/components/avatar)',
+        '</details>',
+        'Body.',
+      ].join('\n\n'),
+    );
+  });
+
   it('turns each resolved story fence into a full-bleed live preview in place', () => {
     const g = pattern('resource-list-page', 1, {
       title: 'Resource list page',
@@ -127,5 +143,10 @@ describe('renderGuidelinesMeta', () => {
       after: ['icons'],
     });
     expect(JSON.parse(meta)).toEqual(['tokens', 'x', 'y', 'z', 'icons']);
+  });
+
+  it('puts the overview page first as a labelled file item', () => {
+    const meta = renderGuidelinesMeta([pattern('x', 10)], { before: [OVERVIEW] });
+    expect(JSON.parse(meta)).toEqual([{ type: 'file', name: 'index', label: 'Overview' }, 'x']);
   });
 });

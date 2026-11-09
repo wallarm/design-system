@@ -17,6 +17,12 @@ import { SearchSectionsHost } from './SearchSections';
 export * from '@rspress/core/theme-original';
 export { HomeHero } from './HomeHero';
 
+// The home page is the hero alone, one screen tall: HomeHero draws its own background, and there
+// are no feature cards or footer message.
+export const HomeBackground = () => null;
+export const HomeFeature = () => null;
+export const HomeFooter = () => null;
+
 // Keeps the DS theme (<html data-theme>) in step with the Rspress appearance toggle.
 function ThemeSync() {
   const dark = useDark();
@@ -25,12 +31,17 @@ function ThemeSync() {
   return null;
 }
 
-// Generated pages have no source file under apps/website/docs to edit; component pages link Source.
-const GENERATED = ['/foundations/tokens', '/get-started/changelog'];
+// Generated pages (gitignored, see apps/website/.gitignore) have no source file to edit; component
+// pages link Source.
+const GENERATED = ['/components/', '/foundations/', '/patterns/', '/templates/'];
+
+const isGenerated = (routePath: string): boolean =>
+  routePath === '/get-started/changelog' ||
+  (GENERATED.some(p => routePath.startsWith(p)) && routePath !== '/foundations/icons');
 
 export function EditLink(props: Parameters<typeof OriginalEditLink>[0]) {
   const { routePath } = usePage().page;
-  if (routePath.startsWith('/components/') || GENERATED.includes(routePath)) return null;
+  if (isGenerated(routePath)) return null;
   return <OriginalEditLink {...props} />;
 }
 

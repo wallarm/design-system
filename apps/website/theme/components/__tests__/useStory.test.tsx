@@ -15,6 +15,17 @@ describe('useStory', () => {
     expect(result.current.Story).toBeNull();
   });
 
+  it('retries a failed load once', async () => {
+    const Basic = () => null;
+    const load = rs
+      .fn<() => Promise<Record<string, unknown>>>()
+      .mockRejectedValueOnce(new Error('chunk failed'))
+      .mockResolvedValue({ Basic });
+    const { result } = renderHook(() => useStory(load, 'Basic'));
+    await waitFor(() => expect(result.current.Story).toBe(Basic));
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
   it('yields a not-found error for an unknown story name', async () => {
     rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const load = () => Promise.resolve({ Basic: () => null });

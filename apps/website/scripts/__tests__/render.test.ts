@@ -1,11 +1,15 @@
 import { describe, expect, it } from '@rstest/core';
-import type { ComponentMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
+import type { ComponentMetadata, ExampleMetadata, Guideline } from '@wallarm-org/mcp-core';
 import {
+  OVERVIEW,
   renderChangelogPage,
   renderComponentPage,
   renderComponentsMeta,
   renderPropsTable,
+  renderSectionIndex,
+  renderTemplatesIndex,
   renderTokensPage,
+  templateCards,
   titleCase,
   toStoryId,
 } from '../render';
@@ -204,12 +208,16 @@ describe('renderComponentsMeta', () => {
     const out = renderComponentsMeta([button, input], { newComponents: new Set(['Input']) });
     expect(out).toContain('"collapsible": true');
     const meta = JSON.parse(out) as (string | Group)[];
-    const groups = meta.filter((m): m is Group => typeof m !== 'string');
+    const groups = meta.filter((m): m is Group => typeof m !== 'string' && 'items' in m);
     const items = groups.flatMap(g => g.items);
     const b = items.find(i => i.label === 'Button');
     expect(b?.link).toBe('/components/button');
     expect(b && 'tag' in b).toBe(false);
     expect(items.find(i => i.label === 'Input')?.tag).toBe('new');
+  });
+
+  it('starts with the overview page', () => {
+    expect(JSON.parse(renderComponentsMeta([button], none))[0]).toEqual(OVERVIEW);
   });
 
   it('labels the AI component category "AI Assistant"', () => {
@@ -258,5 +266,61 @@ describe('renderTokensPage headings', () => {
     ]);
     expect(out).toContain('## Colors Primary');
     expect(out).not.toContain('## colors-primary');
+  });
+});
+
+describe('templateCards', () => {
+  const template = (slug: string, order: number, stories: string[]): Guideline => ({
+    slug: `templates/${slug}`,
+    kind: 'template',
+    title: `${slug} title`,
+    description: 'Use when testing.',
+    components: [],
+    keywords: [],
+    order,
+    markdown: '',
+    sections: [],
+    stories: stories.map(name => ({ name, code: `export const ${name} = () => null;` })),
+  });
+
+  it('lists templates by order with their story names, without the story source', () => {
+    expect(
+      templateCards([
+        template('b-page', 20, ['Default']),
+        template('a-page', 10, ['Default', 'NoData']),
+      ]),
+    ).toEqual([
+      {
+        slug: 'templates/a-page',
+        title: 'a-page title',
+        description: 'Use when testing.',
+        stories: ['Default', 'NoData'],
+      },
+      {
+        slug: 'templates/b-page',
+        title: 'b-page title',
+        description: 'Use when testing.',
+        stories: ['Default'],
+      },
+    ]);
+  });
+});
+
+describe('renderTemplatesIndex', () => {
+  it('is a wide page without the outline, keeping the sidebar, holding the gallery', () => {
+    const page = renderTemplatesIndex();
+    expect(page).toMatch(
+      /^---\ntitle: "Templates"\n[\s\S]*pageType: doc-wide\noutline: false\n---/,
+    );
+    expect(page).toContain('<TemplateGallery />');
+  });
+});
+
+describe('renderSectionIndex', () => {
+  it('is a wide page without the outline, keeping the sidebar, holding the overview', () => {
+    const page = renderSectionIndex('Patterns', 'How the components combine.');
+    expect(page).toBe(
+      '---\ntitle: "Patterns"\ndescription: "How the components combine."\npageType: doc-wide\noutline: false\n---\n\n# Patterns\n\nHow the components combine.\n\n<SectionOverview />\n',
+    );
   });
 });
