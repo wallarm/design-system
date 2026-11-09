@@ -25,7 +25,7 @@ describe('SearchSections', () => {
       sections,
     );
     expect(links).toHaveLength(sections.length);
-    expect(links[1]?.getAttribute('href')).toBe('/design-system/ai/mcp');
+    expect(links[1]?.getAttribute('href')).toBe('/design-system/ai/');
   });
 
   it('opens Storybook externally', () => {

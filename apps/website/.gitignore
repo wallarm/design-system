@@ -6,4 +6,5 @@ docs/patterns/
 docs/templates/
 docs/get-started/changelog.md
 docs/public/components.json
+docs/public/story-code/
 doc_build_local

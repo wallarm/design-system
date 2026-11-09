@@ -105,7 +105,11 @@ const exampleBlock = (e: ExampleMetadata, level: string, base: string): string =
 
 const lastSegment = (title: string | undefined): string => title?.split('/').at(-1) ?? '';
 
-const CATEGORY_LABELS: Record<string, string> = { AI: 'AI Assistant' };
+const CATEGORY_LABELS: Record<string, string> = {
+  'Inputs Date': 'Date & Time',
+  'Status Indication': 'Status',
+  AI: 'AI Assistant',
+};
 
 const category = (c: ComponentMetadata): string => c.examples[0]?.storyTitle?.split('/')[0] ?? '';
 
@@ -186,6 +190,9 @@ const byCategory = (components: ComponentMetadata[]): [string, ComponentMetadata
     .map(([cat, list]) => [cat, list.sort((a, b) => a.name.localeCompare(b.name))]);
 };
 
+/** A section's landing page (theme SectionOverview); it goes first in the section's `_meta.json`. */
+export const OVERVIEW = { type: 'file', name: 'index', label: 'Overview' } as const;
+
 export function renderComponentsMeta(
   components: ComponentMetadata[],
   opts: { newComponents: Set<string> },
@@ -202,7 +209,7 @@ export function renderComponentsMeta(
       ...(opts.newComponents.has(c.name) && { tag: 'new' }),
     })),
   }));
-  return `${JSON.stringify(groups, null, 2)}\n`;
+  return `${JSON.stringify([OVERVIEW, ...groups], null, 2)}\n`;
 }
 
 export const titleCase = (kebab: string): string =>
@@ -258,6 +265,17 @@ const componentLinks = (names: string[], link: (name: string) => string | undefi
     })
     .join(', ');
 
+/** Templates use 25-100 components; past this many the rest fold away, so the preview stays near the top. */
+const COMPONENTS_SHOWN = 8;
+
+const componentsLine = (names: string[], link: (name: string) => string | undefined): string => {
+  const line = `**Components:** ${componentLinks(names.slice(0, COMPONENTS_SHOWN), link)}`;
+  const rest = names.slice(COMPONENTS_SHOWN);
+  return rest.length
+    ? `${line}\n\n<details data-slot='guideline-components'>\n<summary>+${rest.length} more</summary>\n\n${componentLinks(rest, link)}\n\n</details>`
+    : line;
+};
+
 /** `../foundations/spacing.md#rules` in guideline `patterns/x` → `/foundations/spacing#rules`. */
 export const rewriteGuidelineLinks = (markdown: string, slug: string): string =>
   markdown.replace(
@@ -308,9 +326,7 @@ export function renderGuidelinePage(
   const base = opts.storyImportBase;
   const escaped = escapeMarkdown(rewriteGuidelineLinks(g.markdown.trim(), g.slug));
   const body = base ? embedStories(escaped, `${pageName(g)}.stories.tsx`, base) : escaped;
-  const components = g.components.length
-    ? `**Components:** ${componentLinks(g.components, link)}`
-    : '';
+  const components = g.components.length ? componentsLine(g.components, link) : '';
   // The components line goes right under the H1, which the body always starts with.
   const [h1, ...rest] = body.split('\n');
   const content = h1?.startsWith('# ')
@@ -322,6 +338,43 @@ export function renderGuidelinePage(
 /** Sidebar order: guideline pages by `order`, around the fixed pages of the section. */
 export const renderGuidelinesMeta = (
   guidelines: Guideline[],
-  opts: { before?: string[]; after?: string[] } = {},
+  opts: { before?: (string | typeof OVERVIEW)[]; after?: string[] } = {},
 ): string =>
   `${JSON.stringify([...(opts.before ?? []), ...byOrder(guidelines).map(pageName), ...(opts.after ?? [])])}\n`;
+
+/** A template's gallery card data, in page order: rspress.config.ts passes it to the site as a define. */
+export interface TemplateCardData {
+  slug: string;
+  title: string;
+  description: string;
+  stories: string[];
+}
+
+export const templateCards = (templates: Guideline[]): TemplateCardData[] =>
+  byOrder(templates).map(g => ({
+    slug: g.slug,
+    title: g.title,
+    description: g.description,
+    stories: (g.stories ?? []).map(s => s.name),
+  }));
+
+/** The Templates landing page: a wide gallery (theme TemplateGallery, fed by the define). */
+export const renderTemplatesIndex = (): string =>
+  [
+    '---\ntitle: "Templates"\ndescription: "Full screens built from Wallarm design system components: preview each one live, switch its states and copy the code."\npageType: doc-wide\noutline: false\n---',
+    '# Templates',
+    'Full screens built from the design system. Open one to try it live, switch its states and copy the code.',
+    '<TemplateGallery />\n',
+  ].join('\n\n');
+
+/**
+ * A section's overview page: the theme's SectionOverview renders a card per page of the section's
+ * sidebar, so the page carries no list of its own. Wide, without the outline, the sidebar stays.
+ */
+export const renderSectionIndex = (title: string, intro: string): string =>
+  [
+    `---\ntitle: ${JSON.stringify(title)}\ndescription: ${JSON.stringify(intro)}\npageType: doc-wide\noutline: false\n---`,
+    `# ${title}`,
+    intro,
+    '<SectionOverview />\n',
+  ].join('\n\n');

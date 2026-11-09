@@ -40,6 +40,11 @@
 
     --rp-font-family-base: var(--font-sans);
     --rp-font-family-mono: var(--font-mono);
+
+    /* Softer corners than Rspress's 1rem/1.5rem on code blocks, callouts and cards. */
+    --rp-radius: var(--radius-12);
+    --rp-radius-small: var(--radius-8);
+    --rp-radius-large: var(--radius-16);
 }
 
 html.rp-dark {
@@ -82,22 +87,16 @@ html.rp-dark {
     background: var(--rp-c-brand-dark);
 }
 
-/* Solid title instead of Rspress's gradient text. */
-.rp-home-hero__title {
-    margin: 0;
-}
-
-/* Home feature cards stay still on hover: Rspress tilts them (3D rotate/perspective) and slides a
-   shine overlay via inline styles from mouse position, so !important is the only override. The
-   brand border/text colour hover from Rspress is kept. */
-.rp-home-feature__item,
-.rp-home-feature__item-wrapper,
-.rp-home-feature__item__shine {
-    transform: none !important;
-}
-
-.rp-home-feature__item__shine {
-    display: none;
+/* Hero title accent (theme/HomeHero.tsx): a brand gradient on "Design System". The brand text token
+   already switches between themes and keeps 3:1 on the page; the far end only darkens it. */
+[data-slot='hero-accent'] {
+    background: linear-gradient(
+        100deg,
+        var(--color-text-brand),
+        color-mix(in oklab, var(--color-text-brand), black 20%)
+    );
+    background-clip: text;
+    color: transparent;
 }
 
 /* Section shortcuts (theme/SearchSections.tsx) only belong to the empty search dialog. */
@@ -120,4 +119,72 @@ html.rp-dark [data-slot='home-blur'] {
     [data-slot='home-blur'] .lg-blob {
         animation: none !important;
     }
+}
+
+/* Template preview dialog (theme/components/TemplatePreviewDialog.tsx): near-fullscreen. Dialog sets
+   the width but takes no className, so the content fills the positioner's height from here. */
+[data-scope='dialog'][data-part='content']:has([data-preview-frame]) {
+    height: 100%;
+}
+
+/* Below md it takes the whole screen: no positioner gutter around it, no rounded corners. */
+@media (width < 48rem) {
+    [data-scope='dialog'][data-part='positioner']:has([data-preview-frame]) {
+        padding: 0;
+    }
+
+    [data-scope='dialog'][data-part='content']:has([data-preview-frame]) {
+        border: none;
+        border-radius: 0;
+    }
+}
+
+/* Rspress's component CSS lands after this file in the bundle, so the overrides below lead with
+   `body` (or .rp-doc) to outrank selectors of the same weight. */
+
+/* Sticky nav: translucent, so the page blurs through it while scrolling. */
+body .rp-nav {
+    background: --alpha(var(--color-bg-page-bg) / 80%);
+    backdrop-filter: blur(12px) saturate(1.5);
+}
+
+/* Sidebar: neutral hover, brand active item (Rspress uses the link colour and a 600 weight). */
+body .rp-sidebar-item:hover {
+    background-color: var(--color-states-primary-hover);
+}
+
+body .rp-sidebar-item--active,
+body .rp-sidebar-item--active:hover {
+    color: var(--color-text-brand);
+    background-color: var(--color-states-brand-active);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Keyboard focus on the Rspress chrome: its base layer drops button outlines altogether. DS
+   components draw their own rings, so only Rspress's links and buttons get this one. A card's
+   stretched link (TemplateGallery, SectionOverview) leaves it to the card's ring. */
+:where(.rp-link, .rp-button, .rp-sidebar-item, .rp-nav button, summary):focus-visible:not(
+    [data-card-link]
+) {
+    outline: 2px solid var(--color-border-strong-brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-6);
+}
+
+/* Guideline pages fold long component lists (scripts/render.ts componentsLine): pulled up to the
+   line it continues, without Rspress's details padding that would indent the summary. */
+.rp-doc details[data-slot='guideline-components'] {
+    margin: calc(-1 * var(--spacing-8)) 0 var(--spacing-16);
+    padding: 0;
+}
+
+[data-slot='guideline-components'] summary {
+    width: fit-content;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+}
+
+[data-slot='guideline-components'] summary:hover {
+    color: var(--color-text-primary);
 }

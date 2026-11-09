@@ -1,4 +1,4 @@
-import { type ReactNode, useRef, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useRef, useState } from 'react';
 import { BrowserOnly } from '@rspress/core/runtime';
 import {
   Alert,
@@ -44,7 +44,24 @@ export function StoryPlaceholder() {
   return <Skeleton width='100%' height='200px' transparent={false} />;
 }
 
-function Loaded({ load, name }: { load: StoryLoader; name: string }) {
+// Lazy: the dialog stays out of the page bundle until a full-bleed story shows its Expand button.
+const ExpandStory = lazy(() =>
+  import('./TemplatePreviewDialog').then(m => ({ default: m.ExpandStory })),
+);
+
+// Centre a trigger or a fixed-width block (start-aligned if wider); whole-page roots fill the frame.
+export const FULLSCREEN_FRAME =
+  'grid w-full grid-cols-1 [place-items:safe_center] [&>[data-slot=app-shell]]:w-full [&>[data-slot=page]]:w-full';
+
+/**
+ * For a FULLSCREEN_FRAME of fixed height (a card's design screen, the preview dialog): AppShell, an
+ * h-screen root, fills the frame instead of the window. The row is pinned too, or the shell's own
+ * content would size it.
+ */
+export const FILL_APP_SHELL =
+  'has-[>[data-slot=app-shell]]:grid-rows-[100%] [&>[data-slot=app-shell]]:h-full';
+
+export function LoadedStory({ load, name }: { load: StoryLoader; name: string }) {
   const { Story, error } = useStory(load, name);
   if (error) return <StoryError error={error} />;
   return Story ? <Story /> : <StoryPlaceholder />;
@@ -65,14 +82,9 @@ function Live({
   return (
     <div
       ref={ref}
-      className={
-        fullscreen
-          ? // Centre a trigger or a fixed-width block (start-aligned if wider); whole-page roots fill the frame.
-            'grid w-full grid-cols-1 [place-items:safe_center] [&>[data-slot=app-shell]]:w-full [&>[data-slot=page]]:w-full'
-          : 'flex w-full items-center justify-center'
-      }
+      className={fullscreen ? FULLSCREEN_FRAME : 'flex w-full items-center justify-center'}
     >
-      {inView ? <Loaded load={load} name={name} /> : <StoryPlaceholder />}
+      {inView ? <LoadedStory load={load} name={name} /> : <StoryPlaceholder />}
     </div>
   );
 }
@@ -82,12 +94,23 @@ function Preview({ load, name, hideCode = false, fullscreen, children }: StoryPr
 
   return (
     <div className='my-16 flex flex-col gap-8'>
-      {!hideCode && (
-        <SegmentedControl value={view} onChange={setView} className='self-start'>
-          <SegmentedControlItem value='preview'>Preview</SegmentedControlItem>
-          <SegmentedControlItem value='code'>Code</SegmentedControlItem>
-        </SegmentedControl>
-      )}
+      <div className='flex items-center justify-between gap-8 empty:hidden'>
+        {!hideCode && (
+          <SegmentedControl value={view} onChange={setView}>
+            <SegmentedControlItem value='preview'>Preview</SegmentedControlItem>
+            <SegmentedControlItem value='code'>Code</SegmentedControlItem>
+          </SegmentedControl>
+        )}
+        {fullscreen && (
+          <BrowserOnly fallback={null}>
+            {() => (
+              <Suspense fallback={null}>
+                <ExpandStory load={load} name={name} />
+              </Suspense>
+            )}
+          </BrowserOnly>
+        )}
+      </div>
       {view === 'code' ? (
         children
       ) : (

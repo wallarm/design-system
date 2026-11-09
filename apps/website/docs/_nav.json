@@ -1,37 +1,37 @@
 [
   {
     "text": "Get Started",
-    "link": "/get-started/introduction",
+    "link": "/get-started/",
     "activeMatch": "^/get-started/"
   },
   {
     "text": "AI",
-    "link": "/ai/mcp",
+    "link": "/ai/",
     "activeMatch": "^/ai/"
   },
   {
     "text": "Guides",
-    "link": "/guides/testing",
+    "link": "/guides/",
     "activeMatch": "^/guides/"
   },
   {
     "text": "Foundations",
-    "link": "/foundations/tokens",
+    "link": "/foundations/",
     "activeMatch": "^/foundations/"
   },
   {
+    "text": "Components",
+    "link": "/components/",
+    "activeMatch": "^/components/"
+  },
+  {
     "text": "Patterns",
-    "link": "/patterns/app-layout",
+    "link": "/patterns/",
     "activeMatch": "^/patterns/"
   },
   {
     "text": "Templates",
-    "link": "/templates/security-dashboard",
+    "link": "/templates/",
     "activeMatch": "^/templates/"
-  },
-  {
-    "text": "Components",
-    "link": "/components/button",
-    "activeMatch": "^/components/"
   }
 ]

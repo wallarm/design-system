@@ -1,1 +1,1 @@
-["testing", "analytics"]
+[{ "type": "file", "name": "index", "label": "Overview" }, "testing", "analytics"]

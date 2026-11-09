@@ -15,8 +15,9 @@ export function useStory(load: StoryLoader, name: string): StoryState {
 
   useEffect(() => {
     let active = true;
-    // storybook-react-rsbuild is imported here, not at the top, so SSG never evaluates it.
-    Promise.all([load(), import('storybook-react-rsbuild')])
+    // storybook-react-rsbuild is imported here, not at the top, so SSG never evaluates it. A failed
+    // chunk is retried once: a lazy dev compile or a fresh deploy can race the first request.
+    Promise.all([load().catch(() => load()), import('storybook-react-rsbuild')])
       .then(([module, { composeStories }]) => {
         const stories: Record<string, ComponentType | undefined> = composeStories(
           module as Parameters<typeof composeStories>[0],

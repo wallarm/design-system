@@ -1,8 +1,9 @@
 [
+  { "type": "file", "name": "index", "label": "Overview" },
   "introduction",
   "installation",
   "theming",
   "routing",
-  { "type": "dir", "name": "migrations", "label": "Migration guides" },
-  "changelog"
+  "changelog",
+  { "type": "dir", "name": "migrations", "label": "Migration guides" }
 ]
