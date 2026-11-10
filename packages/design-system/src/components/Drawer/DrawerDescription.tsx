@@ -16,7 +16,7 @@ export const DrawerDescription: FC<DrawerDescriptionProps> = ({ children, ref })
       ref={ref}
       data-testid={testId}
       data-slot='drawer-description'
-      className={cn('text-sm font-normal text-text-secondary')}
+      className={cn('col-start-1 row-start-2 text-sm font-normal text-text-secondary')}
     >
       {children}
     </Dialog.Description>
