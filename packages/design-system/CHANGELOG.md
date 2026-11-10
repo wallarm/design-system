@@ -1,3 +1,9 @@
+## [4.12.1](https://github.com/wallarm/design-system/compare/v4.12.0...v4.12.1) (2026-11-10)
+
+### Bug Fixes
+
+* **dropdown-menu:** keep focus in the menu when it opens ([#459](https://github.com/wallarm/design-system/issues/459)) ([b4eb22c](https://github.com/wallarm/design-system/commit/b4eb22c4ce4f908cd95ca36b99d71387aec012f6))
+
 ## [4.12.0](https://github.com/wallarm/design-system/compare/v4.11.0...v4.12.0) (2026-11-09)
 
 ### Features
