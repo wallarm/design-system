@@ -32,7 +32,13 @@ export const DrawerClose: FC<DrawerCloseProps> = ({
 
   if (asChild) {
     return (
-      <Dialog.CloseTrigger {...rest} ref={ref} asChild data-testid={testIdProp}>
+      <Dialog.CloseTrigger
+        data-slot='drawer-close'
+        {...rest}
+        ref={ref}
+        asChild
+        data-testid={testIdProp}
+      >
         {children}
       </Dialog.CloseTrigger>
     );
@@ -48,6 +54,7 @@ export const DrawerClose: FC<DrawerCloseProps> = ({
             color='neutral'
             size='small'
             aria-label='Close drawer'
+            data-slot='drawer-close'
             {...rest}
             data-testid={testId}
           >
