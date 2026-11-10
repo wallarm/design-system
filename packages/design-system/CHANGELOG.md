@@ -1,3 +1,9 @@
+## [4.12.2](https://github.com/wallarm/design-system/compare/v4.12.1...v4.12.2) (2026-11-10)
+
+### Bug Fixes
+
+* **field:** detect checkbox groups without function identity ([#461](https://github.com/wallarm/design-system/issues/461)) ([ffc6c62](https://github.com/wallarm/design-system/commit/ffc6c62bb33e08fcf14ecada93bd27e9736e3c3d))
+
 ## [4.12.1](https://github.com/wallarm/design-system/compare/v4.12.0...v4.12.1) (2026-11-10)
 
 ### Bug Fixes
