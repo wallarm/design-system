@@ -247,12 +247,14 @@ test.describe('Component: DropdownMenu', () => {
       await page.keyboard.press('ArrowDown');
       await expect(gridItem).toHaveAttribute('data-highlighted', '');
 
+      // Radio items keep the menu open on select (closeOnSelect defaults to false).
       await page.keyboard.press('Enter');
+      await expect(gridItem).toHaveAttribute('data-state', 'checked');
+      await expect(getMenuContent(page)).toBeFocused();
+
+      await page.keyboard.press('Escape');
       await expect(getMenuContent(page)).toBeHidden();
       await expect(trigger).toBeFocused();
-
-      await openMenu(page);
-      await expect(gridItem).toHaveAttribute('data-state', 'checked');
     });
 
     test('Should navigate menu items via ArrowUp key', async ({ page }) => {
