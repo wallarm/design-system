@@ -1,3 +1,9 @@
+## [4.12.3](https://github.com/wallarm/design-system/compare/v4.12.2...v4.12.3) (2026-11-10)
+
+### Bug Fixes
+
+* **drawer:** keep header layout when Claude Design wraps children ([#462](https://github.com/wallarm/design-system/issues/462)) ([6b6eeb0](https://github.com/wallarm/design-system/commit/6b6eeb04757fa032fc1b692d3efd739293891ac7))
+
 ## [4.12.2](https://github.com/wallarm/design-system/compare/v4.12.1...v4.12.2) (2026-11-10)
 
 ### Bug Fixes
