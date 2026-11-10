@@ -53,16 +53,19 @@ export async function buildBundle({ outDir }: { outDir: string }) {
   const header = `/* @ds-bundle: ${JSON.stringify({ format: 4, namespace: CLAUDE_DESIGN.namespace, components: components.map(name => ({ name })) })} */`;
   // A literal U+FFFD (an entity decoder's replacement char) is refused by the artifact upload;
   // the minifier only emits it inside string or regex literals, where the escape means the same.
-  const code =
-    `${header}\n${await readInlineScript(join(outDir, 'components/bundle.js'))}\n`.replaceAll(
-      String.fromCharCode(0xfffd),
-      '\\uFFFD',
-    );
+  // A raw SVG data URI (CodeMirror's lint underline and tab highlight) blocks public sharing of
+  // a canvas; both sit inside string or template literals, where the hex escapes mean the same.
+  const code = `${header}\n${await readInlineScript(join(outDir, 'components/bundle.js'))}\n`
+    .replaceAll(String.fromCharCode(0xfffd), '\\uFFFD')
+    .replaceAll('data:image/svg+xml,<svg', 'dat\\x61:image/svg+xml,\\x3csvg');
   const bytes = Buffer.byteLength(code);
   if (bytes > CLAUDE_DESIGN.bundleBudgetBytes)
     throw new Error(`bundle.js ${bytes} bytes exceeds ${CLAUDE_DESIGN.bundleBudgetBytes}`);
   if (/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i.test(code))
     throw new Error('Bundle is unsafe to inline');
+  // URL-encoded SVG data URIs (the Country flags) pass the public-sharing review.
+  if (/data:image\/svg\+xml,\s*</i.test(code))
+    throw new Error('Bundle has a raw SVG data URI, which blocks public sharing');
   await mkdir(join(outDir, 'components'), { recursive: true });
   await writeFile(join(outDir, 'components/bundle.js'), code);
   await mkdir(resolve(PACKAGE_DIR, '.claude-design'), { recursive: true });

@@ -17,6 +17,11 @@ describe('complete Claude Design project', () => {
     for (const path of paths.filter(path => /\/preview(-\d+)?\.html$/.test(path)))
       expect(await readFile(join(out, 'components', path), 'utf8')).toMatch(/^<!-- @dsCard /);
   });
+  it('escapes raw SVG data URIs that block public sharing', async () => {
+    const code = await readFile(join(out, 'components/bundle.js'), 'utf8');
+    expect(code).not.toMatch(/data:image\/svg\+xml,\s*</i);
+    expect(code).toContain('dat\\x61:image/svg+xml,\\x3csvg');
+  });
   it('previews every exported story across its preview parts', async () => {
     for (const { name, rows } of (await previewGroups()).groups) {
       const dir = join(out, 'components', name);
