@@ -1,10 +1,12 @@
 import { Children, isValidElement, type ReactNode } from 'react';
-import { CheckboxGroup } from '../Checkbox';
 
-export const checkContainCheckboxGroup = (children: ReactNode) => {
-  const checkboxGroup = Children.toArray(children).find(item => {
-    return isValidElement(item) && item.type === CheckboxGroup;
-  });
-
-  return !!checkboxGroup;
-};
+// Match the `fieldSlot` tag, not CheckboxGroup's identity: a copy from another
+// bundle (e.g. a Module Federation container) is a different function, and a
+// wrapper can tag itself the same way.
+export const checkContainCheckboxGroup = (children: ReactNode) =>
+  Children.toArray(children).some(
+    item =>
+      isValidElement(item) &&
+      typeof item.type === 'function' &&
+      (item.type as { fieldSlot?: string }).fieldSlot === 'checkbox-group',
+  );
