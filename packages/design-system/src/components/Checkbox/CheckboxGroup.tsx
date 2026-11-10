@@ -62,3 +62,6 @@ export const CheckboxGroup: FC<CheckboxGroupProps> = ({
 };
 
 CheckboxGroup.displayName = 'CheckboxGroup';
+
+// Tag as the Field checkbox-group slot so Field renders a fieldset for it.
+Object.assign(CheckboxGroup, { fieldSlot: 'checkbox-group' as const });
