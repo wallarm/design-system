@@ -2,7 +2,7 @@
  "$about": {
   "source": "reference/agent-characters.html",
   "what": "geom() per shape as the page computes it: top anchor, half-width per row (240 rows, y = i / 2), footprint at y 104",
-  "exported": "2026-11-05, scripts/agent-avatars/capture-fixtures.ts, Chrome stable, deviceScaleFactor 2"
+  "exported": "2026-11-11, scripts/agent-avatars/capture-fixtures.ts, Chrome stable, deviceScaleFactor 2"
  },
  "byShape": {
   "dome": {

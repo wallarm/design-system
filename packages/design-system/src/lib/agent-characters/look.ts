@@ -70,7 +70,7 @@ const DRAW_COLORS = COLORS.filter(c => !c.brand).map(c => c.id); // never coral
 
 /**
  * A first look for an agent without a preset, the same on every client for the same uid.
- * `others`: the six presets until looks can be stored (B3), then the tenant's stored looks.
+ * `others`: the presets until looks can be stored (B3), then the tenant's stored looks.
  * `propPool`: no prop by default (P10), since a custom agent's job is not known.
  */
 export function defaultLook(

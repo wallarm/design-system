@@ -1,16 +1,16 @@
 {
   "$about": {
     "source": "reference/agent-characters.html",
-    "what": "PROPS ids and labels as the page holds them. Prop geometry is code, not data: propDef(kind, shape, color) builds each prop from the shape's anchors (line 1402). This file serialises the data and describes the code; prop paths for the six presets are in cast.json (resolved).",
-    "exported": "2026-11-04, Playwright (playwright-core 1.58.2) with Chrome 156 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "what": "PROPS ids and labels as the page holds them. Prop geometry is code, not data: propDef(kind, shape, color) builds each prop from the shape's anchors (line 1412). This file serialises the data and describes the code; prop paths for the six presets are in cast.json (resolved).",
+    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "PROPS": 1394,
-      "propDef": 1402,
-      "PROP_FID": 1614,
-      "HELLO_PROP": 1590,
-      "FIDDLE": 1602,
-      "GLYPH_PROPS": 2010,
-      "glyph": 2011,
+      "PROPS": 1404,
+      "propDef": 1412,
+      "PROP_FID": 1632,
+      "HELLO_PROP": 1608,
+      "FIDDLE": 1620,
+      "GLYPH_PROPS": 2028,
+      "glyph": 2029,
       "workMotion": "Char.render(), lines 1989-2000"
     },
     "keys": {
@@ -368,6 +368,27 @@
       "helloMove": "slip"
     },
     {
+      "id": "quill",
+      "name": "Quill",
+      "glyph": true,
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "honey",
+        "cocoa"
+      ],
+      "layerMaterial": [
+        "felt",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": null,
+      "fiddleKind": "sway",
+      "idleFiddle": true,
+      "helloMove": "sway"
+    },
+    {
       "id": "none",
       "name": "No prop",
       "glyph": false
@@ -547,6 +568,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1066,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            2,
+            79,
+            37.7032
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0103
         }
       },
       "gumdrop": {
@@ -720,6 +753,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1403,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            -12,
+            79,
+            23.7033
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9501,
+          "visorCovered": 0,
+          "crownCovered": 0.014
         }
       },
       "cushion": {
@@ -893,6 +938,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1066,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            -0.5,
+            79,
+            35.203
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0059
         }
       },
       "pebble": {
@@ -1066,6 +1123,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1122,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            12,
+            79,
+            47.703
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0097
         }
       },
       "capsule": {
@@ -1239,6 +1308,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1464,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            -8,
+            79,
+            27.7033
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0095
         }
       },
       "cloud": {
@@ -1412,6 +1493,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1204,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            17,
+            79,
+            52.703
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9418,
+          "visorCovered": 0,
+          "crownCovered": 0.0112
         }
       },
       "egg": {
@@ -1585,6 +1678,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1294,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            -8,
+            79,
+            27.7033
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9469,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
         }
       },
       "mochi": {
@@ -1758,6 +1863,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1026,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            22,
+            79,
+            57.703
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0122
         }
       },
       "kettle": {
@@ -1931,6 +2048,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1204,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            16,
+            79,
+            51.703
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.6419,
+          "visorCovered": 0,
+          "crownCovered": 0.0122
         }
       },
       "mug": {
@@ -2104,6 +2233,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1189,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            6,
+            79,
+            41.7032
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0096
         }
       },
       "padlock": {
@@ -2276,6 +2417,18 @@
           "overflowsViewBox": false,
           "outsideBody": 0,
           "visorCovered": 0.1204,
+          "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2966,
+            -14,
+            79,
+            21.703
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9469,
+          "visorCovered": 0,
           "crownCovered": 0
         }
       },
@@ -2450,6 +2603,18 @@
           "outsideBody": 0,
           "visorCovered": 0.1049,
           "crownCovered": 0
+        },
+        "quill": {
+          "bbox": [
+            60.2965,
+            2,
+            79,
+            37.7032
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9467,
+          "visorCovered": 0,
+          "crownCovered": 0.0138
         }
       }
     }

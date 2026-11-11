@@ -9,8 +9,9 @@ import { type Character, createCharacter } from '../engine';
 import type { StateId } from '../eyes';
 import { RUNTIME_KEY } from '../runtime';
 import type { SvgNode } from '../svg';
+import { pagePreset, withPageProps } from './pageCast';
 
-// Motion parity with the reference page (look v14): the shared harness runs every scenario on the same virtual
+// Motion parity with the reference page (look v17): the shared harness runs every scenario on the same virtual
 // clock against the port, on the charTree markup, and every frame's attributes must equal the page's.
 type Spec = {
   id: string;
@@ -25,7 +26,11 @@ type Spec = {
   x: number;
   y: number;
 };
-type Scenario = { name: string; cue?: { x: number; y: number; w: number; h: number } };
+type Scenario = {
+  name: string;
+  chars: { id: string }[];
+  cue?: { x: number; y: number; w: number; h: number };
+};
 type Row = [number, number, Record<string, unknown>];
 type Clock = { uninstall(): void };
 type Harness = {
@@ -38,7 +43,7 @@ const FIX = path.resolve(__dirname, '__fixtures__');
 // the harness is one expression; the page evaluates the very same text
 const H = runInThisContext(readFileSync(path.join(FIX, 'motion-harness.js'), 'utf8')) as Harness;
 const page = JSON.parse(
-  gunzipSync(readFileSync(path.join(FIX, 'motion-v14.json.gz'))).toString(),
+  gunzipSync(readFileSync(path.join(FIX, 'motion-v17.json.gz'))).toString(),
 ) as {
   scenarios: Record<string, { rows: Row[]; rects: number[][] }>;
 };
@@ -75,8 +80,7 @@ const adapter = {
         rectAt(cue, sc.cue.x, sc.cue.y, sc.cue.w, sc.cue.h);
       }
     }
-    const look = CAST.find(p => p.id === s.id);
-    if (!look) throw new Error(s.id);
+    const look = pagePreset(s.id);
     const t = charTree(look, {
       size: s.size,
       state: s.state,
@@ -118,7 +122,7 @@ const firstDiff = (mine: Row[], ref: Row[]) => {
   return null;
 };
 
-describe('engine motion parity with the reference page (look v14)', () => {
+describe('engine motion parity with the reference page (look v17)', () => {
   let C: Clock;
   beforeAll(() => {
     document.body.appendChild(stage);
@@ -139,7 +143,10 @@ describe('engine motion parity with the reference page (look v14)', () => {
       const ref = page.scenarios[sc.name];
       if (!ref) throw new Error(`no capture for ${sc.name}`);
       stubbed = [];
-      const mine = H.run(sc, C, adapter);
+      const mine = withPageProps(
+        sc.chars.map(c => c.id),
+        () => H.run(sc, C, adapter),
+      );
       // the geometry the port sees (cue, neighbours) is the geometry the page measured
       const sorted = (r: number[][]) => r.map(x => x.join(',')).sort();
       expect(sorted(stubbed)).toEqual(sorted(ref.rects));
@@ -238,7 +245,7 @@ describe('two bundled copies on one page', () => {
     const b = await import('../engine');
     const rt = (await import('../runtime')).getRuntime();
     expect(a.createCharacter).not.toBe(b.createCharacter);
-    const ids = ['radar', 'wally', 'trim', 'sift', 'probe', 'mend'];
+    const ids = ['radar', 'wally', 'trim', 'sift', 'lens', 'acquit'];
     const raf = window.requestAnimationFrame;
     let requested = 0;
     window.requestAnimationFrame = cb => {

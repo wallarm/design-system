@@ -88,7 +88,7 @@ export const Basic: StoryFn<AgentAvatarProps> = args => (
 
 Basic.args = { agent: 'radar', seed: 'radar', size: 72, state: 'idle', shadow: true };
 
-/** The six agents on duty at the team-card size. Each is told apart by its shape, colour and prop. */
+/** The cast on duty at the team-card size. Each is told apart by its shape, colour and prop. */
 export const Cast: StoryFn = () => (
   <HStack gap={24} align='end'>
     {CAST.map(p => (
@@ -141,7 +141,7 @@ export const Places: StoryFn = () => (
 /** Partial coverage: the agent covers only some of its applications, so the top of its head stays in grey felt. */
 export const PartialCoverage: StoryFn = () => (
   <HStack gap={24}>
-    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'mend').map(p => (
+    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'acquit').map(p => (
       <AgentAvatar
         key={p.id}
         data-testid={`agent-avatar-partial-${p.id}`}
@@ -176,13 +176,13 @@ export const CustomAgent: StoryFn = () => (
   </HStack>
 );
 
-// The six presets plus ten custom agents, as stored looks.
+// The presets plus custom agents, as stored looks: 16 in all.
 const TEAM = [
   ...CAST.map(p => ({
     id: p.id,
     look: { v: 1 as const, shape: p.shape, color: p.color, eyes: p.eyes, prop: p.prop },
   })),
-  ...Array.from({ length: 10 }, (_, i) => ({
+  ...Array.from({ length: 16 - CAST.length }, (_, i) => ({
     id: `custom-${i}`,
     look: defaultLook(`team-agent-${i}`),
   })),
@@ -284,9 +284,9 @@ export const Inviting: StoryFn = () => {
     <VStack gap={24} align='center'>
       <HStack gap={24}>
         <AgentAvatar
-          data-testid='agent-avatar-invite-mend'
-          agent='mend'
-          seed='mend'
+          data-testid='agent-avatar-invite-acquit'
+          agent='acquit'
+          seed='acquit'
           size={72}
           state='invite'
           live
@@ -317,8 +317,8 @@ export const Activation: StoryFn = () => {
     <VStack gap={16} align='center'>
       <AgentAvatar
         data-testid='agent-avatar-activation'
-        agent='probe'
-        seed='probe'
+        agent='bard'
+        seed='bard'
         size={120}
         shadow
         live

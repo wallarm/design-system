@@ -1,10 +1,10 @@
 import { describe, expect, it } from '@rstest/core';
 import { bakeSize, charTree } from '../char';
-import { CAST } from '../data.gen';
 import type { StateId } from '../eyes';
 import { type SvgNode, toSvgString } from '../svg';
-import fixture from './__fixtures__/char-v14.json';
+import fixture from './__fixtures__/char-v17.json';
 import { normalise } from './normaliseSvg';
+import { pagePreset, withPageProps } from './pageCast';
 
 type Case = {
   id: string;
@@ -21,15 +21,16 @@ describe('charTree (static 3D character)', () => {
   for (const k of fixture.cases as Case[]) {
     const name = `${k.id} ${k.state}${k.cover ? ' partial' : ''} @${k.size}`;
     it(`matches the page for ${name}`, () => {
-      const c = CAST.find(p => p.id === k.id);
-      if (!c) throw new Error(k.id);
-      const t = charTree(c, {
-        size: k.size,
-        state: k.state,
-        shadow: k.shadow,
-        cover: k.cover,
-        ids: 'k1',
-      });
+      const c = pagePreset(k.id);
+      const t = withPageProps([k.id], () =>
+        charTree(c, {
+          size: k.size,
+          state: k.state,
+          shadow: k.shadow,
+          cover: k.cover,
+          ids: 'k1',
+        }),
+      );
       const mine = toSvgString(
         'svg',
         { viewBox: '-8 -14 136 128', width: t.width, height: t.height },

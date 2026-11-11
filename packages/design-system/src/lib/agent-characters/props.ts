@@ -1,4 +1,4 @@
-// propDef() of the reference page (look v14), ported line for line. Prop geometry depends on the shape
+// propDef() of the reference page (look v17), ported line for line. Prop geometry depends on the shape
 // (its top anchor and half-widths), so it is code, not data.
 import { mix } from './color';
 import {
@@ -10,7 +10,7 @@ import {
   TONE,
 } from './data.gen';
 import { geom } from './geom';
-import { ell, type Pt, polar, qpts, r2, rotRect, rr, tube } from './paths';
+import { cpts, ell, type Pt, polar, poly, qpts, r2, rotRect, rr, tube } from './paths';
 
 const PROP_FID: Record<string, string> = {
   antennae: 'twitch',
@@ -22,6 +22,7 @@ const PROP_FID: Record<string, string> = {
   headlamp: 'flicker',
   windkey: 'spin',
   monocle: 'slip',
+  quill: 'sway',
   seam: 'none',
   plaster: 'none',
 };
@@ -251,6 +252,30 @@ export function propDef(kind: string, S: AgentShapeDef, col: string): PropDef {
         s: `<path d="M${r2(sx)} ${r2(sy)}C${r2(sx + 3)} ${r2(sy + 7)} ${r2(qx + 4)} ${r2(qy - 7)} ${r2(qx)} ${r2(qy - 2)}" fill="none" stroke="#B08D4C" stroke-width="2.1" stroke-dasharray="0 2.9" stroke-linecap="round"/><path class="glint" d="M${r2(x + 1.5)} ${r2(cy - r + 4.4)}l3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>`,
       });
       anim = { type: 'focus', px: r2(x), py: r2(cy) };
+      break;
+    }
+    case 'quill': {
+      // Look v17: a feather tucked into the crown, the bard's cap feather and the pen that writes the brief.
+      const q = cpts([tx + 1, ty + 7], [tx + 2, ty - 5], [tx + 9, ty - 18], [tx + 19, ty - 28], 24);
+      const n = q.length - 1;
+      const A: Pt[] = [];
+      const Z: Pt[] = [];
+      for (let i = 0; i <= n; i++) {
+        const u = (i / n - 0.3) / 0.7;
+        if (u < 0) continue;
+        const a = q[Math.max(0, i - 1)]!;
+        const b = q[Math.min(n, i + 1)]!;
+        const p = q[i]!;
+        const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+        const nx = -(b[1] - a[1]) / l;
+        const ny = (b[0] - a[0]) / l;
+        const w = Math.sin(Math.PI * u ** 0.72) ** 0.8;
+        A.push([p[0] + nx * w * 6.2, p[1] + ny * w * 6.2]);
+        Z.push([p[0] - nx * w * 3.8, p[1] - ny * w * 3.8]);
+      }
+      add(poly([...A, ...Z.reverse()]), 'honey');
+      add(tube(q.slice(0, Math.round(n * 0.97)), 1.4), 'cocoa');
+      anim = { type: 'sway', px: tx + 1, py: ty + 7 };
       break;
     }
     default: // 'none' and unknown props draw nothing

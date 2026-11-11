@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 describe('propOf (WDS-204)', () => {
-  it('ships the six presets as data equal to propDef', () => {
+  it('ships the presets as data equal to propDef', () => {
     expect(Object.keys(PRESET_PROPS)).toHaveLength(CAST.length);
     for (const c of CAST) {
       const col = hexOf(c.color);

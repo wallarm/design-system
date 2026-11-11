@@ -1,9 +1,9 @@
 {
  "$about": {
-  "run": "2026-11-04T18:45:18.108Z",
+  "run": "2026-11-11T09:20:04.660Z",
   "ids": 5000,
   "idSeed": 20261104,
-  "others": "the six presets (data/cast.json)",
+  "others": "the shipped presets (data/cast.json as data.gen.ts ships it: Acquit for Mend, no Probe)",
   "propPool": [
    "none"
   ],
@@ -13,7 +13,7 @@
  "withIssue": 0,
  "fallbacks": 0,
  "pairsPossible": 252,
- "pairsUsed": 240,
+ "pairsUsed": 239,
  "pairsMissing": [
   "gumdrop/cobalt",
   "cushion/lilac",
@@ -24,9 +24,10 @@
   "capsule/cyan",
   "capsule/mint",
   "capsule/sage",
+  "cloud/powder",
   "egg/mint",
   "egg/sage",
-  "egg/olive"
+  "mochi/mint"
  ],
  "eyesUsed": 4
 }

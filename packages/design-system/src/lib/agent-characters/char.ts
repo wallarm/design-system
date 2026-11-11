@@ -185,7 +185,7 @@ export function charTree(c: Look, o: CharOptions): CharTree {
     el('g', { class: 'back' }, back),
     body,
     el('g', { class: 'front' }, front),
-    // Partial coverage moves the veil under the clipped deco (Mend's seam sits over the crown)
+    // Partial coverage moves the veil under the clipped deco (Acquit's seam sits over the crown)
     ...(o.cover ? [veil, clipGroup] : [clipGroup, veil]),
     el('g', { class: 'visor' }, [
       el('rect', {

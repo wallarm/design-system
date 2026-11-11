@@ -1,13 +1,13 @@
 import { describe, expect, it } from '@rstest/core';
 import { shade, solveField } from '../bake';
-import cases from './__fixtures__/bake-v14.json';
+import cases from './__fixtures__/bake-v17.json';
 
 const fromB64 = (s: string) => Uint8Array.from(Buffer.from(s, 'base64'));
 
 // The page's own coverage masks go in, its own pixels must come out: the shading math is checked without a canvas.
 // The page's pixels went through putImageData → PNG, which stores premultiplied alpha: on the soft rim (alpha < 255)
 // a channel can round by up to 255 / alpha. Opaque pixels must match exactly.
-describe('bake port (look v14)', () => {
+describe('bake port (look v17)', () => {
   for (const c of cases as {
     name: string;
     d: string;

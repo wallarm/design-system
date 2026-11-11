@@ -80,7 +80,7 @@ export const Basic: StoryFn<AgentGlyphProps> = args => (
 
 Basic.args = { agent: 'radar', size: 20, state: 'idle' };
 
-/** The six agents in every state frame, at 20 px. Colour and eyes carry the state; red and crosses never appear. */
+/** The cast in every state frame, at 20 px. Colour and eyes carry the state; red and crosses never appear. */
 export const Cast: StoryFn = () => (
   <VStack gap={12}>
     <HStack gap={16}>
@@ -158,7 +158,7 @@ export const InlineWithText: StoryFn = () => (
 /** Partial coverage: an agent whose template has applications, covering only some of them, shows a grey crown while on duty. */
 export const PartialCoverage: StoryFn = () => (
   <HStack gap={24}>
-    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'mend').map(p => (
+    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'acquit').map(p => (
       <VStack key={p.id} gap={8} align='center'>
         <AgentGlyph
           data-testid={`agent-glyph-partial-${p.id}`}

@@ -103,3 +103,21 @@ Read from `core-frontend` `origin/main` at 42849d1:
 1. **Product (P18):** which low-end machine or profile do the budgets target? Without one, Phase 1 uses a named CI runner profile.
 2. **Platform (H1):** does any edge or ingress in front of the new platform set a CSP? If so, we need `worker-src blob:` and `img-src blob:`.
 3. **Consumer:** access to `ai-assistant-remote`, to confirm it receives the host's shared DS.
+
+## Cast as of 10.11 (WDS-205, 2026-11-11)
+
+The reference is now look v17 (the look page artifact), exported with the handoff's `data/export.cjs`. Against v14 it
+adds Lens (mochi, mint, tall eyes, periscope), Bard (cloud, powder, oval eyes, quill) and the quill prop, and rewords
+the agents' descriptions. Shapes, colours, eyes, states and every other prop are unchanged, and so is the bake, so
+`LOOK_VERSION` stays.
+
+The shipped cast follows the ticket, which is later than the page:
+
+- **Acquit** ships with Mend's look and template (`fp-resolver`). `agent='mend'` is gone.
+- **Probe** has no live agent and leaves the presets. `agent='probe'` now gets its default look, like any other id.
+- **Tune** is a new agent with no character yet. It gets its default look until one lands (P10).
+
+The data files and every fixture keep the page's ids. `scripts/agent-avatars/export-data.ts` renames and drops
+presets only for the module it generates, and the parity tests look fixtures up in the page's presets
+(`__tests__/pageCast.ts`). `default-look.json` was re-run against the shipped cast, so a custom agent can now draw
+Probe's egg in olive but not Lens's or Bard's look.

@@ -1,5 +1,5 @@
 /**
- * Captures the reference page's motion (look v14) for the engine's parity test: every attribute the engine writes,
+ * Captures the reference page's motion (look v17) for the engine's parity test: every attribute the engine writes,
  * frame by frame at 60 fps, on a virtual clock (performance.now, requestAnimationFrame, setTimeout) installed
  * before the page script runs. The scenarios and the clock are the shared harness in
  * src/lib/agent-characters/__tests__/__fixtures__/motion-harness.js, which the jsdom test runs against the port.
@@ -88,13 +88,13 @@ if (errors.length) throw new Error(`page errors: ${errors.join('\n')}`);
 
 const json = JSON.stringify({
   $about: {
-    source: 'reference/agent-characters.html (look v14)',
+    source: 'reference/agent-characters.html (look v17)',
     exported: `${new Date().toISOString().slice(0, 10)}, scripts/agent-avatars/capture-motion.ts, Chrome stable`,
   },
   scenarios: out,
 });
-writeFileSync(path.join(FIX, 'motion-v14.json.gz'), gzipSync(json, { level: 9 }));
+writeFileSync(path.join(FIX, 'motion-v17.json.gz'), gzipSync(json, { level: 9 }));
 // biome-ignore lint/suspicious/noConsole: CLI output
 console.log(
-  `motion-v14.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
+  `motion-v17.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
 );
