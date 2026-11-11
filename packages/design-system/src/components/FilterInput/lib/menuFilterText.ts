@@ -1,4 +1,5 @@
-import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
+import type { ChipSegment } from '../FilterInputField/FilterInputChip/FilterInputChip';
+import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip/segmentVariant';
 import type { FieldValueOption, FilterOperator } from '../types';
 import { isMultiSelectOperator } from './operators';
 
