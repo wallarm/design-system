@@ -27,8 +27,9 @@ export const migration: Migration = {
     for (const el of findComponentElements(file, 'NumericBadge')) {
       const typeAttr = getAttribute(el, 'type');
       if (!typeAttr) {
-        if (hasSpread(el))
+        if (hasSpread(el)) {
           ctx.report(el, `${HINT}: type may come from spread props, review manually`);
+        }
         continue;
       }
       const value = readStaticString(typeAttr);
@@ -36,15 +37,17 @@ export const migration: Migration = {
         ctx.report(typeAttr, `${HINT}: non-static type, review manually`);
         continue;
       }
-      if (hasSpreadAfter(el, typeAttr))
+      if (hasSpreadAfter(el, typeAttr)) {
         ctx.report(
           typeAttr,
           `${HINT}: spread props after type may override it with an old value, review manually`,
         );
+      }
       if (!Object.hasOwn(MAP, value)) continue;
       if (getAttribute(el, 'color')) {
-        if (!NEW_TYPES.has(value))
+        if (!NEW_TYPES.has(value)) {
           ctx.report(typeAttr, `${HINT}: already has color, review manually`);
+        }
         continue;
       }
       const [type, color] = MAP[value] as [string, string];

@@ -1,9 +1,11 @@
-import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { describe, expect, it } from '@rstest/core';
 import { guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
+
 import { loadGuidelines, loadMetadata } from '../metadata';
 import {
   buildInstructions,

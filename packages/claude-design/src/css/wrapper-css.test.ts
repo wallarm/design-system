@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@rstest/core';
 import { JSDOM } from 'jsdom';
 import postcss from 'postcss';
+
 import { tolerateCanvasWrappers } from './wrapper-css';
 
 const selectorsOf = (css: string): string[] => {

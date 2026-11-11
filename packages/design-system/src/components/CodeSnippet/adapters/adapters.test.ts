@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { highlightJsAdapter } from './highlightjs';
 import { plainAdapter } from './plain';
 import { prismAdapter } from './prism';

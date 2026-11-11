@@ -1,4 +1,5 @@
 import { describe, expect, it, rs } from '@rstest/core';
+
 import {
   buildDisplayItems,
   type DisplayItem,

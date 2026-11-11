@@ -1,7 +1,9 @@
 import type { MouseEvent } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { formatCompactRelativeTime } from '../../utils/formatDateTime';
 import { Button } from '../Button';

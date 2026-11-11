@@ -1,4 +1,5 @@
 import type { VariantProps } from 'class-variance-authority';
+
 import type { logoVariants } from './classes';
 
 export type LogoType = 'icon' | 'wordmark' | 'full';

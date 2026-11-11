@@ -1,8 +1,10 @@
 import { act, createRef, StrictMode } from 'react';
+
 import { EditorView } from '@codemirror/view';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { copyText } from '../../utils/copyText';
 import {
   CodeSnippetActions,

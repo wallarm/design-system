@@ -1,5 +1,7 @@
 import type { ComponentProps, FC, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
@@ -29,7 +31,7 @@ export const Ip: FC<IpProps> = ({
         ref={ref}
         data-testid={testId}
         data-slot='ip'
-        className={cn('flex items-center gap-4 min-w-0 max-w-full overflow-hidden', className)}
+        className={cn('flex max-w-full min-w-0 items-center gap-4 overflow-hidden', className)}
       >
         {children}
       </Comp>

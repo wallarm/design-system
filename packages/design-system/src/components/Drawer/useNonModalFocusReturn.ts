@@ -28,7 +28,6 @@ const findTrigger = (contentId: string) =>
  */
 export const useNonModalFocusReturn = (isOpen: boolean, modal: boolean, contentId: string) => {
   // `modal` is read when the drawer opens: switching it on an open drawer is not a close.
-  // oxlint-disable-next-line react-hooks/exhaustive-deps -- only opening and closing re-run this
   useLayoutEffect(() => {
     if (!isOpen || modal) return;
 

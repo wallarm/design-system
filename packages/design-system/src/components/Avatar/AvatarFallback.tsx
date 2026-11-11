@@ -1,5 +1,7 @@
 import type { ComponentType, FC, HTMLAttributes, Ref } from 'react';
+
 import { Avatar as ArkAvatar } from '@ark-ui/react/avatar';
+
 import { type SvgIconProps, UserRound } from '../../icons';
 import { cn } from '../../utils/cn';
 import { getInitials } from '../../utils/getInitials';

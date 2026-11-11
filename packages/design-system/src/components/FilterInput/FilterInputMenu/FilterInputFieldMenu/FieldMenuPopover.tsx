@@ -1,5 +1,7 @@
 import { type FC, useEffect } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react';
+
 import { PopoverContent } from '../../../Popover';
 import { Separator } from '../../../Separator';
 import { useFloatingRecomputeOn } from '../../hooks/useFloatingRecomputeOn';
@@ -79,7 +81,7 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
         minWidth='240px'
         maxWidth='340px'
         // pointer-events-none: a stray hover over the panel must not affect the menu.
-        className='gap-6 pointer-events-none'
+        className='pointer-events-none gap-6'
         // Its layer sits between the field menu and the operator menu it hands off to; the
         // marker lets `keepOpenOnMenuHandoff` ignore the dismiss it sends when it closes.
         data-filter-input-menu='true'
@@ -90,7 +92,7 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
         {example && (
           <>
             <Separator spacing={8} />
-            <pre className='m-0 font-mono text-xs leading-xs text-text-secondary whitespace-pre-wrap'>
+            <pre className='m-0 font-mono text-xs leading-xs whitespace-pre-wrap text-text-secondary'>
               {example}
             </pre>
           </>

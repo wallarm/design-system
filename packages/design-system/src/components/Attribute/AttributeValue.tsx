@@ -1,4 +1,5 @@
 import { Children, type FC, type HTMLAttributes, type ReactNode, type Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
@@ -63,7 +64,7 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
         // Un-clip non-portaled editor dropdowns (horizontal `truncate` sets
         // overflow-hidden). :has() only matches while an InlineEdit is hosted.
         'has-[[data-slot=inline-edit]]:overflow-visible',
-        isHorizontal ? 'flex-1 min-w-0 py-4 truncate' : 'pt-4 min-h-[28px]',
+        isHorizontal ? 'min-w-0 flex-1 truncate py-4' : 'min-h-[28px] pt-4',
         className,
       )}
     >

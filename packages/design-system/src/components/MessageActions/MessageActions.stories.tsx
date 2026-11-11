@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { MessageAction, MessageActions, MessageTimestamp } from '.';
 import { Ellipsis, ThumbsDown, ThumbsUp } from '../../icons';
 import { Copyable, CopyableIcon } from '../Copyable';

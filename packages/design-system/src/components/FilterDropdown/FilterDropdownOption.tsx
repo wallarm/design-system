@@ -1,5 +1,7 @@
 import { type ComponentProps, type ReactNode, type Ref, useContext } from 'react';
+
 import type { CollectionItem } from '@ark-ui/react/collection';
+
 import { useTestId } from '../../utils/testId';
 import { SelectOption } from '../Select/SelectOption';
 import { SelectOptionHint } from '../Select/SelectOptionHint';

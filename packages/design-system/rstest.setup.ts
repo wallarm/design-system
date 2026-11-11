@@ -98,7 +98,7 @@ if (typeof document !== 'undefined' && typeof document.createRange === 'function
     ({
       length: 0,
       item: () => null,
-      [Symbol.iterator]: function* () {
+      *[Symbol.iterator]() {
         yield* [] as DOMRect[];
       },
     }) as unknown as DOMRectList;

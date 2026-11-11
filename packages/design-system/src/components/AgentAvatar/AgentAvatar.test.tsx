@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { charTree } from '../../lib/agent-characters/char';
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { toSvgString } from '../../lib/agent-characters/svg';
@@ -21,13 +23,13 @@ const asPage = (svg: SVGSVGElement) => {
     n.setAttribute('class', part);
     for (const [k, v] of rest) n.setAttribute(k, v);
   }
-  return c.innerHTML.replace(/(id="|url\(#)([^"\)]+?)(g|k|c|vg|eg|s|v)(["\)])/g, '$1ID$3$4');
+  return c.innerHTML.replace(/(id="|url\(#)([^")]+?)(g|k|c|vg|eg|s|v)([")])/g, '$1ID$3$4');
 };
 const corePage = (tree: ReturnType<typeof charTree>) => {
   const host = document.createElement('div');
   host.innerHTML = toSvgString('svg', {}, tree.children);
   return (host.querySelector('svg') as SVGSVGElement).innerHTML.replace(
-    /(id="|url\(#)([^"\)]+?)(g|k|c|vg|eg|s|v)(["\)])/g,
+    /(id="|url\(#)([^")]+?)(g|k|c|vg|eg|s|v)([")])/g,
     '$1ID$3$4',
   );
 };
@@ -35,7 +37,7 @@ const svgOf = (el: HTMLElement) => el.querySelector('svg') as SVGSVGElement;
 
 describe('AgentAvatar (static)', () => {
   it('renders the core static frame for every preset and state', () => {
-    for (const p of CAST)
+    for (const p of CAST) {
       for (const state of [
         'idle',
         'needs',
@@ -58,6 +60,7 @@ describe('AgentAvatar (static)', () => {
         expect(root.hasAttribute('data-veiled')).toBe(tree.veiled);
         unmount();
       }
+    }
   });
 
   it('keeps the crown in every state but Deactivated (04 §4.11)', () => {

@@ -1,5 +1,7 @@
 import type { CSSProperties, FC, Ref } from 'react';
+
 import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
@@ -33,7 +35,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
           data-has-nested-same={nestedSameKindCount > 0 ? '' : undefined}
           className={cn(
             drawerContentVariants({ isResizing: false }),
-            'flex flex-col min-h-0',
+            'flex min-h-0 flex-col',
             'slide-in-from-bottom-[25%] slide-out-to-bottom-[25%]',
             'origin-top',
 
@@ -42,7 +44,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
             'data-[has-nested-same]:-translate-y-[calc((var(--dialog-pushed-back-offset)/(var(--dialog-pushed-back-scale)-(var(--nested-same-kind-count)*var(--dialog-pushed-back-ratio))))*var(--nested-same-kind-count))]',
 
             // Header
-            '**:data-[slot=drawer-header]:pt-20 **:data-[slot=drawer-header]:pb-16 **:data-[slot=drawer-header]:px-24',
+            '**:data-[slot=drawer-header]:px-24 **:data-[slot=drawer-header]:pt-20 **:data-[slot=drawer-header]:pb-16',
           )}
           style={{ width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties}
         >

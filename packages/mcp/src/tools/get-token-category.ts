@@ -1,4 +1,5 @@
 import type { DesignSystemMetadata, TokenCategory } from '@wallarm-org/mcp-core';
+
 import { tokenUtilities } from './search-token';
 
 export function getTokenCategory(

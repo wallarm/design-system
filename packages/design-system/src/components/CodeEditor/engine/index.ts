@@ -21,6 +21,7 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view';
+
 import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorApi, CodeEditorLanguage } from '../types';
 import { adapterPainter } from './adapterPainter';
@@ -408,7 +409,7 @@ export const createEditor = (
         view.dispatch({ effects: compartments.language.reconfigure(extension) });
       },
       error => {
-        // oxlint-disable-next-line no-console -- surfaced once per failed load; editor keeps working without structure
+        // surfaced once per failed load; editor keeps working without structure
         console.error(`[CodeEditor] failed to load the ${lang} parser`, error);
       },
     );

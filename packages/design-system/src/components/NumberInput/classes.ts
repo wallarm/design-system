@@ -1,14 +1,15 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const numberInputRootVariants = cva(
   cn(
     // Layout
-    'flex items-stretch border rounded-8 bg-component-input-bg relative w-full has-[>textarea]:h-auto',
+    'relative flex w-full items-stretch rounded-8 border bg-component-input-bg has-[>textarea]:h-auto',
 
     // Static state
-    'border border-border-primary outline-none shadow-xs transition-[color,border,box-shadow]',
-    '[&:not([data-disabled]):not([data-focus])]:hover:border-component-border-input-hover ',
+    'border border-border-primary shadow-xs transition-[color,border,box-shadow] outline-none',
+    '[&:not([data-disabled]):not([data-focus])]:hover:border-component-border-input-hover',
 
     // Focus state.
     '[&[data-focus]:not([data-disabled])]:ring-3',
@@ -45,8 +46,8 @@ export const numberInputRootVariants = cva(
 
 export const numberInputFieldVariants = cva(
   cn(
-    'flex-1 h-full rounded-none border-0 bg-transparent shadow-none outline-none',
-    'font-sans font-normal text-sm text-text-primary placeholder:text-text-secondary',
+    'h-full flex-1 rounded-none border-0 bg-transparent shadow-none outline-none',
+    'font-sans text-sm font-normal text-text-primary placeholder:text-text-secondary',
   ),
   {
     // Vertical padding is (height - 20) / 2 so the text-sm/20px-line-height
@@ -68,7 +69,7 @@ export const numberInputFieldVariants = cva(
 export const numberInputControlVariants = cva(
   cn(
     'flex flex-col justify-center',
-    'bg-states-primary-default-alt border-l border-border-primary',
+    'border-l border-border-primary bg-states-primary-default-alt',
     '[&_svg]:pointer-events-none',
   ),
   {
@@ -88,9 +89,9 @@ export const numberInputControlVariants = cva(
 
 export const numberInputTriggerVariants = cva(
   cn(
-    'flex items-center justify-center rounded-2 transition-colors cursor-pointer',
+    'flex cursor-pointer items-center justify-center rounded-2 transition-colors',
     'hover:bg-states-primary-hover',
-    '[&[data-disabled]]:cursor-not-allowed [&[data-disabled]]:pointer-events-none',
+    '[&[data-disabled]]:pointer-events-none [&[data-disabled]]:cursor-not-allowed',
   ),
   {
     variants: {
@@ -99,10 +100,10 @@ export const numberInputTriggerVariants = cva(
         // inline-block with a baseline vertical-align, which drags the glyph
         // below center inside this fixed-size button under inherited
         // font-size/line-height.
-        default: 'w-16 h-14 px-2 py-1',
-        medium: 'w-14 h-12 px-2 py-1',
-        small: 'w-12 h-10 px-1 py-0',
-        'inline-edit': 'w-12 h-11 px-1 py-0',
+        default: 'h-14 w-16 px-2 py-1',
+        medium: 'h-12 w-14 px-2 py-1',
+        small: 'h-10 w-12 px-1 py-0',
+        'inline-edit': 'h-11 w-12 px-1 py-0',
       },
     },
     defaultVariants: {

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { NumericBadge } from '../NumericBadge';
@@ -58,54 +60,50 @@ const meta = {
 export default meta;
 
 /** The whole frame: `PageTitle` with a count beside it, `PageActions` on the right, `PageContent` below, asking the shell for the full width and a fixed height. */
-export const Basic: StoryFn<PageProps> = () => {
-  return (
-    <Page name='full-featured' fullSize fixedHeight>
-      <PageHeader>
-        <PageTitle>Page title</PageTitle>
+export const Basic: StoryFn<PageProps> = () => (
+  <Page name='full-featured' fullSize fixedHeight>
+    <PageHeader>
+      <PageTitle>Page title</PageTitle>
 
-        <Badge>1000</Badge>
+      <Badge>1000</Badge>
 
-        <PageActions>
-          <Button variant='secondary' color='neutral' size='small'>
-            Export
-          </Button>
-          <Button size='small'>Settings</Button>
-        </PageActions>
-      </PageHeader>
+      <PageActions>
+        <Button variant='secondary' color='neutral' size='small'>
+          Export
+        </Button>
+        <Button size='small'>Settings</Button>
+      </PageActions>
+    </PageHeader>
 
-      <PageContent>
-        <p>Full-featured page with header actions, tabs (including disabled), and content area.</p>
-      </PageContent>
-    </Page>
-  );
-};
+    <PageContent>
+      <p>Full-featured page with header actions, tabs (including disabled), and content area.</p>
+    </PageContent>
+  </Page>
+);
 
 /** `contained` gives the page its own scroll container, which is what lets `PageHeader sticky` stick. Without it the shell does the scrolling and the header leaves with the content. */
-export const StickyHeader: StoryFn<PageProps> = () => {
-  return (
-    <Page name='sticky-header' contained>
-      <PageHeader sticky>
-        <PageTitle>Sticky header</PageTitle>
+export const StickyHeader: StoryFn<PageProps> = () => (
+  <Page name='sticky-header' contained>
+    <PageHeader sticky>
+      <PageTitle>Sticky header</PageTitle>
 
-        <PageActions>
-          <Button variant='secondary' color='neutral' size='small'>
-            Export
-          </Button>
-          <Button size='small'>Settings</Button>
-        </PageActions>
-      </PageHeader>
+      <PageActions>
+        <Button variant='secondary' color='neutral' size='small'>
+          Export
+        </Button>
+        <Button size='small'>Settings</Button>
+      </PageActions>
+    </PageHeader>
 
-      <PageContent>
-        {Array.from({ length: 40 }, (_, i) => (
-          <p key={`row-${i + 1}`} className='py-8'>
-            Content row {i + 1}
-          </p>
-        ))}
-      </PageContent>
-    </Page>
-  );
-};
+    <PageContent>
+      {Array.from({ length: 40 }, (_, i) => (
+        <p key={`row-${i + 1}`} className='py-8'>
+          Content row {i + 1}
+        </p>
+      ))}
+    </PageContent>
+  </Page>
+);
 
 /** `PageHeaderGroup` stacks the title over a `PageDescription`; `PageToolbar` adds a filter row between the header and the content. */
 export const WithDescriptionAndToolbar: StoryFn<PageProps> = () => {

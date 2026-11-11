@@ -1,5 +1,6 @@
 // FeedbackPulseProgress.tsx  — mirrors Toast/ToastProgress, decoupled from the toast DOM scope.
 import { type FC, useEffect, useRef, useState } from 'react';
+
 import { cn } from '../../utils/cn';
 
 export interface FeedbackPulseProgressProps {

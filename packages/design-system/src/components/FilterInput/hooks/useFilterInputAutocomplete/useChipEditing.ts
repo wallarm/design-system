@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
@@ -47,8 +48,9 @@ const getFirstIncompleteSegment = (
     condition.value === null ||
     condition.value === '' ||
     condition.error === SEGMENT_VARIANT.value
-  )
+  ) {
     return SEGMENT_VARIANT.value;
+  }
   return null;
 };
 

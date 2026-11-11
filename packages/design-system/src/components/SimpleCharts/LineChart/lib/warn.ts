@@ -4,7 +4,7 @@ type WarnFn = (...args: unknown[]) => void;
 
 const PROD: WarnFn = () => {};
 
-// oxlint-disable-next-line no-console -- dev-only warning surface
+// dev-only warning surface
 const DEV = console.warn;
 
 const make = (component: string): WarnFn =>

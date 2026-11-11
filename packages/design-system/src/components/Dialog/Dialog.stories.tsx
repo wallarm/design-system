@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
 import {
@@ -115,103 +117,97 @@ const ContentPlaceholder = ({ height }: { fillHeight?: boolean; height?: number 
  * The minimum: trigger, content, and a title. Every dialog needs a title — it is what a screen
  * reader announces on open.
  */
-export const Basic: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog data-testid='dialog'>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog
-        </Button>
-      </DialogTrigger>
+export const Basic: StoryFn<DialogProps> = () => (
+  <Dialog data-testid='dialog'>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Dialog Title</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Dialog Title</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <ContentPlaceholder />
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      <DialogBody>
+        <ContentPlaceholder />
+      </DialogBody>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * `DialogFooter` holds the decision. Put the confirming action last, since that is where the
  * eye finishes.
  */
-export const WithFooter: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog
-        </Button>
-      </DialogTrigger>
+export const WithFooter: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Dialog's title</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Dialog's title</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <ContentPlaceholder />
-        </DialogBody>
+      <DialogBody>
+        <ContentPlaceholder />
+      </DialogBody>
 
-        <DialogFooter>
-          <DialogFooterControls>
-            <Button variant='ghost' color='neutral' size='large'>
-              Button
-            </Button>
-            <Button variant='primary' color='brand' size='large'>
-              Button
-            </Button>
-          </DialogFooterControls>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      <DialogFooter>
+        <DialogFooterControls>
+          <Button variant='ghost' color='neutral' size='large'>
+            Button
+          </Button>
+          <Button variant='primary' color='brand' size='large'>
+            Button
+          </Button>
+        </DialogFooterControls>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * `DialogDescription` states the consequence, which is what turns a confirmation from a speed
  * bump into a decision. `DialogHeader` finds the title and description among its children and
  * stacks them, so the close button stays right-aligned however many it gets.
  */
-export const WithDescription: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog
-        </Button>
-      </DialogTrigger>
+export const WithDescription: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Dialog's title</DialogTitle>
-          <DialogDescription>Description</DialogDescription>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Dialog's title</DialogTitle>
+        <DialogDescription>Description</DialogDescription>
+      </DialogHeader>
 
-        <DialogBody>
-          <ContentPlaceholder />
-        </DialogBody>
+      <DialogBody>
+        <ContentPlaceholder />
+      </DialogBody>
 
-        <DialogFooter>
-          <DialogFooterControls>
-            <Button variant='ghost' color='neutral' size='large'>
-              Button
-            </Button>
-            <Button variant='primary' color='brand' size='large'>
-              Button
-            </Button>
-          </DialogFooterControls>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      <DialogFooter>
+        <DialogFooterControls>
+          <Button variant='ghost' color='neutral' size='large'>
+            Button
+          </Button>
+          <Button variant='primary' color='brand' size='large'>
+            Button
+          </Button>
+        </DialogFooterControls>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * A left-aligned action for the escape route — cancel, learn more — kept away from the
@@ -316,219 +312,209 @@ export const Sizes: StoryFn<DialogProps> = () => (
 /**
  * Explicit `width`, `minWidth` and `maxWidth` for content the standard steps do not fit.
  */
-export const CustomSizes: StoryFn<DialogProps> = () => {
-  return (
-    <HStack gap={8} justify='center'>
-      <Dialog width='50%'>
-        <DialogTrigger asChild>
-          <Button variant='outline' color='neutral'>
-            50% Width
-          </Button>
-        </DialogTrigger>
+export const CustomSizes: StoryFn<DialogProps> = () => (
+  <HStack gap={8} justify='center'>
+    <Dialog width='50%'>
+      <DialogTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          50% Width
+        </Button>
+      </DialogTrigger>
 
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>50% Width Dialog</DialogTitle>
-          </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>50% Width Dialog</DialogTitle>
+        </DialogHeader>
 
-          <DialogBody>
-            <div className='py-12'>
-              <p>This dialog takes 50% of the viewport width.</p>
-            </div>
-          </DialogBody>
-        </DialogContent>
-      </Dialog>
+        <DialogBody>
+          <div className='py-12'>
+            <p>This dialog takes 50% of the viewport width.</p>
+          </div>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
 
-      <Dialog width={1000}>
-        <DialogTrigger asChild>
-          <Button variant='outline' color='neutral'>
-            1000px Width
-          </Button>
-        </DialogTrigger>
+    <Dialog width={1000}>
+      <DialogTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          1000px Width
+        </Button>
+      </DialogTrigger>
 
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>1000px Width Dialog</DialogTitle>
-          </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>1000px Width Dialog</DialogTitle>
+        </DialogHeader>
 
-          <DialogBody>
-            <div className='py-12'>
-              <p>This dialog has a fixed width of 1000px.</p>
-            </div>
-          </DialogBody>
-        </DialogContent>
-      </Dialog>
-    </HStack>
-  );
-};
+        <DialogBody>
+          <div className='py-12'>
+            <p>This dialog has a fixed width of 1000px.</p>
+          </div>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
+  </HStack>
+);
 
 /**
  * The body scrolls while header and footer stay put, so the decision never scrolls out of
  * reach.
  */
-export const Scrollable: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog with Scroll
-        </Button>
-      </DialogTrigger>
+export const Scrollable: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog with Scroll
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Scrollable Content</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Scrollable Content</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <div className='flex flex-col gap-16'>
-            {Array.from({ length: 20 }).map((_, i) => (
-              <ContentPlaceholder key={i} height={100} />
-            ))}
-          </div>
-        </DialogBody>
+      <DialogBody>
+        <div className='flex flex-col gap-16'>
+          {Array.from({ length: 20 }).map((_, i) => (
+            <ContentPlaceholder key={i} height={100} />
+          ))}
+        </div>
+      </DialogBody>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant='ghost' color='neutral' size='large'>
-              Close
-            </Button>
-          </DialogClose>
-          <Button variant='primary' color='brand' size='large'>
-            Confirm
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant='ghost' color='neutral' size='large'>
+            Close
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+        </DialogClose>
+        <Button variant='primary' color='brand' size='large'>
+          Confirm
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * A field against the panel edge, which is where focus rings and shadows get clipped if the
  * padding is wrong.
  */
-export const WithInputAtEdge: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog with Edge Input
-        </Button>
-      </DialogTrigger>
+export const WithInputAtEdge: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog with Edge Input
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete account</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Delete account</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <Input placeholder='Type your email to confirm' data-testid='edge-input' />
-        </DialogBody>
+      <DialogBody>
+        <Input placeholder='Type your email to confirm' data-testid='edge-input' />
+      </DialogBody>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant='ghost' color='neutral' size='large'>
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button variant='primary' color='destructive' size='large'>
-            Delete
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant='ghost' color='neutral' size='large'>
+            Cancel
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+        </DialogClose>
+        <Button variant='primary' color='destructive' size='large'>
+          Delete
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * The same, with scrolling — the case where a focus ring can be cut by the scroll container
  * rather than the panel.
  */
-export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Scrollable Dialog with Edge Input
-        </Button>
-      </DialogTrigger>
+export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Scrollable Dialog with Edge Input
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete account</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Delete account</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <div className='flex flex-col gap-16'>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <ContentPlaceholder key={i} height={100} />
-            ))}
+      <DialogBody>
+        <div className='flex flex-col gap-16'>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <ContentPlaceholder key={i} height={100} />
+          ))}
 
-            <Input placeholder='Type your email to confirm' data-testid='edge-input' />
-          </div>
-        </DialogBody>
+          <Input placeholder='Type your email to confirm' data-testid='edge-input' />
+        </div>
+      </DialogBody>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant='ghost' color='neutral' size='large'>
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button variant='primary' color='destructive' size='large'>
-            Delete
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant='ghost' color='neutral' size='large'>
+            Cancel
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+        </DialogClose>
+        <Button variant='primary' color='destructive' size='large'>
+          Delete
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * A drawer opened from a dialog. Different families, so neither pushes the other back; they
  * stack.
  */
-export const WithNestedDrawer: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open dialog with drawer inside
-        </Button>
-      </DialogTrigger>
+export const WithNestedDrawer: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open dialog with drawer inside
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Dialog stays in place</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Dialog stays in place</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <VStack gap={12} align='start'>
-            <Text>Opening the drawer below must not scale or shift this dialog.</Text>
+      <DialogBody>
+        <VStack gap={12} align='start'>
+          <Text>Opening the drawer below must not scale or shift this dialog.</Text>
 
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button variant='outline' color='neutral'>
-                  <PanelRight />
-                  Open drawer
-                </Button>
-              </DrawerTrigger>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant='outline' color='neutral'>
+                <PanelRight />
+                Open drawer
+              </Button>
+            </DrawerTrigger>
 
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>Drawer over a dialog</DrawerTitle>
-                </DrawerHeader>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Drawer over a dialog</DrawerTitle>
+              </DrawerHeader>
 
-                <DrawerBody>
-                  <ContentPlaceholder height={200} />
-                </DrawerBody>
-              </DrawerContent>
-            </Drawer>
-          </VStack>
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
-  );
-};
+              <DrawerBody>
+                <ContentPlaceholder height={200} />
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
+        </VStack>
+      </DialogBody>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * A `Select` inside a dialog, checking that its menu escapes the panel rather than being
@@ -613,57 +599,55 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
 /**
  * A `Calendar` inside a dialog, the same check for a popover that is taller than the panel.
  */
-export const WithNestedCalendar: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open dialog with nested calendar
-        </Button>
-      </DialogTrigger>
+export const WithNestedCalendar: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open dialog with nested calendar
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>[Level 1] Main Dialog</DialogTitle>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>[Level 1] Main Dialog</DialogTitle>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant='ghost' color='neutral' size='small'>
-                <PanelRight />
-                Open nested dialog
-              </Button>
-            </DialogTrigger>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant='ghost' color='neutral' size='small'>
+              <PanelRight />
+              Open nested dialog
+            </Button>
+          </DialogTrigger>
 
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>[Level 2] With Calendar</DialogTitle>
-              </DialogHeader>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>[Level 2] With Calendar</DialogTitle>
+            </DialogHeader>
 
-              <DialogBody>
-                <Calendar type='single'>
-                  <CalendarTrigger asChild>
-                    <Button variant='outline' color='neutral'>
-                      Open calendar
-                    </Button>
-                  </CalendarTrigger>
-                  <CalendarContent>
-                    <CalendarBody>
-                      <CalendarGrids />
-                    </CalendarBody>
-                  </CalendarContent>
-                </Calendar>
-              </DialogBody>
-            </DialogContent>
-          </Dialog>
-        </DialogHeader>
+            <DialogBody>
+              <Calendar type='single'>
+                <CalendarTrigger asChild>
+                  <Button variant='outline' color='neutral'>
+                    Open calendar
+                  </Button>
+                </CalendarTrigger>
+                <CalendarContent>
+                  <CalendarBody>
+                    <CalendarGrids />
+                  </CalendarBody>
+                </CalendarContent>
+              </Calendar>
+            </DialogBody>
+          </DialogContent>
+        </Dialog>
+      </DialogHeader>
 
-        <DialogBody>
-          <ContentPlaceholder height={200} />
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      <DialogBody>
+        <ContentPlaceholder height={200} />
+      </DialogBody>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * Owning `open`, which is what you need when something outside the dialog decides it should
@@ -711,195 +695,189 @@ export const Controlled: StoryFn<DialogProps> = () => {
  * Escape disabled, for a decision that must not be dismissed by reflex. Use it sparingly — it
  * takes away the exit readers expect.
  */
-export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog closeOnEscape={false}>
-      <DialogTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Dialog
-        </Button>
-      </DialogTrigger>
+export const NoClosableOnEsc: StoryFn<DialogProps> = () => (
+  <Dialog closeOnEscape={false}>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Dialog
+      </Button>
+    </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Dialog Title</DialogTitle>
-        </DialogHeader>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Dialog Title</DialogTitle>
+      </DialogHeader>
 
-        <DialogBody>
-          <ContentPlaceholder />
-        </DialogBody>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      <DialogBody>
+        <ContentPlaceholder />
+      </DialogBody>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * Without the backdrop. The panel stops reading as blocking, which is usually the wrong signal
  * for a dialog.
  */
-export const NoOverlay: StoryFn<DialogProps> = () => {
-  return (
-    <VStack gap={12}>
-      <Text>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-        been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-        galley of type and scrambled it to make a type specimen book. It has survived not only five
-        centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-        It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
-        passages, and more recently with desktop publishing software like Aldus PageMaker including
-        versions of Lorem Ipsum. Why do we use it? It is a long established fact that a reader will
-        be distracted by the readable content of a page when looking at its layout. The point of
-        using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed
-        to using 'Content here, content here', making it look like readable English. Many desktop
-        publishing packages and web page editors now use Lorem Ipsum as their default model text,
-        and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various
-        versions have evolved over the years, sometimes by accident, sometimes on purpose (injected
-        humour and the like).
-      </Text>
+export const NoOverlay: StoryFn<DialogProps> = () => (
+  <VStack gap={12}>
+    <Text>
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
+      galley of type and scrambled it to make a type specimen book. It has survived not only five
+      centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It
+      was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
+      passages, and more recently with desktop publishing software like Aldus PageMaker including
+      versions of Lorem Ipsum. Why do we use it? It is a long established fact that a reader will be
+      distracted by the readable content of a page when looking at its layout. The point of using
+      Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using
+      'Content here, content here', making it look like readable English. Many desktop publishing
+      packages and web page editors now use Lorem Ipsum as their default model text, and a search
+      for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have
+      evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the
+      like).
+    </Text>
 
-      <Dialog overlay={false}>
-        <DialogTrigger asChild>
-          <Button variant='outline' color='neutral'>
-            Open without Overlay
-          </Button>
-        </DialogTrigger>
-
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>No Overlay</DialogTitle>
-          </DialogHeader>
-
-          <DialogBody>
-            <div className='py-12'>
-              <p>This dialog has no overlay backdrop.</p>
-            </div>
-          </DialogBody>
-        </DialogContent>
-      </Dialog>
-
-      <Text>
-        Where does it come from? Contrary to popular belief, Lorem Ipsum is not simply random text.
-        It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years
-        old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up
-        one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going
-        through the cites of the word in classical literature, discovered the undoubtable source.
-        Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The
-        Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the
-        theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem
-        ipsum dolor sit amet..", comes from a line in section 1.10.32. The standard chunk of Lorem
-        Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and
-        1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact
-        original form, accompanied by English versions from the 1914 translation by H. Rackham.
-      </Text>
-    </VStack>
-  );
-};
-
-/**
- * A dialog inside a dialog: the outer one steps back so the depth is visible. Two is the most a
- * reader can follow.
- */
-export const WithNested: StoryFn<DialogProps> = () => {
-  return (
-    <Dialog>
+    <Dialog overlay={false}>
       <DialogTrigger asChild>
         <Button variant='outline' color='neutral'>
-          1st level dialog
+          Open without Overlay
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>[Level 1] Main Dialog</DialogTitle>
-
-          {/* Level 2 dialog */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant='ghost' color='neutral' size='small'>
-                <PanelRight />
-                2nd level dialog
-              </Button>
-            </DialogTrigger>
-
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>[Level 2] Detail View</DialogTitle>
-                {/* Level 3 dialog */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant='ghost' color='neutral' size='small'>
-                      <PanelRight />
-                      3nd level dialog
-                    </Button>
-                  </DialogTrigger>
-
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>[Level 3] Deep Nested</DialogTitle>
-                    </DialogHeader>
-
-                    <DialogBody>
-                      <VStack gap={12} align='start'>
-                        <Text>Level 3! Unlimited nesting works.</Text>
-                        <ContentPlaceholder height={150} />
-                      </VStack>
-                    </DialogBody>
-
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button size='large' variant='ghost' color='neutral'>
-                          Back
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </DialogHeader>
-
-              <DialogBody>
-                <VStack gap={12} align='start'>
-                  <Text>This is Level 2 dialog. Main dialog is pushed back.</Text>
-
-                  <ContentPlaceholder height={150} />
-                </VStack>
-              </DialogBody>
-
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant='ghost' color='neutral' size='large'>
-                    Back
-                  </Button>
-                </DialogClose>
-                <Button variant='primary' color='brand' size='large'>
-                  Apply
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <DialogTitle>No Overlay</DialogTitle>
         </DialogHeader>
 
         <DialogBody>
-          <VStack gap={12} align='start'>
-            <Text>This is Level 1 dialog. Click above to open nested dialogs:</Text>
-
-            <ContentPlaceholder height={150} />
-          </VStack>
+          <div className='py-12'>
+            <p>This dialog has no overlay backdrop.</p>
+          </div>
         </DialogBody>
-
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant='ghost' color='neutral' size='large'>
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button variant='primary' color='brand' size='large'>
-            Save
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
+
+    <Text>
+      Where does it come from? Contrary to popular belief, Lorem Ipsum is not simply random text. It
+      has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
+      Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of
+      the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the
+      cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum
+      comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of
+      Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics,
+      very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit
+      amet..", comes from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since
+      the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de
+      Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form,
+      accompanied by English versions from the 1914 translation by H. Rackham.
+    </Text>
+  </VStack>
+);
+
+/**
+ * A dialog inside a dialog: the outer one steps back so the depth is visible. Two is the most a
+ * reader can follow.
+ */
+export const WithNested: StoryFn<DialogProps> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        1st level dialog
+      </Button>
+    </DialogTrigger>
+
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>[Level 1] Main Dialog</DialogTitle>
+
+        {/* Level 2 dialog */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant='ghost' color='neutral' size='small'>
+              <PanelRight />
+              2nd level dialog
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>[Level 2] Detail View</DialogTitle>
+              {/* Level 3 dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant='ghost' color='neutral' size='small'>
+                    <PanelRight />
+                    3nd level dialog
+                  </Button>
+                </DialogTrigger>
+
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>[Level 3] Deep Nested</DialogTitle>
+                  </DialogHeader>
+
+                  <DialogBody>
+                    <VStack gap={12} align='start'>
+                      <Text>Level 3! Unlimited nesting works.</Text>
+                      <ContentPlaceholder height={150} />
+                    </VStack>
+                  </DialogBody>
+
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button size='large' variant='ghost' color='neutral'>
+                        Back
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </DialogHeader>
+
+            <DialogBody>
+              <VStack gap={12} align='start'>
+                <Text>This is Level 2 dialog. Main dialog is pushed back.</Text>
+
+                <ContentPlaceholder height={150} />
+              </VStack>
+            </DialogBody>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant='ghost' color='neutral' size='large'>
+                  Back
+                </Button>
+              </DialogClose>
+              <Button variant='primary' color='brand' size='large'>
+                Apply
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </DialogHeader>
+
+      <DialogBody>
+        <VStack gap={12} align='start'>
+          <Text>This is Level 1 dialog. Click above to open nested dialogs:</Text>
+
+          <ContentPlaceholder height={150} />
+        </VStack>
+      </DialogBody>
+
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant='ghost' color='neutral' size='large'>
+            Cancel
+          </Button>
+        </DialogClose>
+        <Button variant='primary' color='brand' size='large'>
+          Save
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 /**
  * Tabs inside a dialog, for a task with a couple of facets — not as a way to fit a whole form
@@ -931,15 +909,15 @@ export const WithTabs: StoryFn<DialogProps> = () => {
           <DialogBody>
             <div className='pt-12'>
               <TabsContent value='tab1'>
-                <h3 className='text-lg font-medium mb-8'>General Settings</h3>
+                <h3 className='mb-8 text-lg font-medium'>General Settings</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab2'>
-                <h3 className='text-lg font-medium mb-8'>Configuration</h3>
+                <h3 className='mb-8 text-lg font-medium'>Configuration</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
               <TabsContent value='tab3'>
-                <h3 className='text-lg font-medium mb-8'>Advanced Options</h3>
+                <h3 className='mb-8 text-lg font-medium'>Advanced Options</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
             </div>

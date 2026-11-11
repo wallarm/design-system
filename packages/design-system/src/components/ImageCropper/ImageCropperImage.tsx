@@ -1,6 +1,8 @@
 import { type FC, type ImgHTMLAttributes, type Ref, useLayoutEffect, useState } from 'react';
+
 import { ImageCropper as ArkImageCropper } from '@ark-ui/react/image-cropper';
 import { useComposedRefs } from '@radix-ui/react-compose-refs';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { useImageCropperInternal, useImageCropperPartId } from './ImageCropperProvider';
@@ -55,7 +57,7 @@ export const ImageCropperImage: FC<ImageCropperImageProps> = ({
       data-testid={testId}
       data-state={state}
       className={cn(
-        'block size-full select-none data-[state=loading]:invisible data-[state=error]:invisible',
+        'block size-full select-none data-[state=error]:invisible data-[state=loading]:invisible',
         className,
       )}
       onLoad={event => {

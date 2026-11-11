@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { Select as ArkUiSelect, type CollectionItem } from '@ark-ui/react/select';
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from '../DropdownMenu';
@@ -32,7 +34,7 @@ export const SelectOption: FC<SelectOptionProps> = ({
       persistFocus
       className={cn(
         dropdownMenuItemVariants({ variant, inset: false }),
-        'flex-wrap relative gap-y-0 gap-x-8 pr-32',
+        'relative flex-wrap gap-x-8 gap-y-0 pr-32',
         // A right-side hint keeps the row on one line so it never lands under the indicator.
         'has-[>[data-slot=select-option-hint]]:flex-nowrap',
         'data-[state=checked]:bg-states-primary-active',

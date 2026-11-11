@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useEffect } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Checkbox, CheckboxIndicator } from '../Checkbox';
@@ -24,9 +25,7 @@ export const SelectionItem: FC<SelectionItemProps> = ({
   const selected = isSelected(itemId);
   const testId = useTestId('item');
 
-  useEffect(() => {
-    return registerDisabled(itemId, disabled);
-  }, [itemId, disabled, registerDisabled]);
+  useEffect(() => registerDisabled(itemId, disabled), [itemId, disabled, registerDisabled]);
 
   // Shift-click toggles a range. The browser suppresses the label→input
   // forwarding click when a modifier key is held (verified in Chromium),

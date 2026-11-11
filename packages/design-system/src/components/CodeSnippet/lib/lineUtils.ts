@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+
 import type { Token } from '../adapters/types';
 import type { LineColor, LineConfig, LineRange } from '../CodeSnippetContext';
 import { LINE_COLOR_STYLES, LINE_TEXT_STYLE_CLASSES } from './lineStyles';

@@ -1,10 +1,13 @@
 import { type FC, useEffect, useState } from 'react';
+
 import './react-aria-polyfill';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
+
 import { DateFormatProvider, type DateOrder, ThemeProvider, Toaster } from '../src';
 import { DocsPage } from './docs/DocsPage';
 import { TOC_OPTIONS } from './docs/toc';
+
 import './preview.css';
 
 let toasterMountCount = 0;

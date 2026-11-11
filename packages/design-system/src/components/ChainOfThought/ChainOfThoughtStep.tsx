@@ -8,6 +8,7 @@ import {
   useId,
   useState,
 } from 'react';
+
 import { ChevronDown, CircleDashed } from '../../icons';
 import { cn } from '../../utils/cn';
 import { Collapse } from '../../utils/Collapse';
@@ -83,8 +84,9 @@ export const ChainOfThoughtStep: FC<ChainOfThoughtStepProps> = ({
       status === 'done' &&
       event.target === event.currentTarget &&
       event.propertyName.endsWith('text-fill-color')
-    )
+    ) {
       setSettled(true);
+    }
   };
   const isOpen = open ?? internalOpen;
   const collapsible = children != null && children !== false;

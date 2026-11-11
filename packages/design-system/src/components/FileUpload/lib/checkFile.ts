@@ -1,4 +1,5 @@
 import { isValidFileType } from '@zag-js/file-utils';
+
 import type { FileUploadErrorCode } from '../types';
 
 export interface FileCheckRules {
@@ -22,10 +23,12 @@ export const checkFile = (file: File, rules: FileCheckRules): FileUploadErrorCod
     rules.acceptList.length ? rules.acceptList.join(',') : undefined,
   );
   if (!typeOk) errors.push('FILE_INVALID_TYPE');
-  if (rules.maxFileSize !== undefined && file.size > rules.maxFileSize)
+  if (rules.maxFileSize !== undefined && file.size > rules.maxFileSize) {
     errors.push('FILE_TOO_LARGE');
-  if (rules.minFileSize !== undefined && file.size < rules.minFileSize)
+  }
+  if (rules.minFileSize !== undefined && file.size < rules.minFileSize) {
     errors.push('FILE_TOO_SMALL');
+  }
   const custom = rules.validate?.(file);
   if (custom) errors.push(...custom);
   return errors;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { AppShell } from './AppShell';
 import { AppShellAside } from './AppShellAside';
 import { AppShellRemote } from './AppShellRemote';

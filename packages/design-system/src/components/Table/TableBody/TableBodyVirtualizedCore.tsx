@@ -1,5 +1,7 @@
 import type { FC, RefObject } from 'react';
+
 import type { VirtualItem } from '@tanstack/react-virtual';
+
 import { useTestId } from '../../../utils/testId';
 import { TABLE_PREPEND_SKELETON_ROWS, useTableValue } from '../lib';
 import { TBody, Td, Tr } from '../primitives';

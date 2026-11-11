@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { indicatorVariants } from './classes';
@@ -23,15 +25,13 @@ export const Indicator: FC<IndicatorProps> = ({
   size = 'sm',
   color = 'info',
   ...props
-}) => {
-  return (
-    <span
-      {...props}
-      ref={ref}
-      className={cn(indicatorVariants({ size, color }), className)}
-      data-slot='indicator'
-    />
-  );
-};
+}) => (
+  <span
+    {...props}
+    ref={ref}
+    className={cn(indicatorVariants({ size, color }), className)}
+    data-slot='indicator'
+  />
+);
 
 Indicator.displayName = 'Indicator';

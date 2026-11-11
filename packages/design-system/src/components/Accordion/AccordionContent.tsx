@@ -1,5 +1,7 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAccordionContext } from './AccordionContext';

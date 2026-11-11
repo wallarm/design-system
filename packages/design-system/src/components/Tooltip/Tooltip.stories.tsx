@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ChevronRight } from '../../icons';
 import { Button } from '../Button';
 import {

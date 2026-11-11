@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { lineChartZoomPopoverRangeClasses } from './classes';
 
@@ -11,17 +12,15 @@ export const LineChartZoomPopoverRange: FC<LineChartZoomPopoverRangeProps> = ({
   className,
   children,
   ...props
-}) => {
-  return (
-    <div
-      {...props}
-      ref={ref}
-      data-slot='line-chart-zoom-popover-range'
-      className={cn(lineChartZoomPopoverRangeClasses, className)}
-    >
-      {children}
-    </div>
-  );
-};
+}) => (
+  <div
+    {...props}
+    ref={ref}
+    data-slot='line-chart-zoom-popover-range'
+    className={cn(lineChartZoomPopoverRangeClasses, className)}
+  >
+    {children}
+  </div>
+);
 
 LineChartZoomPopoverRange.displayName = 'LineChartZoomPopoverRange';

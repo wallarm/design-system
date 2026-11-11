@@ -1,7 +1,8 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
-export const timelineVariants = cva('list-none flex flex-col');
+export const timelineVariants = cva('flex list-none flex-col');
 
 export const timelineItemVariants = cva(
   cn(
@@ -11,8 +12,8 @@ export const timelineItemVariants = cva(
   ),
 );
 
-export const timelineConnectorVariants = cva('col-start-1 flex flex-col items-center h-full');
+export const timelineConnectorVariants = cva('col-start-1 flex h-full flex-col items-center');
 
-export const timelineSeparatorVariants = cva('flex-1 min-h-16 self-center');
+export const timelineSeparatorVariants = cva('min-h-16 flex-1 self-center');
 
-export const timelineContentVariants = cva('col-start-2 flex flex-col gap-4 min-w-0 pb-16');
+export const timelineContentVariants = cva('col-start-2 flex min-w-0 flex-col gap-4 pb-16');

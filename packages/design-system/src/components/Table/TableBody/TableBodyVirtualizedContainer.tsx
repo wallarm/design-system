@@ -1,5 +1,7 @@
 import { type FC, useCallback, useEffect } from 'react';
+
 import { useVirtualizer } from '@tanstack/react-virtual';
+
 import { getRowKey, TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { measureRowElement } from './lib/measureRowElement';
@@ -31,11 +33,12 @@ export const TableBodyVirtualizedContainer: FC = () => {
   // Clear on unmount so any `scrollToRow` call landing between this body's
   // unmount and a successor body's first render doesn't act on a dead
   // virtualizer instance.
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       virtualizerRef.current = null;
-    };
-  }, [virtualizerRef]);
+    },
+    [virtualizerRef],
+  );
 
   useResetVirtualizerOnDataChange(table, virtualizer);
   useSmoothScrollOnSort(table, getScrollElement);

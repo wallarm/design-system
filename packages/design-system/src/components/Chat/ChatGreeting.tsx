@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { useEffect, useRef } from 'react';
+
 import { getRuntime } from '../../lib/agent-characters/runtime';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';

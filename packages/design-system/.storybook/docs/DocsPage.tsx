@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { Controls, Description, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
+
 import { DocsFeedback } from './DocsFeedback';
 import { DocsHeaderLinks } from './DocsHeaderLinks';
 import { DocsSection } from './DocsSection';

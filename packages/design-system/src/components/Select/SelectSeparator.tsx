@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -20,7 +21,7 @@ export const SelectSeparator: FC<SelectSeparatorProps> = ({ className, ref, ...p
       data-slot='select-separator'
       data-testid={testId}
       aria-orientation='horizontal'
-      className={cn('mx-8 my-4 h-px bg-border-primary border-none', className)}
+      className={cn('mx-8 my-4 h-px border-none bg-border-primary', className)}
       {...props}
     />
   );

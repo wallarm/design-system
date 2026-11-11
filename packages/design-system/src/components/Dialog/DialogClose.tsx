@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { DrawerClose, type DrawerCloseProps } from '../Drawer';
 
 type DialogCloseProps = DrawerCloseProps;

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import { buildAssets } from './assets/build-assets';
 import { buildBundle } from './bundle/build-bundle';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from './config';
@@ -117,10 +118,11 @@ async function buildInto(root: string, outDir: string) {
   // The platform asset store is separate: assets/ uploads have their own cap.
   const assetsDir = `${join(outDir, 'assets')}/`;
   const assetCount = files.filter(file => file.startsWith(assetsDir)).length;
-  if (files.length - assetCount > 1008)
+  if (files.length - assetCount > 1008) {
     throw new Error(
       `Artifact has ${files.length - assetCount} files outside assets/; maximum 1008`,
     );
+  }
   if (assetCount > 5000) throw new Error(`Artifact has ${assetCount} assets; maximum 5000`);
   const hashes: Record<string, string> = {};
   let totalBytes = 0;
@@ -180,5 +182,6 @@ async function buildInto(root: string, outDir: string) {
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\nProject: ${CLAUDE_DESIGN.outDir}\n`);
   return summary;
 }
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]))
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   await buildProject();
+}

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 import { TableScrollHandler } from './TableScrollHandler';
 import { useTableScrollHandlerContext } from './TableScrollHandlerContext';
@@ -16,7 +17,7 @@ export const TableScrollHandlerSlot: FC = () => {
     <>
       {/* h-16 keeps the 24px controls from growing the 32px header row: they
           overflow into the cell padding instead. */}
-      <div ref={setAnchorNode} className={cn('shrink-0 ml-auto flex items-center gap-4 h-16')} />
+      <div ref={setAnchorNode} className={cn('ml-auto flex h-16 shrink-0 items-center gap-4')} />
       {!hasConsumerScrollHandler && <TableScrollHandler />}
     </>
   );

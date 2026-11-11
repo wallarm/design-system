@@ -1,4 +1,5 @@
 import type { ReactNode, RefObject } from 'react';
+
 import type {
   Column,
   ColumnVisibilityState,
@@ -7,6 +8,7 @@ import type {
   RowData,
 } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
+
 import type { DSTableFeatures } from '../lib';
 import type {
   TableColumnGroup,

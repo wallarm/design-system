@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import measured from '../../../../scripts/agent-avatars/data/default-look.json';
 import { CAST, COLORS, SHAPE_IDS } from '../data.gen';
 import { defaultLook, hash32, lookIssues, rng } from '../look';

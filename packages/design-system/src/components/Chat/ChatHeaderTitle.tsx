@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { AgentGlyph } from '../AgentGlyph';
@@ -49,7 +50,7 @@ export const ChatHeaderTitle: FC<ChatHeaderTitleProps> = ({
         </span>
       ) : (
         <>
-          <span aria-hidden className='pl-12 pr-4 text-sm font-medium text-text-secondary'>
+          <span aria-hidden className='pr-4 pl-12 text-sm font-medium text-text-secondary'>
             /
           </span>
           {children}

@@ -2,8 +2,7 @@
 // source=https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/Checkbox/CheckboxGroup.tsx
 // component=CheckboxGroup
 
-import type { ErrorSection } from 'figma';
-import figma from 'figma';
+import figma, { type ErrorSection } from 'figma';
 
 const instance = figma.selectedInstance;
 

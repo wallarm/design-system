@@ -107,8 +107,9 @@ const dropFrameClips = (svg: SvgNode, width: string, height: string) => {
 const dropUnusedDefs = (svg: SvgNode) => {
   const refs = new Set<string>();
   walk(svg, n => {
-    for (const v of Object.values(n.attrs))
+    for (const v of Object.values(n.attrs)) {
       for (const [, id] of v.matchAll(/#([\w-]+)/g)) refs.add(id as string);
+    }
   });
   for (const defs of svg.children.filter(c => c.tag === 'defs')) {
     defs.children = defs.children.filter(c => !c.attrs.id || refs.has(c.attrs.id));
@@ -152,10 +153,11 @@ const setPaints = (node: SvgNode, map: (value: string, attr: string) => string) 
 const neutralize = (svg: SvgNode, width: string, height: string) => {
   const body = svg.children.filter(c => c.tag !== 'defs');
   let hasWhiteInk = false;
-  for (const node of body)
+  for (const node of body) {
     walkInk(node, n => {
       if (PAINT_ATTRS.some(a => isWhite(n.attrs[a]))) hasWhiteInk = true;
     });
+  }
 
   if (!hasWhiteInk) {
     for (const node of body) setPaints(node, v => (isPaint(v) ? 'currentColor' : v));
@@ -168,8 +170,9 @@ const neutralize = (svg: SvgNode, width: string, height: string) => {
     walk(node, n => delete n.attrs.id);
     setPaints(node, v => (isWhite(v) ? 'black' : isPaint(v) ? 'none' : v));
   }
-  for (const node of body)
+  for (const node of body) {
     setPaints(node, v => (isWhite(v) ? 'none' : isPaint(v) ? 'currentColor' : v));
+  }
 
   const mask: SvgNode = {
     tag: 'mask',
@@ -244,8 +247,9 @@ export const svgToIconBody = (src: string, tone: IconTone, idPrefix: string): Ic
         }
       });
     }
-    if (stray.size)
+    if (stray.size) {
       warnings.push(`Figma ink ${[...stray].join(', ')} ≠ ${FIGMA_INK}, mapped to currentColor`);
+    }
   }
   if (tone !== 'original') {
     neutralize(svg, width, height);
@@ -254,8 +258,9 @@ export const svgToIconBody = (src: string, tone: IconTone, idPrefix: string): Ic
   dropUnusedDefs(svg);
   prefixIds(svg, idPrefix);
   walk(svg, n => {
-    if (n.tag === 'image' && !warnings.includes('contains a raster fill'))
+    if (n.tag === 'image' && !warnings.includes('contains a raster fill')) {
       warnings.push('contains a raster fill');
+    }
   });
 
   return { viewBox, jsx: svg.children.map(toJsx).join('\n'), warnings };

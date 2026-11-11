@@ -29,6 +29,12 @@
 - Run `pnpm lint:fix` to auto-fix issues
 - Single quotes, semicolons required, trailing commas (configured in `.oxfmtrc.json`)
 
+## Linting
+
+- Oxlint rules live in `oxlint.config.mts`; `pnpm lint` fails on errors and on stale suppressions
+- When a diagnostic is wrong for a recurring pattern, tune or disable the rule there with a one-line reason
+- Use `// oxlint-disable-next-line <rule> -- <reason>` only for a one-off exception
+
 ## Git
 
 - Conventional commits are enforced by commitlint

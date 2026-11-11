@@ -1,5 +1,7 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { Group, type GroupProps } from 'react-resizable-panels';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { ResizableProvider } from './ResizableContext';
@@ -30,24 +32,22 @@ export const ResizablePanelGroup: FC<ResizablePanelGroupProps> = ({
   children,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <ResizableProvider value={{ orientation }}>
-      <TestIdProvider value={testId}>
-        <Group
-          {...props}
-          id={autoSaveId}
-          elementRef={ref}
-          orientation={orientation}
-          data-slot='resizable-panel-group'
-          data-testid={testId}
-          className={cn(className)}
-        >
-          {children}
-        </Group>
-      </TestIdProvider>
-    </ResizableProvider>
-  );
-};
+}) => (
+  <ResizableProvider value={{ orientation }}>
+    <TestIdProvider value={testId}>
+      <Group
+        {...props}
+        id={autoSaveId}
+        elementRef={ref}
+        orientation={orientation}
+        data-slot='resizable-panel-group'
+        data-testid={testId}
+        className={cn(className)}
+      >
+        {children}
+      </Group>
+    </TestIdProvider>
+  </ResizableProvider>
+);
 
 ResizablePanelGroup.displayName = 'ResizablePanelGroup';

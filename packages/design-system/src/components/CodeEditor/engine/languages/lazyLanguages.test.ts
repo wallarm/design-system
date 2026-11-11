@@ -1,6 +1,7 @@
 import { ensureSyntaxTree, language as languageFacet, syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from '@rstest/core';
+
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './index';
 
 describe('lazy languages', () => {

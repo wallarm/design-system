@@ -1,6 +1,7 @@
-import type { FC } from 'react';
-import { useSyncExternalStore } from 'react';
+import { type FC, useSyncExternalStore } from 'react';
+
 import { createPortal } from 'react-dom';
+
 import type { PortalRegistry } from './portalRegistry';
 
 export interface PortalOutletProps {

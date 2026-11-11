@@ -9,20 +9,22 @@
  * Needs Google Chrome stable.
  */
 
-import type { BrowserType } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 
+import type { BrowserType } from '@playwright/test';
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const { chromium } = createRequire(
   path.resolve(here, '../../../configs/playwright-config/package.json'),
 )('@playwright/test') as { chromium: BrowserType };
 const REF = process.env.REF;
-if (!REF)
+if (!REF) {
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
+}
 const FIX = path.resolve(here, '../../src/lib/agent-characters/__tests__/__fixtures__');
 const HARNESS = readFileSync(path.join(FIX, 'motion-harness.js'), 'utf8');
 
@@ -94,7 +96,6 @@ const json = JSON.stringify({
   scenarios: out,
 });
 writeFileSync(path.join(FIX, 'motion-v17.json.gz'), gzipSync(json, { level: 9 }));
-// oxlint-disable-next-line no-console -- CLI output
 console.log(
   `motion-v17.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
 );

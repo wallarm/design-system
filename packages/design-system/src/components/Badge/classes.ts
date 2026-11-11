@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { BadgeColorEnum } from './constants';
 import { generateBadgeVariants } from './generateBadgeVariants';
 import type { BadgeColor } from './types';
@@ -8,17 +9,17 @@ type BadgeVariantsColorMap = Partial<{
 }>;
 
 export const badgeVariants = cva(
-  'inline-flex items-center gap-4 w-fit shrink-0 whitespace-nowrap',
+  'inline-flex w-fit shrink-0 items-center gap-4 whitespace-nowrap',
   {
     variants: {
       variant: {
         default: '',
-        dotted: 'before:w-6 before:h-6 before:bg-current before:rounded-2',
+        dotted: 'before:h-6 before:w-6 before:rounded-2 before:bg-current',
       },
       size: {
-        small: 'h-16 py-2 px-4 [&_svg]:icon-xs rounded-6',
-        medium: 'h-20 py-2 px-6 [&_svg]:icon-sm rounded-8',
-        large: 'h-24 py-4 px-6 [&_svg]:icon-md rounded-8',
+        small: 'h-16 rounded-6 px-4 py-2 [&_svg]:icon-xs',
+        medium: 'h-20 rounded-8 px-6 py-2 [&_svg]:icon-sm',
+        large: 'h-24 rounded-8 px-6 py-4 [&_svg]:icon-md',
       },
       isIconOnly: {
         true: 'justify-center p-2',
@@ -43,7 +44,7 @@ export const badgeVariants = cva(
       },
       textVariant: {
         default: 'font-sans-display text-xs font-medium',
-        code: 'font-mono leading-sm text-xs font-medium',
+        code: 'font-mono text-xs leading-sm font-medium',
       },
       isClickable: {
         true: 'cursor-pointer',

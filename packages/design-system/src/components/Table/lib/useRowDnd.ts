@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
+
 import { useSortable } from '@dnd-kit/sortable';
 import type { Row, RowData } from '@tanstack/react-table';
+
 import { useTableContext } from '../TableContext/useTableContext';
 import type { DSTableFeatures } from './dsTableFeatures';
 import { isGroupRow } from './isGroupRow';

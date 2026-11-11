@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import nav from '../docs/_nav.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');

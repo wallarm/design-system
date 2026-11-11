@@ -1,8 +1,19 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { createPortal } from 'react-dom';
+import {
+  type FC,
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
+
 import { type DismissableElementOptions, trackDismissableElement } from '@zag-js/dismissable';
 import { trapFocus } from '@zag-js/focus-trap';
+import { createPortal } from 'react-dom';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 
@@ -22,11 +33,11 @@ export interface CodeSnippetFrameProps extends Omit<HTMLAttributes<HTMLDivElemen
  * dialog it was opened from (standalone: layer 0, i.e. 40/50).
  */
 const FULLSCREEN_CLASSES = cn(
-  'fixed inset-16 m-0 w-auto h-auto min-w-0 min-h-0 max-w-[none] max-h-[none]',
+  'fixed inset-16 m-0 h-auto max-h-[none] min-h-0 w-auto max-w-[none] min-w-0',
   'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
 );
 const BACKDROP_CLASSES = cn(
-  'fixed inset-0 backdrop-blur-xs bg-component-dialog-overlay',
+  'fixed inset-0 bg-component-dialog-overlay backdrop-blur-xs',
   'z-[calc(var(--drawer-overlay-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
 );
 const HOST_CLASSES = 'contents';

@@ -1,4 +1,5 @@
 import type { FC, PropsWithChildren } from 'react';
+
 import { AccordionContext, type AccordionVariant } from './AccordionContext';
 
 interface AccordionContextProviderProps extends PropsWithChildren {
@@ -8,6 +9,4 @@ interface AccordionContextProviderProps extends PropsWithChildren {
 export const AccordionContextProvider: FC<AccordionContextProviderProps> = ({
   children,
   variant,
-}) => {
-  return <AccordionContext.Provider value={{ variant }}>{children}</AccordionContext.Provider>;
-};
+}) => <AccordionContext.Provider value={{ variant }}>{children}</AccordionContext.Provider>;

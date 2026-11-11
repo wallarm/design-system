@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+
 import { Dialog } from '@ark-ui/react/dialog';
+
 import { useTestId } from '../../utils/testId';
 
 export interface SearchModalTriggerProps extends Omit<

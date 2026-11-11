@@ -46,16 +46,18 @@ export function lookIssues(
     (look.color === 'butter' && (look.prop === 'glasses' || look.prop === 'monocle')) ||
     ((look.color === 'mint' || look.color === 'sage') &&
       (look.shape === 'pebble' || look.shape === 'capsule' || look.shape === 'egg'))
-  )
+  ) {
     out.push('dots-look-alike');
+  }
   if (!isWally && look.shape === 'dome' && look.prop === 'antennae') out.push('reads-as-wally');
   for (const o of others) {
     if (o.shape === look.shape && o.color === look.color) out.push('glyph-twin');
     if (
       o.shape === look.shape &&
       ((o.color === 'sky' && look.color === 'cyan') || (o.color === 'cyan' && look.color === 'sky'))
-    )
+    ) {
       out.push('sky-teal-same-shape');
+    }
   }
   return out.map(code => ({ code, level: 'warning' }));
 }

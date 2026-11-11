@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Timeline } from './Timeline';
 import { TimelineConnector } from './TimelineConnector';
 import { TimelineContent } from './TimelineContent';

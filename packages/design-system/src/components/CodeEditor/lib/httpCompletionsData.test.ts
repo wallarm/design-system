@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { HTTP_METHODS } from '../../HttpMethod/constants';
 import {
   HTTP_COMPLETION_METHODS,

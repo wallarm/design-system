@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -21,7 +22,7 @@ export const PageHeaderGroup: FC<PageHeaderGroupProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='page-header-group'
-      className={cn('flex flex-col min-w-0', className)}
+      className={cn('flex min-w-0 flex-col', className)}
     >
       {children}
     </div>

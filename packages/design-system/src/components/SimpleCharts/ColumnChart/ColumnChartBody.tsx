@@ -1,5 +1,7 @@
 import { type FC, type HTMLAttributes, type ReactNode, type Ref, useContext } from 'react';
+
 import { ComposedChart, ResponsiveContainer } from 'recharts';
+
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { LineChartDataContext } from '../LineChart/LineChartContext';

@@ -1,7 +1,7 @@
 import type { FC, MouseEventHandler } from 'react';
+
 import { cn } from '../../../utils/cn';
-import type { FoldRegion } from '../lib/foldUtils';
-import { getFoldSummaryLabel } from '../lib/foldUtils';
+import { type FoldRegion, getFoldSummaryLabel } from '../lib/foldUtils';
 
 export interface FoldSummaryProps {
   fold: FoldRegion;
@@ -24,7 +24,7 @@ export const FoldSummary: FC<FoldSummaryProps> = ({ fold, lineCount, onToggle, t
   return (
     <button
       type='button'
-      className={cn('inline-flex items-center cursor-pointer select-none', className)}
+      className={cn('inline-flex cursor-pointer items-center select-none', className)}
       aria-expanded={false}
       aria-label={`Collapsed region: ${label}, ${lineCount} lines`}
       data-slot='code-snippet-fold-summary'
@@ -32,7 +32,7 @@ export const FoldSummary: FC<FoldSummaryProps> = ({ fold, lineCount, onToggle, t
       {...summaryProps}
       onClick={handleClick}
     >
-      <span className='inline-flex items-center italic text-text-secondary hover:text-text-primary transition-colors'>
+      <span className='inline-flex items-center text-text-secondary italic transition-colors hover:text-text-primary'>
         {label}
       </span>
     </button>

@@ -1,4 +1,5 @@
 import { type FC, Fragment } from 'react';
+
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import {
@@ -44,7 +45,7 @@ export const RecentSection: FC<RecentSectionProps> = ({
                 if (fieldMeta) onSelect(fieldMeta);
               }}
             >
-              <span className='flex gap-2 items-center text-sm'>
+              <span className='flex items-center gap-2 text-sm'>
                 <span className='text-text-primary'>{attribute}</span>
                 <span className='text-text-secondary'>{operator}</span>
                 <span className='font-medium text-text-info'>{value}</span>
@@ -82,7 +83,7 @@ export const SuggestionsSection: FC<SuggestionsSectionProps> = ({
             ref={registerItem(`suggested-${index}`)}
             onSelect={() => onSelect(field)}
           >
-            <span className='flex gap-2 items-center text-sm'>
+            <span className='flex items-center gap-2 text-sm'>
               <span className='text-text-primary'>{field.label}</span>
               <span className='text-text-secondary'>operator</span>
               <span className='font-medium text-text-info'>Value</span>

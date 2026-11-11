@@ -1,5 +1,7 @@
 import type { Ref } from 'react';
+
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { createReact18Window } from '../harness/react18';
 import { createJsxRuntime, createReactModule } from './react18-shim';
 

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import type { CollectionItem, ListCollection } from '@ark-ui/react/collection';
 
 export interface UseSelectSearchOptions<T extends CollectionItem> {

@@ -157,8 +157,9 @@ function scoreComponent(
 function aliasMatches(query: string): Set<string> {
   const q = ` ${words(query).join(' ')} `;
   const hits = new Set<string>();
-  for (const [phrase, targets] of Object.entries(ALIASES))
+  for (const [phrase, targets] of Object.entries(ALIASES)) {
     if (q.includes(` ${words(phrase).join(' ')} `)) for (const t of targets) hits.add(t);
+  }
   return hits;
 }
 

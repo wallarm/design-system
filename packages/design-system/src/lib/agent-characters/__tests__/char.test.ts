@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { bakeSize, charTree } from '../char';
 import type { StateId } from '../eyes';
 import { type SvgNode, toSvgString } from '../svg';

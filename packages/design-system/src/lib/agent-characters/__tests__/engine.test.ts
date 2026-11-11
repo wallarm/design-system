@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it, rs } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { runInThisContext } from 'node:vm';
 import { gunzipSync } from 'node:zlib';
+
+import { afterAll, beforeAll, describe, expect, it, rs } from '@rstest/core';
+
 import { charTree } from '../char';
 import { CAST } from '../data.gen';
 import { type Character, createCharacter } from '../engine';
@@ -51,8 +53,9 @@ const page = JSON.parse(
 const NS = 'http://www.w3.org/2000/svg';
 const build = (n: SvgNode): Element => {
   const e = document.createElementNS(NS, n.tag);
-  for (const [k, v] of Object.entries(n.attrs))
+  for (const [k, v] of Object.entries(n.attrs)) {
     e.setAttribute(k === 'class' ? 'data-part' : k, String(v));
+  }
   for (const c of n.children ?? []) e.appendChild(build(c));
   return e;
 };
@@ -116,9 +119,11 @@ const adapter = {
 
 /** first differing frame, for a readable failure */
 const firstDiff = (mine: Row[], ref: Row[]) => {
-  for (let i = 0; i < Math.max(mine.length, ref.length); i++)
-    if (JSON.stringify(mine[i]) !== JSON.stringify(ref[i]))
+  for (let i = 0; i < Math.max(mine.length, ref.length); i++) {
+    if (JSON.stringify(mine[i]) !== JSON.stringify(ref[i])) {
       return { row: i, mine: mine[i], page: ref[i] };
+    }
+  }
   return null;
 };
 
@@ -280,8 +285,8 @@ describe('two bundled copies on one page', () => {
     rt.onFrame = () => {
       frames++;
       let running = 0;
-      for (const c of rt.live)
-        for (const k of c.clips as readonly { act?: number; rel?: number; t0: number }[])
+      for (const c of rt.live) {
+        for (const k of c.clips as readonly { act?: number; rel?: number; t0: number }[]) {
           if (k.act && !k.rel) {
             running++;
             if (!seen.has(k)) {
@@ -289,6 +294,8 @@ describe('two bundled copies on one page', () => {
               starts.push(k.t0);
             }
           }
+        }
+      }
       most = Math.max(most, running);
     };
     rs.advanceTimersByTime(60_000);
@@ -298,8 +305,9 @@ describe('two bundled copies on one page', () => {
     expect(most).toBeLessThanOrEqual(2);
     expect(starts.length).toBeGreaterThan(10);
     starts.sort((x, y) => x - y);
-    for (let i = 1; i < starts.length; i++)
+    for (let i = 1; i < starts.length; i++) {
       expect((starts[i] as number) - (starts[i - 1] as number)).toBeGreaterThanOrEqual(700);
+    }
     for (const c of [...rt.live]) (c as Character).dispose();
     expect(rs.getTimerCount()).toBe(0);
   });

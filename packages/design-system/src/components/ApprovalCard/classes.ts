@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority';
 export const approvalCardVariants = cva('flex flex-col');
 
 export const approvalCardCaptionVariants = cva(
-  "px-16 py-2 font-mono text-xs text-text-secondary [font-feature-settings:'liga'_0]",
+  "px-16 py-2 font-mono [font-feature-settings:'liga'_0] text-xs text-text-secondary",
 );
 
 export const approvalCardSurfaceVariants = cva('rounded-16 border border-border-primary-light', {
@@ -29,7 +29,7 @@ export const approvalCardStatusIconVariants = cva('', {
 });
 
 export const approvalCardContentVariants = cva(
-  'flex flex-col gap-8 px-16 pt-12 text-sm text-text-primary break-words',
+  'flex flex-col gap-8 px-16 pt-12 text-sm break-words text-text-primary',
 );
 
 export const approvalCardActionsVariants = cva('flex flex-wrap items-center gap-8 px-16 py-12');

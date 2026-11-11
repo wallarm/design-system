@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Time } from '../../index';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
@@ -84,9 +85,7 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
  * The bare field, behaving exactly like `DateInput`: arrows step a segment, typing fills it and
  * advances.
  */
-export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
-  return <TimeInput {...args} />;
-};
+export const Basic: StoryFn<typeof meta> = ({ ...args }) => <TimeInput {...args} />;
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 

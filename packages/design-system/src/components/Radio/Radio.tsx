@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react/radio-group';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
@@ -22,7 +24,7 @@ export const Radio: FC<RadioProps> = ({ children, 'data-testid': testId, ...prop
         // Active
         '[&:not([data-disabled])]:cursor-pointer',
         // Disabled
-        'data-disabled:**:pointer-events-none data-disabled:cursor-not-allowed',
+        'data-disabled:cursor-not-allowed data-disabled:**:pointer-events-none',
       )}
     >
       {children}

@@ -1,4 +1,5 @@
 import { describe, expect, it, rs } from '@rstest/core';
+
 import { matchNav } from '../matchNav';
 import type { NavConfig, NavConfigDrill, NavConfigLink } from '../types';
 

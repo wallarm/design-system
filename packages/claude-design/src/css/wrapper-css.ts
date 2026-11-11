@@ -330,7 +330,7 @@ const WRAPPER_RULE = `${IS_W} { border-radius: inherit; }`;
 
 function insideKeyframes(rule: postcss.Rule) {
   const { parent } = rule;
-  return parent?.type === 'atrule' && /keyframes$/.test((parent as postcss.AtRule).name);
+  return parent?.type === 'atrule' && (parent as postcss.AtRule).name.endsWith('keyframes');
 }
 
 /**

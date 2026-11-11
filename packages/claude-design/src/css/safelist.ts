@@ -133,16 +133,18 @@ export function canvasSafelist(tokenNames: Set<string>): string[] {
       [...PADDING, 'gap', 'gap-x', 'gap-y'].map(prefix => `${prefix}-${size}`),
     ),
   ];
-  for (const breakpoint of BREAKPOINTS.slice(0, 4))
+  for (const breakpoint of BREAKPOINTS.slice(0, 4)) {
     for (const name of responsive) classes.add(`${breakpoint}:${name}`);
+  }
   const edges = ['border-0', 'border-t-0', 'border-r-0', 'border-b-0', 'border-l-0'];
   for (const variant of ['hover', 'first', 'last']) {
     for (const color of surfaces) classes.add(`${variant}:bg-${color}`);
     for (const color of borders) classes.add(`${variant}:border-${color}`);
     if (variant === 'hover') continue;
     for (const edge of edges) classes.add(`${variant}:${edge}`);
-    for (const size of spacing)
+    for (const size of spacing) {
       for (const prefix of ['pt', 'pr', 'pb', 'pl']) classes.add(`${variant}:${prefix}-${size}`);
+    }
   }
   for (const property of tokenNames) {
     const name = property.replace(/^--/, '');
@@ -177,8 +179,9 @@ export function canvasSafelist(tokenNames: Set<string>): string[] {
         'max-h',
         'min-w',
         'min-h',
-      ])
+      ]) {
         classes.add(`${prefix}-${size}`);
+      }
     }
     if (name.startsWith('radius-')) classes.add(`rounded-${name.slice(7)}`);
     if (name.startsWith('shadow-')) classes.add(name);

@@ -1,6 +1,8 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { SegmentGroup } from '@ark-ui/react/segment-group';
 import type { VariantProps } from 'class-variance-authority';
+
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';

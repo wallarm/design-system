@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { migration } from '../avatar-size-rename';
 import { apply } from './harness';
 

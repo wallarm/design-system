@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
+
 import type { Row, RowData } from '@tanstack/react-table';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
@@ -51,7 +53,7 @@ export const TableRowExpanded = <T extends RowData>({
   return (
     <Tr data-testid={testId} style={dndStyle}>
       {hasExpandColumn && (
-        <Td className='border-b-0 border-r border-border-primary-light bg-bg-surface-2 sticky left-0' />
+        <Td className='sticky left-0 border-r border-b-0 border-border-primary-light bg-bg-surface-2' />
       )}
       <Td
         colSpan={contentColSpan}

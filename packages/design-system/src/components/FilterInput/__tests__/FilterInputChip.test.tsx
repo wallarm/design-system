@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
-import { createRef } from 'react';
+import { type ReactNode, createRef } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { TestIdProvider } from '../../../utils/testId';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
@@ -121,7 +122,7 @@ describe('FilterInputChip', () => {
 
   describe('error state', () => {
     it('applies error styling when error is true', () => {
-      render(<FilterInputChip data-testid='chip' attribute='Test' error={true} />);
+      render(<FilterInputChip data-testid='chip' attribute='Test' error />);
 
       const chip = screen.queryByTestId('chip');
       expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');

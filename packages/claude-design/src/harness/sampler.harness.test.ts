@@ -1,7 +1,10 @@
 import type { ElementType, ReactNode } from 'react';
-import { describe, expect, it, rs } from '@rstest/core';
+
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+
+import { describe, expect, it, rs } from '@rstest/core';
+
 import { SAMPLER_FILE, SKELETON_FILE } from '../sampler/sampler';
 import { createReact18Window } from './react18';
 
@@ -118,8 +121,9 @@ describe(SAMPLER_FILE, () => {
   it('mounts on real React 18 with every x-import, hole and render prop resolved', async () => {
     await withArtboard(SAMPLER_FILE, async ({ document, logic, text }) => {
       await expect.poll(() => document.querySelector('tbody')?.textContent).toContain('Ana Ruiz');
-      for (const part of ['Create user', 'Invite expired', 'API tokens', 'No API tokens yet'])
+      for (const part of ['Create user', 'Invite expired', 'API tokens', 'No API tokens yet']) {
         await expect.poll(text).toContain(part);
+      }
       expect(document.querySelectorAll('[aria-label^="Actions for "]').length).toBe(5);
       logic.setState({ query: 'nobody' });
       await expect.poll(text).toContain('No results found');
@@ -135,20 +139,23 @@ describe(SKELETON_FILE, () => {
       const crumbs = () => byTestId('product-shell--breadcrumb')?.textContent;
       const panel = () => byTestId('product-shell--panel') as HTMLElement;
 
-      for (const part of ['Acme Bank', 'Ask Claude to design this screen'])
+      for (const part of ['Acme Bank', 'Ask Claude to design this screen']) {
         await expect.poll(text).toContain(part);
+      }
       expect(document.querySelector('[aria-label="Search"]')).not.toBeNull();
       expect(document.querySelector('[aria-label="Help"]')).not.toBeNull();
       expect(byTestId('notifications--trigger')?.textContent).toContain('2');
       const rail = byTestId('nav-rail')?.textContent ?? '';
-      for (const label of ['Home', 'API Security', 'Edge', 'Security Testing', 'AI Hypervisor'])
+      for (const label of ['Home', 'API Security', 'Edge', 'Security Testing', 'AI Hypervisor']) {
         expect(rail).toContain(label);
+      }
       const footer = byTestId('nav-rail--footer')?.textContent ?? '';
       expect(footer).toContain('Settings');
       expect(footer).toContain('Maria Lopez');
 
-      for (const label of ['Overview', 'API Discovery', 'API Specifications', 'Attacks'])
+      for (const label of ['Overview', 'API Discovery', 'API Specifications', 'Attacks']) {
         expect(panel().textContent).toContain(label);
+      }
       expect(panel().textContent).toContain('Detect & Respond');
       expect(title()).toBe('Overview');
       expect(crumbs()).toContain('Overview');

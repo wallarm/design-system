@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { isFilterParseError, parseExpression } from '../lib/parseExpression';
 import { serializeExpression } from '../lib/serializeExpression';
 import type { FieldMetadata } from '../types';

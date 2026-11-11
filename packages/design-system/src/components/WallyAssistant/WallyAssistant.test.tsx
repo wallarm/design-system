@@ -1,7 +1,9 @@
 import { createRef, type HTMLAttributes } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { CodeSnippetAdapterProvider, type SyntaxAdapter } from '../CodeSnippet';
 import { Drawer, DrawerContent } from '../Drawer';
 import { APPROVAL_PENDING, CONVERSATION, EMPTY, ERROR_TURN } from './mocks';

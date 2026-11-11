@@ -1,7 +1,9 @@
 import { type FC, useContext } from 'react';
+
 import { XAxis } from 'recharts';
 import type { TickFormatter } from 'recharts/types/cartesian/CartesianAxis';
 import type { XAxisTickContentProps } from 'recharts/types/util/types';
+
 import { LINE_X_LABEL_HEIGHT } from '../LineChart/constants';
 import { renderAxisTick } from '../LineChart/lib/renderAxisTick';
 import { LineChartDataContext } from '../LineChart/LineChartContext';

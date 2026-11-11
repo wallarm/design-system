@@ -7,6 +7,7 @@ import {
   type RefObject,
   useContext,
 } from 'react';
+
 import {
   AssistantMessageMarkdown,
   type AssistantMessageMarkdownVariant,

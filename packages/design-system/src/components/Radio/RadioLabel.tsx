@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react';
+
 import { useTestId } from '../../utils/testId';
 
 export type RadioLabelProps = Omit<ArkUiRadioGroup.ItemTextProps, 'className'>;

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { RESERVED_CONTENT_ATTRIBUTES, sanitizeContentAttributes } from './contentAttributes';
 
 describe('sanitizeContentAttributes', () => {

@@ -1,4 +1,5 @@
 import type { HighlighterGeneric, ThemedToken } from '@shikijs/types';
+
 import type { HighlightResult, ShikiLanguage, SyntaxAdapter, Token, TokenType } from './types';
 
 // Lazy-loaded shiki highlighter instance
@@ -47,8 +48,9 @@ function mapScopeToTokenType(scopes: string[] | undefined): TokenType {
   // Operators
   if (scope.includes('operator')) return 'operator';
   // Punctuation
-  if (scope.includes('punctuation') || scope.includes('bracket') || scope.includes('brace'))
+  if (scope.includes('punctuation') || scope.includes('bracket') || scope.includes('brace')) {
     return 'punctuation';
+  }
   // Classes
   if (scope.includes('class') || scope.includes('type')) return 'class-name';
   // Properties

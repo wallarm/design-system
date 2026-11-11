@@ -1,5 +1,6 @@
 import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { HStack } from '../Stack';
 import { NumberInput } from './NumberInput';
 

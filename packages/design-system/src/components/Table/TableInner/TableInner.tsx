@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+
 import type { TestableProps } from '../../../utils/testId';
 import { TableActionBarAnchor, TableActionBarProvider } from '../TableActionBar';
 import { TableScrollHandlerProvider } from '../TableScrollHandlerContext';
@@ -28,37 +29,35 @@ export const TableInner: FC<TableInnerProps> = ({
   className,
   'data-testid': testId,
   children,
-}) => {
-  return (
-    <TableActionBarProvider>
-      <TableActionBarAnchor className={className} data-testid={testId}>
-        <TableSettingsMenuProvider>
-          <TableScrollHandlerProvider hasConsumerScrollHandler={hasConsumerScrollHandler}>
-            {virtualized === 'window' ? (
-              <TableInnerWindow
-                isEmpty={isEmpty}
-                showSettings={showSettings}
-                hasConsumerSettingsMenu={hasConsumerSettingsMenu}
-                ariaLabel={ariaLabel}
-              >
-                {children}
-              </TableInnerWindow>
-            ) : (
-              <TableInnerContainer
-                isEmpty={isEmpty}
-                virtualized={virtualized}
-                showSettings={showSettings}
-                hasConsumerSettingsMenu={hasConsumerSettingsMenu}
-                ariaLabel={ariaLabel}
-              >
-                {children}
-              </TableInnerContainer>
-            )}
-          </TableScrollHandlerProvider>
-        </TableSettingsMenuProvider>
-      </TableActionBarAnchor>
-    </TableActionBarProvider>
-  );
-};
+}) => (
+  <TableActionBarProvider>
+    <TableActionBarAnchor className={className} data-testid={testId}>
+      <TableSettingsMenuProvider>
+        <TableScrollHandlerProvider hasConsumerScrollHandler={hasConsumerScrollHandler}>
+          {virtualized === 'window' ? (
+            <TableInnerWindow
+              isEmpty={isEmpty}
+              showSettings={showSettings}
+              hasConsumerSettingsMenu={hasConsumerSettingsMenu}
+              ariaLabel={ariaLabel}
+            >
+              {children}
+            </TableInnerWindow>
+          ) : (
+            <TableInnerContainer
+              isEmpty={isEmpty}
+              virtualized={virtualized}
+              showSettings={showSettings}
+              hasConsumerSettingsMenu={hasConsumerSettingsMenu}
+              ariaLabel={ariaLabel}
+            >
+              {children}
+            </TableInnerContainer>
+          )}
+        </TableScrollHandlerProvider>
+      </TableSettingsMenuProvider>
+    </TableActionBarAnchor>
+  </TableActionBarProvider>
+);
 
 TableInner.displayName = 'TableInner';

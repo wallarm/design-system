@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { VStack } from '../Stack';
 import { createTableColumnHelper, Table, type TableColumnDef } from '../Table';
 import { Text } from '../Text';

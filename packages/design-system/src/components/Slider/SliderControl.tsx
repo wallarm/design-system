@@ -1,5 +1,7 @@
 import { Children, type FC, isValidElement, type ReactNode, type Ref } from 'react';
+
 import { Slider as ArkSlider } from '@ark-ui/react/slider';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { sliderControlClassNames, sliderRangeClassNames, sliderTrackClassNames } from './classes';
@@ -26,7 +28,7 @@ export const SliderControl: FC<SliderControlProps> = ({ children, className, ref
       child => isValidElement(child) && child.type === SliderThumb,
     ).length;
     if (renderedThumbs > 0 && renderedThumbs !== thumbCount) {
-      // oxlint-disable-next-line no-console -- dev-only authoring guard (matches BarList/PieChart).
+      // dev-only authoring guard (matches BarList/PieChart).
       console.warn(
         `[Slider] Rendered ${renderedThumbs} <SliderThumb> but the value has ${thumbCount} ` +
           `entr${thumbCount === 1 ? 'y' : 'ies'}. Render exactly one <SliderThumb index> per value entry.`,

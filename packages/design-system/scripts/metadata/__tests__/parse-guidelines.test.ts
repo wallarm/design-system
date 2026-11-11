@@ -1,10 +1,12 @@
-import { afterEach, describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
+
+import { afterEach, describe, expect, it } from '@rstest/core';
 import { guidelinesMetadataSchema } from '@wallarm-org/mcp-core';
+import { Project } from 'ts-morph';
+
 import { collectPublicApi, type PublicApi } from '../internal.js';
 import {
   countProseWords,

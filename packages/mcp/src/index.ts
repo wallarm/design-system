@@ -1,6 +1,7 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+
 // Fallback digest for design-system versions that predate guidelines.json.
 import bundledRules from '../../design-system/src/guidelines/rules.md?raw';
 import { describeSource, loadBundledGuidelines, loadGuidelines, loadMetadata } from './metadata';
@@ -34,8 +35,9 @@ async function main() {
   let guidelinesSource = '';
   if (!guidelines && source.kind === 'installed') {
     guidelines = loadBundledGuidelines();
-    if (guidelines)
+    if (guidelines) {
       guidelinesSource = `\n\n_Guidelines: bundled snapshot v${guidelines.version} — your installed @wallarm-org/design-system v${metadata.version} ships no guidelines.json._`;
+    }
   }
   log(sourceLine, `(${metadataPath})`);
   log(

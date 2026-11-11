@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
+
 import { RUNTIME_KEY } from '../../lib/agent-characters/runtime';
 import { setAgentMotion } from '../AgentAvatar';
 import { WallySkeleton } from '../WallySkeleton';
@@ -36,11 +37,12 @@ class FakeIO {
 /** The greeting's own observer (the runtime has one for live characters too). */
 const enterView = () =>
   act(() => {
-    for (const o of observers.filter(x => x.options?.threshold === 0.6))
+    for (const o of observers.filter(x => x.options?.threshold === 0.6)) {
       o.cb(
         [{ isIntersecting: true, target: o.el } as IntersectionObserverEntry],
         o as unknown as IntersectionObserver,
       );
+    }
   });
 const advance = (ms: number) =>
   act(() => {

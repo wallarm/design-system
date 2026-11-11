@@ -1,6 +1,7 @@
 import { Compartment, EditorState } from '@codemirror/state';
 import { type DecorationSet, EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
+
 import type { HighlightResult, SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { adapterPainter, getPaintedDecorations } from './adapterPainter';
 

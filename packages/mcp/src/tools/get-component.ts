@@ -5,6 +5,7 @@ import type {
   PropMetadata,
   SubComponentMetadata,
 } from '@wallarm-org/mcp-core';
+
 import { formatPropsTable, oneLine, paginate } from './format';
 
 export function getComponent(
@@ -48,9 +49,11 @@ export function exampleEntries(
  */
 function sharedProps(subs: SubComponentMetadata[]): Set<string> {
   const counts = new Map<string, number>();
-  for (const sub of subs)
-    for (const p of sub.props)
+  for (const sub of subs) {
+    for (const p of sub.props) {
       if (!p.required && !p.description) counts.set(p.name, (counts.get(p.name) ?? 0) + 1);
+    }
+  }
   const min = Math.max(3, Math.ceil(subs.length / 2));
   return new Set([...counts].filter(([, n]) => n >= min).map(([name]) => name));
 }
@@ -94,16 +97,18 @@ function formatOverview(c: ComponentMetadata): string {
       : c.name;
   lines.push('', `**Import:** \`import { ${exported} } from '${c.importPath}'\``);
 
-  if (c.props.length > 0)
+  if (c.props.length > 0) {
     lines.push('', '## Props', '', formatPropsTable(c.props, { brief: true }));
+  }
 
   if (c.variants.length > 0) lines.push('', '## Variants', '', formatVariantList(c));
 
   if (c.subComponents.length > 0) {
     lines.push('', `## Sub-components (${c.subComponents.length})`, '');
     if (c.subComponents.some(s => s.description)) {
-      for (const s of c.subComponents)
+      for (const s of c.subComponents) {
         lines.push(`- **${s.name}**${s.description ? ` — ${oneLine(s.description)}` : ''}`);
+      }
     } else {
       lines.push(c.subComponents.map(s => s.name).join(', '));
     }
@@ -116,10 +121,11 @@ function formatOverview(c: ComponentMetadata): string {
   const entries = exampleEntries(c);
   if (entries.length > 0) {
     lines.push('', `## Examples (${entries.length})`, '');
-    for (const { key, example } of entries)
+    for (const { key, example } of entries) {
       lines.push(
         `- \`${key}\`${example.description ? ` — ${oneLine(example.description, 120)}` : ''}`,
       );
+    }
     lines.push(
       '',
       `Code: \`get_example\` ${call({ component: c.name, example: entries[0]?.key ?? '' })}; all code: section \`'examples'\`.`,
@@ -128,8 +134,9 @@ function formatOverview(c: ComponentMetadata): string {
 
   if (c.docs && c.docs.length > 0) {
     lines.push('', '## Usage docs', '');
-    for (const d of c.docs)
+    for (const d of c.docs) {
       lines.push(`- \`docs/${d.name}\` (${Math.round(d.markdown.length / 1000)}k chars)`);
+    }
     lines.push(
       '',
       `Read: \`get_component\` ${call({ name: c.name, section: `docs/${c.docs[0]?.name}` })}.`,
@@ -151,11 +158,12 @@ function formatSubComponent(c: ComponentMetadata, sub: SubComponentMetadata): st
   const usedIn = exampleEntries(c)
     .filter(({ example }) => new RegExp(`<${sub.name}\\b`).test(example.code))
     .map(({ key }) => `\`${key}\``);
-  if (usedIn.length > 0)
+  if (usedIn.length > 0) {
     lines.push(
       '',
       `Used in examples (\`get_example\`): ${usedIn.slice(0, 10).join(', ')}${usedIn.length > 10 ? ', …' : ''}`,
     );
+  }
   return lines.join('\n');
 }
 

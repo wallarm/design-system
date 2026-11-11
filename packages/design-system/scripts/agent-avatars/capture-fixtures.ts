@@ -7,11 +7,12 @@
  * Needs Google Chrome stable (as the handoff's scripts do).
  */
 
-import type { BrowserType } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import type { BrowserType } from '@playwright/test';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 // Playwright is a dependency of the workspace's playwright-config, not of this package: borrow it from there.
@@ -19,8 +20,9 @@ const { chromium } = createRequire(
   path.resolve(here, '../../../configs/playwright-config/package.json'),
 )('@playwright/test') as { chromium: BrowserType };
 const REF = process.env.REF;
-if (!REF)
+if (!REF) {
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
+}
 const OUT = path.resolve(here, '../../src/lib/agent-characters/__tests__/__fixtures__/v17.json');
 
 const browser = await chromium.launch({ channel: 'chrome' });
@@ -189,5 +191,4 @@ writeFileSync(
     1,
   )}\n`,
 );
-// oxlint-disable-next-line no-console -- CLI output
 console.log(`fixtures and ${path.relative(process.cwd(), geomOut)} written`);

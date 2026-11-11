@@ -13,7 +13,7 @@ export const treeViewRowVariants = cva(
         false: '',
       },
       disabled: {
-        true: 'opacity-50 cursor-not-allowed',
+        true: 'cursor-not-allowed opacity-50',
         false: '',
       },
     },

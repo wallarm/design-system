@@ -1,7 +1,9 @@
 import type { ComponentProps } from 'react';
+
 import type { SidebarData } from '@rspress/core';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { overviewGroups, SectionOverview } from '../SectionOverview';
 
 const sidebar: SidebarData = [

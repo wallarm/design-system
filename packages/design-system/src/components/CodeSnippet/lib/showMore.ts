@@ -1,4 +1,5 @@
 import { Children, isValidElement, type ReactNode } from 'react';
+
 import { MIN_HIDDEN_LINES_THRESHOLD } from '../CodeSnippetContext';
 
 /**

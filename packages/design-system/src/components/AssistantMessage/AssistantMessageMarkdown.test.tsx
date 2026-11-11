@@ -1,6 +1,8 @@
 import { createRef, type ReactNode } from 'react';
+
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { AssistantMessage } from './AssistantMessage';
 import { AssistantMessageContent } from './AssistantMessageContent';
 import {
@@ -161,13 +163,16 @@ describe('AssistantMessageMarkdown — streaming snapshots', () => {
         </AssistantMessage>,
       );
       const clone = content().cloneNode(true) as HTMLElement;
-      for (const code of clone.querySelectorAll('code, pre, [data-testid="m--code-block"]'))
+      for (const code of clone.querySelectorAll('code, pre, [data-testid="m--code-block"]')) {
         code.remove();
+      }
       expect(clone.textContent, `prefix ${n}`).not.toMatch(/\*\*|`|\||\[[ x]\]/);
-      for (const el of content().querySelectorAll('h1, h2, h3, h4, h5, h6, p, blockquote'))
+      for (const el of content().querySelectorAll('h1, h2, h3, h4, h5, h6, p, blockquote')) {
         expect(el.textContent?.trim(), `prefix ${n}: empty <${el.tagName}>`).not.toBe('');
-      for (const block of screen.queryAllByTestId('m--code-block'))
+      }
+      for (const block of screen.queryAllByTestId('m--code-block')) {
         expect(block.textContent?.trim(), `prefix ${n}: empty code block`).not.toBe('');
+      }
     }
   });
 });
@@ -287,8 +292,9 @@ describe('AssistantMessageMarkdown — untrusted content', () => {
     renderMd(text);
     const root = content();
     expect(root.querySelector('script, img, iframe, [onerror]')).toBeNull();
-    for (const a of root.querySelectorAll('a[href]'))
+    for (const a of root.querySelectorAll('a[href]')) {
       expect(safeHref(a.getAttribute('href'))).toBe(a.getAttribute('href'));
+    }
   });
 
   it('shows raw HTML as text and keeps the alt of a blocked image', () => {

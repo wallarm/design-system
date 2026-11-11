@@ -1,6 +1,7 @@
-import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
 
 // The six engine rules of the reference page (03 §7.10, lines 325–332) as attribute selectors.
 const css = readFileSync(

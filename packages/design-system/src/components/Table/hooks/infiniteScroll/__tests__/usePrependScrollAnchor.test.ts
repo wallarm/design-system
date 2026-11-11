@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
+
 import { usePrependScrollAnchor } from '../usePrependScrollAnchor';
 
 const makeEl = (scrollHeight: number) => ({ scrollTop: 0, scrollHeight }) as HTMLElement;

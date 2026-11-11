@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Check } from '../../icons';
 import { HStack, VStack } from '../Stack';
 import { NumericBadge } from './NumericBadge';
@@ -82,7 +84,7 @@ export const Types: StoryFn<typeof meta> = () => (
   <VStack gap={8} align='start'>
     {combinations.map(({ type, color }) => (
       <HStack key={`${type}-${color}`} gap={12} align='center'>
-        <span className='sb-annotation w-256 whitespace-nowrap text-right'>
+        <span className='sb-annotation w-256 text-right whitespace-nowrap'>
           {type} / {color}
         </span>
         <div
@@ -144,7 +146,7 @@ export const Clickable: StoryFn<typeof meta> = () => {
     <VStack gap={12} align='start'>
       {combinations.map(({ type, color }) => (
         <HStack key={`${type}-${color}`} gap={12} align='center'>
-          <span className='sb-annotation w-256 whitespace-nowrap text-right'>
+          <span className='sb-annotation w-256 text-right whitespace-nowrap'>
             {type} / {color}
           </span>
           <div className={color === 'neutral-alt' ? 'bg-component-tooltip-bg p-8' : 'p-8'}>

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { findChipSplitIndex } from '../../lib';
 import type { FilterInputChipData } from '../../types';
 

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useTestId } from '../../../utils/testId';
 import { TABLE_PREPEND_SKELETON_ROWS } from '../lib';
 import { TBody } from '../primitives';
@@ -35,9 +36,9 @@ export const TableBody: FC = () => {
         {isLoadingPrevious && (
           <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
         )}
-        {rows.map(row => {
-          return <TableRow key={row.id} row={row} />;
-        })}
+        {rows.map(row => (
+          <TableRow key={row.id} row={row} />
+        ))}
         {isLoading && <TableLoadingState />}
       </TBody>
     </TableBodyRowDndContext>

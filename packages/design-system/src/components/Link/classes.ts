@@ -1,14 +1,14 @@
 import { cva } from 'class-variance-authority';
 
 export const linkVariants = cva(
-  'inline-flex items-center gap-4 font-sans transition-colors underline decoration-transparent hover:decoration-current active:decoration-current outline-none [&_svg]:pointer-events-none [&_svg]:icon-md [&_svg]:shrink-0 cursor-pointer',
+  'inline-flex cursor-pointer items-center gap-4 font-sans underline decoration-transparent transition-colors outline-none hover:decoration-current active:decoration-current [&_svg]:pointer-events-none [&_svg]:icon-md [&_svg]:shrink-0',
   {
     variants: {
       type: {
-        default: 'text-text-link-default hover:text-text-link-hover active:text-link-default',
-        alt: 'text-text-link-default-alt hover:text-text-link-hover-alt active:text-link-default-alt',
+        default: 'active:text-link-default text-text-link-default hover:text-text-link-hover',
+        alt: 'active:text-link-default-alt text-text-link-default-alt hover:text-text-link-hover-alt',
         muted: 'text-text-secondary hover:text-slate-700 active:text-slate-700',
-        table: 'text-text-primary hover:text-text-link-hover active:text-link-default',
+        table: 'active:text-link-default text-text-primary hover:text-text-link-hover',
       },
       size: {
         xs: 'text-2xs',
@@ -22,7 +22,7 @@ export const linkVariants = cva(
         medium: 'font-medium',
       },
       disabled: {
-        true: '!text-text-tertiary !cursor-not-allowed !decoration-transparent hover:!decoration-transparent',
+        true: '!cursor-not-allowed !text-text-tertiary !decoration-transparent hover:!decoration-transparent',
       },
     },
   },

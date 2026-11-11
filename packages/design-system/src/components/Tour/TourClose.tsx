@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
+
 import { X } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';

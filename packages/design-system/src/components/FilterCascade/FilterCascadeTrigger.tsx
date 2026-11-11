@@ -8,6 +8,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+
 import { ChevronDown, ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';

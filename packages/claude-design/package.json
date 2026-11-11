@@ -2,18 +2,13 @@
   "name": "@wallarm-org/claude-design",
   "version": "0.0.0",
   "description": "Installs Wallarm Design System in Claude Design: `npx -y @wallarm-org/claude-design@latest export`",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
+  "license": "MIT",
+  "author": "Wallarm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wallarm/design-system.git",
     "directory": "packages/claude-design"
   },
-  "license": "MIT",
-  "author": "Wallarm",
-  "type": "module",
   "bin": {
     "claude-design": "./bin/claude-design.js"
   },
@@ -21,12 +16,14 @@
     "bin",
     "dist"
   ],
-  "engines": {
-    "node": ">=20.12"
-  },
+  "type": "module",
   "sideEffects": [
     "*.css"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "export": "tsx src/build.ts",
     "bundle": "rslib build",
@@ -67,5 +64,8 @@
     "tsx": "4.23.15",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=20.12"
   }
 }

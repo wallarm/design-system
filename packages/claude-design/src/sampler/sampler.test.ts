@@ -1,5 +1,7 @@
-import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { SKELETON_DATA, SKELETON_FILE, samplerProblems } from './sampler';
 
 const head =

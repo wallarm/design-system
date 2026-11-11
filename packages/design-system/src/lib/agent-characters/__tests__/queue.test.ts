@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { createQueue, Lru, queuedRunner } from '../queue';
 
 const tick = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -9,7 +10,9 @@ describe('bake queue (page pump: 14 ms slices, 16 ms apart)', () => {
     const q = createQueue();
     const job = (id: string, alive = true) => ({
       alive: () => alive,
-      run: () => void ran.push(id),
+      run: () => {
+        ran.push(id);
+      },
     });
     q.enqueue(job('a'));
     q.enqueue(job('b', false));
@@ -48,7 +51,12 @@ describe('bake queue (page pump: 14 ms slices, 16 ms apart)', () => {
         throw new Error('bad layer');
       },
     });
-    q.enqueue({ alive: () => true, run: () => void ran.push('next') });
+    q.enqueue({
+      alive: () => true,
+      run: () => {
+        ran.push('next');
+      },
+    });
     const err = console.error;
     console.error = () => {};
     await tick(30);

@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Circle, CircleCheck, LoaderCircle, Search, Settings } from '../../icons';
 import { Code } from '../Code';
 import { Text } from '../Text';

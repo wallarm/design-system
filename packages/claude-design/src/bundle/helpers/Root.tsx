@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
+
 import { PortalContainerContext } from '../../../../design-system/src/lib/portal/PortalContainerContext';
 import { reportUnstyledClasses } from './unstyledClasses';
 
@@ -39,7 +40,7 @@ export const Root: FC<RootProps> = ({ theme = 'light', children }) => {
         ref={root}
         data-slot='root'
         data-theme={theme}
-        className='bg-bg-page-bg text-text-primary font-sans'
+        className='bg-bg-page-bg font-sans text-text-primary'
       >
         {children}
         <div ref={host} />

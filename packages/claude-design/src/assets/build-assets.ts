@@ -1,15 +1,19 @@
 import { type ComponentType, createElement, type SVGProps } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+
 import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import { DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 
 export async function buildAssets({ outDir }: { outDir: string }) {
   const fontDir = resolve(DESIGN_SYSTEM_DIR, 'src/theme/fonts');
   await mkdir(join(outDir, 'fonts'), { recursive: true });
-  for (const file of (await readdir(fontDir)).filter(file => file.endsWith('.woff2')).sort())
+  for (const file of (await readdir(fontDir)).filter(file => file.endsWith('.woff2')).sort()) {
     await copyFile(join(fontDir, file), join(outDir, 'fonts', file));
+  }
   const icons = (await import(
     pathToFileURL(resolve(DESIGN_SYSTEM_DIR, 'dist/icons/index.js')).href
   )) as Record<string, ComponentType<SVGProps<SVGSVGElement>>>;

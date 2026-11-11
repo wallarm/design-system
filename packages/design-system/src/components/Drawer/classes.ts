@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 
 export const drawerContentVariants = cva(
@@ -39,9 +40,9 @@ export const drawerContentVariants = cva(
     '[&:has([data-slot=drawer-header]+[data-slot=tabs-list])_[data-slot=drawer-body]]:border-t-0',
 
     // Animations
-    'data-[state=open]:animate-in data-[state=closed]:animate-out',
-    'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
-    'data-[state=open]:duration-300 data-[state=closed]:duration-150',
+    'data-[state=closed]:animate-out data-[state=open]:animate-in',
+    'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=closed]:duration-150 data-[state=open]:duration-300',
   ),
   {
     variants: {

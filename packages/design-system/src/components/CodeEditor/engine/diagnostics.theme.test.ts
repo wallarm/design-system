@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from '@rstest/core';
+
 import {
   destroyLintedViews,
   flushLint,

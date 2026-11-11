@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { useSelectContext } from '@ark-ui/react/select';
+
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { SelectSearchInput, type SelectSearchInputProps } from '../Select/SelectSearchInput';
 import { useFilterDropdownContext } from './FilterDropdownContext';

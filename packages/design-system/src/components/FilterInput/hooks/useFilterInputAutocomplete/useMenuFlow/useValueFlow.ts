@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
 import { isBetweenOperator, isMultiSelectOperator } from '../../../lib';
 import {
@@ -51,8 +52,9 @@ export const useValueFlow = ({
         editingChipId ||
         !selectedField ||
         !selectedOperator
-      )
+      ) {
         return false;
+      }
       setBuildingBase({ field: selectedField, operator: selectedOperator, value });
       setSelectedField(pairedField);
       setSelectedOperator(null);

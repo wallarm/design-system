@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { copyTextOf, deriveChatState, isLiveStep } from './deriveChatState';
 import type { ChatApprovalPart, ChatAssistantMessage, ChatMessage, ChatStatus } from './model';
 

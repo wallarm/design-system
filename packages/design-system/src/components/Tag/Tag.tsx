@@ -1,6 +1,8 @@
 import type { FC, HTMLAttributes, MouseEvent, PropsWithChildren, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { type BadgeProps, badgeVariants } from '../Badge';
@@ -8,9 +10,9 @@ import { type BadgeProps, badgeVariants } from '../Badge';
 const tagVariants = cva(
   cn(
     'inline-flex items-center',
-    'rounded-8 border border-border-primary overlay',
-    'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-    'transition-colors cursor-pointer',
+    'overlay rounded-8 border border-border-primary',
+    'focus-visible:ring-3 focus-visible:ring-focus-primary focus-visible:outline-none',
+    'cursor-pointer transition-colors',
 
     // TagClose
     '[&_[data-slot=tag-close]]:cursor-pointer',
@@ -18,9 +20,9 @@ const tagVariants = cva(
   {
     variants: {
       disabled: {
-        true: 'opacity-50 cursor-not-allowed pointer-events-none',
+        true: 'pointer-events-none cursor-not-allowed opacity-50',
         false:
-          'hover:overlay-states-primary-hover active:overlay-states-primary-pressed focus-visible:overlay-states-primary-hover',
+          'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
     },
   },

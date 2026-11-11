@@ -1,6 +1,8 @@
 import { createRef, Profiler, StrictMode } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render } from '@testing-library/react';
+
 import { getRuntime, RUNTIME_KEY } from '../../lib/agent-characters/runtime';
 import { AgentAvatar } from './AgentAvatar';
 import { AgentAvatarGroup } from './AgentAvatarGroup';
@@ -51,7 +53,9 @@ describe('AgentAvatar live', () => {
   it('plays Done in full, then shows the data state and reports the beat', () => {
     const handle = createRef<AgentAvatarHandle>();
     const ended: string[] = [];
-    const onBeatEnd = (b: string) => void ended.push(b);
+    const onBeatEnd = (b: string) => {
+      ended.push(b);
+    };
     const { container } = render(
       <AgentAvatar
         agent='acquit'
@@ -161,7 +165,9 @@ describe('AgentAvatar live', () => {
   it('plays a static beat for its static length when not live', () => {
     const handle = createRef<AgentAvatarHandle>();
     const ended: string[] = [];
-    const onBeatEnd = (b: string) => void ended.push(b);
+    const onBeatEnd = (b: string) => {
+      ended.push(b);
+    };
     const { container } = render(
       <AgentAvatar agent='lens' seed='p1' size={48} handleRef={handle} onBeatEnd={onBeatEnd} />,
     );
@@ -193,8 +199,8 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
     let most = 0;
     rt.onFrame = () => {
       let running = 0;
-      for (const cs of clipsOf())
-        for (const k of cs)
+      for (const cs of clipsOf()) {
+        for (const k of cs) {
           if (k.act && !k.rel) {
             running++;
             if (!seen.has(k)) {
@@ -202,6 +208,8 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
               starts.push(k.t0);
             }
           }
+        }
+      }
       most = Math.max(most, running);
     };
     advance(120_000);
@@ -209,8 +217,9 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
     expect(starts.length).toBeGreaterThan(20);
     expect(most).toBe(2);
     starts.sort((a, b) => a - b);
-    for (let i = 1; i < starts.length; i++)
+    for (let i = 1; i < starts.length; i++) {
       expect((starts[i] as number) - (starts[i - 1] as number)).toBeGreaterThanOrEqual(700);
+    }
   });
 
   it('lets one agent invite at a time, glancing at the cue', () => {
@@ -233,13 +242,15 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
     let invites = 0;
     const seen = new Set<Clip>();
     rt.onFrame = () => {
-      for (const c of rt.live)
-        for (const k of c.clips as readonly Clip[])
+      for (const c of rt.live) {
+        for (const k of c.clips as readonly Clip[]) {
           if (k.inv && !seen.has(k)) {
             seen.add(k);
             inviters.add(c);
             invites++;
           }
+        }
+      }
     };
     advance(40_000);
     rt.onFrame = undefined;
@@ -333,8 +344,9 @@ describe('AgentAvatar live engine review fixes', () => {
       type: string,
       ...rest: unknown[]
     ) {
-      if (this === window || this === document || this === document.documentElement)
+      if (this === window || this === document || this === document.documentElement) {
         added.push(type);
+      }
       return (add as (...a: unknown[]) => void).call(this, type, ...rest);
     } as typeof add;
     try {
@@ -413,7 +425,9 @@ describe('AgentAvatar live engine review fixes', () => {
 
   it('does not report a beat for a data state of Done or Hello', () => {
     const ended: string[] = [];
-    const onBeatEnd = (b: string) => void ended.push(b);
+    const onBeatEnd = (b: string) => {
+      ended.push(b);
+    };
     render(
       <AgentAvatar agent='acquit' seed='d2' size={72} live state='done' onBeatEnd={onBeatEnd} />,
     );
@@ -508,7 +522,9 @@ describe('AgentAvatar live engine review fixes', () => {
       setAgentMotion(from);
       const handle = createRef<AgentAvatarHandle>();
       const ended: string[] = [];
-      const onBeatEnd = (b: string) => void ended.push(b);
+      const onBeatEnd = (b: string) => {
+        ended.push(b);
+      };
       const { unmount } = render(
         <AgentAvatar
           agent='acquit'

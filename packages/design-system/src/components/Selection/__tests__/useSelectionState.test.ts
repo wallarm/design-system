@@ -1,5 +1,6 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
+
 import { useSelectionState } from '../useSelectionState';
 
 interface Item {
@@ -221,10 +222,7 @@ describe('useSelectionState', () => {
             getItemId,
             value,
             disabledIds,
-            onChange: ids => {
-              value = ids;
-              onChange(ids);
-            },
+            onChange,
           }),
         { initialProps: { value, disabledIds: new Set(['b']) } },
       );
@@ -245,10 +243,7 @@ describe('useSelectionState', () => {
             getItemId,
             value,
             disabledIds,
-            onChange: ids => {
-              value = ids;
-              onChange(ids);
-            },
+            onChange,
           }),
         { initialProps: { value, disabledIds: new Set(['b']) } },
       );

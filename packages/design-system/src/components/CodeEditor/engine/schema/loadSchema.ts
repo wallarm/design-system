@@ -1,4 +1,5 @@
 import type { SchemaNode } from 'json-schema-library';
+
 import type { JsonSchema } from '../../types';
 
 /** Library types for the other schema modules, so this file stays the single import site. */

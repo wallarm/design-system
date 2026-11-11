@@ -1,4 +1,5 @@
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { AppShellExpandFrom } from './AppShell';
 import { EXPAND_BORDER_MS, EXPAND_MS, HERO_EASE, SKELETON_DELAY } from './constants';
 

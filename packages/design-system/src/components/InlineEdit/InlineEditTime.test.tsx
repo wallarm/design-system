@@ -1,6 +1,7 @@
 import { Time } from '@internationalized/date';
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { InlineEdit } from './InlineEdit';
 import { useInlineEdit } from './InlineEditContext';
 import { InlineEditControl } from './InlineEditControl';

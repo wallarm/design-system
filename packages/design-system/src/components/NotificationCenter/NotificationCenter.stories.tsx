@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { CheckCheck, History, Settings, TriangleAlert } from '../../icons';
 import { AppShell } from '../AppShell/AppShell';
 import { AppShellHeader } from '../AppShell/AppShellHeader';

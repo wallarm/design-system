@@ -2,8 +2,7 @@
 // source=https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/Breadcrumbs/Breadcrumbs.tsx
 // component=Breadcrumbs
 
-import type { InstanceHandle } from 'figma';
-import figma from 'figma';
+import figma, { type InstanceHandle } from 'figma';
 
 const instance = figma.selectedInstance;
 

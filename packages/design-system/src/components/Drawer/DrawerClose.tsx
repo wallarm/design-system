@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, FC, FocusEvent, ReactNode, Ref } from 'react';
+
 import { Dialog } from '@ark-ui/react/dialog';
+
 import { X } from '../../icons';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { Button } from '../Button';

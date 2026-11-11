@@ -1,4 +1,5 @@
 import { createContext, type RefObject, useLayoutEffect, useRef, useState } from 'react';
+
 import { getScrollRoot, isWindowScrollRoot, type ScrollRoot } from '../lib';
 
 /** The `virtualized='window'` scroll root, shared from the table shell to its body. */

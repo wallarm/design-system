@@ -1,8 +1,10 @@
 import { existsSync, statSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { Node, Project, type SourceFile } from 'ts-morph';
+
 import type { DesignSystemMetadata, ExampleMetadata } from '@wallarm-org/mcp-core';
+import { Node, Project, type SourceFile } from 'ts-morph';
+
 import { readMetaDescription } from '../../../design-system/scripts/metadata/parse-description';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { componentReadme } from './component-readme';
@@ -107,12 +109,13 @@ export const assertStoriesShipped = (
   }
   const listed = new Set(notSynced.map(note => note.split(': ')[0]));
   const dropped = missing.filter(story => !listed.has(`${guide}/${story}`));
-  if (dropped.length || extra.length)
+  if (dropped.length || extra.length) {
     throw new Error(
       `${guide}: guide stories do not match its story files' exports (missing: ${
         dropped.join(', ') || 'none'
       }; unknown: ${extra.join(', ') || 'none'}).`,
     );
+  }
 };
 
 /** Story files outside src/components that have no component guide, by src-relative prefix. */
@@ -187,9 +190,11 @@ export const buildDocs = async ({
   ]) {
     for (const declaration of source.getExportDeclarations()) {
       if (declaration.isTypeOnly()) continue;
-      for (const named of declaration.getNamedExports())
-        if (!named.isTypeOnly())
+      for (const named of declaration.getNamedExports()) {
+        if (!named.isTypeOnly()) {
           publicNames.add(named.getAliasNode()?.getText() ?? named.getName());
+        }
+      }
     }
   }
 
@@ -239,8 +244,9 @@ export const buildDocs = async ({
         });
       }
     } else {
-      if (!component.examples.length)
+      if (!component.examples.length) {
         omitted.push(`${component.name}: no Storybook story; props only.`);
+      }
       guides.push({
         name: component.name,
         description: component.description,
@@ -282,8 +288,9 @@ export const buildDocs = async ({
       ...guide,
       modules: storyModules(modulesProject, storyFiles, publicNames),
     });
-    if (Buffer.byteLength(readme) > README_CAP_BYTES)
+    if (Buffer.byteLength(readme) > README_CAP_BYTES) {
       throw new Error(`${guide.name} README exceeds ${README_CAP_BYTES} bytes.`);
+    }
     assertStoriesShipped(
       guide.name,
       exportedStories(modulesProject, storyFiles),
@@ -298,8 +305,9 @@ export const buildDocs = async ({
   const typePaths = (await readdir(distDir, { recursive: true }))
     .filter(file => file.endsWith('.d.ts'))
     .sort();
-  if (typePaths.length === 0)
+  if (typePaths.length === 0) {
     throw new Error('No declarations in dist; run the normal package build first.');
+  }
   const declarations = (
     await Promise.all(
       typePaths.map(

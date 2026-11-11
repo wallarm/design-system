@@ -1,5 +1,7 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import { Dialog } from '@ark-ui/react/dialog';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -17,8 +19,8 @@ export const DrawerTitle: FC<DrawerTitleProps> = ({ children, ref }) => {
       data-testid={testId}
       data-slot='drawer-title'
       className={cn(
-        'flex-1 min-w-0 col-start-1 row-start-1',
-        'font-sans-display font-medium text-lg leading-28',
+        'col-start-1 row-start-1 min-w-0 flex-1',
+        'font-sans-display text-lg leading-28 font-medium',
         'text-text-primary',
       )}
     >

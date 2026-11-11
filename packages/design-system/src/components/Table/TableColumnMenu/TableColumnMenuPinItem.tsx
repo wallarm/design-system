@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Pin, PinOff } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { useTableValue } from '../lib';

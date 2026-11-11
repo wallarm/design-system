@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+
 import { CSS } from '@dnd-kit/utilities';
 
 interface GetDndStylesParams {

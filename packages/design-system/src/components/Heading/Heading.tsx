@@ -1,6 +1,8 @@
 import type { ElementType, FC, Ref } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import type { PolymorphicComponentProps } from '../Polymorphic';
@@ -40,7 +42,7 @@ const headingVariants = cva('font-sans-display text-text-primary', {
       right: 'text-right',
     },
     grow: {
-      true: 'flex-1 w-full',
+      true: 'w-full flex-1',
     },
     truncate: {
       true: 'truncate',

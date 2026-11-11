@@ -1,4 +1,5 @@
 import type { ColumnDef, Row, RowData } from '@tanstack/react-table';
+
 import { GripVertical } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { useTableContext } from '../TableContext/useTableContext';
@@ -31,21 +32,19 @@ export const createDragHandleColumn = <T extends RowData>(): ColumnDef<
   DSTableFeatures,
   T,
   unknown
-> => {
-  return {
-    id: TABLE_DRAG_HANDLE_COLUMN_ID,
-    size: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
-    minSize: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
-    maxSize: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
-    enableSorting: false,
-    enableResizing: false,
-    enableHiding: false,
-    enablePinning: false,
-    meta: {
-      headerClassName: 'px-4 py-4',
-      cellClassName: 'px-4 py-8 align-middle text-center',
-    },
-    header: () => null,
-    cell: ({ row }) => <DragHandle row={row} />,
-  };
-};
+> => ({
+  id: TABLE_DRAG_HANDLE_COLUMN_ID,
+  size: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+  minSize: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+  maxSize: TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+  enableSorting: false,
+  enableResizing: false,
+  enableHiding: false,
+  enablePinning: false,
+  meta: {
+    headerClassName: 'px-4 py-4',
+    cellClassName: 'px-4 py-8 align-middle text-center',
+  },
+  header: () => null,
+  cell: ({ row }) => <DragHandle row={row} />,
+});

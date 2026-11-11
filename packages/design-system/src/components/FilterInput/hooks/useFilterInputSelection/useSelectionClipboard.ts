@@ -1,5 +1,5 @@
-import type { ClipboardEvent, RefObject } from 'react';
-import { useCallback } from 'react';
+import { type ClipboardEvent, type RefObject, useCallback } from 'react';
+
 import { isFilterParseError, parseExpression } from '../../lib';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
 import { serializeSelectedOrAll } from './lib';

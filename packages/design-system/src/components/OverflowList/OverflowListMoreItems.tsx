@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { overflowListMoreItemVariants } from './classes';
@@ -48,7 +49,7 @@ export const OverflowListMoreItems = <T,>({
           if (show === 'hidden' && !isHidden) return null;
           return (
             <div
-              // oxlint-disable-next-line react/no-array-index-key -- items carry no identity; the source index is stable for a given list
+              // items carry no identity; the source index is stable for a given list
               key={index}
               data-slot='overflow-list-more-item'
               data-testid={itemTestId}

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { insertionGapButton, insertionGapDivider } from './classes';
 
 interface InsertionGapProps {

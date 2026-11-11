@@ -1,9 +1,11 @@
-import { beforeAll, describe, expect, it } from '@rstest/core';
 import { existsSync, readFileSync } from 'node:fs';
 import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+
+import { beforeAll, describe, expect, it } from '@rstest/core';
 import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
+
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from '../config';
 import { boardEntry, CANVAS_FOLDER, CANVAS_HEAD, CANVAS_SKELETON } from '../pack';
 import { SKELETON_DATA, SKELETON_FILE } from '../sampler/sampler';
@@ -71,8 +73,9 @@ describe('Claude Design documentation', () => {
     const rules = await readFile(path.join(DESIGN_SYSTEM_DIR, 'src/guidelines/rules.md'), 'utf8');
     expect(readme).toContain(rules.trim());
     expect(readme).not.toContain('<!-- rules.md -->');
-    for (const required of ['sampler.dc.html', 'dist/guidelines/', 'get_guideline'])
+    for (const required of ['sampler.dc.html', 'dist/guidelines/', 'get_guideline']) {
       expect(readme).toContain(required);
+    }
   });
 
   it('opens with a Start here section that sets up the skeleton the export ships', async () => {
@@ -88,8 +91,9 @@ describe('Claude Design documentation', () => {
       JSON.stringify(boardEntry(skeleton, CANVAS_SKELETON).entry)
         .slice(1, -1)
         .replaceAll(/([:,])/g, '$1 '),
-    ])
+    ]) {
       expect(start).toContain(required);
+    }
     // test:export runs after `export`, so the shipped project is on disk.
     expect(existsSync(path.resolve('.claude-design/project', SKELETON_FILE))).toBe(true);
   });
@@ -126,8 +130,9 @@ describe('Claude Design documentation', () => {
         ? [...new Set(component.examples.map(example => guideName(example.storyFile ?? '')))]
         : [component.name];
       const text = (await Promise.all(guides.map(guideText))).join('\n');
-      for (const example of component.examples)
+      for (const example of component.examples) {
         expect(text, `${component.name}/${example.name}`).toContain(`\n### ${example.name}\n`);
+      }
     }
   });
 
@@ -182,8 +187,9 @@ describe('Claude Design documentation', () => {
       'HorizontalBarStack',
       'Chart',
       'Overview',
-    ])
+    ]) {
       expect(components).toContain(name);
+    }
     expect(components).not.toContain('SimpleCharts');
   });
 
@@ -209,15 +215,17 @@ describe('Claude Design documentation', () => {
         'WallarmExample',
         '## Collections',
         'TableCells',
-      ])
+      ]) {
         expect(text, `${component}: ${forbidden}`).not.toContain(forbidden);
+      }
     }
   });
 
   it('lists components without stories and internals in Not synced', async () => {
     const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
-    for (const name of ['NavRail', 'TopHeader', 'BulkBar'])
+    for (const name of ['NavRail', 'TopHeader', 'BulkBar']) {
       expect(readme).toContain(`- ${name}: no Storybook story; props only.`);
+    }
     expect(readme).toContain('- ThemeProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- DateFormatProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- Checkmark: internal primitive; no guide.');

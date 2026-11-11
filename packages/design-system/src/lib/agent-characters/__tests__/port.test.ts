@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it, rstest } from '@rstest/core';
+
 import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import { hexOf, mix } from '../color';
 import { SHAPES } from '../data.gen';
@@ -25,8 +26,9 @@ const extraLooks = fixture.extraLooks as {
 // geom() rasterises with a canvas, which jsdom lacks: the reference's own geometry is primed instead.
 // The real canvas path is checked side by side in the parity harness.
 beforeAll(() => {
-  for (const [id, g] of Object.entries(geoms))
+  for (const [id, g] of Object.entries(geoms)) {
     primeGeom(id, { top: g.top, HW: Float32Array.from(g.HW), foot: g.foot } satisfies Geom);
+  }
 });
 
 // Glyph clip ids come from a page-wide counter; compare them by position, not by number.
@@ -67,11 +69,12 @@ describe('port of the reference (look v17)', () => {
   });
 
   it('glyph matches for the cast in every state and size', () => {
-    for (const c of PAGE_CAST)
+    for (const c of PAGE_CAST) {
       for (const key of Object.keys(glyphs).filter(k => k.startsWith(`${c.id}|`))) {
         const [, st, size] = key.split('|');
         expect(normIds(glyph(c, Number(size), st as StateId)), key).toBe(normIds(glyphs[key]));
       }
+    }
   });
 
   it('glyph matches for looks outside the cast, only with the builder library (WDS-204)', () => {
@@ -88,11 +91,12 @@ describe('port of the reference (look v17)', () => {
     expect(without.length).toBeGreaterThan(0);
     setPropLibrary(propDef);
     try {
-      for (const c of extraLooks)
+      for (const c of extraLooks) {
         for (const key of Object.keys(glyphs).filter(k => k.startsWith(`${c.shape}+${c.prop}|`))) {
           const st = key.split('|')[1];
           expect(normIds(glyph(c, 24, st as StateId)), key).toBe(normIds(glyphs[key]));
         }
+      }
     } finally {
       setPropLibrary(null);
     }

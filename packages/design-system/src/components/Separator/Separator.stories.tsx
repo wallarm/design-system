@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Heading } from '../Heading';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';

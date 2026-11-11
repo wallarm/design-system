@@ -1,4 +1,5 @@
 import type { FC, PropsWithChildren } from 'react';
+
 import { SelectSharedContext, type SelectSharedContextValue } from './SelectSharedContext';
 
 interface SelectSharedProviderProps {
@@ -8,6 +9,4 @@ interface SelectSharedProviderProps {
 export const SelectSharedProvider: FC<PropsWithChildren<SelectSharedProviderProps>> = ({
   children,
   value,
-}) => {
-  return <SelectSharedContext.Provider value={value}>{children}</SelectSharedContext.Provider>;
-};
+}) => <SelectSharedContext.Provider value={value}>{children}</SelectSharedContext.Provider>;

@@ -1,8 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { type Node, type SourceFile, SyntaxKind } from 'ts-morph';
+
 import { migrations } from '../../migrations';
 import { renderReport } from '../report';
 import { migrateSource, runMigrations } from '../runner';
@@ -158,8 +160,9 @@ describe('migrateSource markers', () => {
       id: 'x',
       title: 'x',
       transform: (f: SourceFile, ctx: MigrationContext) => {
-        for (const el of f.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement))
+        for (const el of f.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement)) {
           ctx.report(el, 'm');
+        }
       },
     };
     const inner = `<Avatar ${mark('x', 'm')} />`;

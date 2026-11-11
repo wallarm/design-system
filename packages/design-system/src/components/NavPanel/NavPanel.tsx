@@ -8,7 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { useArrowNav } from '../../hooks/useArrowNav';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
@@ -99,7 +101,7 @@ export const NavPanel: FC<NavPanelProps> = ({
               className,
             )}
           >
-            <div className='flex h-full flex-col gap-2 overflow-y-auto overscroll-none [scrollbar-width:thin] px-8 pb-8'>
+            <div className='flex h-full [scrollbar-width:thin] flex-col gap-2 overflow-y-auto overscroll-none px-8 pb-8'>
               {children}
             </div>
             <NavPanelResizeHandle />
@@ -118,7 +120,7 @@ export const NavPanel: FC<NavPanelProps> = ({
         data-slot='nav-panel'
         data-testid={testId}
         className={cn(
-          'flex h-full w-[216px] shrink-0 flex-col gap-2 overflow-y-auto overscroll-none [scrollbar-width:thin] border-r border-border-primary-light p-8',
+          'flex h-full w-[216px] shrink-0 [scrollbar-width:thin] flex-col gap-2 overflow-y-auto overscroll-none border-r border-border-primary-light p-8',
           className,
         )}
       >

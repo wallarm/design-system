@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { computeTruncation } from '../useParameterPathTruncation';
 
 const defaults = { jointWidth: 16, ellipsisWidth: 16 };

@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { CircleDashed, Globe } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
@@ -53,7 +54,7 @@ export const Basic: StoryFn<typeof meta> = () => <Skeleton width='200px' height=
 /** Standalone boxes built to match the real components beside them. The point of the comparison is the measurements: a placeholder that is not the content’s size is what makes the page jump on swap-in. */
 export const Shapes: StoryFn<SkeletonProps> = () => (
   <HStack gap={24} align='start'>
-    <div className='flex flex-col items-end gap-24 w-[400px]'>
+    <div className='flex w-[400px] flex-col items-end gap-24'>
       {/* Title */}
       <Skeleton width='256px' height='40px' />
 
@@ -85,7 +86,7 @@ export const Shapes: StoryFn<SkeletonProps> = () => (
       <Skeleton width='284px' height='36px' rounded={12} />
     </div>
 
-    <div className='flex flex-col gap-24 w-[400px]'>
+    <div className='flex w-[400px] flex-col gap-24'>
       {/* Title */}
       <Heading size='4xl'>Advanced API Security</Heading>
 
@@ -148,7 +149,7 @@ export const Shapes: StoryFn<SkeletonProps> = () => (
 /** The cleaner way — wrap the real content and toggle `loading`. The skeleton takes the content’s exact box, so there is nothing to keep in sync by hand. */
 export const Wrap: StoryFn<SkeletonProps> = () => (
   <HStack gap={24} align='start'>
-    <div className='flex flex-col items-end gap-24 w-[400px]'>
+    <div className='flex w-[400px] flex-col items-end gap-24'>
       {/* Title */}
       <Skeleton>
         <Heading size='4xl'>Advanced API Security</Heading>
@@ -226,7 +227,7 @@ export const Wrap: StoryFn<SkeletonProps> = () => (
       </Skeleton>
     </div>
 
-    <div className='flex flex-col gap-24 w-[400px]'>
+    <div className='flex w-[400px] flex-col gap-24'>
       {/* Title */}
       <Heading size='4xl'>Advanced API Security</Heading>
 
@@ -288,7 +289,7 @@ export const Wrap: StoryFn<SkeletonProps> = () => (
 
 /** `transparent`, the default, animates over invisible content so the surface behind shows through; `transparent={false}` fills the box with `surface-1`. */
 export const Transparent: StoryFn<SkeletonProps> = () => (
-  <div className='flex flex-col gap-8 p-8 rounded-8 bg-orange-100'>
+  <div className='flex flex-col gap-8 rounded-8 bg-orange-100 p-8'>
     <div className='flex items-center justify-end gap-24'>
       <span className='sb-annotation'>transparent</span>
       <Skeleton width='200px' height='20px' />

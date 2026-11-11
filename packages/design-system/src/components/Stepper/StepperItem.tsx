@@ -1,5 +1,7 @@
 import { type FC, type LiHTMLAttributes, type ReactNode, type Ref, useContext } from 'react';
+
 import { Steps as ArkSteps, useStepsContext } from '@ark-ui/react/steps';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { stepperItemVariants } from './classes';
@@ -42,7 +44,7 @@ export const StepperItem: FC<StepperItemProps> = ({
   const { statusLabels } = useStepperRootContext('StepperItem');
   const inList = useContext(StepperListContext);
   if (process.env.NODE_ENV !== 'production' && !inList) {
-    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
+    // dev-only authoring guard (matches Stepper root).
     console.warn(
       '[Stepper] StepperItem must be rendered inside a StepperList: an <li> outside the <ol> loses the list semantics.',
     );
@@ -53,7 +55,7 @@ export const StepperItem: FC<StepperItemProps> = ({
   const currentStep = clampStep(value, count);
   const current = index === currentStep;
   if (process.env.NODE_ENV !== 'production' && current && value !== currentStep) {
-    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
+    // dev-only authoring guard (matches Stepper root).
     console.warn(
       `[Stepper] current step ${value} is out of range [0, ${count - 1}]; showing step ${currentStep}.`,
     );

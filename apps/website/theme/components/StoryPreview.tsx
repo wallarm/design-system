@@ -1,4 +1,5 @@
 import { lazy, type ReactNode, Suspense, useRef, useState } from 'react';
+
 import { BrowserOnly } from '@rspress/core/runtime';
 import {
   Alert,
@@ -13,6 +14,7 @@ import {
 } from '@wallarm-org/design-system/SegmentedControl';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
+
 import { useInView } from './useInView';
 import { type StoryLoader, useStory } from './useStory';
 

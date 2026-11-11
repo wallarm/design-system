@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+
 import { Node, type Project, type SourceFile } from 'ts-morph';
+
 import { createProject, DS_PACKAGE, type JsxElementLike } from './jsx';
 import type { ManualItem, Migration } from './types';
 
@@ -62,8 +64,9 @@ function applyMigrations(
   sourceFile: SourceFile,
   migrations: Migration[],
 ): { code: string; manual: Omit<ManualItem, 'file'>[] } {
-  if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0)
+  if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0) {
     throw new Error(SYNTAX_ERROR);
+  }
 
   const manual: Omit<ManualItem, 'file'>[] = [];
   for (const migration of migrations) {

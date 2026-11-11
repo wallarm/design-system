@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { ApprovalCard, ApprovalCardActions, ApprovalCardContent } from '.';
 import { ChevronDown } from '../../icons';
 import { Button } from '../Button';

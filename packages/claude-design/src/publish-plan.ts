@@ -5,6 +5,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+
 import { CLAUDE_DESIGN } from './config';
 
 export interface Plan {
@@ -53,8 +54,9 @@ const collectAssetIds = (value: unknown, ids: Map<string, string>) => {
   if (Array.isArray(value)) for (const item of value) collectAssetIds(item, ids);
   else if (value && typeof value === 'object') {
     const { opaque_id, source_sha256 } = value as Json;
-    if (typeof opaque_id === 'string' && typeof source_sha256 === 'string')
+    if (typeof opaque_id === 'string' && typeof source_sha256 === 'string') {
       ids.set(source_sha256, opaque_id);
+    }
     for (const item of Object.values(value)) collectAssetIds(item, ids);
   }
 };
@@ -74,9 +76,11 @@ const compute = (dir: string, withUploads = true) => {
   const localIndex = readJson(join(dir, 'project/design-system.json')) as Json;
   const hashes = readJson(join(dir, 'file-hashes.json')) as Record<string, string>;
 
-  for (const path of Object.keys(hashes))
-    if (!existsSync(join(dir, 'project', path)))
+  for (const path of Object.keys(hashes)) {
+    if (!existsSync(join(dir, 'project', path))) {
       throw new Error(`file-hashes.json lists project/${path}, which is missing on disk`);
+    }
+  }
 
   const ids = new Map<string, string>();
   const assets = readJson(join(remoteDir, 'assets.json')) as Json;
@@ -84,11 +88,13 @@ const compute = (dir: string, withUploads = true) => {
   collectAssetIds(assets, ids);
   const remoteAssetCount = ids.size;
   const uploadsDir = join(remoteDir, 'uploads');
-  if (withUploads && existsSync(uploadsDir))
+  if (withUploads && existsSync(uploadsDir)) {
     for (const name of readdirSync(uploadsDir)
       .filter(name => name.endsWith('.json'))
-      .sort())
+      .sort()) {
       collectAssetIds(readJson(join(uploadsDir, name)), ids);
+    }
+  }
 
   const local = new Map(Object.entries(hashes).map(([path, hash]) => [`project/${path}`, hash]));
   const remote = new Map(remoteFiles.map(file => [file.path, file]));
@@ -113,11 +119,12 @@ const compute = (dir: string, withUploads = true) => {
     .sort();
 
   const assetGroups = structuredClone(localIndex.assetGroups) as AssetGroups;
-  for (const group of Object.values(assetGroups))
+  for (const group of Object.values(assetGroups)) {
     for (const file of Object.values(group.files)) {
       const blob = ids.get(file.sha256);
       if (blob) file.blob = blob;
     }
+  }
   // Remote key order; replaced keys the remote lacks go last; other local-only keys are dropped.
   const merged: Json = { ...remoteIndex };
   for (const key of REPLACED) merged[key] = key === 'assetGroups' ? assetGroups : localIndex[key];
@@ -152,8 +159,9 @@ export const plan = (dir: string): Plan => {
   // Deletion needs the operator's approval (repository CLAUDE.md); unapproved paths stay published.
   const approvedPath = join(dir, 'remote/approved-stale.json');
   const approvedList: unknown = existsSync(approvedPath) ? readJson(approvedPath) : [];
-  if (!Array.isArray(approvedList) || approvedList.some(path => typeof path !== 'string'))
+  if (!Array.isArray(approvedList) || approvedList.some(path => typeof path !== 'string')) {
     throw new Error('remote/approved-stale.json must be a JSON array of paths');
+  }
   const approved = new Set<string>(approvedList);
   const batches: Plan['batches'] = [];
   let bytes = 0;

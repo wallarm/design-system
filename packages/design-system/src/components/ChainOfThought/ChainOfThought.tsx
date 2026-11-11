@@ -1,4 +1,5 @@
 import type { FC, OlHTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { chainOfThoughtVariants } from './classes';
@@ -26,7 +27,6 @@ export const ChainOfThought: FC<ChainOfThoughtProps> = ({
       ref={ref}
       data-slot='chain-of-thought'
       data-testid={testId}
-      // oxlint-disable-next-line jsx-a11y/no-redundant-roles -- Safari/VoiceOver drops list semantics from lists styled with `list-style: none`; role='list' restores it
       role='list'
       className={cn(chainOfThoughtVariants(), className)}
     >

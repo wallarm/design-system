@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import {
   type Baked,
   type BakeRunner,
@@ -26,7 +27,6 @@ export function useBakedLayers(
   // The layers are rebuilt on every render; their content is what decides a re-bake.
   const signature = `${size}#${layers.map(layerKey).join('\n')}`;
 
-  // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed on the layers' content, not their identity
   useEffect(() => {
     let alive = true;
     const held = new Set<string>();

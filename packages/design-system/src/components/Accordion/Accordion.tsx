@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
+
 import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { AccordionContextProvider, type AccordionVariant } from './AccordionContext';
@@ -47,25 +49,23 @@ export const Accordion: FC<AccordionProps> = ({
   disabled,
   className,
   'data-testid': testId,
-}) => {
-  return (
-    <AccordionContextProvider variant={variant}>
-      <ArkUiAccordion.Root
-        data-slot='accordion'
-        data-testid={testId}
-        data-variant={variant}
-        className={cn(accordionRootVariants(), className)}
-        multiple={multiple}
-        collapsible={collapsible}
-        value={value}
-        defaultValue={defaultValue}
-        onValueChange={onValueChange}
-        disabled={disabled}
-      >
-        <TestIdProvider value={testId}>{children}</TestIdProvider>
-      </ArkUiAccordion.Root>
-    </AccordionContextProvider>
-  );
-};
+}) => (
+  <AccordionContextProvider variant={variant}>
+    <ArkUiAccordion.Root
+      data-slot='accordion'
+      data-testid={testId}
+      data-variant={variant}
+      className={cn(accordionRootVariants(), className)}
+      multiple={multiple}
+      collapsible={collapsible}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      disabled={disabled}
+    >
+      <TestIdProvider value={testId}>{children}</TestIdProvider>
+    </ArkUiAccordion.Root>
+  </AccordionContextProvider>
+);
 
 Accordion.displayName = 'Accordion';

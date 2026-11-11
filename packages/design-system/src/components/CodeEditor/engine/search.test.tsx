@@ -4,6 +4,7 @@ import { EditorView, runScopeHandlers } from '@codemirror/view';
 import { afterEach, describe, expect, it } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { searchExtension } from './search';

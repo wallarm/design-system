@@ -8,19 +8,21 @@
  * Needs Google Chrome stable (as the handoff's scripts do).
  */
 
-import type { BrowserType } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import type { BrowserType } from '@playwright/test';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const { chromium } = createRequire(
   path.resolve(here, '../../../configs/playwright-config/package.json'),
 )('@playwright/test') as { chromium: BrowserType };
 const REF = process.env.REF;
-if (!REF)
+if (!REF) {
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
+}
 const OUT = path.resolve(
   here,
   '../../src/lib/agent-characters/__tests__/__fixtures__/builder-v17.json',
@@ -80,5 +82,4 @@ const data = await page.evaluate(CAPTURE);
 await browser.close();
 if (errors.length) throw new Error(`page errors: ${errors.join('\n')}`);
 writeFileSync(OUT, `${JSON.stringify(data)}\n`);
-// oxlint-disable-next-line no-console -- CLI output
 console.log(`${path.relative(process.cwd(), OUT)} written`);

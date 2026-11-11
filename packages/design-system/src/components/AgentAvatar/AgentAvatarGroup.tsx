@@ -1,4 +1,5 @@
 import { createContext, type FC, type ReactNode, useState } from 'react';
+
 import type { Character } from '../../lib/agent-characters/engine';
 
 /** The live characters of one row or list. */

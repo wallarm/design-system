@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
-import type { Migration, VersionsFile } from '../types';
-import { UsageError } from '../types';
+
+import { type Migration, type VersionsFile, UsageError } from '../types';
 import { parseExactVersion, selectMigrations } from '../versions';
 
 const m = (id: string): Migration => ({ id, title: id, transform: () => {} });

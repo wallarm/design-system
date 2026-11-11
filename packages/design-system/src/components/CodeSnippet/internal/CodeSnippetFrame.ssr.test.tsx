@@ -1,7 +1,8 @@
-import { hydrateRoot } from 'react-dom/client';
-import { renderToString } from 'react-dom/server';
 import { describe, expect, it, rs } from '@rstest/core';
 import { act } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
+
 import { CodeSnippetFrame } from './CodeSnippetFrame';
 
 const noop = () => {

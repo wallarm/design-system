@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@wallarm-org/design-system/Button';
 import {
@@ -65,7 +66,7 @@ function CodeEditorPage() {
   const [withSchema, setWithSchema] = useState(false);
 
   return (
-    <div className='flex flex-col w-screen min-h-screen p-32'>
+    <div className='flex min-h-screen w-screen flex-col p-32'>
       <VStack gap={16}>
         <Heading color='primary'>CodeEditor</Heading>
         <Text color='secondary'>

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Button } from '../Button';
 import { Code } from '../Code';
 import { Alert, type AlertProps } from './Alert';
@@ -47,7 +49,7 @@ export default meta;
 
 /** The five colours with the icon each implies: neutral `primary` for a general notice, then destructive, info, warning and success for real status. */
 export const AllColors: StoryFn<AlertProps> = () => (
-  <div className='flex flex-col gap-16 w-[600px]'>
+  <div className='flex w-[600px] flex-col gap-16'>
     <Alert color='primary'>
       <AlertIcon />
       <AlertContent>
@@ -91,25 +93,23 @@ export const AllColors: StoryFn<AlertProps> = () => (
 );
 
 /** A title on its own is a complete alert. Add a description only when it says something the title does not. */
-export const TitleOnly: StoryFn<AlertProps> = () => {
-  return (
-    <div className='flex flex-col gap-16 w-[600px]'>
-      <Alert color='primary'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Alert with title only</AlertTitle>
-        </AlertContent>
-      </Alert>
+export const TitleOnly: StoryFn<AlertProps> = () => (
+  <div className='flex w-[600px] flex-col gap-16'>
+    <Alert color='primary'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Alert with title only</AlertTitle>
+      </AlertContent>
+    </Alert>
 
-      <Alert color='info'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Information message without description</AlertTitle>
-        </AlertContent>
-      </Alert>
-    </div>
-  );
-};
+    <Alert color='info'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Information message without description</AlertTitle>
+      </AlertContent>
+    </Alert>
+  </div>
+);
 
 /** `AlertClose` gives the reader a way out — add it where dismissing is reasonable, and leave it off while the condition still holds. */
 export const WithCloseButton: StoryFn<AlertProps> = () => {
@@ -117,7 +117,7 @@ export const WithCloseButton: StoryFn<AlertProps> = () => {
   const [showWarning, setShowWarning] = useState(true);
 
   return (
-    <div className='flex flex-col gap-16 w-[600px]'>
+    <div className='flex w-[600px] flex-col gap-16'>
       {showInfo && (
         <Alert color='info'>
           <AlertIcon />
@@ -143,101 +143,97 @@ export const WithCloseButton: StoryFn<AlertProps> = () => {
 };
 
 /** `AlertControls` as a direct child of `Alert` puts the actions top-right, which is what a wide alert wants. The buttons are always `secondary` and `small`, neutral or destructive to match the alert, never a solid primary. */
-export const WithControls: StoryFn<AlertProps> = () => {
-  return (
-    <div className='flex flex-col gap-16 w-[600px]'>
-      <Alert color='info'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Alert with Two Action Buttons</AlertTitle>
-          <AlertDescription>
-            This alert has two action buttons on the right side without a close button.
-          </AlertDescription>
-        </AlertContent>
-        <AlertControls>
-          <Button variant='secondary' color='neutral' size='small'>
-            Learn more
-          </Button>
-          <Button variant='secondary' color='neutral' size='small'>
-            Dismiss
-          </Button>
-        </AlertControls>
-      </Alert>
+export const WithControls: StoryFn<AlertProps> = () => (
+  <div className='flex w-[600px] flex-col gap-16'>
+    <Alert color='info'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Alert with Two Action Buttons</AlertTitle>
+        <AlertDescription>
+          This alert has two action buttons on the right side without a close button.
+        </AlertDescription>
+      </AlertContent>
+      <AlertControls>
+        <Button variant='secondary' color='neutral' size='small'>
+          Learn more
+        </Button>
+        <Button variant='secondary' color='neutral' size='small'>
+          Dismiss
+        </Button>
+      </AlertControls>
+    </Alert>
 
-      <Alert color='info'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Alert with Actions and Close</AlertTitle>
-          <AlertDescription>This alert has action buttons and a close button.</AlertDescription>
-        </AlertContent>
-        <AlertControls>
-          <Button variant='secondary' color='neutral' size='small'>
-            Learn more
-          </Button>
-        </AlertControls>
-        <AlertClose />
-      </Alert>
+    <Alert color='info'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Alert with Actions and Close</AlertTitle>
+        <AlertDescription>This alert has action buttons and a close button.</AlertDescription>
+      </AlertContent>
+      <AlertControls>
+        <Button variant='secondary' color='neutral' size='small'>
+          Learn more
+        </Button>
+      </AlertControls>
+      <AlertClose />
+    </Alert>
 
-      <Alert color='destructive'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Critical Error</AlertTitle>
-          <AlertDescription>An error occurred that requires your attention.</AlertDescription>
-        </AlertContent>
-        <AlertControls>
-          <Button variant='secondary' color='destructive' size='small'>
-            Fix now
-          </Button>
-        </AlertControls>
-        <AlertClose />
-      </Alert>
-    </div>
-  );
-};
+    <Alert color='destructive'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Critical Error</AlertTitle>
+        <AlertDescription>An error occurred that requires your attention.</AlertDescription>
+      </AlertContent>
+      <AlertControls>
+        <Button variant='secondary' color='destructive' size='small'>
+          Fix now
+        </Button>
+      </AlertControls>
+      <AlertClose />
+    </Alert>
+  </div>
+);
 
 /** The same controls nested inside `AlertContent` drop below the text instead, which is what a narrow alert wants. Placement follows the width rather than a rule. */
-export const WithBottomActions: StoryFn<AlertProps> = () => {
-  return (
-    <div className='flex flex-col gap-16 w-[600px]'>
-      <Alert color='info'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Alert with Bottom Actions</AlertTitle>
-          <AlertDescription>
-            This alert has action buttons at the bottom of the content area.
-          </AlertDescription>
-          <AlertControls>
-            <Button variant='secondary' color='neutral' size='small'>
-              Primary Action
-            </Button>
-            <Button variant='secondary' color='neutral' size='small'>
-              Secondary
-            </Button>
-          </AlertControls>
-        </AlertContent>
-        <AlertClose />
-      </Alert>
+export const WithBottomActions: StoryFn<AlertProps> = () => (
+  <div className='flex w-[600px] flex-col gap-16'>
+    <Alert color='info'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Alert with Bottom Actions</AlertTitle>
+        <AlertDescription>
+          This alert has action buttons at the bottom of the content area.
+        </AlertDescription>
+        <AlertControls>
+          <Button variant='secondary' color='neutral' size='small'>
+            Primary Action
+          </Button>
+          <Button variant='secondary' color='neutral' size='small'>
+            Secondary
+          </Button>
+        </AlertControls>
+      </AlertContent>
+      <AlertClose />
+    </Alert>
 
-      <Alert color='destructive'>
-        <AlertIcon />
-        <AlertContent>
-          <AlertTitle>Destructive Alert with Actions</AlertTitle>
-          <AlertDescription>
-            This error requires immediate action. Please review and take necessary steps.
-          </AlertDescription>
-          <AlertControls>
-            <Button variant='secondary' color='destructive' size='small'>
-              Delete
-            </Button>
-            <Button variant='secondary' color='neutral' size='small'>
-              Cancel
-            </Button>
-          </AlertControls>
-        </AlertContent>
-      </Alert>
-    </div>
-  );
-};
+    <Alert color='destructive'>
+      <AlertIcon />
+      <AlertContent>
+        <AlertTitle>Destructive Alert with Actions</AlertTitle>
+        <AlertDescription>
+          This error requires immediate action. Please review and take necessary steps.
+        </AlertDescription>
+        <AlertControls>
+          <Button variant='secondary' color='destructive' size='small'>
+            Delete
+          </Button>
+          <Button variant='secondary' color='neutral' size='small'>
+            Cancel
+          </Button>
+        </AlertControls>
+      </AlertContent>
+    </Alert>
+  </div>
+);
 
 /**
  * Each row puts the alert in a container that crosses one of its bounds, since
@@ -333,7 +329,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
     'This is a very long description that demonstrates the text truncation feature. The description can be quite lengthy and should be limited to a maximum of 4 lines by default. When the text exceeds this limit, it will be truncated with an ellipsis. This behavior ensures that the alert remains compact and does not take up too much vertical space on the page. Additional text is added here to make sure the truncation is visible.';
 
   return (
-    <div className='flex flex-col gap-16 w-600'>
+    <div className='flex w-600 flex-col gap-16'>
       <div>
         <p className='sb-annotation mb-8'>lineClamp 4</p>
         <Alert color='info'>
@@ -372,7 +368,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
 
 /** An inline `Code` line inside the content, for the error code or the command that failed — the one piece of rich content an alert is built to carry. */
 export const WithCode: StoryFn<AlertProps> = () => (
-  <div className='flex flex-col gap-16 w-700'>
+  <div className='flex w-700 flex-col gap-16'>
     <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>

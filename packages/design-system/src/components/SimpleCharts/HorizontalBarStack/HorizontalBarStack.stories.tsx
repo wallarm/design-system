@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';

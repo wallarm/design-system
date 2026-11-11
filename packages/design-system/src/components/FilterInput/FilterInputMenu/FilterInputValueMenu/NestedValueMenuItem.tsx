@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
+
 import { ChevronRight } from '../../../../icons/ChevronRight';
 import { cn } from '../../../../utils/cn';
 import { Badge } from '../../../Badge';
@@ -100,7 +102,7 @@ export const NestedValueMenuItem: FC<NestedValueMenuItemProps> = ({
           (tri-state, for groups) checkbox / single-select checkmark. The
           checkbox brings its own vertical rhythm (Checkmark's `my-2`), so the
           rail adds none — keeping the row at the 32px spec height. */}
-      <div className='flex shrink-0 items-center justify-end gap-8 ml-auto'>
+      <div className='ml-auto flex shrink-0 items-center justify-end gap-8'>
         {isGroup && (
           <span className='flex text-text-secondary'>
             <ChevronRight />

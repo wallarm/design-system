@@ -1,7 +1,9 @@
 import { createRef, type FC, type Ref, useState } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetCode } from './CodeSnippetCode';
 import { CodeSnippetContent } from './CodeSnippetContent';
@@ -67,7 +69,7 @@ describe('CodeSnippet fullscreen', () => {
       <CodeSnippetRoot
         code='const a = 1;'
         data-testid='snippet'
-        className='consumer-class h-[240px] max-w-[600px] w-320 mx-auto'
+        className='consumer-class mx-auto h-[240px] w-320 max-w-[600px]'
       >
         <CodeSnippetActions>
           <CodeSnippetFullscreenButton />

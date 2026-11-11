@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { COLLAPSED_MAX_HEIGHT } from '../classes';
 
 /**

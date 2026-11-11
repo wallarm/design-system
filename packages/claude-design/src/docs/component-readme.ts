@@ -14,8 +14,9 @@ const normalizedType = (
       )
     : [];
   const options = variant?.options.length ? variant.options : cvaOptions;
-  if (options.length && options.every(option => option === 'true' || option === 'false'))
+  if (options.length && options.every(option => option === 'true' || option === 'false')) {
     return 'boolean';
+  }
   return options.length ? options.map(option => JSON.stringify(option)).join(' | ') : prop.type;
 };
 
@@ -41,8 +42,9 @@ export const componentReadme = (
       `| \`${kebab(prop.name)}\` | \`${tableText(normalizedType(prop, component))}\` | ${prop.required ? 'yes' : 'no'} | ${defaultValue === undefined ? '—' : `\`${tableText(defaultValue)}\``} | ${tableText(prop.description ?? '')} |`,
     );
   }
-  if (!component.props.length)
+  if (!component.props.length) {
     lines.push('| — | See emitted declarations in `components/index.d.ts`. | | | |');
+  }
   if (component.subComponents.length) {
     lines.push(
       '',

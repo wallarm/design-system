@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, rstest } from '@rstest/core';
+
 import { hexOf } from '../color';
 import { CAST, PRESET_PROPS } from '../data.gen';
 import { shapeOf } from '../geom';

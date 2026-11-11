@@ -1,5 +1,6 @@
 import type { FC, Ref, RefObject, SVGProps } from 'react';
 import { useContext, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
+
 import { charTree } from '../../lib/agent-characters/char';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
 import { CAST } from '../../lib/agent-characters/data.gen';
@@ -118,8 +119,9 @@ const Frame: FC<FrameProps> = ({ t, size, veil, agent, seed, label, live, rest, 
     return layer && baked[layerKey(layer)] ? { 'data-ready': true } : undefined;
   };
   const withImages = (n: SvgNode): SvgNode => {
-    if (n.attrs['data-j'] === undefined)
+    if (n.attrs['data-j'] === undefined) {
       return n.children ? { ...n, children: n.children.map(withImages) } : n;
+    }
     const layer = t.layers[Number(n.attrs['data-j'])];
     const b = layer && baked[layerKey(layer)];
     if (!b) return n;
@@ -209,8 +211,9 @@ const StaticAvatar: FC<InnerProps> = ({
       },
       // under reduced motion Cover all jumps to its end: Done without the crown, from On duty only (as live)
       coverAll() {
-        if (cover && state === 'idle')
+        if (cover && state === 'idle') {
           setBeat({ kind: 'done', ms: 1600 + r() * 600, covered: true });
+        }
       },
       cueHover: () => undefined,
     }),

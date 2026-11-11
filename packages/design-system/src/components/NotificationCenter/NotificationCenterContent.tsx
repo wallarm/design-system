@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { cn } from '../../utils/cn';
 import { PopoverContent, type PopoverContentProps } from '../Popover';
 
@@ -20,7 +21,7 @@ export const NotificationCenterContent: FC<NotificationCenterContentProps> = ({
     minWidth='400px'
     maxWidth='400px'
     maxHeight='640px'
-    className={cn('p-0 overflow-hidden', className)}
+    className={cn('overflow-hidden p-0', className)}
   />
 );
 

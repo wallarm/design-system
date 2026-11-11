@@ -1,4 +1,5 @@
 import type { FC, InputHTMLAttributes, Ref } from 'react';
+
 import { Search } from '../../icons';
 import { Input } from '../Input';
 import { InputGroup, InputGroupAddon } from '../InputGroup';

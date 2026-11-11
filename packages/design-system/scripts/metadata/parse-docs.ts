@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import type { ComponentDoc } from '@wallarm-org/mcp-core';
 
 /** Usage docs for a component folder: `docs/*.md` (e.g. SimpleCharts) and `*_DESIGN.md` (e.g. Table). */

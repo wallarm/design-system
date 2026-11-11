@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
+
 import {
   closestCenter,
   DndContext,
@@ -25,6 +25,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { createPortal } from 'react-dom';
+
 import { Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { isEqual } from '../../../utils/isEqual';
@@ -254,8 +256,8 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
         className={cn(
           'absolute top-0 right-0 z-30',
           'flex items-start',
-          'bg-bg-light-primary border rounded-tr-12 border-border-primary-light',
-          'pl-6 pr-4 py-4',
+          'rounded-tr-12 border border-border-primary-light bg-bg-light-primary',
+          'py-4 pr-4 pl-6',
           'rounded-tr-12',
         )}
         style={{

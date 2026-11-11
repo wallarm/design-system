@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
 import { Skeleton } from '../../Skeleton';
@@ -37,35 +38,33 @@ export const PieChartSkeleton: FC<PieChartSkeletonProps> = ({
   ref,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        data-slot='pie-chart-skeleton'
-        data-testid={testId}
-        aria-busy='true'
-        aria-live='polite'
-        className={cn(pieChartRootClasses, className)}
-      >
-        <div className={cn(pieChartDonutClasses, 'flex items-center justify-center')}>
-          {/* 48px transparent disc keeps the ring metrics in sync with `PIE_DONUT_INNER_RADIUS`. */}
-          <Skeleton
-            width='120px'
-            height='120px'
-            rounded='full'
-            className='mask-[radial-gradient(circle,transparent_48px,#000_49px)]'
-          />
-        </div>
-        <div className={cn(pieChartLegendClasses, 'gap-8 pl-0 pr-12 py-12')}>
-          {Array.from({ length: rows }, (_, i) => (
-            <PieChartSkeletonRow key={i} />
-          ))}
-        </div>
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='pie-chart-skeleton'
+      data-testid={testId}
+      aria-busy='true'
+      aria-live='polite'
+      className={cn(pieChartRootClasses, className)}
+    >
+      <div className={cn(pieChartDonutClasses, 'flex items-center justify-center')}>
+        {/* 48px transparent disc keeps the ring metrics in sync with `PIE_DONUT_INNER_RADIUS`. */}
+        <Skeleton
+          width='120px'
+          height='120px'
+          rounded='full'
+          className='mask-[radial-gradient(circle,transparent_48px,#000_49px)]'
+        />
       </div>
-    </TestIdProvider>
-  );
-};
+      <div className={cn(pieChartLegendClasses, 'gap-8 py-12 pr-12 pl-0')}>
+        {Array.from({ length: rows }, (_, i) => (
+          <PieChartSkeletonRow key={i} />
+        ))}
+      </div>
+    </div>
+  </TestIdProvider>
+);
 
 PieChartSkeleton.displayName = 'PieChartSkeleton';

@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { FilterInputContext } from './FilterInputContext';
 import type { FilterInputContextValue } from './types';
 

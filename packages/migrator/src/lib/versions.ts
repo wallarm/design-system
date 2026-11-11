@@ -1,6 +1,6 @@
 import { clean, gt, lt, lte, major, prerelease, valid } from 'semver';
-import type { Migration, VersionsFile } from './types';
-import { UsageError } from './types';
+
+import { type Migration, type VersionsFile, UsageError } from './types';
 
 export function parseExactVersion(input: string, flag: '--from' | '--to'): string {
   const version = valid(clean(input));

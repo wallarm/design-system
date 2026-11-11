@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { NumberInput, type NumberInputProps } from '../NumberInput';
 import { useInlineEdit } from './InlineEditContext';

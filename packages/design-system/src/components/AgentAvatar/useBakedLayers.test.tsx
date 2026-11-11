@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
+
 import { type BakeRunner, isRetained, retainedCount } from '../../lib/agent-characters/bake';
 import { layerKey, useBakedLayers } from './useBakedLayers';
 

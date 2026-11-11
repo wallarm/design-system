@@ -1,4 +1,5 @@
 import type { FC, Ref } from 'react';
+
 import { useTestId } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 import { tabsTriggerVariants } from './classes';

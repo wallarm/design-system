@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import { ChevronDown, CircleDashed, Home } from '../../icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Breadcrumbs, BreadcrumbsEllipsis, BreadcrumbsItem } from './index';
@@ -38,108 +40,98 @@ const meta: Meta<typeof Breadcrumbs> = {
 export default meta;
 
 /** The plain trail. The root inserts the chevrons and marks the last item as the current page, so you list only your own items. */
-export const Basic: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args} data-testid='breadcrumbs'>
-        <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
-        <BreadcrumbsItem href='#products'>Products</BreadcrumbsItem>
-        <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const Basic: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args} data-testid='breadcrumbs'>
+      <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
+      <BreadcrumbsItem href='#products'>Products</BreadcrumbsItem>
+      <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 Basic.args = {};
 
 /** One item is the current page and nothing more — which is the case where a breadcrumb has stopped earning its space. */
-export const SingleItem: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
-        <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const SingleItem: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args}>
+      <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 SingleItem.args = {};
 
 /** An icon inside an item, for a level whose type is worth showing as well as naming. */
-export const WithIcons: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
-        <BreadcrumbsItem href='#home'>
-          <Home size='md' />
-          Home
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#category'>
-          <CircleDashed size='md' />
-          Category
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#subcategory'>
-          Subcategory
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem onClick={onCurrentPageClick}>
-          <CircleDashed size='md' />
-          Current Page
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const WithIcons: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args}>
+      <BreadcrumbsItem href='#home'>
+        <Home size='md' />
+        Home
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#category'>
+        <CircleDashed size='md' />
+        Category
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#subcategory'>
+        Subcategory
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem onClick={onCurrentPageClick}>
+        <CircleDashed size='md' />
+        Current Page
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 WithIcons.args = {};
 
 /** Items that call a handler instead of following an `href`, for a trail wired to a router rather than to URLs. */
-export const WithInteractiveItems: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
-        <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
-        <BreadcrumbsItem onClick={onCategoryClick}>
-          <CircleDashed size='md' />
-          Category
-          <ChevronDown size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const WithInteractiveItems: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args}>
+      <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
+      <BreadcrumbsItem onClick={onCategoryClick}>
+        <CircleDashed size='md' />
+        Category
+        <ChevronDown size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 WithInteractiveItems.args = {};
 
 /** Icons with no text. Each item needs its own `aria-label`, since the icon is then the only thing naming the level. */
-export const IconsOnly: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
-        <BreadcrumbsItem href='#home' aria-label='Home'>
-          <Home size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#dashboard' aria-label='Dashboard'>
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#projects' aria-label='Projects'>
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#settings' aria-label='Settings'>
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem href='#security' aria-label='Security'>
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-        <BreadcrumbsItem aria-label='Current page' onClick={onCurrentPageClick}>
-          <CircleDashed size='md' />
-        </BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const IconsOnly: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args}>
+      <BreadcrumbsItem href='#home' aria-label='Home'>
+        <Home size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#dashboard' aria-label='Dashboard'>
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#projects' aria-label='Projects'>
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#settings' aria-label='Settings'>
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem href='#security' aria-label='Security'>
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+      <BreadcrumbsItem aria-label='Current page' onClick={onCurrentPageClick}>
+        <CircleDashed size='md' />
+      </BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 IconsOnly.args = {};
 
@@ -148,7 +140,7 @@ export const WithTruncation: StoryFn<typeof Breadcrumbs> = args => {
   const [showAll, setShowAll] = useState(false);
 
   return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
+    <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
       <Breadcrumbs {...args}>
         <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
         <BreadcrumbsItem href='#level1'>Level 1</BreadcrumbsItem>
@@ -179,21 +171,19 @@ export const WithTruncation: StoryFn<typeof Breadcrumbs> = args => {
 WithTruncation.args = {};
 
 /** What a trail of long labels actually does today: it runs on. Per-item truncation is drawn in Figma but not shipped, so keep labels short. */
-export const LongBreadcrumbs: StoryFn<typeof Breadcrumbs> = args => {
-  return (
-    <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
-        <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
-        <BreadcrumbsItem href='#products'>Products & Services</BreadcrumbsItem>
-        <BreadcrumbsItem href='#category'>Technology Category</BreadcrumbsItem>
-        <BreadcrumbsItem href='#subcategory'>Software Development</BreadcrumbsItem>
-        <BreadcrumbsItem href='#area'>Web Development Tools</BreadcrumbsItem>
-        <BreadcrumbsItem onClick={onCurrentPageClick}>
-          Frontend Frameworks and Libraries
-        </BreadcrumbsItem>
-      </Breadcrumbs>
-    </div>
-  );
-};
+export const LongBreadcrumbs: StoryFn<typeof Breadcrumbs> = args => (
+  <div className='flex min-h-[400px] w-full items-center justify-center p-8'>
+    <Breadcrumbs {...args}>
+      <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
+      <BreadcrumbsItem href='#products'>Products & Services</BreadcrumbsItem>
+      <BreadcrumbsItem href='#category'>Technology Category</BreadcrumbsItem>
+      <BreadcrumbsItem href='#subcategory'>Software Development</BreadcrumbsItem>
+      <BreadcrumbsItem href='#area'>Web Development Tools</BreadcrumbsItem>
+      <BreadcrumbsItem onClick={onCurrentPageClick}>
+        Frontend Frameworks and Libraries
+      </BreadcrumbsItem>
+    </Breadcrumbs>
+  </div>
+);
 
 LongBreadcrumbs.args = {};

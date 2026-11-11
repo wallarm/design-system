@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { getCurrentValueTokenText, getValueFilterText } from '../lib/menuFilterText';
 import type { FieldValueOption } from '../types';
 

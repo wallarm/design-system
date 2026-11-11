@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, type Ref, useEffect, useRef, useState } from 'react';
+
 import { Quote } from '../../icons';
 import { TestIdProvider, useTestId } from '../../utils/testId';
 import { Badge } from '../Badge';

@@ -1,5 +1,7 @@
 import { Children, type FC, isValidElement, type ReactElement, type ReactNode } from 'react';
+
 import { Tour as ArkUiTour } from '@ark-ui/react';
+
 import type { TestableProps } from '../../utils/testId';
 import { TourClose } from './TourClose';
 import { TourInner } from './TourInner';

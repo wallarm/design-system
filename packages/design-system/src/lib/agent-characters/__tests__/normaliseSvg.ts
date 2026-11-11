@@ -4,9 +4,11 @@ export const normalise = (svg: string) => {
   const host = document.createElement('div');
   host.innerHTML = svg.replace(/>\s+</g, '><');
   const root = host.querySelector('svg') as SVGSVGElement;
-  for (const im of root.querySelectorAll('image'))
-    for (const a of [...im.attributes])
+  for (const im of root.querySelectorAll('image')) {
+    for (const a of [...im.attributes]) {
       if (a.name !== 'class' && a.name !== 'preserveAspectRatio') im.removeAttribute(a.name);
+    }
+  }
   for (const g of root.querySelectorAll('.ly')) g.classList.remove('ready');
   const seen = new Map<string, string>();
   return root.innerHTML.replace(

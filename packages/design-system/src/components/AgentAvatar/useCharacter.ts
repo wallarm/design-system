@@ -7,6 +7,7 @@ import {
   useRef,
   useSyncExternalStore,
 } from 'react';
+
 import type { AgentLook } from '../../lib/agent-characters/data.gen';
 import { type Character, createCharacter, joinPeers } from '../../lib/agent-characters/engine';
 import type { StateId } from '../../lib/agent-characters/eyes';

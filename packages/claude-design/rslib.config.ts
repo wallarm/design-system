@@ -1,5 +1,7 @@
-import { defineConfig } from '@rslib/core';
 import { resolve } from 'node:path';
+
+import { defineConfig } from '@rslib/core';
+
 import { prepareBundleEntry } from './src/bundle/build-bundle';
 import { canvasRslibConfig } from './src/bundle/rslib-build';
 import { PACKAGE_DIR } from './src/config';

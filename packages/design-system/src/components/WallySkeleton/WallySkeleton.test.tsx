@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+
 import { WallySkeleton } from '.';
 import { AgentAvatar } from '../AgentAvatar';
 

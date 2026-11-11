@@ -88,8 +88,9 @@ export const deriveAutocompleteValues = ({
       : rawEditingCondition;
 
   const editingMultiValues = (() => {
-    if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator))
+    if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator)) {
       return [];
+    }
 
     // Once the user has typed in the value segment the text owns the selection:
     // the menu's checked set follows it, so a value erased from the text is
@@ -118,10 +119,12 @@ export const deriveAutocompleteValues = ({
   })();
 
   const editingSingleValue = (() => {
-    if (!editingCondition || !selectedOperator || isMultiSelectOperator(selectedOperator))
+    if (!editingCondition || !selectedOperator || isMultiSelectOperator(selectedOperator)) {
       return undefined;
-    if (editingCondition.value != null && !Array.isArray(editingCondition.value))
+    }
+    if (editingCondition.value != null && !Array.isArray(editingCondition.value)) {
       return editingCondition.value;
+    }
     return undefined;
   })();
 
@@ -132,8 +135,9 @@ export const deriveAutocompleteValues = ({
       selectedField?.type !== 'date' ||
       !Array.isArray(editingCondition.value) ||
       editingCondition.value.length < 2
-    )
+    ) {
       return undefined;
+    }
     return [String(editingCondition.value[0]), String(editingCondition.value[1])];
   })();
 

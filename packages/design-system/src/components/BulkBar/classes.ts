@@ -9,10 +9,10 @@ import { cn } from '../../utils/cn';
  */
 export const bulkBarSurfaceClasses = cn(
   // Surface
-  'bg-component-toast-bg rounded-16 shadow-lg',
-  'pl-12 pr-8 py-8',
+  'rounded-16 bg-component-toast-bg shadow-lg',
+  'py-8 pr-8 pl-12',
   // Animation opened
-  'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300',
+  'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom',
   // Animation closed
-  'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom data-[state=closed]:duration-150',
+  'data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom',
 );

@@ -1,6 +1,8 @@
-import { generateNotes } from '@semantic-release/release-notes-generator';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+
+import { generateNotes } from '@semantic-release/release-notes-generator';
+
 import { defineConfig } from './releaserc.mjs';
 
 // The preset and the generator's writer are versioned separately; a mismatch

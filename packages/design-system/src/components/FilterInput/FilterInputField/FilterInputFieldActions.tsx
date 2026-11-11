@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Maximize2 } from '../../../icons/Maximize2';
 import { Minimize2 } from '../../../icons/Minimize2';
 import { X } from '../../../icons/X';
@@ -30,7 +31,7 @@ export const FilterInputFieldActions: FC<FilterInputFieldActionsProps> = ({
   return (
     <>
       {showKeyboardHint && !hasContent && (
-        <div className='absolute right-8 top-0 bottom-0 z-10 flex items-center'>
+        <div className='absolute top-0 right-8 bottom-0 z-10 flex items-center'>
           <KbdGroup>
             <Kbd>⌘</Kbd>
             <Kbd>K</Kbd>
@@ -38,7 +39,7 @@ export const FilterInputFieldActions: FC<FilterInputFieldActionsProps> = ({
         </div>
       )}
       {(showExpandCollapse || hasChips) && (
-        <div className='absolute right-8 top-0 z-10 flex items-center gap-8 pt-8'>
+        <div className='absolute top-0 right-8 z-10 flex items-center gap-8 pt-8'>
           {showExpandCollapse && (
             <Tooltip>
               <TooltipTrigger asChild>

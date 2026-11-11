@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { SHAPE_IDS } from '../data.gen';
 import type { StateId } from '../eyes';
 import { geom, optY, shapeOf } from '../geom';
@@ -27,11 +28,13 @@ describe('glyph without a canvas', () => {
       throw new Error('canvas used');
     };
     try {
-      for (const c of PAGE_CAST)
-        for (const st of ['idle', 'partly', 'failed', 'box', 'invite'] as StateId[])
+      for (const c of PAGE_CAST) {
+        for (const st of ['idle', 'partly', 'failed', 'box', 'invite'] as StateId[]) {
           expect(normIds(glyph(c, 20, st)), `${c.id} ${st}`).toBe(
             normIds(glyphs[`${c.id}|${st}|20`] as string),
           );
+        }
+      }
     } finally {
       proto.getContext = saved;
     }
@@ -61,10 +64,11 @@ describe('glyph without a canvas', () => {
         prop: string;
       }[]) {
         setPropLibrary(propDef); // looks outside the cast take the builder entry's library (WDS-204)
-        for (const st of ['idle', 'partly', 'invite'] as StateId[])
+        for (const st of ['idle', 'partly', 'invite'] as StateId[]) {
           expect(normIds(glyph(c, 24, st)), `${c.shape} ${st}`).toBe(
             normIds(glyphs[`${c.shape}+${c.prop}|${st}|24`] as string),
           );
+        }
       }
     } finally {
       setPropLibrary(null);

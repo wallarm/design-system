@@ -1,4 +1,5 @@
 import type { FC, MouseEvent, Ref } from 'react';
+
 import { WrapText } from '../../icons/WrapText';
 import { useTestId } from '../../utils/testId';
 import { ToggleButton, type ToggleButtonProps } from '../ToggleButton';

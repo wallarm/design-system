@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+
 import { CLAUDE_DESIGN } from './config';
 
 const run = (command: string, args: string[]) =>
@@ -35,19 +36,23 @@ const unpacked = mkdtempSync(join(root, 'fetch-'));
 try {
   run('gh', ['release', 'download', tag, '-p', 'claude-design-*.tgz', '-D', download]);
   const archives = readdirSync(download);
-  if (archives.length !== 1)
+  if (archives.length !== 1) {
     throw new Error(
       `${tag} must have exactly one claude-design-*.tgz asset, found ${archives.length}`,
     );
+  }
   const [archive] = archives as [string];
   run('tar', ['-xzf', join(download, archive), '-C', unpacked]);
-  for (const required of ['project/design-system.json', 'file-hashes.json'])
-    if (!existsSync(join(unpacked, required)))
+  for (const required of ['project/design-system.json', 'file-hashes.json']) {
+    if (!existsSync(join(unpacked, required))) {
       throw new Error(`${archive} has no ${required}; local state left unchanged`);
+    }
+  }
   // The manifest drives stale-path removal, so it must never outlive its project; saved remote
   // reads, upload results and the old plan describe the previous sync, so they go too.
-  for (const name of ['remote', 'publish'])
+  for (const name of ['remote', 'publish']) {
     rmSync(join(root, name), { recursive: true, force: true });
+  }
   for (const name of ['project', 'file-hashes.json', 'summary.json']) {
     rmSync(join(root, name), { recursive: true, force: true });
     if (existsSync(join(unpacked, name))) renameSync(join(unpacked, name), join(root, name));

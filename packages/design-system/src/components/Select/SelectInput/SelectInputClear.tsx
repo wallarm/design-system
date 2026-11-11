@@ -1,5 +1,7 @@
 import type { FC, MouseEvent } from 'react';
+
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
+
 import { X } from '../../../icons';
 import { cn } from '../../../utils/cn';
 
@@ -16,7 +18,7 @@ export const SelectInputClear: FC = () => {
 
   return (
     <ArkUiSelect.ClearTrigger
-      className={cn('icon-md text-icon-secondary cursor-pointer')}
+      className={cn('icon-md cursor-pointer text-icon-secondary')}
       onClick={handleClear}
       asChild
     >

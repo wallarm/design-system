@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+
 import { CLAUDE_DESIGN, PACKAGE_DIR } from '../config';
 
 /** Shipped at the project root, so its link lines match the README's load order. */
@@ -21,8 +22,9 @@ const SPACING_CLASS =
 /** Whether `css` has a rule for `.name`, escaped the way Tailwind writes it. */
 const definesClass = (css: string, name: string) => {
   const selector = `.${name.replace(/[^\w-]/g, '\\$&')}`;
-  for (let at = css.indexOf(selector); at !== -1; at = css.indexOf(selector, at + 1))
+  for (let at = css.indexOf(selector); at !== -1; at = css.indexOf(selector, at + 1)) {
     if (!/[\w\\-]/.test(css[at + selector.length] ?? '')) return true;
+  }
   return false;
 };
 
@@ -33,8 +35,9 @@ export function samplerProblems(
 ): string[] {
   const problems: string[] = [];
   const at = LINKS.map(line => html.indexOf(line));
-  if (at.some((index, i) => index === -1 || (i > 0 && index < (at[i - 1] ?? 0))))
+  if (at.some((index, i) => index === -1 || (i > 0 && index < (at[i - 1] ?? 0)))) {
     problems.push(`head must link, in order: ${LINKS.join(' ')}`);
+  }
   const scale = new Set([...tokens.matchAll(/--spacing-(\d+):/g)].map(([, n]) => n));
   const classes = new Set(
     [...html.matchAll(CLASS_ATTRIBUTE)].flatMap(([, attr, js]) =>
@@ -46,15 +49,18 @@ export function samplerProblems(
     const step = SPACING_CLASS.exec(name.split(':').at(-1) ?? '')?.[1];
     if (step && !scale.has(step)) problems.push(`class ${name} is off the spacing scale`);
   }
-  for (const [, step] of html.matchAll(/var\(--spacing-([\w-]+)\)/g))
+  for (const [, step] of html.matchAll(/var\(--spacing-([\w-]+)\)/g)) {
     if (!scale.has(step ?? '')) problems.push(`var(--spacing-${step}) is not a token`);
+  }
   const globals = new Set(exports);
   // `DS` is the scripts' `var DS = WallarmDS` alias.
   for (const [, name] of html.matchAll(
     new RegExp(`\\b(?:${CLAUDE_DESIGN.namespace}|DS)\\.(\\w+)`, 'g'),
-  ))
-    if (!globals.has(name ?? ''))
+  )) {
+    if (!globals.has(name ?? '')) {
       problems.push(`${CLAUDE_DESIGN.namespace}.${name} is not exported`);
+    }
+  }
   return [...new Set(problems)];
 }
 
@@ -71,8 +77,9 @@ export async function buildSampler({ outDir }: { outDir: string }) {
   for (const file of [SAMPLER_FILE, SKELETON_FILE]) {
     const html = await readFile(new URL(`./${file}`, import.meta.url), 'utf8');
     const problems = samplerProblems(html, context);
-    if (file === SKELETON_FILE && html.split(SKELETON_DATA).length !== 2)
+    if (file === SKELETON_FILE && html.split(SKELETON_DATA).length !== 2) {
       problems.push(`must open its data object with "${SKELETON_DATA}" exactly once`);
+    }
     if (problems.length) throw new Error(`${file}:\n- ${problems.join('\n- ')}`);
     await writeFile(join(outDir, file), html);
   }

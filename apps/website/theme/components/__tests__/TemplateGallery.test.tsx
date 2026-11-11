@@ -1,6 +1,8 @@
 import type { ComponentProps } from 'react';
+
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import { TemplateGallery } from '../TemplateGallery';
 
 rs.mock('@rspress/core/runtime', () => ({

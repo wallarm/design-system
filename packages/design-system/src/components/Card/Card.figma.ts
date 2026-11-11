@@ -1,8 +1,7 @@
 // url=https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=6816-5072
 // source=https://github.com/wallarm/design-system/blob/main/packages/design-system/src/components/Card/Card.tsx
 // component=Card
-import type { SlotResult } from 'figma';
-import figma from 'figma';
+import figma, { type SlotResult } from 'figma';
 
 // An empty slot comes back as a guid-less SLOT section that renders "Missing snippet".
 const filled = (slot?: SlotResult) => !!slot?.some(s => s.type !== 'SLOT' || s.guid);

@@ -9,6 +9,7 @@ import {
 } from '@codemirror/autocomplete';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+
 import { cn } from '../../../utils/cn';
 import { dropdownMenuItemVariants } from '../../DropdownMenu/classes';
 import { httpCompletions } from '../lib/httpCompletions';
@@ -128,19 +129,20 @@ let reported = false;
 const reportSourceError = (error: unknown): null => {
   if (!reported) {
     reported = true;
-    // oxlint-disable-next-line no-console -- surfaced once; a failing consumer source is ignored
+    // surfaced once; a failing consumer source is ignored
     console.error('[CodeEditor] a completion source failed', error);
   }
   return null;
 };
 
 /** Adapts a public `CodeEditorCompletionSource` to a CodeMirror `CompletionSource`. */
-const adaptSource = (
-  source: CodeEditorCompletionSource,
-  language: CodeEditorLanguage,
-  startingLineNumber: number,
-): CompletionSource => {
-  return ctx => {
+const adaptSource =
+  (
+    source: CodeEditorCompletionSource,
+    language: CodeEditorLanguage,
+    startingLineNumber: number,
+  ): CompletionSource =>
+  ctx => {
     const from = completionWord(ctx).from;
     const finish = (items: CodeEditorCompletion[] | null): CompletionResult | null =>
       items && items.length > 0 ? { from, options: items.map(toCompletion) } : null;
@@ -152,7 +154,6 @@ const adaptSource = (
       return reportSourceError(error);
     }
   };
-};
 
 /** Re-open the list after a `Name: ` header (or `"key": `) pick, so values show up at once. */
 const reopensAfter = (completion: Completion): boolean =>
@@ -273,7 +274,7 @@ const builtInSources = (language: CodeEditorLanguage): CompletionSource[] => {
         const line = ctx.state.doc.lineAt(ctx.pos);
         const before = line.text.slice(0, ctx.pos - line.from);
         if (isInsideQuotedString(before)) return completeAnyWord(ctx);
-        return /(?:^|[:,\[])[\s\w]*$/.test(before) ? completeKeywords(ctx) : null;
+        return /(?:^|[:,[])[\s\w]*$/.test(before) ? completeKeywords(ctx) : null;
       },
     ];
   }

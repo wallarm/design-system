@@ -1,4 +1,5 @@
 import { type FC, useCallback, useContext, useEffect, useLayoutEffect, useRef } from 'react';
+
 import {
   elementScroll,
   observeElementOffset,
@@ -8,6 +9,7 @@ import {
   useVirtualizer,
   type Virtualizer,
 } from '@tanstack/react-virtual';
+
 import { WindowScrollRootContext } from '../hooks/useWindowScrollRoot';
 import {
   getOffsetTopInScrollRoot,
@@ -97,11 +99,12 @@ export const TableBodyVirtualizedWindow: FC = () => {
   // Clear on unmount so any `scrollToRow` call landing between this body's
   // unmount and a successor body's first render doesn't act on a dead
   // virtualizer instance.
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       virtualizerRef.current = null;
-    };
-  }, [virtualizerRef]);
+    },
+    [virtualizerRef],
+  );
 
   useResetVirtualizerOnDataChange(table, virtualizer);
 

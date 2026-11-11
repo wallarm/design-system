@@ -1,5 +1,7 @@
 import { Children, type FC, Fragment, type HTMLAttributes, type Ref } from 'react';
+
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
@@ -76,7 +78,6 @@ export const NotificationCenterHeaderActions: FC<NotificationCenterHeaderActions
     className={cn('flex items-center gap-4', className)}
   >
     {Children.toArray(children).map((child, index) => (
-      // oxlint-disable-next-line react/no-array-index-key -- children keep their order; Children.toArray keys the child itself
       <Fragment key={index}>
         {index > 0 && <Separator orientation='vertical' />}
         {child}

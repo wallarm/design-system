@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import type { AvatarSize } from './classes';
 
 const AvatarSizeContext = createContext<AvatarSize>('lg');

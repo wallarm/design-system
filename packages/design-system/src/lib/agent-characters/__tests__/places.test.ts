@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { PLACES, rendererFor } from '../places';
 
 // Handoff 05 §2.1 (D1, D2, D3, D9, D26): size picks only the renderer; liveness and the shadow are set per place.

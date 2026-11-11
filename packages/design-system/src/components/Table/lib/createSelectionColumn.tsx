@@ -7,6 +7,7 @@ import type {
   RowSelectionState,
   Table,
 } from '@tanstack/react-table';
+
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
 import { useTableContext } from '../TableContext';
@@ -208,21 +209,19 @@ const SelectAllHeaderCell = <T extends RowData>(
  * Automatically injected by Table when `onRowSelectionChange` is provided.
  * Supports shift-click range selection.
  */
-export const createSelectionColumn = <T extends RowData>(): ColumnDef<DSTableFeatures, T> => {
-  return {
-    id: TABLE_SELECT_COLUMN_ID,
-    size: TABLE_SELECT_COLUMN_WIDTH,
-    minSize: TABLE_SELECT_COLUMN_WIDTH,
-    maxSize: TABLE_SELECT_COLUMN_WIDTH,
-    enableSorting: false,
-    enableResizing: false,
-    enableHiding: false,
-    enablePinning: false,
-    meta: {
-      headerClassName: 'px-8 py-4',
-      cellClassName: 'px-8 py-8',
-    },
-    header: props => <SelectAllHeaderCell {...props} />,
-    cell: props => <SelectionCell {...props} />,
-  };
-};
+export const createSelectionColumn = <T extends RowData>(): ColumnDef<DSTableFeatures, T> => ({
+  id: TABLE_SELECT_COLUMN_ID,
+  size: TABLE_SELECT_COLUMN_WIDTH,
+  minSize: TABLE_SELECT_COLUMN_WIDTH,
+  maxSize: TABLE_SELECT_COLUMN_WIDTH,
+  enableSorting: false,
+  enableResizing: false,
+  enableHiding: false,
+  enablePinning: false,
+  meta: {
+    headerClassName: 'px-8 py-4',
+    cellClassName: 'px-8 py-8',
+  },
+  header: props => <SelectAllHeaderCell {...props} />,
+  cell: props => <SelectionCell {...props} />,
+});

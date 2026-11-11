@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+
 import {
   type EditorState,
   type Extension,
@@ -8,6 +9,7 @@ import {
   StateField,
 } from '@codemirror/state';
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view';
+
 import { cn } from '../../../utils/cn';
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';

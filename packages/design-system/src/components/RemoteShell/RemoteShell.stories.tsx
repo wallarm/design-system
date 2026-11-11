@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+
 import { Link as RouterLink, useNavigate, useRouterState } from '@tanstack/react-router';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { edgeNavConfig, StoryRouter } from '../AppShell/story-content';
 import { Link } from '../Link';
 import { Page, PageContent, PageHeader, PageTitle } from '../Page';

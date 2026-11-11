@@ -6,7 +6,7 @@ export const otpInputCellClassName = cn(
   // Size & layout
   'h-36 w-32 bg-component-input-bg',
   // Typography
-  'font-mono text-sm text-text-primary text-center uppercase',
+  'text-center font-mono text-sm text-text-primary uppercase',
   // Border
   'border border-border-primary outline-none',
   // Collapse borders between adjacent cells
@@ -35,4 +35,4 @@ export const otpInputCellClassName = cn(
   'data-disabled:cursor-not-allowed data-disabled:opacity-50',
 );
 
-export const otpInputSeparatorClassName = cn('text-text-secondary text-sm select-none shrink-0');
+export const otpInputSeparatorClassName = cn('shrink-0 text-sm text-text-secondary select-none');

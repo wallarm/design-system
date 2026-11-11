@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 
@@ -16,7 +17,7 @@ export const PageTitle: FC<PageTitleProps> = ({ ref, children, className, ...pro
       data-testid={testId}
       data-slot='page-title'
       className={cn(
-        'font-sans-display text-xl font-medium leading-28 text-text-primary truncate',
+        'truncate font-sans-display text-xl leading-28 font-medium text-text-primary',
         className,
       )}
     >

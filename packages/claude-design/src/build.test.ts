@@ -1,7 +1,9 @@
-import { describe, expect, it } from '@rstest/core';
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
+
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR } from './config';
 import { previewGroups } from './previews/build-previews';
 
@@ -14,8 +16,9 @@ describe('complete Claude Design project', () => {
       );
     }
     const paths = await readdir(join(out, 'components'), { recursive: true });
-    for (const path of paths.filter(path => /\/preview(-\d+)?\.html$/.test(path)))
+    for (const path of paths.filter(path => /\/preview(-\d+)?\.html$/.test(path))) {
       expect(await readFile(join(out, 'components', path), 'utf8')).toMatch(/^<!-- @dsCard /);
+    }
   });
   it('escapes raw SVG data URIs that block public sharing', async () => {
     const code = await readFile(join(out, 'components/bundle.js'), 'utf8');
@@ -39,8 +42,9 @@ describe('complete Claude Design project', () => {
     const exportCount = source.match(/^export\s/gm)?.length ?? 0;
     expect(exportCount).toBeGreaterThan(0);
     expect(icons).toHaveLength(exportCount);
-    for (const icon of icons)
+    for (const icon of icons) {
       expect(await readFile(join(out, 'assets/Icons', icon), 'utf8')).not.toContain('currentColor');
+    }
     const index = JSON.parse(await readFile(join(out, 'design-system.json'), 'utf8'));
     expect(index.editing).toBe('code');
     expect(index.lastChange.by).toBe('Wallarm');

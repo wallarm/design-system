@@ -1,6 +1,8 @@
 import { createRef } from 'react';
+
 import { describe, expect, it } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
+
 import { Portal } from './Portal';
 import { PortalContainerContext } from './PortalContainerContext';
 

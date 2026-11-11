@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import postcss from 'postcss';
+
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens } from '../tokens/build-tokens';
 import { buildCss, definedClasses, stripTokenDeclarations } from './build-css';
@@ -43,8 +45,9 @@ describe('buildCss', () => {
       '.text-text-info',
       '.text-icon-ai',
       '.border-border-danger',
-    ])
+    ]) {
       expect(selectors.has(selector)).toBe(true);
+    }
   });
 
   it('ships the author layout kit on the token scale', () => {
@@ -76,8 +79,9 @@ describe('buildCss', () => {
       'last:pb-0',
       'last:border-b-0',
       'text-md',
-    ])
+    ]) {
       expect(classes.has(name), name).toBe(true);
+    }
   });
 
   it('declares every theme token bundle.css reads in tokens.css', () => {
@@ -99,10 +103,11 @@ describe('buildCss', () => {
     expect(css).toMatch(/\.last\\:pb-0:last-child:where\(:not\(\.sc-host-x > \*\)\)/);
     // Forms with no wrapper-tolerant rewrite keep their selector; none may be a layout-kit class.
     expect(result.wrapperSkipped.length).toBeLessThanOrEqual(30);
-    for (const reason of result.wrapperSkipped)
+    for (const reason of result.wrapperSkipped) {
       expect(reason).not.toMatch(
         /`\.(?:space-|divide-|(?:first|last)\\:(?:p|border)|hover\\:(?:bg|border)-)/,
       );
+    }
   });
 
   it('writes UTILITIES.md listing exactly the authorable classes', () => {
@@ -118,7 +123,9 @@ describe('buildCss', () => {
     const readme = readFileSync(new URL('../docs/readme-root.md', import.meta.url), 'utf8');
     const advertised = [
       // The "Here" column of the Tailwind-habit translation table.
-      ...readme.split('\n').flatMap(line => (/^\| `/.test(line) ? [line.split('|')[2] ?? ''] : [])),
+      ...readme
+        .split('\n')
+        .flatMap(line => (line.startsWith('| `') ? [line.split('|')[2] ?? ''] : [])),
       readme.split('## Layout on a canvas')[1]?.split('\n## ')[0] ?? '',
     ]
       .flatMap(text => [...text.matchAll(/`([^`]+)`/g)].map(([, code = '']) => code))

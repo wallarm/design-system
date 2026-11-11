@@ -1,6 +1,8 @@
-import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+
+import { describe, expect, it } from '@rstest/core';
+
 import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import colors from '../../../../scripts/agent-avatars/data/colors.json';
 import eyesJson from '../../../../scripts/agent-avatars/data/eyes.json';

@@ -1,6 +1,7 @@
 import { completionStatus, currentCompletions, startCompletion } from '@codemirror/autocomplete';
 import { EditorSelection } from '@codemirror/state';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 import type { CodeEditorCompletionSource } from '../types';
 

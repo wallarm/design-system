@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { AnimatedBackground, type AnimatedBackgroundProps } from './AnimatedBackground';
 
@@ -34,7 +35,7 @@ export const PixelWithCard: StoryFn<AnimatedBackgroundProps> = () => (
     game
     excludeCardSize={{ width: 300, height: 200 }}
   >
-    <Card className='w-[300px] h-[200px]'>
+    <Card className='h-[200px] w-[300px]'>
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
@@ -55,7 +56,7 @@ export const Blur: StoryFn<AnimatedBackgroundProps> = () => (
 /** The same gradient with content over it. There is no exclusion to set here, since the blur has no grid for a card to interrupt. */
 export const BlurWithCard: StoryFn<AnimatedBackgroundProps> = () => (
   <AnimatedBackground variant='blur' className='h-screen w-screen'>
-    <Card className='w-[300px] h-[200px]'>
+    <Card className='h-[200px] w-[300px]'>
       <CardHeader>
         <CardTitle>Wally Chat</CardTitle>
       </CardHeader>

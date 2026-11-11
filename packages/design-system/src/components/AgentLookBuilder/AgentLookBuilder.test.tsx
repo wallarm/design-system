@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import { render } from '@testing-library/react';
+
 import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-v17.json';
 import { normalise } from '../../lib/agent-characters/__tests__/normaliseSvg';
 import { charTree } from '../../lib/agent-characters/char';
@@ -116,7 +117,7 @@ describe('AgentLookBuilder parity with the reference builder (look v17)', () => 
   beforeAll(() => enableAgentLookLibrary());
   afterAll(() => setPropLibrary(null));
 
-  for (const k of cases)
+  for (const k of cases) {
     it(`draws the ${k.kind} look ${name(k.look)} @${k.size}${k.cover ? ' partial' : ''}`, () => {
       const t = charTree(k.look, {
         size: k.size,
@@ -140,11 +141,13 @@ describe('AgentLookBuilder parity with the reference builder (look v17)', () => 
       for (const n of t.children) walk(n);
       expect(order.map(j => t.layers[j])).toEqual(k.jobs);
     });
+  }
 
   it('draws every captured glyph', () => {
-    for (const g of glyphs)
+    for (const g of glyphs) {
       expect(normIds(glyph(g.look, g.size, g.state)), `${name(g.look)} ${g.state} @${g.size}`).toBe(
         normIds(g.svg),
       );
+    }
   });
 });

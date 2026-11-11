@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, it } from '@rstest/core';
 import postcss from 'postcss';
+
 import { DESIGN_SYSTEM_DIR } from '../config';
 import { buildTokens, type TokenDocument } from './build-tokens';
 import { mapColorValue } from './map-value';
@@ -108,11 +110,13 @@ describe('buildTokens on the real theme', () => {
         .length,
     ).toBeLessThanOrEqual(12);
     for (const [family, count] of Object.entries(result.counts)) {
-      if (family !== 'color' && family !== 'type' && family !== 'fonts')
+      if (family !== 'color' && family !== 'type' && family !== 'fonts') {
         expect(count).toBeLessThanOrEqual(60);
+      }
     }
-    for (const name of result.tokenNames)
+    for (const name of result.tokenNames) {
       expect(name.slice(2)).toMatch(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/);
+    }
     const styles = document.type.groups.flatMap(group => group.styles);
     expect(styles.some(style => style.name === 'body-sm' && style.usage.includes('text-sm'))).toBe(
       true,

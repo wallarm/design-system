@@ -186,8 +186,9 @@ export function buildValueMenuSections(
     for (const group of topGroups) {
       const children = group.children ?? [];
       const rows = toRows(children, filterText);
-      if (rows.length > 0)
+      if (rows.length > 0) {
         sections.push({ label: group.label, rows: withSelectAll(group.label, children, rows) });
+      }
     }
     return sections;
   }

@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import {
   ChevronLeft,
   ChevronRight,

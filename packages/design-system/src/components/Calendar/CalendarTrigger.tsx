@@ -1,5 +1,7 @@
 import type { HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { DatePicker } from '@ark-ui/react';
+
 import type { TestableProps } from '../../utils/testId';
 
 export interface CalendarTriggerProps

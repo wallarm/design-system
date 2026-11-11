@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
 

@@ -1,6 +1,8 @@
 import { createRef, useState } from 'react';
+
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+
 import {
   ImageCropper,
   ImageCropperContext,
@@ -61,8 +63,9 @@ const Cropper = ({ src = '/landscape.png', onLoad }: { src?: string; onLoad?: ()
 describe('ImageCropper', () => {
   it('cascades test IDs and starts unavailable for export until the image is measured', async () => {
     render(<Cropper />);
-    for (const slot of ['frame', 'viewport', 'image', 'selection', 'grid'])
+    for (const slot of ['frame', 'viewport', 'image', 'selection', 'grid']) {
       expect(screen.getByTestId(`cropper--${slot}`)).toBeInTheDocument();
+    }
     expect(screen.getByTestId('ready')).toHaveTextContent('false');
     completeImage(screen.getByTestId('cropper--image'));
     await waitFor(() => expect(screen.getByTestId('ready')).toHaveTextContent('true'));

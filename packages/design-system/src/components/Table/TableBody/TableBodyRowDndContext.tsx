@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
+
 import {
   type CollisionDetection,
   closestCenter,
@@ -23,6 +23,8 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import type { Row, RowData } from '@tanstack/react-table';
+import { createPortal } from 'react-dom';
+
 import type { DSTableFeatures } from '../lib';
 import { useTableContext } from '../TableContext';
 import type { TableRowReorderEvent } from '../types';

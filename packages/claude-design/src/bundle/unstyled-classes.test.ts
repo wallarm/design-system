@@ -1,6 +1,7 @@
 // Outside helpers/: entry.css scans helpers/ for Tailwind classes, and these fixtures must stay unstyled.
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { JSDOM } from 'jsdom';
+
 import { reportUnstyledClasses, styledClasses, unstyledMessage } from './helpers/unstyledClasses';
 
 const silence = () => {

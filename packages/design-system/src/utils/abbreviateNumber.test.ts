@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { abbreviateNumber, formatBytes, formatFullNumber, formatPercent } from './abbreviateNumber';
 
 describe('abbreviateNumber', () => {

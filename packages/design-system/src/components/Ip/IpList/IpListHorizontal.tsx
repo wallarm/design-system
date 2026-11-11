@@ -1,5 +1,7 @@
 import { type ComponentProps, type FC, Fragment, type ReactElement, type Ref } from 'react';
+
 import { composeRefs } from '@radix-ui/react-compose-refs';
+
 import { useOverflowItems } from '../../../hooks';
 import { cn } from '../../../utils/cn';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
@@ -45,10 +47,10 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
         // container stays narrow even when the surrounding column expands, so
         // `useOverflowItems` never observes a size change and never reflows
         // visible items back. `min-w-0` keeps it shrinkable below content.
-        className={cn('flex items-center gap-6 w-full min-w-0 max-w-full', className)}
+        className={cn('flex w-full max-w-full min-w-0 items-center gap-6', className)}
       >
         {visibleItems.map((item, i) => (
-          // oxlint-disable-next-line react/no-array-index-key -- order-preserving prefix slice from useOverflowItems
+          // order-preserving prefix slice from useOverflowItems
           <Fragment key={i}>
             {i > 0 && <IpListSeparator />}
             <div className='shrink-0'>{item}</div>

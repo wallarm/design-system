@@ -30,8 +30,9 @@ export function syncCodex(root) {
     if (server.command) {
       lines.push(`command = ${tomlString(server.command, `${name}.command`)}`);
       const args = server.args === undefined ? [] : server.args;
-      if (!Array.isArray(args))
+      if (!Array.isArray(args)) {
         throw new Error(`MCP args must be an array of strings: ${name}.args`);
+      }
       lines.push(`args = [${args.map(value => tomlString(value, `${name}.args`)).join(', ')}]`);
     } else if (server.type === 'http' && server.url) {
       lines.push(`url = ${tomlString(server.url, `${name}.url`)}`);

@@ -1,7 +1,10 @@
 import type { ElementType, ReactNode } from 'react';
-import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
+
 import { createReact18Window } from './react18';
 
 const cleanups: (() => void)[] = [];

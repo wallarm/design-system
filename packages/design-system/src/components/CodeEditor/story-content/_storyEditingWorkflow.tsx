@@ -1,4 +1,5 @@
 import { type FC, useState } from 'react';
+
 import { CodeSnippetActions } from '../../CodeSnippet/CodeSnippetActions';
 import { CodeSnippetCopyButton } from '../../CodeSnippet/CodeSnippetCopyButton';
 import { CodeSnippetFullscreenButton } from '../../CodeSnippet/CodeSnippetFullscreenButton';

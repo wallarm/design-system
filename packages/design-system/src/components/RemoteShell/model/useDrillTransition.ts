@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+
 import type { NavStackEntry } from './types';
 
 export const DRILL_ANIMATION_DURATION = '220ms';

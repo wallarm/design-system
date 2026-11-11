@@ -1,6 +1,8 @@
 import { type FC, type KeyboardEvent, type ReactNode, useCallback, useEffect, useRef } from 'react';
+
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+
 import { useTestId } from '../../utils/testId';
 
 const contentVariants = cva(
@@ -12,10 +14,10 @@ const contentVariants = cva(
           'w-[400px]',
           'items-center',
           'bg-bg-surface-2 text-text-primary',
-          'border border-border-primary-light rounded-12 shadow-xl',
+          'rounded-12 border border-border-primary-light shadow-xl',
         ],
         tooltip: [
-          'min-w-[256px] max-w-[400px]',
+          'max-w-[400px] min-w-[256px]',
           'items-start',
           'bg-component-tooltip-bg text-text-primary-alt',
           'rounded-16 shadow-md',

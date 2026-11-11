@@ -1,6 +1,8 @@
 import path from 'path';
-import { type Node, Project, type SourceFile, SyntaxKind } from 'ts-morph';
+
 import type { ExampleMetadata } from '@wallarm-org/mcp-core';
+import { type Node, Project, type SourceFile, SyntaxKind } from 'ts-morph';
+
 import { findStoryFiles, readStoryTitle, toCopyableCode } from './story-source.js';
 
 // Stories are read syntactically, so they get their own type-checker-free project:

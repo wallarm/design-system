@@ -1,5 +1,7 @@
 import { type MouseEvent, useCallback } from 'react';
+
 import type { Header, RowData } from '@tanstack/react-table';
+
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -7,7 +9,6 @@ import { tableHeaderButtonClass } from './classes';
 import { type DSTableFeatures, SORT_LABELS, useTableValue } from './lib';
 import { useTableContext } from './TableContext';
 
-// oxlint-disable-next-line no-redeclare -- TypeScript permits the type and value to share this public name.
 interface TableSortHandler<T extends RowData> {
   header: Header<DSTableFeatures, T, unknown>;
 }

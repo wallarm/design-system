@@ -1,6 +1,7 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+
 import { SearchInput } from './SearchInput';
 
 const input = () => within(screen.getByTestId('search')).getByRole('textbox');

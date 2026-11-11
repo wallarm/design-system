@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
 import { Skeleton } from '../../Skeleton';
@@ -40,32 +41,30 @@ export const HorizontalBarStackSkeleton: FC<HorizontalBarStackSkeletonProps> = (
   ref,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        data-slot='horizontal-bar-stack-skeleton'
-        data-testid={testId}
-        aria-busy='true'
-        aria-live='polite'
-        className={cn(horizontalBarStackRootClasses, className)}
-      >
-        <div className={horizontalBarStackSkeletonHeaderClasses}>
-          <Skeleton width='72px' height='36px' rounded={6} />
-        </div>
-        <div className={horizontalBarStackBarWrapperClasses}>
-          <Skeleton width='100%' height='8px' rounded={6} />
-        </div>
-        <div className={horizontalBarStackLegendClasses}>
-          {Array.from({ length: legendItems }, (_, i) => (
-            <HorizontalBarStackSkeletonLegendItem key={i} />
-          ))}
-        </div>
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='horizontal-bar-stack-skeleton'
+      data-testid={testId}
+      aria-busy='true'
+      aria-live='polite'
+      className={cn(horizontalBarStackRootClasses, className)}
+    >
+      <div className={horizontalBarStackSkeletonHeaderClasses}>
+        <Skeleton width='72px' height='36px' rounded={6} />
       </div>
-    </TestIdProvider>
-  );
-};
+      <div className={horizontalBarStackBarWrapperClasses}>
+        <Skeleton width='100%' height='8px' rounded={6} />
+      </div>
+      <div className={horizontalBarStackLegendClasses}>
+        {Array.from({ length: legendItems }, (_, i) => (
+          <HorizontalBarStackSkeletonLegendItem key={i} />
+        ))}
+      </div>
+    </div>
+  </TestIdProvider>
+);
 
 HorizontalBarStackSkeleton.displayName = 'HorizontalBarStackSkeleton';

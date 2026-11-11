@@ -1,16 +1,16 @@
 {
   "name": "@wallarm-org/playwright-config",
   "version": "0.0.0",
-  "type": "module",
   "private": true,
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist"
-  },
+  "type": "module",
   "exports": {
     "./base": "./dist/base.js",
     "./docker": "./dist/docker.js",
     "./storybook": "./dist/storybook.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "@playwright/test": "catalog:"

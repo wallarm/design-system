@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+
 import { listCandidateFiles } from './lib/files';
 import { REPORT_FILE, renderReport } from './lib/report';
 import { runMigrations } from './lib/runner';
@@ -30,8 +31,9 @@ function installedVersion(cwd: string): string {
   for (let dir = cwd; ; dir = path.dirname(dir)) {
     const file = path.join(dir, 'node_modules/@wallarm-org/design-system/package.json');
     if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8')).version;
-    if (path.dirname(dir) === dir)
+    if (path.dirname(dir) === dir) {
       throw new UsageError('could not find installed @wallarm-org/design-system: pass --to');
+    }
   }
 }
 
@@ -51,7 +53,7 @@ export async function main(
   versions: VersionsFile,
   // Passed in (read at runtime by index.ts): a bundled package.json import would freeze the pre-release version.
   version: string,
-  // oxlint-disable-next-line no-console -- CLI output
+  // CLI output
   io: IO = { log: console.log, error: console.error },
 ): Promise<number> {
   try {

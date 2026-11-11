@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, Uploader } from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';

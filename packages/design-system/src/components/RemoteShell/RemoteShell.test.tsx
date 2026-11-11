@@ -8,8 +8,8 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import type { NavConfig } from './model';
-import { useRemoteShellContext } from './model';
+
+import { type NavConfig, useRemoteShellContext } from './model';
 import { RemoteShell } from './RemoteShell';
 import { RemoteShellPanel } from './RemoteShellPanel';
 

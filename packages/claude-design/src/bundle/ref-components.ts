@@ -11,14 +11,17 @@ export function refComponentsPlugin(): PluginObj {
           if (
             t.isImportDeclaration(statement) &&
             /^react\/jsx(?:-dev)?-runtime$/.test(statement.source.value)
-          )
-            for (const specifier of statement.specifiers)
+          ) {
+            for (const specifier of statement.specifiers) {
               if (
                 t.isImportSpecifier(specifier) &&
                 t.isIdentifier(specifier.imported) &&
                 ['jsx', 'jsxs', 'jsxDEV'].includes(specifier.imported.name)
-              )
+              ) {
                 jsxFactories.add(specifier.local.name);
+              }
+            }
+          }
         }
         const declarations: t.Statement[] = [];
         const bridge = program.scope.generateUidIdentifier('canvasComponent');
@@ -37,8 +40,9 @@ export function refComponentsPlugin(): PluginObj {
                 rendersJsx = true;
               },
               CallExpression(call) {
-                if (t.isIdentifier(call.node.callee) && jsxFactories.has(call.node.callee.name))
+                if (t.isIdentifier(call.node.callee) && jsxFactories.has(call.node.callee.name)) {
                   rendersJsx = true;
+                }
               },
             });
             if (!rendersJsx) return;
@@ -66,8 +70,9 @@ export function refComponentsPlugin(): PluginObj {
               !t.isIdentifier(id) ||
               !/^[A-Z]/.test(id.name) ||
               (!t.isArrowFunctionExpression(init) && !t.isFunctionExpression(init))
-            )
+            ) {
               return;
+            }
             let rendersJsx = false;
             path.traverse({
               JSXElement() {
@@ -77,8 +82,9 @@ export function refComponentsPlugin(): PluginObj {
                 rendersJsx = true;
               },
               CallExpression(call) {
-                if (t.isIdentifier(call.node.callee) && jsxFactories.has(call.node.callee.name))
+                if (t.isIdentifier(call.node.callee) && jsxFactories.has(call.node.callee.name)) {
                   rendersJsx = true;
+                }
               },
             });
             if (!rendersJsx) return;
@@ -88,7 +94,7 @@ export function refComponentsPlugin(): PluginObj {
           },
         });
         if (declarations.length) program.unshiftContainer('body', declarations);
-        if (used)
+        if (used) {
           program.unshiftContainer(
             'body',
             t.importDeclaration(
@@ -96,6 +102,7 @@ export function refComponentsPlugin(): PluginObj {
               t.stringLiteral('canvas-component-bridge'),
             ),
           );
+        }
       },
     },
   };

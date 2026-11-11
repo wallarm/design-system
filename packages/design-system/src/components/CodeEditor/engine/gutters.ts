@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import {
   type EditorState,
   type Extension,
@@ -15,6 +16,7 @@ import {
   lineNumberMarkers,
   lineNumbers,
 } from '@codemirror/view';
+
 import { cn } from '../../../utils/cn';
 import type { LineColor, LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';

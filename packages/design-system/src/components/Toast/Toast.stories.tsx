@@ -1,6 +1,8 @@
 import { useRef } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { fn } from 'storybook/test';
+
 import {
   Activity,
   CircleCheck,
@@ -149,9 +151,7 @@ const ToastDemo = () => {
 };
 
 /** Every `type` from one place: the icon and colour come from it, and `default` has none. The second row fires the same toasts with the timer stopped, which is what the screenshot tests use. */
-export const Basic: StoryFn = () => {
-  return <ToastDemo />;
-};
+export const Basic: StoryFn = () => <ToastDemo />;
 
 /** A toast fired from inside a `Drawer`, and again from a `Dialog` on top of it, to prove it renders above every open overlay rather than behind them. */
 export const WithNestedOverlays: StoryFn = () => {

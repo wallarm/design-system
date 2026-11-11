@@ -1,5 +1,7 @@
 import { type FC, type HTMLAttributes, type Ref, useLayoutEffect, useRef, useState } from 'react';
+
 import { ImageCropper as ArkImageCropper } from '@ark-ui/react/image-cropper';
+
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { type CropperSource, ImageCropperProvider } from './ImageCropperProvider';
@@ -144,8 +146,9 @@ export const ImageCropper: FC<ImageCropperProps> = ({
               ready,
               zoom: ark.zoom,
               setZoom: value => {
-                if (Number.isFinite(value))
+                if (Number.isFinite(value)) {
                   ark.setZoom(Math.min(maxZoom, Math.max(minZoom, value)));
+                }
               },
               reset: ark.reset,
               getCroppedImage: async options => {

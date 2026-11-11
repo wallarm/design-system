@@ -1,7 +1,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
+
 import { Project, type SourceFile } from 'ts-morph';
+
 import { buildCanvasScripts, readInlineScript } from '../bundle/rslib-build';
 import { CLAUDE_DESIGN, DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 
@@ -54,12 +56,13 @@ export async function previewGroups(
       for (const decl of source
         .getVariableStatements()
         .filter(v => v.hasExportKeyword())
-        .flatMap(v => v.getDeclarations()))
-        if (EXCLUDED_ADAPTER.test(decl.getText()))
+        .flatMap(v => v.getDeclarations())) {
+        if (EXCLUDED_ADAPTER.test(decl.getText())) {
           omitted.push(
             `${name}/${decl.getName()}: preview omitted; Shiki/highlight.js adapters are not bundled (source in guide).`,
           );
-        else target.rows.push({ file, story: decl.getName() });
+        } else target.rows.push({ file, story: decl.getName() });
+      }
     }
     groups.push(...[...found.values()].filter(g => g.rows.length));
   }
@@ -137,12 +140,14 @@ export async function buildPreviews({
     let names = ['stories'];
     // A script over the platform's text cap is rebuilt in as few parts as fit.
     for (let count = 2; scripts.some(code => Buffer.byteLength(code) > maxBytes); count++) {
-      if (count > g.rows.length)
+      if (count > g.rows.length) {
         throw new Error(`${g.name} preview exceeds ${maxBytes} bytes even with one story per part`);
+      }
       const parts = partsOf(g.rows, count);
       const entries: Record<string, string> = {};
-      for (const [i, rows] of parts.entries())
+      for (const [i, rows] of parts.entries()) {
         entries[`${g.name}/stories-${i + 1}`] = await entryFor(`${g.name}/stories-${i + 1}`, rows);
+      }
       await build(entries);
       names = parts.map((_, i) => `stories-${i + 1}`);
       scripts = await Promise.all(names.map(script => readScript(g.name, script)));

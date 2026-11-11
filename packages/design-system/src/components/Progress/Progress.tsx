@@ -1,5 +1,7 @@
 import type { FC, Ref } from 'react';
+
 import { Progress as ArkUiProgress } from '@ark-ui/react/progress';
+
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { progressRangeVariants, progressTrackVariants } from './classes';
@@ -27,35 +29,33 @@ export const Progress: FC<ProgressProps> = ({
   className,
   'data-testid': testId,
   ref,
-}) => {
-  return (
-    <ArkUiProgress.Root
-      ref={ref}
-      value={value}
-      defaultValue={value}
-      min={min}
-      max={max}
-      data-slot='progress'
-      data-testid={testId}
-      className={cn('flex items-center gap-8 min-w-118 w-full', className)}
+}) => (
+  <ArkUiProgress.Root
+    ref={ref}
+    value={value}
+    defaultValue={value}
+    min={min}
+    max={max}
+    data-slot='progress'
+    data-testid={testId}
+    className={cn('flex w-full min-w-118 items-center gap-8', className)}
+  >
+    <ArkUiProgress.Track
+      data-slot='progress-track'
+      className={progressTrackVariants({ size, color })}
     >
-      <ArkUiProgress.Track
-        data-slot='progress-track'
-        className={progressTrackVariants({ size, color })}
-      >
-        <ArkUiProgress.Range
-          data-slot='progress-range'
-          className={progressRangeVariants({ size, color })}
-        />
-      </ArkUiProgress.Track>
-      {showLabel && (
-        <ArkUiProgress.ValueText
-          data-slot='progress-label'
-          className='text-text-secondary font-sans-display text-xs font-medium tabular-nums'
-        />
-      )}
-    </ArkUiProgress.Root>
-  );
-};
+      <ArkUiProgress.Range
+        data-slot='progress-range'
+        className={progressRangeVariants({ size, color })}
+      />
+    </ArkUiProgress.Track>
+    {showLabel && (
+      <ArkUiProgress.ValueText
+        data-slot='progress-label'
+        className='font-sans-display text-xs font-medium text-text-secondary tabular-nums'
+      />
+    )}
+  </ArkUiProgress.Root>
+);
 
 Progress.displayName = 'Progress';

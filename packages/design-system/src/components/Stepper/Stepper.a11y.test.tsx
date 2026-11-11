@@ -2,6 +2,7 @@ import { Steps as ArkSteps } from '@ark-ui/react/steps';
 import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { Stepper, StepperContent, StepperItem, StepperList, StepperTitle, StepperTrigger } from '.';
 import { StepperFixture, type StepperFixtureProps } from '../../testUtils/StepperFixture';
 import { ARK_CONTENT_ARIA_RESET, ARK_TAB_ARIA_RESET } from './constants';

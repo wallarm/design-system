@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { metricRootClasses } from './classes';
@@ -21,20 +22,18 @@ export const Metric: FC<MetricProps> = ({
   ref,
   'data-testid': testId,
   ...props
-}) => {
-  return (
-    <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        data-slot='metric'
-        data-testid={testId}
-        className={cn(metricRootClasses, className)}
-      >
-        {children}
-      </div>
-    </TestIdProvider>
-  );
-};
+}) => (
+  <TestIdProvider value={testId}>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='metric'
+      data-testid={testId}
+      className={cn(metricRootClasses, className)}
+    >
+      {children}
+    </div>
+  </TestIdProvider>
+);
 
 Metric.displayName = 'Metric';

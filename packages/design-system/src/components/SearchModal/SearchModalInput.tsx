@@ -1,4 +1,5 @@
 import type { FC, InputHTMLAttributes, Ref } from 'react';
+
 import { Search, X } from '../../icons';
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
@@ -33,7 +34,7 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
           <Loader size='sm' />
         </span>
       ) : (
-        <Search className='text-text-secondary shrink-0 !icon-md' />
+        <Search className='!icon-md shrink-0 text-text-secondary' />
       )}
       <input
         {...props}
@@ -41,8 +42,8 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
         value={query}
         onChange={e => setQuery(e.target.value)}
         className={cn(
-          'flex-1 h-48 bg-transparent text-text-primary text-base',
-          'placeholder:text-text-hint outline-none',
+          'h-48 flex-1 bg-transparent text-base text-text-primary',
+          'outline-none placeholder:text-text-hint',
           className,
         )}
         autoComplete='off'
@@ -55,7 +56,7 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
             setQuery('');
             inputRef.current?.focus();
           }}
-          className='shrink-0 cursor-pointer text-text-secondary hover:text-text-primary transition-colors'
+          className='shrink-0 cursor-pointer text-text-secondary transition-colors hover:text-text-primary'
           aria-label='Clear search'
         >
           <X className='!icon-md' />

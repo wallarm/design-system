@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
+
 import { OPERATOR_LABELS_BY_TYPE } from '../lib/constants';
 
 describe('OPERATOR_LABELS_BY_TYPE', () => {

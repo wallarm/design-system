@@ -1,4 +1,5 @@
 import type { EditorView } from '@codemirror/view';
+
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import type { PortalRegistry } from '../lib/portalRegistry';

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
 import { CirclePlus, Earth, LayoutTemplate, Maximize, Plus } from '../../icons';
 import { Button } from '../Button';
 import { Kbd, KbdGroup } from '../Kbd';
@@ -164,7 +166,7 @@ export const Basic: StoryFn<typeof meta> = () => (
 export const Context: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuContextTrigger asChild>
-      <div className='flex items-center justify-center w-300 h-192 border border-border-primary border-dashed rounded-8'>
+      <div className='flex h-192 w-300 items-center justify-center rounded-8 border border-dashed border-border-primary'>
         Right click here
       </div>
     </DropdownMenuContextTrigger>

@@ -1,8 +1,10 @@
-import { pluginReact } from '@rsbuild/plugin-react';
-import { createRslib, type RslibConfig, type Rspack, rspack } from '@rslib/core';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+
+import { pluginReact } from '@rsbuild/plugin-react';
+import { createRslib, type RslibConfig, type Rspack, rspack } from '@rslib/core';
+
 import { DESIGN_SYSTEM_DIR, PACKAGE_DIR } from '../config';
 
 const require = createRequire(import.meta.url);
@@ -128,11 +130,12 @@ export async function canvasRslibConfig(options: CanvasBuildOptions): Promise<Rs
           new rspack.NormalModuleReplacementPlugin(
             /(?:^|\/)adapters\/(?:shiki|highlightjs)$|^\.\/(?:shiki|highlightjs)$/,
             resource => {
-              if (resource.context.includes('/CodeSnippet/adapters'))
+              if (resource.context.includes('/CodeSnippet/adapters')) {
                 resource.request = resolve(
                   runtimeDir,
                   resource.request.includes('highlightjs') ? 'highlightjs.js' : 'shiki.js',
                 );
+              }
             },
           ),
         );
@@ -155,10 +158,11 @@ export async function buildCanvasScripts(
   const expected = new Set(Object.keys(options.entries).map(name => `${name}.js`));
   const unexpected = emitted.filter(name => !expected.has(name));
   const missing = [...expected].filter(name => !emitted.includes(name));
-  if (unexpected.length || missing.length)
+  if (unexpected.length || missing.length) {
     throw new Error(
       `Canvas scripts must be standalone. Unexpected assets: ${unexpected.join(', ')}; missing entries: ${missing.join(', ')}`,
     );
+  }
   return result.stats;
 }
 
@@ -167,7 +171,8 @@ export async function readInlineScript(path: string): Promise<string> {
   const code = (await readFile(path, 'utf8'))
     .replaceAll(/<\/script/gi, match => match.replace('</', '<\\/'))
     .replaceAll('<!--', '<\\!--');
-  if (/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i.test(code))
+  if (/<\/script|<!--|(?:import|fetch)\s*\(\s*['"]https?:/i.test(code)) {
     throw new Error(`${path} is unsafe to inline`);
+  }
   return code;
 }

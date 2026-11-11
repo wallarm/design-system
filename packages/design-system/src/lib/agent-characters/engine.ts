@@ -399,7 +399,7 @@ export class Character implements LiveChar {
     if (st === 'failed') this.nextBeat = now + 1700 + this.r2() * 1000;
     if (st === 'idle') this.nextAct = Math.max(this.nextAct, now + this.actGap() * 0.5);
     if (st === 'done') this.hop(now, 7);
-    if (st === 'failed' && !this.clipBusy('wob', now))
+    if (st === 'failed' && !this.clipBusy('wob', now)) {
       this.clips.push({
         wob: 1,
         t0: now,
@@ -412,6 +412,7 @@ export class Character implements LiveChar {
         ],
         ease: E_INOUT,
       });
+    }
     if (st === 'needs') this.nextHop = now + 500;
     if (st === 'power') this.startLanding(now, prev);
   }
@@ -456,13 +457,14 @@ export class Character implements LiveChar {
     }
     const veil = this.svg.querySelector('[data-part~="veil"]');
     // clipped prop deco (Acquit's seam) sits over the crown; off, the ghost's order is back
-    if (veil)
+    if (veil) {
       this.fig.insertBefore(
         veil,
         on
           ? this.fig.querySelector(':scope > g[clip-path]:not([data-part~="veil"])')
           : this.fig.querySelector(':scope > [data-part~="visor"]'),
       );
+    }
     this.ghostCls();
     this.lastV = null;
     if (!this.isLive()) this.render(now);
@@ -557,11 +559,11 @@ export class Character implements LiveChar {
     }
     if (this.cover && this.cov) {
       this.clear(this.covHT);
-      if (on)
+      if (on) {
         this.covHT = this.later(() => {
           if (this.cover && !this.topping && this.cov) this.cov.t = -0.35 * (this.covY - this.covT);
         }, 150);
-      else if (!this.topping) this.cov.t = 0;
+      } else if (!this.topping) this.cov.t = 0;
     }
   }
   /** "Inviting": three invites per view at most, one inviter per document, news first; true while an invite or a
@@ -630,13 +632,15 @@ export class Character implements LiveChar {
     });
   }
   private releaseClips(now: number, all = true) {
-    for (const c of this.clips)
+    for (const c of this.clips) {
       if ((c.act || c.perk || (all && (c.beat || c.hw || c.tilt))) && !c.rel) c.rel = now;
+    }
   }
   private helloClips(now: number) {
     this.hop(now, 6);
-    if (!this.clips.some(c => c.tilt && !c.rel))
+    if (!this.clips.some(c => c.tilt && !c.rel)) {
       this.clips.push({ tilt: 1, t0: now, keys: HELLO_TILT });
+    }
     const k = this.fid ? this.fid.k : null;
     const hp = k ? HELLO_PROP[k] : undefined;
     if (hp && !this.clips.some(c => c.hw && !c.rel)) this.clips.push({ hw: 1, t0: now, keys: hp });
@@ -706,8 +710,9 @@ export class Character implements LiveChar {
         [...this.rt.live].some(
           c => c !== this && c.visible && c.clips.some(k => k.kind === 'reach' && !k.rel),
         ))
-    )
+    ) {
       W.stretch = 0;
+    }
     let sum = 0;
     for (const k in W) sum += W[k] as number;
     let x = this.r2() * sum;
@@ -776,8 +781,9 @@ export class Character implements LiveChar {
     if (!this.repOn() || now < this.nextAct) return false;
     if (!this.pv) {
       let n = 0;
-      for (const c of this.rt.live)
+      for (const c of this.rt.live) {
         if (c !== this && c.visible && c.clips.some(k => k.act && !k.rel)) n++;
+      }
       if (n >= this.rt.act.cap || now - this.rt.act.last < 700) {
         this.nextAct = now + 500 + this.r2() * 900;
         return false;
@@ -852,8 +858,9 @@ export class Character implements LiveChar {
       return;
     }
     if (st === 'working') {
-      if (!this.read)
+      if (!this.read) {
         this.read = { step: 0, steps: 3 + ((this.r() * 3) | 0), line: 0, next: now + 200 };
+      }
       const R = this.read;
       if (now >= R.next) {
         if (R.step < R.steps) {
@@ -1169,8 +1176,9 @@ export class Character implements LiveChar {
         // the key turns about its shaft; the flat bow never goes to zero width
         const c = Math.cos((t * 2 * Math.PI) / 1.6);
         sxk = 1 + w * ((c < 0 ? -1 : 1) * Math.max(0.14, Math.abs(c)) - 1);
-      } else if (a === 'focus' && w > 0.001)
-        sk = 1 + w * 0.06 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 1.5)); // the monocle focuses
+      } else if (a === 'focus' && w > 0.001) {
+        sk = 1 + w * 0.06 * (0.5 - 0.5 * Math.cos((t * 2 * Math.PI) / 1.5));
+      } // the monocle focuses
       const k3 = (v: number) => Math.round(v * 1000) / 1000;
       const tr2 =
         sxk !== 1

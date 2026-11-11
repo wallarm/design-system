@@ -3,8 +3,10 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import postcss, { type Root } from 'postcss';
+
 import type { TokenCategory } from '@wallarm-org/mcp-core';
+import postcss, { type Root } from 'postcss';
+
 import { mapColorValue, type Theme } from './map-value';
 
 export interface Token {
@@ -102,11 +104,12 @@ function discover(themeDir: string, skipped: Set<string>) {
   // Reuse published discovery without changing it. The AST pass fills its multiline,
   // selector, and component-file gaps without lifting component-local declarations.
   for (const category of parseTokens({ themeDir })) {
-    for (const token of category.tokens)
+    for (const token of category.tokens) {
       values[category.name.endsWith('-dark') ? 'dark' : 'light'].set(
         token.name,
         normalize(token.value),
       );
+    }
   }
   const sources = cssFiles(themeDir);
   const parsed = new Map<string, Root>();
@@ -119,14 +122,16 @@ function discover(themeDir: string, skipped: Set<string>) {
       if (node.type === 'rule') {
         const selectors = node.selectors.map(themeSelector);
         if (selectors.every(theme => theme !== undefined)) themes = selectors;
-        else if (node.selector.includes('data-frame-style'))
+        else if (node.selector.includes('data-frame-style')) {
           skipped.add(`Contextual ${node.selector} overrides remain in bundle.css.`);
+        }
       }
       if (themes.length && 'nodes' in node && node.nodes) {
         for (const declaration of node.nodes) {
           if (declaration.type !== 'decl' || !declaration.prop.startsWith('--')) continue;
-          for (const theme of themes)
+          for (const theme of themes) {
             values[theme].set(declaration.prop, normalize(declaration.value));
+          }
         }
       }
     });
@@ -149,13 +154,14 @@ function makeTypography(values: Map<string, string>, parsed: Map<string, Root>):
         fields[declaration.prop] = normalize(declaration.value);
       });
       const file = /url\(['"]?([^'")]+)['"]?\)/.exec(fields.src ?? '')?.[1];
-      if (file && fields['font-family'])
+      if (file && fields['font-family']) {
         fonts.push({
           family: fields['font-family'].replace(/^['"]|['"]$/g, ''),
           file: `fonts/${path.basename(file)}`,
           weight: fields['font-weight'] ?? '400',
           style: fields['font-style'] ?? 'normal',
         });
+      }
     });
   }
   const sizes = [...values].filter(([name]) => /^--text-[^-]+$/.test(name));
@@ -211,8 +217,9 @@ function makeTypography(values: Map<string, string>, parsed: Map<string, Root>):
 
 function tokenFamily(name: string): string {
   if (name === 'spacing' || name.startsWith('spacing-')) return 'spacing';
-  for (const prefix of ['radius', 'shadow', 'blur', 'leading', 'tracking'])
+  for (const prefix of ['radius', 'shadow', 'blur', 'leading', 'tracking']) {
     if (name.startsWith(`${prefix}-`)) return prefix;
+  }
   if (name.startsWith('icon-')) return 'iconSize';
   if (name.startsWith('font-weight-')) return 'fontWeight';
   if (name.startsWith('text-')) return 'fontSize';
@@ -247,8 +254,9 @@ function compileCss(
   for (const [family, entries] of Object.entries(families)) {
     if (family !== 'shadow') output.push(...entries.tokens.map(token => declare(token, 'light')));
   }
-  for (const [family, value] of Object.entries(document.type.families))
+  for (const [family, value] of Object.entries(document.type.families)) {
     output.push(declare({ name: `font-${family}`, value }, 'light'));
+  }
   output.push('}');
   for (const group of document.type.groups) {
     for (const style of group.styles) {
@@ -263,7 +271,7 @@ function compileCss(
       output.push('}');
     }
   }
-  for (const font of document.type.fonts)
+  for (const font of document.type.fonts) {
     output.push(
       '@font-face {',
       `  font-family: ${JSON.stringify(font.family)};`,
@@ -273,6 +281,7 @@ function compileCss(
       `  src: url(${JSON.stringify(font.file)}) format("woff2");`,
       '}',
     );
+  }
   return { css: `${output.join('\n')}\n`, tokenNames };
 }
 
@@ -433,11 +442,13 @@ export function buildTokens({
     typography.groups.length > 12 ||
     Object.keys(families).length + 2 > 12 ||
     Object.values(families).some(family => family.tokens.length > 60)
-  )
+  ) {
     throw new Error(`Token platform budget exceeded: ${JSON.stringify(counts)}`);
+  }
   const { css, tokenNames } = compileCss(document, families);
-  if (/<\/style/i.test(css))
+  if (/<\/style/i.test(css)) {
     throw new Error('tokens.css contains an unsafe inline style terminator');
+  }
   mkdirSync(outDir, { recursive: true });
   writeFileSync(path.join(outDir, 'tokens.json'), `${JSON.stringify(document, null, 2)}\n`);
   writeFileSync(path.join(outDir, 'tokens.css'), css);

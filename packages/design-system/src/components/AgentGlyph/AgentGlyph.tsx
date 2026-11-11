@@ -1,4 +1,5 @@
 import type { CSSProperties, FC, Ref, SVGProps } from 'react';
+
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { shapeOf } from '../../lib/agent-characters/geom';

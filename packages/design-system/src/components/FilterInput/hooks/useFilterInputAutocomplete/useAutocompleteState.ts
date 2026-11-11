@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseAutocompleteStateOptions {

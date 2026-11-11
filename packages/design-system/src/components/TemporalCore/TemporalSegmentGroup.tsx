@@ -1,7 +1,9 @@
 import type { FC, ReactNode, Ref } from 'react';
+
 import type { DateFieldState, DateSegment, TimeFieldState } from '@react-stately/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
 import { cva } from 'class-variance-authority';
+
 import { cn } from '../../utils/cn';
 import { type DateOrder, useDateFormat } from '../DateFormatProvider';
 import { TemporalSegment } from './TemporalSegment';
@@ -16,7 +18,7 @@ export interface TemporalSegmentGroupProps extends GroupDOMAttributes {
 }
 
 const literalVariants = cva(
-  'relative outline-none text-left font-sans text-sm text-text-primary select-none',
+  'relative text-left font-sans text-sm text-text-primary outline-none select-none',
   {
     variants: {
       disabled: {

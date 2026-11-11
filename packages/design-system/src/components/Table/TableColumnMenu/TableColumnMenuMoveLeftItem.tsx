@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+
 import { arrayMove } from '@dnd-kit/sortable';
+
 import { ArrowLeft } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { useTableValue } from '../lib';

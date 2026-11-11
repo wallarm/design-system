@@ -1,6 +1,7 @@
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { Brain } from '../../icons';
 import { TestIdProvider } from '../../utils/testId';
 import { ChainOfThought } from './ChainOfThought';

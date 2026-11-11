@@ -1,4 +1,5 @@
 import type { ComponentType, FC, HTMLAttributes, ReactNode, Ref } from 'react';
+
 import { Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { useBannerVariant } from './BannerContext';
@@ -46,7 +47,7 @@ export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, ...props }) => {
       ref={ref}
       data-slot='banner-icon'
       data-testid={testId}
-      className='flex items-center py-2 shrink-0'
+      className='flex shrink-0 items-center py-2'
     >
       {content}
     </div>
