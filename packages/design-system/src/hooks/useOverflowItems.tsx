@@ -151,7 +151,7 @@ export function useOverflowItems<T>({
   }, [recompute]);
 
   // Measure on items/renderer change, batched via the scheduler.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the renderers decide what the measurement layer renders, so they must invalidate the cached widths
+  // the renderers decide what the measurement layer renders, so they must invalidate the cached widths
   useLayoutEffect(() => {
     if (items.length === 0) {
       cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace, lastCount: 0 };

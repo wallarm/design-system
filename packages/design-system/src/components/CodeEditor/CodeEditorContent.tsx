@@ -4,7 +4,6 @@ import { flushSync } from 'react-dom';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { useCodeSnippetFrame } from '../CodeSnippet/hooks';
-import { useCodeEditorContext } from './CodeEditorContext';
 import {
   codeEditorContentVariants,
   codeEditorFallbackCodeVariants,
@@ -14,6 +13,7 @@ import {
   codeEditorFallbackVariants,
   codeEditorHostVariants,
 } from './classes';
+import { useCodeEditorContext } from './CodeEditorContext';
 import type { EditorHandle, EngineOptions } from './engine/types';
 import { loadEngine } from './lib/loadEngine';
 import { PortalOutlet } from './lib/PortalOutlet';
@@ -137,7 +137,7 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
       },
       (error: unknown) => {
         if (cancelled) return;
-        // biome-ignore lint/suspicious/noConsole: engine load failures have no onError (spec D12); log and keep the fallback.
+        // oxlint-disable-next-line no-console -- engine load failures have no onError (spec D12); log and keep the fallback.
         console.error(
           '[CodeEditor] Failed to load the editor engine; showing read-only text.',
           error,
@@ -163,7 +163,7 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
   // Re-measure after mount and after CodeSnippetFrame moves its host in/out of fullscreen (spec §7.9).
   // A passive effect runs after CodeSnippetFrame's layout effect has attached/moved the host, so the
   // measure (scheduled for the next frame) never reads a detached or stale geometry.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: isFullscreen is the trigger, not an input.
+  // isFullscreen is the trigger, not an input.
   useEffect(() => {
     handle?.view.requestMeasure();
   }, [handle, isFullscreen]);
@@ -174,7 +174,7 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && !hasAccessibleName) {
-      // biome-ignore lint/suspicious/noConsole: dev-only accessibility authoring guard.
+      // oxlint-disable-next-line no-console -- dev-only accessibility authoring guard.
       console.warn(
         '[CodeEditor] CodeEditorContent has no accessible name. Pass `aria-label` or `aria-labelledby`.',
       );

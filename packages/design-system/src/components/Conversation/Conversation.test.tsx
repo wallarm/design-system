@@ -19,9 +19,9 @@ class CapturingResizeObserver {
   constructor(callback: ResizeObserverCallback) {
     resizeCallbacks.push(callback);
   }
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: test double
+  // test double
   observe() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: test double
+  // test double
   unobserve() {}
   disconnect() {
     resizeCallbacks = [];

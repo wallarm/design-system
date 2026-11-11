@@ -94,7 +94,7 @@ const json = JSON.stringify({
   scenarios: out,
 });
 writeFileSync(path.join(FIX, 'motion-v17.json.gz'), gzipSync(json, { level: 9 }));
-// biome-ignore lint/suspicious/noConsole: CLI output
+// oxlint-disable-next-line no-console -- CLI output
 console.log(
   `motion-v17.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
 );

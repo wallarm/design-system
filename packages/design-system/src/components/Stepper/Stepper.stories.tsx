@@ -1,19 +1,5 @@
 import { type FormEvent, useCallback, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Lock } from '../../icons';
-import { Button } from '../Button';
-import {
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerFooterControls,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '../Drawer';
-import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import {
   Stepper,
   StepperContent,
@@ -29,6 +15,20 @@ import {
   StepperTitle,
   StepperTrigger,
 } from '.';
+import { Lock } from '../../icons';
+import { Button } from '../Button';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerFooterControls,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '../Drawer';
+import { HStack, VStack } from '../Stack';
+import { Text } from '../Text';
 
 const DESCRIPTION = [
   'A horizontal row of numbered steps for a flow that is split into a few screens, such as a create drawer — it shows where the reader is and lets them jump to any step.',

@@ -1,8 +1,8 @@
 import { createRef } from 'react';
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { AgentAvatar } from '../AgentAvatar';
 import { WallySkeleton } from '.';
+import { AgentAvatar } from '../AgentAvatar';
 
 describe('WallySkeleton', () => {
   it('exposes one named loading status without interactive chat controls', () => {

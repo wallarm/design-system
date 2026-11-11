@@ -6,8 +6,7 @@ import { type TestableProps, useTestId } from '../../utils/testId';
 import { useNotificationCenterItemUnread } from './NotificationCenterItem';
 
 export interface NotificationCenterItemTitleProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    TestableProps {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Render your own element, e.g. a router link or `<a href>`. */
   asChild?: boolean;

@@ -11,7 +11,7 @@
 
 - Use path aliases where configured
 - Group imports: 1) React/external 2) Internal packages 3) Relative
-- Biome handles import sorting — do not manually sort
+- Oxfmt handles import sorting — do not manually sort
 
 ## Naming
 
@@ -25,9 +25,9 @@
 
 ## Formatting
 
-- Biome handles formatting — do not argue about style
+- Oxfmt handles formatting — do not argue about style
 - Run `pnpm lint:fix` to auto-fix issues
-- Single quotes, semicolons required, trailing commas (configured in Biome)
+- Single quotes, semicolons required, trailing commas (configured in `.oxfmtrc.json`)
 
 ## Git
 

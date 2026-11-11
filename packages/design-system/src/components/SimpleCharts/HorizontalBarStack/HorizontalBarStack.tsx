@@ -55,8 +55,7 @@ export interface HorizontalBarStackDatum {
 // `onSelect` here is click-to-filter, not the DOM text-selection event — Omit the native
 // handler so the declaration build accepts the narrowed signature (TS2430).
 export interface HorizontalBarStackProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Segments + legend. One array drives both, so colors stay in sync. */
   data: HorizontalBarStackDatum[];
@@ -181,7 +180,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
 
   useEffect(() => {
     if (hasDuplicateNames && process.env.NODE_ENV !== 'production') {
-      // biome-ignore lint/suspicious/noConsole: dev-only misuse warning, stripped in production
+      // oxlint-disable-next-line no-console -- dev-only misuse warning, stripped in production
       console.warn(
         '[HorizontalBarStack] `data` contains duplicate `name` values. Names are used as the React key ' +
           'and the `data-name` hook — duplicates cause key collisions and ambiguous selectors. Provide unique names.',

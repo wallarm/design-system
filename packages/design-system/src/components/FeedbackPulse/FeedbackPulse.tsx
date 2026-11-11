@@ -250,6 +250,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                   content height — as a flex item the fr track collapses to 0. */}
               <div>
                 <div className='flex flex-col gap-4'>
+                  {/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- Radio buttons own roving focus; this group handles their bubbled keyboard events. */}
                   <div
                     ref={scaleRef}
                     role='radiogroup'

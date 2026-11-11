@@ -8,8 +8,10 @@ import { Loader } from '../Loader';
 import { searchModalInputVariants } from './classes';
 import { useSearchModalContext } from './SearchModalContext';
 
-export interface SearchModalInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
+export interface SearchModalInputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'onChange'
+> {
   ref?: Ref<HTMLInputElement>;
   /** Show a loading spinner replacing the search icon */
   loading?: boolean;

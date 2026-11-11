@@ -8,8 +8,8 @@ import { Maximize2 } from '@wallarm-org/design-system/icons/Maximize2';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
 import { FILL_APP_SHELL, FULLSCREEN_FRAME, StoryError } from './StoryPreview';
-import type { PreviewTemplate } from './TemplatePreviewDialog';
 import { parsePreviewParams, withPreviewParams } from './templatePreview';
+import type { PreviewTemplate } from './TemplatePreviewDialog';
 import { useInView } from './useInView';
 import { type StoryLoader, useStory } from './useStory';
 

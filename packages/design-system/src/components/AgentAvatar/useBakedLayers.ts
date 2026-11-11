@@ -26,7 +26,7 @@ export function useBakedLayers(
   // The layers are rebuilt on every render; their content is what decides a re-bake.
   const signature = `${size}#${layers.map(layerKey).join('\n')}`;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the layers' content, not their identity
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- keyed on the layers' content, not their identity
   useEffect(() => {
     let alive = true;
     const held = new Set<string>();

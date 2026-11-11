@@ -5,8 +5,7 @@ import { userMessageShowMoreVariants } from './classes';
 import { useUserMessageBubbleContext } from './UserMessageContext';
 
 export interface UserMessageShowMoreProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Label while the text is clamped. */
   showMoreLabel?: ReactNode;

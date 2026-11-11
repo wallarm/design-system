@@ -1,8 +1,8 @@
 import { mergeRsbuildConfig } from '@rsbuild/core';
 import { defineConfig } from '@rspress/core';
-import type { GuidelinesMetadata } from '@wallarm-org/mcp-core';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import type { GuidelinesMetadata } from '@wallarm-org/mcp-core';
 import { rsbuildConfig } from '@wallarm-org/rsbuild-config/rsbuild.config';
 import { postcssConfig } from '@wallarm-org/tailwind-config/postcss';
 import { cleanSearchIndex } from './plugins/cleanSearchIndex';

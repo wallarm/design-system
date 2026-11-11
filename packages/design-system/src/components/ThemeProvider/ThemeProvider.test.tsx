@@ -1,6 +1,6 @@
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { renderToString } from 'react-dom/server';
 import { ThemeProvider } from './ThemeProvider';
 import { useTheme } from './useTheme';
 

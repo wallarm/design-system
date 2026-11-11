@@ -6,8 +6,7 @@ import { Button, type ButtonProps } from '../Button';
 import { Separator } from '../Separator';
 
 export interface NotificationCenterHeaderProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 
@@ -29,8 +28,7 @@ export const NotificationCenterHeader: FC<NotificationCenterHeaderProps> = ({
 NotificationCenterHeader.displayName = 'NotificationCenterHeader';
 
 export interface NotificationCenterTitleProps
-  extends HTMLAttributes<HTMLHeadingElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLHeadingElement>, TestableProps {
   ref?: Ref<HTMLHeadingElement>;
 }
 
@@ -58,8 +56,7 @@ export const NotificationCenterTitle: FC<NotificationCenterTitleProps> = ({
 NotificationCenterTitle.displayName = 'NotificationCenterTitle';
 
 export interface NotificationCenterHeaderActionsProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 
@@ -79,7 +76,7 @@ export const NotificationCenterHeaderActions: FC<NotificationCenterHeaderActions
     className={cn('flex items-center gap-4', className)}
   >
     {Children.toArray(children).map((child, index) => (
-      // biome-ignore lint/suspicious/noArrayIndexKey: children keep their order; Children.toArray keys the child itself
+      // oxlint-disable-next-line react/no-array-index-key -- children keep their order; Children.toArray keys the child itself
       <Fragment key={index}>
         {index > 0 && <Separator orientation='vertical' />}
         {child}

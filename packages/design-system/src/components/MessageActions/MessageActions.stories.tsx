@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { MessageAction, MessageActions, MessageTimestamp } from '.';
 import { Ellipsis, ThumbsDown, ThumbsUp } from '../../icons';
 import { Copyable, CopyableIcon } from '../Copyable';
 import {
@@ -8,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
-import { MessageAction, MessageActions, MessageTimestamp } from '.';
 
 const DESCRIPTION = [
   'The small row of icon buttons under a chat message — copy, feedback, a more menu and a timestamp.',

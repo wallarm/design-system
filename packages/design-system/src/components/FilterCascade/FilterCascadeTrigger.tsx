@@ -22,8 +22,7 @@ import { FilterCascadeClear } from './FilterCascadeClear';
 import { useFilterCascadeContext } from './FilterCascadeContext';
 
 export interface FilterCascadeTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Only a `<FilterCascadeClear />`, to replace the default ✕ (for example to add attributes). */
   children?: ReactNode;

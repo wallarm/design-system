@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { fn } from 'storybook/test';
 import { ChevronDown, CircleDashed, Home } from '../../icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Breadcrumbs, BreadcrumbsEllipsis, BreadcrumbsItem } from './index';

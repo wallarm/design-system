@@ -146,7 +146,7 @@ class PainterPluginValue implements PluginValue {
   private reportError(error: unknown): void {
     if (this.errorReported) return;
     this.errorReported = true;
-    // biome-ignore lint/suspicious/noConsole: adapter failures are otherwise invisible (colours just stop updating)
+    // oxlint-disable-next-line no-console -- adapter failures are otherwise invisible (colours just stop updating)
     console.error(
       `[CodeEditor] Syntax adapter "${this.config.adapter.name}" failed to highlight "${this.config.language}"; keeping previous colours.`,
       error,

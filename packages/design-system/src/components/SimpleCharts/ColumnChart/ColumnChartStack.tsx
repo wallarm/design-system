@@ -1,8 +1,8 @@
 import { type FC, useContext } from 'react';
 import { Bar, type BarShapeProps, BarStack, usePlotArea } from 'recharts';
 import { useTestId } from '../../../utils/testId';
-import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';
 import { CHART_PALETTE_FILL, resolveChartColor } from '../lib/chartPalette';
+import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';
 import { COLUMN_INACTIVE_OPACITY, COLUMN_PART_GAP, COLUMN_RADIUS } from './constants';
 import { resolveColumnWidth } from './lib/resolveColumnWidth';
 

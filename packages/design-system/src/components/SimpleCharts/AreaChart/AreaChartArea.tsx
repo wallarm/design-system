@@ -1,8 +1,8 @@
 import { type FC, useContext, useEffect } from 'react';
 import { Area } from 'recharts';
 import { useTestId } from '../../../utils/testId';
-import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';
 import { warnLineChartLine } from '../LineChart/lib/warn';
+import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineChartContext';
 import { AreaChartVariantContext } from './AreaChartContext';
 import {
   AREA_FILL_OPACITY,

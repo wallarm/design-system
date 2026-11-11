@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type {
   ComponentMetadata,
   ExampleMetadata,
@@ -5,7 +6,6 @@ import type {
   PropMetadata,
   TokenCategory,
 } from '@wallarm-org/mcp-core';
-import path from 'node:path';
 
 const CATEGORY_ORDER = [
   'Actions',

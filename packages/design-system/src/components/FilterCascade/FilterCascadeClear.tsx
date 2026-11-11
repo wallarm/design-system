@@ -6,8 +6,7 @@ import { filterDropdownClearClassName } from '../FilterDropdown/classes';
 import { useFilterCascadeContext } from './FilterCascadeContext';
 
 export interface FilterCascadeClearProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    TestableProps {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
 }
 

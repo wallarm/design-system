@@ -117,7 +117,7 @@ try {
     ).reduce((sum, size) => sum + size, 0);
     const included = (data.chunks ?? []).flatMap(chunk => moduleNames(chunk.modules));
     const unwanted = included.filter(module => testCase.forbidden.test(module));
-    // biome-ignore lint/suspicious/noConsole: CI reports production bundle measurements.
+    // oxlint-disable-next-line no-console -- CI reports production bundle measurements.
     console.log(
       JSON.stringify({
         name,

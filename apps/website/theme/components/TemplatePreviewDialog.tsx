@@ -84,7 +84,7 @@ function useStoryCode(slug: string, story: string, enabled: boolean): string | n
         if (active) setCode({ key, code: index[story] ?? '' });
       })
       .catch((cause: unknown) => {
-        // biome-ignore lint/suspicious/noConsole: Copy code stays disabled; keep the reason visible
+        // oxlint-disable-next-line no-console -- Copy code stays disabled; keep the reason visible
         console.error(cause);
       });
     return () => {

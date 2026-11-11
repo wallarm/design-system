@@ -8,7 +8,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useChatInputContext } from './ChatInputContext';
 
 export interface ChatInputSubmitProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' | 'color'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' | 'color'>,
     TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Accessible name while idle. */

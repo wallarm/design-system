@@ -21,8 +21,10 @@ export interface PasswordComplexityItem {
   met: boolean;
 }
 
-export interface PasswordComplexityProps
-  extends Omit<ListProps, 'children' | 'variant' | 'marker'> {
+export interface PasswordComplexityProps extends Omit<
+  ListProps,
+  'children' | 'variant' | 'marker'
+> {
   ref?: Ref<HTMLElement>;
   items: PasswordComplexityItem[];
 }

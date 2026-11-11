@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Button } from '../Button';
-import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
-import { Slider, SliderControl, SliderThumb } from '../Slider';
 import {
   ImageCropper,
   ImageCropperContext,
@@ -12,6 +9,9 @@ import {
   ImageCropperSelection,
   ImageCropperViewport,
 } from '.';
+import { Button } from '../Button';
+import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
+import { Slider, SliderControl, SliderThumb } from '../Slider';
 import { LANDSCAPE, PORTRAIT, TALL_BANDS, WIDE_BANDS } from './stories/fixtures';
 
 const meta = {

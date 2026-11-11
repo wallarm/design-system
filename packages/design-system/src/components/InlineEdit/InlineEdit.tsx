@@ -113,7 +113,7 @@ export function InlineEdit<T = unknown>({
   const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
     const prev = overrideRef.current;
     if (process.env.NODE_ENV !== 'production' && prev && prev.mode !== mode) {
-      // biome-ignore lint/suspicious/noConsole: dev-only warning surface
+      // oxlint-disable-next-line no-console -- dev-only warning surface
       console.warn(
         `InlineEdit: an editor registered submitMode='${mode}' while another editor's '${prev.mode}' override is active. Last registration wins.`,
       );

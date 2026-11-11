@@ -30,8 +30,7 @@ import { isSameFile, setInputFiles, toAcceptList, toAcceptString } from './lib';
 import type { FileUploadRejection } from './types';
 
 export interface FileUploadProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'children'>,
-    TestableProps {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'children'>, TestableProps {
   /** Controlled accepted files. */
   value?: File[];
   /** Uncontrolled initial files. */

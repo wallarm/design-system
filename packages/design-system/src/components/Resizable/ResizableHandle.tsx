@@ -6,7 +6,8 @@ import { resizableHandleVariants } from './classes';
 import { useResizableContext } from './ResizableContext';
 
 export interface ResizableHandleProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'role' | 'tabIndex'>,
+  extends
+    Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'role' | 'tabIndex'>,
     Pick<SeparatorProps, 'disabled' | 'disableDoubleClick'>,
     TestableProps {
   ref?: Ref<HTMLDivElement>;

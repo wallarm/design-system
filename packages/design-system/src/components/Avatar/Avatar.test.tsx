@@ -2,8 +2,6 @@ import type { FC } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { SvgIconProps } from '../../icons';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import {
   Avatar,
   AvatarContent,
@@ -13,6 +11,8 @@ import {
   AvatarName,
   AvatarOverlay,
 } from '.';
+import type { SvgIconProps } from '../../icons';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
 const renderAvatar = (props: { src?: string; name?: string; onStatusChange?: () => void } = {}) =>
   render(

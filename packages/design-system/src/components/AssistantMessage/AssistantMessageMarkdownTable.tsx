@@ -8,8 +8,7 @@ import {
 } from './classes';
 
 export interface AssistantMessageMarkdownTableProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 

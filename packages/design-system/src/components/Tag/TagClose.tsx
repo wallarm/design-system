@@ -4,8 +4,7 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface TagCloseProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   children?: ReactNode;
   ref?: Ref<HTMLButtonElement>;
 }

@@ -190,6 +190,7 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
   if (!isOpen) return null;
 
   return (
+    // oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- Option buttons receive focus; the listbox handles their bubbled keyboard events.
     <div
       className={cn(
         dropdownMenuClassNames,

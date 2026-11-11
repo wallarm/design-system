@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import {
+  AssistantMessage,
+  AssistantMessageContent,
+  AssistantMessageError,
+  AssistantMessageLoader,
+  AssistantMessageMarkdown,
+  type AssistantMessageMarkdownComponents,
+  AssistantMessageMarkdownLink,
+} from '.';
 import { Brain, Database, Ellipsis, RefreshCcw, Search, ThumbsDown, ThumbsUp } from '../../icons';
 import { ApprovalCard, ApprovalCardActions, ApprovalCardContent } from '../ApprovalCard';
 import { Button } from '../Button';
@@ -13,15 +22,6 @@ import {
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { MessageAction, MessageActions, MessageTimestamp } from '../MessageActions';
-import {
-  AssistantMessage,
-  AssistantMessageContent,
-  AssistantMessageError,
-  AssistantMessageLoader,
-  AssistantMessageMarkdown,
-  type AssistantMessageMarkdownComponents,
-  AssistantMessageMarkdownLink,
-} from '.';
 import { COT_TEXT, HOSTILE, WALLY_ANSWER } from './mocks';
 
 const DESCRIPTION = [

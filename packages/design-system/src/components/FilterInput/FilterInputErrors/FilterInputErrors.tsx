@@ -23,7 +23,7 @@ export const FilterInputErrors: FC<FilterInputErrorsProps> = ({ errors }) => {
             invalid HTML and triggers a hydration error. */}
         <ul className='list-disc ms-[21px] text-sm text-text-secondary'>
           {errors.map((err, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: errors may repeat (same message for different chips); idx disambiguates
+            // oxlint-disable-next-line react/no-array-index-key -- errors may repeat (same message for different chips); idx disambiguates
             <li key={idx}>{err}</li>
           ))}
         </ul>

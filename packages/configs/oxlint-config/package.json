@@ -1,0 +1,8 @@
+{
+  "name": "@wallarm-org/oxlint-config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./oxlint.json": "./oxlint.json"
+  }
+}

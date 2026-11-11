@@ -9,7 +9,7 @@ interface TreeItemContextValue {
 const TreeItemContext = createContext<TreeItemContextValue>({
   collapsible: false,
   open: false,
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: default no-op
+  // default no-op
   toggle: () => {},
 });
 

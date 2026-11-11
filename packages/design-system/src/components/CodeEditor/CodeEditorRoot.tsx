@@ -6,13 +6,13 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from '../CodeSnippet/adapters/plain';
 import type { SyntaxAdapter } from '../CodeSnippet/adapters/types';
+import { codeSnippetRootVariants } from '../CodeSnippet/classes';
 import type { CodeSnippetSize, LineConfig } from '../CodeSnippet/CodeSnippetContext';
 import {
   CodeSnippetFrameContext,
   type CodeSnippetFrameContextValue,
 } from '../CodeSnippet/CodeSnippetFrameContext';
 import { CodeSnippetShowMoreButton } from '../CodeSnippet/CodeSnippetShowMoreButton';
-import { codeSnippetRootVariants } from '../CodeSnippet/classes';
 import { useAdapter } from '../CodeSnippet/hooks';
 import { CodeSnippetFrame } from '../CodeSnippet/internal/CodeSnippetFrame';
 import {
@@ -37,9 +37,7 @@ type CodeEditorRootNativeProps = Omit<
 >;
 
 export interface CodeEditorRootProps
-  extends CodeEditorRootNativeProps,
-    TestableProps,
-    VariantProps<typeof codeSnippetRootVariants> {
+  extends CodeEditorRootNativeProps, TestableProps, VariantProps<typeof codeSnippetRootVariants> {
   /** Root element, including in fullscreen */
   ref?: Ref<HTMLDivElement>;
   /** Controlled document */
@@ -203,7 +201,7 @@ export const CodeEditorRoot = ({
     if (process.env.NODE_ENV === 'production') return;
     if (!documentIdWithoutValue || warnedDocumentId.current) return;
     warnedDocumentId.current = true;
-    // biome-ignore lint/suspicious/noConsole: dev-only authoring guard.
+    // oxlint-disable-next-line no-console -- dev-only authoring guard.
     console.warn(
       "[CodeEditor] `documentId` requires a controlled `value`: in uncontrolled mode a new document starts from the previous document's text.",
     );

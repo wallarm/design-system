@@ -51,7 +51,7 @@ export const UserMessageBubble: FC<UserMessageBubbleProps> = ({
   // Measured only while clamped: once expanded, the text can't overflow, so the last
   // result is kept and the toggle stays to collapse it again.
   // Layout effect so the first paint already has the toggle padding and fade.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when the text changes
+  // re-measure when the text changes
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el || expanded) return;

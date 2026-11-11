@@ -30,8 +30,7 @@ import { type AreaChartVariant, AreaChartVariantContext } from './AreaChartConte
 import { areaChartRootClasses } from './classes';
 
 export interface AreaChartProps<T extends LineChartDatum = LineChartDatum>
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Long-form data array, one entry per X position. */
   data: T[];

@@ -46,7 +46,7 @@ export function useAutoResize(
     adjustTextareaHeight(ref.current, minRows, maxRows);
   }, [enabled, minRows, maxRows]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: value triggers re-measurement even though adjustHeight reads from the DOM
+  // value triggers re-measurement even though adjustHeight reads from the DOM
   useLayoutEffect(() => {
     adjustHeight();
   }, [adjustHeight, value]);

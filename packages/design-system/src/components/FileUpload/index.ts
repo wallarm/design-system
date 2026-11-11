@@ -1,8 +1,4 @@
-export {
-  fileUploadDropzoneVariants,
-  fileUploadItemVariants,
-  fileUploadVariants,
-} from './classes';
+export { fileUploadDropzoneVariants, fileUploadItemVariants, fileUploadVariants } from './classes';
 export { FileUpload, type FileUploadProps } from './FileUpload';
 export { FileUploadDropzone, type FileUploadDropzoneProps } from './FileUploadDropzone';
 export { FileUploadError, type FileUploadErrorProps } from './FileUploadError';

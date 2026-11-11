@@ -1,5 +1,18 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import {
+  type ChatAssistantMessage,
+  type ChatFeedback,
+  ChatMessageView,
+  ChatPartView,
+  type ChatSnapshot,
+  type ChatToolPermission,
+  type ChatViewConfig,
+  ChatViewProvider,
+  copyTextOf,
+  deriveChatState,
+  WallyAssistant,
+} from '.';
 import { Ellipsis, History, Paperclip, Plus, X } from '../../icons';
 import { Button } from '../Button';
 import { Chat, ChatFooter, ChatHeader, ChatHeaderTitle, ChatTrigger } from '../Chat';
@@ -29,19 +42,6 @@ import {
   SelectPositioner,
 } from '../Select';
 import { Separator } from '../Separator';
-import {
-  type ChatAssistantMessage,
-  type ChatFeedback,
-  ChatMessageView,
-  ChatPartView,
-  type ChatSnapshot,
-  type ChatToolPermission,
-  type ChatViewConfig,
-  ChatViewProvider,
-  copyTextOf,
-  deriveChatState,
-  WallyAssistant,
-} from '.';
 import { APPROVAL_PENDING, CONVERSATION, EMPTY, ERROR_TURN, useMockWally } from './mocks';
 
 const DESCRIPTION = [

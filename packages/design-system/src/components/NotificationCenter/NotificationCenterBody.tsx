@@ -71,8 +71,7 @@ export const NotificationCenterEmpty: FC<NotificationCenterEmptyProps> = ({
 NotificationCenterEmpty.displayName = 'NotificationCenterEmpty';
 
 export interface NotificationCenterSkeletonProps
-  extends HTMLAttributes<HTMLDivElement>,
-    TestableProps {
+  extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Number of placeholder rows. */
   rows?: number;
@@ -94,7 +93,7 @@ export const NotificationCenterSkeleton: FC<NotificationCenterSkeletonProps> = (
     className={cn('flex flex-col gap-4', className)}
   >
     {Array.from({ length: rows }, (_, index) => (
-      // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
+      // oxlint-disable-next-line react/no-array-index-key -- static placeholder rows
       <div key={index} className='flex flex-col gap-2 p-6'>
         <div className='flex items-center justify-between gap-8'>
           <Skeleton width='60%' height='14px' rounded={4} />

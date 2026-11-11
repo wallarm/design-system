@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from '@rstest/core';
-import { type Node, type SourceFile, SyntaxKind } from 'ts-morph';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { type Node, type SourceFile, SyntaxKind } from 'ts-morph';
 import { migrations } from '../../migrations';
 import { renderReport } from '../report';
 import { migrateSource, runMigrations } from '../runner';

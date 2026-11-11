@@ -10,11 +10,12 @@ import { BarListValue } from '../BarList/BarListValue';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
+import { useChartTimeFormatters } from '../hooks/useChartTimeFormatters';
 import {
   HorizontalBarStack,
   type HorizontalBarStackDatum,
 } from '../HorizontalBarStack/HorizontalBarStack';
-import { useChartTimeFormatters } from '../hooks/useChartTimeFormatters';
+import { hourlyData24, singleSeries } from '../LineChart/lib/sampleData';
 import { LineChart } from '../LineChart/LineChart';
 import { LineChartBody } from '../LineChart/LineChartBody';
 import { LineChartGrid } from '../LineChart/LineChartGrid';
@@ -22,7 +23,6 @@ import { LineChartLine } from '../LineChart/LineChartLine';
 import { LineChartTooltip } from '../LineChart/LineChartTooltip';
 import { LineChartXAxis } from '../LineChart/LineChartXAxis';
 import { LineChartYAxis } from '../LineChart/LineChartYAxis';
-import { hourlyData24, singleSeries } from '../LineChart/lib/sampleData';
 import { Metric } from '../Metric/Metric';
 import { MetricCaption } from '../Metric/MetricCaption';
 import { MetricDelta } from '../Metric/MetricDelta';

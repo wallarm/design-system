@@ -14,8 +14,7 @@ export type TemporalInputSize = 'default' | 'medium' | 'small' | 'inline-edit';
  * them with its domain-specific value type.
  */
 export interface TemporalInputCommonProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'>, TestableProps {
   /** Whether to show the leading icon. Default: true. */
   showIcon?: boolean;
   /** Whether the input has an error state. Sets `aria-invalid` and error styling. */

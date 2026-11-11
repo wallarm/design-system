@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@rstest/core';
 import type { Root } from 'react-dom/client';
+import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createReact18Window } from './react18';

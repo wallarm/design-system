@@ -1,8 +1,8 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
-import { storyNameFromExport } from 'storybook/internal/csf';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { storyNameFromExport } from 'storybook/internal/csf';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 import { CODE_EDITOR_KEYBOARD_HINT } from './lib/keyboardHint';
 

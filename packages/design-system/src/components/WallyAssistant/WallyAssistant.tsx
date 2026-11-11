@@ -107,8 +107,7 @@ export interface WallyAssistantOwnProps extends Omit<ChatViewConfig, 'status'> {
 }
 
 export interface WallyAssistantProps
-  extends Omit<ChatProps, WallyAssistantReservedProps>,
-    WallyAssistantOwnProps {}
+  extends Omit<ChatProps, WallyAssistantReservedProps>, WallyAssistantOwnProps {}
 
 const Pill: FC<{
   index: number;

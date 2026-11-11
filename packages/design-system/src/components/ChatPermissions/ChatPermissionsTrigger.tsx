@@ -8,8 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useChatPermissionsContext } from './ChatPermissionsContext';
 
 export interface ChatPermissionsTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
 }
 

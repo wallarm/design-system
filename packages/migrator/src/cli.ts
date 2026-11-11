@@ -51,7 +51,7 @@ export async function main(
   versions: VersionsFile,
   // Passed in (read at runtime by index.ts): a bundled package.json import would freeze the pre-release version.
   version: string,
-  // biome-ignore lint/suspicious/noConsole: CLI output
+  // oxlint-disable-next-line no-console -- CLI output
   io: IO = { log: console.log, error: console.error },
 ): Promise<number> {
   try {
@@ -99,9 +99,9 @@ export async function main(
     }
     const s = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
     io.log(
-      `${dry ? '[dry-run] ' : ''}${s(changed.length, 'file')} changed, ${s(manual.length, 'manual item')}` +
-        (skipped.length ? `, ${s(skipped.length, 'file')} skipped` : '') +
-        (writeReport ? `; see ${REPORT_FILE}` : ''),
+      `${dry ? '[dry-run] ' : ''}${s(changed.length, 'file')} changed, ${s(manual.length, 'manual item')}${
+        skipped.length ? `, ${s(skipped.length, 'file')} skipped` : ''
+      }${writeReport ? `; see ${REPORT_FILE}` : ''}`,
     );
     return 0;
   } catch (e) {

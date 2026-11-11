@@ -5,8 +5,10 @@ import { Link, type LinkProps } from '../Link';
 import type { AssistantMessageMarkdownVariant } from './AssistantMessageMarkdown';
 import { assistantMessageMarkdownLinkVariants } from './classes';
 
-export interface AssistantMessageMarkdownLinkProps
-  extends Omit<LinkProps, 'href' | 'size' | 'asChild'> {
+export interface AssistantMessageMarkdownLinkProps extends Omit<
+  LinkProps,
+  'href' | 'size' | 'asChild'
+> {
   /** Already allow-listed by the renderer: http(s), mailto or relative. */
   href: string;
   /** 'chain-of-thought' → 12px, otherwise 14px. Default 'answer'. */

@@ -3,12 +3,11 @@ import { ArrowDown } from '../../icons';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { useConversationInternal } from './ConversationContext';
 import { conversationScrollButtonVariants } from './classes';
+import { useConversationInternal } from './ConversationContext';
 
 export interface ConversationScrollButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   ref?: Ref<HTMLButtonElement>;
   /** Accessible name and tooltip. Default 'Scroll to latest message'. */
   label?: string;

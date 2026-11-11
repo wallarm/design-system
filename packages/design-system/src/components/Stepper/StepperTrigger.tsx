@@ -7,8 +7,7 @@ import { ARK_TAB_ARIA_RESET } from './constants';
 import { useStepperItemContext } from './StepperContext';
 
 export interface StepperTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'>, TestableProps {
   /** `StepperIndicator`, `StepperTitle` and an optional `StepperDescription`. */
   children: ReactNode;
   ref?: Ref<HTMLButtonElement>;
@@ -32,7 +31,7 @@ export const StepperTrigger: FC<StepperTriggerProps> = ({
   const { current, status, statusLabel } = useStepperItemContext();
   const testId = useTestId('trigger', testIdProp);
   if (process.env.NODE_ENV !== 'production' && rest.id !== undefined) {
-    // biome-ignore lint/suspicious/noConsole: dev-only authoring guard (matches Stepper root).
+    // oxlint-disable-next-line no-console -- dev-only authoring guard (matches Stepper root).
     console.warn(
       `[Stepper] id="${rest.id}" on StepperTrigger: set trigger ids with the root \`ids.triggerId\` prop, or StepperContent's aria-labelledby points at nothing.`,
     );

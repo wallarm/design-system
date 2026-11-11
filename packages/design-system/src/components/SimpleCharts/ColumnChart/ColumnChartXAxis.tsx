@@ -3,8 +3,8 @@ import { XAxis } from 'recharts';
 import type { TickFormatter } from 'recharts/types/cartesian/CartesianAxis';
 import type { XAxisTickContentProps } from 'recharts/types/util/types';
 import { LINE_X_LABEL_HEIGHT } from '../LineChart/constants';
-import { LineChartDataContext } from '../LineChart/LineChartContext';
 import { renderAxisTick } from '../LineChart/lib/renderAxisTick';
+import { LineChartDataContext } from '../LineChart/LineChartContext';
 
 export interface ColumnChartXAxisProps {
   /** Format the rendered tick label. Receives the raw `xKey` value of the column. */

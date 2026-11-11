@@ -43,7 +43,8 @@ export function solveField(maskAt: MaskAt, R: number): Float32Array {
               (nu[i + N] as number) +
               c) *
             0.25;
-          nu[i] = (nu[i] as number) + 1.85 * (v - (nu[i] as number));
+          const cur = nu[i] as number;
+          nu[i] = cur + 1.85 * (v - cur);
         }
     u = nu;
     pN = N;

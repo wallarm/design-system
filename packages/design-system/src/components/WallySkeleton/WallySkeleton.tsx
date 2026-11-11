@@ -12,8 +12,7 @@ import {
 import { Skeleton } from '../Skeleton';
 
 export interface WallySkeletonProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
-    TestableProps {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>, TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 

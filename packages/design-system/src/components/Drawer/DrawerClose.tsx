@@ -8,8 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useDrawerContext } from './DrawerContext';
 
 export interface DrawerCloseProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
-    TestableProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>, TestableProps {
   children?: ReactNode;
   /** Render as child component */
   asChild?: boolean;

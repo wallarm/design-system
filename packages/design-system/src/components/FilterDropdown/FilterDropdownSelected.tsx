@@ -7,8 +7,9 @@ import { SelectSeparator } from '../Select/SelectSeparator';
 import { FilterDropdownAliasContext, useFilterDropdownContext } from './FilterDropdownContext';
 import { FilterDropdownOption } from './FilterDropdownOption';
 
-export interface FilterDropdownSelectedProps<T extends CollectionItem = CollectionItem>
-  extends Omit<ComponentProps<typeof SelectGroup>, 'children'> {
+export interface FilterDropdownSelectedProps<
+  T extends CollectionItem = CollectionItem,
+> extends Omit<ComponentProps<typeof SelectGroup>, 'children'> {
   /** @default 'Selected' */
   label?: ReactNode;
   /**
