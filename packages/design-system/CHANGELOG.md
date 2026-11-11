@@ -1,3 +1,9 @@
+## [4.13.0](https://github.com/wallarm/design-system/compare/v4.12.4...v4.13.0) (2026-11-11)
+
+### Features
+
+* **agent-avatar:** cast as of 10.11 with Acquit, Lens, Bard and the quill (WDS-205) ([#466](https://github.com/wallarm/design-system/issues/466)) ([7875330](https://github.com/wallarm/design-system/commit/78753300a9b76ca885949daff3aac99f6efe7334))
+
 ## [4.12.4](https://github.com/wallarm/design-system/compare/v4.12.3...v4.12.4) (2026-11-11)
 
 ### Bug Fixes
