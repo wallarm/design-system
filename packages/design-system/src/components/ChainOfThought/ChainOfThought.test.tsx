@@ -42,6 +42,29 @@ describe('ChainOfThought', () => {
     expect(row.querySelector('svg')).toBeTruthy();
   });
 
+  it('makes a leaf action keyboard accessible without submitting its surrounding form', async () => {
+    const user = userEvent.setup();
+    const onClick = rs.fn();
+    const onOpenChange = rs.fn();
+    const onSubmit = rs.fn(event => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <ChainOfThought>
+          <ChainOfThoughtStep label='Show source' onClick={onClick} onOpenChange={onOpenChange} />
+        </ChainOfThought>
+      </form>,
+    );
+    const action = screen.getByRole('button', { name: 'Show source' });
+    await user.tab();
+    expect(action).toHaveFocus();
+    await user.keyboard('{Enter} ');
+    expect(onClick).toHaveBeenCalledTimes(2);
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(action).not.toHaveAttribute('aria-expanded');
+    expect(action).not.toHaveAttribute('aria-controls');
+  });
+
   it('renders a collapsible step as a button wired to its content', () => {
     render(
       <ChainOfThought data-testid='cot'>

@@ -87,6 +87,8 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   return (
     <DropdownMenuTrigger asChild>
       <div
+        role='button'
+        tabIndex={0}
         {...props}
         ref={ref}
         data-testid={testId}

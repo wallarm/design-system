@@ -169,7 +169,8 @@ export const AllIcons: Story = {
           }}
         >
           {filteredEntries.map(({ name, category, copyText, Component }) => (
-            <div
+            <button
+              type='button'
               key={`${category}-${name}`}
               className='flex cursor-pointer flex-col items-center justify-center rounded-8 border border-border-primary bg-component-outline-button-bg p-16 transition-colors'
               onClick={() => navigator.clipboard?.writeText(copyText)}
@@ -177,10 +178,10 @@ export const AllIcons: Story = {
             >
               <Component size={selectedSize} style={{ marginBottom: '8px' }} />
 
-              <Text color='secondary' size='sm'>
-                {name}
+              <Text color='secondary' size='sm' asChild>
+                <span>{name}</span>
               </Text>
-            </div>
+            </button>
           ))}
         </div>
 

@@ -170,6 +170,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
       data-testid={testId}
       {...props}
     >
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- The owning treeitem handles Enter/Space and arrow keys; this row is only its pointer hit area, not another tab stop. */}
       <div
         data-slot='tree-view-row'
         data-selected={isSelected || undefined}

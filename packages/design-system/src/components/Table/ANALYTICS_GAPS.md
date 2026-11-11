@@ -68,15 +68,15 @@ attributes to the real `<button>`. See the "Already covered" table above.
 
 ---
 
-## Accepted closed-target gaps (drag / no DOM click)
+## Accepted closed-target gaps (resize / drag / no DOM click)
 
 These are custom interactions with **no** click target. Per the contract's decision tree the correct
 seam is a typed callback; the consumer tracks the outcome outside the DS. Accepted as gaps, recorded here.
 
 ### CG-1 — Column resize handle
 
-- **Where:** `TableResizeHandler.tsx` (`<div>` with `onMouseDown` / `onTouchStart`).
-- **Why a gap:** drag interaction, no DOM click for an SDK to resolve via `closest('[data-analytics-id]')`.
+- **Where:** `TableResizeHandler.tsx` (focusable separator with pointer and keyboard resize handlers).
+- **Why a gap:** dragging or pressing resize keys changes the size without a DOM click for an SDK to resolve via `closest('[data-analytics-id]')`.
 - **Workaround:** `onColumnSizingChange` — consumer observes final column sizes.
 - **Owner:** Design System team — metrics rollout (WDS-114).
 - **Next decision point:** revisit only if product needs per-resize attribution beyond the callback.

@@ -197,7 +197,12 @@ describe('submit-mode override', () => {
       const [on, setOn] = useState(true);
       return (
         <InlineEdit defaultValue='v' defaultEdit submitMode='both'>
-          <button type='button' data-testid='toggle' onClick={() => setOn(false)} />
+          <button
+            type='button'
+            aria-label='Remove editor'
+            data-testid='toggle'
+            onClick={() => setOn(false)}
+          />
           <InlineEditControl>
             {on ? <RegisteringEditor mode='none' /> : <ModeProbe />}
           </InlineEditControl>
