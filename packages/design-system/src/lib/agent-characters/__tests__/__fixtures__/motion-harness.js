@@ -89,6 +89,8 @@
       chars: [{ id: 'trim', state: 'working' }, { id: 'mend', state: 'working' }, { id: 'probe', state: 'working' }],
       ms: 4000,
     },
+    // look v17: the periscope on the mochi and the quill's sway
+    { name: 'working-props-v17', chars: [{ id: 'lens', state: 'working' }, { id: 'bard', state: 'working' }], ms: 4000 },
     { name: 'needs', chars: [{ id: 'wally', state: 'needs' }], ms: 6000, at: [[4500, 0, 'setState', 'working']] },
     { name: 'failed', chars: [{ id: 'radar', state: 'failed' }], ms: 6000 },
     { name: 'idle-failed', chars: [{ id: 'trim' }], ms: 4000, at: [[800, 0, 'setState', 'failed']] },
@@ -98,6 +100,7 @@
     { name: 'hello-radar', chars: [{ id: 'radar', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'hello-trim', chars: [{ id: 'trim', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'hello-probe', chars: [{ id: 'probe', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
+    { name: 'hello-bard', chars: [{ id: 'bard', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'box', chars: [{ id: 'sift', state: 'box' }], ms: 2500 },
     {
       name: 'activation',

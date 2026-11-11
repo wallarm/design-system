@@ -455,7 +455,7 @@ export class Character implements LiveChar {
       this.cov = null;
     }
     const veil = this.svg.querySelector('[data-part~="veil"]');
-    // clipped prop deco (Mend's seam) sits over the crown; off, the ghost's order is back
+    // clipped prop deco (Acquit's seam) sits over the crown; off, the ghost's order is back
     if (veil)
       this.fig.insertBefore(
         veil,

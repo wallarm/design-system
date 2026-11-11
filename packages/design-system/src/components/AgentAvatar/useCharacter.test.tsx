@@ -54,7 +54,7 @@ describe('AgentAvatar live', () => {
     const onBeatEnd = (b: string) => void ended.push(b);
     const { container } = render(
       <AgentAvatar
-        agent='mend'
+        agent='acquit'
         seed='m1'
         size={72}
         live
@@ -163,7 +163,7 @@ describe('AgentAvatar live', () => {
     const ended: string[] = [];
     const onBeatEnd = (b: string) => void ended.push(b);
     const { container } = render(
-      <AgentAvatar agent='probe' seed='p1' size={48} handleRef={handle} onBeatEnd={onBeatEnd} />,
+      <AgentAvatar agent='lens' seed='p1' size={48} handleRef={handle} onBeatEnd={onBeatEnd} />,
     );
     act(() => handle.current?.play('hello'));
     expect(stateOf(container)).toBe('hello');
@@ -184,7 +184,7 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
         <AgentAvatar agent='wally' seed='b' size={72} live />
         <AgentAvatar agent='trim' seed='c' size={72} live />
         <AgentAvatar agent='sift' seed='d' size={120} live />
-        <AgentAvatar agent='probe' seed='e' size={120} live />
+        <AgentAvatar agent='lens' seed='e' size={120} live />
       </AgentAvatarGroup>,
     );
     const rt = getRuntime();
@@ -217,7 +217,7 @@ describe('AgentAvatar idle life, setup states and coverage (WDS-202)', () => {
     const cueRef = createRef<HTMLButtonElement>();
     const Inviting = () => (
       <div>
-        <AgentAvatar agent='mend' seed='i1' size={72} live state='invite' cueRef={cueRef} />
+        <AgentAvatar agent='acquit' seed='i1' size={72} live state='invite' cueRef={cueRef} />
         <AgentAvatar agent='sift' seed='i2' size={72} live state='invite' cueRef={cueRef} />
         <button ref={cueRef} type='button'>
           Set up
@@ -415,7 +415,7 @@ describe('AgentAvatar live engine review fixes', () => {
     const ended: string[] = [];
     const onBeatEnd = (b: string) => void ended.push(b);
     render(
-      <AgentAvatar agent='mend' seed='d2' size={72} live state='done' onBeatEnd={onBeatEnd} />,
+      <AgentAvatar agent='acquit' seed='d2' size={72} live state='done' onBeatEnd={onBeatEnd} />,
     );
     render(
       <AgentAvatar agent='wally' seed='h2' size={72} live state='hello' onBeatEnd={onBeatEnd} />,
@@ -511,7 +511,7 @@ describe('AgentAvatar live engine review fixes', () => {
       const onBeatEnd = (b: string) => void ended.push(b);
       const { unmount } = render(
         <AgentAvatar
-          agent='mend'
+          agent='acquit'
           seed='x1'
           size={72}
           live

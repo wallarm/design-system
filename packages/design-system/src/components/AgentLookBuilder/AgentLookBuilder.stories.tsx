@@ -29,7 +29,7 @@ import {
 
 const DESCRIPTION = [
   'The builder entry: everything a product needs to let admins pick an agent’s look. It holds the kit with display names (`AGENT_SHAPES`, `AGENT_COLORS`, `AGENT_EYES`, `AGENT_PROPS`), `lookIssues` for the combinations to avoid and `defaultLook` for a first look.',
-  '`enableAgentLookLibrary()` loads the full prop library. Any app that renders stored custom looks calls it once at start-up — the cards, rows and tables that show them, not only the picker. Without it `AgentAvatar` and `AgentGlyph` draw only the six presets’ props, and any other prop is left out with a warning in development. Mounted glyphs pick it up on their next render; a mounted 3D character keeps what it drew until its look changes or it remounts, so call it before the first render.',
+  '`enableAgentLookLibrary()` loads the full prop library. Any app that renders stored custom looks calls it once at start-up — the cards, rows and tables that show them, not only the picker. Without it `AgentAvatar` and `AgentGlyph` draw only the presets’ props, and any other prop is left out with a warning in development. Mounted glyphs pick it up on their next render; a mounted 3D character keeps what it drew until its look changes or it remounts, so call it before the first render.',
   'It ships no picker UI; the stories build one from DS `Select`s. `lookIssues` only warns, never blocks; coral is Wally’s and is not offered.',
 ].join(' ');
 

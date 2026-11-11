@@ -30,12 +30,12 @@ import {
   TONE,
 } from '../data.gen';
 
-describe('agent character data (look v14)', () => {
+describe('agent character data (look v17)', () => {
   it('has the kit sizes', () => {
     expect(SHAPES).toHaveLength(12);
     expect(COLORS).toHaveLength(22);
-    expect(PROPS).toHaveLength(16);
-    expect(CAST).toHaveLength(6);
+    expect(PROPS).toHaveLength(17);
+    expect(CAST).toHaveLength(7);
     expect(STATES.map(s => s.key)).toEqual([
       'idle',
       'hello',
@@ -66,7 +66,33 @@ describe('agent character data (look v14)', () => {
       eyes: 'oval',
       prop: 'windkey',
     });
-    expect(CAST.map(p => p.id)).toEqual(cast.presets.map(p => p.id));
+    expect(CAST.find(p => p.id === 'bard')).toMatchObject({
+      shape: 'cloud',
+      color: 'powder',
+      eyes: 'oval',
+      prop: 'quill',
+    });
+  });
+
+  it("ships the cast as of 10.11: Acquit with Mend's look, Lens and Bard, no Probe (WDS-205)", () => {
+    expect(CAST.map(p => p.id)).toEqual([
+      'wally',
+      'radar',
+      'sift',
+      'acquit',
+      'trim',
+      'lens',
+      'bard',
+    ]);
+    const mend = cast.presets.find(p => p.id === 'mend');
+    expect(CAST.find(p => p.id === 'acquit')).toMatchObject({
+      name: 'Acquit',
+      role: mend?.role,
+      shape: mend?.shape,
+      color: mend?.color,
+      eyes: mend?.eyes,
+      prop: mend?.prop,
+    });
   });
 
   it('carries tones, hard tones, eye bases, springs, glyph props and optY', () => {
@@ -76,6 +102,7 @@ describe('agent character data (look v14)', () => {
     expect(SPRINGS.P_SHAPE).toEqual({ T: 0.28, zeta: 0.8 });
     expect(GLYPH_PROPS.has('antennae')).toBe(true);
     expect(GLYPH_PROPS.has('glasses')).toBe(false);
+    expect(GLYPH_PROPS.has('quill')).toBe(true);
     expect(OPTY.dome).toBe(optical.shapes.dome.optY);
   });
 
@@ -93,14 +120,15 @@ describe('agent character data (look v14)', () => {
     expect(ids).toEqual(['kettle', 'cyan', 'none']);
   });
 
-  it('carries each preset template id (null for Wally and Probe)', () => {
+  it('carries each preset template id (null for Wally and agents without a template yet)', () => {
     expect(Object.fromEntries(CAST.map(p => [p.id, p.templateId]))).toEqual({
       wally: null,
       radar: 'attack-anomaly-investigation',
       sift: 'fp-marking',
-      mend: 'fp-resolver',
+      acquit: 'fp-resolver',
       trim: 'ruleset-optimizer',
-      probe: null,
+      lens: null,
+      bard: null,
     });
   });
 

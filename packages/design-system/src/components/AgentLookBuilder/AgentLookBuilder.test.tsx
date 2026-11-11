@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import { render } from '@testing-library/react';
-import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-v14.json';
+import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-v17.json';
 import { normalise } from '../../lib/agent-characters/__tests__/normaliseSvg';
 import { charTree } from '../../lib/agent-characters/char';
 import { glyph } from '../../lib/agent-characters/glyph';
@@ -55,7 +55,7 @@ describe('AgentLookBuilder kit', () => {
     expect(AGENT_COLORS.find(c => c.id === 'cyan')?.name).toBe('teal');
     expect(AGENT_COLORS.filter(c => c.brand).map(c => c.id)).toEqual(['coral']);
     expect(AGENT_EYES.map(e => e.id)).toEqual(['round', 'oval', 'tall', 'sleepy']);
-    expect(AGENT_PROPS).toHaveLength(16);
+    expect(AGENT_PROPS).toHaveLength(17);
     expect(AGENT_PROPS.find(p => p.id === 'antennae')).toEqual({
       id: 'antennae',
       name: expect.any(String),
@@ -112,7 +112,7 @@ describe('enableAgentLookLibrary', () => {
   });
 });
 
-describe('AgentLookBuilder parity with the reference builder (look v14)', () => {
+describe('AgentLookBuilder parity with the reference builder (look v17)', () => {
   beforeAll(() => enableAgentLookLibrary());
   afterAll(() => setPropLibrary(null));
 

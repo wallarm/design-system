@@ -10,7 +10,7 @@ import { glyph } from '../glyph';
 const r4 = (o: Record<string, number>) =>
   Object.fromEntries(Object.entries(o).map(([k, v]) => [k, Math.round(v * 1e4) / 1e4]));
 
-describe('derived values (look v14 data)', () => {
+describe('derived values (look v17 data)', () => {
   it('per-colour derivations', () => {
     const by = colorsJson.derived.byColor as Record<string, Record<string, string | number>>;
     for (const [id, d] of Object.entries(by)) {
