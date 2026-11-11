@@ -65,8 +65,8 @@ export interface RenderPlugins {
 export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: GameEngineHost) {
   // Pre-allocated arrays for per-frame anomaly envelope/visibility pre-computation.
   // Avoids allocating new arrays every frame.
-  let envCache: number[] = [];
-  let revealedCache: boolean[] = [];
+  const envCache: number[] = [];
+  const revealedCache: boolean[] = [];
   let plugins: RenderPlugins = {};
 
   function drawGameDots(t: number): void {
@@ -95,8 +95,8 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     // Pre-compute envelope and revealed flag per anomaly once per frame,
     // saving ~120k Math.sin calls/frame when many dots x anomalies.
     if (envCache.length < aLen) {
-      envCache = new Array(aLen);
-      revealedCache = new Array(aLen);
+      envCache.length = aLen;
+      revealedCache.length = aLen;
     }
     for (let i = 0; i < aLen; i++) {
       const anomaly = liveAnomalies[i]!;

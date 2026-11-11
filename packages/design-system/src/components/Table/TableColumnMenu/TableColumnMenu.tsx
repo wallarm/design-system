@@ -28,7 +28,6 @@ import { TableColumnMenuHideItem } from './TableColumnMenuHideItem';
 import { TableColumnMenuMoveLeftItem } from './TableColumnMenuMoveLeftItem';
 import { TableColumnMenuMoveRightItem } from './TableColumnMenuMoveRightItem';
 import { TableColumnMenuPinItem } from './TableColumnMenuPinItem';
-import { TableColumnMenuSortItem } from './TableColumnMenuSortItem';
 
 interface TableColumnMenuContextValue {
   column: Column<DSTableFeatures, RowData>;

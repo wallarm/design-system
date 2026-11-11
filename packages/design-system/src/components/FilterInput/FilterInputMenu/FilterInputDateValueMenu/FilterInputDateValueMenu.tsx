@@ -98,7 +98,8 @@ export const FilterInputDateValueMenu: FC<FilterInputDateValueMenuProps> = ({
           if (e.key === 'Escape') {
             e.preventDefault();
             e.stopPropagation();
-            onEscape ? onEscape() : onOpenChange?.(false);
+            if (onEscape) onEscape();
+            else onOpenChange?.(false);
           }
         }}
       >

@@ -12,7 +12,6 @@ import {
   Ellipsis,
   Filter,
   FilterX,
-  Lock,
   Plus,
   SearchX,
   Shield,
