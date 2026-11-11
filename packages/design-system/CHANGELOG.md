@@ -1,3 +1,9 @@
+## [4.12.4](https://github.com/wallarm/design-system/compare/v4.12.3...v4.12.4) (2026-11-11)
+
+### Bug Fixes
+
+* **claude-design:** escape raw SVG data URIs that block public sharing ([#465](https://github.com/wallarm/design-system/issues/465)) ([350ec92](https://github.com/wallarm/design-system/commit/350ec927b5d9f6f7f1c4739a75132a203cce09e7))
+
 ## [4.12.3](https://github.com/wallarm/design-system/compare/v4.12.2...v4.12.3) (2026-11-10)
 
 ### Bug Fixes
