@@ -32,6 +32,7 @@ export const useGameKeyboard = (
   useEffect(() => {
     if (!game || !armed || roundOver) return;
 
+    const engine = engineRef.current;
     const held = { left: false, right: false };
 
     function updateDir() {
@@ -75,8 +76,8 @@ export const useGameKeyboard = (
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
-      engineRef.current?.setFiring(false);
-      engineRef.current?.setCannonDir(0);
+      engine?.setFiring(false);
+      engine?.setCannonDir(0);
     };
   }, [game, armed, roundOver, engineRef, handleCommonKey]);
 

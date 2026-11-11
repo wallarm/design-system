@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useLayoutEffect, type FC } from 'react';
 
 import { useTestId } from '../../../utils/testId';
 import { TABLE_PREPEND_SKELETON_ROWS } from '../lib';
@@ -17,6 +17,14 @@ export const TableBody: FC = () => {
   const rows = table.getRowModel().rows;
   const hasData = rows.length > 0;
 
+  // Non-virtualized render path (also: empty-data fallback for virtualized
+  // tables) — clear the virtualizer handle so `scrollToRow` falls back to
+  // DOM lookup via `data-row-id`.
+
+  useLayoutEffect(() => {
+    if (!virtualized || !hasData) virtualizerRef.current = null;
+  }, [virtualized, hasData, virtualizerRef]);
+
   if (virtualized && hasData) {
     if (virtualized === 'window') {
       return <TableBodyVirtualizedWindow />;
@@ -24,11 +32,6 @@ export const TableBody: FC = () => {
 
     return <TableBodyVirtualizedContainer />;
   }
-
-  // Non-virtualized render path (also: empty-data fallback for virtualized
-  // tables) — clear the virtualizer handle so `scrollToRow` falls back to
-  // DOM lookup via `data-row-id`.
-  virtualizerRef.current = null;
 
   return (
     <TableBodyRowDndContext>

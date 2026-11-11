@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type HTMLAttributes,
   type ReactElement,
   type Ref,
@@ -91,7 +92,9 @@ export function AreaChart<T extends LineChartDatum = LineChartDatum>({
   });
 
   const onZoomChangeRef = useRef(onZoomChange);
-  onZoomChangeRef.current = onZoomChange;
+  useLayoutEffect(() => {
+    onZoomChangeRef.current = onZoomChange;
+  });
   const emitZoom = useCallback((range: LineChartZoomRange | null) => {
     onZoomChangeRef.current?.(range);
   }, []);

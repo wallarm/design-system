@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type ComponentPropsWithoutRef,
   type DragEvent,
   type FC,
@@ -225,7 +226,9 @@ export const FileUpload: FC<FileUploadProps> = ({
     onFileAccept: handleAccept,
     onFileReject: handleReject,
   });
-  apiRef.current = api;
+  useLayoutEffect(() => {
+    apiRef.current = api;
+  });
 
   // zag writes the hidden input only when the list changes (its tracker skips the first run),
   // so files held from mount (`defaultValue` / `value`) would never be submitted with the form.

@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, useCallback, useEffect, useRef } from 'react';
+import { useLayoutEffect, type FC, type ReactNode, useCallback, useEffect, useRef } from 'react';
 
 import { Dialog } from '@ark-ui/react/dialog';
 
@@ -20,10 +20,14 @@ export const SearchModal: FC<SearchModalProps> = ({
   'data-testid': testId,
 }) => {
   const onOpenChangeRef = useRef(onOpenChange);
-  onOpenChangeRef.current = onOpenChange;
+  useLayoutEffect(() => {
+    onOpenChangeRef.current = onOpenChange;
+  });
 
   const openRef = useRef(open);
-  openRef.current = open;
+  useLayoutEffect(() => {
+    openRef.current = open;
+  });
 
   const handleOpenChange = useCallback(({ open }: Dialog.OpenChangeDetails) => {
     onOpenChangeRef.current?.(open);

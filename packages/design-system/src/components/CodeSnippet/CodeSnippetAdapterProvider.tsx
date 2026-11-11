@@ -35,6 +35,7 @@ export function CodeSnippetAdapterProvider<TLanguage extends string>({
 
   useEffect(() => {
     if (typeof adapter !== 'function') {
+      // oxlint-disable-next-line react/set-state-in-effect -- Keep the last resolved adapter while switching between synchronous adapters and async loaders.
       setResolvedAdapter(adapter);
       return;
     }

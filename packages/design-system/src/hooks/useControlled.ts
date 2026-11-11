@@ -18,6 +18,8 @@ export const useControlled = <T = unknown>(
 
   const { current: isControlled } = useRef<boolean>(controlled !== undefined);
   const [valueState, setValue] = useState<T | undefined>(defaultProp);
+  // Mode is captured once at mount and never mutated; it is not reactive ref state.
+  // oxlint-disable-next-line react/refs -- Preserve the frozen controlled/uncontrolled contract.
   const value = isControlled ? controlled : valueState;
 
   const setValueIfUncontrolled = useCallback((newValue: T | undefined) => {

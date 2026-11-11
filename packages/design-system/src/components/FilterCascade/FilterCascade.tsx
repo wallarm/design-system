@@ -1,4 +1,5 @@
 import {
+  useLayoutEffect,
   type HTMLAttributes,
   type ReactNode,
   useEffect,
@@ -156,7 +157,9 @@ export const FilterCascade = <T,>({
     loadChildren(node.data, node.path).then(set, (error: unknown) => set({ error }));
   };
   const loadRef = useRef(load);
-  loadRef.current = load;
+  useLayoutEffect(() => {
+    loadRef.current = load;
+  });
 
   // A picked path that runs through lazy levels loads them, so the trigger can name every segment.
   useEffect(() => {

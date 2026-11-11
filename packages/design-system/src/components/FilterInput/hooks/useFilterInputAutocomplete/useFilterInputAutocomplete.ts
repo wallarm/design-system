@@ -289,7 +289,7 @@ export const useFilterInputAutocomplete = ({
       if (tryResumeBuilding(chipId, segment, 0)) return;
       editing.handleChipClick(chipId, segment, anchorEl);
     },
-    [tryResumeBuilding, editing.handleChipClick],
+    [tryResumeBuilding, editing],
   );
 
   const handlePairChipClick = useCallback(
@@ -297,7 +297,7 @@ export const useFilterInputAutocomplete = ({
       if (tryResumeBuilding(chipId, segment, 1)) return;
       editing.handlePairChipClick(chipId, segment, anchorEl);
     },
-    [tryResumeBuilding, editing.handlePairChipClick],
+    [tryResumeBuilding, editing],
   );
 
   const { isBuilding, buildingChipData, editingMultiValues, editingSingleValue, editingDateRange } =

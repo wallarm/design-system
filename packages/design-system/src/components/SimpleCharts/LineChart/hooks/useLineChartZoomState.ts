@@ -176,6 +176,7 @@ export const useLineChartZoomState = ({
   // data/xKey are triggers, not read inside
   useEffect(() => {
     cancelScheduledFlush();
+    // oxlint-disable-next-line react/set-state-in-effect -- Dataset replacement cancels the external rAF drag session before clearing its pending UI state.
     setZoomDrag(null);
     setZoomPending(null);
   }, [data, xKey, cancelScheduledFlush]);

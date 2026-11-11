@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useLayoutEffect, useCallback, useEffect, useRef } from 'react';
 
 import { useControlled } from '../../../../hooks';
 import type { LineChartSeries } from '../LineChartContext';
@@ -27,7 +27,7 @@ interface UseLineChartActiveKeyResult {
  * 2. The setter dedupes against a ref so per-pixel hover events don't keep
  *    firing the callback after `useState` already bailed out.
  *
- * Refs are synced during render so parent-driven external resets flow through
+ * Refs are synced after commit so parent-driven external resets flow through
  * without a stale comparison.
  */
 export const useLineChartActiveKey = ({
@@ -62,15 +62,19 @@ export const useLineChartActiveKey = ({
 
   // Dedupe per-pixel mousemove/hover events so consumer callbacks don't fire
   // with the same value frame after frame (useState bails out, callbacks don't).
-  // Refs are synced during render so parent-driven external resets flow through.
+  // Refs are synced after commit so parent-driven external resets flow through.
   const lastActiveKeyRef = useRef<string | null | undefined>(undefined);
-  lastActiveKeyRef.current = activeKey;
+  useLayoutEffect(() => {
+    lastActiveKeyRef.current = activeKey;
+  });
   // Consumer callback held behind a ref so `setActiveKey` stays referentially
   // stable. Without this, an inline `onActiveKeyChange` from the caller
   // invalidates `setActiveKey`, which cascades into `LineChartDataContext`
   // and re-renders every chart consumer on every parent render.
   const onActiveKeyChangeRef = useRef(onActiveKeyChange);
-  onActiveKeyChangeRef.current = onActiveKeyChange;
+  useLayoutEffect(() => {
+    onActiveKeyChangeRef.current = onActiveKeyChange;
+  });
   const setActiveKey = useCallback(
     (key: string | null) => {
       if (lastActiveKeyRef.current === key) return;

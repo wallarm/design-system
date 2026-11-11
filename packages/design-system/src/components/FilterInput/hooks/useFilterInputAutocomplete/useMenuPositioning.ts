@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useRef, useState } from 'react';
+import { useLayoutEffect, type RefObject, useCallback, useRef, useState } from 'react';
 
 import {
   type AnchorBounds,
@@ -57,15 +57,18 @@ export const useMenuPositioning = ({
   const resetMenuAnchor = useCallback(() => setMenuAnchor(null), []);
 
   useAutoCleanupDetachedElement(editingEl, resetMenuAnchor);
-  useFloatingRecomputeOn(chipsCount, isMenuOpen);
 
-  const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
+  const tick = useResizeTracker(editingEl, isBuilding ? buildingChipRef : null, containerRef);
 
   // Ark UI / zag.js captures `getAnchorRect` on first menu attach and reuses
   // it across repositions — closures of reactive state would go stale.
   // Read everything dynamic through this ref so the function stays stable.
   const anchorStateRef = useRef({ editingEl, isBuilding, chipsCount });
-  anchorStateRef.current = { editingEl, isBuilding, chipsCount };
+  useLayoutEffect(() => {
+    anchorStateRef.current = { editingEl, isBuilding, chipsCount };
+  });
+  // Publish the committed anchor before the resize notification reads it.
+  useFloatingRecomputeOn(chipsCount, isMenuOpen);
 
   // MENU_CHIP_GUTTER_OFFSET added to anchor.bottom in the chip-anchored
   // branches: positioning.gutter alone can't switch reactively (Ark UI captures

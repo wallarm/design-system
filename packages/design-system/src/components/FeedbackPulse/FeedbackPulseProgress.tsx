@@ -1,5 +1,5 @@
 // FeedbackPulseProgress.tsx  — mirrors Toast/ToastProgress, decoupled from the toast DOM scope.
-import { type FC, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, type FC, useEffect, useRef, useState } from 'react';
 
 import { cn } from '../../utils/cn';
 
@@ -22,8 +22,12 @@ export const FeedbackPulseProgress: FC<FeedbackPulseProgressProps> = ({
   const rafRef = useRef(0);
   const pausedRef = useRef(paused);
   const onCompleteRef = useRef(onComplete);
-  pausedRef.current = paused;
-  onCompleteRef.current = onComplete;
+  useLayoutEffect(() => {
+    pausedRef.current = paused;
+  });
+  useLayoutEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   useEffect(() => {
     lastTickRef.current = performance.now();

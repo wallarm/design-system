@@ -63,6 +63,7 @@ export const useValueMenuDisplayValues = ({
       const filteredSet = new Set(filteredValues.map(v => String(v.value)));
       const orphaned = selectedList
         .filter(v => !filteredSet.has(String(v)))
+        // oxlint-disable-next-line react/refs -- Read committed option history only for absent selections; current values and selection invalidate this calculation.
         .map(v => {
           const key = String(v);
           return (
@@ -76,6 +77,7 @@ export const useValueMenuDisplayValues = ({
 
     // Single-select: pin the selected item at the top.
     const selectedSet = new Set(selectedList.map(String));
+    // oxlint-disable-next-line react/refs -- Historical labels are effect-owned fallbacks; current values take precedence (covered by useValueMenuDisplayValues.test).
     const selectedItems = selectedList.map(v => {
       const key = String(v);
       const match = values.find(opt => String(opt.value) === key);

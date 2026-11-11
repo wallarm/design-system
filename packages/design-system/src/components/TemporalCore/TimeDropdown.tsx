@@ -122,9 +122,11 @@ export const TimeDropdown: FC<TimeDropdownProps> = ({
   const selectedItemRef = useRef<HTMLButtonElement>(null);
 
   // Update selected index when value or options change
-  useEffect(() => {
+  const [previousSelection, setPreviousSelection] = useState({ value, timeStep });
+  if (previousSelection.value !== value || previousSelection.timeStep !== timeStep) {
+    setPreviousSelection({ value, timeStep });
     setSelectedIndex(findClosestIndex(allOptions, value));
-  }, [value, allOptions]);
+  }
 
   // Scroll to selected item when dropdown opens
   useEffect(() => {

@@ -187,6 +187,7 @@ export const useFilterInputExpression = ({
         connectors: result.connectors,
       };
       stateRef.current = next;
+      // oxlint-disable-next-line react/set-state-in-effect -- Controlled reconciliation follows the committed consumer value; event handlers use stateRef for synchronous optimistic edits.
       setState(next);
     }
   }, [value, fields]);

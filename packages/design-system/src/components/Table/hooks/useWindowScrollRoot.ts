@@ -35,7 +35,9 @@ export const useWindowScrollRoot = (
   const scrollRootRef = useRef<ScrollRoot | null>(scrollRoot);
   const [isSettled, setIsSettled] = useState(false);
   const hasRowsRef = useRef(hasRows);
-  hasRowsRef.current = hasRows;
+  useLayoutEffect(() => {
+    hasRowsRef.current = hasRows;
+  });
   const trySettleRef = useRef<(() => void) | null>(null);
 
   useLayoutEffect(() => {

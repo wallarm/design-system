@@ -11,6 +11,8 @@ import {
   useState,
 } from 'react';
 
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
+
 import { TooltipTrigger } from '../Tooltip';
 import { useOverflowTooltip } from './OverflowTooltipContext';
 
@@ -72,39 +74,21 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
     };
   }, [activated, setIsOverflowing]);
 
-  const setRefs = (node: HTMLElement) => {
-    containerRef.current = node;
-    // Forward ref if provided
-    if (ref) {
-      if (typeof ref === 'function') {
-        ref(node);
-      } else {
-        (ref as { current: HTMLElement | null }).current = node;
-      }
-    }
-    // Preserve original ref if it exists
-    const originalRef = (children as ComponentPropsWithRef<any>).ref;
-    if (originalRef) {
-      if (typeof originalRef === 'function') {
-        originalRef(node);
-      } else {
-        originalRef.current = node;
-      }
-    }
-  };
+  const child = children as ReactElement<ComponentPropsWithRef<'span'>>;
+  const setRefs = useComposedRefs(containerRef, ref, child.props.ref);
 
   const mergePointerEnter = useCallback(
-    (e: any) => {
+    (e: React.PointerEvent<HTMLSpanElement>) => {
       handlePointerEnter();
-      (children as ComponentPropsWithRef<any>).props?.onPointerEnter?.(e);
+      child.props.onPointerEnter?.(e);
     },
-    [handlePointerEnter, children],
+    [handlePointerEnter, child],
   );
 
   return (
     <TooltipTrigger asChild={asChild}>
       {isValidElement(children)
-        ? cloneElement<ComponentPropsWithRef<any>>(children, {
+        ? cloneElement<ComponentPropsWithRef<'span'>>(child, {
             ref: setRefs,
             onPointerEnter: mergePointerEnter,
           })

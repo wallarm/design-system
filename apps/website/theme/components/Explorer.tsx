@@ -68,6 +68,7 @@ function Anatomy({ load, name }: ExplorerProps) {
   // Re-measure on every rescan (`slots` is a fresh array each time) so outlines follow the DOM.
   useEffect(() => {
     if (!active || !slots.includes(active)) {
+      // oxlint-disable-next-line react/set-state-in-effect -- Outlines are measurements of committed DOM; clear the previous measurement when no slot is active.
       setBoxes([]);
       return;
     }
