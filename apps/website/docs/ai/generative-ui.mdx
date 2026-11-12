@@ -1,0 +1,365 @@
+---
+description: Let an AI agent answer with design-system components instead of text, streamed as A2UI, json-render or OpenUI. Try it live on the page.
+---
+
+# Generative UI
+
+An agent can answer with an interface instead of text. Pick a prompt and watch it build:
+
+<GenUiPlayground compact />
+
+What you just watched:
+
+- **The agent only names components.** It streams JSON that places components from a catalog the
+  app registered (`Metric`, `LineChart`, `Table`…) and never sends code, HTML or styles.
+- **The app fills in the numbers.** Every figure in the layout is a binding to a path, and the app
+  writes those paths from its own API, so the model has no figure to invent.
+- **The page builds up while it streams.** A part that hasn't arrived, or whose data hasn't, holds a
+  skeleton shaped like the component.
+- **One catalog, every format.** The same answer streams as [A2UI](https://a2ui.org) v1.0 messages,
+  [json-render](https://json-render.dev) patches or [OpenUI](https://www.openui.com) Lang; switch
+  the format and it repaints the same.
+
+Open **Stream** to read every line the agent and the app sent, or try the
+[Generative UI playground](/ai/generative-ui-playground) for a full-width view and answers inside the
+Wally chat.
+
+`@wallarm-org/gen-ui` is that catalog: each component is defined once, and the A2UI and json-render
+catalogs and the OpenUI library are derived from the definition. An answer drops into the Wally chat as a custom part, so
+the chat itself needs no changes.
+
+:::warning Experimental
+`@wallarm-org/gen-ui` is on npm, but experimental: its API, the component set and the supported
+formats will change. The format
+libraries are young, so their versions are pinned exactly.
+:::
+
+## Install
+
+```bash
+pnpm add @wallarm-org/gen-ui
+```
+
+It renders with the design system you already have: `@wallarm-org/design-system` (4.14 or later),
+React 19 and zod 4 are peer dependencies. Import only the format you use: `@wallarm-org/gen-ui/a2ui`,
+`/a2ui/express`, `/json-render` or `/openui`, plus `/a2ui/prompt` on the server.
+
+## How it works
+
+```text
+defineComponent(...)          one definition per component: zod props, events, a data-only View
+  ├─ createA2uiCatalog()      → A2UI v1.0 catalog   → <A2uiSurfaces messages={...} />
+  └─ createJsonRenderCatalog() → json-render catalog → <JsonRenderSurface spec={...} />
+                                          ↓
+              WallyAssistant renderPart: a custom part of kind 'wallarm.gen-ui'
+```
+
+1. The agent is prompted with the catalog: `catalog.toJson()` for A2UI, `catalog.prompt()` for
+   json-render.
+2. It streams its answer: A2UI messages (`createSurface`, `updateComponents`, `updateDataModel`) or
+   json-render patches, one JSON line at a time.
+3. The app folds the lines into a custom chat part and returns a surface from `renderPart`. The
+   surface renders what has arrived so far, so the answer builds up while it streams.
+4. A button in the answer fires an action. The app receives its name and parameters and decides what
+   happens; side effects still go through an approval card.
+
+## Define a component
+
+A definition holds what the model reads (name, description, props schema) and how the component is
+drawn (`View`). The View receives plain data: every binding to the data model is already resolved.
+
+```tsx
+import { defineComponent, subsetOf } from '@wallarm-org/gen-ui';
+import { Badge, type BadgeColor } from '@wallarm-org/design-system/Badge';
+import { z } from 'zod';
+
+export const BadgeComponent = defineComponent({
+  name: 'Badge',
+  description: 'A short status label, e.g. a severity or an attack type.',
+  props: z.object({
+    text: z.string(),
+    color: z.enum(subsetOf<BadgeColor>()(['slate', 'red', 'amber', 'green', 'blue'])).optional(),
+  }),
+  View: ({ props }) => (
+    <Badge type='secondary' color={props.color ?? 'slate'}>
+      {props.text}
+    </Badge>
+  ),
+});
+```
+
+A definition stays portable between the formats when it follows these rules:
+
+- Props are strings, numbers, booleans, enums, arrays and objects: no functions, no `ReactNode`.
+- No prop is named `id`, `component`, `children` or `child`: A2UI puts props next to those keys.
+- Events carry no arguments (`events: ['press']`, then `emit('press')`). The spec decides what an
+  action sends, never the component.
+- A container sets `hasChildren: true` and renders `children`.
+- Write the description for the model: when to use the component, not how it looks.
+- Numbers and times take a named format (`format: 'compact'`, `xFormat: 'time'`), never a
+  formatter function: one registry serves Metric, the charts and Table.
+
+The catalog, `wallarmComponents`, has:
+
+| Group | Entries |
+| --- | --- |
+| Layout | Section, Grid, GridItem, Stack, Card |
+| Text and status | Heading, Text, Badge, Alert |
+| Actions | Button |
+| Charts | Metric (with a sparkline), BarList, PieChart, HorizontalBarStack, LineChart, AreaChart, ColumnChart |
+| Data | Table (read-only: typed cells for IPs, methods, status codes, dates, numbers and code) |
+
+The time-series charts share one data shape: `series: [{ key, label, color }]` and
+`points: [{ x, <key>: number }]`, one point per moment.
+
+### Keep the catalog in step with the design system
+
+The catalog offers a component's values (colours, variants, sizes), so it would drift if it typed
+them again. It takes them from the design system's own types instead:
+
+- `subsetOf<BadgeColor>()([...])` offers some of the values. A value the design system renames or
+  removes fails typecheck.
+- `allOf<Values<MetricDeltaProps['sentiment']>>()([...])` offers all of them, and also fails
+  typecheck, with `{ missing: 'neutral' }`, when the design system adds one.
+- A mapping from a catalog value to a design-system value is a typed record, so each target is
+  checked too.
+
+A test fails on any `as` cast in a definition, so a cast can't hide a value the design system no
+longer has. The descriptions for the model, the choice of values and the flattened Views stay
+hand-written: they are decisions, not copies.
+
+## Render an answer in the chat
+
+Create the catalogs once, at module scope, and render the surface from `renderPart`. Hooks belong in
+the surface components, not in `renderPart`.
+
+```tsx
+import { WallyAssistant } from '@wallarm-org/design-system/WallyAssistant';
+import { wallarmComponents } from '@wallarm-org/gen-ui';
+import { A2uiSurfaces, createA2uiCatalog } from '@wallarm-org/gen-ui/a2ui';
+
+const CATALOG = createA2uiCatalog(wallarmComponents);
+const ACTIONS = [{ name: 'block_ips', description: 'Block source IPs after approval.' }];
+
+const renderPart = (part, ctx) =>
+  part.type === 'custom' && part.kind === 'wallarm.gen-ui' ? (
+    <A2uiSurfaces
+      catalog={CATALOG}
+      messages={part.data.lines}
+      actions={ACTIONS}
+      onAction={handleAction}
+    />
+  ) : undefined;
+
+<WallyAssistant {...snapshot} renderPart={renderPart} onSubmit={send} />;
+```
+
+For json-render, the same part renders with `JsonRenderSurface`:
+
+```tsx
+import {
+  createJsonRenderCatalog,
+  JsonRenderSurface,
+  specFromLines,
+} from '@wallarm-org/gen-ui/json-render';
+
+const CATALOG = createJsonRenderCatalog(wallarmComponents, ACTIONS);
+
+<JsonRenderSurface
+  catalog={CATALOG}
+  spec={specFromLines(part.data.lines)}
+  streaming={ctx.streaming}
+  onAction={handleAction}
+/>;
+```
+
+`messages` and `lines` hold everything that has arrived so far, in order. Pass the growing array on
+every snapshot: the surfaces process only what is new.
+
+## Connect a model
+
+The model, its keys, the server route and the data are the app's. The package gives the two ends
+that depend on the catalog: what to tell the model, and what to tell it back when its answer can't
+render.
+
+**The system prompt.** Build it from the same catalog the page renders with, then append your own
+instructions (for example, which data paths the app fills):
+
+```ts
+import { a2uiPrompt } from '@wallarm-org/gen-ui/a2ui/prompt';
+
+// The format's rules, a signature per component and the allowed actions.
+const prompt = a2uiPrompt(CATALOG, { actions: ACTIONS }); // format: 'express' (default) or 'json'
+```
+
+For json-render, `CATALOG.catalog.prompt()` already lists the components and the actions.
+
+**Feedback on a finished answer.** A mistake in the answer leaves a skeleton on the page for good.
+Once the answer is complete, check it and send the issues back as the model's next message; it
+resends only the components it got wrong:
+
+```ts
+import { describeIssues } from '@wallarm-org/gen-ui';
+import { checkA2uiAnswer } from '@wallarm-org/gen-ui/a2ui';
+
+const issues = checkA2uiAnswer(messages, { components: wallarmComponents, actions: ACTIONS });
+if (issues.length) send(describeIssues(issues));
+```
+
+`checkJsonRenderAnswer(spec, options)` does the same for json-render. Both report an unknown
+component, a prop its schema rejects, a child that was never sent, an action outside the allowlist
+and a missing root. A bound prop is never an issue, since its value is the app's.
+
+**Evals.** The same check scores a model or a prompt offline: run your prompts, check each answer,
+count the issues. With `boundFigures: true` it also flags every number written into a prop instead
+of bound, a figure the model may have made up. The playground shows the check under the stream once
+an answer is complete.
+
+## Dashboards
+
+An agent can lay out a whole page, not only a chat answer. The convention that keeps the page
+honest: **the agent sends the layout, the app sends the data.** Prompt the agent to bind every
+figure to a path (`{ "@path": "/kpi/attacks" }` in A2UI, `{ "$state": "/kpi/attacks" }` in
+json-render), and fill those paths from your own API (`updateDataModel` in A2UI, the spec's `state`
+in json-render). Then the model has no figure to invent, and the app refreshes the data without
+asking the agent again.
+
+The package doesn't enforce this split: every number prop also takes a literal, and a surface
+doesn't know which line came from the agent and which from the app. To make it a guarantee, drop
+the agent's own data writes (A2UI `updateDataModel` messages, json-render patches under `/state`)
+before you pass its stream in, and send data only from the app.
+
+Because the data is the app's, it can keep the page current after the answer: send new values for
+the paths the layout already binds, and the page updates with no agent call. The *Watch traffic
+live* prompt in the playground does this every 2 seconds.
+
+While the page streams, every part that isn't renderable yet holds a skeleton, so the layout keeps
+its shape and doesn't jump when the part arrives:
+
+- a child the agent named but hasn't sent yet holds a plain skeleton block, since its type isn't
+  known yet;
+- a component whose props don't match its schema yet holds its own skeleton, declared next to its
+  View (`Skeleton` in `defineComponent`): a chart card with its title and the design system's
+  `MetricSkeleton`, `BarListSkeleton` and the like. That is usually a binding whose data the app
+  hasn't sent; at the end of the stream it is a mistake in the answer, and the skeleton's tooltip
+  lists what failed. Every View renders only with props that pass its schema, so an invalid value
+  from the model holds a skeleton too.
+
+Widgets in one Grid row take the row's height, so tiles line up. Inside a stretched Metric tile the
+value sits at the bottom edge, as the design system lays it out.
+
+Use `Section` for each topic, `Grid` with 4 columns for KPI tiles and 2 or 3 for charts, and
+`GridItem` for a cell that spans columns.
+
+## Actions and safety
+
+Treat everything the agent sends as untrusted input.
+
+- **The catalog is the only vocabulary.** The agent can place only registered components, with
+  props that match their schema. No raw HTML, scripts or URLs reach the page.
+- **Actions are allowlisted.** `onAction` receives only the action names you pass in `actions`. Any
+  other name the agent uses is dropped with a console warning, in every format. For json-render that
+  includes its built-in actions (`setState`, `pushState`, `removeState`, `push`, `pop`,
+  `validateForm`) and `watch` bindings, and a binding's `confirm`, `onSuccess` and `onError` are
+  removed, so the library's own confirm dialog never opens.
+- **Side effects need approval.** A button only asks: the app shows an approval card with the
+  details and runs the action after the user confirms.
+- **Props are validated before rendering.** A component renders only with props that match its
+  schema; anything else holds a skeleton.
+- **A bad message stays contained.** A2UI messages that fail validation go to `onError` (a console
+  warning by default) instead of throwing. In json-render, `specFromLines` drops a patch it can't
+  apply and turns a value that isn't an element into a skeleton. In both, a component that still
+  fails to render blanks only its own surface, not the chat.
+
+## Choosing a format
+
+A2UI and json-render keep the components in a flat list keyed by id, bind props to a data model with
+JSON Pointer paths and stream one JSON line at a time; OpenUI streams one line of text per component.
+The differences:
+
+| | A2UI v1.0 | json-render | OpenUI |
+| --- | --- | --- | --- |
+| What it is | An open protocol led by Google, with renderers for several platforms | A TypeScript library from Vercel Labs | An open format and runtime from Thesys |
+| Catalog | A JSON Schema document (`catalog.toJson()`) | A zod catalog that also writes the system prompt (`catalog.prompt()`) | A zod library that writes the system prompt (`library.prompt()`) |
+| Binding | `{ "@path": "/stats/attacks" }` | `{ "$state": "/stats/attacks" }` | `$stats.attacks` |
+| Action | `{ "event": { "name", "context" } }` on a prop | `on: { press: { action, params } }` on the element | `@block_ips({…})` as an argument |
+| Stream | Messages: `createSurface`, `updateComponents`, `updateDataModel` | RFC 6902 JSON Patch lines | OpenUI Lang statements |
+| Packages | `@a2ui/react`, `@a2ui/web_core` 0.15 | `@json-render/core`, `@json-render/react` 0.22 | `@openuidev/react-lang` 1.1 |
+
+Because the definitions are shared, the choice can follow the agent stack: A2UI for agents that
+already speak A2A or AG-UI, json-render for agents built on the Vercel AI SDK, OpenUI for agents on
+Thesys's stack or when output tokens matter (A2UI Express is the compact form of A2UI).
+
+## A2UI Express
+
+[A2UI Express](https://github.com/a2ui-project/a2ui/tree/main/specification/proposals/express) is a
+compact text form of A2UI that a model writes instead of JSON, one statement per component:
+
+```text
+root = Grid("3", _, [attacks, blocked])
+attacks = Metric("Attacks", $/kpi/attacks, "compact")
+```
+
+Arguments follow the order of the entry's props, `_` skips one, and `$/path` is a binding. The
+official compiler in `@a2ui/agent` turns it into the same v1.0 messages, so rendering is unchanged;
+for the recorded answers the agent's part is about 40% shorter than the JSON. Express is still a
+proposal in the A2UI repository.
+
+```tsx
+import { ExpressSurfaces } from '@wallarm-org/gen-ui/a2ui/express';
+
+<ExpressSurfaces catalog={catalog} surfaceId='main' chunks={chunks} actions={actions} onAction={onAction} />
+```
+
+`chunks` is the text so far, in the pieces it arrived in; a block the compiler rejects goes to
+`onError` and the rest still renders.
+
+## Two versions of zod
+
+json-render needs zod 4, and the definitions are written in zod 4 like the rest of the repository.
+A2UI's `@a2ui/web_core` still depends on zod 3: its binder reads the structure of a schema to
+decide which props bind to data, which are actions and which hold children, and it reads zod 3
+internals to do so (`_def.typeName`, `ZodEffects`, `REF:` descriptions). It also builds the catalog
+document with `zod-to-json-schema`, which supports zod 3 only.
+
+So the package has both, kept apart:
+
+- The definitions stay in zod 4 and pass to json-render unchanged.
+- `toA2uiSchema` rewrites each props schema with the zod 3 API that zod 4 ships as `zod/v3`.
+  String, number and boolean props become A2UI's bindable `DynamicString`, `DynamicNumber` and
+  `DynamicBoolean`. Arrays and objects take a literal or one binding for the whole value.
+- This works because web_core recognises schemas by `_def.typeName` rather than `instanceof`, so a
+  schema from another copy of zod is accepted.
+
+Two costs remain. The TypeScript types of the two zod copies do not match, so the A2UI glue casts at
+that boundary. pnpm also warns `unmet peer zod@^3.25.76` for `@a2ui/react`. The rendering is covered
+by tests in both formats. Forcing one version with `pnpm.overrides` is not an option: web_core's
+binder would stop recognising the schemas. When A2UI moves to zod 4, `toA2uiSchema` reduces to
+swapping in the bindable leaf types, and the casts go away.
+
+## Limitations
+
+- Forms are not in the catalog yet: they need two-way bindings in the shared layer first.
+- Table is read-only: no sorting, selection, pagination or row actions yet.
+- In A2UI, a prop that binds to the data model loses its field description in the catalog document,
+  because the binder reads that description itself.
+- An array or object prop binds as a whole; its fields can't bind one by one.
+- Data-attribute forwarding for analytics is not wired through the catalog yet.
+- Size: A2UI with the catalog adds about 137K gzip to an app, json-render about 119K, OpenUI
+  about 132K and `/a2ui/express` about 176K, since it carries a parser. Compile Express on the server when you can.
+
+## Try it
+
+The playground has an emulated agent that streams the same answer in either format, with an
+approval flow behind its Block button:
+
+```bash
+pnpm turbo run build --filter=@wallarm-org/design-system   # the playground reads the built theme
+pnpm --filter @wallarm-org/playground dev
+```
+
+Then open `/gen-ui` for answers in the chat, or `/gen-ui-playground` for the replay playground
+that the [Generative UI playground](/ai/generative-ui-playground) page embeds: pick a prompt, and
+the stream shows beside the page, each line marked as the agent's layout or the app's data. The
+answers they replay are in `packages/gen-ui/src/fixtures/`; the package README maps where
+everything else lives.

@@ -35,6 +35,7 @@
     "@tanstack/react-router": "1.170.41",
     "@tanstack/router-devtools": "1.167.2",
     "@wallarm-org/design-system": "workspace:*",
+    "@wallarm-org/gen-ui": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",

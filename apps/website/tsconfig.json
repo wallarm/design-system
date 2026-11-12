@@ -8,5 +8,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx", "scripts"]
+  "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx", "scripts",
+    // The DS ambient module declarations its sources need (gen-ui's chat demo reaches CodeSnippet).
+    "../../packages/design-system/src/components/CodeSnippet/adapters/prismjs.d.ts"]
 }

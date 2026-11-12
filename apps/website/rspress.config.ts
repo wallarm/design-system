@@ -57,6 +57,7 @@ export default defineConfig({
       path.join(dir, 'theme/components/TokenTable.tsx'),
       path.join(dir, 'theme/components/TemplateGallery.tsx'),
       path.join(dir, 'theme/components/SectionOverview.tsx'),
+      path.join(dir, 'theme/components/GenUiPlayground.tsx'),
     ],
   },
   themeConfig: {

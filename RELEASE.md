@@ -1,6 +1,6 @@
 # 🚀 Release Process
 
-This project uses **semantic-release** for fully automated versioning and package publishing. Configuration: [`.releaserc.mjs`](./.releaserc.mjs) (design-system), [`packages/mcp/.releaserc.mjs`](./packages/mcp/.releaserc.mjs), [`packages/migrator/.releaserc.mjs`](./packages/migrator/.releaserc.mjs), all built on the shared [`packages/configs/publishing/releaserc.mjs`](./packages/configs/publishing/releaserc.mjs).
+This project uses **semantic-release** for fully automated versioning and package publishing. Configuration: [`.releaserc.mjs`](./.releaserc.mjs) (design-system), [`packages/mcp/.releaserc.mjs`](./packages/mcp/.releaserc.mjs), [`packages/migrator/.releaserc.mjs`](./packages/migrator/.releaserc.mjs), [`packages/gen-ui/.releaserc.mjs`](./packages/gen-ui/.releaserc.mjs), all built on the shared [`packages/configs/publishing/releaserc.mjs`](./packages/configs/publishing/releaserc.mjs).
 
 ## Branch Strategy
 
@@ -155,7 +155,7 @@ After a stable design-system release, the `release` job dispatches the separate 
 6. **GitHub Release** - Creates release with notes
 7. **Site Deploy** - On a stable design-system release, dispatches `deploy-site.yml`, which deploys the docs site and Storybook to GitHub Pages. Its `claude-design` job builds the Claude Design export from the tag, publishes `@wallarm-org/claude-design` at the tag's version through npm Trusted Publishing (OIDC, with provenance; the first version was published by hand; skipped when that version is already on npm; `continue-on-error`, so it never fails the deploy) and attaches `claude-design-vX.Y.Z.tgz` to the GitHub release
 
-`@wallarm-org/mcp` and `@wallarm-org/migrator` are released by the same job only when needed: mcp when `packages/mcp`/`packages/mcp-core` changed or the branch has a breaking change; migrator when `packages/migrator` changed since its last stable tag or the design-system release stamped `packages/migrator/versions.json`. See the job list in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
+`@wallarm-org/mcp`, `@wallarm-org/migrator` and `@wallarm-org/gen-ui` are released by the same job only when needed: mcp when `packages/mcp`/`packages/mcp-core` changed or the branch has a breaking change; migrator when `packages/migrator` changed since its last stable tag or the design-system release stamped `packages/migrator/versions.json`; gen-ui (tags `gen-ui-v*`) when `packages/gen-ui` changed since its last stable tag, or before its first one. The gen-ui step is `continue-on-error`: the package is experimental, so a failed publish never fails the run. See the job list in [CLAUDE.md](./CLAUDE.md#pipeline-jobs).
 
 ## Managing RC Versions
 
@@ -179,7 +179,7 @@ npm install modal-rc@npm:@wallarm-org/design-system@1.1.0-rc-feat-modal.1
 
 ### Required Secrets
 
-- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp` and `@wallarm-org/migrator` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish). `deploy-site.yml` publishes `@wallarm-org/claude-design` through npm Trusted Publishing (trusted publisher: `wallarm/design-system`, workflow `deploy-site.yml`) and falls back to this token only when that is not configured
+- `NPM_TOKEN`: NPM automation token, used by the `release` job to publish `@wallarm-org/design-system`, `@wallarm-org/mcp`, `@wallarm-org/migrator` and `@wallarm-org/gen-ui` (it must be allowed to create new packages under `@wallarm-org` for a package's first publish). `deploy-site.yml` publishes `@wallarm-org/claude-design` through npm Trusted Publishing (trusted publisher: `wallarm/design-system`, workflow `deploy-site.yml`) and falls back to this token only when that is not configured
 - `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by repository rulesets that `GITHUB_TOKEN` cannot bypass (see Branch Rules), so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
 - `FIGMA_ACCESS_TOKEN`: Figma personal access token (scopes: File content read, Code Connect write), used by `publish-code-connect`
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions

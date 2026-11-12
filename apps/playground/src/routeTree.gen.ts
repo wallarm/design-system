@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root';
 import { Route as IndexRouteImport } from './routes/index';
 import { Route as CodeEditorRouteImport } from './routes/code-editor';
+import { Route as GenUiRouteImport } from './routes/gen-ui';
+import { Route as GenUiPlaygroundRouteImport } from './routes/gen-ui-playground';
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const CodeEditorRoute = CodeEditorRouteImport.update({
   path: '/code-editor',
   getParentRoute: () => rootRouteImport,
 } as any);
+const GenUiRoute = GenUiRouteImport.update({
+  id: '/gen-ui',
+  path: '/gen-ui',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const GenUiPlaygroundRoute = GenUiPlaygroundRouteImport.update({
+  id: '/gen-ui-playground',
+  path: '/gen-ui-playground',
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute;
   '/code-editor': typeof CodeEditorRoute;
+  '/gen-ui': typeof GenUiRoute;
+  '/gen-ui-playground': typeof GenUiPlaygroundRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute;
   '/code-editor': typeof CodeEditorRoute;
+  '/gen-ui': typeof GenUiRoute;
+  '/gen-ui-playground': typeof GenUiPlaygroundRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   '/': typeof IndexRoute;
   '/code-editor': typeof CodeEditorRoute;
+  '/gen-ui': typeof GenUiRoute;
+  '/gen-ui-playground': typeof GenUiPlaygroundRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/code-editor';
+  fullPaths: '/' | '/code-editor' | '/gen-ui' | '/gen-ui-playground';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/code-editor';
-  id: '__root__' | '/' | '/code-editor';
+  to: '/' | '/code-editor' | '/gen-ui' | '/gen-ui-playground';
+  id: '__root__' | '/' | '/code-editor' | '/gen-ui' | '/gen-ui-playground';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   CodeEditorRoute: typeof CodeEditorRoute;
+  GenUiRoute: typeof GenUiRoute;
+  GenUiPlaygroundRoute: typeof GenUiPlaygroundRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodeEditorRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    '/gen-ui': {
+      id: '/gen-ui';
+      path: '/gen-ui';
+      fullPath: '/gen-ui';
+      preLoaderRoute: typeof GenUiRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/gen-ui-playground': {
+      id: '/gen-ui-playground';
+      path: '/gen-ui-playground';
+      fullPath: '/gen-ui-playground';
+      preLoaderRoute: typeof GenUiPlaygroundRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CodeEditorRoute: CodeEditorRoute,
+  GenUiRoute: GenUiRoute,
+  GenUiPlaygroundRoute: GenUiPlaygroundRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

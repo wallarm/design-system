@@ -40,7 +40,8 @@
       "includes": [
         "packages/claude-design/src/css/entry.css",
         "packages/design-system/.storybook/preview.css",
-        "apps/website/styles/global.css"
+        "apps/website/styles/global.css",
+        "apps/playground/src/App.css"
       ],
       "css": {
         "parser": {

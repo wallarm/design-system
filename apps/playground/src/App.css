@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@wallarm-org/design-system/theme';
+@source '../../../packages/gen-ui/src';
 
 body {
     background: var(--color-bg-surface-1);

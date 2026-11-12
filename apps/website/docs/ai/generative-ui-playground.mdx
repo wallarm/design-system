@@ -1,0 +1,30 @@
+---
+title: "Generative UI playground"
+description: "Pick a prompt and watch an agent build a page from design-system components, or ask it in the Wally chat, streamed as A2UI, json-render or OpenUI."
+pageType: doc-wide
+outline: false
+---
+
+# Generative UI playground
+
+Recorded agent answers built from design-system components, replayed line by line. Parts that
+haven't arrived yet hold a skeleton, and either answer can stream as A2UI v1.0 messages or as
+json-render patches: one catalog renders both.
+
+## Build a page
+
+Pick a prompt and watch the page build up. The agent streams the layout, with every figure bound to
+a path, and the app fills those paths with its data. Open a line in the stream panel to read it;
+the buttons in an answer fire actions, listed under the stream.
+
+<GenUiPlayground />
+
+## Answer in the chat
+
+Ask the emulated agent for the attacks of the last 24 hours. It answers inside the Wally chat,
+through WallyAssistant's `renderPart`, in the format picked for the next answer (A2UI, Express,
+json-render or OpenUI), and its *Block* button asks for approval before it acts.
+
+<GenUiPlayground demo="chat" />
+
+How it works, and how to render these answers in your app: [Generative UI](/ai/generative-ui).
