@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useState } from 'react';
 
 interface UseControlledProps<T = unknown> {
   /**
@@ -16,15 +16,17 @@ export const useControlled = <T = unknown>(
 ): [T | undefined, (newValue: T | undefined) => void] => {
   const { controlled, default: defaultProp } = props;
 
-  const { current: isControlled } = useRef<boolean>(controlled !== undefined);
+  // The mode is fixed on mount. Held in state, not a ref, so render reads no ref.current.
+  const [isControlled] = useState(controlled !== undefined);
   const [valueState, setValue] = useState<T | undefined>(defaultProp);
   const value = isControlled ? controlled : valueState;
 
-  const setValueIfUncontrolled = useCallback((newValue: T | undefined) => {
+  // React Compiler keeps this stable: it only closes over the never-changing mode and setter.
+  const setValueIfUncontrolled = (newValue: T | undefined) => {
     if (!isControlled) {
       setValue(newValue);
     }
-  }, []);
+  };
 
   return [value, setValueIfUncontrolled];
 };
