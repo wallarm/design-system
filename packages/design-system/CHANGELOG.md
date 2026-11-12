@@ -1,3 +1,9 @@
+## [4.15.0](https://github.com/wallarm/design-system/compare/v4.14.0...v4.15.0) (2026-11-12)
+
+### Features
+
+* **agent-avatar:** agents in DS components (WDS-205) ([98212d2](https://github.com/wallarm/design-system/commit/98212d23a1dc57d6d838a4422ca862bf128d5d4f))
+
 ## [4.14.0](https://github.com/wallarm/design-system/compare/v4.13.0...v4.14.0) (2026-11-12)
 
 ### Features
