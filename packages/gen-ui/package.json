@@ -1,0 +1,74 @@
+{
+  "name": "@wallarm-org/gen-ui",
+  "version": "0.1.0",
+  "description": "Generative UI catalog for the Wallarm Design System: one component definition, rendered from A2UI and json-render specs",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "packages/gen-ui"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./a2ui": {
+      "development": "./src/a2ui/index.tsx",
+      "types": "./dist/a2ui/index.d.ts",
+      "default": "./dist/a2ui/index.js"
+    },
+    "./json-render": {
+      "development": "./src/json-render/index.tsx",
+      "types": "./dist/json-render/index.d.ts",
+      "default": "./dist/json-render/index.js"
+    },
+    "./fixtures": {
+      "development": "./src/fixtures.ts",
+      "types": "./dist/fixtures.d.ts",
+      "default": "./dist/fixtures.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rslib build",
+    "dev": "rslib build --watch",
+    "test": "rstest watch",
+    "test:run": "rstest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@a2ui/react": "0.15.0",
+    "@a2ui/web_core": "0.15.0",
+    "@json-render/core": "0.22.0",
+    "@json-render/react": "0.22.0",
+    "@wallarm-org/design-system": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@rsbuild/plugin-react": "catalog:",
+    "@rslib/core": "catalog:",
+    "@rstest/core": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "1.26.6",
+    "@types/react": "catalog:",
+    "@wallarm-org/rstest-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}
