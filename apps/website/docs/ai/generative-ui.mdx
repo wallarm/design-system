@@ -165,6 +165,45 @@ const CATALOG = createJsonRenderCatalog(wallarmComponents, ACTIONS);
 `messages` and `lines` hold everything that has arrived so far, in order. Pass the growing array on
 every snapshot: the surfaces process only what is new.
 
+## Connect a model
+
+The model, its keys, the server route and the data are the app's. The package gives the two ends
+that depend on the catalog: what to tell the model, and what to tell it back when its answer can't
+render.
+
+**The system prompt.** Build it from the same catalog the page renders with, then append your own
+instructions (for example, which data paths the app fills):
+
+```ts
+import { a2uiPrompt } from '@wallarm-org/gen-ui/a2ui';
+
+// The format's rules, a signature per component and the allowed actions.
+const prompt = a2uiPrompt(CATALOG, { actions: ACTIONS }); // format: 'express' (default) or 'json'
+```
+
+For json-render, `CATALOG.catalog.prompt()` already lists the components and the actions.
+
+**Feedback on a finished answer.** A mistake in the answer leaves a skeleton on the page for good.
+Once the answer is complete, check it and send the issues back as the model's next message; it
+resends only the components it got wrong:
+
+```ts
+import { describeIssues } from '@wallarm-org/gen-ui';
+import { checkA2uiAnswer } from '@wallarm-org/gen-ui/a2ui';
+
+const issues = checkA2uiAnswer(messages, { components: wallarmComponents, actions: ACTIONS });
+if (issues.length) send(describeIssues(issues));
+```
+
+`checkJsonRenderAnswer(spec, options)` does the same for json-render. Both report an unknown
+component, a prop its schema rejects, a child that was never sent, an action outside the allowlist
+and a missing root. A bound prop is never an issue, since its value is the app's.
+
+**Evals.** The same check scores a model or a prompt offline: run your prompts, check each answer,
+count the issues. With `boundFigures: true` it also flags every number written into a prop instead
+of bound, a figure the model may have made up. The playground shows the check under the stream once
+an answer is complete.
+
 ## Dashboards
 
 An agent can lay out a whole page, not only a chat answer. The convention that keeps the page
@@ -254,9 +293,7 @@ for the recorded answers the agent's part is about 40% shorter than the JSON. Ex
 proposal in the A2UI repository.
 
 ```tsx
-import { ExpressSurfaces, expressPrompt } from '@wallarm-org/gen-ui/a2ui';
-
-const systemPrompt = expressPrompt(catalog); // rules, a signature per entry, examples
+import { ExpressSurfaces } from '@wallarm-org/gen-ui/a2ui';
 
 <ExpressSurfaces catalog={catalog} surfaceId='main' chunks={chunks} actions={actions} onAction={onAction} />
 ```

@@ -11,12 +11,14 @@ import { ToggleButton } from '@wallarm-org/design-system/ToggleButton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
 import { A2uiSurfaces } from '../a2ui/A2uiSurfaces';
 import { createA2uiCatalog } from '../a2ui/catalog';
+import { checkA2uiAnswer } from '../a2ui/check';
 import { ExpressSurfaces, toExpressLines } from '../a2ui/express';
 import { wallarmComponents } from '../components';
 import type { GenUiActionHandler } from '../core/define';
 import type { ReplayScenario } from '../fixtures/scenarios';
 import type { StreamLine } from '../fixtures/stream';
 import { createJsonRenderCatalog } from '../json-render/catalog';
+import { checkJsonRenderAnswer } from '../json-render/check';
 import { JsonRenderSurface } from '../json-render/JsonRenderSurface';
 import { specFromLines } from '../json-render/spec';
 
@@ -104,6 +106,17 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
   };
 
   const jsonCatalog = scenario && jsonCatalogs.get(scenario.id);
+  // What the app would send back to the model once the answer is complete (Express compiles to A2UI).
+  const checkOptions = { components: wallarmComponents, actions: scenario?.actions ?? [] };
+  const issues =
+    scenario && replay.done
+      ? format === 'json-render'
+        ? checkJsonRenderAnswer(specFromLines(scenario.jsonRender.map(l => l.line)), checkOptions)
+        : checkA2uiAnswer(
+            scenario.a2ui.map(l => l.line),
+            checkOptions,
+          )
+      : undefined;
 
   return (
     <div className={cn('flex min-h-0 flex-col bg-bg-surface-1', className)}>
@@ -208,6 +221,15 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                 {ticks > 0 ? `${shown.length} lines` : `${replay.count} of ${stream.length} lines`}
               </Text>
             </HStack>
+            {issues && (
+              <div className='px-16 pb-8' data-gen-ui-check>
+                <Text size='sm' color='secondary'>
+                  {issues.length === 0
+                    ? 'Answer check: every component renders, every action is allowed.'
+                    : `Answer check: ${issues.length} issues to send back to the agent.`}
+                </Text>
+              </div>
+            )}
             {format === 'express' && expressOf && (
               <div className='px-16 pb-8'>
                 <Text size='sm' color='secondary'>

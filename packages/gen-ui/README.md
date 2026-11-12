@@ -13,6 +13,7 @@ Experimental and private: not published to npm. The user docs are on the site un
 src/
 ├── index.ts              @wallarm-org/gen-ui: the catalog + the API to define entries
 ├── core/                 format-agnostic: no format library, React only as types
+│   ├── check.ts          checkNodes / describeIssues: the answer check both formats share
 │   ├── define.ts         GenUiComponent (an entry's contract), defineComponent,
 │   │                     subsetOf / allOf / Values (enums from DS types), seriesKey, unique
 │   ├── format.ts         named number and time formats (formatNumber, formatTime)
@@ -28,9 +29,12 @@ src/
 │   ├── catalog.tsx       createA2uiCatalog: entries → A2UI Catalog (toJson() for the agent)
 │   ├── A2uiSurfaces.tsx  feeds messages to a MessageProcessor, renders its surfaces
 │   ├── express.tsx       A2UI Express: the compact text form, compiled by @a2ui/agent
+│   ├── prompt.ts         a2uiPrompt: the system prompt (Express or JSON) with the actions
+│   ├── check.ts          checkA2uiAnswer: the agent's mistakes in a finished answer
 │   └── toA2uiSchema.ts   zod 4 props → the zod 3 schema A2UI's binder reads
 ├── json-render/          @wallarm-org/gen-ui/json-render
 │   ├── catalog.tsx       createJsonRenderCatalog: entries → catalog (prompt()) + registry
+│   ├── check.ts          checkJsonRenderAnswer: the same check for a spec
 │   ├── spec.ts           specFromLines (stream → spec, never throws), sanitizeSpec (allowlist)
 │   └── JsonRenderSurface.tsx  renders a spec; keeps its state in step as the app fills it
 ├── fixtures/             @wallarm-org/gen-ui/fixtures: recorded answers, both formats

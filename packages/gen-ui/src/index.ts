@@ -4,6 +4,12 @@
  */
 export * from './components';
 export {
+  type AnswerNode,
+  type CheckOptions,
+  describeIssues,
+  type GenUiIssue,
+} from './core/check';
+export {
   allOf,
   defineComponent,
   type GenUiAction,

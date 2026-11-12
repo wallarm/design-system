@@ -2,9 +2,9 @@ import { describe, expect, it, rstest } from '@rstest/core';
 import { render, waitFor } from '@testing-library/react';
 import {
   type A2uiMessage,
+  a2uiPrompt,
   createA2uiCatalog,
   ExpressSurfaces,
-  expressPrompt,
   toExpressLines,
 } from '../a2ui';
 import { wallarmComponents } from '../components';
@@ -54,9 +54,14 @@ describe('A2UI Express', () => {
     }
   });
 
-  it('prompts the model with a signature for every catalog entry', () => {
-    const prompt = expressPrompt(catalog);
+  it('prompts the model with a signature for every catalog entry and the allowed actions', () => {
+    const actions = [{ name: 'block_ips', description: 'Block the given IPs.' }];
+    const prompt = a2uiPrompt(catalog, { actions });
     for (const { name } of wallarmComponents) expect(prompt).toContain(`${name}(`);
+    expect(prompt).toContain('- block_ips: Block the given IPs.');
+    const json = a2uiPrompt(catalog, { format: 'json', actions });
+    for (const { name } of wallarmComponents) expect(json).toContain(`"${name}"`);
+    expect(json).toContain('updateComponents');
   });
 
   it('reports a block it cannot compile and renders the rest', async () => {

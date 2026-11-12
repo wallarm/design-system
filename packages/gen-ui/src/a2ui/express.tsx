@@ -5,17 +5,13 @@
  * same v1.0 messages, so everything downstream is unchanged.
  */
 import { type FC, useEffect, useRef, useState } from 'react';
-import { ExpressFormat, ExpressParser } from '@a2ui/agent';
+import { ExpressParser } from '@a2ui/agent';
 import type { Catalog, ComponentApi } from '@a2ui/web_core';
 import type { GenUiAction, GenUiActionHandler } from '../core/define';
 import { A2uiSurfaces } from './A2uiSurfaces';
 import type { A2uiMessage } from './catalog';
 
 type A2uiCatalog = Catalog<ComponentApi>;
-
-/** The system prompt that teaches a model Express for this catalog: rules, signatures, examples. */
-export const expressPrompt = (catalog: A2uiCatalog): string =>
-  new ExpressFormat([catalog], { version: '1.0' }).promptGenerator.generate();
 
 /** A compiler (and decompiler) for one surface. */
 export const createExpressParser = (catalog: A2uiCatalog, surfaceId: string) =>
