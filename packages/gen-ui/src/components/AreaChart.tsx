@@ -16,9 +16,9 @@ import {
   LineChartXAxis,
   LineChartYAxis,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { allOf, defineComponent, seriesKey, unique } from '../define';
-import { formatNumber, formatTime, numberFormat, timeFormat } from '../format';
+import { allOf, defineComponent, seriesKey, unique } from '../core/define';
+import { formatNumber, formatTime, numberFormat, timeFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 import { CHART_COLORS } from './BarList';
 
 const VARIANTS = allOf<AreaChartVariant>()(['stacked', 'standard']);
@@ -49,9 +49,7 @@ export const AreaChartComponent = defineComponent({
   }),
   Skeleton: ({ title }) => <ChartSkeleton title={title} />,
   View: ({ props }) => {
-    // A binding resolves to undefined until its data arrives.
-    const series = props.series ?? [];
-    const points = props.points ?? [];
+    const { series, points } = props;
     const formatX = (value: unknown) => formatTime(String(value), props.xFormat);
     const formatY = (value: unknown) =>
       typeof value === 'number' ? formatNumber(value, props.yFormat) : '—';

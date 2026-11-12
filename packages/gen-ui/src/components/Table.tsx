@@ -17,8 +17,8 @@ import {
   type TableColumnDef,
 } from '@wallarm-org/design-system/Table';
 import { cn } from '@wallarm-org/design-system/utils/cn';
-import { allOf, defineComponent, type Values } from '../define';
-import { formatNumber, NUMBER_FORMATS, type NumberFormat } from '../format';
+import { allOf, defineComponent, type Values } from '../core/define';
+import { formatNumber, NUMBER_FORMATS, type NumberFormat } from '../core/format';
 
 const DATE_FORMATS = allOf<Values<FormatDateTimeProps['format']>>()([
   'relative',
@@ -111,10 +111,8 @@ export const TableComponent = defineComponent({
   }),
   Skeleton: () => <Skeleton width='100%' height='240px' rounded={8} transparent={false} />,
   View: ({ props }) => {
-    // A binding resolves to undefined until its data arrives; a streamed column may lack its key.
-    const columns: TableColumnDef<Row>[] = (props.columns ?? [])
-      .filter(c => c?.key)
-      .map(({ key, header, type = 'text', format }) =>
+    const columns: TableColumnDef<Row>[] = props.columns.map(
+      ({ key, header, type = 'text', format }) =>
         column.accessor(key, {
           header: header ?? key,
           meta: { align: type === 'number' ? 'right' : 'left' },
@@ -123,12 +121,12 @@ export const TableComponent = defineComponent({
             return value === undefined || value === '' ? '—' : CELLS[type](value, format);
           },
         }),
-      );
-    const rows = props.rows ?? [];
+    );
+    const { rows } = props;
     // Agent rows may repeat or omit rowKey; React and TanStack need unique ids, so suffix repeats.
     const seen = new Set<string>();
     const rowIds = rows.map((row, index) => {
-      const base = String(scalar(row?.[props.rowKey]) ?? `#${index}`);
+      const base = String(scalar(row[props.rowKey]) ?? `#${index}`);
       const rowId = seen.has(base) ? `${base}#${index}` : base;
       seen.add(rowId);
       return rowId;

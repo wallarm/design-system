@@ -13,9 +13,9 @@ import {
   type MetricSparklineColor,
   MetricValue,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { allOf, defineComponent, type Values } from '../define';
-import { formatNumber, numberFormat } from '../format';
+import { allOf, defineComponent, type Values } from '../core/define';
+import { formatNumber, numberFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 
 const TRENDS = allOf<Values<MetricDeltaProps['trend']>>()(['up', 'down']);
 const SPARKLINE_COLORS = allOf<MetricSparklineColor>()([

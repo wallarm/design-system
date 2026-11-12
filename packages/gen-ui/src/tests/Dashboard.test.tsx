@@ -1,8 +1,8 @@
 import { describe, expect, it, rstest } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { A2uiSurfaces, createA2uiCatalog } from '../a2ui';
-import { wallarmComponents } from '../components/index';
-import { DASHBOARD_A2UI, DASHBOARD_ACTIONS, DASHBOARD_JSON_RENDER } from '../dashboardFixtures';
+import { wallarmComponents } from '../components';
+import { DASHBOARD_A2UI, DASHBOARD_ACTIONS, DASHBOARD_JSON_RENDER } from '../fixtures/dashboard';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
 
 const a2ui = createA2uiCatalog(wallarmComponents);

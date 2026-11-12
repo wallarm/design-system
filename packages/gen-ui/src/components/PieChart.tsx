@@ -16,9 +16,9 @@ import {
   PieChartLegendValue,
   PieChartSkeleton,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { defineComponent, unique } from '../define';
-import { formatNumber, numberFormat } from '../format';
+import { defineComponent, unique } from '../core/define';
+import { formatNumber, numberFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 import { CHART_COLORS } from './BarList';
 
 export const PieChartComponent = defineComponent({
@@ -45,8 +45,7 @@ export const PieChartComponent = defineComponent({
     </ChartSkeleton>
   ),
   View: ({ props }) => {
-    // A binding resolves to undefined until its data arrives.
-    const items = props.items ?? [];
+    const { items } = props;
     const data: PieChartDatum[] = items.map(item => ({
       name: item.label,
       value: item.value,

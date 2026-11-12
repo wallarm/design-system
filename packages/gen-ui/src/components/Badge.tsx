@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Badge, type BadgeColor } from '@wallarm-org/design-system/Badge';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
-import { defineComponent, subsetOf } from '../define';
+import { defineComponent, subsetOf } from '../core/define';
 
 export const BadgeComponent = defineComponent({
   name: 'Badge',

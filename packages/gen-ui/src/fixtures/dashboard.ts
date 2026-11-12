@@ -4,8 +4,8 @@
  * emitted in both formats, chunk by chunk, so a renderer shows placeholders until a part arrives.
  */
 import type { SpecStreamLine } from '@json-render/core';
-import { type A2uiMessage, WALLARM_A2UI_CATALOG_ID } from './a2ui';
-import type { GenUiAction } from './define';
+import { type A2uiMessage, WALLARM_A2UI_CATALOG_ID } from '../a2ui';
+import type { GenUiAction } from '../core/define';
 
 // ── The app's data (what its API returns for "last 24 hours") ──────────────────
 

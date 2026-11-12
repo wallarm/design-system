@@ -1,4 +1,4 @@
-import type { GenUiComponent } from '../define';
+import type { GenUiComponent } from '../core/define';
 import { AlertComponent } from './Alert';
 import { AreaChartComponent } from './AreaChart';
 import { BadgeComponent } from './Badge';

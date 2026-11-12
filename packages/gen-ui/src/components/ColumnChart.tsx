@@ -20,9 +20,9 @@ import {
   type LineChartTooltipRenderArgs,
   LineChartYAxis,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { defineComponent, seriesKey, unique } from '../define';
-import { formatNumber, formatTime, numberFormat, timeFormat } from '../format';
+import { defineComponent, seriesKey, unique } from '../core/define';
+import { formatNumber, formatTime, numberFormat, timeFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 import { CHART_COLORS } from './BarList';
 
 // Each datum's x is its point index, under a key no series can take: the DS warns when x is not
@@ -52,9 +52,7 @@ export const ColumnChartComponent = defineComponent({
   }),
   Skeleton: ({ title }) => <ChartSkeleton title={title} />,
   View: ({ props }) => {
-    // A binding resolves to undefined until its data arrives.
-    const series = props.series ?? [];
-    const points = props.points ?? [];
+    const { series, points } = props;
     const formatX = (index: unknown) => {
       const x = points[Number(index)]?.x ?? '';
       return props.xFormat ? formatTime(x, props.xFormat) : x;

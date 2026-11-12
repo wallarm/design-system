@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Card, CardContent } from '@wallarm-org/design-system/Card';
-import { defineComponent } from '../define';
+import { defineComponent } from '../core/define';
 
 export const CardComponent = defineComponent({
   name: 'Card',

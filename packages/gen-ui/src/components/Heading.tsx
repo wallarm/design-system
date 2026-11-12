@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Heading, type HeadingProps } from '@wallarm-org/design-system/Heading';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
-import { defineComponent, subsetOf, type Values } from '../define';
+import { defineComponent, subsetOf, type Values } from '../core/define';
 
 export const HeadingComponent = defineComponent({
   name: 'Heading',

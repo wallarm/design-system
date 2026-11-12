@@ -12,9 +12,9 @@ import {
   ChartHeader,
   ChartTitle,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { defineComponent, subsetOf, unique } from '../define';
-import { formatNumber, numberFormat } from '../format';
+import { defineComponent, subsetOf, unique } from '../core/define';
+import { formatNumber, numberFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 
 /** The chart palette the catalog offers; shared by every chart entry. */
 export const CHART_COLORS = subsetOf<ChartColor>()([
@@ -49,8 +49,7 @@ export const BarListComponent = defineComponent({
     </ChartSkeleton>
   ),
   View: ({ props }) => {
-    // A binding resolves to undefined until its data arrives.
-    const items = props.items ?? [];
+    const { items } = props;
     return (
       <Chart className='h-full'>
         <ChartHeader>

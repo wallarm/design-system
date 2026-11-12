@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { cn } from '@wallarm-org/design-system/utils/cn';
-import { defineComponent } from '../define';
+import { defineComponent } from '../core/define';
 import { GAPS } from './Stack';
 
 const COLUMNS = ['1', '2', '3', '4', '6', '12'] as const;

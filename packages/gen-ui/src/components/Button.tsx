@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Button, type ButtonProps } from '@wallarm-org/design-system/Button';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
-import { defineComponent, subsetOf, type Values } from '../define';
+import { defineComponent, subsetOf, type Values } from '../core/define';
 
 const VARIANTS = subsetOf<Values<ButtonProps['variant']>>()(['primary', 'outline', 'ghost']);
 /** Each variant's colour, checked against the DS: no ternary to drift. */

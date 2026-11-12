@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
-import type { GenUiComponent } from './define';
+import type { GenUiComponent } from '../core/define';
+import { isRecord } from '../core/guards';
 import { Placeholder } from './Placeholder';
 
 interface GuardedViewProps {
@@ -38,6 +39,3 @@ export const GuardedView: FC<GuardedViewProps> = ({ component, props, emit, chil
     </View>
   );
 };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;

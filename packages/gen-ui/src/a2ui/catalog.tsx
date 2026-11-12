@@ -1,26 +1,21 @@
-import { type FC, type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+/**
+ * The A2UI catalog: what the agent is prompted with (`toJson()`) and how the React renderer draws
+ * each entry. The children of a container wait in a ChildSlot until the agent has sent them.
+ */
+
+import { type FC, type ReactNode, useSyncExternalStore } from 'react';
 import {
-  A2uiSurface,
   createComponentImplementation,
   type ReactComponentImplementation,
   useA2uiSurface,
 } from '@a2ui/react';
-import {
-  Catalog,
-  type ComponentApi,
-  MessageProcessor,
-  type RendererErrorMessage,
-} from '@a2ui/web_core';
+import { Catalog, type ComponentApi } from '@a2ui/web_core';
 import type { AgentToRendererMessage } from '@a2ui/web_core/v1_0';
 import type { z as z3 } from 'zod/v3';
-import type { GenUiAction, GenUiActionHandler, GenUiComponent } from '../define';
-import { GuardedView } from '../GuardedView';
-import { Placeholder } from '../Placeholder';
-import { SurfaceBoundary } from '../SurfaceBoundary';
-import { warn } from '../warn';
+import type { GenUiComponent } from '../core/define';
+import { GuardedView } from '../render/GuardedView';
+import { Placeholder } from '../render/Placeholder';
 import { A2UI_ACTION, A2UI_CHILD_LIST, toA2uiProps } from './toA2uiSchema';
-
-export { toA2uiProps, toA2uiSchema } from './toA2uiSchema';
 
 /** A v1.0 agent → renderer message: createSurface, updateComponents, updateDataModel, deleteSurface. */
 export type A2uiMessage = AgentToRendererMessage;
@@ -43,7 +38,6 @@ const implement = createComponentImplementation as unknown as (
     context: { componentModel: { properties: Record<string, unknown> } };
   }>,
 ) => ReactComponentImplementation;
-type Surface = Parameters<typeof A2uiSurface>[0]['surface'];
 
 /**
  * A2UI glue: each component's zod props become an A2UI API (bindable leaves, one Action prop
@@ -123,67 +117,3 @@ const ChildSlot: FC<{
   );
   return arrived || !agentId ? buildChild(id, basePath) : <Placeholder id={agentId} />;
 };
-
-export interface A2uiSurfacesProps {
-  catalog: Catalog<ComponentApi>;
-  /** Every message the agent has sent so far, in order; new ones are appended while it streams. */
-  messages: readonly A2uiMessage[];
-  /** The only action names that reach `onAction`; anything else the agent names is dropped. */
-  actions: readonly GenUiAction[];
-  onAction: GenUiActionHandler;
-  /** Messages the processor rejected (bad ids, unknown surface, catalog mismatch). Default: console.warn. */
-  onError?: (errors: readonly RendererErrorMessage[]) => void;
-}
-
-/** Feeds the messages to one MessageProcessor and renders every surface it holds. */
-export const A2uiSurfaces: FC<A2uiSurfacesProps> = ({
-  catalog,
-  messages,
-  actions,
-  onAction,
-  onError = warnErrors,
-}) => {
-  const latest = useRef({ actions, onAction, onError });
-  useEffect(() => {
-    latest.current = { actions, onAction, onError };
-  });
-
-  const [processor] = useState(
-    () =>
-      new MessageProcessor([catalog], action => {
-        const { actions: allowed, onAction: dispatch } = latest.current;
-        if (allowed.some(a => a.name === action.name)) dispatch(action.name, action.context);
-        else warn(`dropped A2UI action '${action.name}', not in the allowlist`);
-      }),
-  );
-  const [surfaces, setSurfaces] = useState(() => [...processor.model.surfacesMap.values()]);
-
-  useEffect(() => {
-    const sync = () => setSurfaces([...processor.model.surfacesMap.values()]);
-    const created = processor.onSurfaceCreated(sync);
-    const deleted = processor.onSurfaceDeleted(sync);
-    return () => {
-      created.unsubscribe();
-      deleted.unsubscribe();
-    };
-  }, [processor]);
-
-  // The processor is incremental: hand it only the messages it hasn't seen. A rejected message is
-  // reported, not thrown, and never re-fed (its createSurface may already have been applied).
-  const fed = useRef(0);
-  useEffect(() => {
-    if (messages.length <= fed.current) return;
-    const batch = messages.slice(fed.current);
-    fed.current = messages.length;
-    const errors = processor.processMessagesWithErrors(batch);
-    if (errors.length) latest.current.onError(errors);
-  }, [messages, processor]);
-
-  return surfaces.map(surface => (
-    <SurfaceBoundary key={surface.id}>
-      <A2uiSurface surface={surface as unknown as Surface} />
-    </SurfaceBoundary>
-  ));
-};
-
-const warnErrors = (errors: readonly RendererErrorMessage[]) => warn('A2UI errors', errors);

@@ -10,9 +10,9 @@ import {
   MetricHeader,
   MetricValue,
 } from '@wallarm-org/design-system/SimpleCharts';
-import { ChartSkeleton } from '../ChartSkeleton';
-import { allOf, defineComponent, type Values } from '../define';
-import { formatNumber, numberFormat } from '../format';
+import { allOf, defineComponent, type Values } from '../core/define';
+import { formatNumber, numberFormat } from '../core/format';
+import { ChartSkeleton } from '../render/ChartSkeleton';
 import { CHART_COLORS } from './BarList';
 
 const TRENDS = allOf<Values<MetricDeltaProps['trend']>>()(['up', 'down']);
@@ -57,12 +57,7 @@ export const HorizontalBarStackComponent = defineComponent({
       <ChartHeader>
         <ChartTitle>{props.title}</ChartTitle>
       </ChartHeader>
-      <HorizontalBarStack
-        // A binding resolves to undefined until its data arrives.
-        data={props.items ?? []}
-        total={props.total}
-        legend={props.legend}
-      >
+      <HorizontalBarStack data={props.items} total={props.total} legend={props.legend}>
         {props.value !== undefined && (
           <MetricHeader>
             <MetricValue>{formatNumber(props.value, props.format)}</MetricValue>

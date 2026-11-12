@@ -4,9 +4,9 @@
  * Every array is in arrival order: feed it item by item to emulate streaming.
  */
 import type { SpecStreamLine } from '@json-render/core';
-import type { A2uiMessage } from './a2ui';
-import { WALLARM_A2UI_CATALOG_ID } from './a2ui';
-import type { GenUiAction } from './define';
+import type { A2uiMessage } from '../a2ui';
+import { WALLARM_A2UI_CATALOG_ID } from '../a2ui';
+import type { GenUiAction } from '../core/define';
 
 export const ATTACK_SUMMARY_ACTIONS: readonly GenUiAction[] = [
   {
@@ -185,5 +185,3 @@ export const ATTACK_SUMMARY_JSON_RENDER: readonly SpecStreamLine[] = [
     children: [],
   }),
 ];
-
-export * from './dashboardFixtures';

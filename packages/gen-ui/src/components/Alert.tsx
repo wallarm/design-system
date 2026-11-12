@@ -8,7 +8,7 @@ import {
   AlertTitle,
 } from '@wallarm-org/design-system/Alert';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
-import { defineComponent, subsetOf } from '../define';
+import { defineComponent, subsetOf } from '../core/define';
 
 export const AlertComponent = defineComponent({
   name: 'Alert',

@@ -3,20 +3,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { A2uiSurfaces, createA2uiCatalog } from './a2ui';
-import { wallarmComponents } from './components/index';
+import { A2uiSurfaces, createA2uiCatalog } from '../a2ui';
+import { wallarmComponents } from '../components';
 import {
   ATTACK_SUMMARY_A2UI,
   ATTACK_SUMMARY_ACTIONS,
   ATTACK_SUMMARY_JSON_RENDER,
-} from './fixtures';
+} from '../fixtures/attackSummary';
 import {
   createJsonRenderCatalog,
   JsonRenderSurface,
   type SpecStreamLine,
   specFromLines,
-} from './json-render';
-import { findPlaceholder } from './tests/findPlaceholder';
+} from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const pendingIds = (root: HTMLElement) =>
   [...root.querySelectorAll('[data-gen-ui-placeholder]')].map(el =>
@@ -154,7 +154,7 @@ describe('gen-ui', () => {
   it('keeps the catalog honest: unique names, and no casts in the definitions', () => {
     const names = wallarmComponents.map(c => c.name);
     expect(new Set(names).size).toBe(names.length);
-    const dir = join(__dirname, 'components');
+    const dir = join(__dirname, '..', 'components');
     for (const file of readdirSync(dir)) {
       // An `as` would hide a value the DS no longer has; use subsetOf/allOf or a typed map.
       // Strings and comments may say "as" in prose; only code counts.

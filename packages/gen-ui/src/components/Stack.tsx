@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Stack, type StackProps } from '@wallarm-org/design-system/Stack';
-import { defineComponent } from '../define';
+import { defineComponent } from '../core/define';
 
 /** The gaps the catalog offers, each mapped to a DS gap: a gap the DS drops fails typecheck. */
 export const GAPS = ['4', '8', '12', '16', '24'] as const;

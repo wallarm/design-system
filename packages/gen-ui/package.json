@@ -18,19 +18,19 @@
       "default": "./dist/index.js"
     },
     "./a2ui": {
-      "development": "./src/a2ui/index.tsx",
+      "development": "./src/a2ui/index.ts",
       "types": "./dist/a2ui/index.d.ts",
       "default": "./dist/a2ui/index.js"
     },
     "./json-render": {
-      "development": "./src/json-render/index.tsx",
+      "development": "./src/json-render/index.ts",
       "types": "./dist/json-render/index.d.ts",
       "default": "./dist/json-render/index.js"
     },
     "./fixtures": {
-      "development": "./src/fixtures.ts",
-      "types": "./dist/fixtures.d.ts",
-      "default": "./dist/fixtures.js"
+      "development": "./src/fixtures/index.ts",
+      "types": "./dist/fixtures/index.d.ts",
+      "default": "./dist/fixtures/index.js"
     }
   },
   "files": [
