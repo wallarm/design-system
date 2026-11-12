@@ -1,3 +1,9 @@
+## [4.16.0](https://github.com/wallarm/design-system/compare/v4.15.0...v4.16.0) (2026-11-12)
+
+### Features
+
+* **gen-ui:** generative UI catalog over the design system, rendered from A2UI and json-render ([#469](https://github.com/wallarm/design-system/issues/469)) ([26d29d7](https://github.com/wallarm/design-system/commit/26d29d7d94bb1c7c67d33542812441f488449f3d))
+
 ## [4.15.0](https://github.com/wallarm/design-system/compare/v4.14.0...v4.15.0) (2026-11-12)
 
 ### Features
