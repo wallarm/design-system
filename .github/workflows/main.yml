@@ -838,6 +838,31 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Check gen-ui release
+        id: check-gen-ui
+        run: |
+          SHOULD_RELEASE=false
+          LAST=$(git describe --tags --abbrev=0 --match 'gen-ui-v*' --exclude '*-*' 2>/dev/null || true)
+          if [ -z "$LAST" ]; then
+            echo "No stable gen-ui tag yet"
+            SHOULD_RELEASE=true
+          elif [ -n "$(git diff --name-only "$LAST"..HEAD -- packages/gen-ui)" ]; then
+            echo "packages/gen-ui changed since $LAST"
+            SHOULD_RELEASE=true
+          fi
+          echo "should_release=$SHOULD_RELEASE" >> "$GITHUB_OUTPUT"
+
+      # Experimental package: a failed publish must not fail the run or the releases above
+      - name: Release gen-ui
+        if: steps.check-gen-ui.outputs.should_release == 'true'
+        continue-on-error: true
+        working-directory: packages/gen-ui
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   # Runs alongside `release`, only on main and only when semantic-release will
   # cut a stable version (RC branches would overwrite the shared Figma mappings)
   publish-code-connect:

@@ -5,7 +5,8 @@ components instead of text. Each component is defined once and rendered from
 [A2UI](https://a2ui.org) v1.0 messages, [json-render](https://json-render.dev) specs or
 [OpenUI](https://www.openui.com) Lang programs.
 
-Experimental and private: not published to npm. The user docs are on the site under
+Experimental: published to npm as `@wallarm-org/gen-ui`, released from `main` with its own tags
+(`gen-ui-v*`, see `RELEASE.md`). The user docs are on the site under
 **AI → Generative UI** (`apps/website/docs/ai/generative-ui.mdx`).
 
 ## Where things are

@@ -29,10 +29,20 @@ catalogs and the OpenUI library are derived from the definition. An answer drops
 the chat itself needs no changes.
 
 :::warning Experimental
-`@wallarm-org/gen-ui` is a private prototype in the repository (`packages/gen-ui`) and is not
-published to npm. Its API, the component set and the supported formats will change. The format
+`@wallarm-org/gen-ui` is on npm, but experimental: its API, the component set and the supported
+formats will change. The format
 libraries are young, so their versions are pinned exactly.
 :::
+
+## Install
+
+```bash
+pnpm add @wallarm-org/gen-ui
+```
+
+It renders with the design system you already have: `@wallarm-org/design-system` (4.14 or later),
+React 19 and zod 4 are peer dependencies. Import only the format you use: `@wallarm-org/gen-ui/a2ui`,
+`/a2ui/express`, `/json-render` or `/openui`, plus `/a2ui/prompt` on the server.
 
 ## How it works
 
