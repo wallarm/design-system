@@ -35,7 +35,8 @@ const ALERT = {
 
 // ── A2UI v1.0 ────────────────────────────────────────────────────────────────
 
-const SURFACE = 'attack_summary';
+export const ATTACK_SUMMARY_SURFACE = 'attack_summary';
+const SURFACE = ATTACK_SUMMARY_SURFACE;
 
 export const ATTACK_SUMMARY_A2UI: readonly A2uiMessage[] = [
   { version: '1.0', createSurface: { surfaceId: SURFACE, catalogId: WALLARM_A2UI_CATALOG_ID } },

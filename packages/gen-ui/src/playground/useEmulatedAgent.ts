@@ -10,21 +10,76 @@ import type {
   ChatPart,
   ChatStatus,
 } from '@wallarm-org/design-system/WallyAssistant';
-import type { A2uiMessage } from '../a2ui/catalog';
-import { ATTACK_SUMMARY_A2UI, ATTACK_SUMMARY_JSON_RENDER } from '../fixtures/attackSummary';
+import { type A2uiMessage, createA2uiCatalog } from '../a2ui/catalog';
+import { toExpressLines } from '../a2ui/express';
+import { wallarmComponents } from '../components';
+import {
+  ATTACK_SUMMARY_A2UI,
+  ATTACK_SUMMARY_JSON_RENDER,
+  ATTACK_SUMMARY_SURFACE,
+} from '../fixtures/attackSummary';
+import { toOpenUiLines } from '../fixtures/openui';
 
-export type GenUiFormat = 'a2ui' | 'json-render';
+export type GenUiFormat = 'a2ui' | 'express' | 'json-render' | 'openui';
+export const GEN_UI_FORMATS: readonly string[] = [
+  'a2ui',
+  'express',
+  'json-render',
+  'openui',
+] satisfies GenUiFormat[];
+export const isGenUiFormat = (value: string): value is GenUiFormat =>
+  GEN_UI_FORMATS.includes(value);
 
 /** The custom part the emulated agent streams: one surface, its lines in arrival order. */
 export type GenUiPartData =
   | { format: 'a2ui'; lines: readonly A2uiMessage[] }
-  | { format: 'json-render'; lines: readonly SpecStreamLine[] };
+  | { format: 'express'; surfaceId: string; lines: readonly string[] }
+  | { format: 'json-render'; lines: readonly SpecStreamLine[] }
+  | { format: 'openui'; lines: readonly string[] };
 export type GenUiPart = ChatCustomPart<GenUiPartData>;
 export const GEN_UI_KIND = 'wallarm.gen-ui';
 
 /** A chat part is a gen-ui surface when it carries this kind; only the emulator makes them. */
 export const isGenUiPart = (part: ChatPart): part is GenUiPart =>
   part.type === 'custom' && part.kind === GEN_UI_KIND;
+
+// The compact formats are derived from the A2UI recording, so every format shows the same answer.
+const EXPRESS_LINES = toExpressLines(
+  createA2uiCatalog(wallarmComponents),
+  ATTACK_SUMMARY_SURFACE,
+  ATTACK_SUMMARY_A2UI,
+);
+// The agent sends its own data in this answer, so every OpenUI line is a statement.
+const OPENUI_LINES = toOpenUiLines(ATTACK_SUMMARY_A2UI.map(line => ({ origin: 'agent', line })))
+  .map(entry => entry.line)
+  .filter(line => typeof line === 'string');
+
+/** The answer's first `count` lines in `format`. */
+const partData = (format: GenUiFormat, count: number): GenUiPartData => {
+  switch (format) {
+    case 'a2ui':
+      return { format, lines: ATTACK_SUMMARY_A2UI.slice(0, count) };
+    case 'express':
+      return { format, surfaceId: ATTACK_SUMMARY_SURFACE, lines: EXPRESS_LINES.slice(0, count) };
+    case 'json-render':
+      return { format, lines: ATTACK_SUMMARY_JSON_RENDER.slice(0, count) };
+    default:
+      return { format, lines: OPENUI_LINES.slice(0, count) };
+  }
+};
+const LENGTH: Record<GenUiFormat, number> = {
+  a2ui: ATTACK_SUMMARY_A2UI.length,
+  express: EXPRESS_LINES.length,
+  'json-render': ATTACK_SUMMARY_JSON_RENDER.length,
+  openui: OPENUI_LINES.length,
+};
+// About the same time per answer: the formats split it into a different number of lines.
+const DELAY: Record<GenUiFormat, number> = {
+  a2ui: 450,
+  express: 300,
+  'json-render': 180,
+  openui: 300,
+};
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -106,19 +161,14 @@ export function useEmulatedAgent(format: GenUiFormat) {
       });
     }
 
-    const total =
-      format === 'a2ui' ? ATTACK_SUMMARY_A2UI.length : ATTACK_SUMMARY_JSON_RENDER.length;
-    for (let i = 1; i <= total; i++) {
-      await sleep(format === 'a2ui' ? 450 : 180);
+    for (let i = 1; i <= LENGTH[format]; i++) {
+      await sleep(DELAY[format]);
       if (!alive()) return;
       const part: GenUiPart = {
         type: 'custom',
         id: `${replyId}:ui`,
         kind: GEN_UI_KIND,
-        data:
-          format === 'a2ui'
-            ? { format, lines: ATTACK_SUMMARY_A2UI.slice(0, i) }
-            : { format, lines: ATTACK_SUMMARY_JSON_RENDER.slice(0, i) },
+        data: partData(format, i),
       };
       upsertPart(replyId, part);
     }
