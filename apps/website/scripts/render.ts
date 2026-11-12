@@ -361,9 +361,9 @@ export const templateCards = (templates: Guideline[]): TemplateCardData[] =>
 /** The Templates landing page: a wide gallery (theme TemplateGallery, fed by the define). */
 export const renderTemplatesIndex = (): string =>
   [
-    '---\ntitle: "Templates"\ndescription: "Full screens built from Wallarm design system components: preview each one live, switch its states and copy the code."\npageType: doc-wide\noutline: false\n---',
+    '---\ntitle: "Templates"\ndescription: "Full screens built from Wallarm design system components: try each one live on the page, then open it full screen to switch its states and copy the code."\npageType: doc-wide\noutline: false\n---',
     '# Templates',
-    'Full screens built from the design system. Open one to try it live, switch its states and copy the code.',
+    'Full screens built from the design system. Each one is live: click through it right here, or open it full screen to switch its states and copy the code.',
     '<TemplateGallery />\n',
   ].join('\n\n');
 

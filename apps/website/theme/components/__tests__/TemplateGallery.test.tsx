@@ -16,26 +16,12 @@ rs.mock('@rspress/core/theme-original', () => ({
 
 afterEach(() => {
   rs.unstubAllEnvs();
-  rs.unstubAllGlobals();
 });
 
 const never = () =>
   new Promise<Record<string, unknown>>(() => {
     // never resolves: neither output may need the story
   });
-
-const stubResizeObserver = () =>
-  rs.stubGlobal(
-    'ResizeObserver',
-    class {
-      observe() {
-        // the thumbnail stays a skeleton
-      }
-      disconnect() {
-        // nothing to release
-      }
-    },
-  );
 
 const templates = [
   {
@@ -57,10 +43,10 @@ describe('TemplateGallery', () => {
     );
   });
 
-  it('renders a card that previews the template and links its docs page', () => {
-    stubResizeObserver();
+  it('renders a card with the live template, a full-screen preview and its docs link', () => {
     const { getByRole } = render(<TemplateGallery templates={templates} />);
-    expect(getByRole('button', { name: 'Preview Security dashboard' })).toBeTruthy();
+    expect(getByRole('region', { name: 'Security dashboard, live' })).toBeTruthy();
+    expect(getByRole('button', { name: 'Open Security dashboard full screen' })).toBeTruthy();
     expect(getByRole('link', { name: 'Read the docs' }).getAttribute('href')).toBe(
       '/design-system/templates/security-dashboard',
     );

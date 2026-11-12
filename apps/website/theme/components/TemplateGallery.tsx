@@ -2,16 +2,21 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { routePathToMdPath, withBase, withSiteOrigin } from '@rspress/core/runtime';
 import { Link } from '@rspress/core/theme-original';
 import { Badge } from '@wallarm-org/design-system/Badge';
+import { Button } from '@wallarm-org/design-system/Button';
 import { Card } from '@wallarm-org/design-system/Card';
 import { ArrowRight } from '@wallarm-org/design-system/icons/ArrowRight';
 import { Maximize2 } from '@wallarm-org/design-system/icons/Maximize2';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
-import { FILL_APP_SHELL, FULLSCREEN_FRAME, StoryError } from './StoryPreview';
+// Internal DS seams (as in claude-design's Root): DS imports resolve to src, so these are the same
+// context instances the template's components read.
+import { OverlayBoundaryContext } from '../../../../packages/design-system/src/lib/portal/OverlayBoundaryContext';
+import { PortalContainerContext } from '../../../../packages/design-system/src/lib/portal/PortalContainerContext';
+import { FILL_APP_SHELL, FULLSCREEN_FRAME, LoadedStory } from './StoryPreview';
 import type { PreviewTemplate } from './TemplatePreviewDialog';
 import { parsePreviewParams, withPreviewParams } from './templatePreview';
 import { useInView } from './useInView';
-import { type StoryLoader, useStory } from './useStory';
+import type { StoryLoader } from './useStory';
 
 // Lazy: the dialog stays out of every page's bundle until a preview opens.
 const TemplatePreviewDialog = lazy(() =>
@@ -22,9 +27,6 @@ export interface TemplateGalleryProps {
   /** In page order; `link` is the template's docs page. */
   templates: (PreviewTemplate & { description: string; link: string })[];
 }
-
-/** Templates are designed for a desktop screen; cards show that screen scaled down. */
-const DESIGN_WIDTH = 1440;
 
 const pageName = (slug: string): string => slug.split('/').at(-1) ?? slug;
 
@@ -43,63 +45,48 @@ export const TEMPLATES: TemplateGalleryProps['templates'] = (import.meta.env.TEM
   }),
 );
 
-function ScaledStory({ load, name, scale }: { load: StoryLoader; name: string; scale: number }) {
-  const { Story, error } = useStory(load, name);
-  if (error) return <StoryError error={error} />;
-  if (!Story) return <Skeleton width='100%' height='100%' transparent={false} rounded='none' />;
-  return (
-    <div
-      // A thumbnail is a still: no CSS animation or transition inside it (none, not paused —
-      // paused freezes enter animations on their first, often invisible, frame).
-      className='absolute top-0 left-0 h-[900px] w-[1440px] origin-top-left **:animate-none **:transition-none'
-      // The scale is measured from the card width, so it can't be a class.
-      style={{ transform: `scale(${scale})` }}
-    >
-      <div className={cn(FULLSCREEN_FRAME, FILL_APP_SHELL, 'h-full')}>
-        <Story />
-      </div>
-    </div>
-  );
-}
-
-/** The template's default story at its design size, scaled to the card; mounted near the viewport. */
-function Thumbnail({ load, name }: { load: StoryLoader; name: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+/**
+ * The template's default story, live and interactive, zoomed to 80% so its 1440px design fits.
+ * Zoom (not a transform) keeps layout and hit-testing real. Everything the story portals (drawers,
+ * menus, tooltips, bulk bars) renders into a host inside the zoomed box instead of the page body, and
+ * the box contains layout and paint, so `position: fixed` resolves against the card: overlays open,
+ * pin and clip inside it. Overlays pinned to the viewport's edge (the table action bar) pin to the
+ * box's edge instead, through OverlayBoundaryContext. The story scrolls in its own layer, so pinned
+ * bars stay put. The frame keeps the desktop 1440:900 proportion and mounts near the viewport.
+ */
+function LiveTemplate({ load, name, title }: { load: StoryLoader; name: string; title: string }) {
+  const ref = useRef<HTMLElement>(null);
+  const host = useRef<HTMLDivElement>(null);
+  const boundary = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, '200px');
-  const [scale, setScale] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) setScale(entry.contentRect.width / DESIGN_WIDTH);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div
+    <section
       ref={ref}
-      // Decorative and non-interactive: the card's button is the way in.
-      inert
-      aria-hidden='true'
-      className='pointer-events-none relative aspect-[1440/900] overflow-hidden bg-bg-page-bg select-none'
+      aria-label={`${title}, live`}
+      className='relative aspect-[1440/900] overflow-hidden bg-bg-page-bg'
     >
-      {inView && scale > 0 ? (
-        <ScaledStory load={load} name={name} scale={scale} />
-      ) : (
-        <Skeleton width='100%' height='100%' transparent={false} rounded='none' />
-      )}
-      <div className='absolute inset-0 flex items-center justify-center bg-bg-strong-primary/30 opacity-0 group-hover:opacity-100 group-has-[[data-card-link]:focus-visible]:opacity-100'>
-        <span className='flex items-center gap-6 rounded-full bg-bg-surface-1 px-12 py-6 text-sm font-medium text-text-primary shadow-lg'>
-          <Maximize2 size='sm' />
-          Preview
-        </span>
-      </div>
-    </div>
+      <PortalContainerContext.Provider value={host}>
+        <OverlayBoundaryContext.Provider value={boundary}>
+          <div ref={boundary} className={ZOOMED}>
+            <div className={cn(FULLSCREEN_FRAME, FILL_APP_SHELL, 'size-full overflow-auto')}>
+              {inView ? (
+                <LoadedStory load={load} name={name} />
+              ) : (
+                <Skeleton width='100%' height='100%' transparent={false} rounded='none' />
+              )}
+            </div>
+            <div ref={host} />
+          </div>
+        </OverlayBoundaryContext.Provider>
+      </PortalContainerContext.Provider>
+    </section>
   );
 }
+
+/** 80% zoom; percentages inside a zoomed box resolve in its zoomed space, so `size-full` lays the
+ *  screen out at 125% of the frame and still fills it. `contain` makes it the containing block of
+ *  the overlays' `position: fixed`. */
+const ZOOMED = 'absolute inset-0 size-full [zoom:0.8] [contain:layout_paint]';
 
 type GalleryTemplate = TemplateGalleryProps['templates'][number];
 
@@ -108,58 +95,63 @@ interface CardProps {
   preview: () => void;
 }
 
-// Stretched over the card, so the whole card opens the preview.
-export const STRETCHED =
-  'cursor-pointer bg-transparent p-0 text-left font-sans-display text-inherit outline-none after:absolute after:inset-0';
-
-/** The card's focus ring (foundations/focus), drawn while its stretched `data-card-link` has focus. */
-const CARD_FOCUS = cn(
-  'has-[[data-card-link]:focus-visible]:border-border-strong-primary',
-  'has-[[data-card-link]:focus-visible]:ring-3 has-[[data-card-link]:focus-visible]:ring-focus-primary',
-);
-
-/** A card opened by its stretched link: brand border on hover, a ring on focus, no transition. */
-export const CARD = cn('relative transition-none hover:border-border-brand', CARD_FOCUS);
-
+/** Heading, description and actions above the card; the heading is an anchor (`#<page>`). */
 function TemplateCard({ template, preview }: CardProps) {
   const states = template.stories.length;
-  const label = `Preview ${template.title}`;
+  const anchor = pageName(template.slug);
   return (
-    <li className='list-none'>
-      <Card className={cn(CARD, 'group gap-0 py-0 hover:shadow-lg')}>
-        <Thumbnail load={template.load} name={template.stories[0] ?? 'Default'} />
-        <div className='flex flex-1 flex-col gap-6 border-t border-border-primary-light p-16'>
-          <div className='flex items-center justify-between gap-8'>
-            <h3 className='m-0 text-lg font-medium text-text-primary'>
-              <button
-                type='button'
-                onClick={preview}
-                aria-label={label}
-                data-card-link
-                className={STRETCHED}
-              >
-                {template.title}
-              </button>
-            </h3>
+    <li id={anchor} className='flex list-none scroll-mt-80 flex-col gap-12'>
+      <div className='flex items-end justify-between gap-16'>
+        <div className='flex min-w-0 flex-col gap-6'>
+          <div className='group/heading flex items-center gap-8'>
+            <h2 className='m-0 border-none p-0 text-xl font-medium text-text-primary'>
+              {template.title}
+            </h2>
+            <a
+              href={`#${anchor}`}
+              aria-label={`Link to ${template.title}`}
+              className='text-lg text-text-secondary no-underline opacity-0 group-hover/heading:opacity-100 focus-visible:opacity-100 hover:text-text-link-default'
+            >
+              #
+            </a>
             <Badge type='secondary' color='slate' size='small'>
               {states} {states === 1 ? 'state' : 'states'}
             </Badge>
           </div>
-          <p className='m-0 line-clamp-2 text-sm text-text-secondary'>{template.description}</p>
+          <p className='m-0 text-sm text-text-secondary'>{template.description}</p>
+        </div>
+        <div className='flex shrink-0 items-center gap-12'>
           <Link
             href={withBase(template.link)}
-            className='relative mt-auto flex w-fit items-center gap-4 pt-6 text-sm font-medium text-text-link-default hover:underline'
+            className='flex items-center gap-4 text-sm font-medium text-text-link-default hover:underline'
           >
             Read the docs
             <ArrowRight size='sm' />
           </Link>
+          <Button
+            variant='outline'
+            color='neutral'
+            size='medium'
+            onClick={preview}
+            aria-label={`Open ${template.title} full screen`}
+          >
+            <Maximize2 />
+            Full screen
+          </Button>
         </div>
+      </div>
+      <Card className='gap-0 overflow-hidden p-0'>
+        <LiveTemplate
+          load={template.load}
+          name={template.stories[0] ?? 'Default'}
+          title={template.title}
+        />
       </Card>
     </li>
   );
 }
 
-const GRID = 'rp-not-doc m-0 my-24 grid grid-cols-1 gap-24 p-0 md:grid-cols-2';
+const GRID = 'rp-not-doc m-0 my-24 grid grid-cols-1 gap-48 p-0';
 
 interface PreviewState {
   index: number;
@@ -265,7 +257,7 @@ function Gallery({ templates }: TemplateGalleryProps) {
   );
 }
 
-/** Templates landing page: live, scaled-down previews that open a full preview dialog. */
+/** Templates landing page: one live, clickable template per row, each with a full-screen preview. */
 export function TemplateGallery({ templates = TEMPLATES }: Partial<TemplateGalleryProps>) {
   // Truthy check: a boolean define in builds, a string env var under Rstest. Links point at the
   // pages' markdown, like the ones Rspress rewrites in MDX.

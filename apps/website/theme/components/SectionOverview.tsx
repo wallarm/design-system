@@ -13,7 +13,19 @@ import { Link } from '@rspress/core/theme-original';
 import { Badge } from '@wallarm-org/design-system/Badge';
 import { Card } from '@wallarm-org/design-system/Card';
 import { cn } from '@wallarm-org/design-system/utils/cn';
-import { CARD, STRETCHED } from './TemplateGallery';
+
+// Stretched over the card, so the whole card follows the link.
+const STRETCHED =
+  'cursor-pointer bg-transparent p-0 text-left font-sans-display text-inherit outline-none after:absolute after:inset-0';
+
+/** The card's focus ring (foundations/focus), drawn while its stretched `data-card-link` has focus. */
+const CARD_FOCUS = cn(
+  'has-[[data-card-link]:focus-visible]:border-border-strong-primary',
+  'has-[[data-card-link]:focus-visible]:ring-3 has-[[data-card-link]:focus-visible]:ring-focus-primary',
+);
+
+/** A card opened by its stretched link: brand border on hover, a ring on focus, no transition. */
+const CARD = cn('relative transition-none hover:border-border-brand', CARD_FOCUS);
 
 export interface OverviewCard {
   title: string;

@@ -1,5 +1,9 @@
-import { type FC, type ReactNode, useMemo, useRef } from 'react';
+import { type FC, type ReactNode, useContext, useMemo, useRef } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
+import {
+  getOverlayBottom,
+  OverlayBoundaryContext,
+} from '../../../lib/portal/OverlayBoundaryContext';
 import { useTableContext } from '../TableContext';
 import { TableActionBarAnchorRefContext } from './TableActionBarAnchorRefContext';
 
@@ -13,12 +17,13 @@ const TABLE_ACTION_BAR_OFFSET = 32;
 export const TableActionBarProvider: FC<TableActionBarProviderProps> = ({ children }) => {
   const { table, selectionEnabled } = useTableContext();
   const anchorRef = useRef<HTMLDivElement>(null);
+  const boundary = useContext(OverlayBoundaryContext);
 
   const selectedCount = selectionEnabled ? Object.keys(table.state.rowSelection).length : 0;
 
   const positioning = useMemo<ArkUiPopover.RootProps['positioning']>(() => {
     // Pin the bar to the bottom of the viewport (not the bottom of the
-    // table) by anchoring it to a zero-height line spanning the table's
+    // table; an OverlayBoundaryContext element stands in for the viewport) by anchoring it to a zero-height line spanning the table's
     // horizontal bounds at the viewport's bottom edge. Placing it `top` of
     // that line keeps it just above the bottom edge regardless of the
     // table's scroll position or height.
@@ -34,7 +39,7 @@ export const TableActionBarProvider: FC<TableActionBarProviderProps> = ({ childr
         const rect = anchorRef.current?.getBoundingClientRect();
         return DOMRect.fromRect({
           x: rect?.left ?? 0,
-          y: window.innerHeight,
+          y: getOverlayBottom(boundary),
           width: rect?.width ?? 0,
           height: 0,
         });
@@ -48,7 +53,7 @@ export const TableActionBarProvider: FC<TableActionBarProviderProps> = ({ childr
       flip: false,
       getAnchorElement: () => anchor,
     };
-  }, []);
+  }, [boundary]);
 
   const handleEscapeKeyDown = () => {
     if (selectionEnabled) table.resetRowSelection();
