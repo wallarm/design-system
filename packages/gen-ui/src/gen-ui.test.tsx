@@ -16,6 +16,7 @@ import {
   type SpecStreamLine,
   specFromLines,
 } from './json-render';
+import { findPlaceholder } from './tests/findPlaceholder';
 
 const pendingIds = (root: HTMLElement) =>
   [...root.querySelectorAll('[data-gen-ui-placeholder]')].map(el =>
@@ -288,6 +289,6 @@ describe('gen-ui', () => {
       />,
     );
     // The binding resolves to nothing again, so Text's props fail and it holds a placeholder.
-    expect(await screen.findByText('Text')).toBeTruthy();
+    expect(await findPlaceholder('Text')).toBeTruthy();
   });
 });

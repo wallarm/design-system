@@ -20,6 +20,7 @@ import {
   type LineChartTooltipRenderArgs,
   LineChartYAxis,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { defineComponent, seriesKey, unique } from '../define';
 import { formatNumber, formatTime, numberFormat, timeFormat } from '../format';
 import { CHART_COLORS } from './BarList';
@@ -49,6 +50,7 @@ export const ColumnChartComponent = defineComponent({
     xFormat: timeFormat,
     yFormat: numberFormat,
   }),
+  Skeleton: ({ title }) => <ChartSkeleton title={title} />,
   View: ({ props }) => {
     // A binding resolves to undefined until its data arrives.
     const series = props.series ?? [];
@@ -80,8 +82,8 @@ export const ColumnChartComponent = defineComponent({
       </LineChartHoverPopover>
     );
     return (
-      <div className='min-w-0 flex-1'>
-        <Chart>
+      <div className='h-full min-w-0 flex-1'>
+        <Chart className='h-full'>
           <ChartHeader>
             <ChartTitle>{props.title}</ChartTitle>
           </ChartHeader>

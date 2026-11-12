@@ -8,7 +8,7 @@ export const CardComponent = defineComponent({
   props: z.object({}),
   hasChildren: true,
   View: ({ children }) => (
-    <Card>
+    <Card className='h-full'>
       <CardContent>{children}</CardContent>
     </Card>
   ),

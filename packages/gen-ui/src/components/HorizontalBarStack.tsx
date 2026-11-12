@@ -4,11 +4,13 @@ import {
   ChartHeader,
   ChartTitle,
   HorizontalBarStack,
+  HorizontalBarStackSkeleton,
   MetricDelta,
   type MetricDeltaProps,
   MetricHeader,
   MetricValue,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { allOf, defineComponent, type Values } from '../define';
 import { formatNumber, numberFormat } from '../format';
 import { CHART_COLORS } from './BarList';
@@ -45,8 +47,13 @@ export const HorizontalBarStackComponent = defineComponent({
       }),
     ),
   }),
+  Skeleton: ({ title }) => (
+    <ChartSkeleton title={title}>
+      <HorizontalBarStackSkeleton />
+    </ChartSkeleton>
+  ),
   View: ({ props }) => (
-    <Chart>
+    <Chart className='h-full'>
       <ChartHeader>
         <ChartTitle>{props.title}</ChartTitle>
       </ChartHeader>

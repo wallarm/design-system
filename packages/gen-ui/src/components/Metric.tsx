@@ -8,10 +8,12 @@ import {
   MetricDelta,
   type MetricDeltaProps,
   MetricHeader,
+  MetricSkeleton,
   MetricSparkline,
   type MetricSparklineColor,
   MetricValue,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { allOf, defineComponent, type Values } from '../define';
 import { formatNumber, numberFormat } from '../format';
 
@@ -53,9 +55,14 @@ export const MetricComponent = defineComponent({
       .optional()
       .describe('Match it to the delta sentiment; brand by default'),
   }),
+  Skeleton: ({ title }) => (
+    <ChartSkeleton title={title}>
+      <MetricSkeleton />
+    </ChartSkeleton>
+  ),
   View: ({ props }) => (
-    <div className='min-w-0 flex-1'>
-      <Chart>
+    <div className='h-full min-w-0 flex-1'>
+      <Chart className='h-full'>
         <ChartHeader>
           <ChartTitle>{props.title}</ChartTitle>
         </ChartHeader>

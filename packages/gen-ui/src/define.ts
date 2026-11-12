@@ -28,6 +28,12 @@ export interface GenUiComponent<S extends z.ZodObject = z.ZodObject> {
   events?: readonly string[];
   hasChildren?: boolean;
   View: FC<GenUiViewProps<z.infer<S>>>;
+  /**
+   * Drawn while the props don't match the schema yet (mid-stream: data still on its way), shaped
+   * like the loaded component so the layout doesn't jump. Gets the title once it has streamed in.
+   * Default: a plain block.
+   */
+  Skeleton?: FC<{ title?: string }>;
 }
 
 /** An app action a spec may bind a component event to, e.g. `block_ip`. */

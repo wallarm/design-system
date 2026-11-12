@@ -9,6 +9,7 @@ import {
 } from '../a2ui';
 import { ColumnChartComponent } from '../components/ColumnChart';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const catalog = [ColumnChartComponent];
 const SERIES = [
@@ -130,10 +131,11 @@ describe('ColumnChart', () => {
       () => renderJsonRender(jsonRender({ series: SERIES, points: [{ x: 'a' }] })),
     ];
     // Unbound data doesn't match the schema yet: a placeholder. Empty or partial data renders.
-    const expected = ['ColumnChart', 'Requests per day', 'ColumnChart', 'Requests per day'];
+    // Even cases are unbound (a skeleton), odd ones render the chart.
     for (const [i, draw] of cases.entries()) {
       const view = draw();
-      expect(await screen.findByText(expected[i] ?? '')).toBeTruthy();
+      if (i % 2 === 0) expect(await findPlaceholder('ColumnChart')).toBeTruthy();
+      else expect(await screen.findByText('Requests per day')).toBeTruthy();
       view.unmount();
     }
   });

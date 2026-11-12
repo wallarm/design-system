@@ -9,6 +9,7 @@ import {
 } from '../a2ui';
 import { LineChartComponent } from '../components/LineChart';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const CATALOG = [LineChartComponent];
 const SERIES = [
@@ -112,12 +113,12 @@ describe('LineChart', () => {
       points: { '@path': '/traffic/points' },
     };
     const view = renderA2ui(a2ui(bound));
-    expect(await screen.findByText('LineChart')).toBeTruthy();
+    expect(await findPlaceholder('LineChart')).toBeTruthy();
     view.unmount();
     const json = renderJsonRender(
       jsonRender({ title: 'Traffic', series: { $state: '/none' }, points: { $state: '/none' } }),
     );
-    expect(await screen.findByText('LineChart')).toBeTruthy();
+    expect(await findPlaceholder('LineChart')).toBeTruthy();
     json.unmount();
     renderA2ui(a2ui({ title: 'Empty', series: SERIES, points: [] }));
     expect(await screen.findByText('Empty')).toBeTruthy();

@@ -14,7 +14,9 @@ import {
   PieChartLegendItem,
   PieChartLegendPercent,
   PieChartLegendValue,
+  PieChartSkeleton,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { defineComponent, unique } from '../define';
 import { formatNumber, numberFormat } from '../format';
 import { CHART_COLORS } from './BarList';
@@ -37,6 +39,11 @@ export const PieChartComponent = defineComponent({
       )
       .refine(unique('label'), 'labels must be unique'),
   }),
+  Skeleton: ({ title }) => (
+    <ChartSkeleton title={title}>
+      <PieChartSkeleton />
+    </ChartSkeleton>
+  ),
   View: ({ props }) => {
     // A binding resolves to undefined until its data arrives.
     const items = props.items ?? [];
@@ -48,7 +55,7 @@ export const PieChartComponent = defineComponent({
     const total = items.reduce((sum, item) => sum + Math.max(0, item.value), 0); // DS coerces negatives to 0
     const formatHovered = (datum: PieChartDatum) => formatNumber(datum.value, props.format);
     return (
-      <Chart>
+      <Chart className='h-full'>
         <ChartHeader>
           <ChartTitle>{props.title}</ChartTitle>
         </ChartHeader>

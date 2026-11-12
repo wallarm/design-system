@@ -166,14 +166,20 @@ doesn't know which line came from the agent and which from the app. To make it a
 the agent's own data writes (A2UI `updateDataModel` messages, json-render patches under `/state`)
 before you pass its stream in, and send data only from the app.
 
-While the page streams, every part that isn't renderable yet holds a dashed placeholder, so the
-layout keeps its shape:
+While the page streams, every part that isn't renderable yet holds a skeleton, so the layout keeps
+its shape and doesn't jump when the part arrives:
 
-- a child the agent named but hasn't sent yet, labelled with the agent's id for it;
-- a component whose props don't match its schema yet, labelled with its type (`Metric`). That is
-  usually a binding whose data the app hasn't sent; at the end of the stream it is a mistake in the
-  answer, and the placeholder's tooltip lists what failed. Every View renders only with props that
-  pass its schema, so an invalid value from the model holds a placeholder too.
+- a child the agent named but hasn't sent yet holds a plain skeleton block, since its type isn't
+  known yet;
+- a component whose props don't match its schema yet holds its own skeleton, declared next to its
+  View (`Skeleton` in `defineComponent`): a chart card with its title and the design system's
+  `MetricSkeleton`, `BarListSkeleton` and the like. That is usually a binding whose data the app
+  hasn't sent; at the end of the stream it is a mistake in the answer, and the skeleton's tooltip
+  lists what failed. Every View renders only with props that pass its schema, so an invalid value
+  from the model holds a skeleton too.
+
+Widgets in one Grid row take the row's height, so tiles line up. Inside a stretched Metric tile the
+value sits at the bottom edge, as the design system lays it out.
 
 Use `Section` for each topic, `Grid` with 4 columns for KPI tiles and 2 or 3 for charts, and
 `GridItem` for a cell that spans columns.
@@ -192,10 +198,10 @@ Treat everything the agent sends as untrusted input.
 - **Side effects need approval.** A button only asks: the app shows an approval card with the
   details and runs the action after the user confirms.
 - **Props are validated before rendering.** A component renders only with props that match its
-  schema; anything else holds a placeholder.
+  schema; anything else holds a skeleton.
 - **A bad message stays contained.** A2UI messages that fail validation go to `onError` (a console
   warning by default) instead of throwing. In json-render, `specFromLines` drops a patch it can't
-  apply and turns a value that isn't an element into a placeholder. In both, a component that still
+  apply and turns a value that isn't an element into a skeleton. In both, a component that still
   fails to render blanks only its own surface, not the chat.
 
 ## A2UI or json-render

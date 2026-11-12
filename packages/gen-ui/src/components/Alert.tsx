@@ -7,6 +7,7 @@ import {
   AlertIcon,
   AlertTitle,
 } from '@wallarm-org/design-system/Alert';
+import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { defineComponent, subsetOf } from '../define';
 
 export const AlertComponent = defineComponent({
@@ -17,6 +18,7 @@ export const AlertComponent = defineComponent({
     description: z.string().optional(),
     tone: z.enum(subsetOf<AlertColor>()(['info', 'warning', 'destructive', 'success'])).optional(),
   }),
+  Skeleton: () => <Skeleton width='100%' height='56px' rounded={12} transparent={false} />,
   View: ({ props }) => (
     <Alert color={props.tone ?? 'info'} minWidth={0}>
       <AlertIcon />

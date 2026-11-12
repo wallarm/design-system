@@ -8,6 +8,7 @@ import {
 } from '../a2ui';
 import { HorizontalBarStackComponent } from '../components/HorizontalBarStack';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const COMPONENTS = [HorizontalBarStackComponent];
 const ITEMS = [
@@ -88,9 +89,9 @@ describe('HorizontalBarStack', () => {
 
   it('holds a placeholder while bound items are still undefined', async () => {
     const view = a2ui({ title: 'Incidents by severity', items: { '@path': '/sev' } });
-    expect(await screen.findByText('HorizontalBarStack')).toBeTruthy();
+    expect(await findPlaceholder('HorizontalBarStack')).toBeTruthy();
     view.unmount();
     jsonRender({ title: 'Incidents by severity', items: { $state: '/sev' } }, {});
-    expect(await screen.findByText('HorizontalBarStack')).toBeTruthy();
+    expect(await findPlaceholder('HorizontalBarStack')).toBeTruthy();
   });
 });

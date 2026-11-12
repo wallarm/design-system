@@ -8,6 +8,7 @@ import {
 } from '../a2ui';
 import { PieChartComponent } from '../components/PieChart';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const ITEMS = [
   { label: '4XX', value: 700, color: 'amber' },
@@ -89,9 +90,9 @@ describe('PieChart', () => {
 
   it('holds a placeholder while a binding has not resolved yet', async () => {
     const view = renderA2ui({ '@path': '/codes' });
-    expect(await screen.findByText('PieChart')).toBeTruthy();
+    expect(await findPlaceholder('PieChart')).toBeTruthy();
     view.unmount();
     renderJsonRender({ $state: '/codes' });
-    expect(await screen.findByText('PieChart')).toBeTruthy();
+    expect(await findPlaceholder('PieChart')).toBeTruthy();
   });
 });

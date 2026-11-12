@@ -5,12 +5,14 @@ import {
   BarListItem,
   BarListLabel,
   BarListPercent,
+  BarListSkeleton,
   BarListValue,
   Chart,
   type ChartColor,
   ChartHeader,
   ChartTitle,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { defineComponent, subsetOf, unique } from '../define';
 import { formatNumber, numberFormat } from '../format';
 
@@ -41,11 +43,16 @@ export const BarListComponent = defineComponent({
       )
       .refine(unique('label'), 'labels must be unique'),
   }),
+  Skeleton: ({ title }) => (
+    <ChartSkeleton title={title}>
+      <BarListSkeleton />
+    </ChartSkeleton>
+  ),
   View: ({ props }) => {
     // A binding resolves to undefined until its data arrives.
     const items = props.items ?? [];
     return (
-      <Chart>
+      <Chart className='h-full'>
         <ChartHeader>
           <ChartTitle>{props.title}</ChartTitle>
         </ChartHeader>

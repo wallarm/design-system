@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Heading, type HeadingProps } from '@wallarm-org/design-system/Heading';
+import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { defineComponent, subsetOf, type Values } from '../define';
 
 export const HeadingComponent = defineComponent({
@@ -9,6 +10,7 @@ export const HeadingComponent = defineComponent({
     text: z.string(),
     size: z.enum(subsetOf<Values<HeadingProps['size']>>()(['md', 'lg', 'xl', '2xl'])).optional(),
   }),
+  Skeleton: () => <Skeleton width='40%' height='24px' transparent={false} />,
   View: ({ props }) => (
     <Heading size={props.size ?? 'lg'} weight='medium'>
       {props.text}

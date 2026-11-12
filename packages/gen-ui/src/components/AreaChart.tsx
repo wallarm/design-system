@@ -16,6 +16,7 @@ import {
   LineChartXAxis,
   LineChartYAxis,
 } from '@wallarm-org/design-system/SimpleCharts';
+import { ChartSkeleton } from '../ChartSkeleton';
 import { allOf, defineComponent, seriesKey, unique } from '../define';
 import { formatNumber, formatTime, numberFormat, timeFormat } from '../format';
 import { CHART_COLORS } from './BarList';
@@ -46,6 +47,7 @@ export const AreaChartComponent = defineComponent({
     xFormat: timeFormat,
     yFormat: numberFormat,
   }),
+  Skeleton: ({ title }) => <ChartSkeleton title={title} />,
   View: ({ props }) => {
     // A binding resolves to undefined until its data arrives.
     const series = props.series ?? [];
@@ -54,7 +56,7 @@ export const AreaChartComponent = defineComponent({
     const formatY = (value: unknown) =>
       typeof value === 'number' ? formatNumber(value, props.yFormat) : '—';
     return (
-      <Chart>
+      <Chart className='h-full'>
         <ChartHeader>
           <ChartTitle>{props.title}</ChartTitle>
         </ChartHeader>

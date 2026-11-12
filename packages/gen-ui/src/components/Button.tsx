@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Button, type ButtonProps } from '@wallarm-org/design-system/Button';
+import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { defineComponent, subsetOf, type Values } from '../define';
 
 const VARIANTS = subsetOf<Values<ButtonProps['variant']>>()(['primary', 'outline', 'ghost']);
@@ -20,6 +21,7 @@ export const ButtonComponent = defineComponent({
     destructive: z.boolean().optional(),
   }),
   events: ['press'],
+  Skeleton: () => <Skeleton width='120px' height='36px' rounded={8} transparent={false} />,
   View: ({ props, emit }) => (
     <Button
       variant={props.variant ?? 'outline'}

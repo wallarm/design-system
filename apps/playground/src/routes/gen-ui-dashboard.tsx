@@ -97,8 +97,7 @@ function DashboardPage() {
           {replay.run === 0 ? (
             <Text color='secondary'>
               Press Build. The agent streams the layout, with every number bound to a path; the app
-              fills those paths from its API. Parts that haven&apos;t arrived hold a dashed
-              placeholder.
+              fills those paths from its API. Parts that haven&apos;t arrived hold a skeleton.
             </Text>
           ) : format === 'a2ui' ? (
             <A2uiSurfaces

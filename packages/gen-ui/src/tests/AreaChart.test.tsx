@@ -8,6 +8,7 @@ import {
 } from '../a2ui';
 import { AreaChartComponent } from '../components/AreaChart';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
+import { findPlaceholder } from './findPlaceholder';
 
 const SERIES = [
   { key: 'blocked', label: 'Blocked', color: 'red' },
@@ -96,8 +97,9 @@ describe('AreaChart', () => {
   it('holds a placeholder while bound data is missing, and an empty frame for no points', async () => {
     // Until the data arrives the props don't match the schema: GuardedView shows a placeholder.
     const view = renderA2ui({ '@path': '/traffic' });
-    expect(await screen.findByText('AreaChart')).toBeTruthy();
-    expect(screen.queryByText('Traffic')).toBeNull();
+    // The skeleton already carries the title that has streamed in.
+    const skeleton = await findPlaceholder('AreaChart');
+    expect(skeleton.textContent).toContain('Traffic');
     view.unmount();
     renderJsonRender({ $state: '/traffic' }, {}).unmount();
     // Points arrived, but there are none: the chart itself says so.

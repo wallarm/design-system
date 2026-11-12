@@ -10,6 +10,7 @@ import { Heading } from '@wallarm-org/design-system/Heading';
 import { HttpMethod } from '@wallarm-org/design-system/HttpMethod';
 import { Ip, IpAddress } from '@wallarm-org/design-system/Ip';
 import { ResponseCode } from '@wallarm-org/design-system/ResponseCode';
+import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import {
   createTableColumnHelper,
   Table,
@@ -108,6 +109,7 @@ export const TableComponent = defineComponent({
     ),
     rows: z.array(z.looseObject({})).describe('One object per row, keyed by the column keys'),
   }),
+  Skeleton: () => <Skeleton width='100%' height='240px' rounded={8} transparent={false} />,
   View: ({ props }) => {
     // A binding resolves to undefined until its data arrives; a streamed column may lack its key.
     const columns: TableColumnDef<Row>[] = (props.columns ?? [])
