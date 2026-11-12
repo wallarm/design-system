@@ -1,3 +1,9 @@
+## [4.14.0](https://github.com/wallarm/design-system/compare/v4.13.0...v4.14.0) (2026-11-12)
+
+### Features
+
+* **website:** live templates in one-per-row cards with overlays kept inside ([#468](https://github.com/wallarm/design-system/issues/468)) ([26ca2e7](https://github.com/wallarm/design-system/commit/26ca2e77b73b213e01c0f956337565288dd2c1e7))
+
 ## [4.13.0](https://github.com/wallarm/design-system/compare/v4.12.4...v4.13.0) (2026-11-11)
 
 ### Features
