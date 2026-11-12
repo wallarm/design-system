@@ -1,7 +1,9 @@
+import { useContext } from 'react';
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
+import { DrawerAncestorIdsContext } from '../Drawer/DrawerRoot';
 import { Dialog } from './Dialog';
 import { DialogBody } from './DialogBody';
 import { DialogClose } from './DialogClose';
@@ -351,5 +353,26 @@ describe('DialogHeader grouping of DialogTitle / DialogDescription', () => {
     const describedBy = screen.getByRole('dialog').getAttribute('aria-describedby');
     const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
     expect(descriptionEl).toBeNull();
+  });
+});
+
+// A Drawer opened from a Dialog must count the Dialog as a React ancestor, or the Dialog's layer
+// can't cascade-dismiss it (keepOpenUnlessAncestorCloses only lets ancestors through).
+describe('Nesting', () => {
+  const AncestorIds = () => (
+    <span data-testid='ancestor-ids'>{useContext(DrawerAncestorIdsContext).join(',')}</span>
+  );
+
+  it('registers its content as an ancestor of layers rendered inside it', async () => {
+    render(
+      <Dialog open data-testid='dialog'>
+        <DialogContent>
+          <AncestorIds />
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const content = await screen.findByTestId('dialog--content');
+    expect(screen.getByTestId('ancestor-ids')).toHaveTextContent(content.id);
   });
 });

@@ -1,4 +1,4 @@
-import { type CSSProperties, type FC, type ReactNode, type Ref, useContext } from 'react';
+import type { CSSProperties, FC, ReactNode, Ref } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -8,7 +8,7 @@ import { useNestedSameKindCount } from './DrawerNestingContext';
 import { DrawerOverlay } from './DrawerOverlay';
 import { DrawerPortal } from './DrawerPortal';
 import { DrawerPositioner } from './DrawerPositioner';
-import { DrawerAncestorIdsContext } from './DrawerRoot';
+import { DrawerAncestorIdsProvider } from './DrawerRoot';
 
 export interface DrawerContentProps {
   children: ReactNode;
@@ -18,8 +18,7 @@ export interface DrawerContentProps {
 
 export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }) => {
   const testId = useTestId('content');
-  const { width, isResizing, overlay, contentId } = useDrawerContext();
-  const ancestorIds = useContext(DrawerAncestorIdsContext);
+  const { width, isResizing, overlay } = useDrawerContext();
   const nestedSameKindCount = useNestedSameKindCount();
 
   return (
@@ -46,9 +45,7 @@ export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }
           style={{ width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties}
           asChild={asChild}
         >
-          <DrawerAncestorIdsContext.Provider value={[...ancestorIds, contentId]}>
-            {children}
-          </DrawerAncestorIdsContext.Provider>
+          <DrawerAncestorIdsProvider>{children}</DrawerAncestorIdsProvider>
         </Dialog.Content>
       </DrawerPositioner>
     </DrawerPortal>
