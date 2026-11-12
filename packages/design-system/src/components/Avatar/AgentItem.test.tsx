@@ -27,6 +27,8 @@ describe('AgentItem', () => {
     expect(root.querySelector('[data-slot^=avatar-fallback], [data-slot=avatar-image]')).toBeNull();
     expect(screen.getByTestId('a--name')).toHaveTextContent('Radar');
     expect(screen.getByTestId('a--description')).toHaveTextContent('Attack Anomaly Investigator');
+    // stretched by a flex column or a row, the glyph and the name stay together at the start
+    expect(root.className).toContain('justify-start');
   });
 
   it('takes a custom look, a size and a state', () => {

@@ -89,8 +89,9 @@ export const avatarOverlayClassNames = cn(
 );
 
 // The agent user item: the glyph in column 1 with no plate, AvatarContent in column 2, as in the person's row.
+// `justify-start` keeps both tracks at their content size when a flex column or a row stretches the item.
 export const agentItemVariants = cva(
-  'inline-grid max-w-full shrink-0 items-center align-middle font-sans',
+  'inline-grid max-w-full shrink-0 items-center justify-start align-middle font-sans',
   {
     variants: {
       size: {
