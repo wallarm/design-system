@@ -12,7 +12,8 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "../design-system/src/components/CodeSnippet/adapters/prismjs.d.ts"
   ],
   "exclude": [
     "node_modules",

@@ -4,6 +4,7 @@
 @import '../../../packages/design-system/src/theme/index.css';
 /* Pattern guideline stories render on the patterns pages; theme/index.css only scans components. */
 @source '../../../packages/design-system/src/guidelines';
+@source '../../../packages/gen-ui/src';
 
 /* Rspress chrome on DS tokens. Rspress declares its vars under :where(), so :root wins; the DS
    tokens themselves flip on <html data-theme>, which themeScript/ThemeSync keep in step with the

@@ -33,8 +33,15 @@ src/
 │   ├── spec.ts           specFromLines (stream → spec, never throws), sanitizeSpec (allowlist)
 │   └── JsonRenderSurface.tsx  renders a spec; keeps its state in step as the app fills it
 ├── fixtures/             @wallarm-org/gen-ui/fixtures: recorded answers, both formats
-│   ├── attackSummary.ts  a chat answer: metrics, a breakdown, an alert, two buttons
-│   └── dashboard.ts      a dashboard: the agent's layout + the app's data, one tree, two formats
+│   ├── stream.ts         the scenario builder: layout chunks + app data → both streams (toStreams)
+│   ├── scenarios.ts      SCENARIOS: every answer a demo can replay, in picker order
+│   ├── attackSummary.ts  a chat answer written by hand in both formats
+│   └── dashboard.ts, …   one scenario per file, built with stream.ts
+├── playground/           @wallarm-org/gen-ui/playground: the demos the playground app and the
+│   │                     docs site embed
+│   ├── GenUiPlayground.tsx  pick a prompt, replay its answer, read the stream beside it
+│   ├── GenUiChatDemo.tsx    answers inside the Wally chat, with an approval before Block
+│   └── useEmulatedAgent.ts  the scripted agent behind the chat demo
 └── tests/                all tests (formats.test.tsx covers the shared behaviour)
 ```
 
@@ -80,6 +87,15 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
 - The root of a widget fills its cell (`h-full`), so a Grid row lines up.
 - The `description` is for the model: when to use it and the data shape, not how it looks.
 
+## Add a recorded answer
+
+1. Create `src/fixtures/<name>.ts` exporting a `Scenario` (see `dashboard.ts`): the prompt, the
+   agent's layout in the chunks it sends them (`node`, with every figure a `bind('/path')`), and
+   the app's data batches with the chunk each arrives after.
+2. Add `{ ...scenario, ...toStreams(scenario) }` to `SCENARIOS` in `src/fixtures/scenarios.ts`:
+   the playground and the docs page list it from there.
+3. Add a test that renders it through both formats and leaves no skeleton at the end.
+
 ## Commands
 
 ```bash
@@ -88,8 +104,9 @@ pnpm --filter @wallarm-org/gen-ui typecheck
 pnpm --filter @wallarm-org/gen-ui build       # rslib → dist/, same layout as src/
 ```
 
-The playground has two demos that replay the fixtures: `/gen-ui` (answers in the Wally chat) and
-`/gen-ui-dashboard` (a dashboard the agent lays out while the app fills its data):
+The playground app has two demos that replay the fixtures: `/gen-ui` (answers in the Wally chat)
+and `/gen-ui-playground` (pick a prompt, watch the agent lay out the answer while the app fills its
+data). The docs site embeds the same `GenUiPlayground` on its Generative UI playground page.
 
 ```bash
 pnpm turbo run build --filter=@wallarm-org/design-system   # the playground reads the built theme

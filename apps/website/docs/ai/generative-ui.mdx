@@ -1,18 +1,31 @@
 ---
-description: Let an AI agent answer with design-system components: one catalog rendered from A2UI or json-render specs inside the Wally chat.
+description: Let an AI agent answer with design-system components instead of text, streamed as A2UI or json-render. Try it live on the page.
 ---
 
 # Generative UI
 
-Generative UI lets an agent answer with an interface instead of text: a metric card, a top-N
-breakdown, a button that asks the app to act. The agent never sends code. It sends JSON that names
-components from a catalog the app registered, and the app renders those components from the design
-system.
+An agent can answer with an interface instead of text. Pick a prompt and watch it build:
 
-`@wallarm-org/gen-ui` is that catalog. Each component is defined once, and two catalogs are derived
-from the definition: one for [A2UI](https://a2ui.org) v1.0 and one for
-[json-render](https://json-render.dev). The rendered answer drops into the Wally chat as a custom
-part, so the chat itself needs no changes.
+<GenUiPlayground compact />
+
+What you just watched:
+
+- **The agent only names components.** It streams JSON that places components from a catalog the
+  app registered (`Metric`, `LineChart`, `Table`…) and never sends code, HTML or styles.
+- **The app fills in the numbers.** Every figure in the layout is a binding to a path, and the app
+  writes those paths from its own API, so the model has no figure to invent.
+- **The page builds up while it streams.** A part that hasn't arrived, or whose data hasn't, holds a
+  skeleton shaped like the component.
+- **One catalog, two formats.** The same answer streams as [A2UI](https://a2ui.org) v1.0 messages or
+  [json-render](https://json-render.dev) patches; switch the format and it repaints the same.
+
+Open **Stream** to read every line the agent and the app sent, or try the
+[Generative UI playground](/ai/generative-ui-playground) for a full-width view and answers inside the
+Wally chat.
+
+`@wallarm-org/gen-ui` is that catalog: each component is defined once, and the A2UI and json-render
+catalogs are derived from the definition. An answer drops into the Wally chat as a custom part, so
+the chat itself needs no changes.
 
 :::warning Experimental
 `@wallarm-org/gen-ui` is a private prototype in the repository (`packages/gen-ui`) and is not
@@ -263,8 +276,8 @@ pnpm turbo run build --filter=@wallarm-org/design-system   # the playground read
 pnpm --filter @wallarm-org/playground dev
 ```
 
-Then open `/gen-ui` for answers in the chat, or `/gen-ui-dashboard` for a dashboard the agent
-builds while the app fills its data. The dashboard page shows the stream beside the page, each line
-marked as the agent's layout or the app's data. The fixtures they replay are in
-`packages/gen-ui/src/fixtures/` (`attackSummary.ts` and `dashboard.ts`). The package README maps
-where everything else lives.
+Then open `/gen-ui` for answers in the chat, or `/gen-ui-playground` for the replay playground
+that the [Generative UI playground](/ai/generative-ui-playground) page embeds: pick a prompt, and
+the stream shows beside the page, each line marked as the agent's layout or the app's data. The
+answers they replay are in `packages/gen-ui/src/fixtures/`; the package README maps where
+everything else lives.

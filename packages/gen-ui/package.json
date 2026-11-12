@@ -31,6 +31,11 @@
       "development": "./src/fixtures/index.ts",
       "types": "./dist/fixtures/index.d.ts",
       "default": "./dist/fixtures/index.js"
+    },
+    "./playground": {
+      "development": "./src/playground/index.ts",
+      "types": "./dist/playground/index.d.ts",
+      "default": "./dist/playground/index.js"
     }
   },
   "files": [

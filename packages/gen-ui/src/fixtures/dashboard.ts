@@ -3,9 +3,8 @@
  * bound to a path, and the app fills those paths from its own API. The tree is written once and
  * emitted in both formats, chunk by chunk, so a renderer shows placeholders until a part arrives.
  */
-import type { SpecStreamLine } from '@json-render/core';
-import { type A2uiMessage, WALLARM_A2UI_CATALOG_ID } from '../a2ui';
 import type { GenUiAction } from '../core/define';
+import { bind, type LayoutNode, node as n, type Scenario, toStreams } from './stream';
 
 // ── The app's data (what its API returns for "last 24 hours") ──────────────────
 
@@ -100,30 +99,8 @@ export const DASHBOARD_ACTIONS: readonly GenUiAction[] = [
 
 // ── The agent's layout, written once ─────────────────────────────────────────
 
-/** A value the app fills: becomes `{ "@path" }` in A2UI and `{ "$state" }` in json-render. */
-const bind = (path: string) => ({ bind: path });
-type Bound = ReturnType<typeof bind>;
-const isBound = (v: unknown): v is Bound =>
-  typeof v === 'object' && v !== null && 'bind' in v && Object.keys(v).length === 1;
-
-interface Node {
-  id: string;
-  type: string;
-  props?: Record<string, unknown>;
-  children?: string[];
-  /** For a Button: the action and its context, which may hold bindings too. */
-  press?: { action: string; params: Record<string, unknown> };
-}
-
-const n = (id: string, type: string, props: Node['props'] = {}, children?: string[]): Node => ({
-  id,
-  type,
-  props,
-  children,
-});
-
 /** Arrival order: the shell first, then one part of the page per chunk. */
-const LAYOUT: Node[][] = [
+const LAYOUT: LayoutNode[][] = [
   [
     n(
       'root',
@@ -232,127 +209,40 @@ const LAYOUT: Node[][] = [
   ],
 ];
 
-/** The app's data, in the order its API answers: the headline numbers first, the rest later. */
-const DATA_CHUNKS: { path: string; value: unknown }[][] = [
-  [
-    { path: '/kpi', value: DASHBOARD_DATA.kpi },
-    { path: '/requestsSpark', value: DASHBOARD_DATA.requestsSpark },
-    { path: '/attacksSpark', value: DASHBOARD_DATA.attacksSpark },
-    { path: '/traffic', value: DASHBOARD_DATA.traffic },
-    { path: '/attacks', value: DASHBOARD_DATA.attacks },
+/** Security dashboard: KPI tiles, traffic and attack charts, breakdowns and a threats table. */
+export const DASHBOARD_SCENARIO: Scenario = {
+  id: 'security-dashboard',
+  prompt: 'Build a security dashboard for the last 24 hours',
+  summary: 'KPI tiles with sparklines, traffic and attack charts, breakdowns, a threats table',
+  surfaceId: 'security_dashboard',
+  actions: DASHBOARD_ACTIONS,
+  layout: LAYOUT,
+  // The app answers right after the agent has sent the components that bind it: the KPI and
+  // chart data after the KPI tiles (chunk 1), the rest after the breakdowns (chunk 3).
+  data: [
+    {
+      after: 1,
+      values: [
+        { path: '/kpi', value: DASHBOARD_DATA.kpi },
+        { path: '/requestsSpark', value: DASHBOARD_DATA.requestsSpark },
+        { path: '/attacksSpark', value: DASHBOARD_DATA.attacksSpark },
+        { path: '/traffic', value: DASHBOARD_DATA.traffic },
+        { path: '/attacks', value: DASHBOARD_DATA.attacks },
+      ],
+    },
+    {
+      after: 3,
+      values: [
+        { path: '/attackTypes', value: DASHBOARD_DATA.attackTypes },
+        { path: '/endpoints', value: DASHBOARD_DATA.endpoints },
+        { path: '/severity', value: DASHBOARD_DATA.severity },
+        { path: '/threats', value: DASHBOARD_DATA.threats },
+        { path: '/topIps', value: DASHBOARD_DATA.topIps },
+      ],
+    },
   ],
-  [
-    { path: '/attackTypes', value: DASHBOARD_DATA.attackTypes },
-    { path: '/endpoints', value: DASHBOARD_DATA.endpoints },
-    { path: '/severity', value: DASHBOARD_DATA.severity },
-    { path: '/threats', value: DASHBOARD_DATA.threats },
-    { path: '/topIps', value: DASHBOARD_DATA.topIps },
-  ],
-];
-
-// ── Emitting both formats ────────────────────────────────────────────────────
-
-const mapBindings = (value: unknown, to: (path: string) => unknown): unknown => {
-  if (isBound(value)) return to(value.bind);
-  if (Array.isArray(value)) return value.map(v => mapBindings(v, to));
-  if (typeof value === 'object' && value !== null)
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, mapBindings(v, to)]));
-  return value;
 };
 
-/** Who sent a line: the agent (layout) or the app (data). */
-export type StreamOrigin = 'agent' | 'app';
-export interface StreamLine<T> {
-  origin: StreamOrigin;
-  line: T;
-}
-
-const SURFACE = 'security_dashboard';
-const toA2uiPath = (path: string) => ({ '@path': path });
-
-const a2uiComponent = (node: Node) => ({
-  id: node.id,
-  component: node.type,
-  ...(mapBindings(node.props, toA2uiPath) as Record<string, unknown>),
-  ...(node.children ? { children: node.children } : {}),
-  ...(node.press
-    ? {
-        press: {
-          event: {
-            name: node.press.action,
-            context: mapBindings(node.press.params, toA2uiPath),
-          },
-        },
-      }
-    : {}),
-});
-
-/**
- * Interleaved like a real session: the agent's chunks in order, and the app's data for a part right
- * after the agent has sent the components that bind it. Index 0 is createSurface (or /root), so
- * chunk 2 holds the KPI tiles and chunk 4 the breakdowns: the KPI and chart data follows chunk 2,
- * the rest follows chunk 4. Until then the bound components hold placeholders.
- */
-const interleave = <T>(agent: T[][], app: T[][]): StreamLine<T>[] =>
-  agent.flatMap((chunk, i) => [
-    ...chunk.map(line => ({ origin: 'agent' as const, line })),
-    ...(i === 2 ? (app[0] ?? []) : i === 4 ? (app[1] ?? []) : []).map(line => ({
-      origin: 'app' as const,
-      line,
-    })),
-  ]);
-
-export const DASHBOARD_A2UI: StreamLine<A2uiMessage>[] = interleave<unknown>(
-  [
-    [{ version: '1.0', createSurface: { surfaceId: SURFACE, catalogId: WALLARM_A2UI_CATALOG_ID } }],
-    ...LAYOUT.map(chunk => [
-      {
-        version: '1.0',
-        updateComponents: { surfaceId: SURFACE, components: chunk.map(a2uiComponent) },
-      },
-    ]),
-  ],
-  // One message per path: a second write to '/' would replace the first.
-  DATA_CHUNKS.map(chunk =>
-    chunk.map(d => ({
-      version: '1.0',
-      updateDataModel: { surfaceId: SURFACE, path: d.path, value: d.value },
-    })),
-  ),
-) as StreamLine<A2uiMessage>[];
-
-const toJsonRenderPath = (path: string) => ({ $state: path });
-
-const jsonRenderElement = (node: Node): SpecStreamLine => ({
-  op: 'add',
-  path: `/elements/${node.id}`,
-  value: {
-    type: node.type,
-    props: mapBindings(node.props, toJsonRenderPath),
-    children: node.children ?? [],
-    ...(node.press
-      ? {
-          on: {
-            press: {
-              action: node.press.action,
-              params: mapBindings(node.press.params, toJsonRenderPath),
-            },
-          },
-        }
-      : {}),
-  },
-});
-
-export const DASHBOARD_JSON_RENDER: StreamLine<SpecStreamLine>[] = [
-  // An empty state first, so the surface mounts with somewhere to put the app's data.
-  { origin: 'app', line: { op: 'add', path: '/state', value: {} } },
-  ...interleave<SpecStreamLine>(
-    [
-      [{ op: 'add', path: '/root', value: 'root' }],
-      ...LAYOUT.map(chunk => chunk.map(jsonRenderElement)),
-    ],
-    DATA_CHUNKS.map(chunk =>
-      chunk.map((d): SpecStreamLine => ({ op: 'add', path: `/state${d.path}`, value: d.value })),
-    ),
-  ),
-];
+const streams = toStreams(DASHBOARD_SCENARIO);
+export const DASHBOARD_A2UI = streams.a2ui;
+export const DASHBOARD_JSON_RENDER = streams.jsonRender;

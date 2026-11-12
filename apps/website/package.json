@@ -26,6 +26,7 @@
     "@rspress/core": "2.0.23",
     "@tanstack/react-router": "1.170.41",
     "@wallarm-org/design-system": "workspace:*",
+    "@wallarm-org/gen-ui": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "catalog:",
