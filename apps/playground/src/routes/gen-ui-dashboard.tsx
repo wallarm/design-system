@@ -59,6 +59,25 @@ function useReplay(lines: readonly StreamLine<unknown>[]) {
   return { ...state, start, done: state.run > 0 && state.count >= lines.length };
 }
 
+/**
+ * One line of the stream in a few words: what the message does and to what. A2UI messages name
+ * their type and the components or path; json-render patches are an op and a path.
+ */
+const describeLine = (line: unknown): string => {
+  if (typeof line !== 'object' || line === null) return String(line);
+  if ('op' in line && 'path' in line) return `${String(line.op)} ${String(line.path)}`;
+  const [type, body] = Object.entries(line).find(([key]) => key !== 'version') ?? ['?', {}];
+  if (typeof body !== 'object' || body === null) return type;
+  if ('components' in body && Array.isArray(body.components)) {
+    const ids = body.components.map((c: unknown) =>
+      typeof c === 'object' && c !== null && 'id' in c ? String(c.id) : '?',
+    );
+    return `${type} · ${ids.join(', ')}`;
+  }
+  if ('path' in body) return `${type} · ${String(body.path)}`;
+  return 'surfaceId' in body ? `${type} · ${String(body.surfaceId)}` : type;
+};
+
 function DashboardPage() {
   const [format, setFormat] = useState<Format>('a2ui');
   const [log, setLog] = useState<readonly { seq: number; text: string }[]>([]);
@@ -125,21 +144,28 @@ function DashboardPage() {
               {arrived.length} of {stream.length} lines
             </Text>
           </HStack>
-          <ol className='m-0 flex min-h-0 flex-1 list-none flex-col gap-8 overflow-auto px-16 pb-16'>
+          <ol className='m-0 flex min-h-0 flex-1 list-none flex-col gap-6 overflow-y-auto overflow-x-hidden px-16 pb-16'>
             {arrived.map((entry, i) => (
               // The stream only grows, so a line's index is its identity.
               // biome-ignore lint/suspicious/noArrayIndexKey: append-only list
-              <li key={`${replay.run}-${i}`} className='flex flex-col gap-4'>
-                <Badge
-                  type='secondary'
-                  color={entry.origin === 'agent' ? 'violet' : 'green'}
-                  size='small'
-                >
-                  {entry.origin === 'agent' ? 'agent · layout' : 'app · data'}
-                </Badge>
-                <pre className='m-0 max-h-120 overflow-auto rounded-8 bg-bg-surface-2 p-8 font-mono text-xs text-text-primary'>
-                  {JSON.stringify(entry.line)}
-                </pre>
+              <li key={`${replay.run}-${i}`} className='min-w-0'>
+                <details className='group rounded-8 bg-bg-surface-2'>
+                  <summary className='flex min-w-0 cursor-pointer list-none items-center gap-8 p-8'>
+                    <Badge
+                      type='secondary'
+                      color={entry.origin === 'agent' ? 'violet' : 'green'}
+                      size='small'
+                    >
+                      {entry.origin === 'agent' ? 'agent · layout' : 'app · data'}
+                    </Badge>
+                    <span className='min-w-0 truncate font-mono text-xs text-text-primary'>
+                      {describeLine(entry.line)}
+                    </span>
+                  </summary>
+                  <pre className='m-0 max-h-320 overflow-y-auto whitespace-pre-wrap break-all border-t border-border-primary-light p-8 font-mono text-xs text-text-primary'>
+                    {JSON.stringify(entry.line, null, 2)}
+                  </pre>
+                </details>
               </li>
             ))}
           </ol>

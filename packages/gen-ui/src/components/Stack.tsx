@@ -20,14 +20,19 @@ export const StackComponent = defineComponent({
     gap: z.enum(GAPS).optional().describe('Space between children, px. Default 12'),
   }),
   hasChildren: true,
-  View: ({ props, children }) => (
-    <Stack
-      direction={props.direction ?? 'column'}
-      gap={GAP[props.gap ?? '12']}
-      wrap='wrap'
-      fullWidth
-    >
-      {children}
-    </Stack>
-  ),
+  View: ({ props, children }) => {
+    const direction = props.direction ?? 'column';
+    // A row wraps onto the next line when narrow. A column never wraps: squeezed by a fixed-height
+    // parent (a chat message) it would move the rest of its children into a new column beside it.
+    return (
+      <Stack
+        direction={direction}
+        gap={GAP[props.gap ?? '12']}
+        wrap={direction === 'row' ? 'wrap' : 'nowrap'}
+        fullWidth
+      >
+        {children}
+      </Stack>
+    );
+  },
 });
