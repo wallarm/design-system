@@ -11,6 +11,7 @@ import { ToggleButton } from '@wallarm-org/design-system/ToggleButton';
 import { cn } from '@wallarm-org/design-system/utils/cn';
 import { A2uiSurfaces } from '../a2ui/A2uiSurfaces';
 import { createA2uiCatalog } from '../a2ui/catalog';
+import { ExpressSurfaces, toExpressLines } from '../a2ui/express';
 import { wallarmComponents } from '../components';
 import type { GenUiActionHandler } from '../core/define';
 import type { ReplayScenario } from '../fixtures/scenarios';
@@ -19,7 +20,7 @@ import { createJsonRenderCatalog } from '../json-render/catalog';
 import { JsonRenderSurface } from '../json-render/JsonRenderSurface';
 import { specFromLines } from '../json-render/spec';
 
-type Format = 'a2ui' | 'json-render';
+type Format = 'a2ui' | 'express' | 'json-render';
 
 /** The agent writes slowly, the app's API answers fast. */
 const DELAY = { agent: 650, app: 220 };
@@ -49,8 +50,14 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
   const [streamOpen, setStreamOpen] = useState(defaultStreamOpen);
   const [log, setLog] = useState<readonly { seq: number; text: string }[]>([]);
   const scenario = scenarios.find(s => s.id === scenarioId) ?? scenarios[0];
+  const [express] = useState(() => new Map(scenarios.map(s => [s.id, toExpress(s)])));
+  const expressOf = scenario && express.get(scenario.id);
   const stream: readonly StreamLine<unknown>[] =
-    format === 'a2ui' ? (scenario?.a2ui ?? []) : (scenario?.jsonRender ?? []);
+    format === 'a2ui'
+      ? (scenario?.a2ui ?? [])
+      : format === 'express'
+        ? (expressOf?.lines ?? [])
+        : (scenario?.jsonRender ?? []);
   const replay = useReplay(stream);
   // Once the answer is complete, the app keeps sending live data (if the scenario has any).
   const live = scenario?.liveStreams;
@@ -61,9 +68,19 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
   const liveRange = Array.from({ length: ticks }, (_, i) => i + 1);
   const liveA2ui = live ? liveRange.flatMap(tick => live.lines(tick).a2ui) : [];
   const liveJsonRender = live ? liveRange.flatMap(tick => live.lines(tick).jsonRender) : [];
+  const liveExpress =
+    live && expressOf
+      ? liveRange.flatMap(tick =>
+          toExpressLines(
+            A2UI_CATALOG,
+            expressOf.surfaceId,
+            live.lines(tick).a2ui.map(entry => entry.line),
+          ).map(line => ({ origin: 'app' as const, line })),
+        )
+      : [];
   const shown: readonly StreamLine<unknown>[] = [
     ...stream.slice(0, replay.count),
-    ...(format === 'a2ui' ? liveA2ui : liveJsonRender),
+    ...(format === 'a2ui' ? liveA2ui : format === 'express' ? liveExpress : liveJsonRender),
   ];
   const [jsonCatalogs] = useState(
     () =>
@@ -81,7 +98,7 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
     replay.restart();
   };
   const handleFormatChange = (value: string) => {
-    if (value !== 'a2ui' && value !== 'json-render') return;
+    if (value !== 'a2ui' && value !== 'express' && value !== 'json-render') return;
     setFormat(value);
     replay.restart();
   };
@@ -96,6 +113,7 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
           <HStack gap={8} align='center'>
             <SegmentedControl value={format} onChange={handleFormatChange}>
               <SegmentedControlItem value='a2ui'>A2UI v1.0</SegmentedControlItem>
+              <SegmentedControlItem value='express'>A2UI Express</SegmentedControlItem>
               <SegmentedControlItem value='json-render'>json-render</SegmentedControlItem>
             </SegmentedControl>
             <ToggleButton
@@ -142,6 +160,19 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                 actions={scenario.actions}
                 onAction={handleAction}
               />
+            ) : format === 'express' ? (
+              expressOf && (
+                <ExpressSurfaces
+                  key={`${scenario.id}-${replay.run}`}
+                  catalog={A2UI_CATALOG}
+                  surfaceId={expressOf.surfaceId}
+                  chunks={[...expressOf.lines.slice(0, replay.count), ...liveExpress].map(
+                    entry => entry.line,
+                  )}
+                  actions={scenario.actions}
+                  onAction={handleAction}
+                />
+              )
             ) : (
               jsonCatalog && (
                 <JsonRenderSurface
@@ -177,6 +208,13 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                 {ticks > 0 ? `${shown.length} lines` : `${replay.count} of ${stream.length} lines`}
               </Text>
             </HStack>
+            {format === 'express' && expressOf && (
+              <div className='px-16 pb-8'>
+                <Text size='sm' color='secondary'>
+                  The agent&apos;s part is {expressOf.saving}% shorter than the same answer in JSON.
+                </Text>
+              </div>
+            )}
             <ol className='m-0 flex min-h-0 flex-1 list-none flex-col gap-6 overflow-y-auto overflow-x-hidden px-16 pb-16'>
               {shown.map((entry, i) => (
                 // The stream only grows, so a line's index is its identity.
@@ -196,7 +234,9 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                       </span>
                     </summary>
                     <pre className='m-0 max-h-320 overflow-y-auto whitespace-pre-wrap break-all border-t border-border-primary-light p-8 font-mono text-xs text-text-primary'>
-                      {JSON.stringify(entry.line, null, 2)}
+                      {typeof entry.line === 'string'
+                        ? entry.line
+                        : JSON.stringify(entry.line, null, 2)}
                     </pre>
                   </details>
                 </li>
@@ -228,6 +268,28 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
       </div>
     </div>
   );
+};
+
+/**
+ * A scenario's answer as the Express a model would write, a statement per line: data assignments
+ * (`$/path = …`) come from the app, the rest from the agent. `saving` compares the agent's part
+ * with the same part in JSON.
+ */
+const toExpress = (scenario: ReplayScenario) => {
+  const messages = scenario.a2ui.map(entry => entry.line);
+  const first = messages[0];
+  const surfaceId = first && 'createSurface' in first ? first.createSurface.surfaceId : 'main';
+  const lines = toExpressLines(A2UI_CATALOG, surfaceId, messages).map(line => ({
+    origin: line.startsWith('$/') ? ('app' as const) : ('agent' as const),
+    line,
+  }));
+  const agentJson = JSON.stringify(
+    scenario.a2ui.filter(entry => entry.origin === 'agent').map(entry => entry.line),
+  ).length;
+  const agentExpress = lines
+    .filter(entry => entry.origin === 'agent')
+    .reduce((total, entry) => total + entry.line.length + 1, 0);
+  return { surfaceId, lines, saving: Math.round((1 - agentExpress / agentJson) * 100) };
 };
 
 /** Live updates stop here, so a page left open doesn't grow its stream forever. */

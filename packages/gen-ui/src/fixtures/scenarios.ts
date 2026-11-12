@@ -11,6 +11,7 @@ import {
 } from './attackSummary';
 import { DASHBOARD_SCENARIO } from './dashboard';
 import { INCIDENT_SCENARIO } from './incident';
+import { LIVE_MONITOR_SCENARIO } from './liveMonitor';
 import { type Scenario, type ScenarioStreams, toStreams } from './stream';
 import { WEEKLY_REPORT_SCENARIO } from './weeklyReport';
 
@@ -31,7 +32,11 @@ export const SCENARIOS: readonly ReplayScenario[] = [
     a2ui: ATTACK_SUMMARY_A2UI.map(line => ({ origin: 'agent', line })),
     jsonRender: ATTACK_SUMMARY_JSON_RENDER.map(line => ({ origin: 'agent', line })),
   },
-  ...[DASHBOARD_SCENARIO, INCIDENT_SCENARIO, API_INVENTORY_SCENARIO, WEEKLY_REPORT_SCENARIO].map(
-    (scenario: Scenario): ReplayScenario => ({ ...scenario, ...toStreams(scenario) }),
-  ),
+  ...[
+    DASHBOARD_SCENARIO,
+    LIVE_MONITOR_SCENARIO,
+    INCIDENT_SCENARIO,
+    API_INVENTORY_SCENARIO,
+    WEEKLY_REPORT_SCENARIO,
+  ].map((scenario: Scenario): ReplayScenario => ({ ...scenario, ...toStreams(scenario) })),
 ];

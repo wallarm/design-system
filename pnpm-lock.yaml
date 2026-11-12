@@ -739,6 +739,9 @@ importers:
 
   packages/gen-ui:
     dependencies:
+      '@a2ui/agent':
+        specifier: 0.1.0
+        version: 0.1.0
       '@a2ui/react':
         specifier: 0.15.0
         version: 0.15.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(zod@4.6.7)
@@ -889,6 +892,9 @@ importers:
         version: 7.0.2
 
 packages:
+
+  '@a2ui/agent@0.1.0':
+    resolution: {integrity: sha512-qpqMN+uQU+vA8JEjtIJsGT6qJJ0FZCnOKSRB6HBhleqnlsasjAiNIMSJfwX/lANv13cnEF10CgMiQGDLSyjnLQ==}
 
   '@a2ui/markdown-it@0.2.2':
     resolution: {integrity: sha512-oj58ybxIPwnRzN2NpvgxrOOwDlZuBKoEtW5U6wRs6SOq1dDjk/zAAkRtb0U52WPSu01gHJOFSGEkuE+Xe09dcQ==}
@@ -4084,6 +4090,9 @@ packages:
   ansis@4.3.1:
     resolution: {integrity: sha512-BJ8/l4R5LRE7hW9WdSuGYrLSHi2ynxeFpDFbH0K/CgNeY/tyhk+vO6TYxXC5r5CpUhNVX310xzPsN/H9lCdfOA==}
     engines: {node: '>=14'}
+
+  antlr4ng@3.0.16:
+    resolution: {integrity: sha512-DQuJkC7kX3xunfF4K2KsWTSvoxxslv+FQp/WHQZTJSsH2Ec3QfFmrxC3Nky2ok9yglXn6nHM4zUaVDxcN5f6kA==}
 
   any-promise@1.3.0:
     resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
@@ -8169,6 +8178,11 @@ packages:
 
 snapshots:
 
+  '@a2ui/agent@0.1.0':
+    dependencies:
+      '@a2ui/web_core': 0.15.0
+      antlr4ng: 3.0.16
+
   '@a2ui/markdown-it@0.2.2(@a2ui/web_core@0.15.0)':
     dependencies:
       '@a2ui/web_core': 0.15.0
@@ -11869,6 +11883,8 @@ snapshots:
   ansi-styles@6.2.3: {}
 
   ansis@4.3.1: {}
+
+  antlr4ng@3.0.16: {}
 
   any-promise@1.3.0: {}
 

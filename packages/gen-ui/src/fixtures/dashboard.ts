@@ -36,8 +36,6 @@ const series = (shift: number) => {
     attacksSpark: points.map(({ x, attacks }) => ({ x, y: attacks })),
   };
 };
-const sum = (shift: number, key: 'requests' | 'attacks') =>
-  window24(shift).reduce((total, point) => total + point[key], 0);
 
 export const DASHBOARD_DATA = {
   kpi: {
@@ -227,25 +225,6 @@ const LAYOUT: LayoutNode[][] = [
   ],
 ];
 
-/**
- * After the answer, the app keeps the dashboard current: every 3 s the window moves one hour on
- * (sped up for the demo) and the KPI totals follow it. The agent isn't asked again.
- */
-const DASHBOARD_LIVE: LiveData = {
-  every: 3000,
-  update: tick => [
-    {
-      path: '/kpi',
-      value: {
-        ...DASHBOARD_DATA.kpi,
-        requests: DASHBOARD_DATA.kpi.requests + sum(tick, 'requests') - sum(0, 'requests'),
-        attacks: DASHBOARD_DATA.kpi.attacks + sum(tick, 'attacks') - sum(0, 'attacks'),
-      },
-    },
-    ...Object.entries(series(tick)).map(([key, value]) => ({ path: `/${key}`, value })),
-  ],
-};
-
 /** Security dashboard: KPI tiles, traffic and attack charts, breakdowns and a threats table. */
 export const DASHBOARD_SCENARIO: Scenario = {
   id: 'security-dashboard',
@@ -254,7 +233,6 @@ export const DASHBOARD_SCENARIO: Scenario = {
   surfaceId: 'security_dashboard',
   actions: DASHBOARD_ACTIONS,
   layout: LAYOUT,
-  live: DASHBOARD_LIVE,
   // The app answers right after the agent has sent the components that bind it: the KPI and
   // chart data after the KPI tiles (chunk 1), the rest after the breakdowns (chunk 3).
   data: [

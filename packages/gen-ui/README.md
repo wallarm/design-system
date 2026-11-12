@@ -27,6 +27,7 @@ src/
 ├── a2ui/                 @wallarm-org/gen-ui/a2ui
 │   ├── catalog.tsx       createA2uiCatalog: entries → A2UI Catalog (toJson() for the agent)
 │   ├── A2uiSurfaces.tsx  feeds messages to a MessageProcessor, renders its surfaces
+│   ├── express.tsx       A2UI Express: the compact text form, compiled by @a2ui/agent
 │   └── toA2uiSchema.ts   zod 4 props → the zod 3 schema A2UI's binder reads
 ├── json-render/          @wallarm-org/gen-ui/json-render
 │   ├── catalog.tsx       createJsonRenderCatalog: entries → catalog (prompt()) + registry
@@ -36,6 +37,7 @@ src/
 │   ├── stream.ts         the scenario builder: layout chunks + app data → both streams (toStreams)
 │   ├── scenarios.ts      SCENARIOS: every answer a demo can replay, in picker order
 │   ├── attackSummary.ts  a chat answer written by hand in both formats
+│   ├── liveMonitor.ts    the live example: the app refreshes the page every 2 s
 │   └── dashboard.ts, …   one scenario per file, built with stream.ts
 ├── playground/           @wallarm-org/gen-ui/playground: the demos the playground app and the
 │   │                     docs site embed

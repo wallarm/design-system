@@ -6,6 +6,7 @@ export * from './apiInventory';
 export * from './attackSummary';
 export * from './dashboard';
 export * from './incident';
+export * from './liveMonitor';
 export * from './scenarios';
 export * from './stream';
 export * from './weeklyReport';

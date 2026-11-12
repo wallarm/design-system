@@ -179,6 +179,10 @@ doesn't know which line came from the agent and which from the app. To make it a
 the agent's own data writes (A2UI `updateDataModel` messages, json-render patches under `/state`)
 before you pass its stream in, and send data only from the app.
 
+Because the data is the app's, it can keep the page current after the answer: send new values for
+the paths the layout already binds, and the page updates with no agent call. The *Watch traffic
+live* prompt in the playground does this every 2 seconds.
+
 While the page streams, every part that isn't renderable yet holds a skeleton, so the layout keeps
 its shape and doesn't jump when the part arrives:
 
@@ -233,6 +237,32 @@ Pointer paths, fire actions by name and stream one JSON line at a time. The diff
 
 Because the definitions are shared, the choice can follow the agent stack: A2UI for agents that
 already speak A2A or AG-UI, json-render for agents built on the Vercel AI SDK.
+
+## A2UI Express
+
+[A2UI Express](https://github.com/a2ui-project/a2ui/tree/main/specification/proposals/express) is a
+compact text form of A2UI that a model writes instead of JSON, one statement per component:
+
+```text
+root = Grid("3", _, [attacks, blocked])
+attacks = Metric("Attacks", $/kpi/attacks, "compact")
+```
+
+Arguments follow the order of the entry's props, `_` skips one, and `$/path` is a binding. The
+official compiler in `@a2ui/agent` turns it into the same v1.0 messages, so rendering is unchanged;
+for the recorded answers the agent's part is about 40% shorter than the JSON. Express is still a
+proposal in the A2UI repository.
+
+```tsx
+import { ExpressSurfaces, expressPrompt } from '@wallarm-org/gen-ui/a2ui';
+
+const systemPrompt = expressPrompt(catalog); // rules, a signature per entry, examples
+
+<ExpressSurfaces catalog={catalog} surfaceId='main' chunks={chunks} actions={actions} onAction={onAction} />
+```
+
+`chunks` is the text so far, in the pieces it arrived in; a block the compiler rejects goes to
+`onError` and the rest still renders.
 
 ## Two versions of zod
 

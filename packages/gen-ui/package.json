@@ -49,6 +49,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@a2ui/agent": "0.1.0",
     "@a2ui/react": "0.15.0",
     "@a2ui/web_core": "0.15.0",
     "@json-render/core": "0.22.0",
