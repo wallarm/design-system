@@ -1,4 +1,5 @@
 import type { FC, Ref } from 'react';
+import { useFieldContext } from '@ark-ui/react/field';
 import { NumberInput as ArkUiNumberInput } from '@ark-ui/react/number-input';
 import type { VariantProps } from 'class-variance-authority';
 import { ChevronDown, ChevronUp } from '../../icons';
@@ -29,29 +30,34 @@ export type NumberInputProps = NumberInputNativeProps &
   TestableProps;
 
 export const NumberInput: FC<NumberInputProps> = ({
-  error = false,
+  error,
   size = 'default',
   defaultValue = '0',
   ...props
-}) => (
-  <ArkUiNumberInput.Root
-    {...props}
-    invalid={error}
-    defaultValue={defaultValue}
-    className={numberInputRootVariants({ size })}
-  >
-    <ArkUiNumberInput.Input className={numberInputFieldVariants({ size })} />
-    <ArkUiNumberInput.Control
-      className={cn(numberInputControlVariants({ size }), '[&_svg]:text-icon-secondary')}
+}) => {
+  // Ark reads the Field itself, but any `invalid` key (even undefined) overrides it.
+  const field = useFieldContext();
+
+  return (
+    <ArkUiNumberInput.Root
+      {...props}
+      invalid={error ?? field?.invalid}
+      defaultValue={defaultValue}
+      className={numberInputRootVariants({ size })}
     >
-      <ArkUiNumberInput.IncrementTrigger className={numberInputTriggerVariants({ size })}>
-        <ChevronUp />
-      </ArkUiNumberInput.IncrementTrigger>
-      <ArkUiNumberInput.DecrementTrigger className={numberInputTriggerVariants({ size })}>
-        <ChevronDown />
-      </ArkUiNumberInput.DecrementTrigger>
-    </ArkUiNumberInput.Control>
-  </ArkUiNumberInput.Root>
-);
+      <ArkUiNumberInput.Input className={numberInputFieldVariants({ size })} />
+      <ArkUiNumberInput.Control
+        className={cn(numberInputControlVariants({ size }), '[&_svg]:text-icon-secondary')}
+      >
+        <ArkUiNumberInput.IncrementTrigger className={numberInputTriggerVariants({ size })}>
+          <ChevronUp />
+        </ArkUiNumberInput.IncrementTrigger>
+        <ArkUiNumberInput.DecrementTrigger className={numberInputTriggerVariants({ size })}>
+          <ChevronDown />
+        </ArkUiNumberInput.DecrementTrigger>
+      </ArkUiNumberInput.Control>
+    </ArkUiNumberInput.Root>
+  );
+};
 
 NumberInput.displayName = 'NumberInput';

@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+import { Field } from '../Field';
 import { Textarea } from './Textarea';
 
 describe('Attribute pass-through', () => {
@@ -186,5 +187,32 @@ describe('Size variants', () => {
     render(<Textarea data-testid='textarea' size='inline-edit' />);
     expect(screen.getByTestId('textarea').className).toContain('py-4');
     expect(screen.getByTestId('textarea').className).toContain('min-h-[64px]');
+  });
+});
+
+describe('Field state', () => {
+  it('inherits invalid and disabled from the Field', () => {
+    render(
+      <Field invalid disabled>
+        <Textarea />
+      </Field>,
+    );
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toHaveAttribute('aria-invalid', 'true');
+    expect(textarea).toBeDisabled();
+    expect(textarea).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('lets explicit control props win over the Field', () => {
+    render(
+      <Field invalid disabled>
+        <Textarea error={false} disabled={false} />
+      </Field>,
+    );
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toHaveAttribute('aria-invalid', 'false');
+    expect(textarea).toBeEnabled();
   });
 });

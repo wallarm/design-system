@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { Field } from '../Field';
 import { PasswordInput } from './PasswordInput';
 
 describe('PasswordInput', () => {
@@ -70,5 +71,20 @@ describe('PasswordInput', () => {
   it('forwards data-testid to root element', () => {
     render(<PasswordInput data-testid='my-password' />);
     expect(screen.getByTestId('my-password')).toBeInTheDocument();
+  });
+});
+
+describe('PasswordInput in a Field', () => {
+  it('inherits invalid and disabled from the Field', () => {
+    render(
+      <Field invalid disabled>
+        <PasswordInput data-testid='pw' />
+      </Field>,
+    );
+
+    const inputEl = screen.getByTestId('pw').querySelector('input') as HTMLInputElement;
+    expect(inputEl).toHaveAttribute('aria-invalid', 'true');
+    expect(inputEl).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeDisabled();
   });
 });

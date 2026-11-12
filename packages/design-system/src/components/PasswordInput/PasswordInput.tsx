@@ -1,4 +1,5 @@
 import { type FC, useState } from 'react';
+import { useFieldContext } from '@ark-ui/react/field';
 import { Eye, EyeOff } from '../../icons';
 import { Input, type InputProps } from '../Input';
 import { InputGroup } from '../InputGroup/InputGroup';
@@ -10,15 +11,18 @@ import { TooltipTrigger } from '../Tooltip/TooltipTrigger';
 export interface PasswordInputProps extends Omit<InputProps, 'type'> {}
 
 export const PasswordInput: FC<PasswordInputProps> = ({
-  disabled = false,
+  disabled,
   size = 'default',
-  error = false,
+  error,
   className,
   ref,
   'data-testid': testId,
   ...props
 }) => {
   const [visible, setVisible] = useState(false);
+  // Input resolves Field state itself; the toggle needs the same disabled value.
+  const field = useFieldContext();
+  const isDisabled = disabled ?? field?.disabled ?? false;
 
   const toggle = () => setVisible(prev => !prev);
 
@@ -38,7 +42,7 @@ export const PasswordInput: FC<PasswordInputProps> = ({
             <button
               type='button'
               tabIndex={-1}
-              disabled={disabled}
+              disabled={isDisabled}
               aria-label={visible ? 'Hide password' : 'Show password'}
               onClick={toggle}
               className='cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex'
