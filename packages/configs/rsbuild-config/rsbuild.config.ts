@@ -13,7 +13,9 @@ export const rsbuildConfig = defineConfig({
       plugins: [
         new rspack.CircularDependencyRspackPlugin({
           failOnError: true,
-          exclude: /node_modules/,
+          // The built design system is a dependency here, as in node_modules for a real
+          // consumer: cycles inside it are the library's, not the app's.
+          exclude: /node_modules|packages\/design-system\/dist\//,
         }),
       ],
     },
