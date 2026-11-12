@@ -19,6 +19,29 @@ import { DrawerTitle } from './DrawerTitle';
 import { DrawerTrigger } from './DrawerTrigger';
 
 describe('Attribute pass-through', () => {
+  it('forwards consumer attributes to the DrawerContent element', () => {
+    render(
+      <Drawer open data-testid='drawer'>
+        <DrawerContent
+          aria-describedby='custom-desc'
+          data-analytics-id='DRAWER_CONTENT'
+          className='custom-class'
+        >
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    const content = screen.getByTestId('drawer--content');
+    expect(content).toHaveAttribute('data-analytics-id', 'DRAWER_CONTENT');
+    expect(content).toHaveAttribute('aria-describedby', 'custom-desc');
+    expect(content).toHaveClass('custom-class');
+    expect(content).toHaveAttribute('role', 'dialog');
+  });
+
   it('forwards data-analytics-id to the DrawerTrigger <button>', () => {
     render(
       <Drawer>

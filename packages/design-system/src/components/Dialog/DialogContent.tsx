@@ -15,7 +15,13 @@ import { DialogPositioner } from './DialogPositioner';
 
 type DialogContentProps = DrawerContentProps & { ref?: Ref<HTMLDivElement> };
 
-export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
+export const DialogContent: FC<DialogContentProps> = ({
+  children,
+  ref,
+  className,
+  style,
+  ...rest
+}) => {
   const testId = useTestId('content');
   const { width, overlay } = useDrawerContext();
   const nestedSameKindCount = useNestedSameKindCount();
@@ -26,6 +32,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
 
       <DialogPositioner>
         <ArkUiDialog.Content
+          {...rest}
           ref={ref}
           data-testid={testId}
           // Pushed-back is keyed on the DS-owned same-kind attribute, not
@@ -44,8 +51,11 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
 
             // Header
             '**:data-[slot=drawer-header]:pt-20 **:data-[slot=drawer-header]:pb-16 **:data-[slot=drawer-header]:px-24',
+            className,
           )}
-          style={{ width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties}
+          style={
+            { ...style, width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties
+          }
         >
           <DrawerAncestorIdsProvider>{children}</DrawerAncestorIdsProvider>
         </ArkUiDialog.Content>
