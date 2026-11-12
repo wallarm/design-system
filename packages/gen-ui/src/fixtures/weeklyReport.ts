@@ -108,17 +108,22 @@ const LAYOUT: LayoutNode[][] = [
     }),
   ],
   [
-    n('recommendations', 'Card', {}, ['rec_title', 'rec_1', 'rec_2', 'rec_3']),
+    n('recommendations', 'Stack', { gap: '8' }, ['rec_title', 'rec_1', 'rec_2', 'rec_3']),
     n('rec_title', 'Heading', { text: 'Recommendations', size: 'md' }),
-    n('rec_1', 'Text', {
-      text: 'Turn on brute-force protection for POST /api/v2/auth/login.',
+    n('rec_1', 'Alert', {
+      tone: 'info',
+      title: 'Turn on brute-force protection',
+      description: 'POST /api/v2/auth/login takes most of the credential attacks.',
     }),
-    n('rec_2', 'Text', {
-      text: 'Review the BOLA hits on /api/v2/orders and enforce object ownership checks.',
+    n('rec_2', 'Alert', {
+      tone: 'info',
+      title: 'Enforce object ownership checks',
+      description: 'The BOLA hits on /api/v2/orders read orders that belong to other users.',
     }),
-    n('rec_3', 'Text', {
-      text: 'Move the path traversal rules from monitoring to blocking mode.',
-      tone: 'secondary',
+    n('rec_3', 'Alert', {
+      tone: 'info',
+      title: 'Block path traversal',
+      description: 'Move the path traversal rules from monitoring to blocking mode.',
     }),
     n('actions', 'Stack', { direction: 'row', gap: '8' }, ['share']),
     {

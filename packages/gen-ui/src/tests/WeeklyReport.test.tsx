@@ -35,6 +35,12 @@ const expectFilled = async (container: HTMLElement) => {
   expect(screen.getByText('SQL injection')).toBeTruthy(); // /attackTypes
   expect(screen.getByText('164,520')).toBeTruthy();
   expect(screen.getByText('Recommendations')).toBeTruthy();
+  // Each recommendation is an info Alert: its title sits inside the alert's role.
+  expect(
+    screen
+      .getAllByRole('alert')
+      .some(alert => alert.textContent?.includes('Turn on brute-force protection')),
+  ).toBe(true);
   expect(container.querySelector('[data-gen-ui-placeholder]')).toBeNull();
 };
 
