@@ -696,7 +696,7 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
 
 /**
  * An agent as the value — Run by, Proposed by: `AgentItem` at 20 px beside the text-sm value, the agent's glyph with
- * no plate, where a person gets the `Avatar` plate. The name truncates in a narrow horizontal cell.
+ * no plate, where a person gets the `Avatar` plate.
  */
 export const AgentValue: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-16'>
@@ -729,16 +729,6 @@ export const AgentValue: StoryFn<AttributeProps> = () => (
             <AvatarName>Artem Miskevich</AvatarName>
           </AvatarContent>
         </Avatar>
-      </AttributeValue>
-    </Attribute>
-    <Attribute orientation='horizontal' data-testid='attr-reviewed-by'>
-      <AttributeLabel width={256}>Reviewed by</AttributeLabel>
-      <AttributeValue>
-        <AgentItem agent='lens' data-testid='attr-reviewed-by-agent'>
-          <AvatarContent>
-            <AvatarName>Lens, the API posture reviewer</AvatarName>
-          </AvatarContent>
-        </AgentItem>
       </AttributeValue>
     </Attribute>
   </div>

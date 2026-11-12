@@ -126,7 +126,10 @@ Probe's egg in olive but not Lens's or Bard's look.
 
 - **Agent user item:** `AgentItem` (exported from `Avatar`) puts the agent's glyph where the plate goes, with no plate,
   and takes the same `AvatarContent` / `AvatarName` / `AvatarDescription` as a person's `Avatar`. A place swaps a person
-  for an agent by swapping the root. Sizes 16, 20 (default) and 24.
+  for an agent by swapping the root. Size picks the renderer (D1): 16, 20 (default) and 24 draw the glyph, 40, 48
+  and 56 the 3D character, live when asked. The gap to the name is measured from the body, not the square box: the
+  character is pulled in by its shape's empty side (`insetPx`), so a narrow capsule sits as close to its name as a
+  person's plate (6 px).
 - **No slot resizes a character:** `AgentGlyph` and `AgentAvatar` pin their width and height with important utilities on
   `--agent-w` / `--agent-h`. A slot's `[&_svg]:icon-*` outranks the svg's `width` / `height` attributes, so fixing it
   once in the character covers Select, DropdownMenu, Badge, FilterDropdown and any later slot.

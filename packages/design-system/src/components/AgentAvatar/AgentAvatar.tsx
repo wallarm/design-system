@@ -2,8 +2,7 @@ import type { CSSProperties, FC, Ref, RefObject, SVGProps } from 'react';
 import { useContext, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { charTree } from '../../lib/agent-characters/char';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
-import { CAST } from '../../lib/agent-characters/data.gen';
-import { defaultLook, hash32, rng } from '../../lib/agent-characters/look';
+import { hash32, lookOf, rng } from '../../lib/agent-characters/look';
 import type { AgentAvatarSize } from '../../lib/agent-characters/places';
 import { getRuntime } from '../../lib/agent-characters/runtime';
 import type { SvgNode } from '../../lib/agent-characters/svg';
@@ -66,7 +65,6 @@ export type AgentAvatarProps = Omit<
     cueRef?: RefObject<HTMLElement | null>;
   };
 
-const lookOf = (id: string | undefined) => CAST.find(p => p.id === id) ?? defaultLook(id ?? '');
 // The ids carry this bundle's number from the document runtime, so two DS copies on a page never share one. Taken
 // on the first mount, not at import: importing the package creates nothing.
 let COPY: string | undefined;

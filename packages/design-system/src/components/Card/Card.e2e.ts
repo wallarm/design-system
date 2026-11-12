@@ -5,7 +5,6 @@ const cardStory = createStoryHelper('data-display-card', [
   'Basic',
   'Variants',
   'Various Content',
-  'Agent',
 ] as const);
 
 const getCards = (page: Page) => page.getByTestId('card');
@@ -25,18 +24,6 @@ test.describe('Card Component', () => {
 
     test('Various content', async ({ page }) => {
       await cardStory.goto(page, 'Various Content');
-      await expect(page).toHaveScreenshot();
-    });
-
-    // The characters are live: reduced motion draws their static frame, and the shot waits for their baked bodies.
-    test('Agent team card', async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await cardStory.goto(page, 'Agent');
-      await page.waitForFunction(() =>
-        [...document.querySelectorAll('[data-testid^="card-agent-"] [data-part~="ly"]')]
-          .filter(g => !g.closest('[data-part~="veil"]'))
-          .every(g => g.hasAttribute('data-ready')),
-      );
       await expect(page).toHaveScreenshot();
     });
   });

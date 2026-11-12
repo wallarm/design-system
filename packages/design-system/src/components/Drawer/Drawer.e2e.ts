@@ -1,6 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
-import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const drawerStory = createStoryHelper('overlay-drawer', [
   'Basic',
@@ -54,11 +53,10 @@ test.describe('Component: Drawer', () => {
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render drawer with an agent in the header correctly', async ({ page }) => {
-      await holdAgentsStill(page);
+    test('Should render drawer with agents in the header correctly', async ({ page }) => {
       await drawerStory.goto(page, 'With Agent');
       await page.getByRole('button', { name: 'Open Agent Drawer' }).click();
-      await waitForAgentBakes(page.getByTestId('agent-drawer--header-leading'));
+      await expect(page.getByTestId('agent-drawer-found-by--glyph')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 

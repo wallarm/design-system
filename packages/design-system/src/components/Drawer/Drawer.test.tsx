@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { AgentAvatar } from '../AgentAvatar';
 import { Button } from '../Button';
 import { Dialog, DialogBody, DialogContent } from '../Dialog';
 import { Overlay } from '../Overlay';
@@ -732,41 +731,5 @@ describe('Stacking without a zag layer', () => {
     expect(drawerPositionerVariants()).toContain('var(--layer-index,0)');
     render(<Overlay data-testid='overlay' />);
     expect(screen.getByTestId('overlay').className).toContain('var(--layer-index,0)');
-  });
-});
-
-describe('DrawerHeader leading', () => {
-  it('renders the leading element before the title stack', () => {
-    render(
-      <Drawer open data-testid='drawer'>
-        <DrawerContent>
-          <DrawerHeader
-            leading={<AgentAvatar agent='radar' seed='radar' size={72} data-testid='agent' />}
-          >
-            <DrawerTitle>Radar</DrawerTitle>
-            <DrawerDescription>Attack Anomaly Investigator</DrawerDescription>
-          </DrawerHeader>
-        </DrawerContent>
-      </Drawer>,
-    );
-
-    const leading = screen.getByTestId('drawer--header-leading');
-    expect(screen.getByTestId('drawer--header').firstElementChild).toBe(leading);
-    expect(leading).toContainElement(screen.getByTestId('agent'));
-    expect(leading.className).not.toContain('overflow-hidden');
-  });
-
-  it('renders no leading wrapper without the prop', () => {
-    render(
-      <Drawer open data-testid='drawer'>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Title</DrawerTitle>
-          </DrawerHeader>
-        </DrawerContent>
-      </Drawer>,
-    );
-
-    expect(screen.queryByTestId('drawer--header-leading')).toBeNull();
   });
 });

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
-import { PLACES } from '../../lib/agent-characters/places';
-import { AgentAvatar } from '../AgentAvatar';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
+import { AgentItem, AvatarContent, AvatarName } from '../Avatar';
+import { Badge } from '../Badge';
 import { Button } from '../Button';
 import {
   Dialog,
@@ -212,36 +212,61 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
 };
 
 /**
- * An agent's drawer: the `leading` slot of `DrawerHeader` holds the agent's 3D character (72 px, live,
- * with the contact shadow — `PLACES.drawerHeader`) before its name and role. No plate, never cropped.
+ * Agents as actors in the header: the meta line names who found and who last changed the item with `AgentItem`
+ * (20 px glyph beside the text-sm name, no plate), composed in `DrawerDescription` like any other inline content.
  */
-export const WithAgent: StoryFn<DrawerProps> = () => {
-  const { size, live, shadow } = PLACES.drawerHeader;
+export const WithAgent: StoryFn<DrawerProps> = () => (
+  <Drawer data-testid='agent-drawer'>
+    <DrawerTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Agent Drawer
+      </Button>
+    </DrawerTrigger>
 
-  return (
-    <Drawer data-testid='agent-drawer'>
-      <DrawerTrigger asChild>
-        <Button variant='outline' color='neutral'>
-          Open Agent Drawer
-        </Button>
-      </DrawerTrigger>
-
-      <DrawerContent>
-        <DrawerHeader
-          leading={
-            <AgentAvatar agent='radar' seed='radar' size={size} live={live} shadow={shadow} />
-          }
-        >
-          <DrawerTitle>Radar</DrawerTitle>
-          <DrawerDescription>Attack Anomaly Investigator</DrawerDescription>
-        </DrawerHeader>
-        <DrawerBody>
-          <ContentPlaceholder fillHeight />
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
-  );
-};
+    <DrawerContent>
+      <DrawerHeader>
+        <DrawerTitle>
+          Attack spike{' '}
+          <span className='font-mono font-normal text-text-secondary'>
+            GET shop.acme.internal/search
+          </span>
+        </DrawerTitle>
+        <DrawerDescription>
+          <HStack gap={8} align='center' wrap='wrap' data-testid='agent-drawer-meta'>
+            <Badge color='amber' type='outline'>
+              Needs approval
+            </Badge>
+            <span aria-hidden='true'>·</span>
+            <Text size='sm' weight='medium' color='primary'>
+              Malicious anomaly
+            </Text>
+            <span aria-hidden='true'>·</span>
+            <HStack gap={4} align='center'>
+              Found by
+              <AgentItem agent='radar' data-testid='agent-drawer-found-by'>
+                <AvatarContent>
+                  <AvatarName>Radar</AvatarName>
+                </AvatarContent>
+              </AgentItem>
+              , updated by
+              <AgentItem agent='sift' data-testid='agent-drawer-updated-by'>
+                <AvatarContent>
+                  <AvatarName>Sift</AvatarName>
+                </AvatarContent>
+              </AgentItem>
+              <Text size='sm' decoration='dashed'>
+                5 min ago
+              </Text>
+            </HStack>
+          </HStack>
+        </DrawerDescription>
+      </DrawerHeader>
+      <DrawerBody>
+        <ContentPlaceholder fillHeight />
+      </DrawerBody>
+    </DrawerContent>
+  </Drawer>
+);
 
 /**
  * A left-aligned secondary action, separated from the committing pair on the right.

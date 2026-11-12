@@ -116,3 +116,18 @@ export function optY(c: { shape: string }) {
 
 /** The px to move the character up so its optical centre sits on the row's centre line. */
 export const optPx = (c: { shape: string }, size: number) => -r2((optY(c) * size) / 136);
+
+const INSET = new Map<string, number>();
+/** The empty box beside the body, each side, in viewBox units: the box is 136 wide, the body centred at x 60. */
+const insetOf = (c: { shape: string }) => {
+  const S = shapeOf(c.shape);
+  let v = INSET.get(S.id);
+  if (v === undefined) {
+    v = 68 - Math.max(...geom(S).HW);
+    INSET.set(S.id, v);
+  }
+  return v;
+};
+
+/** The px between the character's box and its body on each side, so a name can keep its gap from the body. */
+export const insetPx = (c: { shape: string }, size: number) => r2((insetOf(c) * size) / 136);

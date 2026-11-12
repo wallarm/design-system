@@ -1,6 +1,7 @@
 import { createRef } from 'react';
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+import { insetPx } from '../../lib/agent-characters/geom';
 import { defaultLook } from '../../lib/agent-characters/look';
 import { AgentAvatar } from '../AgentAvatar';
 import { AgentGlyph } from '../AgentGlyph';
@@ -37,6 +38,32 @@ describe('AgentItem', () => {
     expect(glyph).toHaveAttribute('width', '16');
     expect(glyph).toHaveAttribute('data-state', 'working');
     expect(screen.getByTestId('a').className).toContain('[&_[data-slot=avatar-name]]:text-xs');
+  });
+
+  it("measures the gap from the body: the box beside it is pulled in by the shape's inset", () => {
+    render(
+      <>
+        <AgentItem agent='trim' data-testid='narrow' />
+        <AgentItem agent='lens' data-testid='wide' />
+      </>,
+    );
+    const narrow = screen.getByTestId('narrow').style.getPropertyValue('--agent-inset');
+    const wide = screen.getByTestId('wide').style.getPropertyValue('--agent-inset');
+    expect(narrow).toBe(`${insetPx({ shape: 'capsule' }, 20)}px`);
+    // a capsule leaves more of the box empty than a mochi, so it is pulled in further
+    expect(Number.parseFloat(narrow)).toBeGreaterThan(Number.parseFloat(wide));
+    expect(screen.getByTestId('narrow--glyph').getAttribute('class')).toContain(
+      '-mx-(--agent-inset)',
+    );
+  });
+
+  it('draws the 3D character from 40 px, live when asked', () => {
+    render(<AgentItem agent='acquit' size={40} live data-testid='a' />);
+    const avatar = screen.getByTestId('a--avatar');
+    expect(avatar).toHaveAttribute('data-slot', 'agent-avatar');
+    expect(avatar).toHaveAttribute('data-seed', 'acquit');
+    expect(avatar.getAttribute('class')).toContain('-mx-(--agent-inset)');
+    expect(screen.queryByTestId('a--glyph')).toBeNull();
   });
 
   it('forwards attributes and the ref to the root, and has no role of its own', () => {
