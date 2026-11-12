@@ -162,7 +162,7 @@ body .rp-sidebar-item--active:hover {
 
 /* Keyboard focus on the Rspress chrome: its base layer drops button outlines altogether. DS
    components draw their own rings, so only Rspress's links and buttons get this one. A card's
-   stretched link (TemplateGallery, SectionOverview) leaves it to the card's ring. */
+   stretched link (SectionOverview) leaves it to the card's ring. */
 :where(.rp-link, .rp-button, .rp-sidebar-item, .rp-nav button, summary):focus-visible:not(
     [data-card-link]
 ) {
