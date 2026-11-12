@@ -14,6 +14,10 @@ export interface UseSelectSearchOptions<T extends CollectionItem> {
 export interface UseSelectSearchResult<T extends CollectionItem> {
   searchValue: string;
   onSearchChange: (value: string) => void;
+  /**
+   * Pass this to `Select` as `collection` and render it, so keyboard navigation and
+   * typeahead skip hidden items. Selected values the search hides stay selected.
+   */
   filteredCollection: ListCollection<T>;
 }
 

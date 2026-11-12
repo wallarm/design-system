@@ -664,7 +664,7 @@ export const SearchableSelect: StoryFn = () => {
       <Field>
         <FieldLabel>Time zone</FieldLabel>
         <Select
-          collection={timeZones}
+          collection={filteredCollection}
           value={[timeZone]}
           positioning={{ sameWidth: true }}
           onValueChange={handleTimeZoneChange}

@@ -60,7 +60,7 @@ There is no `FilterBar`, `PageFilters` or `Combobox` (use `Select` + `useSelectS
 
 **Searchable select**
 
-- Put `SelectSearchInput` in `SelectHeader`, wired to `useSelectSearch`. Pass the original collection to `Select`; render `filteredCollection`.
+- Put `SelectSearchInput` in `SelectHeader`, wired to `useSelectSearch`. Pass `filteredCollection` to `Select` and render it, so arrow keys skip hidden options.
 - If the menu must match the trigger, pass `positioning={{ sameWidth: true }}` and `SelectPositioner className='min-w-full max-w-full'`; otherwise it is 240–320px.
 - Option icons: set `icon` on each item.
 - For several values use `SelectInput multiple`. `SelectButtonTag` is a trigger, not a chip list.
