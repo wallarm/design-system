@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { Stack, type StackProps } from '@wallarm-org/design-system/Stack';
 import { defineComponent } from '../core/define';
 

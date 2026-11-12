@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { Card, CardContent } from '@wallarm-org/design-system/Card';
 import { defineComponent } from '../core/define';
 

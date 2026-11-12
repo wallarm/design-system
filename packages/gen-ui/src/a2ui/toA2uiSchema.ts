@@ -1,5 +1,5 @@
 import { CommonSchemas } from '@a2ui/web_core/v1_0';
-import type { z } from 'zod';
+import type * as z from 'zod';
 import { z as z3 } from 'zod/v3';
 
 /**

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { Badge, type BadgeColor } from '@wallarm-org/design-system/Badge';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { defineComponent, subsetOf } from '../core/define';

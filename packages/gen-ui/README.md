@@ -28,8 +28,8 @@ src/
 ├── a2ui/                 @wallarm-org/gen-ui/a2ui
 │   ├── catalog.tsx       createA2uiCatalog: entries → A2UI Catalog (toJson() for the agent)
 │   ├── A2uiSurfaces.tsx  feeds messages to a MessageProcessor, renders its surfaces
-│   ├── express.tsx       A2UI Express: the compact text form, compiled by @a2ui/agent
-│   ├── prompt.ts         a2uiPrompt: the system prompt (Express or JSON) with the actions
+│   ├── express.tsx       /a2ui/express: A2UI Express, the compact text form, compiled by @a2ui/agent
+│   ├── prompt.ts         /a2ui/prompt: a2uiPrompt, the system prompt (Express or JSON) with the actions
 │   ├── check.ts          checkA2uiAnswer: the agent's mistakes in a finished answer
 │   └── toA2uiSchema.ts   zod 4 props → the zod 3 schema A2UI's binder reads
 ├── json-render/          @wallarm-org/gen-ui/json-render
@@ -118,6 +118,25 @@ data). The docs site embeds the same `GenUiPlayground` on its Generative UI play
 pnpm turbo run build --filter=@wallarm-org/design-system   # the playground reads the built theme
 pnpm --filter @wallarm-org/playground dev
 ```
+
+## Bundle size
+
+What each entry point adds to an app, minified (gzip), with React and the DS external. Measured
+with esbuild from `dist` on 2026-11-12; re-measure after a dependency bump.
+
+| Entry | Size | Most of it |
+| --- | --- | --- |
+| `.` (the catalog) | 110K (33K) | zod 4 |
+| `/a2ui` + the catalog | 498K (137K) | `@a2ui/web_core`, zod 3 and zod 4 |
+| `/a2ui/express` | 634K (176K) | `@a2ui/web_core`, `antlr4ng`, `@a2ui/agent` |
+| `/json-render` + the catalog | 532K (119K) | zod 4 with all its locales |
+
+- Import zod as `import * as z from 'zod'`. `import { z } from 'zod'` keeps every zod locale in the
+  bundle (443K instead of 83K). json-render imports it that way itself, so its entry still pays for them.
+- Express and the prompt have their own entry points because `@a2ui/agent` and its parser are most
+  of the weight. Compile Express on the server when you can, and send the browser A2UI JSON.
+- `@a2ui/agent` imports `fs` and `path` in modules gen-ui doesn't use. Rspack drops them; a
+  bundler that resolves them anyway needs `fs: false, path: false` as fallbacks.
 
 ## Why two versions of zod
 

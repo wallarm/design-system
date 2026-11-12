@@ -3,6 +3,8 @@
  * component (`m = Metric("Attacks", $/kpi/attacks, "compact")`). Arguments follow the order of
  * the entry's props, bindings are `$/path`. The official @a2ui/agent compiler turns it into the
  * same v1.0 messages, so everything downstream is unchanged.
+ *
+ * `@wallarm-org/gen-ui/a2ui/express`: its own entry point, since the compiler is most of its weight.
  */
 import { type FC, useEffect, useRef, useState } from 'react';
 import { ExpressParser } from '@a2ui/agent';

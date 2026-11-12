@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** What a component's View receives from either format's renderer. */
 export interface GenUiViewProps<P> {

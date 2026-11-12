@@ -22,6 +22,16 @@
       "types": "./dist/a2ui/index.d.ts",
       "default": "./dist/a2ui/index.js"
     },
+    "./a2ui/express": {
+      "development": "./src/a2ui/express.tsx",
+      "types": "./dist/a2ui/express.d.ts",
+      "default": "./dist/a2ui/express.js"
+    },
+    "./a2ui/prompt": {
+      "development": "./src/a2ui/prompt.ts",
+      "types": "./dist/a2ui/prompt.d.ts",
+      "default": "./dist/a2ui/prompt.js"
+    },
     "./json-render": {
       "development": "./src/json-render/index.ts",
       "types": "./dist/json-render/index.d.ts",

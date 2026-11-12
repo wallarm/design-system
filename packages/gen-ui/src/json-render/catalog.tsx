@@ -1,7 +1,7 @@
 import { defineCatalog } from '@json-render/core';
 import { type ComponentRegistry, defineRegistry } from '@json-render/react';
 import { schema } from '@json-render/react/schema';
-import { z } from 'zod';
+import * as z from 'zod';
 import type { GenUiAction, GenUiComponent } from '../core/define';
 import { GuardedView } from '../render/GuardedView';
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 /**
  * Named formats instead of formatter functions: a spec is data, so a chart axis or a table cell

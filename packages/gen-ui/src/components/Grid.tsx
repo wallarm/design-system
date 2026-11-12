@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { cn } from '@wallarm-org/design-system/utils/cn';
 import { defineComponent } from '../core/define';
 import { GAPS } from './Stack';

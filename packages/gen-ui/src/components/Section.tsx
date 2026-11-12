@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { Heading } from '@wallarm-org/design-system/Heading';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { Text } from '@wallarm-org/design-system/Text';

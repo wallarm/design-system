@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { z } from 'zod';
+import * as z from 'zod';
 import { Badge } from '@wallarm-org/design-system/Badge';
 import { Code } from '@wallarm-org/design-system/Code';
 import {

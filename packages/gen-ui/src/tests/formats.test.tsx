@@ -161,7 +161,7 @@ describe('gen-ui', () => {
       const code = readFileSync(join(dir, file), 'utf8')
         .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')
         .replace(/(['"`])(?:\\.|(?!\1).)*\1/g, '');
-      const casts = code.match(/\bas (?!const\b)\w/g);
+      const casts = code.replace(/import \* as \w+/g, '').match(/\bas (?!const\b)\w/g);
       expect({ file, casts }).toEqual({ file, casts: null });
     }
   });

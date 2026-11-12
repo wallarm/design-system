@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { Button, type ButtonProps } from '@wallarm-org/design-system/Button';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { defineComponent, subsetOf, type Values } from '../core/define';

@@ -1,12 +1,8 @@
 import { describe, expect, it, rstest } from '@rstest/core';
 import { render, waitFor } from '@testing-library/react';
-import {
-  type A2uiMessage,
-  a2uiPrompt,
-  createA2uiCatalog,
-  ExpressSurfaces,
-  toExpressLines,
-} from '../a2ui';
+import { type A2uiMessage, createA2uiCatalog } from '../a2ui';
+import { ExpressSurfaces, toExpressLines } from '../a2ui/express';
+import { a2uiPrompt } from '../a2ui/prompt';
 import { wallarmComponents } from '../components';
 import { SCENARIOS } from '../fixtures';
 

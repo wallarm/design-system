@@ -175,7 +175,7 @@ render.
 instructions (for example, which data paths the app fills):
 
 ```ts
-import { a2uiPrompt } from '@wallarm-org/gen-ui/a2ui';
+import { a2uiPrompt } from '@wallarm-org/gen-ui/a2ui/prompt';
 
 // The format's rules, a signature per component and the allowed actions.
 const prompt = a2uiPrompt(CATALOG, { actions: ACTIONS }); // format: 'express' (default) or 'json'
@@ -293,7 +293,7 @@ for the recorded answers the agent's part is about 40% shorter than the JSON. Ex
 proposal in the A2UI repository.
 
 ```tsx
-import { ExpressSurfaces } from '@wallarm-org/gen-ui/a2ui';
+import { ExpressSurfaces } from '@wallarm-org/gen-ui/a2ui/express';
 
 <ExpressSurfaces catalog={catalog} surfaceId='main' chunks={chunks} actions={actions} onAction={onAction} />
 ```
@@ -332,6 +332,8 @@ swapping in the bindable leaf types, and the casts go away.
   because the binder reads that description itself.
 - An array or object prop binds as a whole; its fields can't bind one by one.
 - Data-attribute forwarding for analytics is not wired through the catalog yet.
+- Size: A2UI with the catalog adds about 137K gzip to an app, json-render about 119K, and
+  `/a2ui/express` about 176K, since it carries a parser. Compile Express on the server when you can.
 
 ## Try it
 

@@ -10,6 +10,8 @@ export interface A2uiPromptOptions {
 }
 
 /**
+ * `@wallarm-org/gen-ui/a2ui/prompt`, meant for the server that calls the model.
+ *
  * The system prompt for an A2UI agent: the format's rules and a signature per catalog entry (from
  * @a2ui/agent), plus the app's actions, which an A2UI catalog doesn't carry. Append your own
  * instructions, e.g. which data paths the app fills.
