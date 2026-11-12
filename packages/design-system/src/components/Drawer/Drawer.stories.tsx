@@ -216,7 +216,7 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
  * (20 px glyph beside the text-sm name, no plate), composed in `DrawerDescription` like any other inline content.
  */
 export const WithAgent: StoryFn<DrawerProps> = () => (
-  <Drawer data-testid='agent-drawer'>
+  <Drawer width={DRAWER_SIZES.medium} data-testid='agent-drawer'>
     <DrawerTrigger asChild>
       <Button variant='outline' color='neutral'>
         Open Agent Drawer
