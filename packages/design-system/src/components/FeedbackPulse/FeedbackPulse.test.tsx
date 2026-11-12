@@ -2,6 +2,7 @@ import { act } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle } from '../Dialog';
 import { FeedbackPulse } from './FeedbackPulse';
 
 const noop = () => {};
@@ -125,6 +126,31 @@ describe('FeedbackPulse', () => {
     screen.getByRole('button', { name: 'Elsewhere' }).focus();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
+  });
+
+  it('leaves Escape to an open Dialog layer instead of also dismissing', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = rs.fn();
+    const onDialogOpenChange = rs.fn();
+    render(
+      <>
+        <Dialog open onOpenChange={onDialogOpenChange}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Title</DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              <button type='button'>Inside</button>
+            </DialogBody>
+          </DialogContent>
+        </Dialog>
+        <FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />
+      </>,
+    );
+    (await screen.findByRole('button', { name: 'Inside' })).focus();
+    await user.keyboard('{Escape}');
+    expect(onDialogOpenChange).toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('closes with reason "submit" from the Submitted close button', async () => {
