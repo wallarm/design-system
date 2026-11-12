@@ -195,18 +195,14 @@ test.describe('Component: Drawer', () => {
       await openDrawer(page);
       await expect(getDrawerContent(page)).toBeVisible();
 
-      // Force-click the backdrop corner to trigger Ark UI's DismissableLayer.
-      // A real pointerdown (trusted event) is required — synthetic events via
-      // dispatchEvent are ignored by the layer's listener. Position (10, 10)
-      // hits backdrop only, away from the drawer content.
-      // Wait for the backdrop's open-animation to finish and its pointerdown
-      // listener to attach before clicking — otherwise the click can land
-      // before DismissableLayer is wired up.
-      const backdrop = page.locator('[data-scope="dialog"][data-part="backdrop"]');
-      await expect(backdrop).toBeVisible();
-      await expect(backdrop).toHaveAttribute('data-state', 'open');
-      await backdrop.click({ force: true, position: { x: 10, y: 10 } });
-      await expect(getDrawerContent(page)).toBeHidden();
+      // Click the backdrop corner, away from the drawer content, to trigger Ark UI's
+      // DismissableLayer. A real pointerdown (trusted event) is required — synthetic events via
+      // dispatchEvent are ignored. Ark attaches that listener a frame after opening; a click that
+      // lands earlier is lost, so click until it closes.
+      await expect(async () => {
+        await page.mouse.click(10, 10);
+        await expect(getDrawerContent(page)).toBeHidden({ timeout: 1_000 });
+      }).toPass({ timeout: 10_000 });
     });
 
     test('Should close drawer when close button is clicked', async ({ page }) => {
@@ -327,10 +323,12 @@ test.describe('Component: Drawer', () => {
       await page.keyboard.press('Enter');
       await expect(getDrawerContent(page)).toBeVisible();
 
-      // A non-focusable spot on the page, left of the drawer.
-      await page.mouse.click(100, 400);
-
-      await expect(getDrawerContent(page)).toBeHidden();
+      // A non-focusable spot on the page, left of the drawer. Ark attaches its pointerdown-outside
+      // listener a frame after opening; a click that lands earlier is lost, so click until it closes.
+      await expect(async () => {
+        await page.mouse.click(100, 400);
+        await expect(getDrawerContent(page)).toBeHidden({ timeout: 1_000 });
+      }).toPass({ timeout: 10_000 });
       await expect(getDrawerTrigger(page)).not.toBeFocused();
     });
 
