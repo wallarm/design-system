@@ -1,5 +1,5 @@
 /**
- * Writes a recorded answer once and streams it in both formats. A scenario is the agent's layout,
+ * Writes a recorded answer once and streams it in every format. A scenario is the agent's layout,
  * in the chunks it would send them, with every figure bound to a path, plus the app's data for
  * those paths and when it arrives. `toStreams` turns it into A2UI messages and json-render patches,
  * each line marked with who sent it.
@@ -7,6 +7,7 @@
 import type { SpecStreamLine } from '@json-render/core';
 import { type A2uiMessage, WALLARM_A2UI_CATALOG_ID } from '../a2ui/catalog';
 import type { GenUiAction } from '../core/define';
+import { type OpenUiLine, toOpenUiLines } from './openui';
 
 /** A value the app fills: becomes `{ "@path" }` in A2UI and `{ "$state" }` in json-render. */
 export const bind = (path: string) => ({ bind: path });
@@ -74,6 +75,8 @@ export interface StreamLine<T> {
 export interface ScenarioStreams {
   a2ui: StreamLine<A2uiMessage>[];
   jsonRender: StreamLine<SpecStreamLine>[];
+  /** OpenUI Lang statements from the agent, data writes from the app (`toOpenUiLines`). */
+  openui: StreamLine<OpenUiLine>[];
   /** The app's live updates, as lines of both formats, for update number `tick`. */
   liveStreams?: { every: number; lines: (tick: number) => Omit<ScenarioStreams, 'liveStreams'> };
 }
@@ -152,23 +155,25 @@ const fromApp = <T>(line: T): StreamLine<T> => ({ origin: 'app', line });
 export const toStreams = (s: Scenario): ScenarioStreams => {
   const dataAt = (i: number) => s.data.filter(d => d.after === i).flatMap(d => d.values);
   const rootId = s.layout[0]?.[0]?.id ?? 'root';
+  const a2ui = interleave<unknown>(
+    [
+      {
+        version: '1.0',
+        createSurface: { surfaceId: s.surfaceId, catalogId: WALLARM_A2UI_CATALOG_ID },
+      },
+    ],
+    s.layout.map(chunk => [
+      {
+        version: '1.0',
+        updateComponents: { surfaceId: s.surfaceId, components: chunk.map(a2uiComponent) },
+      },
+    ]),
+    // One message per path: a second write to '/' would replace the first.
+    i => dataAt(i).map(d => a2uiData(s.surfaceId, d)),
+  ) as StreamLine<A2uiMessage>[];
   return {
-    a2ui: interleave<unknown>(
-      [
-        {
-          version: '1.0',
-          createSurface: { surfaceId: s.surfaceId, catalogId: WALLARM_A2UI_CATALOG_ID },
-        },
-      ],
-      s.layout.map(chunk => [
-        {
-          version: '1.0',
-          updateComponents: { surfaceId: s.surfaceId, components: chunk.map(a2uiComponent) },
-        },
-      ]),
-      // One message per path: a second write to '/' would replace the first.
-      i => dataAt(i).map(d => a2uiData(s.surfaceId, d)),
-    ) as StreamLine<A2uiMessage>[],
+    a2ui,
+    openui: toOpenUiLines(a2ui),
     jsonRender: [
       // An empty state first, so the surface mounts with somewhere to put the app's data.
       { origin: 'app', line: { op: 'add', path: '/state', value: {} } },
@@ -185,6 +190,7 @@ export const toStreams = (s: Scenario): ScenarioStreams => {
         return {
           a2ui: values.map(d => fromApp(a2uiData(s.surfaceId, d))),
           jsonRender: values.map(d => fromApp(jsonRenderData(d))),
+          openui: values.map(fromApp),
         };
       },
     },

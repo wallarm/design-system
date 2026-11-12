@@ -1,5 +1,5 @@
 ---
-description: Let an AI agent answer with design-system components instead of text, streamed as A2UI or json-render. Try it live on the page.
+description: Let an AI agent answer with design-system components instead of text, streamed as A2UI, json-render or OpenUI. Try it live on the page.
 ---
 
 # Generative UI
@@ -16,21 +16,22 @@ What you just watched:
   writes those paths from its own API, so the model has no figure to invent.
 - **The page builds up while it streams.** A part that hasn't arrived, or whose data hasn't, holds a
   skeleton shaped like the component.
-- **One catalog, two formats.** The same answer streams as [A2UI](https://a2ui.org) v1.0 messages or
-  [json-render](https://json-render.dev) patches; switch the format and it repaints the same.
+- **One catalog, every format.** The same answer streams as [A2UI](https://a2ui.org) v1.0 messages,
+  [json-render](https://json-render.dev) patches or [OpenUI](https://www.openui.com) Lang; switch
+  the format and it repaints the same.
 
 Open **Stream** to read every line the agent and the app sent, or try the
 [Generative UI playground](/ai/generative-ui-playground) for a full-width view and answers inside the
 Wally chat.
 
 `@wallarm-org/gen-ui` is that catalog: each component is defined once, and the A2UI and json-render
-catalogs are derived from the definition. An answer drops into the Wally chat as a custom part, so
+catalogs and the OpenUI library are derived from the definition. An answer drops into the Wally chat as a custom part, so
 the chat itself needs no changes.
 
 :::warning Experimental
 `@wallarm-org/gen-ui` is a private prototype in the repository (`packages/gen-ui`) and is not
-published to npm. Its API, the component set and the supported formats will change. The two formats
-are pre-1.0 libraries, so their versions are pinned exactly.
+published to npm. Its API, the component set and the supported formats will change. The format
+libraries are young, so their versions are pinned exactly.
 :::
 
 ## How it works
@@ -77,7 +78,7 @@ export const BadgeComponent = defineComponent({
 });
 ```
 
-A definition stays portable between both formats when it follows these rules:
+A definition stays portable between the formats when it follows these rules:
 
 - Props are strings, numbers, booleans, enums, arrays and objects: no functions, no `ReactNode`.
 - No prop is named `id`, `component`, `children` or `child`: A2UI puts props next to those keys.
@@ -247,7 +248,7 @@ Treat everything the agent sends as untrusted input.
 - **The catalog is the only vocabulary.** The agent can place only registered components, with
   props that match their schema. No raw HTML, scripts or URLs reach the page.
 - **Actions are allowlisted.** `onAction` receives only the action names you pass in `actions`. Any
-  other name the agent uses is dropped with a console warning, in both formats. For json-render that
+  other name the agent uses is dropped with a console warning, in every format. For json-render that
   includes its built-in actions (`setState`, `pushState`, `removeState`, `push`, `pop`,
   `validateForm`) and `watch` bindings, and a binding's `confirm`, `onSuccess` and `onError` are
   removed, so the library's own confirm dialog never opens.
@@ -260,22 +261,24 @@ Treat everything the agent sends as untrusted input.
   apply and turns a value that isn't an element into a skeleton. In both, a component that still
   fails to render blanks only its own surface, not the chat.
 
-## A2UI or json-render
+## Choosing a format
 
-Both formats keep the components in a flat list keyed by id, bind props to a data model with JSON
-Pointer paths, fire actions by name and stream one JSON line at a time. The differences:
+A2UI and json-render keep the components in a flat list keyed by id, bind props to a data model with
+JSON Pointer paths and stream one JSON line at a time; OpenUI streams one line of text per component.
+The differences:
 
-| | A2UI v1.0 | json-render |
-| --- | --- | --- |
-| What it is | An open protocol led by Google, with renderers for several platforms | A TypeScript library from Vercel Labs |
-| Catalog | A JSON Schema document (`catalog.toJson()`) | A zod catalog that also writes the system prompt (`catalog.prompt()`) |
-| Binding | `{ "@path": "/stats/attacks" }` | `{ "$state": "/stats/attacks" }` |
-| Action | `{ "event": { "name", "context" } }` on a prop | `on: { press: { action, params } }` on the element |
-| Stream | Messages: `createSurface`, `updateComponents`, `updateDataModel` | RFC 6902 JSON Patch lines |
-| Packages | `@a2ui/react`, `@a2ui/web_core` 0.15 | `@json-render/core`, `@json-render/react` 0.22 |
+| | A2UI v1.0 | json-render | OpenUI |
+| --- | --- | --- | --- |
+| What it is | An open protocol led by Google, with renderers for several platforms | A TypeScript library from Vercel Labs | An open format and runtime from Thesys |
+| Catalog | A JSON Schema document (`catalog.toJson()`) | A zod catalog that also writes the system prompt (`catalog.prompt()`) | A zod library that writes the system prompt (`library.prompt()`) |
+| Binding | `{ "@path": "/stats/attacks" }` | `{ "$state": "/stats/attacks" }` | `$stats.attacks` |
+| Action | `{ "event": { "name", "context" } }` on a prop | `on: { press: { action, params } }` on the element | `@block_ips({…})` as an argument |
+| Stream | Messages: `createSurface`, `updateComponents`, `updateDataModel` | RFC 6902 JSON Patch lines | OpenUI Lang statements |
+| Packages | `@a2ui/react`, `@a2ui/web_core` 0.15 | `@json-render/core`, `@json-render/react` 0.22 | `@openuidev/react-lang` 1.1 |
 
 Because the definitions are shared, the choice can follow the agent stack: A2UI for agents that
-already speak A2A or AG-UI, json-render for agents built on the Vercel AI SDK.
+already speak A2A or AG-UI, json-render for agents built on the Vercel AI SDK, OpenUI for agents on
+Thesys's stack or when output tokens matter (A2UI Express is the compact form of A2UI).
 
 ## A2UI Express
 
@@ -332,8 +335,8 @@ swapping in the bindable leaf types, and the casts go away.
   because the binder reads that description itself.
 - An array or object prop binds as a whole; its fields can't bind one by one.
 - Data-attribute forwarding for analytics is not wired through the catalog yet.
-- Size: A2UI with the catalog adds about 137K gzip to an app, json-render about 119K, and
-  `/a2ui/express` about 176K, since it carries a parser. Compile Express on the server when you can.
+- Size: A2UI with the catalog adds about 137K gzip to an app, json-render about 119K, OpenUI
+  about 132K and `/a2ui/express` about 176K, since it carries a parser. Compile Express on the server when you can.
 
 ## Try it
 

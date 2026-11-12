@@ -1,8 +1,9 @@
 # @wallarm-org/gen-ui
 
 Generative UI catalog for the Wallarm design system: an agent answers with design-system
-components instead of text. Each component is defined once and rendered from either
-[A2UI](https://a2ui.org) v1.0 messages or [json-render](https://json-render.dev) specs.
+components instead of text. Each component is defined once and rendered from
+[A2UI](https://a2ui.org) v1.0 messages, [json-render](https://json-render.dev) specs or
+[OpenUI](https://www.openui.com) Lang programs.
 
 Experimental and private: not published to npm. The user docs are on the site under
 **AI → Generative UI** (`apps/website/docs/ai/generative-ui.mdx`).
@@ -13,12 +14,12 @@ Experimental and private: not published to npm. The user docs are on the site un
 src/
 ├── index.ts              @wallarm-org/gen-ui: the catalog + the API to define entries
 ├── core/                 format-agnostic: no format library, React only as types
-│   ├── check.ts          checkNodes / describeIssues: the answer check both formats share
+│   ├── check.ts          checkNodes / describeIssues: the answer check every format shares
 │   ├── define.ts         GenUiComponent (an entry's contract), defineComponent,
 │   │                     subsetOf / allOf / Values (enums from DS types), seriesKey, unique
 │   ├── format.ts         named number and time formats (formatNumber, formatTime)
 │   └── guards.ts         isRecord: narrow untrusted agent output
-├── render/               React pieces both formats share
+├── render/               React pieces every format shares
 │   ├── GuardedView.tsx   validates props against the schema, then View or Skeleton
 │   ├── Placeholder.tsx   what stands in for a part that isn't renderable yet
 │   ├── ChartSkeleton.tsx the chart card skeleton the chart entries use
@@ -37,10 +38,15 @@ src/
 │   ├── check.ts          checkJsonRenderAnswer: the same check for a spec
 │   ├── spec.ts           specFromLines (stream → spec, never throws), sanitizeSpec (allowlist)
 │   └── JsonRenderSurface.tsx  renders a spec; keeps its state in step as the app fills it
-├── fixtures/             @wallarm-org/gen-ui/fixtures: recorded answers, both formats
-│   ├── stream.ts         the scenario builder: layout chunks + app data → both streams (toStreams)
+├── openui/               @wallarm-org/gen-ui/openui
+│   ├── catalog.tsx       createOpenUiLibrary: entries → OpenUI library (prompt()), props in order
+│   ├── check.ts          checkOpenUiAnswer: the same check for a program
+│   └── OpenUiSurface.tsx renders a program; the app's data arrives as $variables
+├── fixtures/             @wallarm-org/gen-ui/fixtures: recorded answers, every format
+│   ├── stream.ts         the scenario builder: layout chunks + app data → every stream (toStreams)
 │   ├── scenarios.ts      SCENARIOS: every answer a demo can replay, in picker order
-│   ├── attackSummary.ts  a chat answer written by hand in both formats
+│   ├── attackSummary.ts  a chat answer written by hand in A2UI and json-render
+│   ├── openui.ts         a recorded A2UI answer as OpenUI Lang (toOpenUiLines, openUiAnswer)
 │   ├── liveMonitor.ts    the live example: the app refreshes the page every 2 s
 │   └── dashboard.ts, …   one scenario per file, built with stream.ts
 ├── playground/           @wallarm-org/gen-ui/playground: the demos the playground app and the
@@ -75,7 +81,7 @@ components/Metric.tsx (one definition)
    Copy the closest entry: `Badge.tsx` for a leaf, `Section.tsx` for a container, `BarList.tsx` for
    a chart.
 2. Add it to `wallarmComponents` and the `export *` list in `src/components/index.ts`.
-3. Add a test in `src/tests/<Name>.test.tsx` that renders it through both formats, with literal
+3. Add a test in `src/tests/<Name>.test.tsx` that renders it through every format, with literal
    and bound props, and with data that hasn't arrived (see `LineChart.test.tsx`).
 
 An entry must follow these rules. Tests or typecheck enforce the ones marked ✓.
@@ -100,12 +106,12 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
    the app's data batches with the chunk each arrives after.
 2. Add `{ ...scenario, ...toStreams(scenario) }` to `SCENARIOS` in `src/fixtures/scenarios.ts`:
    the playground and the docs page list it from there.
-3. Add a test that renders it through both formats and leaves no skeleton at the end.
+3. Add a test that renders it through every format and leaves no skeleton at the end.
 
 ## Commands
 
 ```bash
-pnpm --filter @wallarm-org/gen-ui test:run    # rstest, both formats
+pnpm --filter @wallarm-org/gen-ui test:run    # rstest, every format
 pnpm --filter @wallarm-org/gen-ui typecheck
 pnpm --filter @wallarm-org/gen-ui build       # rslib → dist/, same layout as src/
 ```
@@ -130,9 +136,10 @@ with esbuild from `dist` on 2026-11-12; re-measure after a dependency bump.
 | `/a2ui` + the catalog | 498K (137K) | `@a2ui/web_core`, zod 3 and zod 4 |
 | `/a2ui/express` | 634K (176K) | `@a2ui/web_core`, `antlr4ng`, `@a2ui/agent` |
 | `/json-render` + the catalog | 532K (119K) | zod 4 with all its locales |
+| `/openui` + the catalog | 564K (132K) | zod 4 with all its locales, `@openuidev/lang-core` |
 
 - Import zod as `import * as z from 'zod'`. `import { z } from 'zod'` keeps every zod locale in the
-  bundle (443K instead of 83K). json-render imports it that way itself, so its entry still pays for them.
+  bundle (443K instead of 83K). json-render and OpenUI import it that way themselves, so their entries still pay for them.
 - Express and the prompt have their own entry points because `@a2ui/agent` and its parser are most
   of the weight. Compile Express on the server when you can, and send the browser A2UI JSON.
 - `@a2ui/agent` imports `fs` and `path` in modules gen-ui doesn't use. Rspack drops them; a

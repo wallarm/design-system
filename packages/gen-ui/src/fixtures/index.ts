@@ -7,6 +7,7 @@ export * from './attackSummary';
 export * from './dashboard';
 export * from './incident';
 export * from './liveMonitor';
+export * from './openui';
 export * from './scenarios';
 export * from './stream';
 export * from './weeklyReport';

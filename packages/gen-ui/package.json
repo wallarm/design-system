@@ -37,6 +37,11 @@
       "types": "./dist/json-render/index.d.ts",
       "default": "./dist/json-render/index.js"
     },
+    "./openui": {
+      "development": "./src/openui/index.ts",
+      "types": "./dist/openui/index.d.ts",
+      "default": "./dist/openui/index.js"
+    },
     "./fixtures": {
       "development": "./src/fixtures/index.ts",
       "types": "./dist/fixtures/index.d.ts",
@@ -64,6 +69,7 @@
     "@a2ui/web_core": "0.15.0",
     "@json-render/core": "0.22.0",
     "@json-render/react": "0.22.0",
+    "@openuidev/react-lang": "1.1.0",
     "@wallarm-org/design-system": "workspace:*",
     "zod": "catalog:"
   },

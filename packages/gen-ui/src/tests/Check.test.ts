@@ -2,8 +2,9 @@ import { describe, expect, it } from '@rstest/core';
 import { type A2uiMessage, checkA2uiAnswer } from '../a2ui';
 import { wallarmComponents } from '../components';
 import { describeIssues } from '../core/check';
-import { SCENARIOS } from '../fixtures';
+import { openUiAnswer, SCENARIOS } from '../fixtures';
 import { checkJsonRenderAnswer, specFromLines } from '../json-render';
+import { checkOpenUiAnswer, createOpenUiLibrary } from '../openui';
 
 const options = (actions: (typeof SCENARIOS)[number]['actions']) => ({
   components: wallarmComponents,
@@ -52,12 +53,19 @@ const BROKEN_SPEC = {
   },
 };
 
+const BROKEN_OPENUI = [
+  'root = Stack(null, null, [m, ghost, chart, go])',
+  'm = Metric("Attacks", $a, null, null, null, null, "red")',
+  'chart = Spreadsheet()',
+  'go = Button("Go", null, null, @rm_rf())',
+].join('\n');
+
 const summary = (issues: ReturnType<typeof checkA2uiAnswer>) =>
   issues.map(i => `${i.id}${i.prop ? `.${i.prop}` : ''}: ${i.message.slice(0, 24)}`).sort();
 
 describe('checking a finished answer', () => {
   for (const scenario of SCENARIOS) {
-    it(`finds nothing wrong in "${scenario.prompt}", in both formats`, () => {
+    it(`finds nothing wrong in "${scenario.prompt}", in every format`, () => {
       expect(
         checkA2uiAnswer(
           scenario.a2ui.map(l => l.line),
@@ -66,13 +74,21 @@ describe('checking a finished answer', () => {
       ).toEqual([]);
       const spec = specFromLines(scenario.jsonRender.map(l => l.line));
       expect(checkJsonRenderAnswer(spec, options(scenario.actions))).toEqual([]);
+      const library = createOpenUiLibrary(wallarmComponents, scenario.actions);
+      const { program } = openUiAnswer(scenario.openui);
+      expect(checkOpenUiAnswer(program, library, options(scenario.actions))).toEqual([]);
     });
   }
 
-  it('reports the same mistakes in both formats', () => {
+  it('reports the same mistakes in every format', () => {
     const a2ui = checkA2uiAnswer(BROKEN_A2UI, options([]));
     const json = checkJsonRenderAnswer(BROKEN_SPEC, options([]));
-    expect(summary(a2ui)).toEqual(summary(json));
+    const library = createOpenUiLibrary(wallarmComponents, []);
+    const openui = checkOpenUiAnswer(BROKEN_OPENUI, library, options([]));
+    // Each library words its messages its own way; where the issues are is the same.
+    const where = (issues: typeof a2ui) => issues.map(i => `${i.id}.${i.prop ?? ''}`).sort();
+    expect(where(json)).toEqual(where(a2ui));
+    expect(where(openui)).toEqual(where(a2ui));
     expect(summary(a2ui)).toEqual([
       'chart: Unknown component "Sprea',
       'go: Action "rm_rf" is not al',

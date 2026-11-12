@@ -15,14 +15,20 @@ import { checkA2uiAnswer } from '../a2ui/check';
 import { ExpressSurfaces, toExpressLines } from '../a2ui/express';
 import { wallarmComponents } from '../components';
 import type { GenUiActionHandler } from '../core/define';
+import { openUiAnswer } from '../fixtures/openui';
 import type { ReplayScenario } from '../fixtures/scenarios';
 import type { StreamLine } from '../fixtures/stream';
 import { createJsonRenderCatalog } from '../json-render/catalog';
 import { checkJsonRenderAnswer } from '../json-render/check';
 import { JsonRenderSurface } from '../json-render/JsonRenderSurface';
 import { specFromLines } from '../json-render/spec';
+import { createOpenUiLibrary } from '../openui/catalog';
+import { checkOpenUiAnswer } from '../openui/check';
+import { OpenUiSurface } from '../openui/OpenUiSurface';
 
-type Format = 'a2ui' | 'express' | 'json-render';
+type Format = 'a2ui' | 'express' | 'json-render' | 'openui';
+const FORMATS: readonly string[] = ['a2ui', 'express', 'json-render', 'openui'] satisfies Format[];
+const isFormat = (value: string): value is Format => FORMATS.includes(value);
 
 /** The agent writes slowly, the app's API answers fast. */
 const DELAY = { agent: 650, app: 220 };
@@ -59,7 +65,9 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
       ? (scenario?.a2ui ?? [])
       : format === 'express'
         ? (expressOf?.lines ?? [])
-        : (scenario?.jsonRender ?? []);
+        : format === 'openui'
+          ? (scenario?.openui ?? [])
+          : (scenario?.jsonRender ?? []);
   const replay = useReplay(stream);
   // Once the answer is complete, the app keeps sending live data (if the scenario has any).
   const live = scenario?.liveStreams;
@@ -70,6 +78,7 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
   const liveRange = Array.from({ length: ticks }, (_, i) => i + 1);
   const liveA2ui = live ? liveRange.flatMap(tick => live.lines(tick).a2ui) : [];
   const liveJsonRender = live ? liveRange.flatMap(tick => live.lines(tick).jsonRender) : [];
+  const liveOpenUi = live ? liveRange.flatMap(tick => live.lines(tick).openui) : [];
   const liveExpress =
     live && expressOf
       ? liveRange.flatMap(tick =>
@@ -82,11 +91,16 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
       : [];
   const shown: readonly StreamLine<unknown>[] = [
     ...stream.slice(0, replay.count),
-    ...(format === 'a2ui' ? liveA2ui : format === 'express' ? liveExpress : liveJsonRender),
+    ...{ a2ui: liveA2ui, express: liveExpress, 'json-render': liveJsonRender, openui: liveOpenUi }[
+      format
+    ],
   ];
   const [jsonCatalogs] = useState(
     () =>
       new Map(scenarios.map(s => [s.id, createJsonRenderCatalog(wallarmComponents, s.actions)])),
+  );
+  const [openUiLibraries] = useState(
+    () => new Map(scenarios.map(s => [s.id, createOpenUiLibrary(wallarmComponents, s.actions)])),
   );
 
   const handleAction: GenUiActionHandler = (name, params) => {
@@ -100,22 +114,25 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
     replay.restart();
   };
   const handleFormatChange = (value: string) => {
-    if (value !== 'a2ui' && value !== 'express' && value !== 'json-render') return;
+    if (!isFormat(value)) return;
     setFormat(value);
     replay.restart();
   };
 
   const jsonCatalog = scenario && jsonCatalogs.get(scenario.id);
+  const openUiLibrary = scenario && openUiLibraries.get(scenario.id);
   // What the app would send back to the model once the answer is complete (Express compiles to A2UI).
   const checkOptions = { components: wallarmComponents, actions: scenario?.actions ?? [] };
   const issues =
     scenario && replay.done
       ? format === 'json-render'
         ? checkJsonRenderAnswer(specFromLines(scenario.jsonRender.map(l => l.line)), checkOptions)
-        : checkA2uiAnswer(
-            scenario.a2ui.map(l => l.line),
-            checkOptions,
-          )
+        : format === 'openui' && openUiLibrary
+          ? checkOpenUiAnswer(openUiAnswer(scenario.openui).program, openUiLibrary, checkOptions)
+          : checkA2uiAnswer(
+              scenario.a2ui.map(l => l.line),
+              checkOptions,
+            )
       : undefined;
 
   return (
@@ -128,6 +145,7 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
               <SegmentedControlItem value='a2ui'>A2UI v1.0</SegmentedControlItem>
               <SegmentedControlItem value='express'>A2UI Express</SegmentedControlItem>
               <SegmentedControlItem value='json-render'>json-render</SegmentedControlItem>
+              <SegmentedControlItem value='openui'>OpenUI</SegmentedControlItem>
             </SegmentedControl>
             <ToggleButton
               size='medium'
@@ -183,6 +201,16 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                     entry => entry.line,
                   )}
                   actions={scenario.actions}
+                  onAction={handleAction}
+                />
+              )
+            ) : format === 'openui' ? (
+              openUiLibrary && (
+                <OpenUiSurface
+                  key={`${scenario.id}-${replay.run}`}
+                  library={openUiLibrary}
+                  {...openUiAnswer([...scenario.openui.slice(0, replay.count), ...liveOpenUi])}
+                  streaming={!replay.done}
                   onAction={handleAction}
                 />
               )
@@ -358,6 +386,7 @@ function useReplay(lines: readonly StreamLine<unknown>[]) {
 const describeLine = (line: unknown): string => {
   if (typeof line !== 'object' || line === null) return String(line);
   if ('op' in line && 'path' in line) return `${String(line.op)} ${String(line.path)}`;
+  if ('path' in line && 'value' in line) return `data · ${String(line.path)}`;
   const [type, body] = Object.entries(line).find(([key]) => key !== 'version') ?? ['?', {}];
   if (typeof body !== 'object' || body === null) return type;
   if ('components' in body && Array.isArray(body.components)) {
