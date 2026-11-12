@@ -7,7 +7,6 @@ import type {
   RowSelectionState,
   Table,
 } from '@tanstack/react-table';
-import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
 import { useTableContext } from '../TableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
@@ -50,14 +49,13 @@ const applyRangeSelection = <T extends RowData>(
 
 /**
  * Cell component that handles shift-click range selection.
- * Uses useIsKeyPressed hook to detect Shift key state.
+ * Reads the table-wide Shift key state from TableContext.
  */
 const SelectionCell = <T extends RowData>({
   row,
   table,
 }: CellContext<DSTableFeatures, T, unknown>) => {
-  const { lastSelectedRowIndexRef } = useTableContext<T>();
-  const shiftRef = useIsKeyPressed('Shift');
+  const { lastSelectedRowIndexRef, shiftKeyRef } = useTableContext<T>();
   const hasSubRows = useTableValue(() => row.subRows.length > 0);
 
   const handleCheckedChange = () => {
@@ -71,7 +69,7 @@ const SelectionCell = <T extends RowData>({
     const rows = table.getRowModel().rows;
     const currentIndex = rows.findIndex(r => r.id === row.id);
 
-    if (shiftRef.current && lastSelectedRowIndexRef.current !== null) {
+    if (shiftKeyRef.current && lastSelectedRowIndexRef.current !== null) {
       applyRangeSelection(rows, lastSelectedRowIndexRef.current, currentIndex, table, row);
     } else {
       row.toggleSelected(!row.getIsSelected());

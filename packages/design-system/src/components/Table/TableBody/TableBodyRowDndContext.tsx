@@ -21,7 +21,11 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import type { Row, RowData } from '@tanstack/react-table';
 import type { DSTableFeatures } from '../lib';
 import { useTableContext } from '../TableContext';
@@ -121,7 +125,7 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const handleDragStart = useCallback(
