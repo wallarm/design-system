@@ -69,9 +69,12 @@ pnpm e2e:docker:update -- packages/design-system/src/components/Example/Example.
 ```
 design-system/
 ├── apps/
-│   └── playground/          # Playground application (Rsbuild + React)
+│   ├── playground/          # Playground application (Rsbuild + React)
+│   └── website/             # Documentation site (Rspress)
 ├── packages/
 │   ├── design-system/       # Core design system library
+│   ├── claude-design/       # Claude Design export
+│   ├── gen-ui/              # Generative UI catalog (A2UI, json-render)
 │   ├── mcp/                 # MCP server for AI assistants
 │   ├── mcp-core/            # Shared MCP metadata types and schemas
 │   ├── migrator/            # Migration CLI for consumer upgrades
@@ -95,6 +98,7 @@ design-system/
 **Apps:**
 
 - `@wallarm-org/playground` - Playground application for testing and demonstrating components (Rsbuild + React + TypeScript)
+- `@wallarm-org/website` - Documentation site, built with Rspress and deployed to GitHub Pages with Storybook
 
 **Packages:**
 
@@ -102,6 +106,7 @@ design-system/
 - `@wallarm-org/mcp` - MCP server that gives AI assistants component metadata, props, variants, and design tokens
 - `@wallarm-org/mcp-core` - Shared types and Zod schemas for MCP metadata (bundled into `@wallarm-org/mcp`, not published)
 - `@wallarm-org/migrator` - Codemod CLI that migrates consumer apps across design-system breaking changes
+- `@wallarm-org/gen-ui` - Generative UI catalog: one definition per component, rendered from A2UI and json-render specs (experimental, not published)
 - `@wallarm-org/claude-design` - Builds the Claude Design export and installs it from one prompt (`npx -y @wallarm-org/claude-design@latest export`); published by `deploy-site.yml` at each stable release
 - `@wallarm-org/biome-config` - Shared Biome lint/format configuration
 - `@wallarm-org/publish-scripts` - Shared semantic-release configuration
