@@ -157,5 +157,6 @@ describe('Field description and error wiring', () => {
 
     expect(screen.getByText('Help')).not.toHaveAttribute('id');
     expect(screen.getByRole('alert')).not.toHaveAttribute('id');
+    expect(screen.getByRole('alert')).not.toHaveAttribute('aria-live');
   });
 });

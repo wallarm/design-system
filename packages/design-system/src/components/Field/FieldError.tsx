@@ -14,13 +14,13 @@ export const FieldError: FC<FieldErrorProps> = ({ children, ...props }) => {
   // Prop getter, not Ark's ErrorText part: the part renders only when invalid, this always does.
   const field = useFieldContext();
   const fieldset = useFieldsetContext();
-  const errorTextProps = (field ?? fieldset)?.getErrorTextProps();
+  // Drop Ark's aria-live: role=alert already implies assertive, and both on one node double-announce in VoiceOver.
+  const { 'aria-live': _ariaLive, ...errorTextProps } =
+    (field ?? fieldset)?.getErrorTextProps() ?? {};
 
   return (
     <div
       {...errorTextProps}
-      // role=alert's implicit value; overrides the aria-live=polite Ark's getter adds.
-      aria-live='assertive'
       {...props}
       data-testid={testId}
       role='alert'
