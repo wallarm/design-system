@@ -232,7 +232,13 @@ export const WithAgent: StoryFn<DrawerProps> = () => (
           </span>
         </DrawerTitle>
         <DrawerDescription>
-          <HStack gap={8} align='center' wrap='wrap' data-testid='agent-drawer-meta'>
+          <HStack
+            gap={8}
+            align='center'
+            wrap='wrap'
+            className='mt-4'
+            data-testid='agent-drawer-meta'
+          >
             <Badge color='amber' type='outline'>
               Needs approval
             </Badge>
@@ -241,23 +247,24 @@ export const WithAgent: StoryFn<DrawerProps> = () => (
               Malicious anomaly
             </Text>
             <span aria-hidden='true'>·</span>
-            <HStack gap={4} align='center'>
-              Found by
+            {/* AgentItem is inline: it sits on the text line, so the comma follows the name as in a sentence */}
+            <Text size='sm' color='secondary'>
+              Found by{' '}
               <AgentItem agent='radar' data-testid='agent-drawer-found-by'>
                 <AvatarContent>
-                  <AvatarName>Radar</AvatarName>
+                  <AvatarName className='font-medium'>Radar</AvatarName>
                 </AvatarContent>
               </AgentItem>
-              , updated by
+              , updated by{' '}
               <AgentItem agent='sift' data-testid='agent-drawer-updated-by'>
                 <AvatarContent>
-                  <AvatarName>Sift</AvatarName>
+                  <AvatarName className='font-medium'>Sift</AvatarName>
                 </AvatarContent>
-              </AgentItem>
-              <Text size='sm' decoration='dashed'>
-                5 min ago
+              </AgentItem>{' '}
+              <Text asChild size='sm' decoration='dashed'>
+                <span>5 min ago</span>
               </Text>
-            </HStack>
+            </Text>
           </HStack>
         </DrawerDescription>
       </DrawerHeader>
