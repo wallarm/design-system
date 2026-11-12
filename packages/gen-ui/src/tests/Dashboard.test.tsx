@@ -2,10 +2,20 @@ import { describe, expect, it, rstest } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { A2uiSurfaces, createA2uiCatalog } from '../a2ui';
 import { wallarmComponents } from '../components';
-import { DASHBOARD_A2UI, DASHBOARD_ACTIONS, DASHBOARD_JSON_RENDER } from '../fixtures/dashboard';
+import { formatNumber } from '../core/format';
+import {
+  DASHBOARD_A2UI,
+  DASHBOARD_ACTIONS,
+  DASHBOARD_JSON_RENDER,
+  DASHBOARD_SCENARIO,
+} from '../fixtures/dashboard';
+import { toStreams } from '../fixtures/stream';
+
+const DASHBOARD_STREAMS = toStreams(DASHBOARD_SCENARIO);
+
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
 
-const a2ui = createA2uiCatalog(wallarmComponents);
+const a2uiCatalog = createA2uiCatalog(wallarmComponents);
 const jsonRender = createJsonRenderCatalog(wallarmComponents, DASHBOARD_ACTIONS);
 const a2uiLines = (n = DASHBOARD_A2UI.length) => DASHBOARD_A2UI.slice(0, n).map(l => l.line);
 const jsonLines = (n = DASHBOARD_JSON_RENDER.length) =>
@@ -13,7 +23,7 @@ const jsonLines = (n = DASHBOARD_JSON_RENDER.length) =>
 
 const A2ui = ({ n }: { n?: number }) => (
   <A2uiSurfaces
-    catalog={a2ui}
+    catalog={a2uiCatalog}
     messages={a2uiLines(n)}
     actions={DASHBOARD_ACTIONS}
     onAction={rstest.fn()}
@@ -64,4 +74,49 @@ describe('dashboard: the agent sends the layout, the app fills the data', () => 
     view.rerender(<Json />);
     expect(await screen.findByText('13.2M')).toBeTruthy();
   });
+
+  it('keeps the page current with live app data, in both formats', async () => {
+    const live = DASHBOARD_STREAMS.liveStreams;
+    if (!live) throw new Error('the dashboard scenario has live data');
+    // The first update whose formatted request total differs from the answer's 13.2M.
+    const tick = Array.from({ length: 48 }, (_, i) => i + 1).find(
+      t => text(live.lines(t).a2ui) !== '13.2M',
+    );
+    if (!tick) throw new Error('no live update changes the request total');
+    const ticks = Array.from({ length: tick }, (_, i) => i + 1);
+    const expected = text(live.lines(tick).a2ui);
+
+    const a2ui = render(
+      <A2uiSurfaces
+        catalog={a2uiCatalog}
+        messages={[...a2uiLines(), ...ticks.flatMap(t => live.lines(t).a2ui).map(l => l.line)]}
+        actions={DASHBOARD_ACTIONS}
+        onAction={rstest.fn()}
+      />,
+    );
+    expect(await screen.findByText(expected)).toBeTruthy();
+    a2ui.unmount();
+
+    const json = render(<Json n={DASHBOARD_JSON_RENDER.length} />);
+    expect(await screen.findByText('13.2M')).toBeTruthy();
+    json.rerender(
+      <JsonRenderSurface
+        catalog={jsonRender}
+        spec={specFromLines([
+          ...jsonLines(),
+          ...ticks.flatMap(t => live.lines(t).jsonRender).map(l => l.line),
+        ])}
+        onAction={rstest.fn()}
+      />,
+    );
+    expect(await screen.findByText(expected)).toBeTruthy();
+  });
 });
+
+/** The request total of a live update, as the Requests tile prints it. */
+const text = (lines: readonly { line: unknown }[]) => {
+  const kpi = lines.find(l => JSON.stringify(l.line).includes('"/kpi"'));
+  const requests = (kpi?.line as { updateDataModel: { value: { requests: number } } } | undefined)
+    ?.updateDataModel.value.requests;
+  return requests === undefined ? '' : formatNumber(requests, 'compact');
+};

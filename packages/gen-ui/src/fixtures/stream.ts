@@ -43,7 +43,25 @@ export interface Scenario {
   /** The agent's components in arrival order, one array per chunk it sends. */
   layout: LayoutNode[][];
   /** The app's data: each batch arrives right after the layout chunk at `after` (its index). */
-  data: { after: number; values: { path: string; value: unknown }[] }[];
+  data: { after: number; values: DataValue[] }[];
+  /** Data the app keeps sending once the answer is complete: no agent involved. */
+  live?: LiveData;
+}
+
+/** One write to the data model: a bound path and its new value. */
+export interface DataValue {
+  path: string;
+  value: unknown;
+}
+
+/**
+ * Live data: the app sends new values for paths the layout already binds, every `every` ms, and
+ * the page updates without asking the agent again. `update(tick)` gives the values of update
+ * number `tick` (1, 2, …); it must be pure, so a replay is the same every time.
+ */
+export interface LiveData {
+  every: number;
+  update: (tick: number) => DataValue[];
 }
 
 /** Who sent a line: the agent (layout) or the app (data). */
@@ -56,6 +74,8 @@ export interface StreamLine<T> {
 export interface ScenarioStreams {
   a2ui: StreamLine<A2uiMessage>[];
   jsonRender: StreamLine<SpecStreamLine>[];
+  /** The app's live updates, as lines of both formats, for update number `tick`. */
+  liveStreams?: { every: number; lines: (tick: number) => Omit<ScenarioStreams, 'liveStreams'> };
 }
 
 const mapBindings = (value: unknown, to: (path: string) => unknown): unknown => {
@@ -116,6 +136,18 @@ const jsonRenderElement = (n: LayoutNode): SpecStreamLine => ({
   },
 });
 
+const a2uiData = (surfaceId: string, d: DataValue): A2uiMessage =>
+  ({
+    version: '1.0',
+    updateDataModel: { surfaceId, path: d.path, value: d.value },
+  }) as A2uiMessage;
+const jsonRenderData = (d: DataValue): SpecStreamLine => ({
+  op: 'add',
+  path: `/state${d.path}`,
+  value: d.value,
+});
+const fromApp = <T>(line: T): StreamLine<T> => ({ origin: 'app', line });
+
 /** The scenario as both formats stream it. The first layout chunk's first node is the root. */
 export const toStreams = (s: Scenario): ScenarioStreams => {
   const dataAt = (i: number) => s.data.filter(d => d.after === i).flatMap(d => d.values);
@@ -135,11 +167,7 @@ export const toStreams = (s: Scenario): ScenarioStreams => {
         },
       ]),
       // One message per path: a second write to '/' would replace the first.
-      i =>
-        dataAt(i).map(d => ({
-          version: '1.0',
-          updateDataModel: { surfaceId: s.surfaceId, path: d.path, value: d.value },
-        })),
+      i => dataAt(i).map(d => a2uiData(s.surfaceId, d)),
     ) as StreamLine<A2uiMessage>[],
     jsonRender: [
       // An empty state first, so the surface mounts with somewhere to put the app's data.
@@ -147,8 +175,18 @@ export const toStreams = (s: Scenario): ScenarioStreams => {
       ...interleave<SpecStreamLine>(
         [{ op: 'add', path: '/root', value: rootId }],
         s.layout.map(chunk => chunk.map(jsonRenderElement)),
-        i => dataAt(i).map(d => ({ op: 'add', path: `/state${d.path}`, value: d.value })),
+        i => dataAt(i).map(jsonRenderData),
       ),
     ],
+    liveStreams: s.live && {
+      every: s.live.every,
+      lines: tick => {
+        const values = s.live?.update(tick) ?? [];
+        return {
+          a2ui: values.map(d => fromApp(a2uiData(s.surfaceId, d))),
+          jsonRender: values.map(d => fromApp(jsonRenderData(d))),
+        };
+      },
+    },
   };
 };

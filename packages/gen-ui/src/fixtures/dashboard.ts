@@ -4,16 +4,40 @@
  * emitted in both formats, chunk by chunk, so a renderer shows placeholders until a part arrives.
  */
 import type { GenUiAction } from '../core/define';
-import { bind, type LayoutNode, node as n, type Scenario, toStreams } from './stream';
+import {
+  bind,
+  type LayoutNode,
+  type LiveData,
+  node as n,
+  type Scenario,
+  toStreams,
+} from './stream';
 
 // ── The app's data (what its API returns for "last 24 hours") ──────────────────
 
-const HOURS = Array.from({ length: 24 }, (_, i) => {
-  const at = new Date(Date.UTC(2026, 10, 12, i));
-  return at.toISOString();
-});
 const wave = (i: number, base: number, amp: number, phase = 0) =>
   Math.round(base + amp * Math.sin((i + phase) / 3.2) + amp * 0.35 * Math.sin(i * 1.7));
+
+/** The 24 hourly points of the window, `shift` hours later than the first answer's. */
+const window24 = (shift: number) =>
+  Array.from({ length: 24 }, (_, i) => {
+    const hour = i + shift;
+    const x = new Date(Date.UTC(2026, 10, 12, hour)).toISOString();
+    const requests = wave(hour, 550_000, 90_000);
+    const attacks = wave(hour, 2_700, 900, 2);
+    return { x, requests, attacks, blocked: Math.round(attacks * 0.957) };
+  });
+const series = (shift: number) => {
+  const points = window24(shift);
+  return {
+    traffic: points.map(({ x, requests }) => ({ x, requests })),
+    attacks: points.map(({ x, attacks, blocked }) => ({ x, attacks, blocked })),
+    requestsSpark: points.map(({ x, requests }) => ({ x, y: requests })),
+    attacksSpark: points.map(({ x, attacks }) => ({ x, y: attacks })),
+  };
+};
+const sum = (shift: number, key: 'requests' | 'attacks') =>
+  window24(shift).reduce((total, point) => total + point[key], 0);
 
 export const DASHBOARD_DATA = {
   kpi: {
@@ -24,13 +48,7 @@ export const DASHBOARD_DATA = {
     attacksDelta: { value: 12, trend: 'up', sentiment: 'negative' },
     incidentsDelta: { value: 2, trend: 'down', sentiment: 'positive' },
   },
-  traffic: HOURS.map((x, i) => ({ x, requests: wave(i, 550_000, 90_000) })),
-  attacks: HOURS.map((x, i) => {
-    const attacks = wave(i, 2_700, 900, 2);
-    return { x, attacks, blocked: Math.round(attacks * 0.957) };
-  }),
-  requestsSpark: HOURS.map((x, i) => ({ x, y: wave(i, 550_000, 90_000) })),
-  attacksSpark: HOURS.map((x, i) => ({ x, y: wave(i, 2_700, 900, 2) })),
+  ...series(0),
   attackTypes: [
     { label: 'SQL injection', value: 14_820, color: 'red' },
     { label: 'Cross-site scripting', value: 9_410, color: 'amber' },
@@ -209,6 +227,25 @@ const LAYOUT: LayoutNode[][] = [
   ],
 ];
 
+/**
+ * After the answer, the app keeps the dashboard current: every 3 s the window moves one hour on
+ * (sped up for the demo) and the KPI totals follow it. The agent isn't asked again.
+ */
+const DASHBOARD_LIVE: LiveData = {
+  every: 3000,
+  update: tick => [
+    {
+      path: '/kpi',
+      value: {
+        ...DASHBOARD_DATA.kpi,
+        requests: DASHBOARD_DATA.kpi.requests + sum(tick, 'requests') - sum(0, 'requests'),
+        attacks: DASHBOARD_DATA.kpi.attacks + sum(tick, 'attacks') - sum(0, 'attacks'),
+      },
+    },
+    ...Object.entries(series(tick)).map(([key, value]) => ({ path: `/${key}`, value })),
+  ],
+};
+
 /** Security dashboard: KPI tiles, traffic and attack charts, breakdowns and a threats table. */
 export const DASHBOARD_SCENARIO: Scenario = {
   id: 'security-dashboard',
@@ -217,6 +254,7 @@ export const DASHBOARD_SCENARIO: Scenario = {
   surfaceId: 'security_dashboard',
   actions: DASHBOARD_ACTIONS,
   layout: LAYOUT,
+  live: DASHBOARD_LIVE,
   // The app answers right after the agent has sent the components that bind it: the KPI and
   // chart data after the KPI tiles (chunk 1), the rest after the breakdowns (chunk 3).
   data: [

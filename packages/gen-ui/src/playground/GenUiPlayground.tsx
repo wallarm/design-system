@@ -52,6 +52,19 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
   const stream: readonly StreamLine<unknown>[] =
     format === 'a2ui' ? (scenario?.a2ui ?? []) : (scenario?.jsonRender ?? []);
   const replay = useReplay(stream);
+  // Once the answer is complete, the app keeps sending live data (if the scenario has any).
+  const live = scenario?.liveStreams;
+  const ticks = useLiveTicks(
+    replay.done ? live?.every : undefined,
+    `${scenario?.id}-${format}-${replay.run}`,
+  );
+  const liveRange = Array.from({ length: ticks }, (_, i) => i + 1);
+  const liveA2ui = live ? liveRange.flatMap(tick => live.lines(tick).a2ui) : [];
+  const liveJsonRender = live ? liveRange.flatMap(tick => live.lines(tick).jsonRender) : [];
+  const shown: readonly StreamLine<unknown>[] = [
+    ...stream.slice(0, replay.count),
+    ...(format === 'a2ui' ? liveA2ui : liveJsonRender),
+  ];
   const [jsonCatalogs] = useState(
     () =>
       new Map(scenarios.map(s => [s.id, createJsonRenderCatalog(wallarmComponents, s.actions)])),
@@ -123,7 +136,9 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
               <A2uiSurfaces
                 key={`${scenario.id}-${replay.run}`}
                 catalog={A2UI_CATALOG}
-                messages={scenario.a2ui.slice(0, replay.count).map(entry => entry.line)}
+                messages={[...scenario.a2ui.slice(0, replay.count), ...liveA2ui].map(
+                  entry => entry.line,
+                )}
                 actions={scenario.actions}
                 onAction={handleAction}
               />
@@ -133,7 +148,9 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
                   key={`${scenario.id}-${replay.run}`}
                   catalog={jsonCatalog}
                   spec={specFromLines(
-                    scenario.jsonRender.slice(0, replay.count).map(entry => entry.line),
+                    [...scenario.jsonRender.slice(0, replay.count), ...liveJsonRender].map(
+                      entry => entry.line,
+                    ),
                   )}
                   streaming={!replay.done}
                   onAction={handleAction}
@@ -148,13 +165,20 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
             className='flex w-360 shrink-0 flex-col border-l border-border-primary-light'
           >
             <HStack justify='between' align='center' className='px-16 py-12'>
-              <Text weight='medium'>Stream</Text>
+              <HStack gap={8} align='center'>
+                <Text weight='medium'>Stream</Text>
+                {ticks > 0 && (
+                  <Badge type='secondary' color='green' size='small'>
+                    Live · app data every {Math.round((live?.every ?? 0) / 1000)} s
+                  </Badge>
+                )}
+              </HStack>
               <Text size='sm' color='secondary'>
-                {replay.count} of {stream.length} lines
+                {ticks > 0 ? `${shown.length} lines` : `${replay.count} of ${stream.length} lines`}
               </Text>
             </HStack>
             <ol className='m-0 flex min-h-0 flex-1 list-none flex-col gap-6 overflow-y-auto overflow-x-hidden px-16 pb-16'>
-              {stream.slice(0, replay.count).map((entry, i) => (
+              {shown.map((entry, i) => (
                 // The stream only grows, so a line's index is its identity.
                 // biome-ignore lint/suspicious/noArrayIndexKey: append-only list
                 <li key={`${replay.run}-${i}`} className='min-w-0'>
@@ -205,6 +229,24 @@ export const GenUiPlayground: FC<GenUiPlaygroundProps> = ({
     </div>
   );
 };
+
+/** Live updates stop here, so a page left open doesn't grow its stream forever. */
+const MAX_LIVE_TICKS = 100;
+
+/**
+ * Counts live updates, one every `every` ms while it is set; a new `key` (another prompt, format
+ * or replay) starts over from 0.
+ */
+function useLiveTicks(every: number | undefined, key: string) {
+  const [state, setState] = useState({ key, ticks: 0 });
+  const ticks = state.key === key ? state.ticks : 0;
+  useEffect(() => {
+    if (!every || ticks >= MAX_LIVE_TICKS) return;
+    const timer = setTimeout(() => setState({ key, ticks: ticks + 1 }), every);
+    return () => clearTimeout(timer);
+  }, [every, key, ticks]);
+  return ticks;
+}
 
 /** Replays a stream line by line from mount; `restart` starts over and remounts the surface. */
 function useReplay(lines: readonly StreamLine<unknown>[]) {
