@@ -14,10 +14,10 @@ import {
   Users,
   Zap,
 } from '../../icons';
+import { AgentGlyph } from '../AgentGlyph';
 import { Button } from '../Button';
 import { Kbd } from '../Kbd';
 import { Text } from '../Text';
-import { WallyIcon } from '../WallyIcon';
 import { SearchModal, type SearchModalProps } from './SearchModal';
 import { SearchModalBody } from './SearchModalBody';
 import { SearchModalContent } from './SearchModalContent';
@@ -230,7 +230,7 @@ export const Basic: StoryFn<SearchModalProps> = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={noop}>
-              <WallyIcon variant='circle' size='sm' />
+              <AgentGlyph agent='wally' size={20} />
               <Text size='sm'>{query ? `Ask Wally "${query}"` : 'Ask Wally'}</Text>
             </SearchModalItem>
             {!query && (
@@ -324,7 +324,7 @@ export const EmptyRecents: StoryFn<SearchModalProps> = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={noop}>
-              <WallyIcon variant='circle' size='sm' />
+              <AgentGlyph agent='wally' size={20} />
               <Text size='sm'>{query ? `Ask Wally "${query}"` : 'Ask Wally'}</Text>
             </SearchModalItem>
             {!query && (
@@ -520,7 +520,7 @@ export const DisabledItems: StoryFn<SearchModalProps> = () => {
     () =>
       filterItems(
         [
-          { id: 'ask-wally', label: 'Ask Wally', icon: <WallyIcon variant='circle' size='sm' /> },
+          { id: 'ask-wally', label: 'Ask Wally', icon: <AgentGlyph agent='wally' size={20} /> },
           { id: 'switch-tenant', label: 'Switch tenant', icon: <Users className='!icon-md' /> },
           { id: 'create', label: 'Create\u2026', icon: <Plus className='!icon-md' /> },
         ],

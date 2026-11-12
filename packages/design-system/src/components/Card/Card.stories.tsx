@@ -2,6 +2,9 @@ import { type MouseEvent, useState } from 'react';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CircleDashed } from '../../icons';
+import { CAST } from '../../lib/agent-characters/data.gen';
+import { PLACES } from '../../lib/agent-characters/places';
+import { AgentAvatar } from '../AgentAvatar';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import {
@@ -303,5 +306,37 @@ export const VariousContent: StoryFn<CardProps> = () => (
         </CardHeader>
       </Card>
     </VStack>
+  </HStack>
+);
+
+const TEAM = CAST.filter(p => ['radar', 'sift', 'lens'].includes(p.id));
+
+/**
+ * An agent team card: the agent's character in the `CardTitle` `icon` slot at the team-card place
+ * (`PLACES.teamCard`: 72 px, live, no contact shadow), its name as the title and its role below. The
+ * character sits next to its visible name, so it takes no `label`.
+ */
+export const Agent: StoryFn<CardProps> = () => (
+  <HStack gap={16}>
+    {TEAM.map(p => (
+      <Card key={p.id} data-testid={`card-agent-${p.id}`}>
+        <CardHeader>
+          <CardTitle
+            icon={
+              <AgentAvatar
+                agent={p.id}
+                seed={p.id}
+                size={PLACES.teamCard.size}
+                live={PLACES.teamCard.live}
+                shadow={PLACES.teamCard.shadow}
+              />
+            }
+          >
+            {p.name}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>{p.role}</CardContent>
+      </Card>
+    ))}
   </HStack>
 );

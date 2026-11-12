@@ -6,9 +6,11 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   ChevronDown,
   ChevronRight,
+  CircleStop,
   Copy,
   Database,
   Ellipsis,
+  Eye,
   Filter,
   FilterX,
   Lock,
@@ -18,6 +20,7 @@ import {
   Trash2,
 } from '../../icons';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
+import { AgentItem, Avatar, AvatarContent, AvatarFallback, AvatarName } from '../Avatar';
 import { Badge } from '../Badge';
 import {
   BulkBarSummaryClear,
@@ -118,6 +121,8 @@ const onCopyValue = fn().mockName('onCopyValue');
 const onShowOnly = fn().mockName('onShowOnly');
 const onExclude = fn().mockName('onExclude');
 const onExecute = fn().mockName('onExecute');
+const onViewRun = fn().mockName('onViewRun');
+const onStopRun = fn().mockName('onStopRun');
 
 const DESCRIPTION = [
   'The grid for many records of one shape — reach for a `Card` grid when a row reads better as an object than as a set of columns, and for `Attribute` when you are showing one record rather than many.',
@@ -201,6 +206,118 @@ export const Basic: StoryFn<typeof meta> = () => {
       getRowId={row => row.id}
       sorting={sorting}
       onSortingChange={setSorting}
+    />
+  );
+};
+
+/**
+ * An agent in a cell — the Agent, Found by or Run by column: `AgentItem` at 20 px beside the text-sm row, the agent's
+ * glyph with no plate, where a person gets the `Avatar` plate. The row actions stay in the master cell
+ * (`meta.renderMenuAction`).
+ */
+export const AgentCell: StoryFn<typeof meta> = () => {
+  interface AgentRun {
+    id: string;
+    agent: 'radar' | 'sift' | 'trim';
+    agentName: string;
+    finding: string;
+    runBy: { type: 'agent'; agent: 'wally'; name: string } | { type: 'person'; name: string };
+  }
+
+  const runs: AgentRun[] = [
+    {
+      id: '1',
+      agent: 'radar',
+      agentName: 'Radar',
+      finding: 'Credential stuffing on /api/v1/login',
+      runBy: { type: 'agent', agent: 'wally', name: 'Wally' },
+    },
+    {
+      id: '2',
+      agent: 'sift',
+      agentName: 'Sift',
+      finding: '12 false positives in the SQLi rule',
+      runBy: { type: 'person', name: 'Artem Miskevich' },
+    },
+    {
+      id: '3',
+      agent: 'trim',
+      agentName: 'Trim',
+      finding: '4 rules that never match',
+      runBy: { type: 'agent', agent: 'wally', name: 'Wally' },
+    },
+  ];
+
+  const columns: TableColumnDef<AgentRun>[] = [
+    {
+      accessorKey: 'agentName',
+      header: 'Agent',
+      size: 200,
+      meta: {
+        renderMenuAction: () => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                <Ellipsis />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={onViewRun}>
+                <DropdownMenuItemIcon>
+                  <Eye />
+                </DropdownMenuItemIcon>
+                <DropdownMenuItemText>View run</DropdownMenuItemText>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={onStopRun}>
+                <DropdownMenuItemIcon>
+                  <CircleStop />
+                </DropdownMenuItemIcon>
+                <DropdownMenuItemText>Stop run</DropdownMenuItemText>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+      cell: ({ row }) => (
+        <AgentItem agent={row.original.agent} data-testid={`agent-cell-agent-${row.id}`}>
+          <AvatarContent>
+            <AvatarName>{row.original.agentName}</AvatarName>
+          </AvatarContent>
+        </AgentItem>
+      ),
+    },
+    { accessorKey: 'finding', header: 'Finding', size: 320 },
+    {
+      id: 'runBy',
+      header: 'Run by',
+      size: 200,
+      cell: ({ row }) =>
+        row.original.runBy.type === 'agent' ? (
+          <AgentItem agent={row.original.runBy.agent} data-testid={`agent-cell-run-by-${row.id}`}>
+            <AvatarContent>
+              <AvatarName>{row.original.runBy.name}</AvatarName>
+            </AvatarContent>
+          </AgentItem>
+        ) : (
+          <Avatar size='sm' data-testid={`agent-cell-run-by-${row.id}`}>
+            <AvatarFallback name={row.original.runBy.name} />
+            <AvatarContent>
+              <AvatarName>{row.original.runBy.name}</AvatarName>
+            </AvatarContent>
+          </Avatar>
+        ),
+    },
+  ];
+
+  const getRowId = (run: AgentRun) => run.id;
+
+  return (
+    <Table
+      aria-label='Agent runs'
+      data={runs}
+      columns={columns}
+      getRowId={getRowId}
+      data-testid='agent-cell'
     />
   );
 };

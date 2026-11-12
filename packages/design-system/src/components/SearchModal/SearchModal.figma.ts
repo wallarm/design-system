@@ -46,7 +46,7 @@ const example = figma.code`<SearchModal open={open} onOpenChange={setOpen} onQue
           </Text>
         </SearchModalGroupLabel>
         <SearchModalItem onSelect={handleSelect}>
-          <WallyIcon variant='circle' size='sm' />
+          <AgentGlyph agent='wally' size={20} />
           <Text size='sm'>Ask Wally</Text>
         </SearchModalItem>
         <SearchModalItem onSelect={handleSelect}>
@@ -69,7 +69,7 @@ export default {
   imports: [
     "import { SearchModal, SearchModalBody, SearchModalContent, SearchModalFooter, SearchModalGroup, SearchModalGroupLabel, SearchModalInput, SearchModalItem } from '@wallarm-org/design-system/SearchModal';",
     "import { Text } from '@wallarm-org/design-system/Text';",
-    "import { WallyIcon } from '@wallarm-org/design-system/WallyIcon';",
+    "import { AgentGlyph } from '@wallarm-org/design-system/AgentGlyph';",
     "import { ChevronRight, History, Plus, Search, Users } from '@wallarm-org/design-system/icons';",
   ],
   metadata: { nestable: false },

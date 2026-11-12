@@ -7,5 +7,9 @@ export const isSvgElement = (node: ReactNode): boolean => {
 
   const displayName = (node.type as FC).displayName;
 
-  return typeof displayName === 'string' && displayName.endsWith('Icon');
+  // An agent's glyph stands in for an icon too: a button holding only one squares itself off.
+  return (
+    typeof displayName === 'string' &&
+    (displayName.endsWith('Icon') || displayName === 'AgentGlyph')
+  );
 };

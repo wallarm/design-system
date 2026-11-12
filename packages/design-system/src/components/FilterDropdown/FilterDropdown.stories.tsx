@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { CAST } from '../../lib/agent-characters/data.gen';
+import { AgentGlyph } from '../AgentGlyph';
 import { Button } from '../Button';
 import { SearchInput } from '../SearchInput';
 import { SegmentedTabs, SegmentedTabsList, SegmentedTabsTrigger } from '../SegmentedTabs';
@@ -163,6 +165,57 @@ export const Multi: StoryFn<typeof FilterDropdown> = () => (
     </FilterDropdownTrigger>
     <Menu />
   </FilterDropdown>
+);
+
+const agents = CAST.map(({ id, name }) => ({ value: id, label: name }));
+
+/** Agents are known by their character: the option and the single trigger lead with the glyph. */
+const renderAgentGlyph = (item: (typeof agents)[number]) => (
+  <AgentGlyph agent={item.value} size={16} />
+);
+
+/**
+ * Filter by agent: each option leads with the agent's 16 px glyph through `icon`, and in single
+ * mode the trigger's `renderIcon` puts the picked agent's glyph before its name. Multi keeps the
+ * text forms.
+ */
+export const Agent: StoryFn<typeof FilterDropdown> = () => (
+  <div className='flex gap-8'>
+    <FilterDropdown
+      label='Agent'
+      allLabel='All agents'
+      collection={createListCollection({ items: agents })}
+      defaultValue={['radar']}
+      data-testid='filter-dropdown-single'
+    >
+      <FilterDropdownTrigger renderIcon={renderAgentGlyph} />
+      <FilterDropdownContent>
+        <FilterDropdownAllOption />
+        {agents.map(item => (
+          <FilterDropdownOption key={item.value} item={item} icon={renderAgentGlyph(item)}>
+            {item.label}
+          </FilterDropdownOption>
+        ))}
+      </FilterDropdownContent>
+    </FilterDropdown>
+    <FilterDropdown
+      label='Agent'
+      multiple
+      collection={createListCollection({ items: agents })}
+      defaultValue={['sift']}
+      data-testid='filter-dropdown-multi'
+    >
+      <FilterDropdownTrigger />
+      <FilterDropdownContent>
+        {agents.map(item => (
+          <FilterDropdownOption key={item.value} item={item} icon={renderAgentGlyph(item)}>
+            {item.label}
+          </FilterDropdownOption>
+        ))}
+        <FilterDropdownFooter />
+      </FilterDropdownContent>
+    </FilterDropdown>
+  </div>
 );
 
 const LabelFormRow = ({

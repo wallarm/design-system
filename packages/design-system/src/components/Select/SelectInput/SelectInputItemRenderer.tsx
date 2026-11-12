@@ -46,7 +46,7 @@ export const SelectInputItemRenderer: FC<SelectInputItemRendererProps> = ({
 
   return (
     <Tag size={TAG_SIZE_BY_SELECT_SIZE[size]} data-testid={testId}>
-      {Icon && <Icon />}
+      {item.leading ?? (Icon && <Icon />)}
 
       {item.label}
 

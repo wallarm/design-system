@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const assistantMessageStory = createStoryHelper('ai-assistantmessage', [
   'Answer Prose',
+  'With Agent',
   'With Reasoning',
   'With Actions Visible',
   'With Approval',
@@ -22,6 +23,12 @@ test.describe('Component: AssistantMessage', () => {
   test.describe('Visual', () => {
     test('Should render the answer prose correctly', async ({ page }) => {
       await assistantMessageStory.goto(page, 'Answer Prose');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render an agent author correctly', async ({ page }) => {
+      await assistantMessageStory.goto(page, 'With Agent');
+      await expect(page.getByTestId('with-agent--author--glyph')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

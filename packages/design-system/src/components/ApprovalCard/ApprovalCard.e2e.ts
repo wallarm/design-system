@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const approvalCardStory = createStoryHelper('ai-approvalcard', [
   'Pending',
+  'With Requester',
   'Pending Long Text',
   'Pending With Code Snippet',
   'Allow Once Menu',
@@ -14,6 +15,12 @@ test.describe('Component: ApprovalCard', () => {
   test.describe('Visual', () => {
     test('Should render pending state correctly', async ({ page }) => {
       await approvalCardStory.goto(page, 'Pending');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render an agent requester correctly', async ({ page }) => {
+      await approvalCardStory.goto(page, 'With Requester');
+      await expect(page.getByTestId('approval-card-requester--glyph')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

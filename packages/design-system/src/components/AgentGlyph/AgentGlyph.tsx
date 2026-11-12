@@ -85,12 +85,21 @@ export const AgentGlyph: FC<AgentGlyphProps> = ({
       height={t.height}
       aria-hidden='true'
       className={cn(
-        'block shrink-0',
+        // Important, with the size as a variable: a slot's `[&_svg]:icon-*` outranks the width and height attributes,
+        // and the size is the `size` prop's, never the slot's.
+        'block w-(--agent-w)! h-(--agent-h)! shrink-0',
         optical && 'translate-y-[var(--oy)]',
         t.opacity && 'opacity-55',
         className,
       )}
-      style={optical ? ({ '--oy': `${t.oy}px`, ...style } as CSSProperties) : style}
+      style={
+        {
+          '--agent-w': `${t.width}px`,
+          '--agent-h': `${t.height}px`,
+          ...(optical && { '--oy': `${t.oy}px` }),
+          ...style,
+        } as CSSProperties
+      }
     >
       {t.children.map((n, i) => renderSvgNode(n, i))}
     </svg>

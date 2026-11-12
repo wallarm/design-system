@@ -8,6 +8,7 @@ const tagStory = createStoryHelper('status-indication-tag', [
   'Closable',
   'Selectable',
   'With Icons',
+  'Agent',
   'With On Click',
 ] as const);
 
@@ -40,6 +41,11 @@ test.describe('Component: Tag', () => {
 
     test('Should render tags with icons correctly', async ({ page }) => {
       await tagStory.goto(page, 'With Icons');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render agent tags correctly', async ({ page }) => {
+      await tagStory.goto(page, 'Agent');
       await expect(page).toHaveScreenshot();
     });
   });

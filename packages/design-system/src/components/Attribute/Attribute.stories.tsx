@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Filter } from '../../icons';
+import { AgentItem, Avatar, AvatarContent, AvatarFallback, AvatarName } from '../Avatar';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -690,6 +691,56 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
         </AttributeValue>
       </Attribute>
     </div>
+  </div>
+);
+
+/**
+ * An agent as the value — Run by, Proposed by: `AgentItem` at 20 px beside the text-sm value, the agent's glyph with
+ * no plate, where a person gets the `Avatar` plate. The name truncates in a narrow horizontal cell.
+ */
+export const AgentValue: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-16'>
+    <Attribute data-testid='attr-run-by'>
+      <AttributeLabel>Run by</AttributeLabel>
+      <AttributeValue>
+        <AgentItem agent='radar' data-testid='attr-run-by-agent'>
+          <AvatarContent>
+            <AvatarName>Radar</AvatarName>
+          </AvatarContent>
+        </AgentItem>
+      </AttributeValue>
+    </Attribute>
+    <Attribute orientation='horizontal' data-testid='attr-proposed-by'>
+      <AttributeLabel>Proposed by</AttributeLabel>
+      <AttributeValue>
+        <AgentItem agent='acquit' data-testid='attr-proposed-by-agent'>
+          <AvatarContent>
+            <AvatarName>Acquit</AvatarName>
+          </AvatarContent>
+        </AgentItem>
+      </AttributeValue>
+    </Attribute>
+    <Attribute orientation='horizontal' data-testid='attr-approved-by'>
+      <AttributeLabel>Approved by</AttributeLabel>
+      <AttributeValue>
+        <Avatar size='sm' data-testid='attr-approved-by-person'>
+          <AvatarFallback name='Artem Miskevich' />
+          <AvatarContent>
+            <AvatarName>Artem Miskevich</AvatarName>
+          </AvatarContent>
+        </Avatar>
+      </AttributeValue>
+    </Attribute>
+    <Attribute orientation='horizontal' data-testid='attr-reviewed-by'>
+      <AttributeLabel width={256}>Reviewed by</AttributeLabel>
+      <AttributeValue>
+        <AgentItem agent='lens' data-testid='attr-reviewed-by-agent'>
+          <AvatarContent>
+            <AvatarName>Lens, the API posture reviewer</AvatarName>
+          </AvatarContent>
+        </AgentItem>
+      </AttributeValue>
+    </Attribute>
   </div>
 );
 

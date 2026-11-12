@@ -139,6 +139,9 @@ export {
   type AttributeValueProps,
 } from './components/Attribute';
 export {
+  AgentItem,
+  type AgentItemProps,
+  type AgentItemSize,
   Avatar,
   AvatarContent,
   type AvatarContentProps,

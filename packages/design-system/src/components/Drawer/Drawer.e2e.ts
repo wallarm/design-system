@@ -1,10 +1,12 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const drawerStory = createStoryHelper('overlay-drawer', [
   'Basic',
   'With Footer',
   'With Description',
+  'With Agent',
   'With Footer Left Actions',
   'Sizes',
   'Custom Sizes',
@@ -49,6 +51,14 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'With Description');
       await page.getByRole('button', { name: 'Open Drawer' }).click();
       await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render drawer with an agent in the header correctly', async ({ page }) => {
+      await holdAgentsStill(page);
+      await drawerStory.goto(page, 'With Agent');
+      await page.getByRole('button', { name: 'Open Agent Drawer' }).click();
+      await waitForAgentBakes(page.getByTestId('agent-drawer--header-leading'));
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 

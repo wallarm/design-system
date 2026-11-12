@@ -272,6 +272,19 @@ describe('ChatTrigger', () => {
     expect(screen.getByRole('button', { name: 'Open assistant' })).toBeInTheDocument();
   });
 
+  it('shows the 24 px Wally glyph, not WallyIcon, in a square icon button', () => {
+    render(<ChatTrigger data-testid='trigger' className='extra' />);
+    const button = screen.getByTestId('trigger');
+    const glyph = screen.getByTestId('trigger--icon');
+    expect(glyph).toHaveAttribute('data-agent', 'wally');
+    expect(glyph).toHaveAttribute('width', '24');
+    expect(glyph.getAttribute('class')).not.toContain('translate-y-[var(--oy)]');
+    // the glyph is the button's only graphic: no WallyIcon beside it
+    expect(button.querySelectorAll('svg')).toHaveLength(1);
+    expect(button).toHaveClass('w-24', 'p-2', 'extra');
+    expect(button).not.toHaveClass('px-8');
+  });
+
   it('passes aria-expanded and the consumer onClick through', async () => {
     const onClick = rs.fn();
     render(<ChatTrigger aria-expanded={false} onClick={onClick} />);

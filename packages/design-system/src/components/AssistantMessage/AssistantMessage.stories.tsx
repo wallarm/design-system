@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Brain, Database, Ellipsis, RefreshCcw, Search, ThumbsDown, ThumbsUp } from '../../icons';
 import { ApprovalCard, ApprovalCardActions, ApprovalCardContent } from '../ApprovalCard';
+import { AgentItem, AvatarContent, AvatarName } from '../Avatar';
 import { Button } from '../Button';
 import { ChainOfThought, ChainOfThoughtStep } from '../ChainOfThought';
 import { CodeSnippetAdapterProvider, InlineCodeSnippet, loadPrismAdapter } from '../CodeSnippet';
@@ -29,6 +30,7 @@ const DESCRIPTION = [
   'Stack its parts in this order — an optional `ChainOfThought` with the reasoning and tool calls, an optional `ApprovalCard`, the `AssistantMessageContent`, then a `MessageActions` row; the message spaces them 12px and 4px apart and lines the action icons up with the text.',
   "`AssistantMessageContent` spaces and styles markdown blocks; put `AssistantMessageMarkdown` inside it (WallyAssistant's default) or your own renderer's output.",
   '`AssistantMessageMarkdown` renders untrusted GFM as DS elements — no raw HTML, http/https/mailto/relative links only, images as alt text — and is streaming-safe: pass the whole text so far with `streaming` and it repairs only the unfinished tail.',
+  'A message from another agent names the article after it (`aria-label`) and starts with its `AgentItem` at 20px.',
   'Set `aria-busy` on the message while the answer streams; before the first output, show only an `AssistantMessageLoader` "Working..." row, and if the answer fails, an `AssistantMessageError` after the content with your own Retry button in `action`.',
 ].join(' ');
 
@@ -75,6 +77,26 @@ export const AnswerProse: StoryFn<typeof meta> = () => (
         <li>No request reached the application.</li>
       </ul>
       <p>Want me to add a rule that denies the whole subnet?</p>
+    </AssistantMessageContent>
+  </AssistantMessage>
+);
+
+/**
+ * A message from an agent other than Wally: name the article after the agent and put its 20px
+ * `AgentItem` first, no plate. The author row sits 4px above the answer.
+ */
+export const WithAgent: StoryFn<typeof meta> = () => (
+  <AssistantMessage aria-label='Radar' data-testid='with-agent'>
+    <AgentItem agent='radar' data-testid='with-agent--author'>
+      <AvatarContent>
+        <AvatarName>Radar</AvatarName>
+      </AvatarContent>
+    </AgentItem>
+    <AssistantMessageContent>
+      <p>
+        Found 3 anomalies on <InlineCodeSnippet code='/api/login' size='sm' /> in the last 24 hours.
+        The largest is a burst of 1,204 SQL injection attempts from one subnet.
+      </p>
     </AssistantMessageContent>
   </AssistantMessage>
 );

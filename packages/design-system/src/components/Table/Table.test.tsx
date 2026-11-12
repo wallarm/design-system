@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
+import { AgentItem, AvatarContent, AvatarName } from '../Avatar';
 import {
   BulkBarSummaryClear,
   BulkBarSummaryCount,
@@ -1828,5 +1829,35 @@ describe('Row reordering inside sub-row groups', () => {
     expect(rowById('a').querySelectorAll('td')).toHaveLength(2);
     expect(rowById('a').querySelector('svg')).toBeNull();
     expect(rowById('b').querySelector('svg')).toHaveClass('cursor-not-allowed');
+  });
+});
+
+describe('Agent cell', () => {
+  const agentColumns = [
+    columnHelper.accessor('name', {
+      header: 'Agent',
+      cell: ctx => (
+        <AgentItem agent='radar' data-testid={`agent-${ctx.row.original.id}`}>
+          <AvatarContent>
+            <AvatarName>{ctx.getValue<string>()}</AvatarName>
+          </AvatarContent>
+        </AgentItem>
+      ),
+    }),
+  ];
+
+  it.each([
+    ['master cell', { meta: { resizeType: 'cut' as const } }],
+    [
+      'master cell with actions',
+      { meta: { renderMenuAction: () => <button type='button'>⋯</button> } },
+    ],
+  ])('clips only the width of the %s, so the glyph can rise above the line', (_, extra) => {
+    render(<Table data={data} columns={[{ ...agentColumns[0], ...extra }]} />);
+
+    const wrapper = screen.getByTestId('agent-1').parentElement;
+    expect(screen.getByTestId('agent-1--glyph')).toHaveAttribute('width', '20');
+    expect(wrapper).toHaveClass('overflow-x-clip');
+    expect(wrapper).not.toHaveClass('overflow-hidden');
   });
 });

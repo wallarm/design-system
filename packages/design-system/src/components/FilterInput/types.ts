@@ -117,6 +117,11 @@ export interface FieldValueOption {
    */
   description?: string;
   /**
+   * Leading element of the value row, e.g. an agent's `<AgentGlyph size={16} />`.
+   * Display-only: the chip still shows the `label` alone.
+   */
+  icon?: ReactNode;
+  /**
    * Nested sub-values. When present, this option is a **group** (no own
    * `value`): a section header at the top level, or a submenu trigger when
    * nested. Recursive — a group's children may themselves be groups. Only the

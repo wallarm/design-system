@@ -432,7 +432,7 @@ export const Analytics: StoryFn<typeof meta> = () => (
 );
 
 /**
- * The app-header button that opens the panel (Figma 101:1034): the Wally mascot in a ghost small
+ * The app-header button that opens the panel (Figma 101:1034): the 24 px Wally glyph in a ghost small
  * `Button`, with an "Ask Wally" tooltip that doubles as its accessible name (`label`).
  */
 export const Trigger: StoryFn<typeof meta> = () => <ChatTrigger data-testid='chat-trigger' />;

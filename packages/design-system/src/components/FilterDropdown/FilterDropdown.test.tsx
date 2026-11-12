@@ -4,6 +4,7 @@ import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
+import { AgentGlyph } from '../AgentGlyph';
 import { FilterDropdown, type FilterDropdownProps } from './FilterDropdown';
 import { FilterDropdownAllOption } from './FilterDropdownAllOption';
 import { FilterDropdownClear } from './FilterDropdownClear';
@@ -1107,5 +1108,67 @@ describe('Disabled root and a replacement ✕', () => {
     expect(clearButton).toBeDisabled();
     await userEvent.click(clearButton);
     expect(spy).not.toHaveBeenCalled();
+  });
+});
+
+describe('Leading icons (agents)', () => {
+  const renderAgentIcon = (item: Item) => (
+    <AgentGlyph agent='radar' size={16} data-testid={`icon-${item.value}`} />
+  );
+
+  const AgentHarness = (props: Omit<HarnessProps, 'items' | 'label'>) => (
+    <FilterDropdown
+      collection={createListCollection({ items: few })}
+      label='Agent'
+      data-testid='type-filter'
+      {...props}
+    >
+      <FilterDropdownTrigger renderIcon={renderAgentIcon} />
+      <FilterDropdownContent>
+        {few.map(item => (
+          <FilterDropdownOption
+            key={item.value}
+            item={item}
+            icon={<AgentGlyph agent='radar' size={16} data-testid={`option-icon-${item.value}`} />}
+            data-testid={`option-${item.value}`}
+          >
+            {item.label}
+          </FilterDropdownOption>
+        ))}
+      </FilterDropdownContent>
+    </FilterDropdown>
+  );
+
+  it('renders the option icon before the text and keeps the accessible name', async () => {
+    render(<AgentHarness />);
+    await userEvent.click(trigger());
+    const option = screen.getByTestId('option-lua');
+    const icon = within(option).getByTestId('option-icon-lua');
+    expect(icon.compareDocumentPosition(within(option).getByText('Lua'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(option).toHaveAccessibleName('Lua');
+  });
+
+  it('the single trigger shows the picked item icon before its name', () => {
+    render(<AgentHarness defaultValue={['wasm']} />);
+    expect(within(trigger()).getByTestId('icon-wasm')).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Agent, WASM');
+  });
+
+  it('renders no trigger icon while unset or in multi mode', () => {
+    const { unmount } = render(<AgentHarness />);
+    expect(within(trigger()).queryByTestId(/^icon-/)).not.toBeInTheDocument();
+    unmount();
+    render(<AgentHarness multiple defaultValue={['lua']} />);
+    expect(within(trigger()).queryByTestId(/^icon-/)).not.toBeInTheDocument();
+  });
+
+  it('options without an icon keep the text as the direct child of the option', async () => {
+    render(<Harness />);
+    await userEvent.click(trigger());
+    expect(screen.getByTestId('option-lua').firstElementChild).toBe(
+      within(screen.getByTestId('option-lua')).getByText('Lua'),
+    );
   });
 });

@@ -5,6 +5,9 @@ import figma from 'figma';
 
 const instance = figma.selectedInstance;
 
+// user-item Type = Agent: the agent's glyph in place of the plate (AgentItem), 20 px beside the text-sm name.
+const kind = instance.getEnum('Type', { User: 'user', Agent: 'agent' });
+
 const size = instance.getEnum('Size', { Small: 'sm', Medium: 'md' });
 const nameLayer = instance.findText('Artem Miskevich');
 const name = nameLayer.type === 'TEXT' ? nameLayer.textContent : 'Artem Miskevich';
@@ -23,8 +26,14 @@ const image =
 
 // Branded is not a prop: the plate takes the brand colour inside a data-frame-style='branded' frame.
 const example =
-  type === 'branded'
-    ? figma.code`<div data-frame-style='branded'>
+  kind === 'agent'
+    ? figma.code`<AgentItem agent='radar'>
+  <AvatarContent>
+    <AvatarName>Radar</AvatarName>
+  </AvatarContent>
+</AgentItem>`
+    : type === 'branded'
+      ? figma.code`<div data-frame-style='branded'>
   <Avatar size='${size}'>
     <AvatarFallback name='${name}' />
     <AvatarContent>
@@ -32,7 +41,7 @@ const example =
     </AvatarContent>
   </Avatar>
 </div>`
-    : figma.code`<Avatar size='${size}'>
+      : figma.code`<Avatar size='${size}'>
   ${image}<AvatarFallback name='${name}' />
   <AvatarContent>
     <AvatarName>${name}</AvatarName>
@@ -43,7 +52,7 @@ export default {
   id: 'avatar-content',
   example,
   imports: [
-    "import { Avatar, AvatarContent, AvatarFallback, AvatarImage, AvatarName } from '@wallarm-org/design-system/Avatar';",
+    "import { AgentItem, Avatar, AvatarContent, AvatarFallback, AvatarImage, AvatarName } from '@wallarm-org/design-system/Avatar';",
   ],
   metadata: { nestable: true },
 };

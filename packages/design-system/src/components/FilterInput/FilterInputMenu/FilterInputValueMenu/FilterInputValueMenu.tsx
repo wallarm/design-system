@@ -1,4 +1,4 @@
-import type { FC, RefObject } from 'react';
+import type { FC, ReactNode, RefObject } from 'react';
 import type { BadgeColor } from '../../../Badge';
 import { isValueGroup } from '../../lib';
 import { FlatValueMenu } from './FlatValueMenu';
@@ -14,6 +14,8 @@ export interface ValueOption {
   badge?: { color: BadgeColor; text: string };
   /** Muted secondary line rendered beneath the bold `label`. Display-only. */
   description?: string;
+  /** Leading element of the row (an agent glyph). Display-only. */
+  icon?: ReactNode;
   /**
    * Nested sub-values. When present this option is a group: a section header at
    * the top level, or a submenu trigger when nested. Only leaves are committed.

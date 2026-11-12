@@ -5,6 +5,7 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal',
   'Horizontal Truncation',
   'Horizontal Composition',
+  'Agent Value',
   'Horizontal Loading',
   'Horizontal With Actions',
   'Horizontal With Actions Menu Only',
@@ -28,6 +29,12 @@ test.describe('Component: Attribute', () => {
 
     test('Should render horizontal composition correctly', async ({ page }) => {
       await attributeStory.goto(page, 'Horizontal Composition');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render an agent value without a plate or a clip', async ({ page }) => {
+      await attributeStory.goto(page, 'Agent Value');
+      await expect(page.getByTestId('attr-run-by-agent--glyph')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

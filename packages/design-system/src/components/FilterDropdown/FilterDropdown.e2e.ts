@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const filterDropdownStory = createStoryHelper('inputs-filterdropdown', [
   'Default',
   'Multi',
+  'Agent',
   'Label Forms',
   'States',
   'With Search',
@@ -88,6 +89,18 @@ test.describe('Component: FilterDropdown', () => {
       await filterDropdownStory.goto(page, 'Hint');
       await page.getByTestId('filter-dropdown--trigger').click();
       await expect(page.getByTestId('filter-dropdown--content')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render agent glyphs in the trigger correctly', async ({ page }) => {
+      await filterDropdownStory.goto(page, 'Agent');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render agent glyphs in the open menu correctly', async ({ page }) => {
+      await filterDropdownStory.goto(page, 'Agent');
+      await page.getByTestId('filter-dropdown-single--trigger').click();
+      await expect(page.getByTestId('filter-dropdown-single--content')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
   });

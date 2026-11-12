@@ -7,6 +7,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+import type { CollectionItem } from '@ark-ui/react/collection';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
@@ -35,6 +36,11 @@ export interface FilterDropdownTriggerProps
    * derived from the value and is not overridable.
    */
   children?: ReactNode;
+  /**
+   * Single mode: a leading element for the picked item, such as the agent's 16 px `AgentGlyph`
+   * before its name. Not called while unset or in multi mode.
+   */
+  renderIcon?: (item: CollectionItem) => ReactNode;
 }
 
 const CLEAR_KEYS = new Set(['Backspace', 'Delete']);
@@ -75,6 +81,7 @@ export const FilterDropdownTrigger: FC<FilterDropdownTriggerProps> = ({
   ref,
   className,
   children,
+  renderIcon,
   onKeyDown,
   'aria-label': ariaLabel,
   'data-testid': testIdProp,
@@ -101,8 +108,11 @@ export const FilterDropdownTrigger: FC<FilterDropdownTriggerProps> = ({
   };
 
   let content: ReactNode;
+  let icon: ReactNode;
   let composedLabel = label;
   if (!multiple) {
+    const item = isSet && renderIcon ? collection.find(value[0]) : null;
+    if (item) icon = renderIcon?.(item);
     content = isSet ? (
       <TruncatedText text={labels[0] ?? ''} emphasis='value' />
     ) : (
@@ -151,6 +161,8 @@ export const FilterDropdownTrigger: FC<FilterDropdownTriggerProps> = ({
         onKeyDown={handleKeyDown}
         className={cn(filterDropdownTriggerVariants({ clearable }), className)}
       >
+        {/* Outside the clipping label, so nothing cuts a character that rises above its box. */}
+        {icon}
         <span className='flex min-w-0 items-center gap-4 overflow-hidden'>{content}</span>
         {!clearable && <SelectArrow className='text-icon-primary' />}
       </ArkUiSelect.Trigger>

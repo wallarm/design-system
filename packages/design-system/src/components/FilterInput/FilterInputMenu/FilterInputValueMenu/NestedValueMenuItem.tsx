@@ -79,6 +79,7 @@ export const NestedValueMenuItem: FC<NestedValueMenuItemProps> = ({
       }
       {...(isGroup && { 'aria-haspopup': 'menu', 'aria-expanded': !!expanded })}
     >
+      {option.icon}
       {option.badge ? (
         <Badge color={option.badge.color} type='secondary' variant='default'>
           {option.badge.text}

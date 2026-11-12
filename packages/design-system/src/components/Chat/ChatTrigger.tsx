@@ -1,12 +1,12 @@
 import { type ButtonHTMLAttributes, type FC, type Ref, useId } from 'react';
 import { type TestableProps, useTestId } from '../../utils/testId';
+import { AgentGlyph } from '../AgentGlyph';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { WallyIcon } from '../WallyIcon';
 
 /**
  * The app-header button that opens Wally (Figma 101:1034): a ghost small icon `Button` with the
- * mascot and an "Ask Wally" tooltip. It holds no open state — wire `onClick`/`aria-expanded`
+ * Wally glyph at 24 px and an "Ask Wally" tooltip. It holds no open state — wire `onClick`/`aria-expanded`
  * yourself, or wrap it in `<DrawerTrigger asChild>`.
  */
 export interface ChatTriggerProps
@@ -45,7 +45,13 @@ export const ChatTrigger: FC<ChatTriggerProps> = ({
           data-slot='chat-trigger'
           data-testid={testId}
         >
-          <WallyIcon size='md' data-testid={testId && `${testId}--icon`} />
+          {/* Wally's character, not the brand mark: the wally-button is a character place (WDS-205) */}
+          <AgentGlyph
+            agent='wally'
+            size={24}
+            align='box'
+            data-testid={testId && `${testId}--icon`}
+          />
         </Button>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>

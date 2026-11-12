@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+import { AgentGlyph } from '../../AgentGlyph';
 import { FilterInput } from '../FilterInput';
 import {
   createStatusCodeInputFilter,
@@ -132,6 +133,30 @@ export const WithDescribedChip: Story = {
         placeholder='Type to filter...'
       />
     );
+  },
+};
+
+const agentValueFields: FieldMetadata[] = [
+  {
+    name: 'found_by',
+    label: 'Found by',
+    type: 'string',
+    values: [
+      { value: 'radar', label: 'Radar', icon: <AgentGlyph agent='radar' size={16} /> },
+      { value: 'sift', label: 'Sift', icon: <AgentGlyph agent='sift' size={16} /> },
+      { value: 'acquit', label: 'Acquit', icon: <AgentGlyph agent='acquit' size={16} /> },
+      { value: 'trim', label: 'Trim', icon: <AgentGlyph agent='trim' size={16} /> },
+      { value: 'lens', label: 'Lens', icon: <AgentGlyph agent='lens' size={16} /> },
+      { value: 'bard', label: 'Bard', icon: <AgentGlyph agent='bard' size={16} /> },
+    ],
+  },
+];
+
+/** A value's `icon` leads its row in the value menu: an agent is its 16 px `AgentGlyph`, no plate, beside its name. The chip shows the name alone. */
+export const WithAgentValues: Story = {
+  args: {
+    fields: agentValueFields,
+    placeholder: 'Type to filter...',
   },
 };
 

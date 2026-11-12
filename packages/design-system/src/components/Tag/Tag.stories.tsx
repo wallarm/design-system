@@ -3,6 +3,7 @@ import { createListCollection } from '@ark-ui/react/collection';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Earth, Info } from '../../icons';
+import { AgentGlyph } from '../AgentGlyph';
 import {
   Select,
   SelectButtonTag,
@@ -230,6 +231,43 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
         </Tag>
       </HStack>
     </VStack>
+  </VStack>
+);
+
+/**
+ * An agent in a tag stands as its character beside its name, with no plate: 16 px in a medium
+ * tag, 20 px in a large one. A person keeps the icon slot above.
+ */
+export const Agent: StoryFn<typeof meta> = ({ ...args }) => (
+  <VStack gap={12} align='stretch'>
+    <HStack gap={8}>
+      <Tag {...args} size='medium' data-testid='tag-agent-medium'>
+        <AgentGlyph agent='radar' size={16} data-testid='tag-agent-medium--glyph' />
+        Radar
+      </Tag>
+      <Tag {...args} size='medium'>
+        <AgentGlyph agent='lens' size={16} />
+        Lens
+      </Tag>
+      <Tag {...args} size='medium'>
+        <AgentGlyph agent='bard' size={16} />
+        Bard
+      </Tag>
+    </HStack>
+    <HStack gap={8}>
+      <Tag {...args} size='large' data-testid='tag-agent-large'>
+        <AgentGlyph agent='radar' size={20} data-testid='tag-agent-large--glyph' />
+        Radar
+      </Tag>
+      <Tag {...args} size='large'>
+        <AgentGlyph agent='lens' size={20} />
+        Lens
+      </Tag>
+      <Tag {...args} size='large'>
+        <AgentGlyph agent='bard' size={20} />
+        Bard
+      </Tag>
+    </HStack>
   </VStack>
 );
 

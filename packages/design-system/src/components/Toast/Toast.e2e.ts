@@ -11,6 +11,7 @@ const toastStory = createStoryHelper('messaging-toast', [
   'Long Text',
   'Without Close Button',
   'Custom Icon',
+  'Agent',
 ] as const);
 
 const getToasts = (page: Page) => page.locator('[data-scope="toast"][data-part="root"]');
@@ -199,6 +200,12 @@ test.describe('Toast Component', () => {
     test('Custom icon - without color', async ({ page }) => {
       await toastStory.goto(page, 'Custom Icon');
       await initStaticToast(page, 'Custom Icon without color');
+      await verifyAndClose(page);
+    });
+
+    test('Agent toast - 48 px character', async ({ page }) => {
+      await toastStory.goto(page, 'Agent');
+      await initStaticToast(page, 'Agent toast');
       await verifyAndClose(page);
     });
   });

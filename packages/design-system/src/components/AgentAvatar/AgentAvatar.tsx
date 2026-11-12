@@ -1,4 +1,4 @@
-import type { FC, Ref, RefObject, SVGProps } from 'react';
+import type { CSSProperties, FC, Ref, RefObject, SVGProps } from 'react';
 import { useContext, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { charTree } from '../../lib/agent-characters/char';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
@@ -107,7 +107,7 @@ interface FrameProps {
 
 /** The rendered SVG with its baked layers. Live, the engine owns every attribute it animates. */
 const Frame: FC<FrameProps> = ({ t, size, veil, agent, seed, label, live, rest, svgRef }) => {
-  const { className, ...props } = rest;
+  const { className, style, ...props } = rest;
   const baked = useBakedLayers(
     t.layers.filter(l => !l.veil || veil),
     size,
@@ -150,7 +150,11 @@ const Frame: FC<FrameProps> = ({ t, size, veil, agent, seed, label, live, rest, 
       width={t.width}
       height={t.height}
       {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true })}
-      className={cn('shrink-0', className)}
+      // The size wins over a slot's `[&_svg]:icon-*`, as in AgentGlyph.
+      className={cn('w-(--agent-w)! h-(--agent-h)! shrink-0', className)}
+      style={
+        { '--agent-w': `${t.width}px`, '--agent-h': `${t.height}px`, ...style } as CSSProperties
+      }
     >
       {t.children.map(withImages).map((n, i) => renderSvgNode(n, i, bakedImage))}
     </svg>

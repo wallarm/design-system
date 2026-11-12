@@ -9,6 +9,7 @@ import {
   OctagonAlert,
   TriangleAlert,
 } from '../../icons';
+import { AgentAvatar } from '../AgentAvatar';
 import { Button } from '../Button';
 import {
   Dialog,
@@ -589,6 +590,40 @@ export const CustomIcon: StoryFn = () => {
             Custom Icon without color
           </Button>
         </HStack>
+      </VStack>
+    </VStack>
+  );
+};
+
+/** An agent's toast carries its character in the `icon` slot: `AgentAvatar` at 48 px, static, no shadow (`PLACES.header`). It keeps its own size and colours — no type colour is injected. */
+export const Agent: StoryFn = () => {
+  const toast = useToast();
+
+  const agentToast = (duration?: number) =>
+    toast.create({
+      title: 'Radar finished the investigation',
+      description: 'Attack Anomaly Investigator found 3 anomalies in the last hour.',
+      type: 'info',
+      icon: <AgentAvatar agent='radar' seed='radar' size={48} data-testid='toast-agent-avatar' />,
+      duration,
+    });
+
+  const onTimed = () => agentToast();
+  const onStatic = () => agentToast(STATIC_DURATION);
+
+  return (
+    <VStack gap={16} align='start'>
+      <VStack gap={4} align='start'>
+        <p className='sb-annotation'>timed</p>
+        <Button variant='outline' color='neutral' onClick={onTimed}>
+          Agent toast
+        </Button>
+      </VStack>
+      <VStack gap={4} align='start'>
+        <p className='sb-annotation'>static — no timer</p>
+        <Button variant='secondary' color='neutral' onClick={onStatic}>
+          Agent toast
+        </Button>
       </VStack>
     </VStack>
   );
