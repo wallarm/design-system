@@ -569,3 +569,40 @@ describe('SelectOptionHint', () => {
     );
   });
 });
+
+describe('Select item leading element', () => {
+  const agentItems = [
+    { value: 'radar', label: 'Radar', leading: <span data-testid='lead-radar' /> },
+    { value: 'sift', label: 'Sift', icon: () => <svg data-testid='icon-sift' /> },
+  ];
+
+  it('shows the picked item leading element in the trigger', () => {
+    const collection = createListCollection({ items: agentItems });
+    render(
+      <Select collection={collection} defaultValue={['radar']}>
+        <SelectButton data-testid='trigger' />
+      </Select>,
+    );
+    expect(within(screen.getByTestId('trigger')).getByTestId('lead-radar')).toBeTruthy();
+  });
+
+  it('still shows the icon component when there is no leading element', () => {
+    const collection = createListCollection({ items: agentItems });
+    render(
+      <Select collection={collection} defaultValue={['sift']}>
+        <SelectButton data-testid='trigger' />
+      </Select>,
+    );
+    expect(within(screen.getByTestId('trigger')).getByTestId('icon-sift')).toBeTruthy();
+  });
+
+  it('shows the leading element in a SelectInput chip', () => {
+    const collection = createListCollection({ items: agentItems });
+    render(
+      <Select collection={collection} multiple defaultValue={['radar']} data-testid='select'>
+        <SelectInput />
+      </Select>,
+    );
+    expect(within(screen.getAllByTestId('select--tag')[0]).getByTestId('lead-radar')).toBeTruthy();
+  });
+});

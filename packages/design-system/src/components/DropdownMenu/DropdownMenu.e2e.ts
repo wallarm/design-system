@@ -6,6 +6,7 @@ const dropdownMenuStory = createStoryHelper('actions-dropdownmenu', [
   'Context',
   'With Descriptions',
   'With Icons',
+  'With Agents',
   'With Footer',
   'With Description And Icons',
   'With Checkbox Items',
@@ -40,6 +41,12 @@ test.describe('Component: DropdownMenu', () => {
       await dropdownMenuStory.goto(page, 'With Icons');
       await page.getByRole('button', { name: 'Add Widget' }).click();
       await expect(page.locator('[data-scope="menu"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render dropdown menu with agents correctly', async ({ page }) => {
+      await dropdownMenuStory.goto(page, 'With Agents');
+      await openMenu(page);
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 

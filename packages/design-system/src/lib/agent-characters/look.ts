@@ -96,3 +96,7 @@ export function defaultLook(
   // 200 draws all had an issue: keep the first, so the result stays deterministic (never reached in the handoff run).
   return first;
 }
+
+/** A preset's look; any other id (or none) gets its deterministic default look, never Wally's coral. */
+export const lookOf = (id: string | undefined) =>
+  CAST.find(p => p.id === id) ?? defaultLook(id ?? '');

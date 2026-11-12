@@ -23,6 +23,7 @@ import {
   Terminal,
   Wrench,
 } from '../../icons';
+import { AgentGlyph, defaultLook } from '../AgentGlyph';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import { ChainOfThought, ChainOfThoughtStep } from './index';
@@ -88,6 +89,36 @@ export const Nested: StoryFn<typeof meta> = () => (
     >
       <p>Draft rule blocks SQL injection on /api/v1/login.</p>
     </ChainOfThoughtStep>
+  </ChainOfThought>
+);
+
+/**
+ * A sub-agent step shows the sub-agent's 16px `AgentGlyph` in the `icon` slot when the agent is known, a custom
+ * agent its `defaultLook(uid)`; the label names it. `Bot` stays the fallback for an unknown agent.
+ */
+export const WithAgent: StoryFn<typeof meta> = () => (
+  <ChainOfThought data-testid='cot'>
+    <ChainOfThoughtStep icon={<Brain />} label='Thought for 5s' />
+    <ChainOfThoughtStep
+      icon={<AgentGlyph agent='radar' size={16} />}
+      label='Ran Radar, Attack Anomaly Investigator'
+      defaultOpen
+      data-testid='cot-agent'
+    >
+      <ChainOfThought>
+        <ChainOfThoughtStep icon={<Search />} label='Searched for anomalous requests' />
+        <ChainOfThoughtStep icon={<Wrench />} label='Called get_attacks' />
+      </ChainOfThought>
+    </ChainOfThoughtStep>
+    <ChainOfThoughtStep
+      icon={<AgentGlyph agent='sift' size={16} />}
+      label='Ran Sift, False Positives Analyzer'
+    />
+    <ChainOfThoughtStep
+      icon={<AgentGlyph look={defaultLook('agent-7f3a')} size={16} />}
+      label='Ran Tune'
+    />
+    <ChainOfThoughtStep icon={<Bot />} label='Ran an unknown subagent' />
   </ChainOfThought>
 );
 

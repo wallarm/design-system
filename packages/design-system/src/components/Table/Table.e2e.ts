@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const tableStory = createStoryHelper('data-display-table', [
+  'Agent Cell',
   'Manual Sorting',
   'Column Resizing With Overflow List',
   'Bidirectional Infinite Scroll',
@@ -523,6 +524,12 @@ test.describe('Component: Table', () => {
   });
 
   test.describe('Visual', () => {
+    test('Should render agents in cells without a plate or a clip', async ({ page }) => {
+      await tableStory.goto(page, 'Agent Cell');
+      await expect(page.getByTestId('agent-cell-agent-1--glyph')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
     test('Should render the bidirectional infinite scroll table correctly', async ({ page }) => {
       await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 

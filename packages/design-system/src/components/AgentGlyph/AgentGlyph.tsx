@@ -1,9 +1,8 @@
 import type { CSSProperties, FC, Ref, SVGProps } from 'react';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
-import { CAST } from '../../lib/agent-characters/data.gen';
 import { shapeOf } from '../../lib/agent-characters/geom';
 import { glyphTree } from '../../lib/agent-characters/glyph';
-import { defaultLook } from '../../lib/agent-characters/look';
+import { lookOf } from '../../lib/agent-characters/look';
 import type { AgentGlyphSize } from '../../lib/agent-characters/places';
 import { cn } from '../../utils/cn';
 import { renderSvgNode } from '../../utils/renderSvgNode';
@@ -40,9 +39,6 @@ export type AgentGlyphProps = Omit<
     /** `optical` lifts the body onto the text line (inline places); `box` keeps the box (ladders, stacks). */
     align?: 'optical' | 'box';
   };
-
-/** A preset's look; any other id (or none) gets its deterministic default look, never Wally's coral. */
-const lookOf = (id: string | undefined) => CAST.find(p => p.id === id) ?? defaultLook(id ?? '');
 
 /**
  * An AI agent's character as a flat 16–32 px glyph: body, visor and eyes in the state's frame, plus a top-of-head
@@ -85,12 +81,21 @@ export const AgentGlyph: FC<AgentGlyphProps> = ({
       height={t.height}
       aria-hidden='true'
       className={cn(
-        'block shrink-0',
+        // Important, with the size as a variable: a slot's `[&_svg]:icon-*` outranks the width and height attributes,
+        // and the size is the `size` prop's, never the slot's.
+        'block w-(--agent-w)! h-(--agent-h)! shrink-0',
         optical && 'translate-y-[var(--oy)]',
         t.opacity && 'opacity-55',
         className,
       )}
-      style={optical ? ({ '--oy': `${t.oy}px`, ...style } as CSSProperties) : style}
+      style={
+        {
+          '--agent-w': `${t.width}px`,
+          '--agent-h': `${t.height}px`,
+          ...(optical && { '--oy': `${t.oy}px` }),
+          ...style,
+        } as CSSProperties
+      }
     >
       {t.children.map((n, i) => renderSvgNode(n, i))}
     </svg>

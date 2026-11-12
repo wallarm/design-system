@@ -86,7 +86,7 @@ export const TableBodyCell = <T extends RowData>({
       return (
         <div className='flex items-center justify-between gap-2'>
           {/* Same as a master cell without actions: forcing `block` on rich content breaks it (Avatar is inline-grid). */}
-          <div className='min-w-0 overflow-hidden'>{tooltipText ? wrappedContent : content}</div>
+          <div className='min-w-0 overflow-x-clip'>{tooltipText ? wrappedContent : content}</div>
           <TableMasterCellActions>{menuAction}</TableMasterCellActions>
         </div>
       );
@@ -94,7 +94,8 @@ export const TableBodyCell = <T extends RowData>({
 
     if (isCut) {
       return (
-        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
+        // Clip the width only: an agent glyph's optical lift rises above the line (Radar's dish) into the cell padding.
+        <div className='overflow-x-clip' style={{ minWidth: column.columnDef.size }}>
           {tooltipText ? wrappedContent : content}
         </div>
       );

@@ -3,6 +3,8 @@ import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
+import { AgentItem, AvatarContent, AvatarName } from '../Avatar';
+import { Badge } from '../Badge';
 import { Button } from '../Button';
 import {
   Dialog,
@@ -208,6 +210,70 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
     </Drawer>
   );
 };
+
+/**
+ * Agents as actors in the header: the meta line names who found and who last changed the item with `AgentItem`
+ * (20 px glyph beside the text-sm name, no plate), composed in `DrawerDescription` like any other inline content.
+ */
+export const WithAgent: StoryFn<DrawerProps> = () => (
+  <Drawer width={DRAWER_SIZES.medium} data-testid='agent-drawer'>
+    <DrawerTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open Agent Drawer
+      </Button>
+    </DrawerTrigger>
+
+    <DrawerContent>
+      <DrawerHeader>
+        <DrawerTitle>
+          Attack spike{' '}
+          <span className='font-mono font-normal text-text-secondary'>
+            GET shop.acme.internal/search
+          </span>
+        </DrawerTitle>
+        <DrawerDescription>
+          <HStack
+            gap={8}
+            align='center'
+            wrap='wrap'
+            className='mt-4'
+            data-testid='agent-drawer-meta'
+          >
+            <Badge color='amber' type='outline'>
+              Needs approval
+            </Badge>
+            <span aria-hidden='true'>·</span>
+            <Text size='sm' weight='medium' color='primary'>
+              Malicious anomaly
+            </Text>
+            <span aria-hidden='true'>·</span>
+            {/* AgentItem is inline: it sits on the text line, so the comma follows the name as in a sentence */}
+            <Text size='sm' color='secondary'>
+              Found by{' '}
+              <AgentItem agent='radar' data-testid='agent-drawer-found-by'>
+                <AvatarContent>
+                  <AvatarName className='font-medium'>Radar</AvatarName>
+                </AvatarContent>
+              </AgentItem>
+              , updated by{' '}
+              <AgentItem agent='sift' data-testid='agent-drawer-updated-by'>
+                <AvatarContent>
+                  <AvatarName className='font-medium'>Sift</AvatarName>
+                </AvatarContent>
+              </AgentItem>{' '}
+              <Text asChild size='sm' decoration='dashed'>
+                <span>5 min ago</span>
+              </Text>
+            </Text>
+          </HStack>
+        </DrawerDescription>
+      </DrawerHeader>
+      <DrawerBody>
+        <ContentPlaceholder fillHeight />
+      </DrawerBody>
+    </DrawerContent>
+  </Drawer>
+);
 
 /**
  * A left-aligned secondary action, separated from the committing pair on the right.

@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { LayoutGrid, LayoutTemplate, Pen, Search, SquareArrowOutUpRight } from '../../icons';
+import { AgentGlyph } from '../AgentGlyph';
 import { Button } from '../Button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '../Field';
 import { HStack, VStack } from '../Stack';
@@ -851,6 +852,45 @@ export const WithIcons: StoryFn<typeof Select> = () => {
               <SelectOption key={skill.value} item={skill}>
                 {Icon && <Icon />}
                 <SelectOptionText>{skill.label}</SelectOptionText>
+                <SelectOptionIndicator />
+              </SelectOption>
+            ))}
+          </SelectContent>
+        </SelectPositioner>
+      </Select>
+    </div>
+  );
+};
+
+const agents: SelectDataItem[] = [
+  { label: 'Radar', value: 'radar', leading: <AgentGlyph agent='radar' size={20} /> },
+  { label: 'Sift', value: 'sift', leading: <AgentGlyph agent='sift' size={20} /> },
+  { label: 'Acquit', value: 'acquit', leading: <AgentGlyph agent='acquit' size={20} /> },
+  { label: 'Trim', value: 'trim', leading: <AgentGlyph agent='trim' size={20} /> },
+  { label: 'Lens', value: 'lens', leading: <AgentGlyph agent='lens' size={20} /> },
+  { label: 'Bard', value: 'bard', leading: <AgentGlyph agent='bard' size={20} /> },
+];
+
+/**
+ * An agent leads its option and, once picked, the trigger: pass its `AgentGlyph` as the item's
+ * `leading`. The glyph keeps its own 20 px beside the text-sm row and is never put on a plate.
+ */
+export const WithAgents: StoryFn<typeof Select> = () => {
+  const collection = createListCollection({
+    items: agents,
+  });
+
+  return (
+    <div className='w-300'>
+      <Select collection={collection} defaultValue={['radar']} data-testid='agent-select'>
+        <SelectButton />
+
+        <SelectPositioner>
+          <SelectContent>
+            {collection.items.map(agent => (
+              <SelectOption key={agent.value} item={agent}>
+                {agent.leading}
+                <SelectOptionText>{agent.label}</SelectOptionText>
                 <SelectOptionIndicator />
               </SelectOption>
             ))}

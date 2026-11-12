@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+import { holdAgentsStill, waitForAgentBakes } from '../AgentAvatar/agentAvatar.e2e.helpers';
 
 const approvalCardStory = createStoryHelper('ai-approvalcard', [
   'Pending',
+  'With Requester',
   'Pending Long Text',
   'Pending With Code Snippet',
   'Allow Once Menu',
@@ -14,6 +16,13 @@ test.describe('Component: ApprovalCard', () => {
   test.describe('Visual', () => {
     test('Should render pending state correctly', async ({ page }) => {
       await approvalCardStory.goto(page, 'Pending');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render an agent requester correctly', async ({ page }) => {
+      await holdAgentsStill(page);
+      await approvalCardStory.goto(page, 'With Requester');
+      await waitForAgentBakes(page.getByTestId('approval-card-requester'));
       await expect(page).toHaveScreenshot();
     });
 

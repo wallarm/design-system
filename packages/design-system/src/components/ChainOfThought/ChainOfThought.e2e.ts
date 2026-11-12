@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const cotStory = createStoryHelper('ai-chainofthought', [
   'Basic',
   'Nested',
+  'With Agent',
   'Simple Rows',
   'Simple Result',
   'Working',
@@ -23,6 +24,11 @@ test.describe('Component: ChainOfThought', () => {
 
     test('Should render nested collapsible steps correctly', async ({ page }) => {
       await cotStory.goto(page, 'Nested');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render sub-agent steps with agent glyphs correctly', async ({ page }) => {
+      await cotStory.goto(page, 'With Agent');
       await expect(page).toHaveScreenshot();
     });
 

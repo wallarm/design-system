@@ -1,4 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { AgentItem, Avatar, AvatarContent, AvatarFallback, AvatarName } from '../Avatar';
+import { HStack } from '../Stack';
+import { Text } from '../Text';
 import { Timeline } from './Timeline';
 import { TimelineConnector } from './TimelineConnector';
 import { TimelineContent } from './TimelineContent';
@@ -110,6 +113,71 @@ export const WithContent: StoryFn<typeof meta> = () => (
             The package left the warehouse and is on its way. This step has the longest description
             of the three, to show the connecting line stretching to match a taller row.
           </TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+    </Timeline>
+  </div>
+);
+
+/**
+ * The actor of an entry, composed in `TimelineContent`: an agent through `AgentItem`, a person
+ * through `Avatar`, beside the same label. 20 px beside the text-sm rows, 16 px beside text-xs.
+ */
+export const WithAgent: StoryFn<typeof meta> = () => (
+  <div className='max-w-[360px]'>
+    <Timeline data-testid='timeline'>
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>1</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Rule proposed</TimelineTitle>
+          <HStack gap={4}>
+            <TimelineDescription>Proposed by</TimelineDescription>
+            <AgentItem agent='trim' data-testid='timeline-agent'>
+              <AvatarContent>
+                <AvatarName>Trim</AvatarName>
+              </AvatarContent>
+            </AgentItem>
+          </HStack>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>2</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Rule approved</TimelineTitle>
+          <HStack gap={4}>
+            <TimelineDescription>Approved by</TimelineDescription>
+            <Avatar size='sm' data-testid='timeline-person'>
+              <AvatarFallback name='Artem Miskevich' />
+              <AvatarContent>
+                <AvatarName>Artem Miskevich</AvatarName>
+              </AvatarContent>
+            </Avatar>
+          </HStack>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>3</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Rule applied</TimelineTitle>
+          <HStack gap={4}>
+            <Text size='xs' color='secondary'>
+              Verified by
+            </Text>
+            <AgentItem agent='radar' size={16} data-testid='timeline-agent-xs'>
+              <AvatarContent>
+                <AvatarName>Radar</AvatarName>
+              </AvatarContent>
+            </AgentItem>
+          </HStack>
         </TimelineContent>
       </TimelineItem>
     </Timeline>

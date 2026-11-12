@@ -9,6 +9,8 @@ const tagVariants = cva(
   cn(
     'inline-flex items-center',
     'rounded-8 border border-border-primary overlay',
+    // `overlay` clips its children; an agent's glyph is lifted onto the text line and must not be cropped
+    'has-[[data-slot=agent-glyph]]:overflow-visible',
     'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
     'transition-colors cursor-pointer',
 

@@ -121,3 +121,36 @@ The data files and every fixture keep the page's ids. `scripts/agent-avatars/exp
 presets only for the module it generates, and the parity tests look fixtures up in the page's presets
 (`__tests__/pageCast.ts`). `default-look.json` was re-run against the shipped cast, so a custom agent can now draw
 Probe's egg in olive but not Lens's or Bard's look.
+
+## Agents in DS components (WDS-205, 2026-11-12)
+
+- **Agent user item:** `AgentItem` (exported from `Avatar`) puts the agent's glyph where the plate goes, with no plate,
+  and takes the same `AvatarContent` / `AvatarName` / `AvatarDescription` as a person's `Avatar`. A place swaps a person
+  for an agent by swapping the root. Size picks the renderer (D1): 16, 20 (default) and 24 draw the glyph, 40, 48
+  and 56 the 3D character, live when asked. The gap to the name is measured from the body, not the square box: the
+  character is pulled in by its shape's empty side (`insetPx`), so a narrow capsule sits as close to its name as a
+  person's plate (6 px).
+- **No slot resizes a character:** `AgentGlyph` and `AgentAvatar` pin their width and height with important utilities on
+  `--agent-w` / `--agent-h`. A slot's `[&_svg]:icon-*` outranks the svg's `width` / `height` attributes, so fixing it
+  once in the character covers Select, DropdownMenu, Badge, FilterDropdown and any later slot.
+- **Icon-only buttons:** `isSvgElement` treats `AgentGlyph` as an icon, so a button that holds only a glyph squares
+  itself off, as the chat trigger does.
+- **No slot clips a character:** the optical lift raises the glyph 2–4 px above its box. Master and cut table cells clip
+  only their width (`overflow-x-clip`), and a Tag that holds a glyph lets it overflow.
+- **Performance on the CI runner:** `AgentAvatar.perf.e2e.ts` measures the Team cold bake and 15 live characters at
+  CPU 1× and 4× on the CI Playwright container and reports the numbers without asserting a budget.
+
+### CI runner numbers (2026-11-12, run 43205850793)
+
+Runner: the CI Playwright container (Chromium 153, 4 cores, 16 GB, DPR 1).
+
+| Measure | Result |
+| --- | --- |
+| Team, 16 cards cold: first character drawn | 235 ms |
+| Team, 16 cards cold: all 32 layers baked | 480 ms (245 ms of bake after the first draw) |
+| 15 live at 120 px, CPU 1× | 60 fps, p95 frame 16.7 ms, max 16.8 ms |
+| 15 live at 120 px, CPU 4× (CDP throttle) | 60 fps, p95 frame 16.8 ms, max 16.8 ms |
+
+These are the first numbers from a named CI runner profile (Questions back #1). They are one run, not a budget: the
+06 §9 budgets stay a team decision. At CPU 4× the loop still holds 60 fps, so the frame budget has headroom on this
+runner; the cold bake is the number to watch as the cast grows.

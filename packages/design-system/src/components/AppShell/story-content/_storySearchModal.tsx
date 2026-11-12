@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Building, CircleDashed, Plus } from '../../../icons';
+import { AgentGlyph } from '../../AgentGlyph';
 import { Button } from '../../Button';
 import { Code } from '../../Code';
 import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../../EmptyState';
@@ -17,7 +18,6 @@ import {
   SearchModalTrigger,
 } from '../../SearchModal';
 import { Text } from '../../Text';
-import { WallyIcon } from '../../WallyIcon';
 
 const recentItems = [
   { page: 'Attacks', product: 'Cloud WAF', date: '2 hours ago', href: '/attacks' },
@@ -106,7 +106,7 @@ export const StorySearchModal = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={() => {}}>
-              <WallyIcon variant='circle' size='sm' />
+              <AgentGlyph agent='wally' size={20} />
               <Text size='sm'>Ask Wally</Text>
             </SearchModalItem>
 

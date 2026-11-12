@@ -1,3 +1,4 @@
+export { AgentItem, type AgentItemProps, type AgentItemSize } from './AgentItem';
 export { Avatar, type AvatarProps, type AvatarStatusChangeDetails } from './Avatar';
 export { AvatarContent, type AvatarContentProps } from './AvatarContent';
 export { AvatarDescription, type AvatarDescriptionProps } from './AvatarDescription';

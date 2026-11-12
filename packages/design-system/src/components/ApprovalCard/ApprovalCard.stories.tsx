@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown } from '../../icons';
+import { AgentItem, AvatarContent, AvatarDescription, AvatarName } from '../Avatar';
 import { Button } from '../Button';
 import { CodeSnippetCode, CodeSnippetContent, CodeSnippetRoot } from '../CodeSnippet';
 import {
@@ -15,6 +16,7 @@ const DESCRIPTION = [
   'Asks the user to approve an action Wally wants to take — a tool call, a config change — before it runs.',
   'While `status` is `pending` the card shows its children (`ApprovalCardContent` and `ApprovalCardActions`); once the app sets `approved` or `rejected`, the children are replaced by a one-line status, so the buttons need no gating of their own.',
   'The card has no outer margins or horizontal padding: the panel gutter (`ChatBody` / `ChatFooter`) places it, whether it sits inline in the conversation or docked above the input.',
+  'When an agent other than Wally asks, its live 40px `AgentItem` opens the `ApprovalCardContent`.',
   'Buttons are plain DS components composed by the app, which also owns loading — disable them while the request is in flight.',
 ].join(' ');
 
@@ -55,6 +57,27 @@ export const Pending: StoryFn<typeof meta> = () => (
           <DropdownMenuItem data-testid='approval-card-allow-once'>Allow once</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <Button variant='secondary' color='neutral'>
+        Reject
+      </Button>
+    </ApprovalCardActions>
+  </ApprovalCard>
+);
+
+/** An agent's request: its live 40px `AgentItem` (the 3D character, name and role, no plate) opens the content. */
+export const WithRequester: StoryFn<typeof meta> = () => (
+  <ApprovalCard data-testid='approval-card'>
+    <ApprovalCardContent>
+      <AgentItem agent='acquit' size={40} live data-testid='approval-card-requester'>
+        <AvatarContent>
+          <AvatarName>Acquit</AvatarName>
+          <AvatarDescription>False Positive Resolver</AvatarDescription>
+        </AvatarContent>
+      </AgentItem>
+      <p>Mark 12 requests to /api/search as false positives and add an exception rule</p>
+    </ApprovalCardContent>
+    <ApprovalCardActions>
+      <Button>Allow</Button>
       <Button variant='secondary' color='neutral'>
         Reject
       </Button>

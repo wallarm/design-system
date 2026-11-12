@@ -7,6 +7,7 @@ import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } fro
 import { Loader } from '../Loader';
 import { HStack, VStack } from '../Stack';
 import {
+  AgentItem,
   Avatar,
   AvatarContent,
   AvatarDescription,
@@ -29,6 +30,7 @@ const DESCRIPTION = [
   "A person's photo on a rounded plate, falling back to initials or an icon while it loads, when it fails, or when there is none.",
   'It is decorative beside a visible name; standing alone, give it `aria-label` so it reads as an image.',
   'Add `AvatarContent` with `AvatarName` (and an optional `AvatarDescription`) for the user item: plate and name in one row.',
+  'An AI agent takes `AgentItem` instead of `Avatar`: its character, with no plate, before the same `AvatarContent`.',
   "To let people change it, make the avatar the `FileUploadTrigger` (`asChild`) and give it `as='button'` — picking only previews, and your form uploads.",
 ].join(' ');
 
@@ -161,6 +163,41 @@ export const WithDescription: StoryFn<AvatarProps> = () => (
           <AvatarDescription>maximilian.alexander-montgomery@wallarm.com</AvatarDescription>
         </AvatarContent>
       </Avatar>
+    </div>
+  </VStack>
+);
+
+/**
+ * An AI agent's user item: `AgentItem` puts the agent's glyph where the plate goes, with no plate and no circle, and
+ * takes the same `AvatarContent`. 20 px beside the text-sm name, 24 px for roomier rows, 16 px beside text-xs.
+ */
+export const Agent: StoryFn<AvatarProps> = () => (
+  <VStack gap={16} align='start' data-testid='avatar'>
+    <Avatar size='sm' data-testid='avatar-person'>
+      <AvatarFallback name='Artem Miskevich' />
+      <AvatarContent>
+        <AvatarName>Artem Miskevich</AvatarName>
+      </AvatarContent>
+    </Avatar>
+    {([20, 24, 16] as const).map(size => (
+      <AgentItem key={size} agent='radar' size={size} data-testid={`avatar-agent-${size}`}>
+        <AvatarContent>
+          <AvatarName>Radar</AvatarName>
+        </AvatarContent>
+      </AgentItem>
+    ))}
+    <AgentItem agent='sift' data-testid='avatar-agent-description'>
+      <AvatarContent>
+        <AvatarName>Sift</AvatarName>
+        <AvatarDescription>False Positives Analyzer</AvatarDescription>
+      </AvatarContent>
+    </AgentItem>
+    <div className='w-120'>
+      <AgentItem agent='acquit' data-testid='avatar-agent-truncated'>
+        <AvatarContent>
+          <AvatarName>Acquit, the false positive resolver</AvatarName>
+        </AvatarContent>
+      </AgentItem>
     </div>
   </VStack>
 );

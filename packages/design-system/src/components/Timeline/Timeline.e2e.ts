@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const timelineStory = createStoryHelper('data-display-timeline', [
   'Basic',
   'With Content',
+  'With Agent',
   'Without Connector',
 ] as const);
 
@@ -28,6 +29,11 @@ test.describe('Component: Timeline', () => {
         .last()
         .getByTestId('timeline--item--separator');
       await expect(lastSeparator).toBeHidden();
+    });
+
+    test('Should render entry actors as agents and people correctly', async ({ page }) => {
+      await timelineStory.goto(page, 'With Agent');
+      await expect(page).toHaveScreenshot();
     });
 
     test('Should render content-only steps without a connector column correctly', async ({

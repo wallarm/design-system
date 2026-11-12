@@ -2,6 +2,7 @@ import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
+import { AgentGlyph } from '../AgentGlyph';
 import { Tag } from './Tag';
 import { TagClose } from './TagClose';
 
@@ -114,5 +115,19 @@ describe('Handler composition', () => {
     await userEvent.click(screen.getByTestId('close'));
 
     expect(onAnalyticsClick).toHaveBeenCalledWith('TAG_REMOVE');
+  });
+});
+
+describe('Agent tag', () => {
+  it('keeps the glyph at its own size and unclipped', () => {
+    render(
+      <Tag size='large' data-testid='tag'>
+        <AgentGlyph agent='radar' size={20} data-testid='glyph' />
+        Radar
+      </Tag>,
+    );
+
+    expect(screen.getByTestId('glyph')).toHaveAttribute('width', '20');
+    expect(screen.getByTestId('tag')).toHaveClass('has-[[data-slot=agent-glyph]]:overflow-visible');
   });
 });

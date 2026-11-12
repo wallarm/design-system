@@ -88,6 +88,25 @@ export const avatarOverlayClassNames = cn(
   'group-has-[>img[data-state=visible]]/avatar:bg-component-avatar-overlay',
 );
 
+// The agent user item: the glyph in column 1 with no plate, AvatarContent in column 2, as in the person's row.
+// `justify-start` keeps both tracks at their content size when a flex column or a row stretches the item.
+export const agentItemVariants = cva(
+  'inline-grid max-w-full shrink-0 items-center justify-start gap-x-6 align-middle font-sans',
+  {
+    variants: {
+      size: {
+        16: '[&_[data-slot=avatar-name]]:text-xs',
+        20: '',
+        24: '',
+        40: '',
+        48: '',
+        56: '',
+      },
+    },
+    defaultVariants: { size: 20 },
+  },
+);
+
 export const avatarContentClassNames = cn(
   'col-start-2 row-start-1 flex min-w-0 flex-col text-left',
 );

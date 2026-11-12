@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const filterFieldStory = createStoryHelper('inputs-filterinput-filterinput', [
   'Default',
   'With Keyboard Hint',
+  'With Agent Values',
   'Error Empty',
   'With Preset Value',
   'With Multi Condition Preset',
@@ -29,6 +30,16 @@ test.describe('Component: FilterInput', () => {
 
       const menu = page.getByRole('menu').last();
       await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
+    });
+
+    test('Should render agent glyphs in the value menu correctly', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Agent Values');
+      await page.getByTestId('filter-input').click();
+      await page.getByRole('menuitem', { name: /found by/i }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+
+      const menu = page.getByRole('menu').last();
+      await expect(menu).toHaveScreenshot('agent-values-menu.png');
     });
   });
 

@@ -12,6 +12,7 @@ const selectStory = createStoryHelper('inputs-select', [
   'With Select Input',
   'With Separator',
   'With Icons',
+  'With Agents',
   'With Footer',
   'With Search',
   'With Form Field',
@@ -67,6 +68,11 @@ test.describe('Component: Select', () => {
 
     test('Should render select with icons correctly', async ({ page }) => {
       await selectStory.goto(page, 'With Icons');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render select with agents correctly', async ({ page }) => {
+      await selectStory.goto(page, 'With Agents');
       await expect(page).toHaveScreenshot();
     });
 

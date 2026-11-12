@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { CirclePlus, Earth, LayoutTemplate, Maximize, Plus } from '../../icons';
+import { CirclePlus, Earth, LayoutTemplate, Maximize, Plus, UserPlus } from '../../icons';
+import { AgentGlyph, defaultLook } from '../AgentGlyph';
 import { Button } from '../Button';
 import { Kbd, KbdGroup } from '../Kbd';
 import { DropdownMenu } from './DropdownMenu';
@@ -346,6 +347,60 @@ export const WithIcons: StoryFn<typeof meta> = () => (
       <DropdownMenuItem variant='brand'>
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
+/**
+ * An agent takes the icon's place: a 16 px `AgentGlyph` in `DropdownMenuItemIcon`, beside the agent's
+ * visible name — the glyph is decorative and never announced. A custom agent passes its stored look
+ * (`defaultLook(uid)` until it has one).
+ */
+export const WithAgents: StoryFn<typeof meta> = () => (
+  <DropdownMenu data-testid='dropdown-menu'>
+    <DropdownMenuTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        <UserPlus />
+        Assign to
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem>
+        <DropdownMenuItemIcon>
+          <AgentGlyph agent='radar' size={16} />
+        </DropdownMenuItemIcon>
+        <DropdownMenuItemContent>
+          <DropdownMenuItemText>Radar</DropdownMenuItemText>
+          <DropdownMenuItemDescription>Attack Anomaly Investigator</DropdownMenuItemDescription>
+        </DropdownMenuItemContent>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <DropdownMenuItemIcon>
+          <AgentGlyph agent='sift' size={16} />
+        </DropdownMenuItemIcon>
+        <DropdownMenuItemContent>
+          <DropdownMenuItemText>Sift</DropdownMenuItemText>
+          <DropdownMenuItemDescription>False Positives Analyzer</DropdownMenuItemDescription>
+        </DropdownMenuItemContent>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <DropdownMenuItemIcon>
+          <AgentGlyph agent='lens' size={16} />
+        </DropdownMenuItemIcon>
+        <DropdownMenuItemText>Lens</DropdownMenuItemText>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <DropdownMenuItemIcon>
+          <AgentGlyph agent='bard' size={16} />
+        </DropdownMenuItemIcon>
+        <DropdownMenuItemText>Bard</DropdownMenuItemText>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <DropdownMenuItemIcon>
+          <AgentGlyph look={defaultLook('agent-7f3a')} size={16} />
+        </DropdownMenuItemIcon>
+        <DropdownMenuItemText>Night watch</DropdownMenuItemText>
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

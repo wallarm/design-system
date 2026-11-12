@@ -13,17 +13,24 @@ export interface FilterDropdownOptionProps<T extends CollectionItem = Collection
   item: T;
   /** Secondary text at the right end of the row, such as a count. */
   hint?: ReactNode;
+  /**
+   * Leading element before the text, such as an agent's 16 px `AgentGlyph`. It keeps its own size:
+   * the row does not resize it.
+   */
+  icon?: ReactNode;
   /** Row text. Defaults to the item's label from the collection. */
   children?: ReactNode;
 }
 
 /**
- * One value of the filter: a check (single) or a checkbox (multi) on the right, optional `hint`
- * before it. Inside `FilterDropdownSelected` the same markup renders the row's "Selected" copy.
+ * One value of the filter: an optional leading `icon`, a check (single) or a checkbox (multi) on
+ * the right, optional `hint` before it. Inside `FilterDropdownSelected` the same markup renders
+ * the row's "Selected" copy.
  */
 export const FilterDropdownOption = <T extends CollectionItem>({
   item,
   hint,
+  icon,
   children,
   'data-testid': testIdProp,
   ...props
@@ -33,6 +40,7 @@ export const FilterDropdownOption = <T extends CollectionItem>({
   const value = collection.getItemValue(item);
   const isCopy = alias?.source !== undefined && collection.getItemValue(alias.source) === value;
   const copyTestId = useTestId('selected-option');
+  const text = <SelectOptionText>{children ?? collection.stringifyItem(item)}</SelectOptionText>;
 
   return (
     <SelectOption
@@ -41,7 +49,15 @@ export const FilterDropdownOption = <T extends CollectionItem>({
       data-slot='filter-dropdown-option'
       data-testid={testIdProp ?? (isCopy ? copyTestId : undefined)}
     >
-      <SelectOptionText>{children ?? collection.stringifyItem(item)}</SelectOptionText>
+      {icon === undefined || icon === null ? (
+        text
+      ) : (
+        // One flex item, so a long label wraps beside the icon instead of dropping under it.
+        <span className='flex min-w-0 items-center gap-8'>
+          {icon}
+          {text}
+        </span>
+      )}
       {hint !== undefined && hint !== null && <SelectOptionHint>{hint}</SelectOptionHint>}
       <SelectOptionIndicator />
     </SelectOption>

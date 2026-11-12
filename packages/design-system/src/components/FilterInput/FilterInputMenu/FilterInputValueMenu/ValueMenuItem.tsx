@@ -34,6 +34,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
     onSelect={onSelect}
     className={isPending ? 'bg-states-primary-hover' : undefined}
   >
+    {option.icon}
     {/* Badge */}
     {option.badge ? (
       <Badge color={option.badge.color} type='secondary' variant='default'>
