@@ -16,7 +16,7 @@ Compound component. There is no single "render everything" prop — callers pick
 
 ### Compositional groups (at a glance)
 
-Twenty named exports collapse into six compositional groups. Each group is independent — pick the slots from the groups you need; ignore the rest.
+Nineteen named components collapse into seven compositional groups. Each group is independent — pick the slots from the groups you need; ignore the rest.
 
 | Group              | Members                                                                                                                            | Purpose                                                          |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -32,7 +32,7 @@ The flat-named exports stay the canonical form — the table above is just for q
 
 ### Root + body
 
-- `LineChart<T extends LineChartDatum = LineChartDatum>` — root. Owns `data`, `series`, `xKey`, the controlled series highlight (`activeKey`), the controlled filter (`filteredKeys`), the zoom event (`onZoomChange`), and cross-chart sync (`syncId`, `syncMethod`). **Generic over the datum shape**: pass a concrete `T` to turn `xKey` and `series[].key` into compile-time-checked `keyof T` unions (`<LineChart<RequestRow> data={rows} xKey='timestamp' />`). Leaving the default `LineChartDatum` keeps the loose untyped form. Provides four contexts to its children (data, active key, selection, zoom). The root renders a vertical-flex `<div data-slot='line-chart'>`; **legend placement is structural, not configured** — see the *Layout* section below.
+- `LineChart<T extends LineChartDatum = LineChartDatum>` — root. Owns `data`, `series`, `xKey`, the controlled series highlight (`activeKey`), the controlled filter (`filteredKeys`), the zoom event (`onZoomChange`), and cross-chart sync (`syncId`, `syncMethod`). **Generic over the datum shape**: pass a concrete `T` to turn `xKey` and `series[].key` into compile-time-checked `keyof T` unions (`<LineChart<RequestRow> data={rows} xKey='timestamp' />`). Leaving the default `LineChartDatum` keeps the loose untyped form. Provides five contexts to its children (data, active key, selection, zoom, range registry). The root renders a vertical-flex `<div data-slot='line-chart'>`; **legend placement is structural, not configured** — see the *Layout* section below.
 - `LineChartBody` — wraps recharts' `<ResponsiveContainer>` + `<LineChart>` and passes children through so they can self-register as recharts primitives. Default height is `LINE_CARD_HEIGHT - LINE_HEADER_HEIGHT` (164px) — override with `height`. `aria-hidden='true'` (the legend is the canonical accessible representation). Resizes re-render the plot at most every `LINE_RESIZE_DEBOUNCE_MS` (50ms, recharts' `debounce`); in between the body clips the previous width (`overflow-x-clip`) instead of letting it spill past the card.
 
 ### Plot primitives (children of `LineChartBody`)
