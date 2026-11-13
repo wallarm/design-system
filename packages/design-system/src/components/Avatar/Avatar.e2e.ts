@@ -30,7 +30,7 @@ type VisualStory = Exclude<(typeof STORIES)[number], 'Click To Upload'>;
 const SETTLED: Record<VisualStory, { photo?: string[]; broken?: string[] }> = {
   Basic: { photo: ['avatar'] },
   Sizes: {
-    photo: ['sm', 'md', 'lg'].flatMap(size => [
+    photo: ['sm', 'md', 'lg', 'xl'].flatMap(size => [
       `avatar-${size}-photo`,
       `avatar-${size}-branded-photo`,
     ]),

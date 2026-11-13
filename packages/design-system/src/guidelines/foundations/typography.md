@@ -34,7 +34,7 @@ There are no `heading-*` or `body-*` classes, no `font-regular`, and no `semibol
 - Keep `lineClamp` 1–6; higher values get no CSS.
 - If you mark an error, use `color="danger"` on `Text` and `color="destructive"` on `Code`. Neither accepts the other's value.
 - **Never** add letter spacing below 20px. `Heading` sets tracking per size.
-- **Never** use `font-pixel` (decorative, `EmptyState` only) or `font-serif` (points at Inter, not bundled) in app screens.
+- **Never** use `font-pixel` yourself (decorative: `EmptyState` titles and `HoverCardTitle variant='agent'` only) or `font-serif` (points at Inter, not bundled) in app screens.
 - If you need weight 800, write `font-extrabold`, **never** the misspelled `font-extrablod`.
 - `font-medium` is 450, not 500. You load no font: the theme ships Geist and Geist Mono.
 

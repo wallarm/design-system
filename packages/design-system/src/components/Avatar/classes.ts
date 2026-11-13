@@ -33,6 +33,7 @@ export const avatarVariants = cva(
         sm: 'rounded-8',
         md: 'rounded-8',
         lg: 'rounded-12',
+        xl: 'rounded-16',
       },
     },
     defaultVariants: { size: 'lg' },
@@ -48,6 +49,7 @@ export const avatarPlateVariants = cva('col-start-1 row-start-1 overflow-hidden'
       sm: 'size-20 rounded-8',
       md: 'size-24 rounded-8',
       lg: 'size-32 rounded-12',
+      xl: 'size-56 rounded-16',
     },
   },
   defaultVariants: { size: 'lg' },
@@ -64,18 +66,20 @@ export const avatarImageClassNames = cn(
 export const avatarFallbackVariants = cva(
   cn(
     'inline-flex items-center justify-center select-none data-[state=hidden]:hidden',
-    'border border-border-primary bg-states-primary-hover font-medium text-xs',
+    'border border-border-primary bg-states-primary-hover font-medium',
     'branded:border-border-brand branded:bg-states-brand-hover',
   ),
   {
     variants: {
+      // Initials size per plate.
+      size: { sm: 'text-xs', md: 'text-xs', lg: 'text-xs', xl: 'text-lg' },
       // Initials are text; the icon is an icon. Both follow the Branded frame (Figma 12336:5504).
       initials: {
         true: 'text-text-primary branded:text-text-brand',
         false: 'text-icon-primary branded:text-icon-brand',
       },
     },
-    defaultVariants: { initials: false },
+    defaultVariants: { size: 'lg', initials: false },
   },
 );
 
@@ -114,14 +118,14 @@ export const avatarContentClassNames = cn(
 // Per-size text lives here, so a size-specific change is a one-line edit.
 export const avatarNameVariants = cva('truncate font-normal text-text-primary', {
   variants: {
-    size: { sm: 'text-sm', md: 'text-sm', lg: 'text-sm' },
+    size: { sm: 'text-sm', md: 'text-sm', lg: 'text-sm', xl: 'text-sm' },
   },
   defaultVariants: { size: 'lg' },
 });
 
 export const avatarDescriptionVariants = cva('truncate font-normal text-text-secondary', {
   variants: {
-    size: { sm: 'text-xs', md: 'text-xs', lg: 'text-xs' },
+    size: { sm: 'text-xs', md: 'text-xs', lg: 'text-xs', xl: 'text-xs' },
   },
   defaultVariants: { size: 'lg' },
 });

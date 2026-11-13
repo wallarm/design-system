@@ -41,7 +41,7 @@ export type AgentAvatarProps = Omit<
 > &
   AgentAvatarLook & {
     ref?: Ref<SVGSVGElement>;
-    /** Set per place (see PLACES): 40 Overview rows, 48 headers and toasts, 56 beside people, 72 cards and the drawer, 120 the empty chat. */
+    /** Set per place (see PLACES): 40 Overview rows, 48 headers and toasts, 56 beside people and in the hover card, 72 cards and the drawer, 120 the empty chat. */
     size: AgentAvatarSize;
     state?: AgentAvatarState;
     /** The agent's template has applications (`applications_scoped`): only then can it show Partial coverage. */
@@ -54,7 +54,7 @@ export type AgentAvatarProps = Omit<
     label?: string;
     /** The agent's uid: keeps its timing stable and distinct from its neighbours. */
     seed: string;
-    /** Animated, set per place (40 Overview rows, 72 cards and the drawer, 120 the empty chat). Static under reduced
+    /** Animated, set per place (40 Overview rows, 56 the hover card, 72 cards and the drawer, 120 the empty chat). Static under reduced
      *  motion or when motion is switched off (`setAgentMotion`). */
     live?: boolean;
     /** Beats and Cover all: `play('hello' | 'done')`, `coverAll()`, `cueHover(on)`. */

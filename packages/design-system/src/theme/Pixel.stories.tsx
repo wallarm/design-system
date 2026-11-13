@@ -4,7 +4,7 @@ import { Text } from '../components/Text';
 
 const DESCRIPTION = [
   'Geist Pixel is the decorative typeface. Use it for empty states, and for moments that want personality rather than information.',
-  'There is no `Pixel` component. Pixel type is composed from the `font-pixel` utility plus the shared `text-*` size utilities, so the steps below are conventions rather than a component API. The only place it ships today is `EmptyStateTitle` at the `collection-empty` scale, at 16/24 — the compact `no-results` title is sans, not pixel.',
+  "There is no `Pixel` component. Pixel type is composed from the `font-pixel` utility plus the shared `text-*` size utilities, so the steps below are conventions rather than a component API. It ships in two places only: `EmptyStateTitle` at the `collection-empty` scale, at 16/24 — the compact `no-results` title is sans, not pixel — and `HoverCardTitle variant='agent'`, the agent's name at 20/28. Never write `font-pixel` yourself; reach for one of those two.",
   'One cut only: Square at regular weight. There is no light or bold, so `font-bold` on pixel type renders as a browser-synthesized fake — emphasis has to come from size or colour, never from weight.',
   'Not for UI copy, labels, or anything read at length; that is the text ramp. Keep it to short strings, where the blocky letterforms stay legible.',
 ].join('\n\n');
@@ -40,8 +40,9 @@ const STEPS: PixelStep[] = [
 ];
 
 /**
- * The four sanctioned steps, with the Figma token beside each. Only one ships today —
- * `EmptyStateTitle` at 16 on 24 — so treat the rest as available rather than established.
+ * The four sanctioned steps, with the Figma token beside each. Two ship today —
+ * `EmptyStateTitle` at 16 on 24 and `HoverCardTitle variant='agent'` at 20 on 28 — so treat the
+ * rest as available rather than established.
  */
 export const Scale: StoryFn<typeof meta> = () => (
   <VStack gap={32} align='start'>

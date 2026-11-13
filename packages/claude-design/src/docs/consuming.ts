@@ -1,7 +1,7 @@
 /** Overlay roots with a \`defaultOpen\` prop; build-docs.test.ts checks both lists against metadata. */
 export const DEFAULT_OPEN = ['DropdownMenu', 'Select', 'Tooltip', 'Calendar', 'FilterDropdown'];
 /** Overlay roots that open only through a controlled \`open\` prop. */
-export const CONTROLLED_OPEN = ['Dialog', 'Drawer', 'Popover', 'SearchModal'];
+export const CONTROLLED_OPEN = ['Dialog', 'Drawer', 'HoverCard', 'Popover', 'SearchModal'];
 
 export const consuming = `## Consuming this system
 

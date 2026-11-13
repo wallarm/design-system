@@ -47,11 +47,11 @@ export const AvatarFallback: FC<AvatarFallbackProps> = ({
       // icon (icon-primary); in the Branded frame both take the brand colour (Figma 12336:5504).
       className={cn(
         avatarPlateVariants({ size }),
-        avatarFallbackVariants({ initials: showsInitials }),
+        avatarFallbackVariants({ size, initials: showsInitials }),
         className,
       )}
     >
-      {children ?? (initials || <Icon size='md' />)}
+      {children ?? (initials || <Icon size={size === 'xl' ? 'xl' : 'md'} />)}
     </ArkAvatar.Fallback>
   );
 };
