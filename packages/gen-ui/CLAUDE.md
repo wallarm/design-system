@@ -5,6 +5,8 @@ Read [README.md](./README.md) first: the folder map, how a render works and how 
 ## Hard rules
 
 - One file per catalog entry in `src/components/`, listed in `src/components/index.ts`.
+- Every DS component has a decision in `src/tests/coverage.test.ts`: the entries that render it, or
+  why an agent never places it. A new DS component without one fails the test.
 - Enum values come from DS types through `subsetOf` / `allOf` / a typed map; no `as` casts in
   `src/components/` (a test fails on them).
 - Props are data only; no prop named `id`, `component`, `children` or `child`; events carry no
