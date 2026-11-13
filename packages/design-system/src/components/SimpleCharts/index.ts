@@ -77,6 +77,8 @@ export {
   LineChartLine,
   type LineChartLineProps,
   type LineChartProps,
+  LineChartRange,
+  type LineChartRangeProps,
   type LineChartSeries,
   LineChartTooltip,
   type LineChartTooltipProps,

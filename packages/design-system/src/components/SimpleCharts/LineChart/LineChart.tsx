@@ -3,8 +3,10 @@ import {
   type ReactElement,
   type Ref,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import type { SyncMethod } from 'recharts/types/synchronisation/types';
 import { cn } from '../../../utils/cn';
@@ -20,6 +22,9 @@ import {
   LineChartDataContext,
   type LineChartDataContextValue,
   type LineChartDatum,
+  LineChartRangeContext,
+  type LineChartRangeContextValue,
+  type LineChartRangeEntry,
   LineChartSelectionContext,
   type LineChartSelectionContextValue,
   type LineChartSeries,
@@ -27,6 +32,8 @@ import {
   type LineChartZoomContextValue,
   type LineChartZoomRange,
 } from './LineChartContext';
+import { findOverlappingRanges } from './lib/rangeGeometry';
+import { warnLineChartRange } from './lib/warn';
 
 /**
  * Generic over the datum shape so `xKey` and `series[].key` are checked at
@@ -222,22 +229,66 @@ export function LineChart<T extends LineChartDatum = LineChartDatum>({
     ],
   );
 
+  // Registry of mounted `<LineChartRange>`s. `useCallback`/`useMemo` kept on purpose: this
+  // component writes a ref during render, so React Compiler bails out on it, and an unstable
+  // `registerRange` would make every range re-register (and re-render the root) in a loop.
+  const [ranges, setRanges] = useState<readonly LineChartRangeEntry[]>([]);
+  const registerRange = useCallback((entry: LineChartRangeEntry) => {
+    setRanges(prev => [...prev, entry]);
+    return () => setRanges(prev => prev.filter(r => r !== entry));
+  }, []);
+  const rangeContextValue = useMemo<LineChartRangeContextValue>(
+    () => ({ ranges, registerRange }),
+    [ranges, registerRange],
+  );
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    for (const [a, b] of findOverlappingRanges(ranges)) {
+      const describe = (key: string) => {
+        const r = ranges.find(range => range.key === key);
+        return `${String(r?.from)}..${r?.to === undefined ? 'ongoing' : String(r.to)}`;
+      };
+      warnLineChartRange(
+        `Ranges ${describe(a)} and ${describe(b)} overlap. Both are drawn as is (fills stack); ` +
+          'merge them if they describe one event.',
+      );
+    }
+  }, [ranges]);
+
+  const descriptions = ranges.flatMap(range =>
+    range.description ? [{ key: range.key, text: range.description }] : [],
+  );
+
   return (
     <LineChartDataContext.Provider value={dataValue}>
       <LineChartActiveContext.Provider value={activeKeyContextValue}>
         <LineChartSelectionContext.Provider value={selectionValue}>
           <LineChartZoomContext.Provider value={zoomContextValue}>
-            <TestIdProvider value={testId}>
-              <div
-                {...props}
-                ref={setRootRef}
-                data-slot='line-chart'
-                data-testid={testId}
-                className={cn(lineChartRootClasses, className)}
-              >
-                {children}
-              </div>
-            </TestIdProvider>
+            <LineChartRangeContext.Provider value={rangeContextValue}>
+              <TestIdProvider value={testId}>
+                <div
+                  {...props}
+                  ref={setRootRef}
+                  data-slot='line-chart'
+                  data-testid={testId}
+                  className={cn(lineChartRootClasses, className)}
+                >
+                  {children}
+                  {descriptions.length > 0 ? (
+                    // The plot is `aria-hidden`; this list is the ranges' screen-reader surface.
+                    <ul
+                      data-testid={testId ? `${testId}--range-descriptions` : undefined}
+                      className='sr-only'
+                    >
+                      {descriptions.map(item => (
+                        <li key={item.key}>{item.text}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </TestIdProvider>
+            </LineChartRangeContext.Provider>
           </LineChartZoomContext.Provider>
         </LineChartSelectionContext.Provider>
       </LineChartActiveContext.Provider>

@@ -172,3 +172,26 @@ export const LineChartSelectionContext = createContext<LineChartSelectionContext
 export const LineChartZoomContext = createContext<LineChartZoomContextValue | null>(null);
 
 export const LineChartItemContext = createContext<LineChartItemContextValue | null>(null);
+
+/** Raw props of a mounted `<LineChartRange>`, as registered on the chart root. */
+export interface LineChartRangeEntry {
+  key: string;
+  from: number | string;
+  to?: number | string;
+  seriesKey?: string;
+  description?: string;
+}
+
+/**
+ * Registry of mounted `<LineChartRange>`s. Own context so range changes do not invalidate
+ * `LineChartDataContext`. `registerRange` returns the matching unregister function.
+ */
+export interface LineChartRangeContextValue {
+  ranges: readonly LineChartRangeEntry[];
+  registerRange: (entry: LineChartRangeEntry) => () => void;
+}
+
+export const LineChartRangeContext = createContext<LineChartRangeContextValue>({
+  ranges: [],
+  registerRange: () => () => undefined,
+});
