@@ -186,10 +186,12 @@ export const LineChartLine: FC<LineChartLineProps> = ({
         isAnimationActive={false}
         tooltipType='none'
         legendType='none'
-        // Clicks fall through to the base line underneath.
-        pointerEvents='none'
+        // The clip also clips hit-testing, so the copy carries the consumer handlers for its part.
+        onClick={wrap(onClick)}
+        onMouseEnter={wrap(onMouseEnter)}
+        onMouseLeave={wrap(onMouseLeave)}
         shape={renderClippedShape(clipId, clipRects)}
-        data-slot='line-chart-line'
+        data-slot='line-chart-line-in-range'
         data-testid={inRangeTestId}
         data-key={seriesKey}
         data-in-range='true'

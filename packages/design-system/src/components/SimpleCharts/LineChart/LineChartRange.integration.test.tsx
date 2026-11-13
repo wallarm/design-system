@@ -1,8 +1,9 @@
 import { cloneElement, isValidElement, type ReactNode } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import * as actualRecharts from 'recharts' with { rstest: 'importActual' };
 import { resolveChartColor } from '../lib/chartPalette';
+import { LINE_STROKE_WIDTH } from './constants';
 import { LineChart } from './LineChart';
 import { LineChartBody } from './LineChartBody';
 import { LineChartHoverPopoverRow } from './LineChartHoverPopoverRow';
@@ -37,12 +38,22 @@ const series = [
   { key: 'usual', label: 'Usual', variant: 'dashed' as const },
 ];
 
-const Chart = ({ testId, filteredKeys }: { testId: string; filteredKeys?: string[] }) => (
+const Chart = ({
+  testId,
+  filteredKeys,
+  ranges = <LineChartRange from={10} to={20} seriesKey='attacks' />,
+  onLineClick,
+}: {
+  testId: string;
+  filteredKeys?: string[];
+  ranges?: ReactNode;
+  onLineClick?: () => void;
+}) => (
   <LineChart data-testid={testId} data={data} series={series} xKey='t' filteredKeys={filteredKeys}>
     <LineChartBody>
       <LineChartXAxis />
-      <LineChartRange from={10} to={20} seriesKey='attacks' />
-      <LineChartLine seriesKey='attacks' disableAnimation />
+      {ranges}
+      <LineChartLine seriesKey='attacks' disableAnimation onClick={onLineClick} />
       <LineChartLine seriesKey='usual' disableAnimation />
       <LineChartTooltip />
     </LineChartBody>
@@ -51,6 +62,16 @@ const Chart = ({ testId, filteredKeys }: { testId: string; filteredKeys?: string
 
 const clipIdOf = (element: Element): string | undefined =>
   element.getAttribute('clip-path')?.match(/^url\(#(.+)\)$/)?.[1];
+
+// [x1, x2] of every rect in the clipPath an element points at.
+const clipRectsOf = (container: Element, element: Element) =>
+  [...container.querySelectorAll(`clipPath[id="${clipIdOf(element)}"] rect`)].map(r => [
+    Number(r.getAttribute('x')),
+    Number(r.getAttribute('x')) + Number(r.getAttribute('width')),
+  ]);
+
+const attacksBase = () =>
+  screen.getAllByTestId('lc--line').find(el => el.getAttribute('data-key') === 'attacks')!;
 
 describe('LineChartLine — in-range copy', () => {
   it('renders a danger copy of the targeted series clipped to the range', () => {
@@ -89,6 +110,49 @@ describe('LineChartLine — in-range copy', () => {
       .getAllByTestId('lc--line')
       .filter(el => el.getAttribute('data-key') === 'usual');
     expect(usual).not.toHaveAttribute('clip-path', expect.stringContaining('url(#'));
+  });
+
+  it('fires the consumer onClick from the in-range copy', () => {
+    const onLineClick = rs.fn();
+    render(<Chart testId='lc' onLineClick={onLineClick} />);
+    fireEvent.click(screen.getByTestId('lc--line-in-range'));
+    expect(onLineClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('merges overlapping ranges into one gap in the base clip', () => {
+    const { container } = render(
+      <Chart
+        testId='lc'
+        ranges={
+          <>
+            <LineChartRange from={5} to={15} seriesKey='attacks' />
+            <LineChartRange from={10} to={25} seriesKey='attacks' />
+          </>
+        }
+      />,
+    );
+    const inside = clipRectsOf(container, screen.getByTestId('lc--line-in-range'));
+    expect(inside).toHaveLength(2);
+    const start = Math.min(...inside.map(([x1]) => x1!));
+    const end = Math.max(...inside.map(([, x2]) => x2!));
+    const outside = clipRectsOf(container, attacksBase());
+    expect(outside).toHaveLength(2);
+    expect(outside[0]![1]).toBeCloseTo(start);
+    expect(outside[1]![0]).toBeCloseTo(end);
+  });
+
+  it('pushes clamped edges past the plot by the stroke width', () => {
+    const { container } = render(
+      <Chart testId='lc' ranges={<LineChartRange from={0} seriesKey='attacks' />} />,
+    );
+    const fill = screen.getByTestId('lc--range').querySelector('rect')!;
+    const plotLeft = Number(fill.getAttribute('x'));
+    const plotRight = plotLeft + Number(fill.getAttribute('width'));
+    const [[x1, x2]] = clipRectsOf(container, screen.getByTestId('lc--line-in-range')) as [
+      [number, number],
+    ];
+    expect(x1).toBeCloseTo(plotLeft - LINE_STROKE_WIDTH);
+    expect(x2).toBeCloseTo(plotRight + LINE_STROKE_WIDTH);
   });
 
   it('draws no copy for a filtered-out series but keeps the range', () => {
