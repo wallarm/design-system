@@ -20,5 +20,6 @@ export {
   type DrawerPositionerProps,
 } from './DrawerPositioner';
 export { DrawerResizeHandle } from './DrawerResizeHandle';
+export { DrawerAncestorIdsProvider } from './DrawerRoot';
 export { DrawerTitle, type DrawerTitleProps } from './DrawerTitle';
 export { DrawerTrigger, type DrawerTriggerProps } from './DrawerTrigger';

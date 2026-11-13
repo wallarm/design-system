@@ -16,6 +16,18 @@ type LayerDismissRequest = Parameters<NonNullable<Dialog.RootProps['onRequestDis
  */
 export const DrawerAncestorIdsContext = createContext<readonly string[]>([]);
 
+/** Adds this Drawer/Dialog's content id to the ancestry seen by layers rendered inside it. */
+export const DrawerAncestorIdsProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const { contentId } = useDrawerContext();
+  const ancestorIds = useContext(DrawerAncestorIdsContext);
+
+  return (
+    <DrawerAncestorIdsContext.Provider value={[...ancestorIds, contentId]}>
+      {children}
+    </DrawerAncestorIdsContext.Provider>
+  );
+};
+
 /** A Drawer/Dialog content still mounted for its exit animation. */
 const EXITING_DIALOG_LAYER = '[data-scope="dialog"][data-part="content"][data-state="closed"]';
 

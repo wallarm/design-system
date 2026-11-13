@@ -3,6 +3,7 @@ import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import {
+  DrawerAncestorIdsProvider,
   type DrawerContentProps,
   DrawerOverlay,
   DrawerPortal,
@@ -46,7 +47,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
           )}
           style={{ width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties}
         >
-          {children}
+          <DrawerAncestorIdsProvider>{children}</DrawerAncestorIdsProvider>
         </ArkUiDialog.Content>
       </DialogPositioner>
     </DrawerPortal>
