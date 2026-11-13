@@ -112,13 +112,21 @@ export const Cast: StoryFn = () => (
   </VStack>
 );
 
-/** The four glyph sizes. 16 px is the floor; above 32 px the 3D AgentAvatar takes over. */
+/** The four glyph sizes for the cast. 16 px is the floor; above 32 px the 3D AgentAvatar takes over. */
 export const Sizes: StoryFn = () => (
   <HStack gap={24} align='end'>
     {([16, 20, 24, 32] as const).map(size => (
       <VStack key={size} gap={8} align='center'>
         <span className='sb-annotation'>{size}</span>
-        <AgentGlyph data-testid={`agent-glyph-${size}`} agent='wally' size={size} align='box' />
+        {CAST.map(p => (
+          <AgentGlyph
+            key={p.id}
+            data-testid={`agent-glyph-${size}-${p.id}`}
+            agent={p.id}
+            size={size}
+            align='box'
+          />
+        ))}
       </VStack>
     ))}
   </HStack>
@@ -157,8 +165,8 @@ export const InlineWithText: StoryFn = () => (
 
 /** Partial coverage: an agent whose template has applications, covering only some of them, shows a grey crown while on duty. */
 export const PartialCoverage: StoryFn = () => (
-  <HStack gap={24}>
-    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'tune').map(p => (
+  <HStack gap={24} wrap='wrap'>
+    {CAST.map(p => (
       <VStack key={p.id} gap={8} align='center'>
         <AgentGlyph
           data-testid={`agent-glyph-partial-${p.id}`}
