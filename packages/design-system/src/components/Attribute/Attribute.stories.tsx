@@ -713,9 +713,9 @@ export const AgentValue: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal' data-testid='attr-proposed-by'>
       <AttributeLabel>Proposed by</AttributeLabel>
       <AttributeValue>
-        <AgentItem agent='acquit' data-testid='attr-proposed-by-agent'>
+        <AgentItem agent='tune' data-testid='attr-proposed-by-agent'>
           <AvatarContent>
-            <AvatarName>Acquit</AvatarName>
+            <AvatarName>Tune</AvatarName>
           </AvatarContent>
         </AgentItem>
       </AttributeValue>

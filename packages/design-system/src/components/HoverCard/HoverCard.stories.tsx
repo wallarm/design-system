@@ -89,7 +89,7 @@ export const Agent: StoryFn<typeof meta> = () => {
           <Badge variant='dotted' type='secondary' color='blue'>
             Working
           </Badge>
-          <HoverCardDescription>Attack Anomaly Investigator</HoverCardDescription>
+          <HoverCardDescription>Anomaly Investigation Agent</HoverCardDescription>
         </HoverCardHeader>
         <Separator spacing={6} />
         <Attribute orientation='horizontal' data-testid='agent-card--runs'>
@@ -541,7 +541,7 @@ export const Analytics: StoryFn<typeof meta> = () => (
         <Badge variant='dotted' type='secondary' color='blue'>
           Working
         </Badge>
-        <HoverCardDescription>Attack Anomaly Investigator</HoverCardDescription>
+        <HoverCardDescription>Anomaly Investigation Agent</HoverCardDescription>
       </HoverCardHeader>
       <Separator spacing={6} />
       <Attribute orientation='horizontal' data-testid='analytics-card--latest-run'>

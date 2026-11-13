@@ -455,7 +455,7 @@ export class Character implements LiveChar {
       this.cov = null;
     }
     const veil = this.svg.querySelector('[data-part~="veil"]');
-    // clipped prop deco (Acquit's seam) sits over the crown; off, the ghost's order is back
+    // clipped prop deco (the seam) sits over the crown; off, the ghost's order is back
     if (veil)
       this.fig.insertBefore(
         veil,
@@ -1163,6 +1163,11 @@ export class Character implements LiveChar {
       else if (a === 'wave') ang = w * 9 * Math.sin((t * 2 * Math.PI) / 0.8);
       else if (a === 'wind') ang = 0;
       else if (a === 'rock') ang = w * 2.5 * Math.sin((t * 2 * Math.PI) / 2.4);
+      else if (a === 'zap') {
+        // the bolt: a short crackle, then a pause
+        const ph = t % 1.3;
+        ang = ph < 0.3 ? w * 6 * Math.sin((ph * 2 * Math.PI) / 0.1) * (1 - ph / 0.3) : 0;
+      }
       let sxk = 1;
       let sk = 1;
       if (a === 'wind' && w > 0.001) {

@@ -144,7 +144,7 @@ const agentValueFields: FieldMetadata[] = [
     values: [
       { value: 'radar', label: 'Radar', icon: <AgentGlyph agent='radar' size={16} /> },
       { value: 'sift', label: 'Sift', icon: <AgentGlyph agent='sift' size={16} /> },
-      { value: 'acquit', label: 'Acquit', icon: <AgentGlyph agent='acquit' size={16} /> },
+      { value: 'tune', label: 'Tune', icon: <AgentGlyph agent='tune' size={16} /> },
       { value: 'trim', label: 'Trim', icon: <AgentGlyph agent='trim' size={16} /> },
       { value: 'lens', label: 'Lens', icon: <AgentGlyph agent='lens' size={16} /> },
       { value: 'bard', label: 'Bard', icon: <AgentGlyph agent='bard' size={16} /> },

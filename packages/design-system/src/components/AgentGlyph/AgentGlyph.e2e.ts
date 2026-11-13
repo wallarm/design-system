@@ -64,7 +64,7 @@ test.describe('Component: AgentGlyph', () => {
             return Math.abs(centre - (row.top + row.height / 2));
           }),
         );
-      expect(offsets).toHaveLength(7);
+      expect(offsets).toHaveLength(10);
       for (const d of offsets) expect(d).toBeLessThanOrEqual(0.13);
     });
   });

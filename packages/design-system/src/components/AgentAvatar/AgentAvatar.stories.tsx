@@ -88,13 +88,16 @@ export const Basic: StoryFn<AgentAvatarProps> = args => (
 
 Basic.args = { agent: 'radar', seed: 'radar', size: 72, state: 'idle', shadow: true };
 
-/** The cast on duty at the team-card size. Each is told apart by its shape, colour and prop. */
+/** The cast of ten on duty at the team-card size. Each is told apart by its shape, colour and prop; a planned agent says so after its role. */
 export const Cast: StoryFn = () => (
-  <HStack gap={24} align='end'>
+  <HStack gap={24} align='start' wrap='wrap'>
     {CAST.map(p => (
-      <VStack key={p.id} gap={8} align='center'>
+      <VStack key={p.id} gap={4} align='center' className='w-120 text-center'>
         <AgentAvatar data-testid={`agent-avatar-${p.id}`} agent={p.id} seed={p.id} size={72} />
         <Text size='sm'>{p.name}</Text>
+        <Text size='xs' color='secondary'>
+          {p.planned ? `${p.role} · planned` : p.role}
+        </Text>
       </VStack>
     ))}
   </HStack>
@@ -141,7 +144,7 @@ export const Places: StoryFn = () => (
 /** Partial coverage: the agent covers only some of its applications, so the top of its head stays in grey felt. */
 export const PartialCoverage: StoryFn = () => (
   <HStack gap={24}>
-    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'acquit').map(p => (
+    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'tune').map(p => (
       <AgentAvatar
         key={p.id}
         data-testid={`agent-avatar-partial-${p.id}`}
@@ -284,9 +287,9 @@ export const Inviting: StoryFn = () => {
     <VStack gap={24} align='center'>
       <HStack gap={24}>
         <AgentAvatar
-          data-testid='agent-avatar-invite-acquit'
-          agent='acquit'
-          seed='acquit'
+          data-testid='agent-avatar-invite-tune'
+          agent='tune'
+          seed='tune'
           size={72}
           state='invite'
           live

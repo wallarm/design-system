@@ -107,16 +107,14 @@ describe('AgentAvatar (static)', () => {
   });
 
   it('is decorative without a label and an image with one', () => {
-    const a = svgOf(render(<AgentAvatar agent='acquit' seed='m' size={48} />).container);
+    const a = svgOf(render(<AgentAvatar agent='tune' seed='m' size={48} />).container);
     expect([a.getAttribute('aria-hidden'), a.getAttribute('role')]).toEqual(['true', null]);
-    const b = svgOf(
-      render(<AgentAvatar agent='acquit' seed='m' size={48} label='Acquit' />).container,
-    );
+    const b = svgOf(render(<AgentAvatar agent='tune' seed='m' size={48} label='Tune' />).container);
     expect([
       b.getAttribute('aria-hidden'),
       b.getAttribute('role'),
       b.getAttribute('aria-label'),
-    ]).toEqual([null, 'img', 'Acquit']);
+    ]).toEqual([null, 'img', 'Tune']);
   });
 
   it('never draws Wally for an unknown agent', () => {

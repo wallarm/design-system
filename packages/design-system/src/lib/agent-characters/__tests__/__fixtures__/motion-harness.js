@@ -63,15 +63,20 @@
     return C;
   }
 
-  // Each scenario: characters (preset id, start state, options, page position), timed calls on them, length in ms.
-  // Positions are fixed so pointer-free geometry (peers, the Set up cue) reads the same rects on both sides.
+  // Looks that left the cast in Look Demo v5 (Probe's, Mend's), kept for the props only they showed in motion.
+  const HEADLAMP = { shape: 'egg', color: 'olive', eyes: 'round', prop: 'headlamp' };
+  const SEAM = { shape: 'pebble', color: 'sand', eyes: 'sleepy', prop: 'seam' };
+
+  // Each scenario: characters (preset id, an optional look over it, start state, options, page position), timed calls
+  // on them, length in ms. Positions are fixed so pointer-free geometry (peers, the Set up cue) reads the same rects
+  // on both sides.
   const SCENARIOS = [
     { name: 'idle', chars: [{ id: 'radar' }], ms: 10000 },
     { name: 'idle-wally', chars: [{ id: 'wally' }], ms: 10000 },
-    { name: 'idle-probe', chars: [{ id: 'probe' }], ms: 10000 },
+    { name: 'idle-headlamp', chars: [{ id: 'seek', look: HEADLAMP }], ms: 10000 },
     {
       name: 'peers',
-      chars: [{ id: 'trim' }, { id: 'sift' }, { id: 'mend' }],
+      chars: [{ id: 'trim' }, { id: 'sift' }, { id: 'patch', look: SEAM }],
       peers: true,
       ms: 16000,
     },
@@ -86,20 +91,33 @@
     },
     {
       name: 'working-props',
-      chars: [{ id: 'trim', state: 'working' }, { id: 'mend', state: 'working' }, { id: 'probe', state: 'working' }],
+      chars: [
+        { id: 'trim', state: 'working' },
+        { id: 'patch', look: SEAM, state: 'working' },
+        { id: 'seek', look: HEADLAMP, state: 'working' },
+      ],
       ms: 4000,
     },
     // look v17: the periscope on the mochi and the quill's sway
     { name: 'working-props-v17', chars: [{ id: 'lens', state: 'working' }, { id: 'bard', state: 'working' }], ms: 4000 },
+    // Look Demo v5: the bolt's crackle and the flag's wave, at work, on Hello and as the idle fiddle
+    {
+      name: 'working-props-demo-v5',
+      chars: [{ id: 'replay', state: 'working' }, { id: 'seek', state: 'working' }, { id: 'tune', state: 'working' }],
+      ms: 4000,
+    },
+    { name: 'hello-replay', chars: [{ id: 'replay', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
+    { name: 'hello-seek', chars: [{ id: 'seek', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
+    { name: 'fiddle-bolt', chars: [{ id: 'replay' }], ms: 7000, at: [[500, 0, 'preview', 'prop']] },
     { name: 'needs', chars: [{ id: 'wally', state: 'needs' }], ms: 6000, at: [[4500, 0, 'setState', 'working']] },
     { name: 'failed', chars: [{ id: 'radar', state: 'failed' }], ms: 6000 },
     { name: 'idle-failed', chars: [{ id: 'trim' }], ms: 4000, at: [[800, 0, 'setState', 'failed']] },
-    { name: 'off', chars: [{ id: 'probe' }], ms: 4000, at: [[1000, 0, 'setState', 'off']] },
-    { name: 'done', chars: [{ id: 'mend', autoReturn: true }], ms: 4000, at: [[500, 0, 'setState', 'done']] },
+    { name: 'off', chars: [{ id: 'seek' }], ms: 4000, at: [[1000, 0, 'setState', 'off']] },
+    { name: 'done', chars: [{ id: 'patch', autoReturn: true }], ms: 4000, at: [[500, 0, 'setState', 'done']] },
     { name: 'hello', chars: [{ id: 'wally', autoReturn: true }], ms: 4000, at: [[500, 0, 'greet']] },
     { name: 'hello-radar', chars: [{ id: 'radar', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'hello-trim', chars: [{ id: 'trim', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
-    { name: 'hello-probe', chars: [{ id: 'probe', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
+    { name: 'hello-headlamp', chars: [{ id: 'seek', look: HEADLAMP, autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'hello-bard', chars: [{ id: 'bard', autoReturn: true }], ms: 3500, at: [[300, 0, 'greet']] },
     { name: 'box', chars: [{ id: 'sift', state: 'box' }], ms: 2500 },
     {
@@ -129,7 +147,7 @@
     },
     {
       name: 'invite-activation',
-      chars: [{ id: 'probe', state: 'invite', cue: true }],
+      chars: [{ id: 'replay', state: 'invite', cue: true }],
       cue: { x: 40, y: 200, w: 96, h: 32 },
       ms: 6000,
       at: [[3500, 0, 'setState', 'power']],
@@ -137,7 +155,7 @@
     {
       name: 'two-inviters',
       chars: [
-        { id: 'mend', state: 'invite', cue: true },
+        { id: 'patch', state: 'invite', cue: true },
         { id: 'sift', state: 'invite', cue: true },
       ],
       cue: { x: 200, y: 220, w: 96, h: 32 },
@@ -166,8 +184,8 @@
       at: [[500, 0, 'preview', 'stretch']],
     },
     {
-      name: 'coverage-mend',
-      chars: [{ id: 'mend', cover: true, autoReturn: true }],
+      name: 'coverage-seam',
+      chars: [{ id: 'patch', look: SEAM, cover: true, autoReturn: true }],
       ms: 5000,
       at: [[1000, 0, 'coverAll']],
     },

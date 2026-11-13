@@ -1,14 +1,13 @@
 import { beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import { hexOf, mix } from '../color';
-import { SHAPES } from '../data.gen';
+import { CAST, SHAPES } from '../data.gen';
 import { eyesPath, eyeTargets, helloPop, type StateId } from '../eyes';
 import { type Geom, optY, primeGeom, SHAPE } from '../geom';
 import { glyph } from '../glyph';
 import { setPropLibrary } from '../propOf';
 import { propDef } from '../props';
-import fixture from './__fixtures__/v17.json';
-import { PAGE_CAST } from './pageCast';
+import fixture from './__fixtures__/demo-v5.json';
 
 type FixtureGeom = { top: [number, number]; HW: number[]; foot: [number, number]; optY: number };
 const geoms = fixture.geoms as Record<string, FixtureGeom>;
@@ -38,7 +37,7 @@ const normIds = (s: string) => {
   });
 };
 
-describe('port of the reference (look v17)', () => {
+describe('port of the reference (Look Demo v5)', () => {
   it('optY matches for every shape', () => {
     for (const S of SHAPES) expect(optY({ shape: S.id })).toBe(geoms[S.id].optY);
   });
@@ -67,7 +66,7 @@ describe('port of the reference (look v17)', () => {
   });
 
   it('glyph matches for the cast in every state and size', () => {
-    for (const c of PAGE_CAST)
+    for (const c of CAST)
       for (const key of Object.keys(glyphs).filter(k => k.startsWith(`${c.id}|`))) {
         const [, st, size] = key.split('|');
         expect(normIds(glyph(c, Number(size), st as StateId)), key).toBe(normIds(glyphs[key]));
@@ -104,7 +103,7 @@ describe('port of the reference (look v17)', () => {
       string,
       { bodyColor: string; eyeColor: string; idleEyesPath: string; prop: unknown; glyph20: string }
     >;
-    for (const c of PAGE_CAST) {
+    for (const c of CAST) {
       const r = resolved[c.id]!;
       const S = SHAPE[c.shape];
       const col = hexOf(c.color);

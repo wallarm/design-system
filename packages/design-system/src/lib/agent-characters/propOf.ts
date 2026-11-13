@@ -1,5 +1,5 @@
 // The prop registry (WDS-204): preset rendering ships the presets' props as data; the full library (props.ts,
-// propDef for 16 props on any shape) is registered only by the AgentLookBuilder entry.
+// propDef for 18 props on any shape) is registered only by the AgentLookBuilder entry.
 import { type AgentShapeDef, PRESET_PROPS, type PropDef } from './data.gen';
 
 type PropLibrary = (kind: string, S: AgentShapeDef, col: string) => PropDef;

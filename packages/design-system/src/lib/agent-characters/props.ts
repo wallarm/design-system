@@ -1,4 +1,4 @@
-// propDef() of the reference page (look v17), ported line for line. Prop geometry depends on the shape
+// propDef() of the reference page (Look Demo v5), ported line for line. Prop geometry depends on the shape
 // (its top anchor and half-widths), so it is code, not data.
 import { mix } from './color';
 import {
@@ -25,6 +25,8 @@ const PROP_FID: Record<string, string> = {
   quill: 'sway',
   seam: 'none',
   plaster: 'none',
+  flag: 'flutter',
+  bolt: 'zap',
 };
 /** Any other prop: 'bob' (a greeting lift, no idle fiddle). */
 export const fidKind = (p: string) => PROP_FID[p] || 'bob';
@@ -278,6 +280,46 @@ export function propDef(kind: string, S: AgentShapeDef, col: string): PropDef {
       anim = { type: 'sway', px: tx + 1, py: ty + 7 };
       break;
     }
+    case 'flag': {
+      // The roster of ten: the pennant in red, the red team's flag; it waves at work.
+      add(
+        tube(
+          [
+            [tx + 3, ty + 5],
+            [tx + 6, ty - 21],
+          ],
+          2,
+        ),
+        'ink',
+      );
+      add(`M${tx + 6} ${ty - 21}L${tx + 23} ${ty - 16}L${tx + 6} ${ty - 10}Z`, '#E5484D');
+      anim = { type: 'wave', px: tx + 6, py: ty - 15 };
+      break;
+    }
+    case 'bolt': {
+      // A lightning bolt stuck into the crown, tip down, leaning right; it crackles at work.
+      const k = 1.6;
+      const th = (12 * Math.PI) / 180;
+      const c = Math.cos(th);
+      const s = Math.sin(th);
+      const bx = tx;
+      const by = ty + 4;
+      const pts: Pt[] = [
+        [2, -20],
+        [-8, -8],
+        [1, -8],
+        [0, 0],
+        [10, -12],
+        [1, -12],
+      ];
+      add(
+        poly(pts.map(([x, y]) => [bx + k * (x * c - y * s), by + k * (x * s + y * c)])),
+        '#F6C12C',
+        'vinyl',
+      );
+      anim = { type: 'zap', px: bx, py: by };
+      break;
+    }
     default: // 'none' and unknown props draw nothing
       break;
   }
@@ -292,6 +334,7 @@ export function propDef(kind: string, S: AgentShapeDef, col: string): PropDef {
     sway: [tx, ty + 3],
     flicker: [tx, ty + 10],
     spin: [tx, ty - 10],
+    zap: [tx, ty + 4],
   };
   const fp: Pt = FP[fk] || (anim && fk === 'slip' ? [anim.px, anim.py] : [tx, ty]);
   return { layers: L, deco, anim, fid: { k: fk, px: r2(fp[0]), py: r2(fp[1]) } };

@@ -2,10 +2,10 @@
   "$about": {
     "source": "reference/agent-characters.html",
     "what": "optY() for every shape and the lift optPx() gives at common sizes.",
-    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "exported": "2026-11-13, Look Demo v5, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "optY": 1394,
-      "optPx": 1401,
+      "optY": 1265,
+      "optPx": 1272,
       "css": "line 769: .who svg, .chip svg, .g6 svg, .ip-gl svg, .opt, #inprod .ip-ovr .ip-av { translate: 0 var(--oy, 0px) }"
     },
     "formula": "optY = ((top + 108) / 2 + centroidY) / 2 - 50, where top is geom().top[1], centroidY is the half-width-weighted mean y of the body between top and the floor (rows every 0.5 unit), and 50 is the viewBox centre. Props never count. optPx(size) = -round2(optY x size / 136): a negative number, the px to move the character up so the body's optical centre sits on the row's centre line. glyph() writes it as --oy on its <svg>; inline places apply translate: 0 var(--oy)."
@@ -190,10 +190,12 @@
     "wally": "dome",
     "radar": "gumdrop",
     "sift": "cushion",
-    "mend": "pebble",
     "trim": "capsule",
-    "probe": "egg",
+    "tune": "safe",
     "lens": "mochi",
-    "bard": "cloud"
+    "bard": "cloud",
+    "replay": "pebble",
+    "patch": "pebble",
+    "seek": "egg"
   }
 }

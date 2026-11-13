@@ -1,9 +1,9 @@
 {
  "$about": {
-  "run": "2026-11-11T09:20:04.660Z",
+  "run": "2026-11-13T10:52:10.338Z",
   "ids": 5000,
   "idSeed": 20261104,
-  "others": "the shipped presets (data/cast.json as data.gen.ts ships it: Acquit for Mend, no Probe)",
+  "others": "the cast of ten (data/cast.json, Look Demo v5)",
   "propPool": [
    "none"
   ],
@@ -12,14 +12,15 @@
  "unstable": 0,
  "withIssue": 0,
  "fallbacks": 0,
- "pairsPossible": 252,
- "pairsUsed": 239,
+ "pairsPossible": 264,
+ "pairsUsed": 248,
  "pairsMissing": [
   "gumdrop/cobalt",
   "cushion/lilac",
-  "pebble/sand",
   "pebble/mint",
   "pebble/sage",
+  "pebble/petrol",
+  "pebble/oat",
   "capsule/sky",
   "capsule/cyan",
   "capsule/mint",
@@ -27,7 +28,9 @@
   "cloud/powder",
   "egg/mint",
   "egg/sage",
-  "mochi/mint"
+  "egg/graphite",
+  "mochi/mint",
+  "safe/butter"
  ],
  "eyesUsed": 4
 }

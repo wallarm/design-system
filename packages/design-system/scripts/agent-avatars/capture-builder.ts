@@ -1,5 +1,5 @@
 /**
- * Captures the reference builder's output (look v17) for the AgentLookBuilder parity test (WDS-204):
+ * Captures the reference builder's output (Look Demo v5) for the AgentLookBuilder parity test (WDS-204):
  * 20 looks from the builder's own Random (Math.random seeded) and the «needs care» cases of handoff 02,
  * each as a static 3D character and glyphs.
  *
@@ -23,7 +23,7 @@ if (!REF)
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
 const OUT = path.resolve(
   here,
-  '../../src/lib/agent-characters/__tests__/__fixtures__/builder-v17.json',
+  '../../src/lib/agent-characters/__tests__/__fixtures__/builder-demo-v5.json',
 );
 
 const browser = await chromium.launch({ channel: 'chrome' });

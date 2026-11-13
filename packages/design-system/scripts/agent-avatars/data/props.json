@@ -1,17 +1,17 @@
 {
   "$about": {
     "source": "reference/agent-characters.html",
-    "what": "PROPS ids and labels as the page holds them. Prop geometry is code, not data: propDef(kind, shape, color) builds each prop from the shape's anchors (line 1412). This file serialises the data and describes the code; prop paths for the six presets are in cast.json (resolved).",
-    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "what": "PROPS ids and labels as the page holds them. Prop geometry is code, not data: propDef(kind, shape, color) builds each prop from the shape's anchors (line 1283). This file serialises the data and describes the code; prop paths for the six presets are in cast.json (resolved).",
+    "exported": "2026-11-13, Look Demo v5, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "PROPS": 1404,
-      "propDef": 1412,
-      "PROP_FID": 1632,
-      "HELLO_PROP": 1608,
-      "FIDDLE": 1620,
-      "GLYPH_PROPS": 2028,
-      "glyph": 2029,
-      "workMotion": "Char.render(), lines 1989-2000"
+      "PROPS": 1275,
+      "propDef": 1283,
+      "PROP_FID": 1513,
+      "HELLO_PROP": 1487,
+      "FIDDLE": 1500,
+      "GLYPH_PROPS": 1909,
+      "glyph": 1910,
+      "workMotion": "Char.render(), line 1889"
     },
     "keys": {
       "glyph": "drawn by glyph() at 16-32 px (GLYPH_PROPS); every other prop is left out of the flat glyph",
@@ -371,6 +371,7 @@
       "id": "quill",
       "name": "Quill",
       "glyph": true,
+      "anchor": "top anchor: a feather tucked into the crown, its quill rising up and to the right",
       "shapeExceptions": [],
       "layers": 2,
       "tones": [
@@ -383,10 +384,52 @@
       ],
       "decoClasses": [],
       "decoClippedToBody": false,
-      "workMotion": null,
+      "workMotion": "rotate about the quill foot, 7 deg, 1.2 s",
       "fiddleKind": "sway",
       "idleFiddle": true,
       "helloMove": "sway"
+    },
+    {
+      "id": "flag",
+      "name": "Red flag",
+      "glyph": true,
+      "anchor": "top anchor: a pole rising 26 units and a red triangular flag",
+      "shapeExceptions": [],
+      "layers": 2,
+      "tones": [
+        "ink",
+        "fixed #E5484D"
+      ],
+      "layerMaterial": [
+        "vinyl",
+        "felt"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "rotate about the pole at the flag, 9 deg, 0.8 s",
+      "fiddleKind": "flutter",
+      "idleFiddle": true,
+      "helloMove": "flutter"
+    },
+    {
+      "id": "bolt",
+      "name": "Lightning",
+      "glyph": true,
+      "anchor": "top anchor: a lightning bolt stuck into the crown at ty + 4, tip down, 1.6x scale, leaning 12 deg right",
+      "shapeExceptions": [],
+      "layers": 1,
+      "tones": [
+        "fixed #F6C12C"
+      ],
+      "layerMaterial": [
+        "vinyl"
+      ],
+      "decoClasses": [],
+      "decoClippedToBody": false,
+      "workMotion": "a crackle about the tip: 6 deg at 10 Hz fading over 0.3 s, then still until 1.3 s",
+      "fiddleKind": "zap",
+      "idleFiddle": true,
+      "helloMove": "zap"
     },
     {
       "id": "none",
@@ -580,6 +623,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0103
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            8.0878,
+            83,
+            35.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9211,
+          "visorCovered": 0,
+          "crownCovered": 0.0103
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            3.36,
+            79.64,
+            34
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.973,
+          "visorCovered": 0,
+          "crownCovered": 0.0065
         }
       },
       "gumdrop": {
@@ -765,6 +832,30 @@
           "outsideBody": 0.9501,
           "visorCovered": 0,
           "crownCovered": 0.014
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            -5.9122,
+            83,
+            21.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9368,
+          "visorCovered": 0,
+          "crownCovered": 0.0121
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            -10.64,
+            79.64,
+            20
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9806,
+          "visorCovered": 0,
+          "crownCovered": 0.0068
         }
       },
       "cushion": {
@@ -950,6 +1041,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0059
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            5.5878,
+            83,
+            33.4122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0061
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            0.86,
+            79.64,
+            31.5
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9712,
+          "visorCovered": 0,
+          "crownCovered": 0.004
         }
       },
       "pebble": {
@@ -1135,6 +1250,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0097
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            18.0878,
+            83,
+            45.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.919,
+          "visorCovered": 0,
+          "crownCovered": 0.01
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            13.36,
+            79.64,
+            44
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9719,
+          "visorCovered": 0,
+          "crownCovered": 0.0064
         }
       },
       "capsule": {
@@ -1320,6 +1459,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0095
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            -1.9122,
+            83,
+            25.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9203,
+          "visorCovered": 0,
+          "crownCovered": 0.0096
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            -6.64,
+            79.64,
+            24
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9725,
+          "visorCovered": 0,
+          "crownCovered": 0.0061
         }
       },
       "cloud": {
@@ -1505,6 +1668,30 @@
           "outsideBody": 0.9418,
           "visorCovered": 0,
           "crownCovered": 0.0112
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            23.0878,
+            83,
+            50.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.8982,
+          "visorCovered": 0,
+          "crownCovered": 0.0133
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            18.36,
+            79.64,
+            49
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9391,
+          "visorCovered": 0,
+          "crownCovered": 0.0146
         }
       },
       "egg": {
@@ -1690,6 +1877,30 @@
           "outsideBody": 0.9469,
           "visorCovered": 0,
           "crownCovered": 0.0099
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            -1.9122,
+            83,
+            25.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9215,
+          "visorCovered": 0,
+          "crownCovered": 0.0099
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            -6.64,
+            79.64,
+            24
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9735,
+          "visorCovered": 0,
+          "crownCovered": 0.0062
         }
       },
       "mochi": {
@@ -1875,6 +2086,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0122
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            28.0878,
+            83,
+            55.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0126
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            23.36,
+            79.64,
+            54
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9714,
+          "visorCovered": 0,
+          "crownCovered": 0.0081
         }
       },
       "kettle": {
@@ -2060,6 +2295,30 @@
           "outsideBody": 0.6419,
           "visorCovered": 0,
           "crownCovered": 0.0122
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            22.0878,
+            83,
+            49.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.6917,
+          "visorCovered": 0,
+          "crownCovered": 0.0124
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            17.36,
+            79.64,
+            48
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.4591,
+          "visorCovered": 0,
+          "crownCovered": 0.0078
         }
       },
       "mug": {
@@ -2245,6 +2504,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0096
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            12.0878,
+            83,
+            39.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.01
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            7.36,
+            79.64,
+            38
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9712,
+          "visorCovered": 0,
+          "crownCovered": 0.0065
         }
       },
       "padlock": {
@@ -2428,6 +2711,30 @@
           ],
           "overflowsViewBox": false,
           "outsideBody": 0.9469,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            -7.9122,
+            83,
+            19.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9215,
+          "visorCovered": 0,
+          "crownCovered": 0
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            -12.64,
+            79.64,
+            18
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9732,
           "visorCovered": 0,
           "crownCovered": 0
         }
@@ -2615,6 +2922,30 @@
           "outsideBody": 0.9467,
           "visorCovered": 0,
           "crownCovered": 0.0138
+        },
+        "flag": {
+          "bbox": [
+            62.0097,
+            8.0878,
+            83,
+            35.9122
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9186,
+          "visorCovered": 0,
+          "crownCovered": 0.0143
+        },
+        "bolt": {
+          "bbox": [
+            50.14,
+            3.36,
+            79.64,
+            34
+          ],
+          "overflowsViewBox": false,
+          "outsideBody": 0.9712,
+          "visorCovered": 0,
+          "crownCovered": 0.0093
         }
       }
     }
