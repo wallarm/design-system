@@ -83,3 +83,32 @@ export const unitsByKey: Record<string, string> = {
   errors: ' err',
   latency: ' ms',
 };
+
+// Attack spike: 5-minute buckets from 10:20 to 12:20 against the usual level for the same time.
+const SPIKE_BUCKET_START = new Date(2025, 0, 1, 10, 20, 0).getTime();
+export const SPIKE_BUCKET_MS = 5 * 60 * 1000;
+const spikeAt = (hours: number, minutes: number) => new Date(2025, 0, 1, hours, minutes).getTime();
+const SPIKE_ATTACKS = [
+  112, 96, 131, 104, 88, 120, 109, 94, 127, 101, 115, 98, 640, 1820, 3250, 2930, 2275, 1410, 720,
+  180, 118, 92, 124, 105, 99,
+];
+const SPIKE_USUAL = [
+  102, 98, 105, 101, 97, 103, 100, 104, 99, 102, 106, 101, 103, 100, 98, 104, 102, 99, 101, 105,
+  100, 97, 103, 101, 99,
+];
+
+export const spikeData: LineChartDatum[] = SPIKE_ATTACKS.map((attacks, i) => ({
+  timestamp: SPIKE_BUCKET_START + i * SPIKE_BUCKET_MS,
+  attacks,
+  usual: SPIKE_USUAL[i] ?? null,
+}));
+
+export const spikeSeries: LineChartSeries[] = [
+  { key: 'attacks', label: 'Attacks', color: 'slate' },
+  { key: 'usual', label: 'Usual', color: 'var(--color-border-strong-primary)', variant: 'dashed' },
+];
+
+export const SPIKE_START = spikeAt(11, 20);
+export const SPIKE_END = spikeAt(11, 52);
+export const EARLY_START = spikeAt(10, 0);
+export const EARLY_END = spikeAt(10, 40);

@@ -26,6 +26,7 @@ import { LineChartHoverPopoverTimestamp } from './LineChartHoverPopoverTimestamp
 import { LineChartLegend } from './LineChartLegend';
 import { LineChartLegendItem } from './LineChartLegendItem';
 import { LineChartLine } from './LineChartLine';
+import { LineChartRange } from './LineChartRange';
 import { LineChartTooltip } from './LineChartTooltip';
 import { LineChartXAxis } from './LineChartXAxis';
 import { LineChartYAxis } from './LineChartYAxis';
@@ -36,13 +37,20 @@ import {
   dailyData60,
   dashedSeries,
   dataWithErrorGaps,
+  EARLY_END,
+  EARLY_START,
   hourlyData24,
   hourlyData1000,
   hourlyDataA,
   hourlyDataB,
   multiSeries,
+  SPIKE_BUCKET_MS,
+  SPIKE_END,
+  SPIKE_START,
   singlePointData,
   singleSeries,
+  spikeData,
+  spikeSeries,
   unitsByKey,
 } from './lib/sampleData';
 
@@ -62,6 +70,7 @@ const meta = {
     LineChartXAxis,
     LineChartYAxis,
     LineChartLine,
+    LineChartRange,
     LineChartTooltip,
     LineChartHoverPopover,
     LineChartHoverPopoverTimestamp,
@@ -1047,3 +1056,196 @@ export const LongTimeRange: StoryFn<typeof meta> = () => (
     <LongTimeRangeChart />
   </div>
 );
+
+const SPIKE_DESCRIPTION = 'Attack spike from 11:20 to 11:52, peak 3,250 per 5 minutes';
+
+/**
+ * `LineChartRange` marks a time window — an attack spike, an incident — against the usual level
+ * for the same time. The window gets a danger fill with dashed edges, the series named by
+ * `seriesKey` turns red inside it, and the start and end labels sit outside the edges. An edge
+ * between two buckets (11:52 here) lands between them rather than snapping to one.
+ */
+export const HighlightedRange: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Attacks per 5 minutes</ChartTitle>
+        </ChartHeader>
+        <LineChart data-testid='line-chart' data={spikeData} series={spikeSeries} xKey='timestamp'>
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartRange
+              from={SPIKE_START}
+              to={SPIKE_END}
+              seriesKey='attacks'
+              startLabel={formatHour(SPIKE_START)}
+              endLabel={formatHour(SPIKE_END)}
+              description={SPIKE_DESCRIPTION}
+            />
+            <LineChartLine seriesKey='attacks' curve='linear' />
+            <LineChartLine seriesKey='usual' curve='linear' />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+/**
+ * Hovering a bucket inside the range paints the ranged series' popover dot red, so the reader
+ * can tell the anomaly from the usual level at a glance. The bucket heading (`11:25 – 11:30`) is
+ * plain `xTickFormatter` work — the consumer knows the bucket size, the chart does not.
+ */
+export const HighlightedRangeHover: StoryFn<typeof meta> = () => {
+  const { formatHour } = useChartTimeFormatters();
+  const formatBucket = (value: unknown) =>
+    `${formatHour(value)} – ${formatHour(Number(value) + SPIKE_BUCKET_MS)}`;
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Attacks per 5 minutes</ChartTitle>
+        </ChartHeader>
+        <LineChart data-testid='line-chart' data={spikeData} series={spikeSeries} xKey='timestamp'>
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartRange
+              from={SPIKE_START}
+              to={SPIKE_END}
+              seriesKey='attacks'
+              startLabel={formatHour(SPIKE_START)}
+              endLabel={formatHour(SPIKE_END)}
+              description={SPIKE_DESCRIPTION}
+            />
+            <LineChartLine seriesKey='attacks' curve='linear' />
+            <LineChartLine seriesKey='usual' curve='linear' />
+            <LineChartTooltip xTickFormatter={formatBucket} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+/**
+ * Leave out `to` for a range that has not ended: it runs to the plot's right edge and the end
+ * label defaults to `Ongoing`, drawn inside the range.
+ */
+export const OngoingRange: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Attacks per 5 minutes</ChartTitle>
+        </ChartHeader>
+        <LineChart data-testid='line-chart' data={spikeData} series={spikeSeries} xKey='timestamp'>
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartRange
+              from={SPIKE_START}
+              seriesKey='attacks'
+              startLabel={formatHour(SPIKE_START)}
+              description='Attack spike since 11:20, ongoing'
+            />
+            <LineChartLine seriesKey='attacks' curve='linear' />
+            <LineChartLine seriesKey='usual' curve='linear' />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+/**
+ * Mount one `LineChartRange` per window. With two or more visible the labels drop out — the
+ * fills say enough — and a range that began before the first bucket clamps to the plot's left
+ * edge. Every description still reaches the screen-reader list.
+ */
+export const SeveralRanges: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Attacks per 5 minutes</ChartTitle>
+        </ChartHeader>
+        <LineChart data-testid='line-chart' data={spikeData} series={spikeSeries} xKey='timestamp'>
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartRange
+              from={EARLY_START}
+              to={EARLY_END}
+              seriesKey='attacks'
+              description='Scan from 10:00 to 10:40'
+            />
+            <LineChartRange
+              from={SPIKE_START}
+              to={SPIKE_END}
+              seriesKey='attacks'
+              description={SPIKE_DESCRIPTION}
+            />
+            <LineChartLine seriesKey='attacks' curve='linear' />
+            <LineChartLine seriesKey='usual' curve='linear' />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+/**
+ * The full anatomy: header, a legend row and a 140px plot. The usual level is an ordinary
+ * dashed series, so its legend item keeps the square dot like any other.
+ */
+export const RangeWithLegend: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Attacks per 5 minutes</ChartTitle>
+        </ChartHeader>
+        <LineChart data-testid='line-chart' data={spikeData} series={spikeSeries} xKey='timestamp'>
+          <LineChartLegend>
+            {spikeSeries.map(s => (
+              <LineChartLegendItem key={s.key} seriesKey={s.key}>
+                <LineChartHoverPopoverDot color={s.color} />
+                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+              </LineChartLegendItem>
+            ))}
+          </LineChartLegend>
+          <LineChartBody height={140}>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartRange
+              from={SPIKE_START}
+              to={SPIKE_END}
+              seriesKey='attacks'
+              startLabel={formatHour(SPIKE_START)}
+              endLabel={formatHour(SPIKE_END)}
+              description={SPIKE_DESCRIPTION}
+            />
+            <LineChartLine seriesKey='attacks' curve='linear' />
+            <LineChartLine seriesKey='usual' curve='linear' />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};

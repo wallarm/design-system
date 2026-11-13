@@ -15,10 +15,29 @@ const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', 
   'Zoom',
   'Loading',
   'Empty',
+  'Highlighted Range',
+  'Highlighted Range Hover',
+  'Ongoing Range',
+  'Several Ranges',
+  'Range With Legend',
 ] as const);
 
 const LEGEND_ITEM = 'line-chart--legend-item';
 const LINE = 'line-chart--line';
+const RANGE_STORIES = [
+  'Highlighted Range',
+  'Ongoing Range',
+  'Several Ranges',
+  'Range With Legend',
+] as const;
+// Hover the middle of the range group (its labels sit outside both edges, so the centre stays
+// inside the fill) at the plot's vertical centre.
+const hoverInsideRange = async (page: Page) => {
+  const range = await page.getByTestId('line-chart--range').boundingBox();
+  const body = await page.getByTestId('line-chart--body').boundingBox();
+  if (!range || !body) throw new Error('range or chart body has no bounding box');
+  await page.mouse.move(range.x + range.width / 2, body.y + body.height / 2);
+};
 const byKey = (page: Page, testId: string, key: string) =>
   page.getByTestId(testId).and(page.locator(`[data-key="${key}"]`));
 
@@ -79,6 +98,20 @@ test.describe('LineChart', () => {
 
     test('Empty', async ({ page }) => {
       await lineChartStory.goto(page, 'Empty');
+      await expect(page).toHaveScreenshot();
+    });
+
+    for (const story of RANGE_STORIES) {
+      test(story.replaceAll(' ', ''), async ({ page }) => {
+        await lineChartStory.goto(page, story);
+        await expect(page).toHaveScreenshot();
+      });
+    }
+
+    test('HighlightedRangeHover', async ({ page }) => {
+      await lineChartStory.goto(page, 'Highlighted Range Hover');
+      await hoverInsideRange(page);
+      await expect(page.getByTestId('line-chart--hover-popover')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -181,6 +214,17 @@ test.describe('LineChart', () => {
 
       await page.getByTestId('chart--title').hover();
       await expect(line).not.toHaveAttribute('data-active', 'true');
+    });
+
+    test('Should show the attacks and usual rows when hovering inside a range', async ({
+      page,
+    }) => {
+      await lineChartStory.goto(page, 'Highlighted Range Hover');
+      await hoverInsideRange(page);
+      const popover = page.getByTestId('line-chart--hover-popover');
+      await expect(popover).toBeVisible();
+      await expect(popover).toContainText('Attacks');
+      await expect(popover).toContainText('Usual');
     });
 
     test('Should lock the hover popover Y across peaks and valleys', async ({ page }) => {
@@ -346,6 +390,13 @@ test.describe('LineChart', () => {
   });
 
   test.describe('Accessibility', () => {
+    test('Should list the range description for screen readers', async ({ page }) => {
+      await lineChartStory.goto(page, 'Highlighted Range');
+      await expect(page.getByTestId('line-chart--range-descriptions')).toContainText(
+        'Attack spike from 11:20 to 11:52, peak 3,250 per 5 minutes',
+      );
+    });
+
     test('Should mark the chart body as decorative with aria-hidden', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
       const body = page.getByTestId('line-chart--body');
