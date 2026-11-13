@@ -1,8 +1,9 @@
 import { type FC, type ReactNode, useContext, useEffect, useId } from 'react';
-import { DefaultZIndexes, usePlotArea, useXAxisScale, ZIndexLayer } from 'recharts';
+import { DefaultZIndexes, ZIndexLayer } from 'recharts';
 import { useTestId } from '../../../utils/testId';
-import { LineChartDataContext, LineChartRangeContext } from './LineChartContext';
-import { layoutRangeLabels, type RangeX, resolveRangeEdges } from './lib/rangeGeometry';
+import { useRangeEdges } from './hooks/useRangeEdges';
+import { LineChartRangeContext } from './LineChartContext';
+import { layoutRangeLabels } from './lib/rangeGeometry';
 
 const LABEL_GAP = 4;
 const LABEL_TOP = 4;
@@ -45,32 +46,22 @@ export const LineChartRange: FC<LineChartRangeProps> = ({
   description,
 }) => {
   const key = useId();
-  const dataCtx = useContext(LineChartDataContext);
   const { ranges, registerRange } = useContext(LineChartRangeContext);
   const testId = useTestId('range');
   const startLabelTestId = useTestId('range-start-label');
   const endLabelTestId = useTestId('range-end-label');
-  const scale = useXAxisScale();
-  const plotArea = usePlotArea();
+  const geometry = useRangeEdges();
 
   useEffect(
     () => registerRange({ key, from, to, seriesKey, description }),
     [registerRange, key, from, to, seriesKey, description],
   );
 
-  if (!dataCtx || !scale || !plotArea) return null;
+  if (!geometry) return null;
 
-  const xs = dataCtx.data.map(datum => datum[dataCtx.xKey]) as RangeX[];
+  const { edgesOf, plotArea } = geometry;
   const plotLeft = plotArea.x;
   const plotRight = plotArea.x + plotArea.width;
-  const edgesOf = (range: { from: RangeX; to?: RangeX }) =>
-    resolveRangeEdges({
-      ...range,
-      xs,
-      pixelOf: index => scale(xs[index], { position: 'middle' }),
-      plotLeft,
-      plotRight,
-    });
 
   const edges = edgesOf({ from, to });
   if (!edges) return null;

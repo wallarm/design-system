@@ -1,5 +1,5 @@
-import { type FC, type MouseEvent, useContext, useEffect } from 'react';
-import { Line } from 'recharts';
+import { type FC, type MouseEvent, useContext, useEffect, useId } from 'react';
+import { Line, LineDrawShape, type LineDrawShapeProps } from 'recharts';
 import type { CurveMouseEventHandler } from 'recharts/types/shape/Curve';
 import { useTestId } from '../../../utils/testId';
 import {
@@ -9,10 +9,17 @@ import {
   LINE_STROKE_WIDTH,
   resolveSeriesColor,
 } from './constants';
-import { LineChartActiveContext, LineChartDataContext } from './LineChartContext';
+import { useRangeEdges } from './hooks/useRangeEdges';
+import {
+  LineChartActiveContext,
+  LineChartDataContext,
+  LineChartRangeContext,
+} from './LineChartContext';
 import { warnLineChartLine } from './lib/warn';
 
 // Strip recharts' first `(curveProps, event)` arg so the public API stays event-only.
+const IN_RANGE_STROKE = 'var(--color-bg-fill-danger)';
+
 const wrap = (
   cb: ((event: MouseEvent<SVGPathElement>) => void) | undefined,
 ): CurveMouseEventHandler | undefined => (cb ? (_props, event) => cb(event) : undefined);
@@ -52,6 +59,10 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   const dataCtx = useContext(LineChartDataContext);
   const { activeKey } = useContext(LineChartActiveContext);
   const testId = useTestId('line');
+  const inRangeTestId = useTestId('line-in-range');
+  const clipId = useId();
+  const { ranges } = useContext(LineChartRangeContext);
+  const geometry = useRangeEdges();
 
   const series = dataCtx?.seriesByKey.get(seriesKey);
   const isHidden = dataCtx?.hiddenSet.has(seriesKey) ?? false;
@@ -74,7 +85,37 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   const isActive = activeKey === seriesKey;
   const opacity = activeKey !== null && !isActive ? LINE_INACTIVE_OPACITY : 1;
 
-  return (
+  const clipRects = geometry
+    ? ranges.flatMap(range => {
+        if (range.seriesKey !== seriesKey) return [];
+        const edges = geometry.edgesOf(range);
+        return edges ? [{ key: range.key, ...edges }] : [];
+      })
+    : [];
+
+  // A danger copy of the line drawn over the base line, clipped to the range rectangles — the
+  // colour switches at exactly the range fill's edge. Recharts drops a `clipPath` prop on
+  // `<Line>` (it sets its own on the curve), so the clip goes through a custom `shape`.
+  const renderInRangeShape = (shapeProps: LineDrawShapeProps) => (
+    <>
+      <defs>
+        <clipPath id={clipId}>
+          {clipRects.map(rect => (
+            <rect
+              key={rect.key}
+              x={rect.x1}
+              y={geometry?.plotArea.y}
+              width={Math.max(0, rect.x2 - rect.x1)}
+              height={geometry?.plotArea.height}
+            />
+          ))}
+        </clipPath>
+      </defs>
+      <LineDrawShape {...shapeProps} clipPath={`url(#${clipId})`} />
+    </>
+  );
+
+  const base = (
     <Line
       dataKey={seriesKey}
       name={series.label}
@@ -97,6 +138,38 @@ export const LineChartLine: FC<LineChartLineProps> = ({
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
     />
+  );
+
+  if (clipRects.length === 0) return base;
+
+  return (
+    <>
+      {base}
+      <Line
+        dataKey={seriesKey}
+        name={series.label}
+        type={curve}
+        stroke={IN_RANGE_STROKE}
+        strokeWidth={strokeWidth}
+        strokeDasharray={strokeDasharray}
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        dot={false}
+        activeDot={false}
+        opacity={opacity}
+        connectNulls={connectNulls}
+        isAnimationActive={false}
+        tooltipType='none'
+        legendType='none'
+        // Clicks fall through to the base line underneath.
+        pointerEvents='none'
+        shape={renderInRangeShape}
+        data-slot='line-chart-line'
+        data-testid={inRangeTestId}
+        data-key={seriesKey}
+        data-in-range='true'
+      />
+    </>
   );
 };
 

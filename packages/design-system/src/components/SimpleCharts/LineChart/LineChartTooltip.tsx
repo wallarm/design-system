@@ -5,6 +5,7 @@ import { HOVER_POPOVER_TOP, LINE_CURSOR_DASHARRAY } from './constants';
 import {
   LineChartDataContext,
   type LineChartDatum,
+  LineChartRangeContext,
   LineChartSelectionContext,
   type LineChartSeries,
   LineChartZoomContext,
@@ -12,12 +13,19 @@ import {
 import { LineChartHoverPopover } from './LineChartHoverPopover';
 import { LineChartHoverPopoverRow } from './LineChartHoverPopoverRow';
 import { LineChartHoverPopoverTimestamp } from './LineChartHoverPopoverTimestamp';
+import { buildTooltipRows } from './lib/buildTooltipRows';
+import type { RangeX } from './lib/rangeGeometry';
 
 export interface LineChartTooltipRow {
   /** Series schema for this row. */
   series: LineChartSeries;
   /** Raw datum value at the active index for `series.key`. */
   value: number | string | null | undefined;
+  /**
+   * `true` when a `<LineChartRange>` whose `seriesKey` is this row's series contains the
+   * hovered datum. The default popover paints this row's dot `red`.
+   */
+  inRange: boolean;
 }
 
 export interface LineChartTooltipRenderArgs {
@@ -70,6 +78,7 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
   const dataCtx = useContext(LineChartDataContext);
   const { hiddenSet } = useContext(LineChartSelectionContext);
   const zoomCtx = useContext(LineChartZoomContext);
+  const { ranges } = useContext(LineChartRangeContext);
   // `usePlotArea` returns the inner plot rectangle (post-axes, post-margins) —
   // anchoring against this (not the SVG) keeps the popover between the topmost
   // line and the X axis even when the X-tick band is tall.
@@ -99,10 +108,13 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
     if (!datum) return null;
 
     const xValue = datum[dataCtx.xKey] as number | string;
-    const rows: LineChartTooltipRow[] = visibleSeries.map(s => ({
-      series: s,
-      value: datum[s.key] as number | string | null | undefined,
-    }));
+    const rows: LineChartTooltipRow[] = buildTooltipRows({
+      datum,
+      series: visibleSeries,
+      ranges,
+      xKey: dataCtx.xKey,
+      xs: dataCtx.data.map(d => d[dataCtx.xKey]) as RangeX[],
+    });
 
     const body = children ? (
       children({ datum, rows, xValue })
@@ -112,7 +124,12 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
           {formatXValue(xValue, xTickFormatter)}
         </LineChartHoverPopoverTimestamp>
         {rows.map(row => (
-          <LineChartHoverPopoverRow key={row.series.key} series={row.series} value={row.value} />
+          <LineChartHoverPopoverRow
+            key={row.series.key}
+            series={row.series}
+            value={row.value}
+            color={row.inRange ? 'red' : undefined}
+          />
         ))}
       </LineChartHoverPopover>
     );

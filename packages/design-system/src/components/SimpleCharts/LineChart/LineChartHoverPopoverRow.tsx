@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { ChartHoverCardRow } from '../internal/ChartHoverCard';
+import type { ChartColor } from '../types';
 import type { LineChartSeries } from './LineChartContext';
 
 export interface LineChartHoverPopoverRowProps extends HTMLAttributes<HTMLDivElement> {
@@ -10,6 +11,8 @@ export interface LineChartHoverPopoverRowProps extends HTMLAttributes<HTMLDivEle
   value?: number | string | null;
   /** Optional value formatter. Defaults to the shared locale formatting. */
   formatValue?: (value: number | string | null | undefined) => ReactNode;
+  /** Dot colour override. Defaults to `series.color` (`'slate'` when unset). */
+  color?: ChartColor | (string & {});
 }
 
 /**
@@ -20,6 +23,7 @@ export const LineChartHoverPopoverRow: FC<LineChartHoverPopoverRowProps> = ({
   series,
   value,
   formatValue,
+  color,
   children,
   ref,
   ...props
@@ -27,7 +31,7 @@ export const LineChartHoverPopoverRow: FC<LineChartHoverPopoverRowProps> = ({
   <ChartHoverCardRow
     ref={ref}
     data-key={series.key}
-    color={series.color ?? 'slate'}
+    color={color ?? series.color ?? 'slate'}
     label={series.label}
     value={value}
     formatValue={formatValue}
