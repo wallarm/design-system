@@ -49,12 +49,9 @@ or authenticated access.
 
 ### Figma
 
-`.mcp.json` defines both `figma-web` (`https://mcp.figma.com/mcp`) and
-`figma-desktop` (`http://127.0.0.1:3845/mcp`). After sync and restart, use the web
-server for file URLs. If it requests authentication, run `codex mcp login figma-web`
+`.mcp.json` defines `figma` (`https://mcp.figma.com/mcp`), the remote Figma MCP
+server; use it for file URLs. If it requests authentication, run `codex mcp login figma`
 in the same Codex account/environment as the session and complete the browser login.
-Desktop access requires the Figma application and its Desktop MCP server running.
-Generating the config does not start Figma or enable its server.
 
 ## Hooks and permissions
 
