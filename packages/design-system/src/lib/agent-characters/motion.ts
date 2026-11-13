@@ -1,5 +1,6 @@
 // The reference page's motion constants (look v14, lines 1290–1297 and 1541–1645), ported line for line: easings,
 // springs and their integrator, the clips (Failed beat, Hello, the idle repertoire, the invite) and the blink curve.
+// The bolt's crackle (zap) comes from Look Demo v5.
 // Do not "improve" anything here (D25): every number is the page's.
 import { clamp, r2 } from './paths';
 
@@ -133,6 +134,7 @@ export const HELLO_PROP: Record<string, Key[]> = {
     kx(1100, { bm: 0.5, pb: 0 }),
     kx(1200, { bm: 0, pb: 0 }),
   ], // two flashes
+  zap: osc('pa', 250, [12, -12, 10, -9, 7, -4], 200, 1300), // the bolt crackles
   bob: [
     kx(0, { pb: 0 }),
     kx(250, { pb: 0 }),
@@ -195,6 +197,19 @@ export const FIDDLE: Record<string, Key[]> = {
     kx(1500, { bm: 0 }, E_INOUT),
   ],
   spin: [kx(0, { pw: 0 }), kx(1500, { pw: 720 }, E_INOUT)],
+  zap: [
+    kx(0, { pa: 0, pb: 0 }),
+    kx(50, { pa: 8, pb: -1.4 }, E_LIN),
+    kx(100, { pa: -7, pb: 0 }, E_LIN),
+    kx(150, { pa: 6, pb: -1 }, E_LIN),
+    kx(200, { pa: -4, pb: 0 }, E_LIN),
+    kx(260, { pa: 0, pb: 0 }, E_LIN),
+    kx(700, { pa: 0, pb: 0 }),
+    kx(750, { pa: 7, pb: -1.4 }, E_LIN),
+    kx(800, { pa: -6, pb: 0 }, E_LIN),
+    kx(860, { pa: 3, pb: 0 }, E_LIN),
+    kx(950, { pa: 0, pb: 0 }, E_SETTLE),
+  ], // two short crackles
   slip: [
     kx(0, { pb: 0, pdx: 0, lid: 0, gx: 0 }),
     kx(280, { pb: 3.2, pdx: 0.8, lid: 0, gx: 0.15 }, E_IN),
@@ -206,7 +221,7 @@ export const FIDDLE: Record<string, Key[]> = {
   ], // the monocle slips and is screwed back in
 };
 /** fiddles with 50–130 ms keys need the full frame rate */
-export const FAST = new Set(['twitch', 'flutter', 'flicker']);
+export const FAST = new Set(['twitch', 'flutter', 'flicker', 'zap']);
 
 export interface Gaze {
   gx: number;

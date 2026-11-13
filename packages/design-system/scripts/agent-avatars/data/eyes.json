@@ -2,15 +2,15 @@
   "$about": {
     "source": "reference/agent-characters.html",
     "what": "EYES and EYE_BASE as the page holds them, and the geometry eyesPath() and eyeD() build from them. Per-state targets are in states.json.",
-    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "exported": "2026-11-13, Look Demo v5, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "EYE_BASE": 1563,
-      "EYES": 1564,
-      "eyeTargets": 1565,
-      "helloPop": 1578,
-      "eyeD": 1579,
-      "eyesPath": 1586,
-      "makeChar": 1676
+      "EYE_BASE": 1442,
+      "EYES": 1443,
+      "eyeTargets": 1444,
+      "helloPop": 1457,
+      "eyeD": 1458,
+      "eyesPath": 1465,
+      "makeChar": 1557
     }
   },
   "styles": [

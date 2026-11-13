@@ -4,17 +4,20 @@ import path from 'node:path';
 import { runInThisContext } from 'node:vm';
 import { gunzipSync } from 'node:zlib';
 import { charTree } from '../char';
-import { CAST } from '../data.gen';
+import { type AgentPreset, CAST } from '../data.gen';
 import { type Character, createCharacter } from '../engine';
 import type { StateId } from '../eyes';
+import { setPropLibrary } from '../propOf';
+import { propDef } from '../props';
 import { RUNTIME_KEY } from '../runtime';
 import type { SvgNode } from '../svg';
-import { pagePreset, withPageProps } from './pageCast';
 
-// Motion parity with the reference page (look v17): the shared harness runs every scenario on the same virtual
+// Motion parity with the reference page (Look Demo v5): the shared harness runs every scenario on the same virtual
 // clock against the port, on the charTree markup, and every frame's attributes must equal the page's.
 type Spec = {
   id: string;
+  /** a look over the preset: a prop that left the cast */
+  look?: Partial<Pick<AgentPreset, 'shape' | 'color' | 'eyes' | 'prop'>>;
   state: StateId;
   size: number;
   live: boolean;
@@ -28,7 +31,7 @@ type Spec = {
 };
 type Scenario = {
   name: string;
-  chars: { id: string }[];
+  chars: { id: string; look?: object }[];
   cue?: { x: number; y: number; w: number; h: number };
 };
 type Row = [number, number, Record<string, unknown>];
@@ -43,7 +46,7 @@ const FIX = path.resolve(__dirname, '__fixtures__');
 // the harness is one expression; the page evaluates the very same text
 const H = runInThisContext(readFileSync(path.join(FIX, 'motion-harness.js'), 'utf8')) as Harness;
 const page = JSON.parse(
-  gunzipSync(readFileSync(path.join(FIX, 'motion-v17.json.gz'))).toString(),
+  gunzipSync(readFileSync(path.join(FIX, 'motion-demo-v5.json.gz'))).toString(),
 ) as {
   scenarios: Record<string, { rows: Row[]; rects: number[][] }>;
 };
@@ -80,7 +83,9 @@ const adapter = {
         rectAt(cue, sc.cue.x, sc.cue.y, sc.cue.w, sc.cue.h);
       }
     }
-    const look = pagePreset(s.id);
+    const preset = CAST.find(p => p.id === s.id);
+    if (!preset) throw new Error(s.id);
+    const look = { ...preset, ...s.look };
     const t = charTree(look, {
       size: s.size,
       state: s.state,
@@ -122,7 +127,7 @@ const firstDiff = (mine: Row[], ref: Row[]) => {
   return null;
 };
 
-describe('engine motion parity with the reference page (look v17)', () => {
+describe('engine motion parity with the reference page (Look Demo v5)', () => {
   let C: Clock;
   beforeAll(() => {
     document.body.appendChild(stage);
@@ -143,10 +148,15 @@ describe('engine motion parity with the reference page (look v17)', () => {
       const ref = page.scenarios[sc.name];
       if (!ref) throw new Error(`no capture for ${sc.name}`);
       stubbed = [];
-      const mine = withPageProps(
-        sc.chars.map(c => c.id),
-        () => H.run(sc, C, adapter),
-      );
+      // a look outside the cast needs the full prop library, as in production
+      const custom = sc.chars.some(c => c.look);
+      if (custom) setPropLibrary(propDef);
+      let mine: Row[];
+      try {
+        mine = H.run(sc, C, adapter);
+      } finally {
+        if (custom) setPropLibrary(null);
+      }
       // the geometry the port sees (cue, neighbours) is the geometry the page measured
       const sorted = (r: number[][]) => r.map(x => x.join(',')).sort();
       expect(sorted(stubbed)).toEqual(sorted(ref.rects));
@@ -245,7 +255,7 @@ describe('two bundled copies on one page', () => {
     const b = await import('../engine');
     const rt = (await import('../runtime')).getRuntime();
     expect(a.createCharacter).not.toBe(b.createCharacter);
-    const ids = ['radar', 'wally', 'trim', 'sift', 'lens', 'acquit'];
+    const ids = ['radar', 'wally', 'trim', 'sift', 'lens', 'tune'];
     const raf = window.requestAnimationFrame;
     let requested = 0;
     window.requestAnimationFrame = cb => {

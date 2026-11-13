@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { createRef, Fragment, useEffect, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CAST } from '../../lib/agent-characters/data.gen';
 import { defaultLook } from '../../lib/agent-characters/look';
-import { PLACES } from '../../lib/agent-characters/places';
 import { Button } from '../Button';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
@@ -88,60 +87,52 @@ export const Basic: StoryFn<AgentAvatarProps> = args => (
 
 Basic.args = { agent: 'radar', seed: 'radar', size: 72, state: 'idle', shadow: true };
 
-/** The cast on duty at the team-card size. Each is told apart by its shape, colour and prop. */
+/** The cast of ten on duty at the team-card size. Each is told apart by its shape, colour and prop; a planned agent says so after its role. */
 export const Cast: StoryFn = () => (
-  <HStack gap={24} align='end'>
+  <HStack gap={24} align='start' wrap='wrap'>
     {CAST.map(p => (
-      <VStack key={p.id} gap={8} align='center'>
+      <VStack key={p.id} gap={4} align='center' className='w-120 text-center'>
         <AgentAvatar data-testid={`agent-avatar-${p.id}`} agent={p.id} seed={p.id} size={72} />
         <Text size='sm'>{p.name}</Text>
+        <Text size='xs' color='secondary'>
+          {p.planned ? `${p.role} · planned` : p.role}
+        </Text>
       </VStack>
     ))}
   </HStack>
 );
 
-/** Every state frame of one agent. The eyes and a few body cues carry the state; red and crosses never appear. */
+/** Every state frame of the cast. The eyes and a few body cues carry the state; red and crosses never appear. */
 export const States: StoryFn = () => (
-  <HStack gap={24} align='end' wrap='wrap'>
+  <div className='grid grid-cols-[repeat(10,auto)] items-center gap-x-16 gap-y-8'>
+    <span />
     {STATES.map(state => (
-      <VStack key={state} gap={8} align='center'>
-        <AgentAvatar
-          data-testid={`agent-avatar-${state}`}
-          agent='sift'
-          seed='sift'
-          size={72}
-          state={state}
-        />
-        <Text size='sm'>{STATE_LABELS[state]}</Text>
-      </VStack>
+      <Text key={state} size='xs' color='secondary' align='center'>
+        {STATE_LABELS[state]}
+      </Text>
     ))}
-  </HStack>
-);
-
-/** Each place in the product with its size and shadow. */
-export const Places: StoryFn = () => (
-  <HStack gap={32} align='end'>
-    {Object.entries(PLACES)
-      .filter(([, p]) => p.renderer === '3d')
-      .map(([name, p]) => (
-        <VStack key={name} gap={8} align='center'>
+    {CAST.map(p => (
+      <Fragment key={p.id}>
+        <Text size='sm'>{p.name}</Text>
+        {STATES.map(state => (
           <AgentAvatar
-            data-testid={`agent-avatar-place-${name}`}
-            agent='trim'
-            seed='trim'
-            size={p.size as AgentAvatarProps['size']}
-            shadow={p.shadow}
+            key={state}
+            data-testid={`agent-avatar-${p.id}-${state}`}
+            agent={p.id}
+            seed={p.id}
+            size={72}
+            state={state}
           />
-          <span className='sb-annotation'>{name}</span>
-        </VStack>
-      ))}
-  </HStack>
+        ))}
+      </Fragment>
+    ))}
+  </div>
 );
 
 /** Partial coverage: the agent covers only some of its applications, so the top of its head stays in grey felt. */
 export const PartialCoverage: StoryFn = () => (
-  <HStack gap={24}>
-    {CAST.filter(p => p.id === 'radar' || p.id === 'sift' || p.id === 'acquit').map(p => (
+  <HStack gap={24} wrap='wrap'>
+    {CAST.map(p => (
       <AgentAvatar
         key={p.id}
         data-testid={`agent-avatar-partial-${p.id}`}
@@ -213,44 +204,67 @@ const LIVE_STATES: AgentAvatarState[] = [
   'invite',
 ];
 
-/** Every persistent state, live. On duty plays its idle repertoire; Needs you is the only one that hops. */
+/** Every persistent state of the cast, live, in one group. On duty plays its idle repertoire and glances at the
+ *  neighbours; Needs you is the only one that hops. */
 export const LiveStates: StoryFn = () => (
-  <HStack gap={24} align='end' wrap='wrap'>
-    {LIVE_STATES.map(state => (
-      <VStack key={state} gap={8} align='center'>
-        <AgentAvatar
-          data-testid={`agent-avatar-live-${state}`}
-          agent='radar'
-          seed={`radar-${state}`}
-          size={72}
-          state={state}
-          live
-        />
-        <Text size='sm'>{STATE_LABELS[state]}</Text>
-      </VStack>
-    ))}
-  </HStack>
+  <AgentAvatarGroup>
+    <div className='grid grid-cols-[repeat(8,auto)] items-center gap-x-16 gap-y-8'>
+      <span />
+      {LIVE_STATES.map(state => (
+        <Text key={state} size='xs' color='secondary' align='center'>
+          {STATE_LABELS[state]}
+        </Text>
+      ))}
+      {CAST.map(p => (
+        <Fragment key={p.id}>
+          <VStack gap={0}>
+            <Text size='sm'>{p.name}</Text>
+            <Text size='xs' color='secondary'>
+              {p.planned ? `${p.role} · planned` : p.role}
+            </Text>
+          </VStack>
+          {LIVE_STATES.map(state => (
+            <AgentAvatar
+              key={state}
+              data-testid={`agent-avatar-live-${p.id}-${state}`}
+              agent={p.id}
+              seed={`${p.id}-${state}`}
+              size={72}
+              state={state}
+              live
+            />
+          ))}
+        </Fragment>
+      ))}
+    </div>
+  </AgentAvatarGroup>
 );
 
 /** Hello (from On duty) and Done are one-shots: they play in full, then the character shows its state again. */
 export const Beats: StoryFn = () => {
-  const handle = useRef<AgentAvatarHandle>(null);
+  const [handles] = useState(() => CAST.map(() => createRef<AgentAvatarHandle>()));
   const [ended, setEnded] = useState('');
-  const sayHello = () => handle.current?.play('hello');
-  const finishRun = () => handle.current?.play('done');
+  const sayHello = () => handles.forEach(h => h.current?.play('hello'));
+  const finishRun = () => handles.forEach(h => h.current?.play('done'));
   const onBeatEnd = (beat: string) => setEnded(beat);
   return (
     <VStack gap={16} align='center'>
-      <AgentAvatar
-        data-testid='agent-avatar-beats'
-        agent='wally'
-        seed='wally'
-        size={120}
-        shadow
-        live
-        handleRef={handle}
-        onBeatEnd={onBeatEnd}
-      />
+      <AgentAvatarGroup>
+        <HStack gap={24} wrap='wrap'>
+          {CAST.map((p, i) => (
+            <AgentAvatar
+              key={p.id}
+              data-testid={`agent-avatar-beats-${p.id}`}
+              agent={p.id}
+              seed={p.id}
+              size={72}
+              live
+              handleRef={handles[i]}
+              onBeatEnd={onBeatEnd}
+            />
+          ))}
+        </HStack>
+      </AgentAvatarGroup>
       <HStack gap={8}>
         <Button
           data-testid='agent-avatar-beats-hello'
@@ -282,25 +296,19 @@ export const Inviting: StoryFn = () => {
   const cue = useRef<HTMLButtonElement>(null);
   return (
     <VStack gap={24} align='center'>
-      <HStack gap={24}>
-        <AgentAvatar
-          data-testid='agent-avatar-invite-acquit'
-          agent='acquit'
-          seed='acquit'
-          size={72}
-          state='invite'
-          live
-          cueRef={cue}
-        />
-        <AgentAvatar
-          data-testid='agent-avatar-invite-sift'
-          agent='sift'
-          seed='sift'
-          size={72}
-          state='invite'
-          live
-          cueRef={cue}
-        />
+      <HStack gap={24} wrap='wrap'>
+        {CAST.map(p => (
+          <AgentAvatar
+            key={p.id}
+            data-testid={`agent-avatar-invite-${p.id}`}
+            agent={p.id}
+            seed={p.id}
+            size={72}
+            state='invite'
+            live
+            cueRef={cue}
+          />
+        ))}
       </HStack>
       <Button ref={cue} data-testid='agent-avatar-invite-setup' size='small'>
         Set up
@@ -315,15 +323,19 @@ export const Activation: StoryFn = () => {
   const toggle = () => setState(state === 'box' ? 'idle' : 'box');
   return (
     <VStack gap={16} align='center'>
-      <AgentAvatar
-        data-testid='agent-avatar-activation'
-        agent='bard'
-        seed='bard'
-        size={120}
-        shadow
-        live
-        state={state}
-      />
+      <HStack gap={24} wrap='wrap'>
+        {CAST.map(p => (
+          <AgentAvatar
+            key={p.id}
+            data-testid={`agent-avatar-activation-${p.id}`}
+            agent={p.id}
+            seed={p.id}
+            size={72}
+            live
+            state={state}
+          />
+        ))}
+      </HStack>
       <Button data-testid='agent-avatar-activation-toggle' size='small' onClick={toggle}>
         {state === 'box' ? 'Activate' : 'Reset'}
       </Button>
@@ -334,27 +346,31 @@ export const Activation: StoryFn = () => {
 /** Cover all applications: the grey crown fills to the top in 480 ms and the agent plays Done. Hover or focus on the
  *  button raises the line first. */
 export const Coverage: StoryFn = () => {
-  const handle = useRef<AgentAvatarHandle>(null);
+  const [handles] = useState(() => CAST.map(() => createRef<AgentAvatarHandle>()));
   const cue = useRef<HTMLButtonElement>(null);
   const [coverage, setCoverage] = useState<'full' | 'partial'>('partial');
-  const coverAll = () => handle.current?.coverAll();
+  const coverAll = () => handles.forEach(h => h.current?.coverAll());
   const onBeatEnd = () => setCoverage('full');
   const reset = () => setCoverage('partial');
   return (
     <VStack gap={16} align='center'>
-      <AgentAvatar
-        data-testid='agent-avatar-coverage'
-        agent='radar'
-        seed='radar'
-        size={120}
-        shadow
-        live
-        hasApplications
-        coverage={coverage}
-        handleRef={handle}
-        cueRef={cue}
-        onBeatEnd={onBeatEnd}
-      />
+      <HStack gap={24} wrap='wrap'>
+        {CAST.map((p, i) => (
+          <AgentAvatar
+            key={p.id}
+            data-testid={`agent-avatar-coverage-${p.id}`}
+            agent={p.id}
+            seed={p.id}
+            size={72}
+            live
+            hasApplications
+            coverage={coverage}
+            handleRef={handles[i]}
+            cueRef={cue}
+            onBeatEnd={onBeatEnd}
+          />
+        ))}
+      </HStack>
       <HStack gap={8}>
         <Button ref={cue} data-testid='agent-avatar-coverage-all' size='small' onClick={coverAll}>
           Cover all applications
@@ -404,15 +420,15 @@ export const ReducedMotion: StoryFn = () => {
   const toggle = () => setOff(!off);
   return (
     <VStack gap={16} align='center'>
-      <HStack gap={24}>
-        {LIVE_STATES.slice(0, 4).map(state => (
+      <HStack gap={24} wrap='wrap'>
+        {CAST.map((p, i) => (
           <AgentAvatar
-            key={state}
-            data-testid={`agent-avatar-motion-${state}`}
-            agent='trim'
-            seed={`trim-${state}`}
+            key={p.id}
+            data-testid={`agent-avatar-motion-${p.id}`}
+            agent={p.id}
+            seed={p.id}
             size={72}
-            state={state}
+            state={LIVE_STATES[i % 4]}
             live
           />
         ))}

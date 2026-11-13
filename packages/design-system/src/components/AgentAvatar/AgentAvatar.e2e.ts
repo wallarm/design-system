@@ -5,7 +5,6 @@ const agentAvatarStory = createStoryHelper('ai-agentavatar', [
   'Basic',
   'Cast',
   'States',
-  'Places',
   'Partial Coverage',
   'Custom Agent',
   'Team',
@@ -59,14 +58,7 @@ const waitForBakes = (page: Page) =>
 
 test.describe('Component: AgentAvatar', () => {
   test.describe('Visual', () => {
-    for (const story of [
-      'Basic',
-      'Cast',
-      'States',
-      'Places',
-      'Partial Coverage',
-      'Custom Agent',
-    ] as const) {
+    for (const story of ['Basic', 'Cast', 'States', 'Partial Coverage', 'Custom Agent'] as const) {
       test(`Should render the ${story} story correctly`, async ({ page }) => {
         await agentAvatarStory.goto(page, story);
         await waitForBakes(page);
@@ -99,17 +91,22 @@ test.describe('Component: AgentAvatar', () => {
     test('Should stop requesting frames when reduced motion is switched on', async ({ page }) => {
       await countFrames(page);
       await agentAvatarStory.goto(page, 'Live States');
-      await expect(page.getByTestId('agent-avatar-live-idle')).toHaveAttribute('data-live', 'true');
+      await expect(page.getByTestId('agent-avatar-live-radar-idle')).toHaveAttribute(
+        'data-live',
+        'true',
+      );
       expect(await framesIn(page, 1000)).toBeGreaterThan(30);
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await expect(page.getByTestId('agent-avatar-live-idle')).not.toHaveAttribute('data-live');
+      await expect(page.getByTestId('agent-avatar-live-radar-idle')).not.toHaveAttribute(
+        'data-live',
+      );
       await page.waitForTimeout(200);
       expect(await framesIn(page, 1000)).toBe(0);
     });
 
     test('Should return to the state when the Done beat is played', async ({ page }) => {
       await agentAvatarStory.goto(page, 'Beats');
-      const avatar = page.getByTestId('agent-avatar-beats');
+      const avatar = page.getByTestId('agent-avatar-beats-wally');
       await page.getByTestId('agent-avatar-beats-done').click();
       await expect(avatar).toHaveAttribute('data-state', 'done');
       await expect(page.getByTestId('agent-avatar-beats-ended')).toHaveText('done ended', {
@@ -120,7 +117,7 @@ test.describe('Component: AgentAvatar', () => {
 
     test('Should land in On duty when Activate is clicked', async ({ page }) => {
       await agentAvatarStory.goto(page, 'Activation');
-      const avatar = page.getByTestId('agent-avatar-activation');
+      const avatar = page.getByTestId('agent-avatar-activation-bard');
       await page.getByTestId('agent-avatar-activation-toggle').click();
       await expect(avatar).toHaveAttribute('data-state', 'power');
       await expect(avatar).toHaveAttribute('data-state', 'idle', { timeout: 3000 });

@@ -1,7 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import cast from '../../../../scripts/agent-avatars/data/cast.json';
 import colors from '../../../../scripts/agent-avatars/data/colors.json';
 import eyesJson from '../../../../scripts/agent-avatars/data/eyes.json';
 import optical from '../../../../scripts/agent-avatars/data/optical.json';
@@ -30,12 +29,12 @@ import {
   TONE,
 } from '../data.gen';
 
-describe('agent character data (look v17)', () => {
+describe('agent character data (Look Demo v5)', () => {
   it('has the kit sizes', () => {
     expect(SHAPES).toHaveLength(12);
-    expect(COLORS).toHaveLength(22);
-    expect(PROPS).toHaveLength(17);
-    expect(CAST).toHaveLength(7);
+    expect(COLORS).toHaveLength(23);
+    expect(PROPS).toHaveLength(19);
+    expect(CAST).toHaveLength(10);
     expect(STATES.map(s => s.key)).toEqual([
       'idle',
       'hello',
@@ -74,25 +73,35 @@ describe('agent character data (look v17)', () => {
     });
   });
 
-  it("ships the cast as of 10.11: Acquit with Mend's look, Lens and Bard, no Probe (WDS-205)", () => {
+  it('ships the final cast of ten: no Acquit, Tune, Replay, Patch and Seek (WDS-208)', () => {
     expect(CAST.map(p => p.id)).toEqual([
       'wally',
       'radar',
       'sift',
-      'acquit',
       'trim',
+      'tune',
       'lens',
       'bard',
+      'replay',
+      'patch',
+      'seek',
     ]);
-    const mend = cast.presets.find(p => p.id === 'mend');
-    expect(CAST.find(p => p.id === 'acquit')).toMatchObject({
-      name: 'Acquit',
-      role: mend?.role,
-      shape: mend?.shape,
-      color: mend?.color,
-      eyes: mend?.eyes,
-      prop: mend?.prop,
+    const looks = Object.fromEntries(
+      CAST.map(({ id, shape, color, eyes, prop }) => [id, [shape, color, eyes, prop].join(' · ')]),
+    );
+    expect(looks).toMatchObject({
+      tune: 'safe · butter · oval · none',
+      replay: 'pebble · petrol · tall · bolt',
+      patch: 'pebble · oat · sleepy · plaster',
+      seek: 'egg · graphite · sleepy · flag',
     });
+    expect(CAST.filter(p => p.planned).map(p => p.id)).toEqual(['replay', 'patch', 'seek']);
+    expect(CAST.find(p => p.id === 'sift')?.role).toBe('False Positive Analyzer');
+  });
+
+  it('adds crimson for the builder only: no agent in the cast is red', () => {
+    expect(COLORS.find(c => c.id === 'crimson')).toMatchObject({ hex: '#D42A45', g: 'warm' });
+    expect(CAST.some(p => p.color === 'crimson')).toBe(false);
   });
 
   it('carries tones, hard tones, eye bases, springs, glyph props and optY', () => {
@@ -103,6 +112,8 @@ describe('agent character data (look v17)', () => {
     expect(GLYPH_PROPS.has('antennae')).toBe(true);
     expect(GLYPH_PROPS.has('glasses')).toBe(false);
     expect(GLYPH_PROPS.has('quill')).toBe(true);
+    expect(GLYPH_PROPS.has('flag')).toBe(true);
+    expect(GLYPH_PROPS.has('bolt')).toBe(true);
     expect(OPTY.dome).toBe(optical.shapes.dome.optY);
   });
 
@@ -125,10 +136,13 @@ describe('agent character data (look v17)', () => {
       wally: null,
       radar: 'attack-anomaly-investigation',
       sift: 'fp-marking',
-      acquit: 'fp-resolver',
       trim: 'ruleset-optimizer',
+      tune: null,
       lens: null,
       bard: null,
+      replay: null,
+      patch: null,
+      seek: null,
     });
   });
 

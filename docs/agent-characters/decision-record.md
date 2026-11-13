@@ -122,6 +122,8 @@ presets only for the module it generates, and the parity tests look fixtures up 
 (`__tests__/pageCast.ts`). `default-look.json` was re-run against the shipped cast, so a custom agent can now draw
 Probe's egg in olive but not Lens's or Bard's look.
 
+Superseded by the final cast of ten (WDS-208, below): the renames, the drops and `pageCast.ts` are gone.
+
 ## Agents in DS components (WDS-205, 2026-11-12)
 
 - **Agent user item:** `AgentItem` (exported from `Avatar`) puts the agent's glyph where the plate goes, with no plate,
@@ -154,3 +156,26 @@ Runner: the CI Playwright container (Chromium 153, 4 cores, 16 GB, DPR 1).
 These are the first numbers from a named CI runner profile (Questions back #1). They are one run, not a budget: the
 06 §9 budgets stay a team decision. At CPU 4× the loop still holds 60 fps, so the frame budget has headroom on this
 runner; the cold bake is the number to watch as the cast grows.
+
+## Final cast of ten (WDS-208, 2026-11-13)
+
+The reference is now Look Demo v5 (the look page artifact, 12.11), exported with the handoff's `data/export.cjs`
+(its cast fields updated for v5: `planned` in place of `soon`, the template ids of the ten). The fixtures are
+`__fixtures__/*-demo-v5.json`. Shapes, eyes, states and the bake are unchanged, and the geometry and bake fixtures
+re-captured byte for byte, so `LOOK_VERSION` stays.
+
+- **Cast:** Wally, Radar, Sift, Trim, Tune, Lens, Bard, Replay, Patch and Seek, with the roles of the final agents
+  sheet. The page now ships the cast as is, so `export-data.ts` no longer renames or drops presets and the tests
+  read `CAST` directly.
+- **Acquit is out:** the false-positive resolver is merged into Sift. `agent='acquit'` gets its default look, like
+  any other id. The `fp-resolver` template id points to no preset until product decides where it goes.
+- **Planned:** Replay, Patch and Seek carry `planned: true`; a place shows «· planned» after the role.
+- **Props:** flag (the pennant in red, waves at work) and bolt (a lightning bolt stuck into the crown, leaning right;
+  at work a 0.3 s crackle every 1.3 s, a crackle on Hello and as the idle fiddle). Both draw in the glyph.
+- **Crimson** `#D42A45` is for the builder only: no agent in the cast is red.
+- **Builder:** `lookIssues` skips `dots-look-alike` for a look from the cast (shape, colour and prop), as the page's
+  `dotsWarn` does. The code keeps its name; its text is now «Too close to an existing character».
+- **Motion parity:** the harness keeps the headlamp and the seam, which left the cast with Probe and Mend, as looks
+  over a cast preset (`look` on a scenario's character), and adds the bolt and the flag at work, on Hello and as
+  the fiddle.
+- `default-look.json` was re-run against the cast of ten.

@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, rstest } from '@rstest/core';
 import { render } from '@testing-library/react';
-import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-v17.json';
+import fixture from '../../lib/agent-characters/__tests__/__fixtures__/builder-demo-v5.json';
 import { normalise } from '../../lib/agent-characters/__tests__/normaliseSvg';
 import { charTree } from '../../lib/agent-characters/char';
+import { CAST } from '../../lib/agent-characters/data.gen';
 import { glyph } from '../../lib/agent-characters/glyph';
 import { setPropLibrary } from '../../lib/agent-characters/propOf';
 import { type SvgNode, toSvgString } from '../../lib/agent-characters/svg';
@@ -50,18 +51,23 @@ describe('AgentLookBuilder kit', () => {
     expect(AGENT_SHAPES).toHaveLength(12);
     expect(AGENT_SHAPES[0]).toEqual({ id: 'dome', name: expect.any(String), family: 'soft' });
     expect(AGENT_SHAPES.find(s => s.id === 'safe')?.family).toBe('object');
-    expect(AGENT_COLORS).toHaveLength(22);
+    expect(AGENT_COLORS).toHaveLength(23);
     expect(AGENT_COLORS.find(c => c.id === 'coral')).toMatchObject({ group: 'brand', brand: true });
     expect(AGENT_COLORS.find(c => c.id === 'cyan')?.name).toBe('teal');
     expect(AGENT_COLORS.filter(c => c.brand).map(c => c.id)).toEqual(['coral']);
     expect(AGENT_EYES.map(e => e.id)).toEqual(['round', 'oval', 'tall', 'sleepy']);
-    expect(AGENT_PROPS).toHaveLength(17);
+    expect(AGENT_PROPS).toHaveLength(19);
     expect(AGENT_PROPS.find(p => p.id === 'antennae')).toEqual({
       id: 'antennae',
       name: expect.any(String),
       glyph: true,
     });
     expect(AGENT_PROPS.find(p => p.id === 'seam')?.glyph).toBe(false);
+  });
+
+  it('approves every look from the cast as it is (WDS-208)', () => {
+    for (const p of CAST)
+      expect(lookIssues(p, { isWally: p.id === 'wally', others: [] }), p.id).toEqual([]);
   });
 
   it('flags coral for anyone but Wally (D22) and draws default looks from a prop pool', () => {
@@ -112,7 +118,7 @@ describe('enableAgentLookLibrary', () => {
   });
 });
 
-describe('AgentLookBuilder parity with the reference builder (look v17)', () => {
+describe('AgentLookBuilder parity with the reference builder (Look Demo v5)', () => {
   beforeAll(() => enableAgentLookLibrary());
   afterAll(() => setPropLibrary(null));
 

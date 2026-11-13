@@ -1,12 +1,11 @@
 import { describe, expect, it } from '@rstest/core';
-import { SHAPE_IDS } from '../data.gen';
+import { CAST, SHAPE_IDS } from '../data.gen';
 import type { StateId } from '../eyes';
 import { geom, optY, shapeOf } from '../geom';
 import { glyph } from '../glyph';
 import { setPropLibrary } from '../propOf';
 import { propDef } from '../props';
-import fixture from './__fixtures__/v17.json';
-import { PAGE_CAST } from './pageCast';
+import fixture from './__fixtures__/demo-v5.json';
 
 // WDS-197: the glyph path reads geometry from data, never from a canvas (SSR, consumers' jsdom tests).
 // Its own file, so no other test has primed the geometry cache.
@@ -27,7 +26,7 @@ describe('glyph without a canvas', () => {
       throw new Error('canvas used');
     };
     try {
-      for (const c of PAGE_CAST)
+      for (const c of CAST)
         for (const st of ['idle', 'partly', 'failed', 'box', 'invite'] as StateId[])
           expect(normIds(glyph(c, 20, st)), `${c.id} ${st}`).toBe(
             normIds(glyphs[`${c.id}|${st}|20`] as string),

@@ -1,5 +1,5 @@
 /**
- * Captures the reference page's motion (look v17) for the engine's parity test: every attribute the engine writes,
+ * Captures the reference page's motion (Look Demo v5) for the engine's parity test: every attribute the engine writes,
  * frame by frame at 60 fps, on a virtual clock (performance.now, requestAnimationFrame, setTimeout) installed
  * before the page script runs. The scenarios and the clock are the shared harness in
  * src/lib/agent-characters/__tests__/__fixtures__/motion-harness.js, which the jsdom test runs against the port.
@@ -58,7 +58,7 @@ const SETUP = `(() => {
         cue = stage.querySelector('[data-cue]');
         if (!cue) { cue = box(document.createElement('button'), sc.cue.x, sc.cue.y, sc.cue.w, sc.cue.h); cue.dataset.cue = ''; stage.appendChild(cue); }
       }
-      const c = { ...PRESETS[s.id], name: '' };
+      const c = { ...PRESETS[s.id], ...s.look, name: '' };
       const ch = makeChar(c, { size: s.size, state: s.state, live: s.live, shadow: s.shadow, ghostable: true, cover: !!s.cover, autoReturn: !!s.autoReturn, salt: s.salt, cue });
       const wrap = box(document.createElement('div'), s.x, s.y, s.size, Math.round(s.size * 128 / 136));
       ch.svg.style.display = 'block';
@@ -88,13 +88,13 @@ if (errors.length) throw new Error(`page errors: ${errors.join('\n')}`);
 
 const json = JSON.stringify({
   $about: {
-    source: 'reference/agent-characters.html (look v17)',
+    source: 'reference/agent-characters.html (Look Demo v5)',
     exported: `${new Date().toISOString().slice(0, 10)}, scripts/agent-avatars/capture-motion.ts, Chrome stable`,
   },
   scenarios: out,
 });
-writeFileSync(path.join(FIX, 'motion-v17.json.gz'), gzipSync(json, { level: 9 }));
+writeFileSync(path.join(FIX, 'motion-demo-v5.json.gz'), gzipSync(json, { level: 9 }));
 // biome-ignore lint/suspicious/noConsole: CLI output
 console.log(
-  `motion-v17.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
+  `motion-demo-v5.json.gz: ${names.length} scenarios, ${(json.length / 1e6).toFixed(1)} MB of JSON`,
 );

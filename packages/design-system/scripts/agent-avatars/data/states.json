@@ -2,15 +2,15 @@
   "$about": {
     "source": "reference/agent-characters.html",
     "what": "STATES keys and labels as the page holds them, the product state each one stands for (the page's States table), and eyeTargets() for every eye style x state.",
-    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "exported": "2026-11-13, Look Demo v5, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "STATES": 2176,
-      "NO_APPS": 2177,
-      "eyeTargets": 1565,
-      "helloPop": 1578,
-      "springs": 1560,
-      "glyph": 2029,
-      "setCover": 1801
+      "STATES": 2064,
+      "NO_APPS": 2065,
+      "eyeTargets": 1444,
+      "helloPop": 1457,
+      "springs": 1439,
+      "glyph": 1910,
+      "setCover": 1682
     }
   },
   "states": [

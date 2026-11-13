@@ -2,15 +2,15 @@
   "$about": {
     "source": "reference/agent-characters.html",
     "what": "COLORS and CGROUPS as the page holds them, the prop tones, the fixed colors of the visor and the ghost, and the per-color values the page derives with mix().",
-    "exported": "2026-11-11, look v17, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
+    "exported": "2026-11-13, Look Demo v5, Playwright (playwright-core 1.63.0) with Chrome 157 headless, 1440 x 900 viewport, deviceScaleFactor 2; values read from the page's own constants and functions at runtime",
     "lines": {
-      "COLORS": 1328,
-      "CGROUPS": 1343,
-      "TONE": 1345,
-      "HARD": 1351,
-      "makeChar": 1676,
-      "glyph": 2029,
-      "MAT": 1550
+      "COLORS": 1199,
+      "CGROUPS": 1214,
+      "TONE": 1216,
+      "HARD": 1222,
+      "makeChar": 1557,
+      "glyph": 1910,
+      "MAT": 1429
     },
     "keys": {
       "id": "color id, used in configs",
@@ -88,6 +88,12 @@
       "id": "pink",
       "name": "pink",
       "hex": "#E373A8",
+      "g": "warm"
+    },
+    {
+      "id": "crimson",
+      "name": "crimson",
+      "hex": "#D42A45",
       "g": "warm"
     },
     {
@@ -287,6 +293,15 @@
         "glyphRim": "#a7567c",
         "glyphOffFill": "#c99fb9",
         "luma": 154.53
+      },
+      "crimson": {
+        "eye": "#efaeb8",
+        "bodyDark": "#901f32",
+        "bodyLight": "#e57f8f",
+        "visorLip": "#eeaab5",
+        "glyphRim": "#9c2135",
+        "glyphOffFill": "#c38291",
+        "luma": 95.908
       },
       "sand": {
         "eye": "#f0e3d3",

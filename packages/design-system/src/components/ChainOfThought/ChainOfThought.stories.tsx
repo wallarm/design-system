@@ -101,7 +101,7 @@ export const WithAgent: StoryFn<typeof meta> = () => (
     <ChainOfThoughtStep icon={<Brain />} label='Thought for 5s' />
     <ChainOfThoughtStep
       icon={<AgentGlyph agent='radar' size={16} />}
-      label='Ran Radar, Attack Anomaly Investigator'
+      label='Ran Radar, Anomaly Investigation Agent'
       defaultOpen
       data-testid='cot-agent'
     >
@@ -112,7 +112,7 @@ export const WithAgent: StoryFn<typeof meta> = () => (
     </ChainOfThoughtStep>
     <ChainOfThoughtStep
       icon={<AgentGlyph agent='sift' size={16} />}
-      label='Ran Sift, False Positives Analyzer'
+      label='Ran Sift, False Positive Analyzer'
     />
     <ChainOfThoughtStep
       icon={<AgentGlyph look={defaultLook('agent-7f3a')} size={16} />}

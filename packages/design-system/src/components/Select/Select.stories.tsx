@@ -865,7 +865,7 @@ export const WithIcons: StoryFn<typeof Select> = () => {
 const agents: SelectDataItem[] = [
   { label: 'Radar', value: 'radar', leading: <AgentGlyph agent='radar' size={20} /> },
   { label: 'Sift', value: 'sift', leading: <AgentGlyph agent='sift' size={20} /> },
-  { label: 'Acquit', value: 'acquit', leading: <AgentGlyph agent='acquit' size={20} /> },
+  { label: 'Tune', value: 'tune', leading: <AgentGlyph agent='tune' size={20} /> },
   { label: 'Trim', value: 'trim', leading: <AgentGlyph agent='trim' size={20} /> },
   { label: 'Lens', value: 'lens', leading: <AgentGlyph agent='lens' size={20} /> },
   { label: 'Bard', value: 'bard', leading: <AgentGlyph agent='bard' size={20} /> },

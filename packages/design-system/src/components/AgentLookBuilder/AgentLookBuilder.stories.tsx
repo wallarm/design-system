@@ -35,7 +35,7 @@ const DESCRIPTION = [
 
 const ISSUE_TEXT: Record<LookIssueCode, string> = {
   'coral-not-wally': 'Coral belongs to Wally.',
-  'dots-look-alike': 'Looks like a character from OpenAI Dots.',
+  'dots-look-alike': 'Too close to an existing character.',
   'reads-as-wally': 'A dome with antennae reads as a second Wally.',
   'glyph-twin':
     'Another agent has the same shape and colour: as glyphs they are hard to tell apart.',

@@ -68,10 +68,10 @@ export const Pending: StoryFn<typeof meta> = () => (
 export const WithRequester: StoryFn<typeof meta> = () => (
   <ApprovalCard data-testid='approval-card'>
     <ApprovalCardContent>
-      <AgentItem agent='acquit' size={40} live data-testid='approval-card-requester'>
+      <AgentItem agent='sift' size={40} live data-testid='approval-card-requester'>
         <AvatarContent>
-          <AvatarName>Acquit</AvatarName>
-          <AvatarDescription>False Positive Resolver</AvatarDescription>
+          <AvatarName>Sift</AvatarName>
+          <AvatarDescription>False Positive Analyzer</AvatarDescription>
         </AvatarContent>
       </AgentItem>
       <p>Mark 12 requests to /api/search as false positives and add an exception rule</p>

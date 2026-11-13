@@ -13,7 +13,7 @@ describe('AgentItem', () => {
       <AgentItem agent='radar' data-testid='a'>
         <AvatarContent>
           <AvatarName>Radar</AvatarName>
-          <AvatarDescription>Attack Anomaly Investigator</AvatarDescription>
+          <AvatarDescription>Anomaly Investigation Agent</AvatarDescription>
         </AvatarContent>
       </AgentItem>,
     );
@@ -27,7 +27,7 @@ describe('AgentItem', () => {
     expect(glyph).toHaveAttribute('aria-hidden', 'true');
     expect(root.querySelector('[data-slot^=avatar-fallback], [data-slot=avatar-image]')).toBeNull();
     expect(screen.getByTestId('a--name')).toHaveTextContent('Radar');
-    expect(screen.getByTestId('a--description')).toHaveTextContent('Attack Anomaly Investigator');
+    expect(screen.getByTestId('a--description')).toHaveTextContent('Anomaly Investigation Agent');
     // stretched by a flex column or a row, the glyph and the name stay together at the start
     expect(root.className).toContain('justify-start');
   });
@@ -58,10 +58,10 @@ describe('AgentItem', () => {
   });
 
   it('draws the 3D character from 40 px, live when asked', () => {
-    render(<AgentItem agent='acquit' size={40} live data-testid='a' />);
+    render(<AgentItem agent='tune' size={40} live data-testid='a' />);
     const avatar = screen.getByTestId('a--avatar');
     expect(avatar).toHaveAttribute('data-slot', 'agent-avatar');
-    expect(avatar).toHaveAttribute('data-seed', 'acquit');
+    expect(avatar).toHaveAttribute('data-seed', 'tune');
     expect(avatar.getAttribute('class')).toContain('-mx-(--agent-inset)');
     expect(screen.queryByTestId('a--glyph')).toBeNull();
   });

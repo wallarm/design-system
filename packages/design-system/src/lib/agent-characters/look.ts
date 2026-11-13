@@ -40,12 +40,16 @@ export function lookIssues(
 ): LookIssue[] {
   const out: LookIssueCode[] = [];
   if (look.color === 'coral' && !isWally) out.push('coral-not-wally');
-  // no OpenAI Dots look-alikes
+  // no look-alikes of an existing character; a look from the cast is approved as it is
+  const inCast = CAST.some(
+    k => k.shape === look.shape && k.color === look.color && k.prop === look.prop,
+  );
   if (
-    (look.shape === 'cloud' && BLUE.has(look.color) && look.prop === 'beanie') ||
-    (look.color === 'butter' && (look.prop === 'glasses' || look.prop === 'monocle')) ||
-    ((look.color === 'mint' || look.color === 'sage') &&
-      (look.shape === 'pebble' || look.shape === 'capsule' || look.shape === 'egg'))
+    !inCast &&
+    ((look.shape === 'cloud' && BLUE.has(look.color) && look.prop === 'beanie') ||
+      (look.color === 'butter' && (look.prop === 'glasses' || look.prop === 'monocle')) ||
+      ((look.color === 'mint' || look.color === 'sage') &&
+        (look.shape === 'pebble' || look.shape === 'capsule' || look.shape === 'egg')))
   )
     out.push('dots-look-alike');
   if (!isWally && look.shape === 'dome' && look.prop === 'antennae') out.push('reads-as-wally');

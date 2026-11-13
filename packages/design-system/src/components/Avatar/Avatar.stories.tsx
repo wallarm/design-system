@@ -189,13 +189,13 @@ export const Agent: StoryFn<AvatarProps> = () => (
     <AgentItem agent='sift' data-testid='avatar-agent-description'>
       <AvatarContent>
         <AvatarName>Sift</AvatarName>
-        <AvatarDescription>False Positives Analyzer</AvatarDescription>
+        <AvatarDescription>False Positive Analyzer</AvatarDescription>
       </AvatarContent>
     </AgentItem>
     <div className='w-120'>
-      <AgentItem agent='acquit' data-testid='avatar-agent-truncated'>
+      <AgentItem agent='tune' data-testid='avatar-agent-truncated'>
         <AvatarContent>
-          <AvatarName>Acquit, the false positive resolver</AvatarName>
+          <AvatarName>Tune, the policy tuning agent</AvatarName>
         </AvatarContent>
       </AgentItem>
     </div>

@@ -135,14 +135,14 @@ describe('AgentGlyph', () => {
   it('forwards ref, className, data-testid and data attributes', () => {
     const ref = createRef<SVGSVGElement>();
     const { container } = render(
-      <AgentGlyph ref={ref} agent='acquit' size={16} className='ml-4' data-testid='g' />,
+      <AgentGlyph ref={ref} agent='tune' size={16} className='ml-4' data-testid='g' />,
     );
     const svg = svgOf(container);
     expect(ref.current).toBe(svg);
     expect(svg.getAttribute('class')).toContain('ml-4');
     expect(svg.getAttribute('data-testid')).toBe('g');
     expect(svg.getAttribute('data-slot')).toBe('agent-glyph');
-    expect(svg.getAttribute('data-agent')).toBe('acquit');
+    expect(svg.getAttribute('data-agent')).toBe('tune');
     expect(svg.getAttribute('data-state')).toBe('idle');
     expect([
       svg.getAttribute('width'),

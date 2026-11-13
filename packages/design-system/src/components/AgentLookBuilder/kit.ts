@@ -16,7 +16,7 @@ import { setPropLibrary } from '../../lib/agent-characters/propOf';
 import { propDef } from '../../lib/agent-characters/props';
 
 /**
- * Loads the full prop library (16 props on any shape) for every DS copy on the page. Any app that renders stored
+ * Loads the full prop library (18 props on any shape) for every DS copy on the page. Any app that renders stored
  * custom looks calls it once at start-up — the cards, rows and tables that show them, not only the picker.
  * Without it only the presets' props are drawn. Mounted glyphs pick it up on their next render; a mounted 3D
  * character keeps what it drew until its look changes or it remounts, so call it before the first render.

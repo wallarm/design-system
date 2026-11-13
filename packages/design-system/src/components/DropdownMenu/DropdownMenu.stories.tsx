@@ -372,7 +372,7 @@ export const WithAgents: StoryFn<typeof meta> = () => (
         </DropdownMenuItemIcon>
         <DropdownMenuItemContent>
           <DropdownMenuItemText>Radar</DropdownMenuItemText>
-          <DropdownMenuItemDescription>Attack Anomaly Investigator</DropdownMenuItemDescription>
+          <DropdownMenuItemDescription>Anomaly Investigation Agent</DropdownMenuItemDescription>
         </DropdownMenuItemContent>
       </DropdownMenuItem>
       <DropdownMenuItem>
@@ -381,7 +381,7 @@ export const WithAgents: StoryFn<typeof meta> = () => (
         </DropdownMenuItemIcon>
         <DropdownMenuItemContent>
           <DropdownMenuItemText>Sift</DropdownMenuItemText>
-          <DropdownMenuItemDescription>False Positives Analyzer</DropdownMenuItemDescription>
+          <DropdownMenuItemDescription>False Positive Analyzer</DropdownMenuItemDescription>
         </DropdownMenuItemContent>
       </DropdownMenuItem>
       <DropdownMenuItem>

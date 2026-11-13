@@ -1,5 +1,5 @@
 /**
- * Captures the reference page's own output (look v17) for the port's unit tests:
+ * Captures the reference page's own output (Look Demo v5) for the port's unit tests:
  * geom/optY per shape, eyesPath, propDef and glyph.
  *
  *   REF=<path to agent-characters.html> pnpm tsx scripts/agent-avatars/capture-fixtures.ts
@@ -21,7 +21,10 @@ const { chromium } = createRequire(
 const REF = process.env.REF;
 if (!REF)
   throw new Error('Set REF to the reference page (handoff reference/agent-characters.html)');
-const OUT = path.resolve(here, '../../src/lib/agent-characters/__tests__/__fixtures__/v17.json');
+const OUT = path.resolve(
+  here,
+  '../../src/lib/agent-characters/__tests__/__fixtures__/demo-v5.json',
+);
 
 const browser = await chromium.launch({ channel: 'chrome' });
 const page = await browser.newPage({
@@ -122,7 +125,7 @@ const BAKE_CAPTURE = `(async () => {
   return out;
 })()`;
 const bakes = await page.evaluate(BAKE_CAPTURE);
-writeFileSync(path.resolve(path.dirname(OUT), 'bake-v17.json'), `${JSON.stringify(bakes)}\n`);
+writeFileSync(path.resolve(path.dirname(OUT), 'bake-demo-v5.json'), `${JSON.stringify(bakes)}\n`);
 
 // Static 3D characters (WDS-199): makeChar's markup with live off, its bake jobs, and region() per layer outline.
 const CHAR_CAPTURE = `(() => {
@@ -154,7 +157,7 @@ const CHAR_CAPTURE = `(() => {
   return { dpr: DPR, cases: out, regions };
 })()`;
 const chars = await page.evaluate(CHAR_CAPTURE);
-writeFileSync(path.resolve(path.dirname(OUT), 'char-v17.json'), `${JSON.stringify(chars)}\n`);
+writeFileSync(path.resolve(path.dirname(OUT), 'char-demo-v5.json'), `${JSON.stringify(chars)}\n`);
 
 await browser.close();
 if (errors.length) throw new Error(`page errors: ${errors.join('\n')}`);
