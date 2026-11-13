@@ -3,6 +3,7 @@
  * formats and in arrival order, and the scenario builder that writes them.
  */
 export * from './apiInventory';
+export * from './attackInvestigation';
 export * from './attackSummary';
 export * from './dashboard';
 export * from './incident';

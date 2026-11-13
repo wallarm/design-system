@@ -24,6 +24,8 @@ src/
 │   ├── GuardedView.tsx   validates props against the schema, then View or Skeleton
 │   ├── Placeholder.tsx   what stands in for a part that isn't renderable yet
 │   ├── ChartSkeleton.tsx the chart card skeleton the chart entries use
+│   ├── cells.tsx         a record field's value types (ip, status, country…): Table, its row
+│   │                     details and KeyValueList draw them the same way
 │   ├── SurfaceBoundary.tsx  error boundary: a View that throws blanks its own surface only
 │   └── warn.ts           the one console.warn for rejected agent output
 ├── components/           THE CATALOG: one file per entry, index.ts lists them in order
@@ -55,7 +57,8 @@ src/
 │   ├── GenUiPlayground.tsx  pick a prompt, replay its answer, read the stream beside it
 │   ├── GenUiChatDemo.tsx    answers inside the Wally chat, with an approval before Block
 │   └── useEmulatedAgent.ts  the scripted agent behind the chat demo
-└── tests/                all tests (formats.test.tsx covers the shared behaviour)
+└── tests/                all tests (formats.test.tsx covers the shared behaviour, coverage.test.ts
+                          holds a decision for every DS component)
 ```
 
 ## How a render works
@@ -79,9 +82,11 @@ components/Metric.tsx (one definition)
 ## Add a component
 
 1. Create `src/components/<Name>.tsx` with `defineComponent({ name, description, props, View })`.
-   Copy the closest entry: `Badge.tsx` for a leaf, `Section.tsx` for a container, `BarList.tsx` for
-   a chart.
-2. Add it to `wallarmComponents` and the `export *` list in `src/components/index.ts`.
+   Copy the closest entry: `Badge.tsx` for a leaf, `Section.tsx` for a container, `Tabs.tsx` for a
+   container whose children each get a label, `BarList.tsx` for a chart. A record's fields take the
+   value types in `render/cells.tsx`.
+2. Add it to `wallarmComponents` and the `export *` list in `src/components/index.ts`, and name it
+   in the DS components it renders in `src/tests/coverage.test.ts`.
 3. Add a test in `src/tests/<Name>.test.tsx` that renders it through every format, with literal
    and bound props, and with data that hasn't arrived (see `LineChart.test.tsx`).
 

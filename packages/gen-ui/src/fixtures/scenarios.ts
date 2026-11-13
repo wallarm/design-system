@@ -4,6 +4,7 @@
  */
 import type { GenUiAction } from '../core/define';
 import { API_INVENTORY_SCENARIO } from './apiInventory';
+import { ATTACK_INVESTIGATION_SCENARIO } from './attackInvestigation';
 import {
   ATTACK_SUMMARY_A2UI,
   ATTACK_SUMMARY_ACTIONS,
@@ -39,6 +40,7 @@ export const SCENARIOS: readonly ReplayScenario[] = [
     LIVE_MONITOR_SCENARIO,
     INCIDENT_SCENARIO,
     API_INVENTORY_SCENARIO,
+    ATTACK_INVESTIGATION_SCENARIO,
     WEEKLY_REPORT_SCENARIO,
   ].map((scenario: Scenario): ReplayScenario => ({ ...scenario, ...toStreams(scenario) })),
 ];
