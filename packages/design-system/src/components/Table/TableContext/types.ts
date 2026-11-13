@@ -67,6 +67,8 @@ export interface TableContextValue<T extends RowData> {
 
   // Shift-click range selection (ref to avoid unnecessary re-renders)
   lastSelectedRowIndexRef: RefObject<number | null>;
+  // Shift key state, tracked once per table (not per selection cell)
+  shiftKeyRef: RefObject<boolean>;
 
   // Master checkbox in the selection column header
   selectAllRowsEnabled: boolean;

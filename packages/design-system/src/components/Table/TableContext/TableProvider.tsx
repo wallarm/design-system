@@ -29,7 +29,7 @@ import {
   type SortingState,
   useTable,
 } from '@tanstack/react-table';
-import { useControlled } from '../../../hooks';
+import { useControlled, useIsKeyPressed } from '../../../hooks';
 import { useTableState } from '../hooks';
 import {
   createDragHandleColumn,
@@ -335,6 +335,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
 
   // Refs (stable across renders)
   const lastSelectedRowIndexRef = useRef<number | null>(null);
+  const shiftKeyRef = useIsKeyPressed('Shift');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const headerScrollRef = useRef<HTMLDivElement | null>(null);
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
@@ -373,6 +374,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       alwaysPinnedLeft,
       masterColumnId,
       lastSelectedRowIndexRef,
+      shiftKeyRef,
       selectAllRowsEnabled: enableSelectAllRows,
       onSelectAllRows,
       containerRef,
@@ -423,6 +425,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       setColumnOrder,
       alwaysPinnedLeft,
       masterColumnId,
+      shiftKeyRef,
       onEndReached,
       onEndReachedThreshold,
       onStartReached,
