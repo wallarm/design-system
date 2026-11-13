@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { useTestId } from '../../../utils/testId';
 import { ChartHoverCardRow } from '../internal/ChartHoverCard';
 import type { ChartColor } from '../types';
 import type { LineChartSeries } from './LineChartContext';
@@ -27,18 +28,22 @@ export const LineChartHoverPopoverRow: FC<LineChartHoverPopoverRowProps> = ({
   children,
   ref,
   ...props
-}) => (
-  <ChartHoverCardRow
-    ref={ref}
-    data-key={series.key}
-    color={color ?? series.color ?? 'slate'}
-    label={series.label}
-    value={value}
-    formatValue={formatValue}
-    {...props}
-  >
-    {children}
-  </ChartHoverCardRow>
-);
+}) => {
+  const testId = useTestId('hover-popover-row');
+  return (
+    <ChartHoverCardRow
+      ref={ref}
+      data-testid={testId}
+      data-key={series.key}
+      color={color ?? series.color ?? 'slate'}
+      label={series.label}
+      value={value}
+      formatValue={formatValue}
+      {...props}
+    >
+      {children}
+    </ChartHoverCardRow>
+  );
+};
 
 LineChartHoverPopoverRow.displayName = 'LineChartHoverPopoverRow';

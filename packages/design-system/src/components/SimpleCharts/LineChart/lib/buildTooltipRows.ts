@@ -1,11 +1,6 @@
 import type { LineChartDatum, LineChartRangeEntry, LineChartSeries } from '../LineChartContext';
+import type { LineChartTooltipRow } from '../LineChartTooltip';
 import { isInRange, type RangeX } from './rangeGeometry';
-
-export interface TooltipRow {
-  series: LineChartSeries;
-  value: number | string | null | undefined;
-  inRange: boolean;
-}
 
 /**
  * Joins the visible series with their value at `datum`. `inRange` is true only when a range
@@ -23,7 +18,7 @@ export function buildTooltipRows({
   ranges: readonly LineChartRangeEntry[];
   xKey: string;
   xs: readonly RangeX[];
-}): TooltipRow[] {
+}): LineChartTooltipRow[] {
   const x = datum[xKey] as RangeX;
   return series.map(s => ({
     series: s,

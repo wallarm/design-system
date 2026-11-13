@@ -8,13 +8,23 @@ import { LineChartBody } from './LineChartBody';
 import { LineChartHoverPopoverRow } from './LineChartHoverPopoverRow';
 import { LineChartLine } from './LineChartLine';
 import { LineChartRange } from './LineChartRange';
+import { LineChartTooltip } from './LineChartTooltip';
 import { LineChartXAxis } from './LineChartXAxis';
 import { buildTooltipRows } from './lib/buildTooltipRows';
 
+// Datum the mocked recharts Tooltip treats as hovered.
+let hoveredDatum: Record<string, unknown> | undefined;
+
 // jsdom has no layout, so recharts' ResponsiveContainer measures 0 and renders nothing.
 // Swap it for a fixed-size passthrough so the chart (and its scale/plot area) mounts.
+// jsdom also has no pointer, so Tooltip renders its content as if `hoveredDatum` were hovered.
 rs.mock('recharts', () => ({
   ...actualRecharts,
+  Tooltip: ({
+    content,
+  }: {
+    content: (props: { active: boolean; payload: unknown[] }) => ReactNode;
+  }) => (hoveredDatum ? content({ active: true, payload: [{ payload: hoveredDatum }] }) : null),
   ResponsiveContainer: ({ children }: { children?: ReactNode }) =>
     isValidElement<{ width?: number; height?: number }>(children)
       ? cloneElement(children, { width: 800, height: 160 })
@@ -34,6 +44,7 @@ const Chart = ({ testId, filteredKeys }: { testId: string; filteredKeys?: string
       <LineChartRange from={10} to={20} seriesKey='attacks' />
       <LineChartLine seriesKey='attacks' disableAnimation />
       <LineChartLine seriesKey='usual' disableAnimation />
+      <LineChartTooltip />
     </LineChartBody>
   </LineChart>
 );
@@ -51,6 +62,33 @@ describe('LineChartLine — in-range copy', () => {
     expect(clipId).toBeTruthy();
     expect(container.querySelector(`clipPath[id="${clipId}"] rect`)).not.toBeNull();
     expect(screen.getAllByTestId('lc--line-in-range')).toHaveLength(1);
+  });
+
+  it('clips the base line to the outside of the range', () => {
+    const { container } = render(<Chart testId='lc' />);
+    const [base] = screen
+      .getAllByTestId('lc--line')
+      .filter(el => el.getAttribute('data-key') === 'attacks');
+    const baseClip = clipIdOf(base!);
+    const copyClip = clipIdOf(screen.getByTestId('lc--line-in-range'));
+    expect(baseClip).toBeTruthy();
+    expect(baseClip).not.toBe(copyClip);
+    const xsOf = (id: string | undefined) =>
+      [...container.querySelectorAll(`clipPath[id="${id}"] rect`)].map(r => [
+        Number(r.getAttribute('x')),
+        Number(r.getAttribute('x')) + Number(r.getAttribute('width')),
+      ]);
+    const [[inX1, inX2]] = xsOf(copyClip) as [[number, number]];
+    const outside = xsOf(baseClip);
+    // The outside rects end and resume exactly at the range edges.
+    const near = (a: number | undefined, b: number) => Math.abs((a ?? Number.NaN) - b) < 1e-6;
+    expect(outside.some(([, x2]) => near(x2, inX1))).toBe(true);
+    expect(outside.some(([x1]) => near(x1, inX2))).toBe(true);
+    // The other series is not clipped at all.
+    const [usual] = screen
+      .getAllByTestId('lc--line')
+      .filter(el => el.getAttribute('data-key') === 'usual');
+    expect(usual).not.toHaveAttribute('clip-path', expect.stringContaining('url(#'));
   });
 
   it('draws no copy for a filtered-out series but keeps the range', () => {
@@ -103,10 +141,40 @@ describe('buildTooltipRows', () => {
 
 describe('LineChartHoverPopoverRow — color override', () => {
   it('paints the dot with the override instead of the series colour', () => {
-    const { container } = render(
-      <LineChartHoverPopoverRow series={series[0]!} value={1} color='red' />,
+    render(
+      <LineChartHoverPopoverRow data-testid='row' series={series[0]!} value={1} color='red' />,
     );
-    const dot = container.querySelector<HTMLElement>('[data-slot="chart-hover-card-dot"]');
-    expect(dot?.style.backgroundColor).toBe(resolveChartColor('red'));
+    expect(screen.getByTestId('row--dot').style.backgroundColor).toBe(resolveChartColor('red'));
+  });
+});
+
+describe('LineChartTooltip — in-range rows', () => {
+  const dotColorOf = (key: string) => {
+    const row = screen
+      .getAllByTestId('lc--hover-popover-row')
+      .find(el => el.getAttribute('data-key') === key);
+    return screen.getAllByTestId('lc--hover-popover-row--dot').find(dot => row?.contains(dot))
+      ?.style.backgroundColor;
+  };
+
+  it('paints only the in-range series dot red in the default popover', () => {
+    hoveredDatum = data[3];
+    try {
+      render(<Chart testId='lc' />);
+      expect(dotColorOf('attacks')).toBe(resolveChartColor('red'));
+      expect(dotColorOf('usual')).not.toBe(resolveChartColor('red'));
+    } finally {
+      hoveredDatum = undefined;
+    }
+  });
+
+  it('keeps the series colour outside the range', () => {
+    hoveredDatum = data[5];
+    try {
+      render(<Chart testId='lc' />);
+      expect(dotColorOf('attacks')).toBe(resolveChartColor('slate'));
+    } finally {
+      hoveredDatum = undefined;
+    }
   });
 });

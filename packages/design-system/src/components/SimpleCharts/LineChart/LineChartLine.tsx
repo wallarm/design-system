@@ -17,8 +17,9 @@ import {
 } from './LineChartContext';
 import { warnLineChartLine } from './lib/warn';
 
-// Strip recharts' first `(curveProps, event)` arg so the public API stays event-only.
 const IN_RANGE_STROKE = 'var(--color-bg-fill-danger)';
+
+// Strip recharts' first `(curveProps, event)` arg so the public API stays event-only.
 
 const wrap = (
   cb: ((event: MouseEvent<SVGPathElement>) => void) | undefined,
@@ -61,6 +62,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   const testId = useTestId('line');
   const inRangeTestId = useTestId('line-in-range');
   const clipId = useId();
+  const baseClipId = useId();
   const { ranges } = useContext(LineChartRangeContext);
   const geometry = useRangeEdges();
 
@@ -89,31 +91,53 @@ export const LineChartLine: FC<LineChartLineProps> = ({
     ? ranges.flatMap(range => {
         if (range.seriesKey !== seriesKey) return [];
         const edges = geometry.edgesOf(range);
-        return edges ? [{ key: range.key, ...edges }] : [];
+        if (!edges) return [];
+        // A clamped edge sits on the plot edge, where the stroke's half-width and round cap
+        // overhang it — push the clip past them so no base colour peeks out.
+        return [
+          {
+            key: range.key,
+            x1: edges.clampedStart ? edges.x1 - strokeWidth : edges.x1,
+            x2: edges.clampedEnd ? edges.x2 + strokeWidth : edges.x2,
+          },
+        ];
       })
     : [];
 
-  // A danger copy of the line drawn over the base line, clipped to the range rectangles — the
-  // colour switches at exactly the range fill's edge. Recharts drops a `clipPath` prop on
-  // `<Line>` (it sets its own on the curve), so the clip goes through a custom `shape`.
-  const renderInRangeShape = (shapeProps: LineDrawShapeProps) => (
-    <>
-      <defs>
-        <clipPath id={clipId}>
-          {clipRects.map(rect => (
-            <rect
-              key={rect.key}
-              x={rect.x1}
-              y={geometry?.plotArea.y}
-              width={Math.max(0, rect.x2 - rect.x1)}
-              height={geometry?.plotArea.height}
-            />
-          ))}
-        </clipPath>
-      </defs>
-      <LineDrawShape {...shapeProps} clipPath={`url(#${clipId})`} />
-    </>
-  );
+  // The base line is clipped to everything outside the ranges and a danger copy to the ranges,
+  // so the colour switches at exactly the range fill's edge with nothing blended underneath
+  // (dimmed lines stay a single colour). Rects extend past the plot vertically so peaks on the
+  // Y domain edges keep their full stroke. Recharts drops a `clipPath` prop on `<Line>` (it
+  // sets its own on the curve), so the clips go through a custom `shape`.
+  const top = (geometry?.plotArea.y ?? 0) - strokeWidth;
+  const height = (geometry?.plotArea.height ?? 0) + strokeWidth * 2;
+  const outsideRects: { key: string; x1: number; x2: number }[] = [];
+  let cursor = Number.NEGATIVE_INFINITY;
+  for (const rect of [...clipRects].sort((a, b) => a.x1 - b.x1)) {
+    if (rect.x1 > cursor) outsideRects.push({ key: `out-${rect.key}`, x1: cursor, x2: rect.x1 });
+    cursor = Math.max(cursor, rect.x2);
+  }
+  outsideRects.push({ key: 'out-end', x1: cursor, x2: Number.POSITIVE_INFINITY });
+
+  const renderClippedShape =
+    (id: string, rects: { key: string; x1: number; x2: number }[]) =>
+    (shapeProps: LineDrawShapeProps) => (
+      <>
+        <defs>
+          <clipPath id={id}>
+            {rects.map(rect => {
+              // SVG rejects infinite lengths — the outer rects only need to clear the chart.
+              const x1 = Math.max(rect.x1, -1e6);
+              const x2 = Math.min(rect.x2, 1e6);
+              return (
+                <rect key={rect.key} x={x1} y={top} width={Math.max(0, x2 - x1)} height={height} />
+              );
+            })}
+          </clipPath>
+        </defs>
+        <LineDrawShape {...shapeProps} clipPath={`url(#${id})`} />
+      </>
+    );
 
   const base = (
     <Line
@@ -137,6 +161,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
       data-testid={testId}
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
+      shape={clipRects.length > 0 ? renderClippedShape(baseClipId, outsideRects) : undefined}
     />
   );
 
@@ -163,7 +188,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
         legendType='none'
         // Clicks fall through to the base line underneath.
         pointerEvents='none'
-        shape={renderInRangeShape}
+        shape={renderClippedShape(clipId, clipRects)}
         data-slot='line-chart-line'
         data-testid={inRangeTestId}
         data-key={seriesKey}

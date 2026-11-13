@@ -82,6 +82,8 @@ const defaultFormatValue = (value: number | string | null | undefined): ReactNod
 
 export interface ChartHoverCardRowProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
+  /** Row test id; the dot gets `{data-testid}--dot`. */
+  'data-testid'?: string;
   /** Dot colour — palette token or CSS colour. */
   color?: ChartColor | (string & {});
   /** Extra dot class (e.g. a `bg-*` escape hatch that wins over `color`). */
@@ -103,17 +105,20 @@ export const ChartHoverCardRow: FC<ChartHoverCardRowProps> = ({
   className,
   children,
   ref,
+  'data-testid': testId,
   ...props
 }) => (
   <div
     {...props}
     ref={ref}
+    data-testid={testId}
     data-slot='chart-hover-card-row'
     className={cn(chartHoverCardRowClasses, className)}
   >
     {children ?? (
       <>
         <ChartHoverCardDot
+          data-testid={testId ? `${testId}--dot` : undefined}
           color={color}
           className={cn(chartHoverCardRowDotClasses, dotClassName)}
         />

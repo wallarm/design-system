@@ -108,7 +108,7 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
     if (!datum) return null;
 
     const xValue = datum[dataCtx.xKey] as number | string;
-    const rows: LineChartTooltipRow[] = buildTooltipRows({
+    const rows = buildTooltipRows({
       datum,
       series: visibleSeries,
       ranges,
