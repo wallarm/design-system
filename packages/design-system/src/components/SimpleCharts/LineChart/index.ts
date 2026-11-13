@@ -30,6 +30,7 @@ export {
   type LineChartLegendItemProps,
 } from './LineChartLegendItem';
 export { LineChartLine, type LineChartLineProps } from './LineChartLine';
+export { LineChartRange, type LineChartRangeProps } from './LineChartRange';
 export {
   LineChartTooltip,
   type LineChartTooltipProps,

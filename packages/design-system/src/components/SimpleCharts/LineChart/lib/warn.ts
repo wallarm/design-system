@@ -12,3 +12,4 @@ const make = (component: string): WarnFn =>
 
 export const warnLineChart = make('LineChart');
 export const warnLineChartLine = make('LineChartLine');
+export const warnLineChartRange = make('LineChartRange');
