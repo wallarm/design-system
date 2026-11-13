@@ -976,7 +976,7 @@ export const WithSearch: StoryFn<typeof Select> = () => {
 
   return (
     <div className='w-300'>
-      <Select collection={collection}>
+      <Select collection={filteredCollection} data-testid='select-with-search'>
         <SelectButton />
 
         <SelectPositioner>

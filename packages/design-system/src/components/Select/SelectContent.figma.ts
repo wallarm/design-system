@@ -104,11 +104,11 @@ const example = figma.code`const collection = createListCollection({
 });${
   search
     ? figma.code`
-const { searchValue, onSearchChange } = useSelectSearch(collection);`
+const { searchValue, onSearchChange, filteredCollection } = useSelectSearch(collection);`
     : ''
 }
 
-<Select collection={collection}${multiple ? ' multiple' : ''}${
+<Select collection={${search ? 'filteredCollection' : 'collection'}}${multiple ? ' multiple' : ''}${
   selected.length > 0 ? ` defaultValue={[${selected.join(', ')}]}` : ''
 }>
   <SelectButton />
