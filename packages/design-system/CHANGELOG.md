@@ -1,3 +1,16 @@
+## [4.16.1](https://github.com/wallarm/design-system/compare/v4.16.0...v4.16.1) (2026-11-13)
+
+### Bug Fixes
+
+* **dialog:** register Dialog content as an ancestor of nested layers ([#479](https://github.com/wallarm/design-system/issues/479)) ([9162c35](https://github.com/wallarm/design-system/commit/9162c35d491ca69194891659034440fd6c7a1974))
+* **drawer:** forward consumer attributes on DrawerContent and DialogContent ([#480](https://github.com/wallarm/design-system/issues/480)) ([9d56eb6](https://github.com/wallarm/design-system/commit/9d56eb67740c2546af7198548c018541927ffd8b))
+* **feedback-pulse:** leave Escape to an open overlay layer ([#477](https://github.com/wallarm/design-system/issues/477)) ([3fb6e90](https://github.com/wallarm/design-system/commit/3fb6e907bbde41229660f56c8c17b69c6a60ccc4))
+* **field:** wire FieldDescription, FieldError and controls to Field state ([#483](https://github.com/wallarm/design-system/issues/483)) ([707ed3f](https://github.com/wallarm/design-system/commit/707ed3fc7a4f5bcfcc4be667d3161a5d2bc9f4ab))
+* **hooks:** make useControlled compile under React Compiler ([#482](https://github.com/wallarm/design-system/issues/482)) ([c6f5809](https://github.com/wallarm/design-system/commit/c6f5809d76f4c5f93326ebcbfce49e87f093b972))
+* **popover:** scale overlay animations from Zag's transform origin ([#475](https://github.com/wallarm/design-system/issues/475)) ([f8f4b27](https://github.com/wallarm/design-system/commit/f8f4b270084be8b02a0198badb0fd8404c7fee5c))
+* **select:** feed the filtered collection to Select in the search pattern ([#478](https://github.com/wallarm/design-system/issues/478)) ([1f871ee](https://github.com/wallarm/design-system/commit/1f871eecacda927b004c78d2acaccce0c503f98b))
+* **table:** move rows to the next row with the keyboard ([#481](https://github.com/wallarm/design-system/issues/481)) ([777cd32](https://github.com/wallarm/design-system/commit/777cd329e417db06969ebb86a24f1dbb51f38719))
+
 ## [4.16.0](https://github.com/wallarm/design-system/compare/v4.15.0...v4.16.0) (2026-11-12)
 
 ### Features
