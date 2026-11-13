@@ -18,7 +18,7 @@ const tooltipContentVariants = cva(
     // into the portal positioner's --z-index, so the value lives here.
     'z-(--tooltip-z-index) overflow-hidden',
     // Animation base
-    'animate-in fade-in-0 zoom-in-95 origin-[--transform-origin]',
+    'animate-in fade-in-0 zoom-in-95 origin-(--transform-origin)',
     // Animation closed
     'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
     // Animation bottom
