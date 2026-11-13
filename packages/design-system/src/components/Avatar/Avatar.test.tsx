@@ -53,6 +53,36 @@ describe('Avatar', () => {
     expect(screen.getByTestId('av--fallback')).toHaveClass('text-xs');
   });
 
+  it('applies the xl size: a 56px plate with text-lg initials', () => {
+    render(
+      <Avatar data-testid='av' size='xl'>
+        <AvatarImage />
+        <AvatarFallback name='Artem Miskevich' />
+        <AvatarOverlay />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('av')).toHaveClass('rounded-16');
+    for (const part of ['image', 'fallback', 'overlay']) {
+      expect(screen.getByTestId(`av--${part}`)).toHaveClass('size-56', 'rounded-16');
+    }
+    const fallback = screen.getByTestId('av--fallback');
+    expect(fallback).toHaveClass('text-lg');
+    expect(fallback).not.toHaveClass('text-xs');
+    expect(fallback.textContent).toBe('AM');
+  });
+
+  it.each([
+    ['xl', 'icon-xl'],
+    ['lg', 'icon-md'],
+  ] as const)('draws the %s fallback icon at %s', (size, iconClass) => {
+    render(
+      <Avatar data-testid='av' size={size}>
+        <AvatarFallback />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('av--fallback').querySelector('svg')).toHaveClass(iconClass);
+  });
+
   it('shows the fallback while loading and the photo once loaded', async () => {
     const onStatusChange = rs.fn();
     renderAvatar({ src: '/me.png', name: 'Ada Lovelace', onStatusChange });

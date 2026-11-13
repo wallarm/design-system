@@ -56,11 +56,11 @@ export const Basic: StoryFn<AvatarProps> = args => (
   </Avatar>
 );
 
-const SIZES = ['sm', 'md', 'lg'] as const;
+const SIZES = ['sm', 'md', 'lg', 'xl'] as const;
 
 /**
  * `sm` (20px) and `md` (24px, the nav-rail plate) are the compact sizes for user items; `lg` (32px,
- * the default) is for rows and forms. Each row shows a photo, initials and the icon, then the same
+ * the default) is for rows and forms; `xl` (56px) is the person's plate in `HoverCard`. Each row shows a photo, initials and the icon, then the same
  * three inside a Branded frame.
  */
 export const Sizes: StoryFn<AvatarProps> = () => (

@@ -33,6 +33,8 @@ export const PLACES = {
   header: { size: 48, renderer: '3d', live: false, shadow: false },
   /** a row beside people's avatars */
   peopleRow: { size: 56, renderer: '3d', live: false, shadow: false },
+  /** the user/agent hover card: only the open card mounts a character, one at a time */
+  hoverCard: { size: 56, renderer: '3d', live: true, shadow: false },
   /** Agent team card */
   teamCard: { size: 72, renderer: '3d', live: true, shadow: false },
   /** Agent drawer header */

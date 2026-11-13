@@ -1,7 +1,7 @@
 ---
 title: Layering
 description: Use when an overlay must paint above another one, or when you consider adding a z-index class to app code.
-components: [Drawer, Dialog, DropdownMenu, Select, Popover, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader]
+components: [Drawer, Dialog, DropdownMenu, Select, Popover, HoverCard, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader]
 keywords: [z-index, z, stacking, layer, portal, overlay, modal, nested drawer, dialog over drawer, dropdown in dialog, tooltip above, toast above, sticky header, popper]
 order: 50
 ---
@@ -16,7 +16,7 @@ Overlays stack themselves by nesting depth. App code never sets z-index on a des
 | --- | --- | --- |
 | A panel over the page | `Drawer` | A `fixed` div with `z-50` |
 | A modal over the page or over a drawer | `Dialog` from `@wallarm-org/design-system/Dialog` | A second `Drawer` styled as a modal |
-| A menu, select, popover or date picker inside a drawer or dialog | `DropdownMenu`, `Select`, `Popover`, `Calendar`, `FilterCascade` as-is | A `z-[100]` class on the content |
+| A menu, select, popover, hover card or date picker inside a drawer or dialog | `DropdownMenu`, `Select`, `Popover`, `HoverCard`, `Calendar`, `FilterCascade` as-is | A `z-[100]` class on the content |
 | A hint above everything | `Tooltip` | A `Popover` with a raised z-index |
 | A notification above every drawer and dialog | `useToast()` from `@wallarm-org/design-system/Toast`, plus one `Toaster` | A `Drawer` without overlay |
 | A sticky page header | `PageHeader` with `sticky` | `sticky top-0 z-50` in app code |
@@ -38,7 +38,7 @@ What does not exist:
 - If a dropdown, select, popover, calendar or tooltip sits in any overlay, use it as-is. It already paints above its host.
 - If your app has its own fixed element (chat widget), keep its z-index below 40. At 40 or higher it paints over the drawer backdrop.
 - If your app has its own sticky element inside a scroll area, use `z-10`.
-- **Never** add a `z-*` class or `style={{ zIndex }}` to `DrawerContent`, `DropdownMenuContent`, `SelectPositioner`, `PopoverContent`, `CalendarContent` or `TooltipContent`.
+- **Never** add a `z-*` class or `style={{ zIndex }}` to `DrawerContent`, `DropdownMenuContent`, `SelectPositioner`, `PopoverContent`, `HoverCardContent`, `CalendarContent` or `TooltipContent`.
 - If chrome you can't change (a framework or docs-site header) sits at z-index 40 or higher, raise `--drawer-overlay-z-index` and `--drawer-positioner-z-index` together on `:root` above it, positioner 10 higher. Keep both under 900.
 - **Never** override `--tooltip-z-index` or `--toast-z-index`, and never change only one of the two drawer variables.
 - **Never** wrap an overlay trigger in `transform`, `filter` or `isolation: isolate` to fix stacking. Overlay content is portaled to `document.body`.
@@ -92,7 +92,7 @@ An app-owned floating widget stays below the drawer backdrop.
 
 ### Depth-based overlays
 
-`Drawer`, `Dialog`, `DropdownMenu`, `Select`, `Popover`, `Calendar` and `FilterCascade`. Each level adds 20.
+`Drawer`, `Dialog`, `DropdownMenu`, `Select`, `Popover`, `HoverCard`, `Calendar` and `FilterCascade`. Each level adds 20.
 
 | Depth | Backdrop | Content |
 | --- | --- | --- |

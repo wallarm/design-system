@@ -12,6 +12,7 @@ describe('places', () => {
       overviewSetup: { size: 40, renderer: '3d', live: false, shadow: false },
       header: { size: 48, renderer: '3d', live: false, shadow: false },
       peopleRow: { size: 56, renderer: '3d', live: false, shadow: false },
+      hoverCard: { size: 56, renderer: '3d', live: true, shadow: false },
       teamCard: { size: 72, renderer: '3d', live: true, shadow: false },
       drawerHeader: { size: 72, renderer: '3d', live: true, shadow: true },
       emptyChat: { size: 120, renderer: '3d', live: true, shadow: true },

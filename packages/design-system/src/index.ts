@@ -541,6 +541,22 @@ export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDat
 export { FormatNumber, type FormatNumberProps } from './components/FormatNumber';
 export { Heading, type HeadingProps } from './components/Heading';
 export {
+  HoverCard,
+  HoverCardAction,
+  type HoverCardActionProps,
+  HoverCardContent,
+  type HoverCardContentProps,
+  HoverCardDescription,
+  type HoverCardDescriptionProps,
+  HoverCardHeader,
+  type HoverCardHeaderProps,
+  type HoverCardProps,
+  HoverCardTitle,
+  type HoverCardTitleProps,
+  HoverCardTrigger,
+  type HoverCardTriggerProps,
+} from './components/HoverCard';
+export {
   HTTP_METHOD_COLOR,
   HTTP_METHODS,
   HttpMethod,
