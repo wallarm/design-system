@@ -92,6 +92,10 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
     [dataCtx, hiddenSet],
   );
 
+  // Built once per render, not per mousemove frame; charts without ranges never read it.
+  const xs: RangeX[] =
+    dataCtx && ranges.length > 0 ? dataCtx.data.map(d => d[dataCtx.xKey] as RangeX) : [];
+
   if (!dataCtx) return null;
 
   // Falls back to the original top-aligned anchor for the first frame, before
@@ -113,7 +117,7 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
       series: visibleSeries,
       ranges,
       xKey: dataCtx.xKey,
-      xs: dataCtx.data.map(d => d[dataCtx.xKey]) as RangeX[],
+      xs,
     });
 
     const body = children ? (

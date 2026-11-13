@@ -49,79 +49,79 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
 
-test.describe('LineChart', () => {
-  test.describe('Screenshots', () => {
-    test('Default', async ({ page }) => {
+test.describe('Component: LineChart', () => {
+  test.describe('Visual', () => {
+    test('Should render default correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Default');
       await expect(page).toHaveScreenshot();
     });
 
-    test('DefaultMulti', async ({ page }) => {
+    test('Should render default multi correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
       await expect(page).toHaveScreenshot();
     });
 
-    test('WithMetric', async ({ page }) => {
+    test('Should render with metric correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'With Metric');
       await expect(page).toHaveScreenshot();
     });
 
-    test('Curves', async ({ page }) => {
+    test('Should render curves correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Curves');
       await expect(page).toHaveScreenshot();
     });
 
-    test('LineStyling', async ({ page }) => {
+    test('Should render line styling correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Line Styling');
       await expect(page).toHaveScreenshot();
     });
 
-    test('EdgeCases', async ({ page }) => {
+    test('Should render edge cases correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Edge Cases');
       await expect(page).toHaveScreenshot();
     });
 
-    test('CustomTooltip', async ({ page }) => {
+    test('Should render custom tooltip correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Custom Tooltip');
       await expect(page).toHaveScreenshot();
     });
 
-    test('LegendPlacements', async ({ page }) => {
+    test('Should render legend placements correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Legend Placements');
       await expect(page).toHaveScreenshot();
     });
 
-    test('Loading', async ({ page }) => {
+    test('Should render loading correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Loading');
       await expect(page).toHaveScreenshot();
     });
 
-    test('Empty', async ({ page }) => {
+    test('Should render empty correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Empty');
       await expect(page).toHaveScreenshot();
     });
 
     for (const story of RANGE_STORIES) {
-      test(story.replaceAll(' ', ''), async ({ page }) => {
+      test(`Should render ${story.toLowerCase()} correctly`, async ({ page }) => {
         await lineChartStory.goto(page, story);
         await expect(page).toHaveScreenshot();
       });
     }
 
-    test('HighlightedRangeHover', async ({ page }) => {
+    test('Should render highlighted range hover correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Highlighted Range Hover');
       await hoverInsideRange(page);
       await expect(page.getByTestId('line-chart--hover-popover')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
-    test('Hovered (legend → line dim)', async ({ page }) => {
+    test('Should render dimmed lines on legend hover correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
       await byKey(page, LEGEND_ITEM, 'errors').hover();
       await expect(page).toHaveScreenshot();
     });
 
-    test('Filterable - Isolated', async ({ page }) => {
+    test('Should render isolated series correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
       // First click on the Filterable story isolates the clicked series.
       await byKey(page, LEGEND_ITEM, 'errors').click();
@@ -132,7 +132,7 @@ test.describe('LineChart', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Filterable - PartiallyShown', async ({ page }) => {
+    test('Should render partially shown series correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
       // Click to isolate `requests`, then click `latency` to add it to the
       // visible set — leaving `errors` as the only hidden series.
@@ -390,7 +390,9 @@ test.describe('LineChart', () => {
   });
 
   test.describe('Accessibility', () => {
-    test('Should list the range description for screen readers', async ({ page }) => {
+    test('Should be described to screen readers via the range descriptions list', async ({
+      page,
+    }) => {
       await lineChartStory.goto(page, 'Highlighted Range');
       await expect(page.getByTestId('line-chart--range-descriptions')).toContainText(
         'Attack spike from 11:20 to 11:52, peak 3,250 per 5 minutes',

@@ -1,9 +1,10 @@
-import { type FC, type ReactNode, useContext, useEffect, useId } from 'react';
+import { type FC, useContext, useEffect, useId } from 'react';
 import { DefaultZIndexes, ZIndexLayer } from 'recharts';
 import { useTestId } from '../../../utils/testId';
 import { useRangeEdges } from './hooks/useRangeEdges';
-import { LineChartRangeContext } from './LineChartContext';
-import { layoutRangeLabels } from './lib/rangeGeometry';
+import { LineChartDataContext, LineChartRangeContext } from './LineChartContext';
+import { layoutRangeLabels, type RangeX, rangeDataProblem } from './lib/rangeGeometry';
+import { warnLineChartRange } from './lib/warn';
 
 const LABEL_GAP = 4;
 const LABEL_TOP = 4;
@@ -12,10 +13,8 @@ const LABEL_FONT_SIZE = 10;
 // labels with wide glyphs get clipped or hidden too eagerly.
 const LABEL_CHAR_WIDTH = 5.5;
 
-const estimateWidth = (label: ReactNode): number =>
-  typeof label === 'string' || typeof label === 'number'
-    ? String(label).length * LABEL_CHAR_WIDTH
-    : 0;
+const estimateWidth = (label: string | number | undefined): number =>
+  label === undefined ? 0 : String(label).length * LABEL_CHAR_WIDTH;
 
 export interface LineChartRangeProps {
   /** Range start, an `xKey` value. At or before the first datum the range clamps to the plot's left edge. */
@@ -24,10 +23,13 @@ export interface LineChartRangeProps {
   to?: number | string;
   /** Series recoloured inside the range. Omitted = nothing is recoloured. */
   seriesKey?: string;
-  /** Label outside the start edge. Hidden when it would not fit or 2+ ranges are visible. */
-  startLabel?: ReactNode;
+  /**
+   * Label outside the start edge (SVG text, so plain text only). Hidden when it would not fit or
+   * 2+ ranges are visible.
+   */
+  startLabel?: string | number;
   /** Label outside the end edge. An ongoing range defaults to `"Ongoing"`, drawn inside the range. */
-  endLabel?: ReactNode;
+  endLabel?: string | number;
   /** Screen-reader text, listed in a visually hidden list on the chart root. */
   description?: string;
 }
@@ -51,11 +53,19 @@ export const LineChartRange: FC<LineChartRangeProps> = ({
   const startLabelTestId = useTestId('range-start-label');
   const endLabelTestId = useTestId('range-end-label');
   const geometry = useRangeEdges();
+  const dataCtx = useContext(LineChartDataContext);
+  const problem = dataCtx
+    ? rangeDataProblem({ from, to }, dataCtx.data.map(d => d[dataCtx.xKey]) as RangeX[])
+    : null;
 
   useEffect(
     () => registerRange({ key, from, to, seriesKey, description }),
     [registerRange, key, from, to, seriesKey, description],
   );
+
+  useEffect(() => {
+    if (problem) warnLineChartRange(`not drawn: ${problem}.`, { from, to });
+  }, [problem, from, to]);
 
   if (!geometry) return null;
 

@@ -4,6 +4,7 @@ import {
   isInRange,
   layoutRangeLabels,
   type RangeEdges,
+  rangeDataProblem,
   resolveRangeEdges,
 } from './rangeGeometry';
 
@@ -86,6 +87,30 @@ describe('isInRange', () => {
     expect(isInRange('d', { from: 'b', to: 'c' }, letters)).toBe(false);
     expect(isInRange('d', { from: 'b' }, letters)).toBe(true);
     expect(isInRange('b', { from: 'zz' }, letters)).toBe(false);
+  });
+
+  it('contains nothing when the range cannot be drawn on the data', () => {
+    // Newest-first or duplicate timestamps: resolveRangeEdges draws nothing, so no row is in range.
+    expect(isInRange(10, range, [20, 15, 10, 5, 0])).toBe(false);
+    expect(isInRange(10, range, [0, 5, 10, 10, 20])).toBe(false);
+  });
+});
+
+describe('rangeDataProblem', () => {
+  it('accepts a drawable range and one outside the data window', () => {
+    expect(rangeDataProblem({ from: 5, to: 15 }, xs)).toBeNull();
+    expect(rangeDataProblem({ from: 30, to: 40 }, xs)).toBeNull();
+    expect(rangeDataProblem({ from: 'b' }, ['a', 'b'])).toBeNull();
+    expect(rangeDataProblem({ from: 'x' }, [])).toBeNull();
+  });
+
+  it('explains why a range can never be drawn', () => {
+    expect(rangeDataProblem({ from: 5 }, [20, 10, 0])).toMatch(/ascending/);
+    expect(rangeDataProblem({ from: 'a' }, xs)).toMatch(/numeric/);
+    expect(rangeDataProblem({ from: 'Monday', to: 'Wed' }, ['Mon', 'Tue', 'Wed'])).toMatch(
+      /"Monday" matches no datum/,
+    );
+    expect(rangeDataProblem({ from: 'Wed', to: 'Mon' }, ['Mon', 'Tue', 'Wed'])).toMatch(/after/);
   });
 });
 

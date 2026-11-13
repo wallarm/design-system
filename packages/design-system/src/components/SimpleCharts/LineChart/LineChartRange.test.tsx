@@ -101,6 +101,20 @@ describe('LineChartRange — overlap warning', () => {
   });
 });
 
+describe('LineChartRange — undrawable range warning', () => {
+  it('warns when an edge does not fit the X data and draws nothing', () => {
+    renderChart([{ from: 'Monday', to: 'Wed' }]);
+    expect(warnLineChartRange).toHaveBeenCalledTimes(1);
+    expect(String(rs.mocked(warnLineChartRange).mock.calls[0]?.[0])).toContain('not drawn');
+    expect(screen.queryByTestId('lc--range')).toBeNull();
+  });
+
+  it('does not warn for a range outside the data window', () => {
+    renderChart([{ from: 100, to: 200 }]);
+    expect(warnLineChartRange).not.toHaveBeenCalled();
+  });
+});
+
 describe('LineChartRange — drawing', () => {
   it('renders the range group with both labels for a single range', () => {
     renderChart([{ from: 10, to: 15, startLabel: '11:20', endLabel: '11:52' }]);

@@ -86,10 +86,35 @@ export function resolveRangeEdges({
 }
 
 /**
- * Whether datum X `x` lies inside the range (inclusive; `to` omitted = ongoing). Numeric X compares
- * values; string X compares indexes in `xs` between the matched edges.
+ * Why a range can never be drawn on this data — the dev warning text — or `null`. A range that
+ * merely falls outside the data window is not a problem (zooming moves it back in).
  */
-export function isInRange(x: RangeX, { from, to }: RangeBounds, xs: readonly RangeX[]): boolean {
+export function rangeDataProblem({ from, to }: RangeBounds, xs: readonly RangeX[]): string | null {
+  if (xs.length === 0) return null;
+  if (xs.every(x => typeof x === 'number')) {
+    if (typeof from !== 'number' || (to !== undefined && typeof to !== 'number')) {
+      return 'numeric X data needs numeric `from`/`to`';
+    }
+    if (!isAscendingNumbers(xs)) return 'numeric X values must be strictly ascending';
+    return to !== undefined && from > to ? '`from` is after `to`' : null;
+  }
+  if (xs.some(x => typeof x !== 'string')) return 'X values mix numbers and strings';
+  for (const edge of [from, to]) {
+    if (edge !== undefined && !xs.includes(edge)) {
+      return `edge ${JSON.stringify(edge)} matches no datum X value`;
+    }
+  }
+  return to !== undefined && xs.indexOf(from) > xs.indexOf(to) ? '`from` is after `to`' : null;
+}
+
+/**
+ * Whether datum X `x` lies inside the range (inclusive; `to` omitted = ongoing). Numeric X compares
+ * values; string X compares indexes in `xs` between the matched edges. A range that cannot be drawn
+ * on `xs` (see `rangeDataProblem`) contains nothing, so the popover never claims an invisible range.
+ */
+export function isInRange(x: RangeX, range: RangeBounds, xs: readonly RangeX[]): boolean {
+  if (rangeDataProblem(range, xs)) return false;
+  const { from, to } = range;
   if (typeof x === 'number') {
     if (typeof from !== 'number' || (to !== undefined && typeof to !== 'number')) return false;
     return x >= from && (to === undefined || x <= to);
