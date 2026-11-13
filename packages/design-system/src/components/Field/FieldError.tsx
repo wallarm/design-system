@@ -1,4 +1,6 @@
 import type { FC, HTMLAttributes } from 'react';
+import { useFieldContext } from '@ark-ui/react/field';
+import { useFieldsetContext } from '@ark-ui/react/fieldset';
 import { OctagonAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -8,9 +10,17 @@ type FieldErrorProps = HTMLAttributes<HTMLDivElement>;
 
 export const FieldError: FC<FieldErrorProps> = ({ children, ...props }) => {
   const testId = useTestId('error');
+  // Ark's error-text props (id) let an invalid Field/Fieldset wire the control to this message.
+  // Prop getter, not Ark's ErrorText part: the part renders only when invalid, this always does.
+  const field = useFieldContext();
+  const fieldset = useFieldsetContext();
+  // Drop Ark's aria-live: role=alert already implies assertive, and both on one node double-announce in VoiceOver.
+  const { 'aria-live': _ariaLive, ...errorTextProps } =
+    (field ?? fieldset)?.getErrorTextProps() ?? {};
 
   return (
     <div
+      {...errorTextProps}
       {...props}
       data-testid={testId}
       role='alert'

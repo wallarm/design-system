@@ -1,7 +1,5 @@
 import type { FC, Ref, TextareaHTMLAttributes } from 'react';
-import type { HTMLProps } from '@ark-ui/react/factory';
 import { useFieldContext } from '@ark-ui/react/field';
-import { mergeProps } from '@ark-ui/react/utils';
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import type { VariantProps } from 'class-variance-authority';
 import { SvgIcon } from '../../icons/SvgIcon';
@@ -31,16 +29,18 @@ export interface TextareaProps
 }
 
 export const Textarea: FC<TextareaProps> = ({
-  error = false,
-  disabled = false,
+  error,
+  disabled,
   size = 'default',
   minRows,
   maxRows,
   ref,
   ...props
 }) => {
+  // Explicit props win; otherwise the enclosing Field's state applies.
   const field = useFieldContext();
-  const mergedProps = mergeProps<HTMLProps<'textarea'>>(field?.getTextareaProps());
+  const invalid = error ?? field?.invalid ?? false;
+  const isDisabled = disabled ?? field?.disabled ?? false;
 
   const autoResize = maxRows != null;
   const effectiveMinRows = minRows ?? (autoResize ? 1 : undefined);
@@ -55,12 +55,12 @@ export const Textarea: FC<TextareaProps> = ({
   return (
     <div className='relative' data-slot='textarea'>
       <textarea
-        {...mergedProps}
+        {...field?.getTextareaProps()}
         {...props}
         ref={composeRefs(autoResizeRef, ref)}
-        disabled={disabled}
-        aria-invalid={Boolean(error)}
-        aria-disabled={disabled}
+        disabled={isDisabled}
+        aria-invalid={invalid}
+        aria-disabled={isDisabled}
         rows={effectiveMinRows}
         {...(autoResize && {
           onInput: (e: React.InputEvent<HTMLTextAreaElement>) => {
@@ -69,7 +69,7 @@ export const Textarea: FC<TextareaProps> = ({
           },
         })}
         className={cn(
-          inputVariants({ error }),
+          inputVariants({ error: invalid }),
           textareaPaddingVariants({ size }),
           '[scrollbar-width:thin]',
           !autoResize && textareaHeightVariants({ size }),

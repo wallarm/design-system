@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
+import { Field } from '../Field';
 import { Input } from './Input';
 
 describe('Attribute pass-through', () => {
@@ -64,5 +65,32 @@ describe('Placeholder typography', () => {
     // rendering placeholder text a couple pixels lower than typed text.
     render(<Input data-testid='input' placeholder='Enter name' />);
     expect(screen.getByTestId('input').className).toContain('placeholder:text-sm');
+  });
+});
+
+describe('Field state', () => {
+  it('inherits invalid and disabled from the Field', () => {
+    render(
+      <Field invalid disabled>
+        <Input />
+      </Field>,
+    );
+
+    const input = screen.getByRole('textbox');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('lets explicit control props win over the Field', () => {
+    render(
+      <Field invalid disabled>
+        <Input error={false} disabled={false} />
+      </Field>,
+    );
+
+    const input = screen.getByRole('textbox');
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+    expect(input).toBeEnabled();
   });
 });

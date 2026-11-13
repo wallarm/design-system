@@ -2,6 +2,7 @@ import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
+import { Field } from '../Field';
 import { NumberInput } from './NumberInput';
 
 // NumberInput is wrapper-level by current contract — see
@@ -143,5 +144,27 @@ describe('Size variants', () => {
   it('renders the inline-edit (28px) height', () => {
     render(<NumberInput data-testid='number-input' size='inline-edit' />);
     expect(screen.getByTestId('number-input')).toHaveClass('h-28');
+  });
+});
+
+describe('NumberInput in a Field', () => {
+  it('inherits invalid from the Field', () => {
+    render(
+      <Field invalid>
+        <NumberInput />
+      </Field>,
+    );
+
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('lets an explicit error={false} win over the Field', () => {
+    render(
+      <Field invalid>
+        <NumberInput error={false} />
+      </Field>,
+    );
+
+    expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-invalid', 'true');
   });
 });

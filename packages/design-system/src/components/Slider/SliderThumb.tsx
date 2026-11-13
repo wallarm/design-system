@@ -68,8 +68,7 @@ export const SliderThumb: FC<SliderThumbProps> = ({
       // via Field instead) — passing '' overrides that dangling IDREF so `aria-label`
       // names the node. A real id (explicit, or the Field label) takes precedence.
       aria-labelledby={ariaLabelledby ?? ''}
-      // Consumer `aria-describedby` wins; else the Field's help/error id (DS-wide gap:
-      // the DS FieldError/Description don't register with Ark, so this is usually empty).
+      // Consumer `aria-describedby` wins; else the Field's FieldDescription id.
       aria-describedby={ariaDescribedbyProp ?? ariaDescribedby}
       data-slot='slider-thumb'
       data-testid={testId}
