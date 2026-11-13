@@ -734,10 +734,11 @@ jobs:
           fi
 
           # 2) Recover tags published to npm but missing from git
-          for PKG in "@wallarm-org/design-system" "@wallarm-org/mcp" "@wallarm-org/migrator"; do
+          for PKG in "@wallarm-org/design-system" "@wallarm-org/mcp" "@wallarm-org/migrator" "@wallarm-org/gen-ui"; do
             case "$PKG" in
               @wallarm-org/mcp) TAG_PREFIX="mcp-v";;
               @wallarm-org/migrator) TAG_PREFIX="migrator-v";;
+              @wallarm-org/gen-ui) TAG_PREFIX="gen-ui-v";;
               *) TAG_PREFIX="v";;
             esac
 
