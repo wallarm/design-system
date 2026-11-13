@@ -15,6 +15,9 @@ updates:
       include: scope
     # minor/patch go into one grouped PR; majors stay ungrouped, so each gets its own PR
     groups:
+      # Ark and our direct @zag-js pins must move together (zagLockstep.test.ts); any update type, majors included
+      ark-zag:
+        patterns: ["@ark-ui/*", "@zag-js/*"]
       minor-and-patch:
         update-types: [minor, patch]
 
