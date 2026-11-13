@@ -68,10 +68,15 @@ const hoverOpen = async (page: Page, story: Story) => {
   await expect(getContent(page, story)).toBeVisible();
 };
 
+// A tooltip has pointer-events: none (zag, non-interactive), which elementFromPoint skips:
+// lift it for the hit test only.
 const isTopmost = (locator: Locator) =>
   locator.evaluate(el => {
+    const { pointerEvents } = el.style;
+    el.style.pointerEvents = 'auto';
     const rect = el.getBoundingClientRect();
     const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    el.style.pointerEvents = pointerEvents;
     return !!top && el.contains(top);
   });
 
@@ -137,8 +142,9 @@ test.describe('Component: HoverCard', () => {
       const tooltip = getPart(page, 'In Table', 'title--content');
       await expect(tooltip).toBeVisible();
 
-      // The portaled tooltip is a React descendant of the content, so entering it is no leave.
-      await tooltip.hover();
+      // The tooltip takes no pointer events (force skips that check): the pointer resting over it
+      // must not close the card.
+      await tooltip.hover({ force: true });
       await page.clock.runFor(CLOSE_DELAY * 3);
       await expect(getContent(page, 'In Table')).toBeVisible();
     });
@@ -157,10 +163,11 @@ test.describe('Component: HoverCard', () => {
       await getTrigger(page, 'In Table').hover();
       await page.clock.runFor(TOOLTIP_OPEN_DELAY);
       // On a HoverCard trigger AvatarName drops its overflow tooltip: the card shows the full name.
-      await expect(page.getByTestId('user-row-4--content')).toHaveCount(0);
+      // By role: the tooltip's user-row-4--content id is also AvatarContent's.
+      await expect(page.getByRole('tooltip')).toHaveCount(0);
       await page.clock.runFor(OPEN_DELAY - TOOLTIP_OPEN_DELAY);
       await expect(getContent(page, 'In Table')).toBeVisible();
-      await expect(page.getByTestId('user-row-4--content')).toHaveCount(0);
+      await expect(page.getByRole('tooltip')).toHaveCount(0);
       await expect(getTrigger(page, 'In Table')).toHaveCount(1);
     });
 
