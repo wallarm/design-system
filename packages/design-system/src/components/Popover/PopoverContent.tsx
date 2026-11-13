@@ -86,7 +86,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             // scroll would otherwise move the page underneath.
             'overscroll-contain',
             // Animations
-            'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
+            'animate-in fade-in-0 zoom-in-95 origin-(--transform-origin)',
             // Animation closed
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             // Animation bottom

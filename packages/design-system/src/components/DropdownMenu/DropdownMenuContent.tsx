@@ -69,7 +69,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           className={cn(
             dropdownMenuClassNames,
             'max-h-(--available-height)',
-            'origin-[--transform-origin]',
+            'origin-(--transform-origin)',
             className,
           )}
           {...props}

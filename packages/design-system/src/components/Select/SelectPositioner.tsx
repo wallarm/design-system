@@ -40,7 +40,7 @@ export const SelectPositioner: FC<SelectPositionerProps> = ({
             'max-w-320',
             'max-h-(--available-height)',
             'p-0',
-            'origin-[--transform-origin]',
+            'origin-(--transform-origin)',
             className,
           )}
         >
