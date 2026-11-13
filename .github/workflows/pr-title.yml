@@ -1,8 +1,9 @@
 name: PR Title Check
 
 on:
+  # No branch filter: both jobs are required checks, and a PR in a stack (base = another branch)
+  # would otherwise wait forever for a status that is never reported.
   pull_request:
-    branches: [main]
     types: [opened, edited, synchronize, reopened]
 
 permissions:
