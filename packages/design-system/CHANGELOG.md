@@ -1,3 +1,10 @@
+## [4.17.0](https://github.com/wallarm/design-system/compare/v4.16.1...v4.17.0) (2026-11-13)
+
+### Features
+
+* **hover-card:** user and agent hover card (WDS-206) ([#485](https://github.com/wallarm/design-system/issues/485)) ([355a22c](https://github.com/wallarm/design-system/commit/355a22cda2e6386681fcdb6745c79b6afe6ea7fa))
+* **line-chart:** highlighted range (WDS-207) ([#486](https://github.com/wallarm/design-system/issues/486)) ([4962303](https://github.com/wallarm/design-system/commit/4962303428435f007849c19ca2069ffedf877be4))
+
 ## [4.16.1](https://github.com/wallarm/design-system/compare/v4.16.0...v4.16.1) (2026-11-13)
 
 ### Bug Fixes
