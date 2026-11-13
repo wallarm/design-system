@@ -4,15 +4,18 @@
  */
 import type { GenUiAction } from '../core/define';
 import { API_INVENTORY_SCENARIO } from './apiInventory';
+import { API_STRUCTURE_SCENARIO } from './apiStructure';
 import { ATTACK_INVESTIGATION_SCENARIO } from './attackInvestigation';
 import {
   ATTACK_SUMMARY_A2UI,
   ATTACK_SUMMARY_ACTIONS,
   ATTACK_SUMMARY_JSON_RENDER,
 } from './attackSummary';
+import { CONFIG_REVIEW_SCENARIO } from './configReview';
 import { DASHBOARD_SCENARIO } from './dashboard';
 import { INCIDENT_SCENARIO } from './incident';
 import { LIVE_MONITOR_SCENARIO } from './liveMonitor';
+import { NO_RESULTS_SCENARIO } from './noResults';
 import { toOpenUiLines } from './openui';
 import { type Scenario, type ScenarioStreams, toStreams } from './stream';
 import { WEEKLY_REPORT_SCENARIO } from './weeklyReport';
@@ -41,6 +44,9 @@ export const SCENARIOS: readonly ReplayScenario[] = [
     INCIDENT_SCENARIO,
     API_INVENTORY_SCENARIO,
     ATTACK_INVESTIGATION_SCENARIO,
+    API_STRUCTURE_SCENARIO,
+    CONFIG_REVIEW_SCENARIO,
+    NO_RESULTS_SCENARIO,
     WEEKLY_REPORT_SCENARIO,
   ].map((scenario: Scenario): ReplayScenario => ({ ...scenario, ...toStreams(scenario) })),
 ];
