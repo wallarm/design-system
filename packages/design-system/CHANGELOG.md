@@ -1,3 +1,9 @@
+## [4.18.0](https://github.com/wallarm/design-system/compare/v4.17.0...v4.18.0) (2026-11-13)
+
+### Features
+
+* **agent-avatar:** final cast of ten (WDS-208) ([#488](https://github.com/wallarm/design-system/issues/488)) ([8f9112f](https://github.com/wallarm/design-system/commit/8f9112f21f8e5e7001791fa41a079f27fcbd2ae9))
+
 ## [4.17.0](https://github.com/wallarm/design-system/compare/v4.16.1...v4.17.0) (2026-11-13)
 
 ### Features
