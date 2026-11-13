@@ -15,6 +15,29 @@ import { DialogTitle } from './DialogTitle';
 import { DialogTrigger } from './DialogTrigger';
 
 describe('Attribute pass-through', () => {
+  it('forwards consumer attributes to the DialogContent element', () => {
+    render(
+      <Dialog open data-testid='dialog'>
+        <DialogContent
+          aria-describedby='custom-desc'
+          data-analytics-id='DIALOG_CONTENT'
+          className='custom-class'
+        >
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+          </DialogHeader>
+          <DialogBody>Body</DialogBody>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const content = screen.getByTestId('dialog--content');
+    expect(content).toHaveAttribute('data-analytics-id', 'DIALOG_CONTENT');
+    expect(content).toHaveAttribute('aria-describedby', 'custom-desc');
+    expect(content).toHaveClass('custom-class');
+    expect(content).toHaveAttribute('role', 'dialog');
+  });
+
   it('forwards data-analytics-id to the default DialogTrigger <button>', () => {
     render(
       <Dialog>

@@ -1,4 +1,4 @@
-import type { CSSProperties, FC, ReactNode, Ref } from 'react';
+import type { CSSProperties, FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -10,13 +10,25 @@ import { DrawerPortal } from './DrawerPortal';
 import { DrawerPositioner } from './DrawerPositioner';
 import { DrawerAncestorIdsProvider } from './DrawerRoot';
 
-export interface DrawerContentProps {
+/**
+ * `id` is omitted: the dialog machine owns the content id (`ids.content` in DrawerRoot), which
+ * wires the trigger's `aria-controls`, nesting and non-modal focus return.
+ */
+export interface DrawerContentProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'id'> {
   children: ReactNode;
   asChild?: boolean;
   ref?: Ref<HTMLDivElement>;
 }
 
-export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }) => {
+export const DrawerContent: FC<DrawerContentProps> = ({
+  children,
+  asChild,
+  ref,
+  className,
+  style,
+  ...rest
+}) => {
   const testId = useTestId('content');
   const { width, isResizing, overlay } = useDrawerContext();
   const nestedSameKindCount = useNestedSameKindCount();
@@ -27,6 +39,7 @@ export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }
 
       <DrawerPositioner isResizing={isResizing}>
         <Dialog.Content
+          {...rest}
           ref={ref}
           data-testid={testId}
           // Pushed-back is keyed on the DS-owned same-kind attribute, not
@@ -41,8 +54,11 @@ export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }
 
             'data-[has-nested-same]:scale-[calc(var(--drawer-pushed-back-scale)-(var(--nested-same-kind-count)*var(--drawer-pushed-back-ratio)))]',
             'data-[has-nested-same]:-translate-x-[calc((var(--drawer-pushed-back-offset)/(var(--drawer-pushed-back-scale)-(var(--nested-same-kind-count)*var(--drawer-pushed-back-ratio))))*var(--nested-same-kind-count))]',
+            className,
           )}
-          style={{ width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties}
+          style={
+            { ...style, width, '--nested-same-kind-count': nestedSameKindCount } as CSSProperties
+          }
           asChild={asChild}
         >
           <DrawerAncestorIdsProvider>{children}</DrawerAncestorIdsProvider>
