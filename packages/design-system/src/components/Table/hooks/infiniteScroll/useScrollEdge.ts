@@ -19,8 +19,11 @@ interface UseScrollEdgeOptions {
 
 /**
  * Fires `onReached` once when the user scrolls within `threshold` px of the
- * given edge. Re-arms after scrolling back past the threshold. A cooldown
- * guard prevents rapid re-fires when prepended/appended rows grow the content.
+ * given edge. Re-arms after scrolling back past the threshold, or once the
+ * content height changes (new rows): a jump straight to the new edge, such as
+ * a scrollbar drag or End, never passes a point outside the threshold. A
+ * cooldown guard prevents rapid re-fires when prepended/appended rows grow the
+ * content.
  */
 export const useScrollEdge = ({
   edge,
@@ -32,6 +35,7 @@ export const useScrollEdge = ({
   scrollRoot,
 }: UseScrollEdgeOptions) => {
   const firedRef = useRef(false);
+  const firedHeightRef = useRef(0);
   const lastFiredAtRef = useRef(0);
 
   // Latest-callback ref: re-running the effect on identity changes races with
@@ -61,8 +65,10 @@ export const useScrollEdge = ({
 
       if (distance <= threshold) {
         const now = Date.now();
+        if (firedRef.current && scrollHeight !== firedHeightRef.current) firedRef.current = false;
         if (!firedRef.current && now - lastFiredAtRef.current >= SCROLL_EDGE_COOLDOWN_MS) {
           firedRef.current = true;
+          firedHeightRef.current = scrollHeight;
           lastFiredAtRef.current = now;
           callback();
         }
