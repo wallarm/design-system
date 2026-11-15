@@ -7,6 +7,11 @@ export interface GenUiViewProps<P> {
   props: P;
   /** Fires one of the component's `events`; the format decides what reaches the agent. */
   emit: (event: string) => void;
+  /**
+   * Writes one of the component's `bindable` props: to the path the agent bound it to, so an
+   * action reads it from there, or, for a literal, kept in the View.
+   */
+  set: <K extends keyof P & string>(prop: K, value: P[K]) => void;
   /** Rendered children, when the component `hasChildren`. */
   children?: ReactNode;
 }
@@ -18,7 +23,8 @@ export interface GenUiViewProps<P> {
  * - `props` is a plain zod object of strings, numbers, booleans, enums, arrays and objects:
  *   no functions, no ReactNode.
  * - No prop named `id`, `component`, `children` or `child`: A2UI puts props flat next to them.
- * - Events carry no arguments: the spec, not the component, decides what an action sends.
+ * - Events carry no arguments: the spec, not the component, decides what an action sends. A value
+ *   the user enters goes to a bound path (`bindable`), and the action's context reads that path.
  */
 export interface GenUiComponent<S extends z.ZodObject = z.ZodObject> {
   name: string;
@@ -26,6 +32,8 @@ export interface GenUiComponent<S extends z.ZodObject = z.ZodObject> {
   description: string;
   props: S;
   events?: readonly string[];
+  /** Props the user changes (an input's value): the View writes them with `set`. */
+  bindable?: readonly (keyof z.infer<S> & string)[];
   hasChildren?: boolean;
   View: FC<GenUiViewProps<z.infer<S>>>;
   /**

@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import { type FC, type ReactNode, useState } from 'react';
 import type { GenUiComponent } from '../core/define';
 import { isRecord } from '../core/guards';
 import { Placeholder } from './Placeholder';
@@ -8,6 +8,11 @@ interface GuardedViewProps {
   /** The props as the format resolved them: untrusted, and possibly incomplete mid-stream. */
   props: unknown;
   emit: (event: string) => void;
+  /**
+   * Writes a `bindable` prop to the path the agent bound it to, and says whether it did; a prop
+   * the agent sent as a literal has no path, so the value stays here instead.
+   */
+  write?: (prop: string, value: unknown) => boolean;
   children?: ReactNode;
 }
 
@@ -18,8 +23,14 @@ interface GuardedViewProps {
  * skeleton instead: mid-stream that is a binding whose data hasn't arrived yet, at the end a
  * mistake in the answer (the reasons are in the skeleton's tooltip).
  */
-export const GuardedView: FC<GuardedViewProps> = ({ component, props, emit, children }) => {
-  const parsed = component.props.safeParse(props);
+export const GuardedView: FC<GuardedViewProps> = ({ component, props, emit, write, children }) => {
+  const [local, setLocal] = useState<Record<string, unknown>>({});
+  const set = (prop: string, value: unknown) => {
+    if (!component.bindable?.includes(prop)) return;
+    if (write?.(prop, value)) return;
+    setLocal(current => ({ ...current, [prop]: value }));
+  };
+  const parsed = component.props.safeParse(isRecord(props) ? { ...props, ...local } : props);
   if (!parsed.success) {
     const { Skeleton } = component;
     const title = isRecord(props) && typeof props.title === 'string' ? props.title : undefined;
@@ -34,7 +45,7 @@ export const GuardedView: FC<GuardedViewProps> = ({ component, props, emit, chil
   }
   const { View } = component;
   return (
-    <View props={parsed.data} emit={emit}>
+    <View props={parsed.data} emit={emit} set={set}>
       {children}
     </View>
   );

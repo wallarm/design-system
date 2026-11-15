@@ -13,6 +13,7 @@ import { Catalog, type ComponentApi } from '@a2ui/web_core';
 import type { AgentToRendererMessage } from '@a2ui/web_core/v1_0';
 import type { z as z3 } from 'zod/v3';
 import type { GenUiComponent } from '../core/define';
+import { isRecord } from '../core/guards';
 import { GuardedView } from '../render/GuardedView';
 import { Placeholder } from '../render/Placeholder';
 import { A2UI_ACTION, A2UI_CHILD_LIST, toA2uiProps } from './toA2uiSchema';
@@ -67,8 +68,17 @@ export const createA2uiCatalog = (
           const action = values[event];
           if (typeof action === 'function') action();
         };
+        // The binder adds a `setValue` beside each bindable `value`; it writes to the `@path`.
+        const write = (prop: string, value: unknown) => {
+          const raw = context.componentModel.properties[prop];
+          const setter = values[`set${prop.charAt(0).toUpperCase()}${prop.slice(1)}`];
+          if (!isRecord(raw) || typeof raw['@path'] !== 'string') return false;
+          if (typeof setter !== 'function') return false;
+          setter(value);
+          return true;
+        };
         return (
-          <GuardedView component={component} props={values} emit={emit}>
+          <GuardedView component={component} props={values} emit={emit} write={write}>
             {children?.map((child, index) => {
               const ref = typeof child === 'string' ? { id: child, basePath: undefined } : child;
               // The binder hands back node refs; the ids the agent wrote are in the raw props
