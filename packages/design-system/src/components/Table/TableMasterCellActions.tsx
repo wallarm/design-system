@@ -15,6 +15,8 @@ export const TableMasterCellActions = ({ children }: TableMasterCellActionsProps
         'group-hover/row:opacity-100 group-hover/row:pointer-events-auto',
         'group-data-[preview-active]/row:opacity-100 group-data-[preview-active]/row:pointer-events-auto',
         'has-[[data-state=open]]:opacity-100 has-[[data-state=open]]:pointer-events-auto',
+        // A keyboard focus on an action shows it, as a hover does.
+        'has-[:focus-visible]:opacity-100 has-[:focus-visible]:pointer-events-auto',
         '[&_[data-state=open]]:overlay [&_[data-state=open]]:overlay-states-primary-hover',
       )}
     >
