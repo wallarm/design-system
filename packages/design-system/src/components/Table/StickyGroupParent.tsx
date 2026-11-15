@@ -1,8 +1,10 @@
-import { type FC, useEffect, useRef } from 'react';
+import { type FC, type RefObject, useEffect, useRef } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useStickyGroupParent } from './hooks';
 import {
+  type ScrollRoot,
+  scrollRootBy,
   TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
@@ -25,18 +27,32 @@ const SYSTEM_COLUMN_IDS = new Set([
 interface StickyGroupParentProps {
   tableWidth: number;
   headerHeight: number;
+  /**
+   * `virtualized='window'`: the resolved scroll root. The overlay is then drawn
+   * by the caller inside the sticky header shell, right under `headerRef`: the
+   * body's horizontal scroll viewport never scrolls vertically, so nothing in it
+   * can stick.
+   */
+  windowScrollRoot?: ScrollRoot | null;
+  headerRef?: RefObject<HTMLElement | null>;
 }
 
-export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, headerHeight }) => {
-  const { table, containerRef, tbodyRef, virtualizerRef, virtualized, renderFullWidthGroupRow } =
+export const StickyGroupParent: FC<StickyGroupParentProps> = ({
+  tableWidth,
+  headerHeight,
+  windowScrollRoot,
+  headerRef,
+}) => {
+  const { table, containerRef, tbodyRef, virtualizerRef, renderFullWidthGroupRow } =
     useTableContext();
 
-  const useWindowScroll = virtualized === 'window';
+  const useWindowScroll = windowScrollRoot != null;
 
   const { stickyRow, pushUpOffset } = useStickyGroupParent<RowData>({
     table,
     scrollElementRef: containerRef,
-    useWindowScroll,
+    windowScrollRoot,
+    headerRef,
     headerHeight,
     tbodyRef,
     virtualizerRef,
@@ -70,9 +86,10 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
         if (tbodyEl) {
           const rowEl = tbodyEl.querySelector(`[data-row-id="${stickyRow.id}"]`);
           if (rowEl instanceof HTMLElement) {
-            if (useWindowScroll) {
-              const rect = rowEl.getBoundingClientRect();
-              window.scrollTo({ top: window.scrollY + rect.top - headerHeight });
+            if (windowScrollRoot) {
+              const headerBottom =
+                headerRef?.current?.getBoundingClientRect().bottom ?? headerHeight;
+              scrollRootBy(windowScrollRoot, rowEl.getBoundingClientRect().top - headerBottom);
             } else {
               scrollElement.scrollTop = rowEl.offsetTop + (tbodyEl.offsetTop || 0) - headerHeight;
             }
@@ -83,7 +100,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
 
     prevExpandedRef.current = isExpanded;
     prevStickyIdRef.current = stickyRow.id;
-  }, [stickyRow, containerRef, tbodyRef, useWindowScroll, headerHeight]);
+  }, [stickyRow, containerRef, tbodyRef, windowScrollRoot, headerRef, headerHeight]);
 
   const cells = useTableValue(() => stickyRow?.getVisibleCells());
   const systemCells = cells?.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
@@ -99,8 +116,11 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
   // scroll which causes a brief layout reflow (the "jump" glitch).
   return (
     <div
-      className='sticky z-[21] h-0 overflow-visible pointer-events-none'
-      style={{ top: headerHeight }}
+      className={cn(
+        'pointer-events-none',
+        !useWindowScroll && 'sticky z-[21] h-0 overflow-visible',
+      )}
+      style={useWindowScroll ? undefined : { top: headerHeight }}
       aria-hidden='true'
     >
       {stickyRow && (

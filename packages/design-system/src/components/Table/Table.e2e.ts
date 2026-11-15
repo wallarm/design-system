@@ -13,6 +13,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Row Reordering',
   'Sticky Group Parent',
   'Sticky Group Parent Virtualized',
+  'Sticky Group Parent Window In Pane',
   'Infinite Scroll Window In Pane',
   'Infinite Scroll Window In Pane Anchored',
   'Infinite Scroll Window In Pane Late Rows',
@@ -294,6 +295,51 @@ test.describe('Component: Table', () => {
       await expect(pane.locator('[data-row-id]').first()).toBeVisible();
 
       expect(await pane.evaluate(el => el.scrollTop)).toBe(300);
+    });
+
+    test('Should pin the group row under the header in a padded pane in window mode', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Sticky Group Parent Window In Pane');
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      await pane.evaluate(el => {
+        el.scrollTop = 600;
+      });
+
+      const read = () =>
+        pane.evaluate(el => {
+          const paneTop = el.getBoundingClientRect().top + el.clientTop;
+          const head = el.querySelector('thead')!.getBoundingClientRect();
+          // The stuck group row is drawn as a copy in an aria-hidden overlay.
+          const overlay = el.querySelector('[aria-hidden="true"] tbody tr');
+          const rect = overlay?.getBoundingClientRect();
+          return {
+            headerTop: Math.round(head.top - paneTop),
+            overlayTop: rect ? Math.round(rect.top - head.bottom) : null,
+            overlayText: overlay?.textContent ?? '',
+          };
+        });
+
+      // The header sits at the pane's edge, not under its padding; the group row right under it.
+      await expect.poll(read).toMatchObject({ headerTop: 0, overlayTop: 0 });
+      expect((await read()).overlayText).toMatch(/\S/);
+    });
+
+    test('Should show the row actions while one of them has the keyboard focus', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Agent Cell');
+      const more = page.getByRole('button', { name: 'More' }).first();
+      await expect(more).toBeAttached();
+      const actions = more.locator('xpath=ancestor::*[@data-master-cell-action][1]');
+      await expect(actions).toHaveCSS('opacity', '0');
+
+      for (let i = 0; i < 30 && !(await more.evaluate(el => el === document.activeElement)); i++)
+        await page.keyboard.press('Tab');
+      await expect(more).toBeFocused();
+      await expect(actions).toHaveCSS('opacity', '1');
     });
 
     test('Should allow selecting text in a table body cell', async ({ page }) => {
