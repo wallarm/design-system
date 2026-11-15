@@ -92,9 +92,34 @@ describe('useScrollEdge', () => {
     expect(onReached).toHaveBeenCalledTimes(2);
   });
 
-  it('re-arms when the content grows, so a jump straight to the new end fires again', () => {
+  it('re-arms when new rows arrive, so a jump straight to the new end fires again', () => {
     // A page loaded while at the end; the user then drags the scrollbar to the new end
     // without a scroll event in between that lands outside the threshold.
+    const el = makeEl({ scrollTop: 850 });
+    const onReached = rs.fn();
+    const { rerender } = renderHook(
+      ({ itemCount }) =>
+        useScrollEdge({
+          edge: 'end',
+          mode: 'container',
+          scrollRef: { current: el as unknown as HTMLElement },
+          onReached,
+          threshold: 200,
+          itemCount,
+        }),
+      { initialProps: { itemCount: 50 } },
+    );
+    expect(onReached).toHaveBeenCalledTimes(1);
+
+    rerender({ itemCount: 100 });
+    el.scrollHeight = 2000;
+    el.scrollTop = 1850;
+    rs.spyOn(Date, 'now').mockReturnValue(10_500);
+    el.fire();
+    expect(onReached).toHaveBeenCalledTimes(2);
+  });
+
+  it('stays fired while the content grows without new rows (loading rows, measuring)', () => {
     const el = makeEl({ scrollTop: 850 });
     const onReached = rs.fn();
     renderHook(() =>
@@ -104,15 +129,16 @@ describe('useScrollEdge', () => {
         scrollRef: { current: el as unknown as HTMLElement },
         onReached,
         threshold: 200,
+        itemCount: 50,
       }),
     );
     expect(onReached).toHaveBeenCalledTimes(1);
 
-    el.scrollHeight = 2000;
-    el.scrollTop = 1850;
+    el.scrollHeight = 1200;
+    el.scrollTop = 1050;
     rs.spyOn(Date, 'now').mockReturnValue(10_500);
     el.fire();
-    expect(onReached).toHaveBeenCalledTimes(2);
+    expect(onReached).toHaveBeenCalledTimes(1);
   });
 
   it('does not fire while disabled', () => {

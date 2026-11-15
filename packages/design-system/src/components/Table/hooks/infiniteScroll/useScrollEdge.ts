@@ -15,12 +15,14 @@ interface UseScrollEdgeOptions {
   enabled?: boolean;
   /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
   scrollRoot?: ScrollRoot | null;
+  /** The rows rendered; a change re-arms the edge (new rows, not loaders or row measuring) */
+  itemCount?: number;
 }
 
 /**
  * Fires `onReached` once when the user scrolls within `threshold` px of the
- * given edge. Re-arms after scrolling back past the threshold, or once the
- * content height changes (new rows): a jump straight to the new edge, such as
+ * given edge. Re-arms after scrolling back past the threshold, or once
+ * `itemCount` changes (new rows): a jump straight to the new edge, such as
  * a scrollbar drag or End, never passes a point outside the threshold. A
  * cooldown guard prevents rapid re-fires when prepended/appended rows grow the
  * content.
@@ -33,9 +35,10 @@ export const useScrollEdge = ({
   threshold,
   enabled = true,
   scrollRoot,
+  itemCount,
 }: UseScrollEdgeOptions) => {
   const firedRef = useRef(false);
-  const firedHeightRef = useRef(0);
+  const firedCountRef = useRef(itemCount);
   const lastFiredAtRef = useRef(0);
 
   // Latest-callback ref: re-running the effect on identity changes races with
@@ -45,8 +48,10 @@ export const useScrollEdge = ({
     onReachedRef.current = onReached;
   });
   const enabledRef = useRef(enabled);
+  const itemCountRef = useRef(itemCount);
   useEffect(() => {
     enabledRef.current = enabled;
+    itemCountRef.current = itemCount;
   });
 
   useEffect(() => {
@@ -65,10 +70,11 @@ export const useScrollEdge = ({
 
       if (distance <= threshold) {
         const now = Date.now();
-        if (firedRef.current && scrollHeight !== firedHeightRef.current) firedRef.current = false;
+        if (firedRef.current && itemCountRef.current !== firedCountRef.current)
+          firedRef.current = false;
         if (!firedRef.current && now - lastFiredAtRef.current >= SCROLL_EDGE_COOLDOWN_MS) {
           firedRef.current = true;
-          firedHeightRef.current = scrollHeight;
+          firedCountRef.current = itemCountRef.current;
           lastFiredAtRef.current = now;
           callback();
         }
