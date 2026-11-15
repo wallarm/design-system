@@ -108,7 +108,7 @@ The catalog, `wallarmComponents`, has:
 | Content on demand | Drawer, Dialog (a button opens them; the children are the content) |
 | Text and status | Heading, Text, List, Link, CodeSnippet, Badge, Alert, EmptyState, Progress |
 | Actions | Button |
-| Form fields | Input, Select, Checkbox, Switch (their value binds two-way) |
+| Form fields | Input, Textarea, SearchInput, NumberInput, Slider, Select, RadioGroup, SegmentedControl, Checkbox, Switch, ToggleButton, DateInput, DateRangeInput, TimeInput (their value binds two-way) |
 | Charts | Metric (with a sparkline), BarList, PieChart, HorizontalBarStack, LineChart, AreaChart, ColumnChart |
 | Records | Table, KeyValueList, Timeline, Tree |
 
@@ -169,6 +169,10 @@ the values in its context.
 | json-render | `"value": { "$bindState": "/ip" }` | `"params": { "ip": { "$state": "/ip" } }` |
 | OpenUI | `$ip` | `@block_ip({ip: $ip})` |
 
+Dates and times travel as ISO strings: `"2026-11-15"`, `"14:30"`, and a range as
+`{ "start": "2026-11-01", "end": "2026-11-15" }`. A number field holds a number, or nothing while it
+is empty or half-typed.
+
 OpenUI writes back only to a top-level variable, so keep each field's path one segment long
 (`/ip`, not `/form/ip`). A field the agent sends a literal for starts from it and keeps the user's
 input on the page, but no action can read it.
@@ -197,8 +201,8 @@ first cell (never a column of actions): choosing it writes the row's key to `act
 ### Every design-system component is decided
 
 `src/tests/coverage.test.ts` lists every design-system component with the entries that render it,
-or the reason an agent never places it: an input still to come (date and number fields), the chat that hosts the answer,
-app chrome, an overlay the app opens itself, or an internal primitive. A new design-system
+or the reason an agent never places it: a secret, a file, the app's own filters, the chat that
+hosts the answer, app chrome, an overlay the app opens itself, or an internal primitive. A new design-system
 component fails the test until someone decides, so the catalog can't fall behind unnoticed.
 
 ### Keep the catalog in step with the design system
@@ -428,8 +432,9 @@ swapping in the bindable leaf types, and the casts go away.
 
 ## Limitations
 
-- The form fields are Input, Select, Checkbox and Switch; date, number and multi-line fields are
-  not in the catalog yet, and a field has no validation beyond `required`'s marker.
+- A field has no validation beyond `required`'s marker and a date's `min`/`max` shown as an
+  error: the app checks the values an action sends. DateRangeInput reports a range only once both
+  ends are filled.
 - A Table row has one action in its menu, and its first cell opens its details only with the
   mouse, since the design system's master cell has no keyboard handler.
 - Tooltip, Popover, HoverCard and Toast are not in the catalog: content on demand goes in a Drawer

@@ -9,6 +9,8 @@ import { CardComponent } from './Card';
 import { CheckboxComponent } from './Checkbox';
 import { CodeSnippetComponent } from './CodeSnippet';
 import { ColumnChartComponent } from './ColumnChart';
+import { DateInputComponent } from './DateInput';
+import { DateRangeInputComponent } from './DateRangeInput';
 import { DialogComponent } from './Dialog';
 import { DrawerComponent } from './Drawer';
 import { EmptyStateComponent } from './EmptyState';
@@ -21,17 +23,25 @@ import { LineChartComponent } from './LineChart';
 import { LinkComponent } from './Link';
 import { ListComponent } from './List';
 import { MetricComponent } from './Metric';
+import { NumberInputComponent } from './NumberInput';
 import { PieChartComponent } from './PieChart';
 import { ProgressComponent } from './Progress';
+import { RadioGroupComponent } from './RadioGroup';
+import { SearchInputComponent } from './SearchInput';
 import { SectionComponent } from './Section';
+import { SegmentedControlComponent } from './SegmentedControl';
 import { SelectComponent } from './Select';
 import { SeparatorComponent } from './Separator';
+import { SliderComponent } from './Slider';
 import { StackComponent } from './Stack';
 import { SwitchComponent } from './Switch';
 import { TableComponent } from './Table';
 import { TabsComponent } from './Tabs';
 import { TextComponent } from './Text';
+import { TextareaComponent } from './Textarea';
+import { TimeInputComponent } from './TimeInput';
 import { TimelineComponent } from './Timeline';
+import { ToggleButtonComponent } from './ToggleButton';
 import { TreeComponent } from './Tree';
 
 export * from './Accordion';
@@ -44,6 +54,8 @@ export * from './Card';
 export * from './Checkbox';
 export * from './CodeSnippet';
 export * from './ColumnChart';
+export * from './DateInput';
+export * from './DateRangeInput';
 export * from './Dialog';
 export * from './Drawer';
 export * from './EmptyState';
@@ -56,17 +68,25 @@ export * from './LineChart';
 export * from './Link';
 export * from './List';
 export * from './Metric';
+export * from './NumberInput';
 export * from './PieChart';
 export * from './Progress';
+export * from './RadioGroup';
+export * from './SearchInput';
 export * from './Section';
+export * from './SegmentedControl';
 export * from './Select';
 export * from './Separator';
+export * from './Slider';
 export * from './Stack';
 export * from './Switch';
 export * from './Table';
 export * from './Tabs';
 export * from './Text';
+export * from './Textarea';
+export * from './TimeInput';
 export * from './Timeline';
+export * from './ToggleButton';
 export * from './Tree';
 
 /**
@@ -98,6 +118,16 @@ export const wallarmComponents: readonly GenUiComponent[] = [
   SelectComponent,
   CheckboxComponent,
   SwitchComponent,
+  TextareaComponent,
+  SearchInputComponent,
+  NumberInputComponent,
+  SliderComponent,
+  RadioGroupComponent,
+  SegmentedControlComponent,
+  ToggleButtonComponent,
+  DateInputComponent,
+  DateRangeInputComponent,
+  TimeInputComponent,
   MetricComponent,
   BarListComponent,
   HorizontalBarStackComponent,

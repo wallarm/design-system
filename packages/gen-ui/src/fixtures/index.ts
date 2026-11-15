@@ -13,6 +13,7 @@ export * from './incident';
 export * from './liveMonitor';
 export * from './noResults';
 export * from './openui';
+export * from './rateLimit';
 export * from './scenarios';
 export * from './stream';
 export * from './weeklyReport';
