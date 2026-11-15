@@ -10,7 +10,7 @@ import { wallarmComponents } from '../components';
  */
 type Decision = { entries: readonly string[] } | { excluded: string };
 
-const FORMS = 'input: forms with two-way binding (#472)';
+const FORMS = 'input not in the catalog yet: the form fields are Input, Select, Checkbox, Switch';
 const CHAT = 'chat host: the Wally chat renders gen-ui answers, not the other way round';
 const CHROME = 'app chrome: the app around the answer owns it';
 const PRIMITIVE = 'internal primitive: entries use it inside their Views';

@@ -10,7 +10,8 @@ Read [README.md](./README.md) first: the folder map, how a render works and how 
 - Enum values come from DS types through `subsetOf` / `allOf` / a typed map; no `as` casts in
   `src/components/` (a test fails on them).
 - Props are data only; no prop named `id`, `component`, `children` or `child`; events carry no
-  arguments.
+  arguments. A value the user enters is a `bindable` prop the View writes with `set`, and the
+  action's context reads its path; the app's action allowlist still checks every action.
 - Format-specific code stays in `src/a2ui/`, `src/json-render/` or `src/openui/`; `src/core/`
   imports no format library, and React only as types.
 - Agent output is untrusted: actions go through the app's allowlist, and nothing from a spec is

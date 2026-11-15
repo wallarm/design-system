@@ -10,10 +10,21 @@ import type { GenUiAction } from '../core/define';
 import { type OpenUiLine, toOpenUiLines } from './openui';
 
 /** A value the app fills: becomes `{ "@path" }` in A2UI and `{ "$state" }` in json-render. */
-export const bind = (path: string) => ({ bind: path });
-type Bound = ReturnType<typeof bind>;
+export const bind = (path: string): Bound => ({ bind: path });
+/**
+ * A value the user changes: `{ "@path" }` in A2UI too, `{ "$bindState" }` in json-render. OpenUI
+ * writes back only to a top-level `$variable`, so the path is one segment (`/ip`).
+ */
+export const field = (path: string): Bound => ({ bind: path, twoWay: true });
+interface Bound {
+  bind: string;
+  twoWay?: true;
+}
 const isBound = (v: unknown): v is Bound =>
-  typeof v === 'object' && v !== null && 'bind' in v && Object.keys(v).length === 1;
+  typeof v === 'object' &&
+  v !== null &&
+  'bind' in v &&
+  Object.keys(v).every(key => key === 'bind' || key === 'twoWay');
 
 /** One component in the agent's layout. */
 export interface LayoutNode {
@@ -22,8 +33,17 @@ export interface LayoutNode {
   props?: Record<string, unknown>;
   children?: string[];
   /** For a Button: the action and its context, which may hold bindings too. */
-  press?: { action: string; params: Record<string, unknown> };
+  press?: Handler;
+  /** Any other event of the entry (a Table's `rowAction`): the action and its context. */
+  on?: Record<string, Handler>;
 }
+
+interface Handler {
+  action: string;
+  params: Record<string, unknown>;
+}
+
+const handlers = (n: LayoutNode) => Object.entries({ ...n.on, ...(n.press && { press: n.press }) });
 
 export const node = (
   id: string,
@@ -81,8 +101,8 @@ export interface ScenarioStreams {
   liveStreams?: { every: number; lines: (tick: number) => Omit<ScenarioStreams, 'liveStreams'> };
 }
 
-const mapBindings = (value: unknown, to: (path: string) => unknown): unknown => {
-  if (isBound(value)) return to(value.bind);
+const mapBindings = (value: unknown, to: (path: string, twoWay?: true) => unknown): unknown => {
+  if (isBound(value)) return to(value.bind, value.twoWay);
   if (Array.isArray(value)) return value.map(v => mapBindings(v, to));
   if (typeof value === 'object' && value !== null)
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, mapBindings(v, to)]));
@@ -103,20 +123,20 @@ const interleave = <T>(
 ];
 
 const toA2uiPath = (path: string) => ({ '@path': path });
-const toJsonRenderPath = (path: string) => ({ $state: path });
+const toJsonRenderPath = (path: string, twoWay?: true) =>
+  twoWay ? { $bindState: path } : { $state: path };
 
 const a2uiComponent = (n: LayoutNode) => ({
   id: n.id,
   component: n.type,
   ...(mapBindings(n.props, toA2uiPath) as Record<string, unknown>),
   ...(n.children ? { children: n.children } : {}),
-  ...(n.press
-    ? {
-        press: {
-          event: { name: n.press.action, context: mapBindings(n.press.params, toA2uiPath) },
-        },
-      }
-    : {}),
+  ...Object.fromEntries(
+    handlers(n).map(([event, h]) => [
+      event,
+      { event: { name: h.action, context: mapBindings(h.params, toA2uiPath) } },
+    ]),
+  ),
 });
 
 const jsonRenderElement = (n: LayoutNode): SpecStreamLine => ({
@@ -126,14 +146,14 @@ const jsonRenderElement = (n: LayoutNode): SpecStreamLine => ({
     type: n.type,
     props: mapBindings(n.props, toJsonRenderPath),
     children: n.children ?? [],
-    ...(n.press
+    ...(handlers(n).length
       ? {
-          on: {
-            press: {
-              action: n.press.action,
-              params: mapBindings(n.press.params, toJsonRenderPath),
-            },
-          },
+          on: Object.fromEntries(
+            handlers(n).map(([event, h]) => [
+              event,
+              { action: h.action, params: mapBindings(h.params, toJsonRenderPath) },
+            ]),
+          ),
         }
       : {}),
   },

@@ -6,6 +6,7 @@ export * from './apiInventory';
 export * from './apiStructure';
 export * from './attackInvestigation';
 export * from './attackSummary';
+export * from './blockSources';
 export * from './configReview';
 export * from './dashboard';
 export * from './incident';

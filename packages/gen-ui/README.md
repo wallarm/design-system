@@ -98,7 +98,9 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
   `allOf<…>()([...])` for all of them, or a typed `Record<…, DSType>` map. No `as` casts in a
   definition.
 - Numbers and times take a named format from `core/format.ts`, never a formatter function.
-- Events carry no arguments: `events: ['press']`, then `emit('press')`.
+- Events carry no arguments: `events: ['press']`, then `emit('press')`. A value the user enters
+  goes to a path: list the prop in `bindable` and write it with `set(prop, value)`; the action's
+  context reads the path (see `Input.tsx`, `Fields.test.tsx`).
 - A container sets `hasChildren: true` and renders `children`.
 - The `View` gets props that already passed the schema, so it needn't guard against missing data;
   declare a `Skeleton` shaped like the loaded component.
@@ -108,8 +110,9 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
 ## Add a recorded answer
 
 1. Create `src/fixtures/<name>.ts` exporting a `Scenario` (see `dashboard.ts`): the prompt, the
-   agent's layout in the chunks it sends them (`node`, with every figure a `bind('/path')`), and
-   the app's data batches with the chunk each arrives after.
+   agent's layout in the chunks it sends them (`node`, with every figure a `bind('/path')`, every
+   value the user enters a `field('/path')`, and events in `press` or `on`), and the app's data
+   batches with the chunk each arrives after (see `blockSources.ts` for a form).
 2. Add `{ ...scenario, ...toStreams(scenario) }` to `SCENARIOS` in `src/fixtures/scenarios.ts`:
    the playground and the docs page list it from there.
 3. Add a test that renders it through every format and leaves no skeleton at the end.

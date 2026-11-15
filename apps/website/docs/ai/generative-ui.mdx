@@ -93,7 +93,8 @@ A definition stays portable between the formats when it follows these rules:
 - Props are strings, numbers, booleans, enums, arrays and objects: no functions, no `ReactNode`.
 - No prop is named `id`, `component`, `children` or `child`: A2UI puts props next to those keys.
 - Events carry no arguments (`events: ['press']`, then `emit('press')`). The spec decides what an
-  action sends, never the component.
+  action sends, never the component. A value the user enters goes to a path instead: list the prop
+  in `bindable` and write it with `set('value', next)`.
 - A container sets `hasChildren: true` and renders `children`.
 - Write the description for the model: when to use the component, not how it looks.
 - Numbers and times take a named format (`format: 'compact'`, `xFormat: 'time'`), never a
@@ -107,6 +108,7 @@ The catalog, `wallarmComponents`, has:
 | Content on demand | Drawer, Dialog (a button opens them; the children are the content) |
 | Text and status | Heading, Text, List, Link, CodeSnippet, Badge, Alert, EmptyState, Progress |
 | Actions | Button |
+| Form fields | Input, Select, Checkbox, Switch (their value binds two-way) |
 | Charts | Metric (with a sparkline), BarList, PieChart, HorizontalBarStack, LineChart, AreaChart, ColumnChart |
 | Records | Table, KeyValueList, Timeline, Tree |
 
@@ -153,10 +155,49 @@ Clicking the same cell again closes it; another row's first cell switches to tha
 The drawer is drawn from the row the app sent; the agent never opens it. When a row should open the
 app's own page or panel instead, use a Button bound to an app action.
 
+### Forms and selectable tables
+
+A form field's value binds two-way: the agent binds it to a path, the field writes what the user
+enters back to that path, and the Button that submits reads the path in its action's context. The
+component still sends nothing itself, so the app's allowlist sees the same action as before, with
+the values in its context.
+
+| Format | Field value | Read in the action |
+| --- | --- | --- |
+| A2UI | `"value": { "@path": "/ip" }` | `"context": { "ip": { "@path": "/ip" } }` |
+| Express | `$/ip` | `Event("block_ip", {ip: $/ip})` |
+| json-render | `"value": { "$bindState": "/ip" }` | `"params": { "ip": { "$state": "/ip" } }` |
+| OpenUI | `$ip` | `@block_ip({ip: $ip})` |
+
+OpenUI writes back only to a top-level variable, so keep each field's path one segment long
+(`/ip`, not `/form/ip`). A field the agent sends a literal for starts from it and keeps the user's
+input on the page, but no action can read it.
+
+A Table takes part the same way. Headers sort the rows, and `pageSize` pages them. `selectable`
+puts checkboxes on the rows and writes the selected rows' `rowKey` values to `selection`, so a
+Button sends them, e.g. "Block selected". `rowActionItem` adds an item to each row's menu in its
+first cell (never a column of actions): choosing it writes the row's key to `actionRow` and fires
+`rowAction`, which the spec binds to an app action that reads `actionRow`.
+
+```json
+{
+  "id": "sources",
+  "component": "Table",
+  "rowKey": "ip",
+  "columns": [{ "key": "ip", "header": "Source", "type": "ip" }],
+  "rows": { "@path": "/sources" },
+  "selectable": true,
+  "selection": { "@path": "/selection" },
+  "rowActionItem": { "label": "Allow this source" },
+  "actionRow": { "@path": "/target" },
+  "rowAction": { "event": { "name": "allow_ip", "context": { "ip": { "@path": "/target" } } } }
+}
+```
+
 ### Every design-system component is decided
 
 `src/tests/coverage.test.ts` lists every design-system component with the entries that render it,
-or the reason an agent never places it: an input (forms, #472), the chat that hosts the answer,
+or the reason an agent never places it: an input still to come (date and number fields), the chat that hosts the answer,
 app chrome, an overlay the app opens itself, or an internal primitive. A new design-system
 component fails the test until someone decides, so the catalog can't fall behind unnoticed.
 
@@ -387,9 +428,10 @@ swapping in the bindable leaf types, and the casts go away.
 
 ## Limitations
 
-- Forms are not in the catalog yet: they need two-way bindings in the shared layer first.
-- Table has no sorting, selection, pagination or row actions yet (#472); a row's first cell opens
-  its details only with the mouse, since the design system's master cell has no keyboard handler.
+- The form fields are Input, Select, Checkbox and Switch; date, number and multi-line fields are
+  not in the catalog yet, and a field has no validation beyond `required`'s marker.
+- A Table row has one action in its menu, and its first cell opens its details only with the
+  mouse, since the design system's master cell has no keyboard handler.
 - Tooltip, Popover, HoverCard and Toast are not in the catalog: content on demand goes in a Drawer
   or Dialog, and a toast is the app's answer to an action.
 - In A2UI, a prop that binds to the data model loses its field description in the catalog document,

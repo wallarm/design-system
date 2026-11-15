@@ -11,6 +11,7 @@ import {
   ATTACK_SUMMARY_ACTIONS,
   ATTACK_SUMMARY_JSON_RENDER,
 } from './attackSummary';
+import { BLOCK_SOURCES_SCENARIO } from './blockSources';
 import { CONFIG_REVIEW_SCENARIO } from './configReview';
 import { DASHBOARD_SCENARIO } from './dashboard';
 import { INCIDENT_SCENARIO } from './incident';
@@ -44,6 +45,7 @@ export const SCENARIOS: readonly ReplayScenario[] = [
     INCIDENT_SCENARIO,
     API_INVENTORY_SCENARIO,
     ATTACK_INVESTIGATION_SCENARIO,
+    BLOCK_SOURCES_SCENARIO,
     API_STRUCTURE_SCENARIO,
     CONFIG_REVIEW_SCENARIO,
     NO_RESULTS_SCENARIO,
