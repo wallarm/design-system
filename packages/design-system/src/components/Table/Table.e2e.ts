@@ -327,6 +327,38 @@ test.describe('Component: Table', () => {
       expect((await read()).overlayText).toMatch(/\S/);
     });
 
+    test('Should keep the pinned group row in line with the columns when scrolled sideways in window mode', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Sticky Group Parent Window In Pane');
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+      await pane.evaluate(el => {
+        el.style.width = '420px';
+      });
+
+      // Scrolled sideways before any group sticks, then down until one does.
+      await pane.evaluate(el => {
+        el.querySelector<HTMLElement>('[data-table-scroll-container]')!.scrollLeft = 200;
+      });
+      await pane.evaluate(el => {
+        el.scrollTop = 600;
+      });
+
+      const offset = () =>
+        pane.evaluate(el => {
+          const th = el.querySelector('thead tr th:last-child')!.getBoundingClientRect();
+          const td = el.querySelector('[aria-hidden="true"] tbody tr td:last-child');
+          return td ? Math.round(td.getBoundingClientRect().left - th.left) : null;
+        });
+      await expect.poll(offset).toBe(0);
+
+      await pane.evaluate(el => {
+        el.querySelector<HTMLElement>('[data-table-scroll-container]')!.scrollLeft = 50;
+      });
+      await expect.poll(offset).toBe(0);
+    });
+
     test('Should show the row actions while one of them has the keyboard focus', async ({
       page,
     }) => {

@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useEffect, useRef } from 'react';
+import { type FC, type RefObject, useEffect, useLayoutEffect, useRef } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useStickyGroupParent } from './hooks';
@@ -112,15 +112,27 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({
   );
   const isFullWidth = fullWidthContent !== undefined;
 
+  // Window mode: the caller mirrors the body's scrollLeft onto this anchor's
+  // wrapper, so the anchor is as wide as the table (else its clip hides the
+  // overflow and there is nothing to scroll). Empty, it still clamps to 0, so a
+  // row that sticks takes the body's scrollLeft again.
+  const anchorRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const wrapper = anchorRef.current?.parentElement;
+    if (useWindowScroll && stickyRow && wrapper && containerRef.current)
+      wrapper.scrollLeft = containerRef.current.scrollLeft;
+  }, [useWindowScroll, stickyRow, containerRef]);
+
   // Always render the sticky anchor to avoid DOM insertion/removal during
   // scroll which causes a brief layout reflow (the "jump" glitch).
   return (
     <div
+      ref={anchorRef}
       className={cn(
         'pointer-events-none',
         !useWindowScroll && 'sticky z-[21] h-0 overflow-visible',
       )}
-      style={useWindowScroll ? undefined : { top: headerHeight }}
+      style={useWindowScroll ? { width: tableWidth } : { top: headerHeight }}
       aria-hidden='true'
     >
       {stickyRow && (
