@@ -33,7 +33,9 @@ const DECISIONS: Record<string, Decision> = {
   Badge: { entries: ['Badge', 'Table'] },
   Banner: { excluded: `${CHROME}; a message in the answer is Alert` },
   Breadcrumbs: { excluded: CHROME },
-  BulkBar: { excluded: 'Table selection and bulk actions (#472)' },
+  BulkBar: {
+    excluded: 'a bulk action is a Button whose context reads the bound Table selection',
+  },
   Button: { entries: ['Button'] },
   ButtonBase: { excluded: PRIMITIVE },
   Calendar: { excluded: FORMS },
@@ -55,7 +57,7 @@ const DECISIONS: Record<string, Decision> = {
   DateRangeInput: { excluded: FORMS },
   Dialog: { entries: ['Dialog'] },
   Drawer: { entries: ['Drawer', 'Table'] },
-  DropdownMenu: { excluded: 'menu items need event arguments (#472)' },
+  DropdownMenu: { entries: ['Table'] },
   EmptyState: { entries: ['EmptyState'] },
   FeedbackPulse: { excluded: 'overlay: the app opens its survey, with its own logic' },
   Field: { entries: ['Input', 'Select'] },
@@ -91,7 +93,7 @@ const DECISIONS: Record<string, Decision> = {
   OverflowTooltip: { excluded: PRIMITIVE },
   Overlay: { excluded: PRIMITIVE },
   Page: { excluded: `${CHROME}; an answer is laid out with Section` },
-  Pagination: { excluded: 'Table paging (#472)' },
+  Pagination: { entries: ['Table'] },
   ParameterPath: VALUE,
   PasswordComplexity: { excluded: FORMS },
   PasswordInput: { excluded: FORMS },
@@ -110,7 +112,9 @@ const DECISIONS: Record<string, Decision> = {
     excluded: 'a switch between app views: alternative panes in an answer are Tabs',
   },
   Select: { entries: ['Select'] },
-  Selection: { excluded: 'Table selection and bulk actions (#472)' },
+  Selection: {
+    excluded: 'selectable items outside a Table: Table rows select through its selection prop',
+  },
   Separator: { entries: ['Separator'] },
   SimpleCharts: {
     entries: [

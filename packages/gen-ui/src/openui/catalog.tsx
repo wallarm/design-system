@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import {
   action,
   type ComponentRenderProps,
@@ -95,10 +95,18 @@ const renderer = (component: GenUiComponent) => {
       field?.setValue(value);
       return field !== undefined;
     };
-    const emit = (event: string) => {
-      const plan = props[event];
-      if (isRecord(plan)) triggerAction('', undefined, plan);
-    };
+    // An action's context is evaluated with the props, so an event waits for the render after
+    // it: a value the View wrote just before (a Table's actionRow) is in the context then.
+    const [queued, setQueued] = useState<readonly string[]>([]);
+    const emit = (event: string) => setQueued(current => [...current, event]);
+    useEffect(() => {
+      if (!queued.length) return;
+      setQueued([]);
+      for (const event of queued) {
+        const plan = props[event];
+        if (isRecord(plan)) triggerAction('', undefined, plan);
+      }
+    }, [queued, props, triggerAction]);
     const children = Array.isArray(props.children) ? props.children : [];
     return (
       <GuardedView component={component} props={data} emit={emit} write={write}>
