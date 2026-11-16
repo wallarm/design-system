@@ -134,8 +134,9 @@ pnpm --filter @wallarm-org/gen-ui build       # rslib → dist/, same layout as 
 ANTHROPIC_API_KEY=… pnpm --filter @wallarm-org/gen-ui evals --format json-render --model claude-sonnet-5-5
 ```
 
-A recorded answer is also an eval: when you add one, add its case to `src/evals/cases.ts` with the
-same id (`Evals.test.ts` scores it in every format), and keep it free of composition warnings
+A recorded answer can be an eval: add its case to `src/evals/cases.ts` with the same id and
+`Evals.test.ts` scores it in every format (the test lists the recorded answers that have no case,
+so a new one fails it until you add a case or the list entry), and keep it free of composition warnings
 (`Composition.test.ts`). An answer that legitimately breaks a rule means the rule is wrong.
 
 The playground app has two demos that replay the fixtures: `/gen-ui` (answers in the Wally chat)

@@ -5,6 +5,7 @@ import {
   type CheckOptions,
   checkNodes,
   type GenUiIssue,
+  pathsIn,
 } from '../core/check';
 import type { GenUiComponent } from '../core/define';
 import { isRecord } from '../core/guards';
@@ -67,5 +68,6 @@ const toNode = (
     children: ids,
     actions,
     bindings: bindingsOf(props, pathOf),
+    reads: pathsIn(rest, pathOf),
   };
 };

@@ -1,6 +1,7 @@
 /**
  * Scores a finished answer, in any format, against an eval case: the structural errors (what the
- * check reports, plus bindings to paths the app doesn't fill), the composition warnings, and the
+ * check reports, plus any prop or action context
+ * that reads a path the app doesn't fill), the composition warnings, and the
  * case's expectations.
  */
 import type { Spec } from '@json-render/core';
@@ -46,13 +47,13 @@ export const scoreAnswer = (
   const { tree, issues } = read(answer, options);
   const paths = Object.keys(evalCase.data);
   const unknownPaths = tree.nodes.flatMap(node =>
-    Object.entries(node.bindings ?? {})
-      .filter(([, path]) => !paths.some(known => under(path, known)))
-      .map(([prop, path]) => ({
+    [...new Set(node.reads ?? [])]
+      .filter(path => !paths.some(known => under(path, known)))
+      .map(path => ({
         id: node.id,
         component: node.type,
-        prop,
-        message: `Binds ${path}, which the app doesn't fill.`,
+        prop: Object.entries(node.bindings ?? {}).find(([, bound]) => bound === path)?.[0],
+        message: `Reads ${path}, which the app doesn't fill.`,
       })),
   );
   const errors = [...issues.filter(i => i.severity !== 'warning'), ...unknownPaths];

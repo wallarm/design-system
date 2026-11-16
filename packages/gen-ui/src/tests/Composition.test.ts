@@ -106,6 +106,26 @@ describe('the composition check', () => {
     expect(where(openui)).toEqual(expected);
   });
 
+  it('takes a column Stack as the root, not a row Stack', () => {
+    const rooted = (direction: string) =>
+      issuesIn({
+        ...toStreams({
+          ...BAD,
+          layout: [
+            [
+              n('root', 'Stack', { direction }, ['h', 't']),
+              n('h', 'Heading', { text: 'Reply' }),
+              n('t', 'Text', { text: 'Done.' }),
+            ],
+          ],
+        }),
+        actions: [],
+      });
+    for (const issues of Object.values(rooted('column'))) expect(issues).toEqual([]);
+    for (const issues of Object.values(rooted('row')))
+      expect(where(issues)).toEqual(['root: warning']);
+  });
+
   it('stays off unless asked, so existing callers see no warning', () => {
     const { a2ui } = toStreams(BAD);
     expect(

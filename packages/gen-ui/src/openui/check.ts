@@ -6,6 +6,7 @@ import {
   type CheckOptions,
   checkNodes,
   type GenUiIssue,
+  pathsIn,
 } from '../core/check';
 import type { GenUiComponent } from '../core/define';
 import { isRecord } from '../core/guards';
@@ -47,6 +48,10 @@ const parse = (program: string, library: OpenUiLibrary, components: readonly Gen
       children: children.map((child, i) => child.statementId ?? `${id}_children_${i}`),
       actions: (component?.events ?? []).flatMap(event => actionNames(element.props[event])),
       bindings: bindingsOf(props, pathOf),
+      reads: pathsIn(
+        [props, ...(component?.events ?? []).map(event => element.props[event])],
+        pathOf,
+      ),
     });
     children.forEach((child, i) => visit(child, `${id}_children_${i}`));
   };

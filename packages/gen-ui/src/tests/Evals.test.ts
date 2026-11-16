@@ -101,7 +101,7 @@ const BAD_DASHBOARD: Scenario = {
 describe('the eval scorer', () => {
   for (const scenario of SCENARIOS) {
     const evalCase = EVAL_CASES.find(c => c.id === scenario.id);
-    if (!evalCase) continue;
+    if (!evalCase) continue; // the list below names every recorded answer without a case
     it(`scores the recorded "${scenario.prompt}" clean, in every format`, () => {
       for (const answer of answers(scenario))
         expect(scoreAnswer(evalCase, answer)).toMatchObject({
@@ -118,6 +118,40 @@ describe('the eval scorer', () => {
     expect(EVAL_CASES.filter(c => !recorded.has(c.id)).map(c => c.id)).toEqual([
       'fintech-onboarding',
     ]);
+  });
+
+  it('names every recorded answer that is not an eval yet', () => {
+    const cased = new Set(EVAL_CASES.map(c => c.id));
+    expect(SCENARIOS.filter(s => !cased.has(s.id)).map(s => s.id)).toEqual([
+      'attack-summary',
+      'live-monitor',
+      'api-inventory',
+      'api-structure',
+      'config-review',
+    ]);
+  });
+
+  it('reports an action context that reads a path the app does not fill, in every format', () => {
+    const empty: Scenario = {
+      ...ONBOARDING,
+      actions: caseFor('no-results').actions,
+      layout: [
+        [
+          n('root', 'Section', { title: 'No attacks' }, ['empty']),
+          {
+            ...n('empty', 'EmptyState', { title: 'No attacks', description: bind('/reason') }),
+            press: { action: 'search_attacks', params: { filter: bind('/made_up_filter') } },
+          },
+        ],
+      ],
+    };
+    for (const answer of answers(toStreams(empty))) {
+      const result = scoreAnswer(caseFor('no-results'), answer);
+      expect(result.errors.map(e => e.message)).toEqual([
+        "Reads /made_up_filter, which the app doesn't fill.",
+      ]);
+      expect(result.score).toBe(0);
+    }
   });
 
   it('scores a good tailored onboarding dashboard clean, in every format', () => {

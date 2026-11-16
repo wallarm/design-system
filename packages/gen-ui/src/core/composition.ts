@@ -40,7 +40,6 @@ const CARDED = new Set([
 ]);
 /** Overlays: what they hold opens in its own layer, so it starts a new card and depth. */
 const OVERLAYS = new Set(['Dialog', 'Drawer']);
-const ROOTS = new Set(['Section', 'Stack']);
 const MAX_DEPTH = 6;
 const MAX_ALERTS = 3;
 
@@ -61,7 +60,10 @@ export const checkComposition = (
     issues.push({ id: node.id, component: node.type, message, severity: 'warning' });
 
   const root = rootId === undefined ? undefined : byId.get(rootId);
-  if (root && !ROOTS.has(root.type))
+  if (
+    root &&
+    !(root.type === 'Section' || (root.type === 'Stack' && root.props.direction !== 'row'))
+  )
     warn(root, 'Put the answer in a Section with a title (or a column Stack for a short reply).');
 
   /** Every node under `node`, not looking inside overlays. */

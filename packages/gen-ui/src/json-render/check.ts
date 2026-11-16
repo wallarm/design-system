@@ -5,6 +5,7 @@ import {
   type CheckOptions,
   checkNodes,
   type GenUiIssue,
+  pathsIn,
 } from '../core/check';
 import { isRecord } from '../core/guards';
 
@@ -30,6 +31,7 @@ export const readJsonRenderAnswer = (spec: Spec): AnswerTree => ({
         (Array.isArray(binding) ? binding : [binding]).map(b => b.action),
       ),
       bindings: bindingsOf(props, pathOf),
+      reads: pathsIn([props, element.on], pathOf),
     };
   }),
   rootId: spec.root,

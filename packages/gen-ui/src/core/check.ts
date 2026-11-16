@@ -20,6 +20,8 @@ export interface AnswerNode {
   actions: readonly string[];
   /** The app data path each top-level prop bound to one reads, e.g. `{ points: '/traffic' }`. */
   bindings?: Readonly<Record<string, string>>;
+  /** Every app data path the node reads: bound props, nested values and action contexts. */
+  reads?: readonly string[];
 }
 
 export interface GenUiIssue {
@@ -113,6 +115,17 @@ export const bindingsOf = (
       return path === undefined ? [] : [[key, path]];
     }),
   );
+
+/** Every path bound anywhere in `value`: nested props, list items, an action's context. */
+export const pathsIn = (
+  value: unknown,
+  pathOf: (value: unknown) => string | undefined,
+): string[] => {
+  const path = pathOf(value);
+  if (path !== undefined) return [path];
+  if (Array.isArray(value)) return value.flatMap(item => pathsIn(item, pathOf));
+  return isRecord(value) ? Object.values(value).flatMap(item => pathsIn(item, pathOf)) : [];
+};
 
 /** The answer as nodes, the form every format's reader gives. */
 export interface AnswerTree {

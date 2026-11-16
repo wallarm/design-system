@@ -353,8 +353,8 @@ if (issues.length) send(describeIssues(issues));
 scores answers against cases. A case is a prompt, the data paths the app fills, the allowed actions
 and what a good answer does ("a time-series chart for /traffic", "no Table for the one /source",
 "a Button that blocks the top IPs"). `scoreAnswer(case, answer)` reads an answer in any format and
-returns its errors (including a binding to a path the app doesn't fill), composition warnings,
-expectations met and a 0-1 score. `EVAL_CASES` holds eight: a dashboard, a weekly report, an
+returns its errors (including a prop or action context that reads a path the app doesn't fill),
+composition warnings, expectations met and a 0-1 score. `EVAL_CASES` holds eight: a dashboard, a weekly report, an
 incident, one attacker, two forms, an empty result and a first dashboard tailored from scanner data
 (a payments company → PCI DSS). Write your own cases the same way for your prompts.
 

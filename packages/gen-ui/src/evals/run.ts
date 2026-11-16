@@ -103,8 +103,12 @@ const ask = async (c: EvalCase): Promise<string> => {
 
 /** The model's text as an answer: code fences dropped, JSON read line by line (or as an array). */
 const toAnswer = (text: string): EvalAnswer => {
-  const body = text.replace(/^```\w*$/gm, '').trim();
-  if (format === 'openui') return { format, program: body };
+  const unfenced = text.replace(/^```\w*$/gm, '').trim();
+  if (format === 'openui') return { format, program: unfenced };
+  // Prose around the JSON: keep from the first bracket to the last.
+  const start = unfenced.search(/[[{]/);
+  const end = Math.max(unfenced.lastIndexOf(']'), unfenced.lastIndexOf('}'));
+  const body = start < 0 ? unfenced : unfenced.slice(start, end + 1);
   const parsed: unknown[] = [];
   try {
     const whole: unknown = JSON.parse(body);
