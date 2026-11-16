@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react';
 import { defineCatalog } from '@json-render/core';
-import { type ComponentRegistry, defineRegistry } from '@json-render/react';
+import { type ComponentRegistry, defineRegistry, useStateStore } from '@json-render/react';
 import { schema } from '@json-render/react/schema';
 import * as z from 'zod';
 import type { GenUiAction, GenUiComponent } from '../core/define';
@@ -37,10 +38,10 @@ export const createJsonRenderCatalog = (
     components: Object.fromEntries(
       components.map(component => [
         component.name,
-        ({ props, children, emit }) => (
-          <GuardedView component={component} props={props} emit={emit}>
+        ({ props, children, emit, bindings }) => (
+          <JsonRenderView component={component} props={props} emit={emit} bindings={bindings}>
             {children}
-          </GuardedView>
+          </JsonRenderView>
         ),
       ]),
     ),
@@ -49,6 +50,34 @@ export const createJsonRenderCatalog = (
   });
 
   return { catalog, registry: registry as ComponentRegistry, actions };
+};
+
+/** `$bindState` puts the prop's state path in `bindings`; a write goes to that path. */
+const JsonRenderView = ({
+  component,
+  props,
+  children,
+  emit,
+  bindings,
+}: {
+  component: GenUiComponent;
+  props: unknown;
+  children?: ReactNode;
+  emit: (event: string) => void;
+  bindings?: Record<string, string>;
+}) => {
+  const store = useStateStore();
+  const write = (prop: string, value: unknown) => {
+    const path = bindings?.[prop];
+    if (!path) return false;
+    store.set(path, value);
+    return true;
+  };
+  return (
+    <GuardedView component={component} props={props} emit={emit} write={write}>
+      {children}
+    </GuardedView>
+  );
 };
 
 export type JsonRenderCatalog = ReturnType<typeof createJsonRenderCatalog>;

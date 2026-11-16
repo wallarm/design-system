@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import {
   action,
   type ComponentRenderProps,
@@ -6,6 +6,9 @@ import {
   type DefinedComponent,
   defineAction,
   defineComponent,
+  reactive,
+  type StateField,
+  useStateField,
   useTriggerAction,
 } from '@openuidev/react-lang';
 import * as z from 'zod';
@@ -28,9 +31,11 @@ export const createOpenUiLibrary = (
   const defined: DefinedComponent[] = [];
   const child = z.lazy(() => z.union(defined.map(d => d.ref)));
   for (const component of components) {
-    const { name, description, props, events = [], hasChildren } = component;
+    const { name, description, props, events = [], bindable = [], hasChildren } = component;
     // Widened to a plain object schema: the renderer reads the props through GuardedView anyway.
+    // A bindable prop is reactive, so `$ip` there stays a binding the View writes back to.
     const schema: z.ZodObject = props
+      .extend(Object.fromEntries(bindable.map(key => [key, reactive(props.shape[key])])))
       .extend(Object.fromEntries(events.map(event => [event, action().optional()])))
       .extend(hasChildren ? { children: z.array(child).optional() } : {});
     defined.push(
@@ -68,14 +73,43 @@ export const dataProps = (component: GenUiComponent, props: Record<string, unkno
 const renderer = (component: GenUiComponent) => {
   const Render = ({ props, renderNode }: ComponentRenderProps) => {
     const triggerAction = useTriggerAction();
-    const data = dataProps(component, props);
-    const emit = (event: string) => {
-      const plan = props[event];
-      if (isRecord(plan)) triggerAction('', undefined, plan);
+    // One field per bindable prop: a fixed list per entry, so the hooks run in the same order.
+    const fields: StateField[] = [];
+    for (const key of component.bindable ?? []) {
+      // biome-ignore lint/correctness/useHookAtTopLevel: the list is fixed for each entry
+      fields.push(useStateField(key, props[key]));
+    }
+    // A bindable prop's raw value is the binding itself; its field holds the value.
+    const data = {
+      ...Object.fromEntries(
+        Object.entries(dataProps(component, props)).filter(
+          ([key]) => !component.bindable?.includes(key),
+        ),
+      ),
+      // null is OpenUI's unset, as for every other prop.
+      ...Object.fromEntries(fields.filter(f => f.value !== null).map(f => [f.name, f.value])),
     };
+    // A reactive field writes its `$variable`; any other keeps the value in OpenUI's form state.
+    const write = (prop: string, value: unknown) => {
+      const field = fields.find(f => f.name === prop);
+      field?.setValue(value);
+      return field !== undefined;
+    };
+    // An action's context is evaluated with the props, so an event waits for the render after
+    // it: a value the View wrote just before (a Table's actionRow) is in the context then.
+    const [queued, setQueued] = useState<readonly string[]>([]);
+    const emit = (event: string) => setQueued(current => [...current, event]);
+    useEffect(() => {
+      if (!queued.length) return;
+      setQueued([]);
+      for (const event of queued) {
+        const plan = props[event];
+        if (isRecord(plan)) triggerAction('', undefined, plan);
+      }
+    }, [queued, props, triggerAction]);
     const children = Array.isArray(props.children) ? props.children : [];
     return (
-      <GuardedView component={component} props={data} emit={emit}>
+      <GuardedView component={component} props={data} emit={emit} write={write}>
         {component.hasChildren &&
           children.map((node, i) => (
             <Fragment

@@ -11,12 +11,14 @@ import {
   ATTACK_SUMMARY_ACTIONS,
   ATTACK_SUMMARY_JSON_RENDER,
 } from './attackSummary';
+import { BLOCK_SOURCES_SCENARIO } from './blockSources';
 import { CONFIG_REVIEW_SCENARIO } from './configReview';
 import { DASHBOARD_SCENARIO } from './dashboard';
 import { INCIDENT_SCENARIO } from './incident';
 import { LIVE_MONITOR_SCENARIO } from './liveMonitor';
 import { NO_RESULTS_SCENARIO } from './noResults';
 import { toOpenUiLines } from './openui';
+import { RATE_LIMIT_SCENARIO } from './rateLimit';
 import { type Scenario, type ScenarioStreams, toStreams } from './stream';
 import { WEEKLY_REPORT_SCENARIO } from './weeklyReport';
 
@@ -44,6 +46,8 @@ export const SCENARIOS: readonly ReplayScenario[] = [
     INCIDENT_SCENARIO,
     API_INVENTORY_SCENARIO,
     ATTACK_INVESTIGATION_SCENARIO,
+    BLOCK_SOURCES_SCENARIO,
+    RATE_LIMIT_SCENARIO,
     API_STRUCTURE_SCENARIO,
     CONFIG_REVIEW_SCENARIO,
     NO_RESULTS_SCENARIO,
