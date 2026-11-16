@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactTable, Row, RowData } from '@tanstack/react-table';
-import type { DSTableFeatures } from '../lib';
+import type { DSTableFeatures, ScrollRoot } from '../lib';
 import type { TableVirtualizerInstance } from '../TableContext/types';
 
 interface GroupRange {
@@ -19,7 +19,13 @@ export interface StickyGroupParentResult<T extends RowData> {
 interface UseStickyGroupParentOptions {
   table: ReactTable<DSTableFeatures, RowData>;
   scrollElementRef: RefObject<HTMLElement | null>;
-  useWindowScroll: boolean;
+  /**
+   * `virtualized='window'`: the resolved scroll root (the window or a scrolling
+   * pane). Positions are then read in viewport coordinates against the bottom of
+   * `headerRef`, the sticky header, so the root's own offset never matters.
+   */
+  windowScrollRoot?: ScrollRoot | null;
+  headerRef?: RefObject<HTMLElement | null>;
   headerHeight: number;
   tbodyRef: RefObject<HTMLTableSectionElement | null>;
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
@@ -123,12 +129,14 @@ export const useStickyGroupParent = <T extends RowData>(
   const {
     table,
     scrollElementRef,
-    useWindowScroll,
+    windowScrollRoot,
+    headerRef,
     headerHeight,
     tbodyRef,
     virtualizerRef,
     enabled,
   } = options;
+  const useWindowScroll = windowScrollRoot != null;
 
   const [stickyRow, setStickyRow] = useState<Row<DSTableFeatures, T> | null>(null);
   const [pushUpOffset, setPushUpOffset] = useState(0);
@@ -149,8 +157,11 @@ export const useStickyGroupParent = <T extends RowData>(
     const scrollElement = scrollElementRef.current;
     if (!scrollElement) return;
 
-    const scrollTop = useWindowScroll ? window.scrollY : scrollElement.scrollTop;
-    const headerBottom = scrollTop + headerHeight;
+    // Window mode works in viewport coordinates: scrollTop 0, the header's bottom as drawn.
+    const scrollTop = useWindowScroll ? 0 : scrollElement.scrollTop;
+    const headerBottom = useWindowScroll
+      ? (headerRef?.current?.getBoundingClientRect().bottom ?? headerHeight)
+      : scrollTop + headerHeight;
 
     const tbodyEl = tbodyRef.current;
     const virt = virtualizerRef.current;
@@ -165,9 +176,8 @@ export const useStickyGroupParent = <T extends RowData>(
 
     if (tbodyEl) {
       if (useWindowScroll) {
-        // Window mode: scroll-content coords = document coords
-        tbodyScrollOffset = tbodyEl.getBoundingClientRect().top + window.scrollY;
-        scrollContainerTop = 0; // document coords: viewport origin = 0 + scrollY
+        // A window virtualizer's measurements start at its scrollMargin (the tbody's offset in the root).
+        tbodyScrollOffset = tbodyEl.getBoundingClientRect().top - (virt?.options.scrollMargin ?? 0);
       } else {
         const scrollRect = scrollElement.getBoundingClientRect();
         scrollContainerTop = scrollRect.top;
@@ -229,13 +239,22 @@ export const useStickyGroupParent = <T extends RowData>(
       setStickyRow(foundRow as Row<DSTableFeatures, T> | null);
       setPushUpOffset(offset);
     }
-  }, [enabled, scrollElementRef, useWindowScroll, headerHeight, table, virtualizerRef, tbodyRef]);
+  }, [
+    enabled,
+    scrollElementRef,
+    useWindowScroll,
+    headerRef,
+    headerHeight,
+    table,
+    virtualizerRef,
+    tbodyRef,
+  ]);
 
   // Scroll listener
   useEffect(() => {
     if (!enabled) return;
 
-    const scrollTarget = useWindowScroll ? window : scrollElementRef.current;
+    const scrollTarget = windowScrollRoot ?? scrollElementRef.current;
     if (!scrollTarget) return;
 
     const handleScroll = () => {
@@ -251,7 +270,7 @@ export const useStickyGroupParent = <T extends RowData>(
       scrollTarget.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [enabled, useWindowScroll, scrollElementRef, compute]);
+  }, [enabled, windowScrollRoot, scrollElementRef, compute]);
 
   // Recompute when expanded state changes
   useEffect(() => {

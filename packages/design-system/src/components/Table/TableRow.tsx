@@ -82,6 +82,7 @@ const TableRowInner = <T extends RowData>({
     allLeafColumns,
     renderFullWidthGroupRow,
     renderFullWidthRow,
+    virtualized,
   } = useTableContext<T>();
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
@@ -131,9 +132,11 @@ const TableRowInner = <T extends RowData>({
 
     // Make expanded group parent rows CSS-sticky so they pin instantly (no
     // frame delay). The JS overlay (StickyGroupParent, z-[21]) layers on top
-    // for the push-up animation and virtualization fallback.
+    // for the push-up animation and virtualization fallback. Not in window
+    // mode: the body sits in the horizontal scroll viewport, which never
+    // scrolls vertically, so a sticky row there only sits low over its child.
     const stickyStyle =
-      hasSubRowGrouping && isExpanded
+      hasSubRowGrouping && isExpanded && virtualized !== 'window'
         ? {
             position: 'sticky' as const,
             top: allLeafColumns.some(c => c.columnDef.meta?.description?.type === 'text') ? 48 : 32,

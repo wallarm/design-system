@@ -71,6 +71,7 @@ export const useInfiniteScroll = <T extends RowData>({
     onReached: onStartReached,
     threshold: onStartReachedThreshold ?? TABLE_START_REACHED_THRESHOLD,
     enabled: ready,
+    itemCount: rows.length,
   });
 
   useScrollEdge({
@@ -81,5 +82,6 @@ export const useInfiniteScroll = <T extends RowData>({
     onReached: onEndReached,
     threshold: onEndReachedThreshold ?? TABLE_END_REACHED_THRESHOLD,
     enabled: ready,
+    itemCount: rows.length,
   });
 };

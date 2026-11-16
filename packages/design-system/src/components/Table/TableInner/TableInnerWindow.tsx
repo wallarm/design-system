@@ -7,7 +7,7 @@ import {
   useWindowScrollRoot,
   WindowScrollRootContext,
 } from '../hooks';
-import { useContainerWidth } from '../lib';
+import { isWindowScrollRoot, useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
@@ -46,6 +46,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
+  const groupScrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
   const { scrollRoot, isSettled } = useWindowScrollRoot(
     containerRef,
@@ -75,6 +76,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
       // The header lives outside the horizontal scroller (see below), so it
       // follows the body by mirroring its scrollLeft.
       if (headerScrollRef.current) headerScrollRef.current.scrollLeft = scrollEl.scrollLeft;
+      if (groupScrollRef.current) groupScrollRef.current.scrollLeft = scrollEl.scrollLeft;
     };
 
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
@@ -92,6 +94,12 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const headerHeight = hasTextDescription ? 48 : 32;
 
   const tableStyles = 'table-fixed border-separate border-spacing-0';
+  // `top: 0` sticks at a pane's padding edge, and rows would show through the
+  // padding above the header: stick at the pane's border edge instead.
+  const shellTop =
+    scrollRoot && !isWindowScrollRoot(scrollRoot)
+      ? -Number.parseFloat(getComputedStyle(scrollRoot).paddingTop) || 0
+      : 0;
 
   return (
     <div ref={rootRef} data-testid={testId} className='group/scroll relative outline-none'>
@@ -103,7 +111,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           window, so a header inside it never snaps. The settings slot is
           absolutely positioned, so it rides along with the sticky shell.
         */}
-        <div className='sticky top-0 z-30'>
+        <div className='sticky z-30' style={{ top: shellTop }}>
           <div ref={headerScrollRef} className='overflow-hidden'>
             <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
               <TableColGroup tableWidth={tableWidth} />
@@ -111,16 +119,26 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
             </table>
           </div>
           {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
+          {/* The stuck group row, under the header for the same reason. */}
+          {hasSubRowGrouping && (
+            <div
+              ref={groupScrollRef}
+              className='pointer-events-none absolute inset-x-0 top-full overflow-hidden'
+            >
+              <StickyGroupParent
+                tableWidth={tableWidth}
+                headerHeight={headerHeight}
+                windowScrollRoot={scrollRoot}
+                headerRef={headerScrollRef}
+              />
+            </div>
+          )}
         </div>
         <ScrollAreaViewport
           ref={containerRef}
           data-table-scroll-container
           style={{ overflowX: 'auto', overflowY: 'hidden' }}
         >
-          {hasSubRowGrouping && (
-            <StickyGroupParent tableWidth={tableWidth} headerHeight={headerHeight} />
-          )}
-
           {/* Body */}
           <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
             <TableColGroup tableWidth={tableWidth} />

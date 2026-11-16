@@ -2751,3 +2751,30 @@ export const StickyGroupParentVirtualized: StoryFn<typeof meta> = () => {
   );
 };
 StickyGroupParentVirtualized.tags = ['!autodocs'];
+
+/**
+ * `virtualized='window'` grouping in a padded app pane: the group row sticks under the header,
+ * which sticks at the pane's top edge (rows never show through the pane's padding).
+ */
+export const StickyGroupParentWindowInPane: StoryFn<typeof meta> = () => {
+  const data = useMemo(() => createLargeGroupedData(6, 30), []);
+  const [expanded, setExpanded] = useState<TableExpandedState>(() =>
+    Object.fromEntries(data.map(g => [g.id, true])),
+  );
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto', paddingTop: 24 }}>
+      <Table<SecurityHeaderEntry>
+        data={data}
+        columns={headerColumns}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        expanded={expanded}
+        onExpandedChange={setExpanded}
+        virtualized='window'
+        data-testid='sticky-group-parent-window-table'
+      />
+    </div>
+  );
+};
+StickyGroupParentWindowInPane.tags = ['!autodocs'];
