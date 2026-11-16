@@ -17,11 +17,11 @@ import { isRecord } from '../core/guards';
 import { GuardedView } from '../render/GuardedView';
 
 /**
- * The OpenUI library for the catalog (what the model is prompted with: `library.prompt()`). Each
- * entry's props pass through in their order, which is the positional order in OpenUI Lang; an
- * entry's events become action props after them, and a container takes `children` last. The
- * app's actions are library actions, written `@block_ips({ips: …})`: the map is the action's
- * context, as in A2UI.
+ * The OpenUI library for the catalog (what the model is prompted with: `library.prompt()`, with
+ * `{ additionalRules: [...COMPOSITION_RULES] }` for the layout rules). Each entry's props pass
+ * through in their order, which is the positional order in OpenUI Lang; an entry's events become
+ * action props after them, and a container takes `children` last. The app's actions are library
+ * actions, written `@block_ips({ips: …})`: the map is the action's context, as in A2UI.
  */
 export const createOpenUiLibrary = (
   components: readonly GenUiComponent[],

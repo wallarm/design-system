@@ -1,5 +1,14 @@
 import { createParser, type ElementNode } from '@openuidev/react-lang';
-import { type AnswerNode, type CheckOptions, checkNodes, type GenUiIssue } from '../core/check';
+import {
+  type AnswerNode,
+  type AnswerTree,
+  bindingsOf,
+  type CheckOptions,
+  checkNodes,
+  type GenUiIssue,
+  pathsIn,
+} from '../core/check';
+import type { GenUiComponent } from '../core/define';
 import { isRecord } from '../core/guards';
 import { dataProps, type OpenUiLibrary } from './catalog';
 
@@ -9,31 +18,61 @@ const isBinding = (value: unknown) => isRecord(value) && typeof value.k === 'str
 const isElement = (value: unknown): value is ElementNode =>
   isRecord(value) && value.type === 'element' && typeof value.typeName === 'string';
 
+/** `$kpi.attacks` → `/kpi/attacks`, `$rows[0]` → `/rows/0`; any other expression has no path. */
+const pathOf = (value: unknown): string | undefined => {
+  if (!isRecord(value)) return undefined;
+  if (value.k === 'StateRef' && typeof value.n === 'string')
+    return `/${value.n.replace(/^\$/, '')}`;
+  const base = value.k === 'Member' || value.k === 'Index' ? pathOf(value.obj) : undefined;
+  if (base === undefined) return undefined;
+  if (value.k === 'Member' && typeof value.field === 'string') return `${base}/${value.field}`;
+  const index = isRecord(value.index) ? value.index.v : undefined;
+  return typeof index === 'number' || typeof index === 'string' ? `${base}/${index}` : undefined;
+};
+
+const parse = (program: string, library: OpenUiLibrary, components: readonly GenUiComponent[]) => {
+  const { library: lib } = library;
+  const result = createParser(lib.toJSONSchema(), lib.root).parse(program);
+  const nodes: AnswerNode[] = [];
+  const visit = (element: ElementNode, fallbackId: string) => {
+    const id = element.statementId ?? fallbackId;
+    const component = components.find(c => c.name === element.typeName);
+    const children = Array.isArray(element.props.children)
+      ? element.props.children.filter(isElement)
+      : [];
+    const props = component ? dataProps(component, element.props) : element.props;
+    nodes.push({
+      id,
+      type: element.typeName,
+      props,
+      children: children.map((child, i) => child.statementId ?? `${id}_children_${i}`),
+      actions: (component?.events ?? []).flatMap(event => actionNames(element.props[event])),
+      bindings: bindingsOf(props, pathOf),
+      reads: pathsIn(
+        [props, ...(component?.events ?? []).map(event => element.props[event])],
+        pathOf,
+      ),
+    });
+    children.forEach((child, i) => visit(child, `${id}_children_${i}`));
+  };
+  if (isElement(result.root)) visit(result.root, 'root');
+  return { result, tree: { nodes, rootId: result.root?.statementId } };
+};
+
+/** A finished OpenUI Lang program as nodes, for the check and the evals. */
+export const readOpenUiAnswer = (
+  program: string,
+  library: OpenUiLibrary,
+  components: readonly GenUiComponent[],
+): AnswerTree => parse(program, library, components).tree;
+
 /** The agent's mistakes in a finished OpenUI Lang program, per statement. */
 export const checkOpenUiAnswer = (
   program: string,
   library: OpenUiLibrary,
   options: CheckOptions,
 ): GenUiIssue[] => {
-  const { library: lib } = library;
-  const result = createParser(lib.toJSONSchema(), lib.root).parse(program);
-  const nodes: AnswerNode[] = [];
-  const visit = (element: ElementNode, fallbackId: string) => {
-    const id = element.statementId ?? fallbackId;
-    const component = options.components.find(c => c.name === element.typeName);
-    const children = Array.isArray(element.props.children)
-      ? element.props.children.filter(isElement)
-      : [];
-    nodes.push({
-      id,
-      type: element.typeName,
-      props: component ? dataProps(component, element.props) : element.props,
-      children: children.map((child, i) => child.statementId ?? `${id}_children_${i}`),
-      actions: (component?.events ?? []).flatMap(event => actionNames(element.props[event])),
-    });
-    children.forEach((child, i) => visit(child, `${id}_children_${i}`));
-  };
-  if (isElement(result.root)) visit(result.root, 'root');
+  const { result, tree } = parse(program, library, options.components);
 
   // The parser checks props itself and drops what fails (a value outside an enum, a call to an
   // unknown action, a component it doesn't know), so those come from its report.
@@ -51,7 +90,7 @@ export const checkOpenUiAnswer = (
       return { ...at, prop: path?.split('/').filter(Boolean).join('.') || undefined, message };
     }),
   ];
-  const issues = [...checkNodes(nodes, result.root?.statementId, isBinding, options), ...reported];
+  const issues = [...checkNodes(tree.nodes, tree.rootId, isBinding, options), ...reported];
   // A prop both checks flag is one issue.
   return issues.filter(
     (issue, i) =>

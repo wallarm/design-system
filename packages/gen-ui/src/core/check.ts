@@ -5,6 +5,7 @@
  * Each format reads its answer into nodes (`checkA2uiAnswer`, `checkJsonRenderAnswer`); the result
  * goes back to the model as a "fix these" message (`describeIssues`) or into an eval.
  */
+import { checkComposition } from './composition';
 import type { GenUiAction, GenUiComponent } from './define';
 import { isRecord } from './guards';
 
@@ -17,6 +18,10 @@ export interface AnswerNode {
   children: readonly string[];
   /** Names of the actions the component fires. */
   actions: readonly string[];
+  /** The app data path each top-level prop bound to one reads, e.g. `{ points: '/traffic' }`. */
+  bindings?: Readonly<Record<string, string>>;
+  /** Every app data path the node reads: bound props, nested values and action contexts. */
+  reads?: readonly string[];
 }
 
 export interface GenUiIssue {
@@ -26,6 +31,8 @@ export interface GenUiIssue {
   /** The prop, dot-separated, when the issue is in one. */
   prop?: string;
   message: string;
+  /** `warning`: the answer renders but breaks a composition rule. Unset means an error. */
+  severity?: 'error' | 'warning';
 }
 
 export interface CheckOptions {
@@ -33,13 +40,15 @@ export interface CheckOptions {
   actions: readonly GenUiAction[];
   /** Report a number written into a prop instead of bound: a figure the model may have made up. */
   boundFigures?: boolean;
+  /** Also report the composition rules the tree breaks, as warnings (`checkComposition`). */
+  composition?: boolean;
 }
 
 export const checkNodes = (
   nodes: readonly AnswerNode[],
   rootId: string | undefined,
   isBinding: (value: unknown) => boolean,
-  { components, actions, boundFigures = false }: CheckOptions,
+  { components, actions, boundFigures = false, composition = false }: CheckOptions,
 ): GenUiIssue[] => {
   const issues: GenUiIssue[] = [];
   const ids = new Set(nodes.map(node => node.id));
@@ -67,18 +76,62 @@ export const checkNodes = (
       for (const prop of literalNumbers(node.props, isBinding))
         issues.push({ ...at, prop, message: 'A figure is written in; bind it to the app data.' });
   }
-  return issues;
+  return composition ? [...issues, ...checkComposition(nodes, rootId)] : issues;
 };
 
-/** The issues as one message to send the model, asking it to resend only those components. */
-export const describeIssues = (issues: readonly GenUiIssue[]): string =>
-  [
-    'Some components in your answer cannot render. Fix them and resend only these components:',
-    ...issues.map(
-      i =>
-        `- ${i.id}${i.component ? ` (${i.component})` : ''}${i.prop ? `, ${i.prop}` : ''}: ${i.message}`,
-    ),
+/**
+ * The issues as one message to send the model, asking it to resend only those components. Errors
+ * come first; warnings follow as suggestions, since the answer renders without fixing them.
+ */
+export const describeIssues = (issues: readonly GenUiIssue[]): string => {
+  const line = (i: GenUiIssue) =>
+    `- ${i.id}${i.component ? ` (${i.component})` : ''}${i.prop ? `, ${i.prop}` : ''}: ${i.message}`;
+  const errors = issues.filter(i => i.severity !== 'warning');
+  const warnings = issues.filter(i => i.severity === 'warning');
+  return [
+    ...(errors.length
+      ? [
+          'Some components in your answer cannot render. Fix them and resend only these components:',
+          ...errors.map(line),
+        ]
+      : []),
+    ...(warnings.length
+      ? [
+          'Suggestions to make the answer read better: resend the components they name, changed.',
+          ...warnings.map(line),
+        ]
+      : []),
   ].join('\n');
+};
+
+/** `AnswerNode.bindings` from a node's props, given how the format writes a bound path. */
+export const bindingsOf = (
+  props: Record<string, unknown>,
+  pathOf: (value: unknown) => string | undefined,
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(props).flatMap(([key, value]) => {
+      const path = pathOf(value);
+      return path === undefined ? [] : [[key, path]];
+    }),
+  );
+
+/** Every path bound anywhere in `value`: nested props, list items, an action's context. */
+export const pathsIn = (
+  value: unknown,
+  pathOf: (value: unknown) => string | undefined,
+): string[] => {
+  const path = pathOf(value);
+  if (path !== undefined) return [path];
+  if (Array.isArray(value)) return value.flatMap(item => pathsIn(item, pathOf));
+  return isRecord(value) ? Object.values(value).flatMap(item => pathsIn(item, pathOf)) : [];
+};
+
+/** The answer as nodes, the form every format's reader gives. */
+export interface AnswerTree {
+  nodes: AnswerNode[];
+  rootId: string | undefined;
+}
 
 /** True when the value at `path`, or one of its parents, is a binding (the app fills it). */
 const boundOnPath = (

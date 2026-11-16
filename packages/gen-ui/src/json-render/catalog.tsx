@@ -7,9 +7,10 @@ import type { GenUiAction, GenUiComponent } from '../core/define';
 import { GuardedView } from '../render/GuardedView';
 
 /**
- * The json-render catalog (what the model is prompted with: `catalog.prompt()`) and the registry
- * that renders it. The zod props pass through untouched: `$state`/`$bindState` and the other
- * expressions are resolved by the json-render runtime before a View sees them.
+ * The json-render catalog (what the model is prompted with: `catalog.prompt()`, with
+ * `{ customRules: [...COMPOSITION_RULES] }` for the layout rules) and the registry that renders it.
+ * The zod props pass through untouched: `$state`/`$bindState` and the other expressions are
+ * resolved by the json-render runtime before a View sees them.
  */
 export const createJsonRenderCatalog = (
   components: readonly GenUiComponent[],

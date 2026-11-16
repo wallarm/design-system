@@ -45,6 +45,11 @@
       "types": "./dist/openui/index.d.ts",
       "default": "./dist/openui/index.js"
     },
+    "./evals": {
+      "development": "./src/evals/index.ts",
+      "types": "./dist/evals/index.d.ts",
+      "default": "./dist/evals/index.js"
+    },
     "./fixtures": {
       "development": "./src/fixtures/index.ts",
       "types": "./dist/fixtures/index.d.ts",
@@ -64,6 +69,7 @@
     "dev": "rslib build --watch",
     "test": "rstest watch",
     "test:run": "rstest run",
+    "evals": "tsx src/evals/run.ts",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "prepare-publish",
     "postpublish": "restore-package"
