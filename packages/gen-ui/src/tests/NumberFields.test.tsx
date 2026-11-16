@@ -13,6 +13,7 @@ import { SliderComponent } from '../components/Slider';
 import { StackComponent } from '../components/Stack';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
 import { createOpenUiLibrary, OpenUiSurface } from '../openui';
+import { typeNumber } from './typeNumber';
 
 afterEach(cleanup);
 
@@ -40,7 +41,7 @@ const CASES: FieldCase[] = [
     prop: 'value',
     props: { label: 'Requests per minute' },
     openUiArgs: b => `"Requests per minute", ${b}`,
-    fill: async () => userEvent.type(await screen.findByLabelText('Requests per minute'), '120'),
+    fill: async () => typeNumber(await screen.findByLabelText('Requests per minute'), '120'),
     sent: 120,
     literal: 5,
     read: () => (screen.getByLabelText('Requests per minute') as HTMLInputElement).value,
