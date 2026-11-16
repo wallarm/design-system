@@ -9,6 +9,7 @@ import { RATE_LIMIT_DRAFT, RATE_LIMIT_SCENARIO } from '../fixtures/rateLimit';
 import { toStreams } from '../fixtures/stream';
 import { createJsonRenderCatalog, JsonRenderSurface, specFromLines } from '../json-render';
 import { createOpenUiLibrary, OpenUiSurface } from '../openui';
+import { typeNumber } from './typeNumber';
 
 // jsdom has none of these; the DS Table measures its container and scroll edges.
 const noop = () => undefined;
@@ -79,7 +80,7 @@ describe('"Rate-limit POST /oauth/token"', () => {
       render(surface(onAction));
       const limit = await screen.findByLabelText(/Requests per source/);
       await userEvent.clear(limit);
-      await userEvent.type(limit, '60');
+      await typeNumber(limit, '60');
       await userEvent.click(screen.getByRole('radio', { name: '5 min' }));
       await userEvent.click(screen.getByText('Challenge'));
       screen.getByRole('slider').focus();
