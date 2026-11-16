@@ -5,10 +5,12 @@
 export * from './components';
 export {
   type AnswerNode,
+  type AnswerTree,
   type CheckOptions,
   describeIssues,
   type GenUiIssue,
 } from './core/check';
+export { COMPOSITION_RULES, checkComposition, compositionPrompt } from './core/composition';
 export {
   allOf,
   defineComponent,

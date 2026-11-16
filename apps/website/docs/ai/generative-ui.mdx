@@ -303,10 +303,68 @@ if (issues.length) send(describeIssues(issues));
 component, a prop its schema rejects, a child that was never sent, an action outside the allowlist
 and a missing root. A bound prop is never an issue, since its value is the app's.
 
-**Evals.** The same check scores a model or a prompt offline: run your prompts, check each answer,
-count the issues. With `boundFigures: true` it also flags every number written into a prop instead
-of bound, a figure the model may have made up. The playground shows the check under the stream once
-an answer is complete.
+With `boundFigures: true` the check also flags every number written into a prop instead of bound,
+a figure the model may have made up. The playground shows the check under the stream once an
+answer is complete.
+
+## Answer quality
+
+An answer that renders can still read badly: a Card inside a Card, a pie chart for a time series,
+a one-row table for a single record, an Alert for every sentence. Weaker models do this most. Three
+things keep answers consistent.
+
+**Composition rules in the prompt.** `COMPOSITION_RULES` is a short list of layout rules, each with
+its reason: one root Section with a title and a one-line subtitle; KPIs as Metric tiles in a Grid at
+the top, then charts, then the detail Table, then the actions; which chart fits which data (time →
+LineChart or AreaChart, a ranking → BarList, parts of a whole → PieChart or HorizontalBarStack);
+Table for several records, KeyValueList for one; no Card in a Card, and none around a Metric or a
+chart; a Grid or Tabs only with two or more children; EmptyState instead of an empty table; at most
+three Alerts; bind every figure; short text. `a2uiPrompt` adds them; for the other formats pass them
+to the library's prompt:
+
+```ts
+import { COMPOSITION_RULES } from '@wallarm-org/gen-ui';
+
+CATALOG.catalog.prompt({ customRules: [...COMPOSITION_RULES] }); // json-render
+LIBRARY.library.prompt({ additionalRules: [...COMPOSITION_RULES] }); // OpenUI
+a2uiPrompt(CATALOG, { actions: ACTIONS }); // A2UI: added; composition: false leaves them out
+```
+
+**The composition check.** `composition: true` makes every format's check also report the rules a
+tree shows, as issues with `severity: 'warning'`: a root that isn't a Section or Stack, a Card
+holding a Card, a Metric or a chart, a Grid or Tabs with fewer than two children, a Metric outside a
+Grid or a row Stack, more than three Alerts, a Separator between Sections, nesting deeper than six
+levels. `describeIssues` lists errors first and words warnings as suggestions, so the same feedback
+loop fixes both. Every recorded answer passes with no warning.
+
+```ts
+const issues = checkA2uiAnswer(messages, {
+  components: wallarmComponents,
+  actions: ACTIONS,
+  composition: true,
+});
+if (issues.length) send(describeIssues(issues));
+```
+
+`checkComposition(nodes, rootId)` runs the same rules on nodes from any reader
+(`readA2uiAnswer`, `readJsonRenderAnswer`, `readOpenUiAnswer`).
+
+**Evals.** Which chart fits the data is not something a tree shows, so `@wallarm-org/gen-ui/evals`
+scores answers against cases. A case is a prompt, the data paths the app fills, the allowed actions
+and what a good answer does ("a time-series chart for /traffic", "no Table for the one /source",
+"a Button that blocks the top IPs"). `scoreAnswer(case, answer)` reads an answer in any format and
+returns its errors (including a binding to a path the app doesn't fill), composition warnings,
+expectations met and a 0-1 score. `EVAL_CASES` holds eight: a dashboard, a weekly report, an
+incident, one attacker, two forms, an empty result and a first dashboard tailored from scanner data
+(a payments company → PCI DSS). Write your own cases the same way for your prompts.
+
+```bash
+ANTHROPIC_API_KEY=… pnpm --filter @wallarm-org/gen-ui evals --format openui --model claude-sonnet-5-5
+```
+
+The runner asks the model every case through the Anthropic Messages API and prints each score, the
+expectations it missed and the issues. `--case <id>` runs one; `GEN_UI_EVAL_MODEL` and
+`GEN_UI_EVAL_FORMAT` set the defaults. Without a key it skips.
 
 ## Dashboards
 

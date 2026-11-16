@@ -5,7 +5,14 @@ export default defineConfig({
   lib: [{ format: 'esm', bundle: false, dts: true }],
   plugins: [pluginReact({ reactCompiler: true })],
   source: {
-    entry: { index: ['./src/**/*.{ts,tsx}', '!./src/**/*.test.*', '!./src/tests/**'] },
+    entry: {
+      index: [
+        './src/**/*.{ts,tsx}',
+        '!./src/**/*.test.*',
+        '!./src/tests/**',
+        '!./src/evals/run.ts',
+      ],
+    },
     tsconfigPath: './tsconfig.build.json',
   },
 });

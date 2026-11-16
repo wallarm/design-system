@@ -16,6 +16,8 @@ src/
 ├── index.ts              @wallarm-org/gen-ui: the catalog + the API to define entries
 ├── core/                 format-agnostic: no format library, React only as types
 │   ├── check.ts          checkNodes / describeIssues: the answer check every format shares
+│   ├── composition.ts    COMPOSITION_RULES (layout rules for the prompt), checkComposition
+│   │                     (the ones a tree shows, as warnings; `composition: true` on a check)
 │   ├── define.ts         GenUiComponent (an entry's contract), defineComponent,
 │   │                     subsetOf / allOf / Values (enums from DS types), seriesKey, unique
 │   ├── format.ts         named number and time formats (formatNumber, formatTime)
@@ -34,16 +36,17 @@ src/
 │   ├── A2uiSurfaces.tsx  feeds messages to a MessageProcessor, renders its surfaces
 │   ├── express.tsx       /a2ui/express: A2UI Express, the compact text form, compiled by @a2ui/agent
 │   ├── prompt.ts         /a2ui/prompt: a2uiPrompt, the system prompt (Express or JSON) with the actions
-│   ├── check.ts          checkA2uiAnswer: the agent's mistakes in a finished answer
+│   ├── check.ts          checkA2uiAnswer: the agent's mistakes in a finished answer;
+│   │                     readA2uiAnswer: the answer as nodes
 │   └── toA2uiSchema.ts   zod 4 props → the zod 3 schema A2UI's binder reads
 ├── json-render/          @wallarm-org/gen-ui/json-render
 │   ├── catalog.tsx       createJsonRenderCatalog: entries → catalog (prompt()) + registry
-│   ├── check.ts          checkJsonRenderAnswer: the same check for a spec
+│   ├── check.ts          checkJsonRenderAnswer / readJsonRenderAnswer: the same for a spec
 │   ├── spec.ts           specFromLines (stream → spec, never throws), sanitizeSpec (allowlist)
 │   └── JsonRenderSurface.tsx  renders a spec; keeps its state in step as the app fills it
 ├── openui/               @wallarm-org/gen-ui/openui
 │   ├── catalog.tsx       createOpenUiLibrary: entries → OpenUI library (prompt()), props in order
-│   ├── check.ts          checkOpenUiAnswer: the same check for a program
+│   ├── check.ts          checkOpenUiAnswer / readOpenUiAnswer: the same for a program
 │   └── OpenUiSurface.tsx renders a program; the app's data arrives as $variables
 ├── fixtures/             @wallarm-org/gen-ui/fixtures: recorded answers, every format
 │   ├── stream.ts         the scenario builder: layout chunks + app data → every stream (toStreams)
@@ -52,6 +55,10 @@ src/
 │   ├── openui.ts         a recorded A2UI answer as OpenUI Lang (toOpenUiLines, openUiAnswer)
 │   ├── liveMonitor.ts    the live example: the app refreshes the page every 2 s
 │   └── dashboard.ts, …   one scenario per file, built with stream.ts
+├── evals/                @wallarm-org/gen-ui/evals: answer quality, not only validity
+│   ├── cases.ts          EVAL_CASES: prompt, data paths, actions, what a good answer does
+│   ├── score.ts          scoreAnswer: errors, composition warnings, expectations → 0-1
+│   └── run.ts            `pnpm evals`: asks a model every case (fetch, no SDK); not built
 ├── playground/           @wallarm-org/gen-ui/playground: the demos the playground app and the
 │   │                     docs site embed
 │   ├── GenUiPlayground.tsx  pick a prompt, replay its answer, read the stream beside it
@@ -123,7 +130,13 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
 pnpm --filter @wallarm-org/gen-ui test:run    # rstest, every format
 pnpm --filter @wallarm-org/gen-ui typecheck
 pnpm --filter @wallarm-org/gen-ui build       # rslib → dist/, same layout as src/
+# The eval cases against a model; skips without a key. --case <id> runs one.
+ANTHROPIC_API_KEY=… pnpm --filter @wallarm-org/gen-ui evals --format json-render --model claude-sonnet-5-5
 ```
+
+A recorded answer is also an eval: when you add one, add its case to `src/evals/cases.ts` with the
+same id (`Evals.test.ts` scores it in every format), and keep it free of composition warnings
+(`Composition.test.ts`). An answer that legitimately breaks a rule means the rule is wrong.
 
 The playground app has two demos that replay the fixtures: `/gen-ui` (answers in the Wally chat)
 and `/gen-ui-playground` (pick a prompt, watch the agent lay out the answer while the app fills its

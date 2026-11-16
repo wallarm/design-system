@@ -1,31 +1,50 @@
-import { type AnswerNode, type CheckOptions, checkNodes, type GenUiIssue } from '../core/check';
+import {
+  type AnswerNode,
+  type AnswerTree,
+  bindingsOf,
+  type CheckOptions,
+  checkNodes,
+  type GenUiIssue,
+} from '../core/check';
+import type { GenUiComponent } from '../core/define';
 import { isRecord } from '../core/guards';
 import type { A2uiMessage } from './catalog';
 
 const isBinding = (value: unknown) => isRecord(value) && ('@path' in value || '@call' in value);
+const pathOf = (value: unknown) =>
+  isRecord(value) && typeof value['@path'] === 'string' ? value['@path'] : undefined;
+
+/** A finished A2UI answer (one surface) as nodes, for the check and the evals. */
+export const readA2uiAnswer = (
+  messages: readonly A2uiMessage[],
+  components: readonly GenUiComponent[],
+): AnswerTree => {
+  // A later message replaces a component with the same id, as the renderer does.
+  const byId = new Map<string, AnswerNode>();
+  for (const message of messages) {
+    const raw =
+      'createSurface' in message
+        ? message.createSurface.components
+        : 'updateComponents' in message
+          ? message.updateComponents.components
+          : undefined;
+    for (const component of raw ?? []) byId.set(component.id, toNode(component, components));
+  }
+  return { nodes: [...byId.values()], rootId: 'root' };
+};
 
 /** The agent's mistakes in a finished A2UI answer (one surface), per component. */
 export const checkA2uiAnswer = (
   messages: readonly A2uiMessage[],
   options: CheckOptions,
 ): GenUiIssue[] => {
-  // A later message replaces a component with the same id, as the renderer does.
-  const byId = new Map<string, AnswerNode>();
-  for (const message of messages) {
-    const components =
-      'createSurface' in message
-        ? message.createSurface.components
-        : 'updateComponents' in message
-          ? message.updateComponents.components
-          : undefined;
-    for (const raw of components ?? []) byId.set(raw.id, toNode(raw, options));
-  }
-  return checkNodes([...byId.values()], 'root', isBinding, options);
+  const { nodes, rootId } = readA2uiAnswer(messages, options.components);
+  return checkNodes(nodes, rootId, isBinding, options);
 };
 
 const toNode = (
   { id, component, children, ...rest }: { id: string; component: string; [key: string]: unknown },
-  { components }: CheckOptions,
+  components: readonly GenUiComponent[],
 ): AnswerNode => {
   const events = components.find(c => c.name === component)?.events ?? [];
   const props = Object.fromEntries(Object.entries(rest).filter(([key]) => !events.includes(key)));
@@ -41,5 +60,12 @@ const toNode = (
     : isRecord(children) && typeof children.componentId === 'string'
       ? [children.componentId]
       : [];
-  return { id, type: component, props, children: ids, actions };
+  return {
+    id,
+    type: component,
+    props,
+    children: ids,
+    actions,
+    bindings: bindingsOf(props, pathOf),
+  };
 };
