@@ -386,6 +386,26 @@ test.describe('Component: Table', () => {
       await expect.poll(offset).toBe(0);
     });
 
+    test('Should expose one table with its column headers and rows in window mode', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Window Virtualization');
+      await expect(page.locator('[data-row-id]').first()).toBeVisible();
+
+      const tables = page.getByRole('table');
+      await expect(tables).toHaveCount(1);
+      await expect(tables.getByRole('columnheader').first()).toBeVisible();
+      expect(await tables.getByRole('row').count()).toBeGreaterThan(1);
+      // The header's controls take focus, so nothing above them may be aria-hidden.
+      const hidden = await page.evaluate(
+        () =>
+          [...document.querySelectorAll('thead button')].filter(b =>
+            b.closest('[aria-hidden="true"]'),
+          ).length,
+      );
+      expect(hidden).toBe(0);
+    });
+
     test('Should show the row actions while one of them has the keyboard focus', async ({
       page,
     }) => {

@@ -20,6 +20,8 @@ export const Th: FC<ThProps> = ({
   <th
     ref={ref}
     scope='col'
+    // biome-ignore lint/a11y/noRedundantRoles: Explicit: window mode lays the table out as two role='presentation' tables, which would strip the implied role.
+    role='columnheader'
     className={cn(
       tableHeadCellVariants({ interactive, sorted, pinned, lastPinnedLeft, draggable, dragging }),
       className,
