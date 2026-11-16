@@ -359,6 +359,33 @@ test.describe('Component: Table', () => {
       await expect.poll(offset).toBe(0);
     });
 
+    test('Should keep the body in line with the header when a header control takes focus in window mode', async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 600, height: 600 });
+      await tableStory.goto(page, 'Window Virtualization');
+      const pane = page.locator('body');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // Focus on a control past the right edge scrolls the header shell, not the body.
+      const column = await pane.evaluate(el => {
+        const button = [...el.querySelectorAll<HTMLElement>('thead button')].at(-1)!;
+        button.focus();
+        return [...button.closest('tr')!.children].indexOf(button.closest('th')!) + 1;
+      });
+      expect(column).toBeGreaterThan(2);
+
+      const offset = () =>
+        pane.evaluate((el, n) => {
+          const th = el.querySelector(`thead tr th:nth-child(${n})`)!.getBoundingClientRect();
+          const td = el
+            .querySelector(`[data-table-scroll-container] tbody tr td:nth-child(${n})`)!
+            .getBoundingClientRect();
+          return Math.round(td.left - th.left);
+        }, column);
+      await expect.poll(offset).toBe(0);
+    });
+
     test('Should show the row actions while one of them has the keyboard focus', async ({
       page,
     }) => {

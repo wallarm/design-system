@@ -79,8 +79,20 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
       if (groupScrollRef.current) groupScrollRef.current.scrollLeft = scrollEl.scrollLeft;
     };
 
+    // The browser scrolls the header itself to bring a focused header control into view: the
+    // body follows, and its scroll mirrors the rest back. Equal values fire no scroll, no loop.
+    const header = headerScrollRef.current;
+    const onHeaderScroll = () => {
+      if (header && scrollEl.scrollLeft !== header.scrollLeft)
+        scrollEl.scrollLeft = header.scrollLeft;
+    };
+
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
-    return () => scrollEl.removeEventListener('scroll', onScroll);
+    header?.addEventListener('scroll', onHeaderScroll, { passive: true });
+    return () => {
+      scrollEl.removeEventListener('scroll', onScroll);
+      header?.removeEventListener('scroll', onHeaderScroll);
+    };
   }, [containerRef, headerScrollRef]);
 
   useWheelHorizontalScroll(containerRef, headerScrollRef);
