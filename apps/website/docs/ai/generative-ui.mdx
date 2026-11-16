@@ -103,14 +103,62 @@ The catalog, `wallarmComponents`, has:
 
 | Group | Entries |
 | --- | --- |
-| Layout | Section, Grid, GridItem, Stack, Card |
-| Text and status | Heading, Text, Badge, Alert |
+| Layout | Section, Grid, GridItem, Stack, Card, Tabs, Accordion, Separator |
+| Content on demand | Drawer, Dialog (a button opens them; the children are the content) |
+| Text and status | Heading, Text, List, Link, CodeSnippet, Badge, Alert, EmptyState, Progress |
 | Actions | Button |
 | Charts | Metric (with a sparkline), BarList, PieChart, HorizontalBarStack, LineChart, AreaChart, ColumnChart |
-| Data | Table (read-only: typed cells for IPs, methods, status codes, dates, numbers and code) |
+| Records | Table, KeyValueList, Timeline, Tree |
+
+Table, its row details and KeyValueList draw a record's fields with one set of value types: text,
+number, badge, datetime, code, ip, method, status, country (an ISO code, with its flag) and
+parameter (a request point such as `post.json_doc.password`).
+
+Tabs and Accordion take `labels`, and `labels[i]` heads the child at the same index. Opening a
+tab, a section, a Drawer or a Dialog is the page's own state: it has no side effects and fires no
+action. To do something, put a Button bound to an app action inside.
 
 The time-series charts share one data shape: `series: [{ key, label, color }]` and
 `points: [{ x, <key>: number }]`, one point per moment.
+
+### Open a row's details from a Table
+
+Give a Table `detail`, and clicking a row's first cell opens a side drawer with that row's fields.
+The fields may be ones no column shows, so the table stays narrow and the drawer holds the rest.
+Clicking the same cell again closes it; another row's first cell switches to that row.
+
+```json
+{
+  "id": "requests",
+  "component": "Table",
+  "rowKey": "id",
+  "columns": [
+    { "key": "time", "header": "Time", "type": "datetime" },
+    { "key": "path", "header": "Path", "type": "code" },
+    { "key": "status", "header": "Status", "type": "status" }
+  ],
+  "rows": { "@path": "/requests" },
+  "detail": {
+    "titleKey": "path",
+    "fields": [
+      { "key": "host", "label": "Host" },
+      { "key": "point", "label": "Point", "type": "parameter" },
+      { "key": "country", "label": "Country", "type": "country" },
+      { "key": "userAgent", "label": "User agent", "type": "code" }
+    ]
+  }
+}
+```
+
+The drawer is drawn from the row the app sent; the agent never opens it. When a row should open the
+app's own page or panel instead, use a Button bound to an app action.
+
+### Every design-system component is decided
+
+`src/tests/coverage.test.ts` lists every design-system component with the entries that render it,
+or the reason an agent never places it: an input (forms, #472), the chat that hosts the answer,
+app chrome, an overlay the app opens itself, or an internal primitive. A new design-system
+component fails the test until someone decides, so the catalog can't fall behind unnoticed.
 
 ### Keep the catalog in step with the design system
 
@@ -340,7 +388,10 @@ swapping in the bindable leaf types, and the casts go away.
 ## Limitations
 
 - Forms are not in the catalog yet: they need two-way bindings in the shared layer first.
-- Table is read-only: no sorting, selection, pagination or row actions yet.
+- Table has no sorting, selection, pagination or row actions yet (#472); a row's first cell opens
+  its details only with the mouse, since the design system's master cell has no keyboard handler.
+- Tooltip, Popover, HoverCard and Toast are not in the catalog: content on demand goes in a Drawer
+  or Dialog, and a toast is the app's answer to an action.
 - In A2UI, a prop that binds to the data model loses its field description in the catalog document,
   because the binder reads that description itself.
 - An array or object prop binds as a whole; its fields can't bind one by one.

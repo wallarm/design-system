@@ -1,15 +1,13 @@
-import type { ReactNode } from 'react';
+import { useState } from 'react';
 import * as z from 'zod';
-import { Badge } from '@wallarm-org/design-system/Badge';
-import { Code } from '@wallarm-org/design-system/Code';
 import {
-  FormatDateTime,
-  type FormatDateTimeProps,
-} from '@wallarm-org/design-system/FormatDateTime';
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@wallarm-org/design-system/Drawer';
 import { Heading } from '@wallarm-org/design-system/Heading';
-import { HttpMethod } from '@wallarm-org/design-system/HttpMethod';
-import { Ip, IpAddress } from '@wallarm-org/design-system/Ip';
-import { ResponseCode } from '@wallarm-org/design-system/ResponseCode';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import {
   createTableColumnHelper,
@@ -17,80 +15,24 @@ import {
   type TableColumnDef,
 } from '@wallarm-org/design-system/Table';
 import { cn } from '@wallarm-org/design-system/utils/cn';
-import { allOf, defineComponent, type Values } from '../core/define';
-import { formatNumber, NUMBER_FORMATS, type NumberFormat } from '../core/format';
+import { defineComponent } from '../core/define';
+import {
+  FieldList,
+  recordField,
+  renderValue,
+  scalar,
+  VALUE_TYPES_HELP,
+  valueFormat,
+  valueType,
+} from '../render/cells';
 
-const DATE_FORMATS = allOf<Values<FormatDateTimeProps['format']>>()([
-  'relative',
-  'date',
-  'datetime',
-]);
-type DateFormat = (typeof DATE_FORMATS)[number];
-
-const CELL_TYPES = [
-  'text',
-  'number',
-  'badge',
-  'datetime',
-  'code',
-  'ip',
-  'method',
-  'status',
-] as const;
-type CellType = (typeof CELL_TYPES)[number];
-
-type Scalar = string | number;
 type Row = Record<string, unknown>;
-
-const isNumberFormat = (f?: string): f is NumberFormat => NUMBER_FORMATS.some(n => n === f);
-const isDateFormat = (f?: string): f is DateFormat => DATE_FORMATS.some(d => d === f);
-
-/** Agent rows are untrusted: only strings and numbers render, booleans print, the rest is empty. */
-const scalar = (value: unknown): Scalar | undefined => {
-  if (typeof value === 'string' || typeof value === 'number') return value;
-  if (typeof value === 'boolean') return String(value);
-  return undefined;
-};
-
-/** One renderer per cell type; the Record makes a new type without a renderer fail typecheck. */
-const CELLS: Record<CellType, (value: Scalar, format?: string) => ReactNode> = {
-  text: value => value,
-  number: (value, format) =>
-    typeof value === 'number'
-      ? formatNumber(value, isNumberFormat(format) ? format : 'number')
-      : value,
-  badge: value => (
-    <Badge type='secondary' color='slate'>
-      {value}
-    </Badge>
-  ),
-  datetime: (value, format) => (
-    <FormatDateTime
-      value={value}
-      format={isDateFormat(format) ? format : 'datetime'}
-      layout='inline'
-    />
-  ),
-  code: value => (
-    <Code size='s' truncate>
-      {value}
-    </Code>
-  ),
-  ip: value => (
-    <Ip>
-      <IpAddress>{value}</IpAddress>
-    </Ip>
-  ),
-  method: value => <HttpMethod method={String(value)} />,
-  status: value => <ResponseCode code={value} />,
-};
 
 const column = createTableColumnHelper<Row>();
 
 export const TableComponent = defineComponent({
   name: 'Table',
-  description:
-    'A read-only table of records: requests, events, IPs, rules. Use it when the user needs to compare rows across several fields; for a ranked top-N of one number prefer BarList. Each row is a flat object of strings and numbers keyed by the column keys; rowKey names the field that is unique per row. Column types: datetime takes an ISO time or epoch ms, ip an IP string, method an HTTP verb, status an HTTP response code, code a short literal (path, payload, rule id), badge a short label. Send rows in display order: there is no sorting, paging or selection.',
+  description: `A read-only table of records: requests, events, IPs, rules. Use it when the user needs to compare rows across several fields; for a ranked top-N of one number prefer BarList. Each row is a flat object of strings and numbers keyed by the column keys; rowKey names the field that is unique per row. Column ${VALUE_TYPES_HELP} Send rows in display order: there is no sorting, paging or selection. Add detail when a row has more to say than fits in a row: clicking its first cell opens a side drawer that lists the detail fields, which may be row fields no column shows.`,
   props: z.object({
     title: z.string().optional(),
     rowKey: z.string().describe('The row field that is unique per row, e.g. "requestId"'),
@@ -98,31 +40,37 @@ export const TableComponent = defineComponent({
       z.object({
         key: z.string().describe('The row field this column shows'),
         header: z.string(),
-        type: z.enum(CELL_TYPES).optional().describe('Default text'),
-        format: z
-          .enum([...NUMBER_FORMATS, ...DATE_FORMATS])
-          .optional()
-          .describe(
-            'number columns: number, compact, percent (0-100), bytes, ms; datetime columns: relative, date, datetime',
-          ),
+        type: valueType,
+        format: valueFormat,
       }),
     ),
     rows: z.array(z.looseObject({})).describe('One object per row, keyed by the column keys'),
+    detail: z
+      .object({
+        titleKey: z
+          .string()
+          .optional()
+          .describe('The row field the drawer is titled with. Default: the first column'),
+        fields: z.array(recordField),
+      })
+      .optional()
+      .describe("The drawer a row's first cell opens: its title and the fields it lists, in order"),
   }),
   Skeleton: () => <Skeleton width='100%' height='240px' rounded={8} transparent={false} />,
   View: ({ props }) => {
+    const { rows, detail } = props;
+    // Open row, and the row the drawer shows: it stays while the drawer animates closed.
+    const [activeRowId, setActiveRowId] = useState<string | null>(null);
+    const [shownRowId, setShownRowId] = useState<string | null>(null);
+
     const columns: TableColumnDef<Row>[] = props.columns.map(
       ({ key, header, type = 'text', format }) =>
         column.accessor(key, {
           header: header ?? key,
           meta: { align: type === 'number' ? 'right' : 'left' },
-          cell: ({ row }) => {
-            const value = scalar(row.original[key]);
-            return value === undefined || value === '' ? '—' : CELLS[type](value, format);
-          },
+          cell: ({ row }) => renderValue(row.original[key], type, format),
         }),
     );
-    const { rows } = props;
     // Agent rows may repeat or omit rowKey; React and TanStack need unique ids, so suffix repeats.
     const seen = new Set<string>();
     const rowIds = rows.map((row, index) => {
@@ -133,6 +81,22 @@ export const TableComponent = defineComponent({
     });
     const getRowId = (_row: Row, index: number) => rowIds[index] ?? String(index);
 
+    // A row the app's data no longer has closes the drawer for good, not until it comes back:
+    // the open row is reset during render, as React does for state that follows props.
+    if (activeRowId !== null && !rowIds.includes(activeRowId)) setActiveRowId(null);
+    const openRowId = activeRowId !== null && rowIds.includes(activeRowId) ? activeRowId : null;
+    const openRow = (rowId: string) => {
+      setActiveRowId(rowId === openRowId ? null : rowId);
+      setShownRowId(rowId);
+    };
+    const onOpenChange = (open: boolean) => {
+      if (!open) setActiveRowId(null);
+    };
+    const shown = shownRowId === null ? undefined : rows[rowIds.indexOf(shownRowId)];
+    const titleKey = detail?.titleKey ?? props.columns[0]?.key;
+    const titleColumn = props.columns.find(c => c.key === titleKey);
+    const titleValue = titleKey === undefined ? undefined : scalar(shown?.[titleKey]);
+
     return (
       <div className={cn('flex min-w-0 flex-col gap-8')}>
         {props.title && (
@@ -140,7 +104,38 @@ export const TableComponent = defineComponent({
             {props.title}
           </Heading>
         )}
-        <Table data={rows} columns={columns} getRowId={getRowId} aria-label={props.title} />
+        <Table
+          data={rows}
+          columns={columns}
+          getRowId={getRowId}
+          aria-label={props.title}
+          onMasterCellClick={detail ? openRow : undefined}
+          activeRowId={detail ? openRowId : undefined}
+        />
+        {detail && (
+          // Not modal: the table stays usable, and another row's first cell switches the drawer.
+          <Drawer
+            open={openRowId !== null}
+            onOpenChange={onOpenChange}
+            modal={false}
+            overlay={false}
+            closeOnOutsideClick={false}
+            width={560}
+          >
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>
+                  {titleValue === undefined || titleValue === ''
+                    ? props.title || 'Details'
+                    : renderValue(titleValue, titleColumn?.type, titleColumn?.format)}
+                </DrawerTitle>
+              </DrawerHeader>
+              <DrawerBody>
+                <FieldList fields={detail.fields} record={shown} />
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
+        )}
       </div>
     );
   },
