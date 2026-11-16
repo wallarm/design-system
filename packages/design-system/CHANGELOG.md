@@ -1,3 +1,15 @@
+## [4.19.0](https://github.com/wallarm/design-system/compare/v4.18.0...v4.19.0) (2026-11-16)
+
+### Features
+
+* **gen-ui:** form validation that works the same in every format ([#492](https://github.com/wallarm/design-system/issues/492)) ([df79569](https://github.com/wallarm/design-system/commit/df79569f876da429c03ddcdc43450a81ce6c6d54))
+* **gen-ui:** forms with two-way binding and Table interactions ([#490](https://github.com/wallarm/design-system/issues/490)) ([5efbf7b](https://github.com/wallarm/design-system/commit/5efbf7bccddb96423f18cbd03b5264b073244054))
+* **gen-ui:** rest of the catalog, Table row details and a coverage test ([#489](https://github.com/wallarm/design-system/issues/489)) ([7054596](https://github.com/wallarm/design-system/commit/7054596b8c5348df2d180e5965fb045182522721))
+
+### Bug Fixes
+
+* **table:** infinite scroll re-arm, row actions on focus, window-mode sticky group rows ([#491](https://github.com/wallarm/design-system/issues/491)) ([126dbeb](https://github.com/wallarm/design-system/commit/126dbeb44e6148ecfa77877e329f776db9124584))
+
 ## [4.18.0](https://github.com/wallarm/design-system/compare/v4.17.0...v4.18.0) (2026-11-13)
 
 ### Features
