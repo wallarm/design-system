@@ -106,7 +106,8 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
 - A field checks the constraints the agent sent (`required`, `min`, `pattern`…) in `validate`:
   `props => message | undefined` (helpers in `core/validate.ts`). The View gets the message as
   `error` once the field was touched or a submit tried; a `submit` Button fires only when every
-  field on its surface passes (see `Validation.test.tsx`).
+  mounted field on its surface passes (a closed Drawer or Dialog mounts none; see
+  `Validation.test.tsx`).
 - A container sets `hasChildren: true` and renders `children`.
 - The `View` gets props that already passed the schema, so it needn't guard against missing data;
   declare a `Skeleton` shaped like the loaded component.

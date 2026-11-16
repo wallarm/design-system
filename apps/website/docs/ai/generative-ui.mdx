@@ -191,7 +191,9 @@ function catalog).
 
 A field shows its error once the user changes it, so a fresh form isn't red. A Button with
 `submit: true` checks every field on its surface first: while any has an error it shows them all
-and fires nothing. A Button without `submit` fires as before.
+and fires nothing. A Button without `submit` fires as before. A closed Drawer or Dialog renders
+no fields, so a submit Button outside one doesn't check the fields inside it: keep a form and its
+submit Button together.
 
 ```json
 [
@@ -473,7 +475,8 @@ swapping in the bindable leaf types, and the casts go away.
 ## Limitations
 
 - Validation runs on the page, for the user: the app still checks the values an action sends.
-  DateRangeInput reports a range only once both ends are filled.
+  DateRangeInput reports a range only once both ends are filled. A submit Button checks only the
+  fields on the page: those in a closed Drawer or Dialog aren't mounted, so they aren't checked.
 - A Table row has one action in its menu, and its first cell opens its details only with the
   mouse, since the design system's master cell has no keyboard handler.
 - Tooltip, Popover, HoverCard and Toast are not in the catalog: content on demand goes in a Drawer
