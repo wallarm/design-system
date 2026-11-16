@@ -2,6 +2,7 @@ import * as z from 'zod';
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldIndicator,
   FieldLabel,
 } from '@wallarm-org/design-system/Field';
@@ -9,6 +10,7 @@ import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { Textarea } from '@wallarm-org/design-system/Textarea';
 import { defineComponent } from '../core/define';
+import { textError, textRules } from '../core/validate';
 
 export const TextareaComponent = defineComponent({
   name: 'Textarea',
@@ -20,17 +22,19 @@ export const TextareaComponent = defineComponent({
     placeholder: z.string().optional(),
     description: z.string().optional().describe('Help under the field'),
     required: z.boolean().optional(),
+    ...textRules,
     rows: z.number().int().min(1).max(20).optional().describe('Visible lines'),
   }),
   bindable: ['value'],
+  validate: textError,
   Skeleton: () => (
     <VStack gap={4} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />
       <Skeleton width='100%' height='76px' transparent={false} />
     </VStack>
   ),
-  View: ({ props, set }) => (
-    <Field required={props.required ?? false}>
+  View: ({ props, set, error }) => (
+    <Field required={props.required ?? false} invalid={!!error}>
       <FieldLabel>
         {props.label}
         {props.required && <FieldIndicator />}
@@ -42,6 +46,7 @@ export const TextareaComponent = defineComponent({
         onChange={event => set('value', event.target.value)}
       />
       {props.description && <FieldDescription>{props.description}</FieldDescription>}
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   ),
 });

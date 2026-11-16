@@ -73,13 +73,19 @@ const LAYOUT: LayoutNode[][] = [
       label: 'Reason',
       value: field('/reason'),
       description: 'Shown in the deny list next to each address',
+      required: true,
     }),
     n('options', 'Stack', { gap: '8' }, ['subnet', 'notify']),
     n('actions', 'Stack', { direction: 'row' }, ['submit']),
     n('subnet', 'Checkbox', { label: 'Also block their /24 subnets', checked: field('/subnet') }),
     n('notify', 'Switch', { label: 'Notify the on-call team', checked: field('/notify') }),
     {
-      ...n('submit', 'Button', { label: 'Block selected', variant: 'primary', destructive: true }),
+      ...n('submit', 'Button', {
+        label: 'Block selected',
+        variant: 'primary',
+        destructive: true,
+        submit: true,
+      }),
       press: {
         action: 'block_ips',
         params: {

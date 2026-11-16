@@ -156,7 +156,7 @@ const surfaces = (c: DateCase) => ({
       program={[
         'root = Stack(null, null, [f, go])',
         `f = ${c.type}(${c.openUiArgs('$v')})`,
-        'go = Button("Send", null, null, @submit({v: $v}))',
+        'go = Button("Send", null, null, null, @submit({v: $v}))',
         '$v = null',
       ].join('\n')}
       onAction={onAction}

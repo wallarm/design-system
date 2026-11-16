@@ -177,6 +177,46 @@ OpenUI writes back only to a top-level variable, so keep each field's path one s
 (`/ip`, not `/form/ip`). A field the agent sends a literal for starts from it and keeps the user's
 input on the page, but no action can read it.
 
+#### Validation
+
+The agent sends the constraints as props, and gen-ui checks them the same way in every format
+(not A2UI's `checks` or json-render's `validateForm`: OpenUI has no checks, and A2UI's need a
+function catalog).
+
+| Fields | Constraints |
+| --- | --- |
+| Input, Textarea | `required`, `minLength`, `maxLength`, `pattern` (a regular expression the whole value matches), `patternMessage` |
+| NumberInput, DateInput, TimeInput | `required`, `min`, `max` |
+| Select, RadioGroup, DateRangeInput | `required` |
+
+A field shows its error once the user changes it, so a fresh form isn't red. A Button with
+`submit: true` checks every field on its surface first: while any has an error it shows them all
+and fires nothing. A Button without `submit` fires as before.
+
+```json
+[
+  {
+    "id": "limit",
+    "component": "NumberInput",
+    "label": "Requests",
+    "value": { "@path": "/limit" },
+    "min": 1,
+    "max": 10000,
+    "required": true
+  },
+  {
+    "id": "create",
+    "component": "Button",
+    "label": "Create rule",
+    "submit": true,
+    "press": { "event": { "name": "create_rate_limit", "context": { "limit": { "@path": "/limit" } } } }
+  }
+]
+```
+
+An entry adds a check with `validate: props => message | undefined` in `defineComponent`; the View
+gets the message as `error`.
+
 A Table takes part the same way. Headers sort the rows, and `pageSize` pages them. `selectable`
 puts checkboxes on the rows and writes the selected rows' `rowKey` values to `selection`, so a
 Button sends them, e.g. "Block selected". `rowActionItem` adds an item to each row's menu in its
@@ -432,9 +472,8 @@ swapping in the bindable leaf types, and the casts go away.
 
 ## Limitations
 
-- A field has no validation beyond `required`'s marker and a date's `min`/`max` shown as an
-  error: the app checks the values an action sends. DateRangeInput reports a range only once both
-  ends are filled.
+- Validation runs on the page, for the user: the app still checks the values an action sends.
+  DateRangeInput reports a range only once both ends are filled.
 - A Table row has one action in its menu, and its first cell opens its details only with the
   mouse, since the design system's master cell has no keyboard handler.
 - Tooltip, Popover, HoverCard and Toast are not in the catalog: content on demand goes in a Drawer

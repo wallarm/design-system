@@ -3,12 +3,14 @@ import { DateRangeInput } from '@wallarm-org/design-system/DateRangeInput';
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldIndicator,
   FieldLabel,
 } from '@wallarm-org/design-system/Field';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { defineComponent, type GenUiViewProps } from '../core/define';
+import { REQUIRED } from '../core/validate';
 import { toDate } from './DateInput';
 
 const schema = z.object({
@@ -29,8 +31,8 @@ const toRange = (value: z.infer<typeof schema>['value']) => {
 };
 
 /** A named component so React Compiler keeps the parsed range stable between renders. */
-const DateRangeInputView = ({ props, set }: GenUiViewProps<z.infer<typeof schema>>) => (
-  <Field required={props.required ?? false}>
+const DateRangeInputView = ({ props, set, error }: GenUiViewProps<z.infer<typeof schema>>) => (
+  <Field required={props.required ?? false} invalid={!!error}>
     <FieldLabel>
       {props.label}
       {props.required && <FieldIndicator />}
@@ -48,6 +50,7 @@ const DateRangeInputView = ({ props, set }: GenUiViewProps<z.infer<typeof schema
       }
     />
     {props.description && <FieldDescription>{props.description}</FieldDescription>}
+    {error && <FieldError>{error}</FieldError>}
   </Field>
 );
 
@@ -57,6 +60,8 @@ export const DateRangeInputComponent = defineComponent({
     'A period the user picks by its first and last day: a report window, how far back to look for attacks. Bind value two-way to a path; it holds {start, end} ISO dates like {start: "2026-11-01", end: "2026-11-15"}, and the Button that submits sends that path in its action context.',
   props: schema,
   bindable: ['value'],
+  validate: props =>
+    props.required && !(props.value?.start && props.value.end) ? REQUIRED : undefined,
   Skeleton: () => (
     <VStack gap={4} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />

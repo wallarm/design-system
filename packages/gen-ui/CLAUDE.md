@@ -12,6 +12,8 @@ Read [README.md](./README.md) first: the folder map, how a render works and how 
 - Props are data only; no prop named `id`, `component`, `children` or `child`; events carry no
   arguments. A value the user enters is a `bindable` prop the View writes with `set`, and the
   action's context reads its path; the app's action allowlist still checks every action.
+- Validation is gen-ui's, not a format's: an entry checks its constraints in `validate`, and the
+  View shows `error`; never wire A2UI `checks` or json-render `validateForm`.
 - Format-specific code stays in `src/a2ui/`, `src/json-render/` or `src/openui/`; `src/core/`
   imports no format library, and React only as types.
 - Agent output is untrusted: actions go through the app's allowlist, and nothing from a spec is

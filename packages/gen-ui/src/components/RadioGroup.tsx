@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { Field, FieldIndicator, FieldLabel } from '@wallarm-org/design-system/Field';
+import { Field, FieldError, FieldIndicator, FieldLabel } from '@wallarm-org/design-system/Field';
 import {
   Radio,
   RadioDescription,
@@ -10,6 +10,7 @@ import {
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { defineComponent, unique } from '../core/define';
+import { REQUIRED } from '../core/validate';
 
 export const RadioGroupComponent = defineComponent({
   name: 'RadioGroup',
@@ -26,6 +27,7 @@ export const RadioGroupComponent = defineComponent({
     required: z.boolean().optional(),
   }),
   bindable: ['value'],
+  validate: props => (props.required && !props.value ? REQUIRED : undefined),
   Skeleton: () => (
     <VStack gap={8} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />
@@ -33,8 +35,8 @@ export const RadioGroupComponent = defineComponent({
       <Skeleton width='160px' height='20px' transparent={false} />
     </VStack>
   ),
-  View: ({ props, set }) => (
-    <Field required={props.required ?? false}>
+  View: ({ props, set, error }) => (
+    <Field required={props.required ?? false} invalid={!!error}>
       <FieldLabel>
         {props.label}
         {props.required && <FieldIndicator />}
@@ -52,6 +54,7 @@ export const RadioGroupComponent = defineComponent({
           </Radio>
         ))}
       </RadioGroup>
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   ),
 });

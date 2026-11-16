@@ -3,6 +3,7 @@ import * as z from 'zod';
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldIndicator,
   FieldLabel,
 } from '@wallarm-org/design-system/Field';
@@ -10,6 +11,7 @@ import { NumberInput } from '@wallarm-org/design-system/NumberInput';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { defineComponent } from '../core/define';
+import { rangeError } from '../core/validate';
 
 /** What a field's text means on the path: a number, or nothing while it is empty or half-typed. */
 const numberOf = (text: string) => {
@@ -31,20 +33,21 @@ export const NumberInputComponent = defineComponent({
     required: z.boolean().optional(),
   }),
   bindable: ['value'],
+  validate: props => rangeError(props),
   Skeleton: () => (
     <VStack gap={4} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />
       <Skeleton width='100%' height='32px' transparent={false} />
     </VStack>
   ),
-  View: ({ props, set }) => {
+  View: ({ props, set, error }) => {
     // The typed text stays while it means the bound number ("-", "1." mid-typing); a new value
     // from the app replaces it.
     const [text, setText] = useState('');
     const shown =
       numberOf(text) === props.value ? text : props.value === undefined ? '' : String(props.value);
     return (
-      <Field required={props.required ?? false}>
+      <Field required={props.required ?? false} invalid={!!error}>
         <FieldLabel>
           {props.label}
           {props.required && <FieldIndicator />}
@@ -60,6 +63,7 @@ export const NumberInputComponent = defineComponent({
           }}
         />
         {props.description && <FieldDescription>{props.description}</FieldDescription>}
+        {error && <FieldError>{error}</FieldError>}
       </Field>
     );
   },

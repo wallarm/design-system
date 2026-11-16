@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { Field, FieldIndicator, FieldLabel } from '@wallarm-org/design-system/Field';
+import { Field, FieldError, FieldIndicator, FieldLabel } from '@wallarm-org/design-system/Field';
 import {
   createListCollection,
   Select,
@@ -13,6 +13,7 @@ import {
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { defineComponent, unique } from '../core/define';
+import { REQUIRED } from '../core/validate';
 
 export const SelectComponent = defineComponent({
   name: 'Select',
@@ -29,16 +30,17 @@ export const SelectComponent = defineComponent({
     required: z.boolean().optional(),
   }),
   bindable: ['value'],
+  validate: props => (props.required && !props.value ? REQUIRED : undefined),
   Skeleton: () => (
     <VStack gap={4} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />
       <Skeleton width='100%' height='32px' transparent={false} />
     </VStack>
   ),
-  View: ({ props, set }) => {
+  View: ({ props, set, error }) => {
     const collection = createListCollection({ items: props.options });
     return (
-      <Field required={props.required ?? false}>
+      <Field required={props.required ?? false} invalid={!!error}>
         <FieldLabel>
           {props.label}
           {props.required && <FieldIndicator />}
@@ -60,6 +62,7 @@ export const SelectComponent = defineComponent({
             </SelectContent>
           </SelectPositioner>
         </Select>
+        {error && <FieldError>{error}</FieldError>}
       </Field>
     );
   },

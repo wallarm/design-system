@@ -98,5 +98,14 @@ describe('"Rate-limit POST /oauth/token"', () => {
         }),
       );
     });
+
+    it(`holds the rule back while the limit is empty in ${format}`, async () => {
+      const onAction = rstest.fn();
+      render(surface(onAction));
+      await userEvent.clear(await screen.findByLabelText(/Requests per source/));
+      await userEvent.click(screen.getByRole('button', { name: 'Create rule' }));
+      expect(await screen.findByText('Required')).toBeTruthy();
+      expect(onAction).not.toHaveBeenCalled();
+    });
   }
 });

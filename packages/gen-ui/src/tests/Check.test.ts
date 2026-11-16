@@ -57,7 +57,7 @@ const BROKEN_OPENUI = [
   'root = Stack(null, null, [m, ghost, chart, go])',
   'm = Metric("Attacks", $a, null, null, null, null, "red")',
   'chart = Spreadsheet()',
-  'go = Button("Go", null, null, @rm_rf())',
+  'go = Button("Go", null, null, null, @rm_rf())',
 ].join('\n');
 
 const summary = (issues: ReturnType<typeof checkA2uiAnswer>) =>

@@ -107,8 +107,8 @@ describe('OpenUI Lang', () => {
     const onAction = rstest.fn();
     const program = [
       'root = Stack("row", null, [ok, away])',
-      'ok = Button("Block", "primary", null, @block_ips({ips: $top}))',
-      'away = Button("Open", null, null, @OpenUrl("https://example.com"))',
+      'ok = Button("Block", "primary", null, null, @block_ips({ips: $top}))',
+      'away = Button("Open", null, null, null, @OpenUrl("https://example.com"))',
     ].join('\n');
     render(
       <OpenUiSurface
