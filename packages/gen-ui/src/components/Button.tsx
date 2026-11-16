@@ -19,14 +19,22 @@ export const ButtonComponent = defineComponent({
     label: z.string(),
     variant: z.enum(VARIANTS).optional(),
     destructive: z.boolean().optional(),
+    submit: z
+      .boolean()
+      .optional()
+      .describe(
+        'Validates the form on this surface before firing press; set it on the button that sends the form',
+      ),
   }),
   events: ['press'],
   Skeleton: () => <Skeleton width='120px' height='36px' rounded={8} transparent={false} />,
-  View: ({ props, emit }) => (
+  View: ({ props, emit, checkForm }) => (
     <Button
       variant={props.variant ?? 'outline'}
       color={props.destructive ? 'destructive' : COLOR[props.variant ?? 'outline']}
-      onClick={() => emit('press')}
+      onClick={() => {
+        if (!props.submit || checkForm()) emit('press');
+      }}
     >
       {props.label}
     </Button>

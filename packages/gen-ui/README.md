@@ -19,6 +19,7 @@ src/
 │   ├── define.ts         GenUiComponent (an entry's contract), defineComponent,
 │   │                     subsetOf / allOf / Values (enums from DS types), seriesKey, unique
 │   ├── format.ts         named number and time formats (formatNumber, formatTime)
+│   ├── validate.ts       the fields' `validate` checks: required, min/max, text length, pattern
 │   └── guards.ts         isRecord: narrow untrusted agent output
 ├── render/               React pieces every format shares
 │   ├── GuardedView.tsx   validates props against the schema, then View or Skeleton
@@ -27,6 +28,7 @@ src/
 │   ├── cells.tsx         a record field's value types (ip, status, country…): Table, its row
 │   │                     details and KeyValueList draw them the same way
 │   ├── SurfaceBoundary.tsx  error boundary: a View that throws blanks its own surface only
+│   ├── SurfaceForm.tsx   each surface's fields' errors, checked by a `submit` Button
 │   └── warn.ts           the one console.warn for rejected agent output
 ├── components/           THE CATALOG: one file per entry, index.ts lists them in order
 ├── a2ui/                 @wallarm-org/gen-ui/a2ui
@@ -101,6 +103,11 @@ An entry must follow these rules. Tests or typecheck enforce the ones marked ✓
 - Events carry no arguments: `events: ['press']`, then `emit('press')`. A value the user enters
   goes to a path: list the prop in `bindable` and write it with `set(prop, value)`; the action's
   context reads the path (see `Input.tsx`, `Fields.test.tsx`).
+- A field checks the constraints the agent sent (`required`, `min`, `pattern`…) in `validate`:
+  `props => message | undefined` (helpers in `core/validate.ts`). The View gets the message as
+  `error` once the field was touched or a submit tried; a `submit` Button fires only when every
+  mounted field on its surface passes (a closed Drawer or Dialog mounts none; see
+  `Validation.test.tsx`).
 - A container sets `hasChildren: true` and renders `children`.
 - The `View` gets props that already passed the schema, so it needn't guard against missing data;
   declare a `Skeleton` shaped like the loaded component.

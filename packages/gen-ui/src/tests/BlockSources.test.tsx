@@ -84,7 +84,7 @@ describe('"Block the sources brute-forcing /oauth/token"', () => {
       await userEvent.click(screen.getByRole('combobox'));
       await userEvent.click(await screen.findByRole('option', { name: '7 days' }));
       await userEvent.click(screen.getByText('Also block their /24 subnets'));
-      await userEvent.type(screen.getByLabelText('Reason'), ', again');
+      await userEvent.type(screen.getByLabelText(/Reason/), ', again');
       await userEvent.click(screen.getByRole('button', { name: 'Block selected' }));
       await waitFor(() =>
         expect(onAction).toHaveBeenCalledWith('block_ips', {

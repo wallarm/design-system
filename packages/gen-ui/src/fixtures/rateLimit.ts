@@ -1,7 +1,7 @@
 /**
  * A rule the agent drafts and the user tunes: the limit, its window, what happens over it, when it
  * applies and a note. Every field is bound two-way, the app fills the draft, and the button sends
- * the tuned rule in one action.
+ * the tuned rule in one action once the form is valid (the limit is required and bounded).
  */
 import type { GenUiAction } from '../core/define';
 import { bind, field, type LayoutNode, node as n, type Scenario } from './stream';
@@ -75,10 +75,10 @@ const LAYOUT: LayoutNode[][] = [
     n('schedule', 'Grid', { columns: '2', gap: '16' }, ['period', 'starts']),
     n('period', 'DateRangeInput', { label: 'Active', value: field('/period') }),
     n('starts', 'TimeInput', { label: 'Starts at', value: field('/startsAt') }),
-    n('note', 'Textarea', { label: 'Note', value: field('/note'), rows: 2 }),
+    n('note', 'Textarea', { label: 'Note', value: field('/note'), rows: 2, maxLength: 200 }),
     n('actions', 'Stack', { direction: 'row' }, ['create']),
     {
-      ...n('create', 'Button', { label: 'Create rule', variant: 'primary' }),
+      ...n('create', 'Button', { label: 'Create rule', variant: 'primary', submit: true }),
       press: {
         action: 'create_rate_limit',
         params: {

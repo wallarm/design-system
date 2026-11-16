@@ -137,7 +137,7 @@ const surfaces = {
         'root = Stack(null, null, [t, go])',
         // title, rowKey, columns, rows, detail, pageSize, selectable, selection, rowActionItem, actionRow, rowAction
         `t = Table(null, "ip", ${JSON.stringify(COLUMNS).replace(/"(\w+)":/g, '$1:')}, $rows, null, ${extra.pageSize ?? 'null'}, true, $sel, {label: "Allow"}, $row, @allow_ip({ip: $row}))`,
-        'go = Button("Block selected", null, null, @block_ips({ips: $sel}))',
+        'go = Button("Block selected", null, null, null, @block_ips({ips: $sel}))',
         '$sel = []',
         '$row = null',
       ].join('\n')}

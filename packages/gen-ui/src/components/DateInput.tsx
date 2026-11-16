@@ -4,12 +4,14 @@ import { DateInput } from '@wallarm-org/design-system/DateInput';
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldIndicator,
   FieldLabel,
 } from '@wallarm-org/design-system/Field';
 import { Skeleton } from '@wallarm-org/design-system/Skeleton';
 import { VStack } from '@wallarm-org/design-system/Stack';
 import { defineComponent, type GenUiViewProps } from '../core/define';
+import { NOT_BEFORE_AFTER, rangeError } from '../core/validate';
 
 const schema = z.object({
   label: z.string(),
@@ -31,11 +33,10 @@ export const toDate = (iso: string | undefined) => {
 };
 
 /** A named component so React Compiler keeps the parsed value stable between renders. */
-const DateInputView = ({ props, set }: GenUiViewProps<z.infer<typeof schema>>) => {
+const DateInputView = ({ props, set, error }: GenUiViewProps<z.infer<typeof schema>>) => {
   const { value, min, max } = props;
-  const outOfRange = !!value && ((!!min && value < min) || (!!max && value > max));
   return (
-    <Field required={props.required ?? false}>
+    <Field required={props.required ?? false} invalid={!!error}>
       <FieldLabel>
         {props.label}
         {props.required && <FieldIndicator />}
@@ -45,11 +46,12 @@ const DateInputView = ({ props, set }: GenUiViewProps<z.infer<typeof schema>>) =
         minValue={toDate(min) ?? undefined}
         maxValue={toDate(max) ?? undefined}
         isRequired={props.required}
-        error={outOfRange}
+        error={!!error}
         // ISO strings compare in date order; `slice` drops a time part the DS may add.
         onChange={next => set('value', next?.toString().slice(0, 10))}
       />
       {props.description && <FieldDescription>{props.description}</FieldDescription>}
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   );
 };
@@ -60,6 +62,7 @@ export const DateInputComponent = defineComponent({
     'A calendar date the user enters: when a rule starts, a report day. Bind value two-way to a path; it holds an ISO date like "2026-11-15", and the Button that submits sends that path in its action context.',
   props: schema,
   bindable: ['value'],
+  validate: props => rangeError(props, NOT_BEFORE_AFTER),
   Skeleton: () => (
     <VStack gap={4} align='stretch' fullWidth>
       <Skeleton width='120px' height='16px' transparent={false} />

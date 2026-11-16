@@ -12,6 +12,16 @@ export interface GenUiViewProps<P> {
    * action reads it from there, or, for a literal, kept in the View.
    */
   set: <K extends keyof P & string>(prop: K, value: P[K]) => void;
+  /**
+   * The entry's `validate` message, once the user changed this field or a submit was tried on its
+   * surface: a fresh form isn't red.
+   */
+  error?: string;
+  /**
+   * Shows every field's error on this surface and says whether all of them pass: a submit Button
+   * calls it before `emit`.
+   */
+  checkForm: () => boolean;
   /** Rendered children, when the component `hasChildren`. */
   children?: ReactNode;
 }
@@ -35,6 +45,12 @@ export interface GenUiComponent<S extends z.ZodObject = z.ZodObject> {
   /** Props the user changes (an input's value): the View writes them with `set`. */
   bindable?: readonly (keyof z.infer<S> & string)[];
   hasChildren?: boolean;
+  /**
+   * What is wrong with the value the user entered, against the constraints the agent sent
+   * (`required`, `min`…), or undefined. The View gets it as `error`; a submit Button won't fire
+   * while any field on its surface has one.
+   */
+  validate?: (props: z.infer<S>) => string | undefined;
   View: FC<GenUiViewProps<z.infer<S>>>;
   /**
    * Drawn while the props don't match the schema yet (mid-stream: data still on its way), shaped
