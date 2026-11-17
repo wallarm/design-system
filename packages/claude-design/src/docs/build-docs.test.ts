@@ -221,6 +221,7 @@ describe('Claude Design documentation', () => {
     expect(readme).toContain('- ThemeProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- DateFormatProvider: provider; use WallarmDS.Root on the canvas.');
     expect(readme).toContain('- Checkmark: internal primitive; no guide.');
+    expect(readme).toContain('- OverlayManager: hook-only');
   });
 
   it('ships barrel re-export targets', async () => {
@@ -232,6 +233,7 @@ describe('Claude Design documentation', () => {
     const readme = await readFile(path.join(outDir, 'README.md'), 'utf8');
     expect(readme).toContain('- src/theme/Pixel.stories.tsx: theme gallery story');
     expect(readme).toContain('- src/icons/module/Icons.stories.tsx: icon gallery story');
+    expect(readme).toContain('- src/components/OverlayManager/OverlayManager.stories.tsx:');
   });
 
   it('omits internal primitives and stays within the declaration budget', async () => {
