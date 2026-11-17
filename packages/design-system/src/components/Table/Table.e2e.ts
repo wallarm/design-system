@@ -407,6 +407,14 @@ test.describe('Component: Table', () => {
       expect(hidden).toBe(0);
     });
 
+    test('Should keep a draggable header a column header', async ({ page }) => {
+      await tableStory.goto(page, 'Column Drag And Drop');
+      const table = page.getByRole('table').filter({ has: page.locator('[data-row-id]') });
+      const headers = table.locator('thead th');
+      await expect(headers.filter({ hasText: 'Requests' })).toBeVisible();
+      await expect(table.getByRole('columnheader')).toHaveCount(await headers.count());
+    });
+
     test('Should show the row actions while one of them has the keyboard focus', async ({
       page,
     }) => {
@@ -455,8 +463,6 @@ test.describe('Component: Table', () => {
     }) => {
       await tableStory.goto(page, 'Column Drag And Drop');
 
-      // dnd-kit's `attributes` swap the draggable header's a11y role to "button"
-      // (for keyboard sortable support), so query by DOM text, not ARIA role.
       const requestsHeader = page.locator('thead th').filter({ hasText: 'Requests' });
 
       // The header's leading "More" menu button occupies the top-left corner

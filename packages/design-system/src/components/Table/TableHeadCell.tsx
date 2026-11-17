@@ -143,6 +143,8 @@ export const TableHeadCell = <T extends RowData>({
       colSpan={header.colSpan}
       aria-sort={ariaSort}
       {...(canDnd ? { ...listeners, ...attributes } : {})}
+      // dnd-kit's attributes make the header a "button": it stays a column header.
+      role='columnheader'
       tabIndex={-1}
     >
       {isNotBasicColumn && content}
