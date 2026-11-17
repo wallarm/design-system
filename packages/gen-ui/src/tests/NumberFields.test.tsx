@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, rstest } from '@rstest/core';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type A2uiMessage,
@@ -157,7 +157,8 @@ for (const c of CASES) {
     it('starts from a literal the agent sent and still takes input', async () => {
       render(surfaces(c).A2UI(rstest.fn(), c.literal));
       await c.fill();
-      expect(c.read()).toBe(c.afterLiteral);
+      // Ark's NumberInput writes the input one frame late, so a fast typist can see a stale value.
+      await waitFor(() => expect(c.read()).toBe(c.afterLiteral));
     });
   });
 }
