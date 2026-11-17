@@ -1,4 +1,11 @@
-import { type FC, Suspense, useLayoutEffect, useState, useSyncExternalStore } from 'react';
+import {
+  type FC,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { InstanceErrorBoundary } from './InstanceErrorBoundary';
 import { OverlayStoreContext } from './OverlayStoreContext';
 import {
@@ -54,12 +61,14 @@ export const OverlayProvider: FC<OverlayProviderProps> = ({ children, onError })
     store.setOnError(onError ?? reportOverlayError);
   }, [store, onError]);
 
-  // A layout effect: StrictMode's replay re-attaches before any passive effect, so a child's
-  // mount-effect open() does not hit the detached store.
+  // Attach in a layout effect: StrictMode's replay runs it before replaying any passive effect,
+  // so a child's mount-effect open() never hits a detached store. Detach in a passive cleanup:
+  // a Suspense boundary above that re-suspends disconnects only layout effects, and only a real
+  // unmount may settle and drop the overlays.
   useLayoutEffect(() => {
     store.attach();
-    return store.detach;
   }, [store]);
+  useEffect(() => store.detach, [store]);
 
   return (
     <OverlayStoreContext.Provider value={store}>

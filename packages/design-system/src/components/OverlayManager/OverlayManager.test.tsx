@@ -276,6 +276,38 @@ describe('OverlayProvider and useOverlay', () => {
     expect(screen.getByTestId('page')).toBeVisible();
   });
 
+  it('keeps open overlays when a Suspense boundary above the provider re-suspends', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    let resolveSection: (module: { default: () => ReactNode }) => void = () => undefined;
+    const section = new Promise<{ default: () => ReactNode }>(resolve => {
+      resolveSection = resolve;
+    });
+    const LazySection = lazy(() => section);
+    const Page = ({ show }: { show: boolean }) => (
+      <Suspense fallback={<span data-testid='outer-fallback' />}>
+        <OverlayProvider>
+          <Opener onResult={onResult} />
+          {show && <LazySection />}
+        </OverlayProvider>
+      </Suspense>
+    );
+    const { rerender } = render(<Page show={false} />);
+    await openConfirm(user);
+    await flushLayers();
+
+    rerender(<Page show />);
+    expect(await screen.findByTestId('outer-fallback')).toBeInTheDocument();
+    await flushLayers();
+    expect(onResult).not.toHaveBeenCalled();
+
+    await act(async () => resolveSection({ default: () => <span data-testid='section' /> }));
+    expect(await screen.findByTestId('section')).toBeInTheDocument();
+    expect(screen.getByTestId('confirm--content')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('confirm-ok'));
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(true));
+  });
+
   it('reports a render error, settles undefined and keeps other overlays open', async () => {
     rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const user = userEvent.setup();
