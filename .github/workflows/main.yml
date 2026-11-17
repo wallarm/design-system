@@ -158,8 +158,9 @@ jobs:
             fi
             if [ "$SPECS" != ALL ]; then
               COUNT=$(wc -w <<< "$SPECS")
-              # ~35 specs fill a 7-minute shard; never more than the full run's 4
-              SHARDS=$(( (COUNT + 34) / 35 ))
+              # Affected specs skew heavy (Table, patterns, templates): 33 of them took 7 min on
+              # one shard. Keep the full run's 4 shards unless there are fewer specs than that.
+              SHARDS=$(( COUNT < 4 ? COUNT : 4 ))
               echo "specs=$SPECS" >> $GITHUB_OUTPUT
               echo "shards=$(jq -cn --argjson n "$SHARDS" '[range(1; $n + 1)]')" >> $GITHUB_OUTPUT
               echo "✅ E2E: $COUNT affected specs on $SHARDS shard(s)"
