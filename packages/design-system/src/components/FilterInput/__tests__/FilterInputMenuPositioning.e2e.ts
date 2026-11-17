@@ -29,12 +29,18 @@ test.describe('Component: FilterInput - Menu Positioning', () => {
       });
       await expect(fieldMenu).toBeVisible({ timeout: 5000 });
 
-      const inputBefore = await input.boundingBox();
-      const menuBefore = await fieldMenu.boundingBox();
-      expect(inputBefore).not.toBeNull();
-      expect(menuBefore).not.toBeNull();
+      // Left-edge gap between the menu and the input. Polled, not read once: the
+      // menu turns visible while its zoom-in-95 open animation still scales it, so
+      // a box read in the first frames is up to ~9px off the settled position.
+      const menuOffset = async () => {
+        const [inputBox, menuBox] = [await input.boundingBox(), await fieldMenu.boundingBox()];
+        return inputBox && menuBox ? Math.abs(menuBox.x - inputBox.x) : Number.POSITIVE_INFINITY;
+      };
+
       // Field menu is anchored to the input — left edges align within tolerance.
-      expect(Math.abs(menuBefore!.x - inputBefore!.x)).toBeLessThan(8);
+      await expect.poll(menuOffset).toBeLessThan(8);
+      const inputBefore = await input.boundingBox();
+      expect(inputBefore).not.toBeNull();
 
       // Backspace on empty input removes the last committed chip while keeping
       // the field menu open — this is the scenario the fix addresses.
@@ -42,21 +48,15 @@ test.describe('Component: FilterInput - Menu Positioning', () => {
       await expect(chips).toHaveCount(1);
       await expect(fieldMenu).toBeVisible();
 
-      // Give floating-ui one paint to react to the synthetic resize dispatched
-      // by useFloatingRecomputeOn on chipsCount change.
-      await page.waitForTimeout(100);
-
-      const inputAfter = await input.boundingBox();
-      const menuAfter = await fieldMenu.boundingBox();
-      expect(inputAfter).not.toBeNull();
-      expect(menuAfter).not.toBeNull();
-
       // Input shifted left (one fewer chip in front of it).
+      const inputAfter = await input.boundingBox();
+      expect(inputAfter).not.toBeNull();
       expect(inputAfter!.x).toBeLessThan(inputBefore!.x - 5);
 
-      // Menu followed the input — without the fix, menu.x would stick near the
-      // old inputBefore.x and drift away from the live input position.
-      expect(Math.abs(menuAfter!.x - inputAfter!.x)).toBeLessThan(8);
+      // Menu followed the input once floating-ui reacted to the synthetic resize
+      // useFloatingRecomputeOn dispatches on chipsCount change — without the fix,
+      // menu.x would stick near the old inputBefore.x and the poll times out.
+      await expect.poll(menuOffset).toBeLessThan(8);
     });
   });
 });
