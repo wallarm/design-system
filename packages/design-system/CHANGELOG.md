@@ -1,3 +1,15 @@
+## [4.19.2](https://github.com/wallarm/design-system/compare/v4.19.1...v4.19.2) (2026-11-17)
+
+### Bug Fixes
+
+* **line-chart:** regular weight for range labels (WDS-207) ([#504](https://github.com/wallarm/design-system/issues/504)) ([59ab878](https://github.com/wallarm/design-system/commit/59ab8786dcf4f67515c427130dc7b3bb56389074))
+
+## [4.19.1](https://github.com/wallarm/design-system/compare/v4.19.0...v4.19.1) (2026-11-17)
+
+### Bug Fixes
+
+* **hover-card:** plain-text trigger name aligned with its icon (WDS-206) ([#505](https://github.com/wallarm/design-system/issues/505)) ([72d6037](https://github.com/wallarm/design-system/commit/72d603712e10ffe4f578ee051b4dbf134f0772f5))
+
 ## [4.19.0](https://github.com/wallarm/design-system/compare/v4.18.0...v4.19.0) (2026-11-16)
 
 ### Features

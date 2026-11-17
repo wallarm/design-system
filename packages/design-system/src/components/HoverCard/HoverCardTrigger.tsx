@@ -3,10 +3,11 @@ import { HoverCard as ArkUiHoverCard } from '@ark-ui/react/hover-card';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 /**
- * Always asChild. The child is the item's real interactive element: a DS Link, a router link,
- * <a href> or <button>. Analytics attributes, aria-*, id, ref and handlers go on the child.
- * Ark composes its focus, blur and pointer handlers with the child's own; it never replaces them.
- * data-testid: useTestId('trigger', override). Pass it explicitly when the trigger sits inside
+ * Always asChild. The child is the element the card opens from. A name is plain text in a
+ * focusable <span tabIndex={0}>, so the card also opens on keyboard focus; a DS Link, a router
+ * link, <a href> or <button> work too. Analytics attributes, aria-*, id, ref and handlers go on
+ * the child. Ark composes its focus, blur and pointer handlers with the child's own; it never
+ * replaces them. data-testid: useTestId('trigger', override). Pass it explicitly when the trigger sits inside
  * Avatar or AgentItem, because they re-provide the cascade.
  * On an element that already has a Tooltip, nest the two asChild triggers in either order
  * (<HoverCardTrigger><TooltipTrigger asChild>…</TooltipTrigger></HoverCardTrigger> or the reverse)
