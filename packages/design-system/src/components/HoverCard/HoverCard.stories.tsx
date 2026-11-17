@@ -34,7 +34,7 @@ const DESCRIPTION = [
   'One action at most, as `HoverCardAction`. The product leaves out a row that does not apply (Approvals for agents that never ask) and the action when the viewer lacks the permission. A row that applies but is empty passes `isEmpty` and shows the em dash; never write "None".',
   'Fetch inside the content: it mounts only when the card opens, so a data component in `HoverCardContent` fetches on open with no `open` wiring. While it loads, keep the known name and the row labels, and skeleton only the values.',
   'On an element that already has a `Tooltip`, nest `HoverCardTrigger` and `TooltipTrigger asChild` on it and pass the same `ids.trigger` to `HoverCard` and `Tooltip`. Tooltips outside the content close while the card is up, so neither needs `open` wiring.',
-  "`data-analytics-id` goes on the trigger's child — the real link or button — on `HoverCardAction`, and on each row `Link`. The card adds no seam of its own.",
+  "`data-analytics-id` goes on the trigger's child — the name's span, link or button — on `HoverCardAction`, and on each row `Link`. The card adds no seam of its own.",
   "The DS has no status mapping; pass a `Badge variant='dotted' type='secondary'`. People: Active green, Invited blue, Invite expired w-orange, Deactivated gray. Agents: On duty green, Working blue, Needs you amber, Failed red, Deactivated and Not set up gray, Inviting blue.",
 ].join('\n\n');
 
@@ -71,13 +71,11 @@ const WEEK_AGO = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 export const Agent: StoryFn<typeof meta> = () => {
   return (
     <HoverCard data-testid='agent-card'>
-      <AgentItem agent='radar' size={20}>
+      <AgentItem agent='radar' size={24}>
         <AvatarContent>
           <AvatarName>
             <HoverCardTrigger data-testid='agent-card--trigger'>
-              <Link href='#' size='md'>
-                Radar
-              </Link>
+              <span tabIndex={0}>Radar</span>
             </HoverCardTrigger>
           </AvatarName>
         </AvatarContent>
@@ -136,14 +134,12 @@ export const User: StoryFn<typeof meta> = () => {
 
   return (
     <HoverCard data-testid='user-card'>
-      <Avatar size='sm'>
+      <Avatar size='md'>
         <AvatarFallback name='Artem Miskevich' />
         <AvatarContent>
           <AvatarName>
             <HoverCardTrigger data-testid='user-card--trigger'>
-              <Link href='#' size='md'>
-                Artem Miskevich
-              </Link>
+              <span tabIndex={0}>Artem Miskevich</span>
             </HoverCardTrigger>
           </AvatarName>
         </AvatarContent>
@@ -187,13 +183,11 @@ export const User: StoryFn<typeof meta> = () => {
  */
 export const WithoutAction: StoryFn<typeof meta> = () => (
   <HoverCard data-testid='lens-card'>
-    <AgentItem agent='lens' size={20}>
+    <AgentItem agent='lens' size={24}>
       <AvatarContent>
         <AvatarName>
           <HoverCardTrigger data-testid='lens-card--trigger'>
-            <Link href='#' size='md'>
-              Lens
-            </Link>
+            <span tabIndex={0}>Lens</span>
           </HoverCardTrigger>
         </AvatarName>
       </AvatarContent>
@@ -231,14 +225,12 @@ export const WithoutAction: StoryFn<typeof meta> = () => (
 export const Loading: StoryFn<typeof meta> = () => {
   return (
     <HoverCard data-testid='loading-card'>
-      <Avatar size='sm'>
+      <Avatar size='md'>
         <AvatarFallback name='Artem Miskevich' />
         <AvatarContent>
           <AvatarName>
             <HoverCardTrigger data-testid='loading-card--trigger'>
-              <Link href='#' size='md'>
-                Artem Miskevich
-              </Link>
+              <span tabIndex={0}>Artem Miskevich</span>
             </HoverCardTrigger>
           </AvatarName>
         </AvatarContent>
@@ -276,14 +268,12 @@ export const Loading: StoryFn<typeof meta> = () => {
 export const Unavailable: StoryFn<typeof meta> = () => {
   return (
     <HoverCard data-testid='unavailable-card'>
-      <Avatar size='sm'>
+      <Avatar size='md'>
         <AvatarFallback />
         <AvatarContent>
           <AvatarName>
             <HoverCardTrigger data-testid='unavailable-card--trigger'>
-              <Link href='#' size='md'>
-                Former Employee
-              </Link>
+              <span tabIndex={0}>Former Employee</span>
             </HoverCardTrigger>
           </AvatarName>
         </AvatarContent>
@@ -316,14 +306,12 @@ const LONG_ROLES = [
 export const LongValues: StoryFn<typeof meta> = () => {
   return (
     <HoverCard data-testid='long-card'>
-      <Avatar size='sm'>
+      <Avatar size='md'>
         <AvatarFallback name='Konstantin Aleksandrovich Konstantinopolsky' />
         <AvatarContent>
           <AvatarName>
             <HoverCardTrigger data-testid='long-card--trigger'>
-              <Link href='#' size='md'>
-                Konstantin Aleksandrovich Konstantinopolsky
-              </Link>
+              <span tabIndex={0}>Konstantin Aleksandrovich Konstantinopolsky</span>
             </HoverCardTrigger>
           </AvatarName>
         </AvatarContent>
@@ -399,9 +387,10 @@ const USERS: UserRow[] = [
 /**
  * A name cell, as in the users table. The cell forces its direct child to block, so the card sits
  * in a `<span>`, and only `HoverCardTrigger` goes inside `AvatarName` — `AvatarName` renders its
- * children again in its own tooltip. The name is a button that opens the user. The last name is
- * truncated: its tooltip repeats the trigger, so that copy shares the trigger's id and test id —
- * a known limitation until `AvatarName` can show plain text in its tooltip.
+ * children again in its own tooltip. The name is plain text, as everywhere: the card's action
+ * opens the user. The last name is truncated: its tooltip repeats the trigger, so that copy shares
+ * the trigger's id and test id — a known limitation until `AvatarName` can show plain text in its
+ * tooltip.
  */
 export const InTable: StoryFn<typeof meta> = () => {
   const handleOpenUser = fn();
@@ -421,11 +410,7 @@ export const InTable: StoryFn<typeof meta> = () => {
               <AvatarContent>
                 <AvatarName>
                   <HoverCardTrigger data-testid={`user-card-${row.id}--trigger`}>
-                    <Link type='table' size='md' asChild>
-                      <button type='button' onClick={handleOpenUser}>
-                        {row.original.name}
-                      </button>
-                    </Link>
+                    <span tabIndex={0}>{row.original.name}</span>
                   </HoverCardTrigger>
                 </AvatarName>
               </AvatarContent>
@@ -492,9 +477,7 @@ export const WithTooltip: StoryFn<typeof meta> = () => {
       <Tooltip data-testid='tooltip-card-tooltip' ids={{ trigger: triggerId }}>
         <HoverCardTrigger data-testid='tooltip-card--trigger'>
           <TooltipTrigger asChild>
-            <Link href='#' size='md'>
-              Artem Miskevich
-            </Link>
+            <span tabIndex={0}>Artem Miskevich</span>
           </TooltipTrigger>
         </HoverCardTrigger>
         <TooltipContent>Signed in 5 minutes ago</TooltipContent>
@@ -519,17 +502,17 @@ export const WithTooltip: StoryFn<typeof meta> = () => {
 /**
  * Analytics attributes go on the elements themselves: the trigger's child, each row `Link` and
  * `HoverCardAction`. The card adds no seam of its own, so each `data-analytics-id` lands on the
- * real `<a>` or `<button>`.
+ * real element: the name's `<span>`, the row `<a>` and the action's `<a>`.
  */
 export const Analytics: StoryFn<typeof meta> = () => (
   <HoverCard data-testid='analytics-card'>
-    <AgentItem agent='radar' size={20}>
+    <AgentItem agent='radar' size={24}>
       <AvatarContent>
         <AvatarName>
           <HoverCardTrigger data-testid='analytics-card--trigger'>
-            <Link href='#' size='md' data-analytics-id='history.agent'>
+            <span tabIndex={0} data-analytics-id='history.agent'>
               Radar
-            </Link>
+            </span>
           </HoverCardTrigger>
         </AvatarName>
       </AvatarContent>
