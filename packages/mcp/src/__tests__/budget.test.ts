@@ -128,6 +128,14 @@ describe.skipIf(!hasRealMetadata)('response budget (real metadata)', () => {
     expect(searchComponents(metadata, 'notification center')[0]?.name).toBe('NotificationCenter');
   });
 
+  it.each(['useOverlay', 'defineOverlay', 'OverlayProvider', 'dialog manager'])(
+    '"%s" finds OverlayManager first',
+    query => expect(searchComponents(metadata, query)[0]?.name).toBe('OverlayManager'),
+  );
+
+  it('"overlay" still finds the Overlay backdrop first', () =>
+    expect(searchComponents(metadata, 'overlay')[0]?.name).toBe('Overlay'));
+
   it('every search alias points at a real component', () => {
     const names = new Set(metadata.components.map(c => c.name));
     const missing = Object.values(ALIASES)

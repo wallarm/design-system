@@ -1,7 +1,7 @@
 ---
 title: Confirmation dialogs
 description: Use when an action deletes, disables or overwrites something, or when closing a form would lose unsaved changes, and the user must confirm first.
-components: [Dialog, Drawer, Button, Input, Toast, Toaster]
+components: [Dialog, Drawer, Button, Input, Toast, Toaster, OverlayProvider]
 keywords: [confirm, confirmation, are you sure, delete, remove, revoke, deactivate, disable, destructive, type to confirm, unsaved changes, leave without saving, discard, modal, alert dialog, ConfirmDialog]
 order: 30
 ---
@@ -50,7 +50,49 @@ A confirmation dialog asks one question about one action, then runs that action 
 - If the dialog opens from a `Drawer`, render it inside `DrawerContent`. See [Layering](../foundations/layering.md).
 - To guard unsaved changes, intercept `onOpenChange(false)` on the `Drawer`. One handler covers the close X, `Escape` and outside click.
 - **Never** open a confirmation from a toast or from another confirmation.
-- Use one controlled `open` state per dialog, set by the control that starts the action.
+- Use one controlled `open` state per dialog, set by the control that starts the action. If several places open it, use a managed overlay (below).
+
+### Managed confirmation
+
+Define the dialog once and open it from any row, menu or drawer. It renders one `Dialog` root and spreads `controller.rootProps` onto it; `open()` resolves with the value passed to `controller.close`, or `undefined` when dismissed.
+
+```tsx
+import { Dialog, DialogContent } from '@wallarm-org/design-system/Dialog';
+import { defineOverlay, type OverlayProps, useOverlay } from '@wallarm-org/design-system/OverlayManager';
+
+interface DeleteUserDialogProps extends OverlayProps<boolean> {
+  userId: string;
+  userName: string;
+}
+
+export const DeleteUserDialog = ({ userId, userName, controller }: DeleteUserDialogProps) => {
+  const deleteUser = useDeleteUser();
+  // Ignore close requests while the request runs.
+  const handleOpenChange = (open: boolean) => {
+    if (!deleteUser.isPending) controller.rootProps.onOpenChange(open);
+  };
+  // On failure keep it open and show an error toast; close only on success.
+  const handleConfirm = async () => {
+    await deleteUser.mutateAsync(userId);
+    controller.close(true);
+  };
+  return (
+    <Dialog {...controller.rootProps} onOpenChange={handleOpenChange} width={400}>
+      <DialogContent>{/* title, description, Cancel, confirm calling handleConfirm */}</DialogContent>
+    </Dialog>
+  );
+};
+
+// overlays.ts: importing it does not load the dialog.
+export const DeleteUserOverlay = defineOverlay(() =>
+  import('./DeleteUserDialog').then(m => m.DeleteUserDialog),
+);
+
+// One OverlayProvider per app, around everything the root route renders. A drawer that can close
+// from outside (?user=) mounts its own OverlayProvider inside DrawerContent and opens from below it.
+const deleteUser = useOverlay(DeleteUserOverlay);
+const deleted = await deleteUser.open({ userId, userName });
+```
 
 ### Copy
 
