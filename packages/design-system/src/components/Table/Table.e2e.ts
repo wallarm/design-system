@@ -19,6 +19,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Infinite Scroll Window In Pane Late Rows',
   'Infinite Scroll Window In Hidden Pane Anchored',
   'Infinite Scroll Window In Scrolled Pane',
+  'Window Virtualization',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
