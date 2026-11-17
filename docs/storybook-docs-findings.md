@@ -1243,3 +1243,22 @@ Not findings — decisions worth remembering so they are not rediscovered.
   `data-testid`.
 - **Found while** — reviewing `Stepper` (WDS-148).
 - **Status** — Open (documented)
+
+### Dialog opened from a menu item: focus lands on `body` when it closes
+
+- **What** — When a `DropdownMenuItem` opens a `Dialog`, closing the dialog leaves focus on `body`
+  instead of returning it to the menu trigger.
+- **Evidence** — Reproduced in Storybook on Chromium: `Patterns/Confirmation dialogs` → `Default`
+  (a controlled `Dialog` opened from a row's menu item) and `Overlay/OverlayManager` →
+  `From Menu Item` (the same dialog opened through `useOverlay`) both end with
+  `document.activeElement` on `BODY` after Escape, and so does the managed one after confirm. A
+  dialog opened by a button (`Confirm Dialog`) returns focus to that button. The overlay manager
+  design spec expects the menu trigger here.
+- **Why it matters** — A keyboard user who opens a row's menu and cancels the dialog loses their
+  place in the table and has to tab in from the top. The overlay manager does not cause it, so its
+  usage doc only says that focus lands on `body`.
+- **Suggested action** — Decide whether the menu should hand focus back to its trigger after an item
+  that opens another overlay, or the dialog should take the trigger as its return target. Settle it
+  in `DropdownMenu` / `Drawer`, not in the manager.
+- **Found while** — documenting `OverlayManager`.
+- **Status** — Open.
