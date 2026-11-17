@@ -556,3 +556,90 @@ describe('OverlayProvider and useOverlay', () => {
     expect(onResult).not.toHaveBeenCalled();
   });
 });
+
+describe('closeOnChange', () => {
+  it('closes open overlays when closeOnChange changes', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    const { rerender } = render(
+      <OverlayProvider closeOnChange='/users'>
+        <Opener onResult={onResult} />
+      </OverlayProvider>,
+    );
+    await openConfirm(user);
+    await flushLayers();
+
+    rerender(
+      <OverlayProvider closeOnChange='/roles'>
+        <Opener onResult={onResult} />
+      </OverlayProvider>,
+    );
+
+    await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
+  });
+
+  it('keeps an overlay that the new page opens from a mount effect in the same commit', async () => {
+    const PageA = () => <span data-testid='page-a' />;
+    const PageB = () => {
+      const info = useOverlay(InfoOverlay);
+      useEffect(() => {
+        info.open();
+      }, [info]);
+      return <span data-testid='page-b' />;
+    };
+    const App = ({ page }: { page: 'a' | 'b' }) => (
+      <OverlayProvider closeOnChange={page}>{page === 'b' ? <PageB /> : <PageA />}</OverlayProvider>
+    );
+    const { rerender } = render(<App page='a' />);
+
+    rerender(<App page='b' />);
+    await flushLayers();
+
+    expect(screen.getByTestId('info--content')).toBeInTheDocument();
+  });
+
+  it('does not close overlays on the StrictMode effect replay', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    render(
+      <StrictMode>
+        <OverlayProvider closeOnChange='a'>
+          <Opener onResult={onResult} />
+        </OverlayProvider>
+      </StrictMode>,
+    );
+    await openConfirm(user);
+    await flushLayers();
+
+    expect(screen.getByTestId('confirm--content')).toHaveAttribute('data-state', 'open');
+    expect(onResult).not.toHaveBeenCalled();
+  });
+
+  it('drops an overlay still loading when closeOnChange changes', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    let resolveCode: (component: typeof ConfirmDialog) => void = () => undefined;
+    const code = new Promise<typeof ConfirmDialog>(resolve => {
+      resolveCode = resolve;
+    });
+    const SlowOverlay = defineOverlay(() => code);
+    const { rerender } = render(
+      <OverlayProvider closeOnChange='/users'>
+        <Opener definition={SlowOverlay} onResult={onResult} />
+      </OverlayProvider>,
+    );
+    await user.click(screen.getByTestId('open'));
+
+    rerender(
+      <OverlayProvider closeOnChange='/roles'>
+        <Opener definition={SlowOverlay} onResult={onResult} />
+      </OverlayProvider>,
+    );
+    await act(async () => resolveCode(ConfirmDialog));
+    await flushLayers();
+
+    expect(screen.queryByTestId('confirm--content')).toBeNull();
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
+  });
+});
