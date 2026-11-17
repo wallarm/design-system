@@ -59,6 +59,7 @@ Define the dialog once and open it from any row, menu or drawer. It renders one 
 ```tsx
 import { Dialog, DialogContent } from '@wallarm-org/design-system/Dialog';
 import { defineOverlay, type OverlayProps, useOverlay } from '@wallarm-org/design-system/OverlayManager';
+import { useToast } from '@wallarm-org/design-system/Toast';
 
 interface DeleteUserDialogProps extends OverlayProps<boolean> {
   userId: string;
@@ -67,14 +68,19 @@ interface DeleteUserDialogProps extends OverlayProps<boolean> {
 
 export const DeleteUserDialog = ({ userId, userName, controller }: DeleteUserDialogProps) => {
   const deleteUser = useDeleteUser();
+  const toast = useToast();
   // Ignore close requests while the request runs.
   const handleOpenChange = (open: boolean) => {
     if (!deleteUser.isPending) controller.rootProps.onOpenChange(open);
   };
-  // On failure keep it open and show an error toast; close only on success.
+  // Close only on success; on failure it stays open.
   const handleConfirm = async () => {
-    await deleteUser.mutateAsync(userId);
-    controller.close(true);
+    try {
+      await deleteUser.mutateAsync(userId);
+      controller.close(true);
+    } catch {
+      toast.create({ type: 'error', title: "Couldn't delete the user" });
+    }
   };
   return (
     <Dialog {...controller.rootProps} onOpenChange={handleOpenChange} width={400}>
