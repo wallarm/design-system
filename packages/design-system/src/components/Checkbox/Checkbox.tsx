@@ -1,3 +1,4 @@
+// CI probe: exercises affected-only test selection (ci/tests-optimization). Do not merge.
 import type { FC, Ref } from 'react';
 import { Checkbox as ArkUiCheckbox, useCheckboxGroupContext } from '@ark-ui/react/checkbox';
 import { cn } from '../../utils/cn';
