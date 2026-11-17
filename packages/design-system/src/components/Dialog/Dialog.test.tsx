@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { describe, expect, it } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { describe, expect, it, rs } from '@rstest/core';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
 import { DrawerAncestorIdsContext } from '../Drawer/DrawerRoot';
@@ -397,5 +397,24 @@ describe('Nesting', () => {
 
     const content = await screen.findByTestId('dialog--content');
     expect(screen.getByTestId('ancestor-ids')).toHaveTextContent(content.id);
+  });
+});
+
+describe('Exit complete', () => {
+  const ExitDialog = ({ open, onExitComplete }: { open: boolean; onExitComplete: () => void }) => (
+    <Dialog open={open} onExitComplete={onExitComplete}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Title</DialogTitle>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+
+  it('forwards onExitComplete', async () => {
+    const onExitComplete = rs.fn();
+    const { rerender } = render(<ExitDialog open onExitComplete={onExitComplete} />);
+    rerender(<ExitDialog open={false} onExitComplete={onExitComplete} />);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
   });
 });

@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import { describe, expect, it, rs } from '@rstest/core';
-import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
 import { Dialog, DialogBody, DialogContent } from '../Dialog';
@@ -754,5 +761,160 @@ describe('Stacking without a zag layer', () => {
     expect(drawerPositionerVariants()).toContain('var(--layer-index,0)');
     render(<Overlay data-testid='overlay' />);
     expect(screen.getByTestId('overlay').className).toContain('var(--layer-index,0)');
+  });
+});
+
+describe('Exit complete', () => {
+  const BACKDROP = '[data-scope="dialog"][data-part="backdrop"]';
+
+  afterEach(() => {
+    rs.restoreAllMocks();
+  });
+
+  // jsdom has no CSS animations; make only the backdrop "animate" so it finishes last, as in a browser.
+  // zag caches computed styles per node, so call this before the drawer mounts.
+  const animateBackdrop = () => {
+    const realGetComputedStyle = window.getComputedStyle.bind(window);
+    rs.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) => {
+      if (!element.matches(BACKDROP)) return realGetComputedStyle(element, pseudo);
+      return {
+        get animationName() {
+          return element.getAttribute('data-state') === 'closed' ? 'exit' : 'enter';
+        },
+        animationDuration: '0.2s',
+        display: 'block',
+      } as unknown as CSSStyleDeclaration;
+    });
+  };
+
+  const ExitDrawer = ({
+    open,
+    overlay,
+    onExitComplete,
+    testId = 'exit-drawer',
+  }: {
+    open: boolean;
+    overlay?: boolean;
+    onExitComplete?: () => void;
+    testId?: string;
+  }) => (
+    <Drawer open={open} overlay={overlay} onExitComplete={onExitComplete} data-testid={testId}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Title</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>Body {testId}</DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+
+  it('fires once after the drawer closes', async () => {
+    const onExitComplete = rs.fn();
+    const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('exit-drawer--content')).toBeNull();
+    expect(document.querySelector(BACKDROP)).toBeNull();
+  });
+
+  it('waits for the backdrop when it outlives the content', async () => {
+    animateBackdrop();
+    const onExitComplete = rs.fn();
+    const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitForElementToBeRemoved(() => screen.queryByTestId('exit-drawer--content'));
+    expect(onExitComplete).not.toHaveBeenCalled();
+    fireEvent.animationEnd(document.querySelector(BACKDROP) as Element);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+  });
+
+  it('fires once with overlay={false}', async () => {
+    const onExitComplete = rs.fn();
+    const { rerender } = render(
+      <ExitDrawer open overlay={false} onExitComplete={onExitComplete} />,
+    );
+    rerender(<ExitDrawer open={false} overlay={false} onExitComplete={onExitComplete} />);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires once in total when the drawer reopens before the backdrop finishes', async () => {
+    animateBackdrop();
+    const onExitComplete = rs.fn();
+    const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitForElementToBeRemoved(() => screen.queryByTestId('exit-drawer--content'));
+    rerender(<ExitDrawer open onExitComplete={onExitComplete} />);
+    await screen.findByTestId('exit-drawer--content');
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitForElementToBeRemoved(() => screen.queryByTestId('exit-drawer--content'));
+    fireEvent.animationEnd(document.querySelector(BACKDROP) as Element);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('never fires for a drawer that was never opened', async () => {
+    const onExitComplete = rs.fn();
+    render(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await flushLayers();
+    expect(onExitComplete).not.toHaveBeenCalled();
+  });
+
+  it('never fires when the drawer unmounts while open', async () => {
+    const onExitComplete = rs.fn();
+    const { unmount } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    await flushLayers();
+    expect(unmount).not.toThrow();
+    await flushLayers();
+    expect(onExitComplete).not.toHaveBeenCalled();
+  });
+
+  it('never fires when the drawer unmounts while the backdrop is still exiting', async () => {
+    animateBackdrop();
+    const onExitComplete = rs.fn();
+    const { rerender, unmount } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitForElementToBeRemoved(() => screen.queryByTestId('exit-drawer--content'));
+    expect(unmount).not.toThrow();
+    await flushLayers();
+    expect(onExitComplete).not.toHaveBeenCalled();
+  });
+
+  it('fires only the closed drawer callback when two drawers are open', async () => {
+    const onExitA = rs.fn();
+    const onExitB = rs.fn();
+    const { rerender } = render(
+      <>
+        <ExitDrawer open testId='a' onExitComplete={onExitA} />
+        <ExitDrawer open testId='b' onExitComplete={onExitB} />
+      </>,
+    );
+    rerender(
+      <>
+        <ExitDrawer open={false} testId='a' onExitComplete={onExitA} />
+        <ExitDrawer open testId='b' onExitComplete={onExitB} />
+      </>,
+    );
+    await waitFor(() => expect(onExitA).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(onExitA).toHaveBeenCalledTimes(1);
+    expect(onExitB).not.toHaveBeenCalled();
+    expect(screen.getByTestId('b--content')).toBeInTheDocument();
+  });
+
+  it('calls the latest callback when the handler changes during the exit', async () => {
+    const first = rs.fn();
+    const second = rs.fn();
+    const { rerender } = render(<ExitDrawer open onExitComplete={first} />);
+    rerender(<ExitDrawer open={false} onExitComplete={first} />);
+    rerender(<ExitDrawer open={false} onExitComplete={second} />);
+    await waitFor(() => expect(second).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(second).toHaveBeenCalledTimes(1);
+    expect(first).not.toHaveBeenCalled();
   });
 });

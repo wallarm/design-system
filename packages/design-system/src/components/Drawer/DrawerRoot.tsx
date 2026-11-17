@@ -1,4 +1,4 @@
-import { createContext, type FC, type ReactNode, useContext } from 'react';
+import { createContext, type FC, type ReactNode, useContext, useEffect, useId } from 'react';
 import {
   Dialog,
   type DialogFocusOutsideEvent,
@@ -62,6 +62,7 @@ interface DrawerRootProps {
   modal: boolean;
   onInteractOutside?: (event: DrawerInteractOutsideEvent) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  onExitComplete?: () => void;
 }
 
 export const DrawerRoot: FC<DrawerRootProps> = ({
@@ -71,10 +72,36 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
   modal,
   onInteractOutside,
   onEscapeKeyDown,
+  onExitComplete,
 }) => {
   const { isOpen, onOpenChange, contentId } = useDrawerContext();
   const ancestorIds = useContext(DrawerAncestorIdsContext);
   useNonModalFocusReturn(isOpen, modal, contentId);
+  const backdropId = useId();
+
+  // The backdrop (200ms) has its own presence and outlives the content (150ms); Ark's Root
+  // onExitComplete covers only the content. Report once, from whichever finishes last: the first
+  // to finish still finds the other's node. zag dispatches a non-bubbling `exitcomplete` on each
+  // presence node, so listen in the capture phase.
+  useEffect(() => {
+    if (!onExitComplete) return;
+    const handleBackdropExitComplete = (event: Event) => {
+      const { target } = event;
+      if (
+        target instanceof Element &&
+        target.id === backdropId &&
+        !document.getElementById(contentId)
+      ) {
+        onExitComplete();
+      }
+    };
+    document.addEventListener('exitcomplete', handleBackdropExitComplete, true);
+    return () => document.removeEventListener('exitcomplete', handleBackdropExitComplete, true);
+  }, [onExitComplete, backdropId, contentId]);
+
+  const handleContentExitComplete = () => {
+    if (!document.getElementById(backdropId)) onExitComplete?.();
+  };
 
   const handleOpenChange = ({ open }: Dialog.OpenChangeDetails) => {
     onOpenChange(open);
@@ -82,7 +109,7 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
 
   return (
     <Dialog.Root
-      ids={{ content: contentId }}
+      ids={{ content: contentId, backdrop: backdropId }}
       open={isOpen}
       onOpenChange={handleOpenChange}
       closeOnEscape={closeOnEscape}
@@ -92,6 +119,7 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
       onFocusOutside={ignoreProgrammaticFocusOutside(modal)}
       onInteractOutside={onInteractOutside}
       onEscapeKeyDown={onEscapeKeyDown}
+      onExitComplete={handleContentExitComplete}
       lazyMount
       unmountOnExit
     >
