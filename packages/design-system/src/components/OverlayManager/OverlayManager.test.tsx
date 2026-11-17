@@ -599,6 +599,10 @@ describe('closeOnChange', () => {
     expect(screen.getByTestId('info--content')).toBeInTheDocument();
   });
 
+  // Smoke test: StrictMode's replay empties the store (detach) before it re-runs the layout
+  // effect, so this cannot catch a missing same-key guard. That is pinned by overlayStore.test.ts
+  // ('setCloseKey records the first key and ignores an unchanged one') and by the Suspense
+  // re-suspend test above.
   it('does not close overlays on the StrictMode effect replay', async () => {
     const user = userEvent.setup();
     const onResult = rs.fn();
