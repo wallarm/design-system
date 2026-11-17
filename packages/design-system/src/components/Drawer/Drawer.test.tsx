@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import {
   act,
@@ -858,11 +858,12 @@ describe('Exit complete', () => {
   });
 
   it('fires once when the drawer closes in a hidden tab', async () => {
+    // The backdrop "animates" and gets no animationend, so only zag's hidden-tab branch, which
+    // unmounts the panel and the backdrop at once, can finish the exit.
+    animateBackdrop();
     const onExitComplete = rs.fn();
     const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
-    // In a hidden tab zag skips the exit animation and unmounts the panel and the backdrop at once.
     rs.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
-    expect(document.visibilityState).toBe('hidden');
     rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
     await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
     await flushLayers();
@@ -928,5 +929,43 @@ describe('Exit complete', () => {
     await flushLayers();
     expect(second).toHaveBeenCalledTimes(1);
     expect(first).not.toHaveBeenCalled();
+  });
+
+  it('calls the latest callback when a background re-render lands as the backdrop finishes', async () => {
+    animateBackdrop();
+    const calls: number[] = [];
+    let setCount: (count: number) => void = () => undefined;
+    const Counter = ({ open }: { open: boolean }) => {
+      const [count, setCountState] = useState(0);
+      useEffect(() => {
+        setCount = setCountState;
+      }, []);
+      const handleExitComplete = () => {
+        calls.push(count);
+      };
+      return (
+        <>
+          <span data-testid='count'>{count}</span>
+          <ExitDrawer open={open} onExitComplete={handleExitComplete} />
+        </>
+      );
+    };
+    const { rerender } = render(<Counter open />);
+    rerender(<Counter open={false} />);
+    await waitForElementToBeRemoved(() => screen.queryByTestId('exit-drawer--content'));
+
+    // Finish the backdrop's exit in the microtask right after React commits the update below:
+    // React runs that commit's passive effects only in a later task.
+    const backdrop = document.querySelector(BACKDROP) as Element;
+    const observer = new MutationObserver(() => backdrop.dispatchEvent(new Event('animationend')));
+    observer.observe(screen.getByTestId('count'), {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+    // A non-urgent update, as a fetch or a timer makes.
+    setTimeout(() => setCount(5));
+    await waitFor(() => expect(calls).toEqual([5]));
+    observer.disconnect();
   });
 });

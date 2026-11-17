@@ -1,4 +1,4 @@
-import { createContext, type FC, type ReactNode, useContext, useEffect, useId } from 'react';
+import { createContext, type FC, type ReactNode, useContext, useId, useLayoutEffect } from 'react';
 import {
   Dialog,
   type DialogFocusOutsideEvent,
@@ -82,8 +82,10 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
   // The backdrop (200ms) has its own presence and outlives the content (150ms); Ark's Root
   // onExitComplete covers only the content. Report once, from whichever finishes last: the first
   // to finish still finds the other's node. zag dispatches a non-bubbling `exitcomplete` on each
-  // presence node, so listen in the capture phase.
-  useEffect(() => {
+  // presence node, so listen in the capture phase. A layout effect: zag can finish the backdrop in
+  // the microtask right after a commit, before React runs that commit's passive effects, and the
+  // listener must already call the latest onExitComplete.
+  useLayoutEffect(() => {
     if (!onExitComplete) return;
     const handleBackdropExitComplete = (event: Event) => {
       const { target } = event;
