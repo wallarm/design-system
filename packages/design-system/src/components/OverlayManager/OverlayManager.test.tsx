@@ -204,6 +204,8 @@ describe('OverlayProvider and useOverlay', () => {
     const content = screen.getByTestId('confirm--content');
     expect(screen.getByTestId('confirm--title')).toHaveTextContent('Delete Jane? (none)');
     expect(content).toHaveAttribute('data-state', 'closed');
+    // zag starts tracking the exit animation one frame after the close; an earlier end is lost.
+    await flushLayers();
     fireEvent.animationEnd(content);
     await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
   });
@@ -390,6 +392,7 @@ describe('OverlayProvider and useOverlay', () => {
     expect(await screen.findByTestId('info--content')).toBeInTheDocument();
     const closing = screen.getByTestId('confirm--content');
     expect(closing).toHaveAttribute('data-state', 'closed');
+    await flushLayers();
     fireEvent.animationEnd(closing);
     await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
     expect(screen.getByTestId('info--content')).toBeInTheDocument();
