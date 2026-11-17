@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.unit.json",
+  "include": ["src/components/OverlayManager/**/*.types.test.ts", "src/components/OverlayManager/__tests__/**/*"]
+}
