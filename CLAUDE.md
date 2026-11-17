@@ -199,11 +199,11 @@ New compound component workflow: `component-architect` → `design-system` → `
 
 `check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). The GitHub Pages deploy is a third workflow, [`deploy-site.yml`](./.github/workflows/deploy-site.yml), dispatched by `release` (see item 9). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
-1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
-2. **quality** - Lint (Biome), typecheck, agent harness and release-notes tests and Rstest unit tests (3 shards) in parallel
+1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs the merge base with its open PR's target branch — `main` before a PR exists — or `HEAD~1` on `main`), the test scope on branches (the E2E specs `scripts/ci/affected-e2e.mjs` finds through the import graph, on 1–4 shards; `rstest --changed <merge base>` for unit tests; a dependency, config or theme change runs everything), whether to release MCP, and the Playwright container tag
+2. **quality** - Lint (Biome), typecheck, agent harness and release-notes tests and Rstest unit tests (3 shards; on branches only the tests related to the change) in parallel. Typecheck and build restore the Turborepo cache (`.turbo/cache`)
 3. **build** - Builds all packages except `@wallarm-org/website` (`--filter='!@wallarm-org/website'`), and builds Storybook as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
 4. **claude-design** - After `build`, in parallel with `e2e` and `release`: verifies the separate Claude Design build (repeatability and React 18 harness). `continue-on-error`, so a failure never fails the run or blocks a release
-5. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
+5. **e2e** - 4 shards on `main` (fewer on branches, which run only the affected specs) inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/storybook/iframe.html`
 6. **unit-test-report** / **e2e-report** - Publish JUnit results
 7. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
 8. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run
@@ -216,7 +216,7 @@ Secrets and branch rules: [RELEASE.md → Requirements](./RELEASE.md#requirement
 ### Commit triggers
 
 - `[update-screenshots]` in the head commit message regenerates baselines and commits them back to the branch.
-- `[skip-e2e]` in the commit message skips E2E. E2E is also skipped automatically when no path in `E2E_PATHS` (`main.yml`) changed.
+- `[skip-e2e]` in the commit message skips E2E. E2E is also skipped automatically when no path in `E2E_PATHS` (`main.yml`) changed, or on a branch when the changes reach no E2E spec.
 
 ## 🎉 Success Criteria
 
