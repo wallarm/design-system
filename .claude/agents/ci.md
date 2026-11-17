@@ -31,7 +31,7 @@ main only:                                        → publish-code-connect
 | Job | Purpose | Runs On |
 |-----|---------|---------|
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
-| `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards), all parallel | Always |
+| `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards; branches run `rstest --changed` from the merge base with the PR target), all parallel | After setup |
 | `build` | Builds all packages except `@wallarm-org/website` (`--filter='!@wallarm-org/website'`) + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
 | `claude-design` | Verifies the Claude Design build (`verify`, `test:export`); `continue-on-error`, never fails the run or blocks `release` | After build, parallel with e2e/release |
 | `e2e` | Sharded Playwright tests (4 shards; branches run only the specs `scripts/ci/affected-e2e.mjs` finds affected, on 1–4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
