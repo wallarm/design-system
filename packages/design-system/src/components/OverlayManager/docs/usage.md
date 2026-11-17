@@ -39,7 +39,7 @@ const RootRoute = () => {
 - `closeOnChange` closes every overlay opened before its value changed, so a page change leaves no dialog of the old page on screen. Pass a string or number key that changes when the new page commits. On TanStack Router derive it from the matches, not from `location`: `location` changes when navigation starts, while the old page is still on screen and clickable. Add the org id to close on a tenant switch too, and check the key in a browser.
 - A change closes the overlays that were open and cancels the ones still loading. Overlays opened after it are left alone. Without the prop, overlays stay open across navigation.
 - A key that goes from `undefined` to its first value counts as a change and closes everything open, so pass the key from the first render.
-- An `open()` called from a descendant's layout effect in the same commit as a `closeOnChange` change is closed with the rest. An `open()` from a mount `useEffect` survives, so open on arrival from an effect.
+- An `open()` called from a descendant's layout effect in the same commit as a `closeOnChange` change is closed with the rest. An `open()` from a mount `useEffect` survives, so open on arrival from an effect. Under StrictMode, React runs that effect twice in development: one overlay opens, and the first run's `open()` resolves `undefined`. Ignore that result with a flag that the effect's cleanup sets, as when fetching data in an effect.
 - `onError` receives loader and render errors, and that overlay's `open()` resolves `undefined`. Report the error and show a toast; the default is `reportError`.
 
 ## Define an overlay
@@ -83,8 +83,9 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({ userId, userName, 
 - `controller` carries `rootProps` (`open`, `onOpenChange`, `onExitComplete`) and `close(result)`. Spread `controller.rootProps` onto the root.
 - Render exactly one root, on every render, from the first to the last. No early return, no conditional root, nothing that suspends above it. Loading, error and not-found states go inside `DialogBody` or `DrawerBody`. An overlay that decides not to show calls `controller.close()` from an effect or a handler.
 - Render the title from the first frame, with placeholder text while data loads.
-- Guard dismissal by wrapping `onOpenChange`, and call `controller.rootProps.onOpenChange(false)` only when closing is allowed (a request is pending, a form is dirty). Escape, an outside click and the close X all go through it.
+- Guard dismissal by wrapping `onOpenChange`, and call `controller.rootProps.onOpenChange(false)` only when closing is allowed: not while a request is pending or the form is dirty. Escape, an outside click and the close X all go through it.
 - `controller.close(result)` settles the `open()` promise with `result`. Dismissal settles it with `undefined`.
+- An overlay reads the React context above `OverlayProvider`, not the context of the component that opened it. Put the providers it needs above `OverlayProvider`, and pass page data in the payload or fetch it by id inside the overlay. A hook that needs a page-level provider (filters, selection, a form) either throws, which reaches `onError`, or reads that context's default value.
 - Pass ids in the payload and use no route-scoped router hooks: a closing overlay keeps rendering after the page has changed. `useNavigate`, `useRouter` and `strict: false` hooks are fine.
 - An overlay that navigates calls `controller.close(result)` first, so that a `closeOnChange` change does not settle it with `undefined` before it.
 - A dialog the overlay itself needs, such as a nested confirm, renders inside the root's content as React children or opens as a managed overlay from inside. Never render it as a sibling of the root: its exit is cut when the instance is removed.
@@ -154,6 +155,6 @@ Overlays opened through it are React descendants of the drawer's content, so the
 ## Limits
 
 - A remote without its own provider falls through to the host's. When the host and the remote share the design-system module, a remote's `useOverlay` finds any provider of the same design-system version above it, and the overlay renders with the host's contexts (query client, router), not the remote's. It throws `useOverlay must be used inside an <OverlayProvider>` only when none is above, so mount one provider per remote.
-- Focus return is unchanged from a controlled `Dialog`. With no trigger, focus goes back to the element that had it when the overlay opened, which is the button that was clicked. When a menu item opened it, the menu and its item are gone by then, so focus lands on `body`. Loading the code does not change either case.
+- Focus return is unchanged from a controlled `Dialog`. With no trigger, focus returns to the element that had it when the overlay opened: the clicked button in Chrome, `body` in Safari. When a menu item opened it, focus currently lands on `body` (seen in Chromium, the same as a controlled `Dialog`). That is an open design-system finding, tracked in `docs/storybook-docs-findings.md`.
 - Test ids repeat during an exit. A closing instance stays mounted while it animates out, so a reopen inside that window, or two stacked instances of one definition, share ids such as `{id}--content`. Wait for the closing content to detach before reopening, or target the open instance.
 - A `closeOnChange` change and a provider unmount force the close, and a guard cannot veto them. For a route change from a dirty form, use your router's blocker.
