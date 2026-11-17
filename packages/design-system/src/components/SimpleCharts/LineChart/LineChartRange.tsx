@@ -9,7 +9,7 @@ import { warnLineChartRange } from './lib/warn';
 const LABEL_GAP = 4;
 const LABEL_TOP = 4;
 const LABEL_FONT_SIZE = 10;
-// ponytail: char-count width estimate for 10px medium text; switch to getComputedTextLength if
+// ponytail: char-count width estimate for 10px text; switch to getComputedTextLength if
 // labels with wide glyphs get clipped or hidden too eagerly.
 const LABEL_CHAR_WIDTH = 5.5;
 
@@ -96,7 +96,7 @@ export const LineChartRange: FC<LineChartRangeProps> = ({
     dominantBaseline: 'hanging',
     fill: 'var(--color-text-danger)',
     fontSize: LABEL_FONT_SIZE,
-    fontWeight: 500,
+    fontWeight: 400,
     fontFamily: 'var(--font-sans)',
   } as const;
   const edgeProps = {
