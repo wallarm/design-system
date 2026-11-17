@@ -330,7 +330,8 @@ describe('OverlayProvider and useOverlay', () => {
   });
 
   // StrictMode replays the effects of a subtree that a Suspense boundary reveals again, including
-  // the provider's passive cleanup. Body scroll lock is not asserted: a plain Dialog leaks it too.
+  // the provider's passive cleanup. The body scroll lock is not asserted: a plain Dialog can leak it
+  // after a Suspense hide and reveal, which is a separate bug.
   it('keeps open overlays when a Suspense boundary above the provider re-suspends under StrictMode', async () => {
     const user = userEvent.setup();
     const onResult = rs.fn();
