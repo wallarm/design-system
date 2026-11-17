@@ -857,6 +857,18 @@ describe('Exit complete', () => {
     expect(onExitComplete).toHaveBeenCalledTimes(1);
   });
 
+  it('fires once when the drawer closes in a hidden tab', async () => {
+    const onExitComplete = rs.fn();
+    const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
+    // In a hidden tab zag skips the exit animation and unmounts the panel and the backdrop at once.
+    rs.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    expect(document.visibilityState).toBe('hidden');
+    rerender(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
+    await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+    await flushLayers();
+    expect(onExitComplete).toHaveBeenCalledTimes(1);
+  });
+
   it('never fires for a drawer that was never opened', async () => {
     const onExitComplete = rs.fn();
     render(<ExitDrawer open={false} onExitComplete={onExitComplete} />);
