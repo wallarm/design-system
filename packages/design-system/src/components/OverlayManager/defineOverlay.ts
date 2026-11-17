@@ -21,8 +21,9 @@ export const defineOverlay = <Props extends OverlayProps<never>>(
   load: () => Promise<ComponentType<Props> & { readonly _result?: never }>,
 ): OverlayDefinition<OverlayPayload<Props>, OverlayResult<Props>> => {
   let cached: Promise<ErasedOverlayComponent> | undefined;
+  // `new Promise` calls the loader synchronously and turns a synchronous throw into a rejection.
   const loadOnce = () =>
-    (cached ??= load().then(
+    (cached ??= new Promise<unknown>(resolve => resolve(load())).then(
       component => component as unknown as ErasedOverlayComponent,
       error => {
         cached = undefined;

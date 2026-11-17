@@ -25,6 +25,18 @@ describe('defineOverlay', () => {
     expect(load).toHaveBeenCalledTimes(2);
   });
 
+  it('turns a loader that throws synchronously into a rejection', async () => {
+    const load = rs
+      .fn(() => Promise.resolve(Overlay))
+      .mockImplementationOnce(() => {
+        throw new Error('sync');
+      });
+    const definition = internal(defineOverlay(load));
+    await expect(definition.preload()).resolves.toBeUndefined();
+    await expect(definition.load()).resolves.toBe(Overlay);
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
   it('preload resolves undefined and never rejects', async () => {
     const load = rs.fn(async (): Promise<typeof Overlay> => {
       throw new Error('chunk');
