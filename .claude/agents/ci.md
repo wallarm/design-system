@@ -19,7 +19,7 @@ The canonical job list is [`CLAUDE.md` → Pipeline Jobs](../../CLAUDE.md#pipeli
 The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 10 jobs:
 
 ```
-setup → quality (lint | typecheck | test ×3) → build → e2e (4 shards) → unit-test-report / e2e-report
+setup → quality (lint | typecheck | test ×3) → build → e2e (4 shards; fewer on branches) → unit-test-report / e2e-report
                                                   → e2e-update-screenshots (4 shards) → commit-screenshots
                                                   → release (stable on main, RC on feature/*, feat/*, fix/*)
 main only:                                        → publish-code-connect
@@ -31,10 +31,10 @@ main only:                                        → publish-code-connect
 | Job | Purpose | Runs On |
 |-----|---------|---------|
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
-| `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards), all parallel | Always |
+| `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards; branches run `rstest --changed` from the merge base with the PR target), all parallel | After setup |
 | `build` | Builds all packages except `@wallarm-org/website` (`--filter='!@wallarm-org/website'`) + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
 | `claude-design` | Verifies the Claude Design build (`verify`, `test:export`); `continue-on-error`, never fails the run or blocks `release` | After build, parallel with e2e/release |
-| `e2e` | Sharded Playwright tests (4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
+| `e2e` | Sharded Playwright tests (4 shards; branches run only the specs `scripts/ci/affected-e2e.mjs` finds affected, on 1–4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
 | `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
 | `e2e-update-screenshots` | Auto-update visual snapshots (4 shards) | Any branch, `[update-screenshots]` in head commit |
 | `commit-screenshots` | Commits updated screenshots back to the branch | After e2e-update-screenshots |
@@ -48,7 +48,7 @@ Also separately (PRs only, `pr-title.yml`): `check-pr-title` validates conventio
 ## Special Triggers
 
 - `[update-screenshots]` in commit message → triggers screenshot update job
-- `[skip-e2e]` in commit message → skips E2E tests; also auto-skipped when nothing in `E2E_PATHS` (setup job) changed
+- `[skip-e2e]` in commit message → skips E2E tests; also auto-skipped when nothing in `E2E_PATHS` (setup job) changed or, on a branch, the changes reach no spec. Branches compare against the merge base with their open PR's target (`main` before a PR exists); unit tests run with `rstest --changed` from the same base
 - Bot screenshot commits (`github-actions[bot]`) get a full verification `e2e` run against the new baselines
 
 ## Release Flow

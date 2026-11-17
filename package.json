@@ -22,7 +22,7 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "test:run": "turbo run test:run",
-    "test:harness": "node --test scripts/agents/*.test.mjs .claude/hooks/*.test.mjs packages/configs/publishing/*.test.mjs",
+    "test:harness": "node --test scripts/agents/*.test.mjs scripts/ci/*.test.mjs .claude/hooks/*.test.mjs packages/configs/publishing/*.test.mjs",
     "agents:sync": "node scripts/agents/sync-codex.mjs",
     "e2e": "turbo run e2e",
     "e2e:ui": "turbo run e2e:ui",
