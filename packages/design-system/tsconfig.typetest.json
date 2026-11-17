@@ -1,4 +1,5 @@
 {
   "extends": "./tsconfig.unit.json",
+  "compilerOptions": { "declaration": true },
   "include": ["src/components/OverlayManager/**/*.types.test.ts", "src/components/OverlayManager/__tests__/**/*"]
 }

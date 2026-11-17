@@ -524,7 +524,7 @@ describe('OverlayProvider and useOverlay', () => {
     rs.spyOn(console, 'error').mockImplementation(() => undefined);
 
     expect(() => render(<Opener onResult={rs.fn()} />)).toThrow(
-      'useOverlay must be used inside an <OverlayProvider>',
+      /^useOverlay must be used inside an <OverlayProvider>$/,
     );
   });
 
