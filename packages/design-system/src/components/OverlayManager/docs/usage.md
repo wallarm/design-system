@@ -74,7 +74,13 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({ userId, userName, 
 
   return (
     <Dialog {...controller.rootProps} onOpenChange={handleOpenChange} width={400}>
-      <DialogContent>{/* title, description, Cancel in DialogClose, confirm with handleConfirm */}</DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete user?</DialogTitle>
+        </DialogHeader>
+        {/* DialogBody with the description; DialogFooter with Cancel in DialogClose and the
+            confirm button with loading={deleteUser.isPending} calling handleConfirm */}
+      </DialogContent>
     </Dialog>
   );
 };

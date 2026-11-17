@@ -57,7 +57,8 @@ A confirmation dialog asks one question about one action, then runs that action 
 Define the dialog once and open it from any row, menu or drawer. It renders one `Dialog` root and spreads `controller.rootProps` onto it; `open()` resolves with the value passed to `controller.close`, or `undefined` when dismissed.
 
 ```tsx
-import { Dialog, DialogContent } from '@wallarm-org/design-system/Dialog';
+import { Button } from '@wallarm-org/design-system/Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@wallarm-org/design-system/Dialog';
 import { defineOverlay, type OverlayProps, useOverlay } from '@wallarm-org/design-system/OverlayManager';
 import { useToast } from '@wallarm-org/design-system/Toast';
 
@@ -84,7 +85,13 @@ export const DeleteUserDialog = ({ userId, userName, controller }: DeleteUserDia
   };
   return (
     <Dialog {...controller.rootProps} onOpenChange={handleOpenChange} width={400}>
-      <DialogContent>{/* title, description, Cancel, confirm calling handleConfirm */}</DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete user?</DialogTitle>
+        </DialogHeader>
+        {/* DialogBody with the description; DialogFooter with Cancel in DialogClose and the
+            confirm button with loading={deleteUser.isPending} calling handleConfirm */}
+      </DialogContent>
     </Dialog>
   );
 };
@@ -96,8 +103,15 @@ export const DeleteUserOverlay = defineOverlay(() =>
 
 // One OverlayProvider per app, around everything the root route renders. A drawer that can close
 // from outside (?user=) mounts its own OverlayProvider inside DrawerContent and opens from below it.
-const deleteUser = useOverlay(DeleteUserOverlay);
-const deleted = await deleteUser.open({ userId, userName });
+export const DeleteUserButton = ({ userId, userName }: { userId: string; userName: string }) => {
+  const deleteUserOverlay = useOverlay(DeleteUserOverlay);
+  const toast = useToast();
+  const handleDelete = async () => {
+    const deleted = await deleteUserOverlay.open({ userId, userName });
+    if (deleted) toast.create({ type: 'default', title: 'User deleted' });
+  };
+  return <Button onClick={handleDelete}>Delete user</Button>;
+};
 ```
 
 ### Copy
