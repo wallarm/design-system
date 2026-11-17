@@ -68,14 +68,14 @@ export const OverlayProvider: FC<OverlayProviderProps> = ({ children, closeOnCha
     store.setCloseKey(closeOnChange);
   }, [store, closeOnChange]);
 
-  // Attach in a layout effect: StrictMode's replay runs it before replaying any passive effect,
-  // so a child's mount-effect open() never hits a detached store. Detach in a passive cleanup:
-  // a Suspense boundary above that re-suspends disconnects only layout effects, and only a real
-  // unmount may settle and drop the overlays.
+  // Only a real unmount may settle and drop the overlays. Release in a passive cleanup, because a
+  // Suspense boundary above that re-suspends disconnects only layout effects. StrictMode replays
+  // that cleanup on mount and on a Suspense reveal, but re-runs this layout effect in the same
+  // tick, and the attach cancels the release before its deferred detach.
   useLayoutEffect(() => {
     store.attach();
   }, [store]);
-  useEffect(() => store.detach, [store]);
+  useEffect(() => store.release, [store]);
 
   return (
     <OverlayStoreContext.Provider value={store}>

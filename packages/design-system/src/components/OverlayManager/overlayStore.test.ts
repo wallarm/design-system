@@ -174,6 +174,24 @@ describe('overlayStore', () => {
     expect(store.getSnapshot()).toEqual([]);
   });
 
+  // A definition not made by defineOverlay, such as a mocked definitions module.
+  it('resolves undefined and reports when the loader throws synchronously', async () => {
+    const store = createOverlayStore();
+    const onError = rs.fn();
+    store.setOnError(onError);
+    const error = new Error('no load');
+
+    const result = store.open(
+      definitionOf(() => {
+        throw error;
+      }),
+    );
+
+    await expect(result).resolves.toBeUndefined();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+    expect(store.getSnapshot()).toEqual([]);
+  });
+
   it('fail settles undefined, drops the instance and reports', async () => {
     const store = createOverlayStore();
     const onError = rs.fn();
@@ -279,6 +297,35 @@ describe('overlayStore', () => {
     await flush();
 
     expect(store.getSnapshot()).toMatchObject([{ open: true }]);
+  });
+
+  it('release followed by attach in the same tick does not detach', async () => {
+    const store = createOverlayStore();
+    const { result, id } = await openLoaded(store);
+
+    store.release();
+    store.attach();
+    await flush();
+
+    expect(store.getSnapshot()).toMatchObject([{ id, open: true }]);
+    store.close(id, 'kept');
+    await expect(result).resolves.toBe('kept');
+  });
+
+  it('release without attach detaches after a microtask and settles its opens undefined', async () => {
+    const store = createOverlayStore();
+    const { result: a } = await openLoaded(store);
+    const gate = deferred<ErasedOverlayComponent>();
+    const b = store.open(definitionOf(() => gate.promise));
+
+    store.release();
+    expect(store.getSnapshot()).toHaveLength(1);
+    await Promise.resolve();
+
+    expect(store.getSnapshot()).toEqual([]);
+    await expect(a).resolves.toBeUndefined();
+    await expect(b).resolves.toBeUndefined();
+    await expect(store.open(eager())).resolves.toBeUndefined();
   });
 
   it('detach clears the fallback timers', async () => {

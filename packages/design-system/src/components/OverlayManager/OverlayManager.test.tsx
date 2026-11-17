@@ -6,6 +6,7 @@ import {
   Suspense,
   useContext,
   useEffect,
+  useLayoutEffect,
 } from 'react';
 import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -121,6 +122,24 @@ const InfoDialog = ({ controller }: OverlayProps) => (
   </Dialog>
 );
 const InfoOverlay = defineOverlay(async () => InfoDialog);
+
+/** A managed Drawer with the confirm's payload and result, so `Opener` can open it. */
+const PanelDrawer = ({ name, controller }: ConfirmProps) => {
+  const handleDone = () => controller.close(true);
+  return (
+    <Drawer {...controller.rootProps} data-testid='panel'>
+      <DrawerContent>
+        <DrawerBody>
+          {name}
+          <Button data-testid='panel-done' onClick={handleDone}>
+            Done
+          </Button>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+const PanelOverlay = defineOverlay(async () => PanelDrawer);
 
 interface OpenerProps {
   name?: string;
@@ -310,6 +329,44 @@ describe('OverlayProvider and useOverlay', () => {
     await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(true));
   });
 
+  // StrictMode replays the effects of a subtree that a Suspense boundary reveals again, including
+  // the provider's passive cleanup. Body scroll lock is not asserted: a plain Dialog leaks it too.
+  it('keeps open overlays when a Suspense boundary above the provider re-suspends under StrictMode', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    let resolveSection: (module: { default: () => ReactNode }) => void = () => undefined;
+    const section = new Promise<{ default: () => ReactNode }>(resolve => {
+      resolveSection = resolve;
+    });
+    const LazySection = lazy(() => section);
+    const Page = ({ show }: { show: boolean }) => (
+      <StrictMode>
+        <Suspense fallback={<span data-testid='outer-fallback' />}>
+          <OverlayProvider>
+            <Opener definition={PanelOverlay} onResult={onResult} />
+            {show && <LazySection />}
+          </OverlayProvider>
+        </Suspense>
+      </StrictMode>
+    );
+    const { rerender } = render(<Page show={false} />);
+    await user.click(screen.getByTestId('open'));
+    await screen.findByTestId('panel--content');
+    await flushLayers();
+
+    rerender(<Page show />);
+    expect(await screen.findByTestId('outer-fallback')).toBeInTheDocument();
+    await flushLayers();
+
+    await act(async () => resolveSection({ default: () => <span data-testid='section' /> }));
+    expect(await screen.findByTestId('section')).toBeInTheDocument();
+    await flushLayers();
+    expect(screen.getByTestId('panel--content')).toBeInTheDocument();
+    expect(onResult).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('panel-done'));
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(true));
+  });
+
   it('reports a render error, settles undefined and keeps other overlays open', async () => {
     rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const user = userEvent.setup();
@@ -363,6 +420,21 @@ describe('OverlayProvider and useOverlay', () => {
     await user.click(screen.getByTestId('confirm-ok'));
 
     await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(true));
+  });
+
+  it('settles open overlays undefined when the provider unmounts', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    const { unmount } = render(
+      <OverlayProvider>
+        <Opener onResult={onResult} />
+      </OverlayProvider>,
+    );
+    await openConfirm(user);
+
+    unmount();
+
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
   });
 
   it('opens a chained overlay while the first is still exiting', async () => {
@@ -468,6 +540,27 @@ describe('OverlayProvider and useOverlay', () => {
       <StrictMode>
         <OverlayProvider>
           <OpenOnMount />
+        </OverlayProvider>
+      </StrictMode>,
+    );
+
+    await flushLayers();
+
+    expect(screen.getByTestId('confirm--content')).toBeInTheDocument();
+  });
+
+  it('keeps an overlay that a child opens from its layout effect under StrictMode', async () => {
+    const OpenOnLayout = () => {
+      const confirm = useOverlay(ConfirmOverlay);
+      useLayoutEffect(() => {
+        confirm.open({ name: 'Jane' });
+      }, [confirm]);
+      return null;
+    };
+    render(
+      <StrictMode>
+        <OverlayProvider>
+          <OpenOnLayout />
         </OverlayProvider>
       </StrictMode>,
     );
@@ -599,10 +692,10 @@ describe('closeOnChange', () => {
     expect(screen.getByTestId('info--content')).toBeInTheDocument();
   });
 
-  // Smoke test: StrictMode's replay empties the store (detach) before it re-runs the layout
-  // effect, so this cannot catch a missing same-key guard. That is pinned by overlayStore.test.ts
+  // Smoke test: StrictMode replays the provider's effects at mount, before anything is open, so
+  // this cannot catch a missing same-key guard. That is pinned by overlayStore.test.ts
   // ('setCloseKey records the first key and ignores an unchanged one') and by the Suspense
-  // re-suspend test above.
+  // re-suspend tests above.
   it('does not close overlays on the StrictMode effect replay', async () => {
     const user = userEvent.setup();
     const onResult = rs.fn();

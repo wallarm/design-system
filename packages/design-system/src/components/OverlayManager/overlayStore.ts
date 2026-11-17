@@ -25,9 +25,17 @@ export interface OverlayStore {
   /** The first call records the key; a different key sweeps every instance created before it. */
   setCloseKey: (key: OverlayCloseKey) => void;
   setOnError: (onError: (error: unknown) => void) => void;
-  /** Provider mounted, including the remount after a StrictMode replay. */
+  /**
+   * Provider mounted or revealed, including the re-run of a StrictMode replay. Cancels a pending
+   * `release`.
+   */
   attach: () => void;
-  /** Provider unmounted: settles everything `undefined`, drops all, and later open() calls resolve `undefined` at once. */
+  /**
+   * Provider's passive cleanup: detaches one microtask later unless `attach` runs first. A
+   * StrictMode replay re-attaches synchronously, so only a real unmount detaches.
+   */
+  release: () => void;
+  /** Settles everything `undefined`, drops all, and later open() calls resolve `undefined` at once. */
   detach: () => void;
 }
 
@@ -63,6 +71,8 @@ export const createOverlayStore = (): OverlayStore => {
   let onError = reportOverlayError;
   let recordedKey: { value: OverlayCloseKey } | undefined;
   let detached = false;
+  /** Bumped by every attach, so a release can tell whether one ran after it. */
+  let attachCount = 0;
 
   const emit = () => {
     for (const listener of [...listeners]) listener();
@@ -117,6 +127,19 @@ export const createOverlayStore = (): OverlayStore => {
     onError(error);
   };
 
+  const detach = () => {
+    detached = true;
+    settlePending();
+    for (const entry of live.values()) {
+      entry.settle(undefined);
+      clearTimeout(entry.fallbackTimer);
+    }
+    live.clear();
+    if (instances.length === 0) return;
+    instances = [];
+    emit();
+  };
+
   return {
     subscribe: listener => {
       listeners.add(listener);
@@ -136,7 +159,9 @@ export const createOverlayStore = (): OverlayStore => {
         }
         const id = ++lastId;
         pending.set(id, { definition, payload: { ...payload }, settle: resolve });
-        definition.load().then(
+        // Inside the chain, so a loader that throws, or a definition with no load at all (not made
+        // by defineOverlay, e.g. a mock), still settles through failLoad.
+        new Promise<ErasedOverlayComponent>(resolveLoad => resolveLoad(definition.load())).then(
           Component => insert(id, Component),
           error => failLoad(id, error),
         );
@@ -168,18 +193,14 @@ export const createOverlayStore = (): OverlayStore => {
     },
     attach: () => {
       detached = false;
+      attachCount++;
     },
-    detach: () => {
-      detached = true;
-      settlePending();
-      for (const entry of live.values()) {
-        entry.settle(undefined);
-        clearTimeout(entry.fallbackTimer);
-      }
-      live.clear();
-      if (instances.length === 0) return;
-      instances = [];
-      emit();
+    release: () => {
+      const releasedAt = attachCount;
+      queueMicrotask(() => {
+        if (attachCount === releasedAt) detach();
+      });
     },
+    detach,
   };
 };
