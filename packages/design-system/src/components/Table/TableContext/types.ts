@@ -7,7 +7,7 @@ import type {
   RowData,
 } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
-import type { DSTableFeatures } from '../lib';
+import type { ColumnDndStyles, DSTableFeatures } from '../lib';
 import type {
   TableColumnGroup,
   TableProps,
@@ -88,6 +88,9 @@ export interface TableContextValue<T extends RowData> {
   // viewport (see TableInnerWindow); programmatic horizontal scrolls move it
   // in the same frame as the body. Unused in container mode.
   headerScrollRef: RefObject<HTMLDivElement | null>;
+
+  // Each column's drag style, from its header cell to its body cells.
+  columnDndStyles: ColumnDndStyles;
 
   // Ref to the <tbody> element — populated by whichever body component
   // mounts (virtualized window, virtualized container, or non-virt).

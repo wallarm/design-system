@@ -492,6 +492,29 @@ test.describe('Component: Table', () => {
       await page.mouse.up();
     });
 
+    test('Should still reorder columns once rows have unmounted', async ({ page }) => {
+      await tableStory.goto(page, 'Window Virtualization');
+      await expect(page.locator('[data-row-id]').first()).toBeVisible();
+      // A shorter window unmounts the last rows, the last to have mounted, and mounts none.
+      const rows = page.locator('[data-row-id]');
+      const mounted = await rows.count();
+      await page.setViewportSize({ width: 1280, height: 300 });
+      await expect.poll(() => rows.count()).toBeLessThan(mounted);
+
+      const headers = page.getByRole('columnheader');
+      const before = await headers.allTextContents();
+      const [from, to] = [headers.nth(2), headers.nth(3)];
+      const a = await from.boundingBox();
+      const b = await to.boundingBox();
+      if (!a || !b) throw new Error('Column headers not found');
+      await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 15 });
+      await page.mouse.up();
+
+      expect(await headers.allTextContents()).not.toEqual(before);
+    });
+
     test('Should reorder columns via drag and drop', async ({ page }) => {
       await tableStory.goto(page, 'Column Drag And Drop');
 

@@ -1,5 +1,10 @@
 export { collectDirectChildren } from './collectDirectChildren';
 export {
+  type ColumnDndStyles,
+  createColumnDndStyles,
+  useColumnDndStyle,
+} from './columnDndStyles';
+export {
   getAlignClass,
   getExpandBorderClass,
   SCROLL_EDGE_COOLDOWN_MS,
