@@ -472,15 +472,16 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const columnOrderAtom = table.atoms.columnOrder.get();
-      const currentOrder = columnOrderAtom.length ? columnOrderAtom : allLeafColumns.map(c => c.id);
+      // The leaf columns come in the order the table draws them: a stored order
+      // may name only some (a reset keeps just the pinned ones).
+      const currentOrder = table.getAllLeafColumns().map(c => c.id);
 
       const oldIndex = currentOrder.indexOf(String(active.id));
       const newIndex = currentOrder.indexOf(String(over.id));
       const newOrder = arrayMove(currentOrder, oldIndex, newIndex);
       setColumnOrder(newOrder);
     },
-    [table, allLeafColumns, setColumnOrder],
+    [table, setColumnOrder],
   );
 
   // Column IDs for DnD — exclude always-pinned so they don't shift visually

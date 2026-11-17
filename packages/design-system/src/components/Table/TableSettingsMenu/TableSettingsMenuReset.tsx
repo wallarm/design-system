@@ -25,6 +25,7 @@ export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({
     defaultColumnVisibility,
     defaultColumnOrder,
     setColumnOrder,
+    alwaysPinnedLeft,
     deferColumnVisibility,
   } = useTableContext();
   const { visibilityDraft, setVisibilityDraft } = useTableSettingsMenuContentContext();
@@ -51,7 +52,10 @@ export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({
       resolveVisibilityDraft(visibilityDraft, currentVisibility, defaultColumnVisibility),
       defaultColumnVisibility,
     );
-  const orderMatch = !defaultColumnOrder || isEqual(effectiveOrder, defaultColumnOrder);
+  // Without the always-pinned columns: a reset to [] stores just those.
+  const movable = (order: string[] = []) => order.filter(id => !alwaysPinnedLeft.includes(id));
+  const orderMatch =
+    !defaultColumnOrder || isEqual(movable(effectiveOrder), movable(defaultColumnOrder));
   const isDefaultState = visibilityMatch && orderMatch;
 
   return (
