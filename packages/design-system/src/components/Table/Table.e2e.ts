@@ -413,6 +413,8 @@ test.describe('Component: Table', () => {
       const headers = table.locator('thead th');
       await expect(headers.filter({ hasText: 'Requests' })).toBeVisible();
       await expect(table.getByRole('columnheader')).toHaveCount(await headers.count());
+      // Not announced as dnd-kit's "sortable" in place of a column header.
+      await expect(headers.and(page.locator('[aria-roledescription]'))).toHaveCount(0);
     });
 
     test('Should show the row actions while one of them has the keyboard focus', async ({
