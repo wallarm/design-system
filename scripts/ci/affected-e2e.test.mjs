@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { affectedE2e } from './affected-e2e.mjs';
@@ -43,4 +44,27 @@ test('specs under __tests__ belong to their component folder', () => {
 
 test('no changes run nothing', () => {
   assert.deepEqual(affectedE2e(root, []), []);
+});
+
+test("an import by the package's own name counts as an edge, a Code Connect string does not", (t) => {
+  const tmp = mkdtempSync(join(tmpdir(), 'affected-e2e-'));
+  t.after(() => rmSync(tmp, { recursive: true, force: true }));
+  const files = {
+    'A/index.ts': "export * from './A';",
+    'A/A.tsx': 'export const A = 1;',
+    'A/A.e2e.ts': '',
+    'B/B.stories.tsx': "import { A } from '@wallarm-org/design-system/A';",
+    'B/B.e2e.ts': '',
+    'C/C.figma.ts': `const example = "import { A } from '@wallarm-org/design-system/A';";`,
+    'C/C.e2e.ts': '',
+  };
+  for (const [path, content] of Object.entries(files)) {
+    const file = join(tmp, ds, 'src/components', path);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, content);
+  }
+  assert.deepEqual(affectedE2e(tmp, [`${ds}src/components/A/A.tsx`]), [
+    'src/components/A/A.e2e.ts',
+    'src/components/B/B.e2e.ts',
+  ]);
 });

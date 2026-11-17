@@ -22,10 +22,16 @@ function resolveImport(from, spec) {
   }
 }
 
+// `@wallarm-org/design-system[/sub]` → its `development` export in package.json
+function resolveSelf(root, sub = '') {
+  const path = !sub ? 'index' : /^(icons|utils)(\/|$)/.test(sub) ? sub : `components/${sub}`;
+  return resolveImport(join(root, SRC, 'index.ts'), `./${path}`);
+}
+
 /**
  * E2E specs that a change can affect. A spec drives the stories next to it, and stories render
- * source over relative imports (design-system has no path aliases), so a spec is affected when a
- * file in its component folder transitively imports a changed file.
+ * source over relative imports or the package's own name (design-system has no path aliases), so
+ * a spec is affected when a file in its component folder transitively imports a changed file.
  *
  * @param {string} root repo root
  * @param {string[]} changed repo-relative paths, already narrowed to the E2E-relevant set
@@ -38,11 +44,12 @@ export function affectedE2e(root, changed) {
   const files = walk(join(root, SRC));
   const importers = new Map();
   for (const file of files) {
-    if (!/\.tsx?$/.test(file)) continue;
-    for (const [, spec] of readFileSync(file, 'utf8').matchAll(
-      /(?:from|import)\s*\(?\s*['"](\.{1,2}\/[^'"]+)['"]/g,
+    // Code Connect files only quote imports as strings; Storybook never renders them
+    if (!/\.tsx?$/.test(file) || file.endsWith('.figma.ts')) continue;
+    for (const [, spec, self] of readFileSync(file, 'utf8').matchAll(
+      /(?:from|import)\s*\(?\s*['"](\.{1,2}\/[^'"]+|@wallarm-org\/design-system(?:\/([^'"]+))?)['"]/g,
     )) {
-      const target = resolveImport(file, spec);
+      const target = spec.startsWith('.') ? resolveImport(file, spec) : resolveSelf(root, self);
       if (!target) continue;
       if (!importers.has(target)) importers.set(target, new Set());
       importers.get(target).add(file);
