@@ -1,3 +1,9 @@
+## [4.20.1](https://github.com/wallarm/design-system/compare/v4.20.0...v4.20.1) (2026-11-18)
+
+### Bug Fixes
+
+* **table:** a draggable header is announced as a column header ([#516](https://github.com/wallarm/design-system/issues/516)) ([492c6dc](https://github.com/wallarm/design-system/commit/492c6dcf9e6caf8a6990675ca274ab4c95186ffc))
+
 ## [4.20.0](https://github.com/wallarm/design-system/compare/v4.19.2...v4.20.0) (2026-11-18)
 
 ### Features
