@@ -19,6 +19,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Infinite Scroll Window In Pane Late Rows',
   'Infinite Scroll Window In Hidden Pane Anchored',
   'Infinite Scroll Window In Scrolled Pane',
+  'Window Virtualization',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -359,6 +360,61 @@ test.describe('Component: Table', () => {
       await expect.poll(offset).toBe(0);
     });
 
+    test('Should keep the body in line with the header when a header control takes focus in window mode', async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 600, height: 600 });
+      await tableStory.goto(page, 'Window Virtualization');
+      const pane = page.locator('body');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // Focus on a control past the right edge scrolls the header shell, not the body.
+      const column = await pane.evaluate(el => {
+        const button = [...el.querySelectorAll<HTMLElement>('thead button')].at(-1)!;
+        button.focus();
+        return [...button.closest('tr')!.children].indexOf(button.closest('th')!) + 1;
+      });
+      expect(column).toBeGreaterThan(2);
+
+      const offset = () =>
+        pane.evaluate((el, n) => {
+          const th = el.querySelector(`thead tr th:nth-child(${n})`)!.getBoundingClientRect();
+          const td = el
+            .querySelector(`[data-table-scroll-container] tbody tr td:nth-child(${n})`)!
+            .getBoundingClientRect();
+          return Math.round(td.left - th.left);
+        }, column);
+      await expect.poll(offset).toBe(0);
+    });
+
+    test('Should expose one table with its column headers and rows in window mode', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Window Virtualization');
+      await expect(page.locator('[data-row-id]').first()).toBeVisible();
+
+      const tables = page.getByRole('table');
+      await expect(tables).toHaveCount(1);
+      await expect(tables.getByRole('columnheader').first()).toBeVisible();
+      expect(await tables.getByRole('row').count()).toBeGreaterThan(1);
+      // The header's controls take focus, so nothing above them may be aria-hidden.
+      const hidden = await page.evaluate(
+        () =>
+          [...document.querySelectorAll('thead button')].filter(b =>
+            b.closest('[aria-hidden="true"]'),
+          ).length,
+      );
+      expect(hidden).toBe(0);
+    });
+
+    test('Should keep a draggable header a column header', async ({ page }) => {
+      await tableStory.goto(page, 'Column Drag And Drop');
+      const table = page.getByRole('table').filter({ has: page.locator('[data-row-id]') });
+      const headers = table.locator('thead th');
+      await expect(headers.filter({ hasText: 'Requests' })).toBeVisible();
+      await expect(table.getByRole('columnheader')).toHaveCount(await headers.count());
+    });
+
     test('Should show the row actions while one of them has the keyboard focus', async ({
       page,
     }) => {
@@ -407,8 +463,6 @@ test.describe('Component: Table', () => {
     }) => {
       await tableStory.goto(page, 'Column Drag And Drop');
 
-      // dnd-kit's `attributes` swap the draggable header's a11y role to "button"
-      // (for keyboard sortable support), so query by DOM text, not ARIA role.
       const requestsHeader = page.locator('thead th').filter({ hasText: 'Requests' });
 
       // The header's leading "More" menu button occupies the top-left corner
@@ -436,6 +490,29 @@ test.describe('Component: Table', () => {
       await expect(requestsHeader).toHaveCSS('user-select', 'none');
 
       await page.mouse.up();
+    });
+
+    test('Should still reorder columns once rows have unmounted', async ({ page }) => {
+      await tableStory.goto(page, 'Window Virtualization');
+      await expect(page.locator('[data-row-id]').first()).toBeVisible();
+      // A shorter window unmounts the last rows, the last to have mounted, and mounts none.
+      const rows = page.locator('[data-row-id]');
+      const mounted = await rows.count();
+      await page.setViewportSize({ width: 1280, height: 300 });
+      await expect.poll(() => rows.count()).toBeLessThan(mounted);
+
+      const headers = page.getByRole('columnheader');
+      const before = await headers.allTextContents();
+      const [from, to] = [headers.nth(2), headers.nth(3)];
+      const a = await from.boundingBox();
+      const b = await to.boundingBox();
+      if (!a || !b) throw new Error('Column headers not found');
+      await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 15 });
+      await page.mouse.up();
+
+      expect(await headers.allTextContents()).not.toEqual(before);
     });
 
     test('Should reorder columns via drag and drop', async ({ page }) => {

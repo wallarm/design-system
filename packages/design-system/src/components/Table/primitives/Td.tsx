@@ -24,6 +24,8 @@ export const Td: FC<TdProps> = ({
   return (
     <td
       ref={ref}
+      // biome-ignore lint/a11y/noRedundantRoles: Explicit: window mode lays the table out as two role='presentation' tables, which would strip the implied role.
+      role='cell'
       className={cn(
         hasVariants
           ? tableBodyCellVariants({ pinned, lastPinnedLeft, expanded, lastRow })

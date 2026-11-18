@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -32,6 +32,7 @@ import {
 import { useControlled, useIsKeyPressed } from '../../../hooks';
 import { useTableState } from '../hooks';
 import {
+  createColumnDndStyles,
   createDragHandleColumn,
   createExpandColumn,
   createSelectionColumn,
@@ -338,6 +339,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   const shiftKeyRef = useIsKeyPressed('Shift');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const headerScrollRef = useRef<HTMLDivElement | null>(null);
+  const [columnDndStyles] = useState(createColumnDndStyles);
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
   const virtualizerRef = useRef<TableVirtualizerInstance | null>(null);
 
@@ -379,6 +381,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       onSelectAllRows,
       containerRef,
       headerScrollRef,
+      columnDndStyles,
       tbodyRef,
       virtualizerRef,
       onEndReached,
@@ -399,6 +402,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     }),
     [
       table,
+      columnDndStyles,
       isLoading,
       isLoadingPrevious,
       skeletonCount,
@@ -472,15 +476,16 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const columnOrderAtom = table.atoms.columnOrder.get();
-      const currentOrder = columnOrderAtom.length ? columnOrderAtom : allLeafColumns.map(c => c.id);
+      // The leaf columns come in the order the table draws them: a stored order
+      // may name only some (a reset keeps just the pinned ones).
+      const currentOrder = table.getAllLeafColumns().map(c => c.id);
 
       const oldIndex = currentOrder.indexOf(String(active.id));
       const newIndex = currentOrder.indexOf(String(over.id));
       const newOrder = arrayMove(currentOrder, oldIndex, newIndex);
       setColumnOrder(newOrder);
     },
-    [table, allLeafColumns, setColumnOrder],
+    [table, setColumnOrder],
   );
 
   // Column IDs for DnD — exclude always-pinned so they don't shift visually

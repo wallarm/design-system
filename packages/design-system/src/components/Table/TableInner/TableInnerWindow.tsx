@@ -79,8 +79,20 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
       if (groupScrollRef.current) groupScrollRef.current.scrollLeft = scrollEl.scrollLeft;
     };
 
+    // The browser scrolls the header itself to bring a focused header control into view: the
+    // body follows, and its scroll mirrors the rest back. Equal values fire no scroll, no loop.
+    const header = headerScrollRef.current;
+    const onHeaderScroll = () => {
+      if (header && scrollEl.scrollLeft !== header.scrollLeft)
+        scrollEl.scrollLeft = header.scrollLeft;
+    };
+
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
-    return () => scrollEl.removeEventListener('scroll', onScroll);
+    header?.addEventListener('scroll', onHeaderScroll, { passive: true });
+    return () => {
+      scrollEl.removeEventListener('scroll', onScroll);
+      header?.removeEventListener('scroll', onHeaderScroll);
+    };
   }, [containerRef, headerScrollRef]);
 
   useWheelHorizontalScroll(containerRef, headerScrollRef);
@@ -102,7 +114,15 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
       : 0;
 
   return (
-    <div ref={rootRef} data-testid={testId} className='group/scroll relative outline-none'>
+    // One table for assistive tech: the header and the body are two <table>s for layout only
+    // (the header must sit outside the horizontal scroller), so the wrapper carries the role.
+    <div
+      ref={rootRef}
+      data-testid={testId}
+      role='table'
+      aria-label={ariaLabel}
+      className='group/scroll relative outline-none'
+    >
       <ScrollArea className='group/scroll rounded-12 border border-border-primary-light'>
         {/*
           Sticky header. It must sit outside the horizontal scroll viewport:
@@ -113,7 +133,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
         */}
         <div className='sticky z-30' style={{ top: shellTop }}>
           <div ref={headerScrollRef} className='overflow-hidden'>
-            <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
+            <table className={tableStyles} style={{ width: tableWidth }} role='presentation'>
               <TableColGroup tableWidth={tableWidth} />
               <TableHead />
             </table>
@@ -140,7 +160,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           style={{ overflowX: 'auto', overflowY: 'hidden' }}
         >
           {/* Body */}
-          <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
+          <table className={tableStyles} style={{ width: tableWidth }} role='presentation'>
             <TableColGroup tableWidth={tableWidth} />
             {!isEmpty && (
               <WindowScrollRootContext.Provider value={scrollRoot}>

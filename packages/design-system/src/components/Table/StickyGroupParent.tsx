@@ -123,6 +123,15 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({
       wrapper.scrollLeft = containerRef.current.scrollLeft;
   }, [useWindowScroll, stickyRow, containerRef]);
 
+  // The stuck row is an aria-hidden copy of the real one, still clickable: its
+  // controls stay out of the tab order, which reaches the real row instead.
+  useLayoutEffect(() => {
+    for (const el of anchorRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button, input, select, textarea, [tabindex]',
+    ) ?? [])
+      el.tabIndex = -1;
+  });
+
   // Always render the sticky anchor to avoid DOM insertion/removal during
   // scroll which causes a brief layout reflow (the "jump" glitch).
   return (
