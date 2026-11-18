@@ -308,11 +308,33 @@ test.describe('Component: Drawer', () => {
     test('Should report one finished exit per close when the drawer closes', async ({ page }) => {
       await drawerStory.goto(page, 'Exit Complete');
       const exitCount = page.getByTestId('exit-count');
+      // Record the count when the closed backdrop's fade ends. This capture listener runs before
+      // zag's listener on the backdrop, which ends the exit, so the count must still be the
+      // previous one: a callback fired at the end of the panel's shorter exit would show here.
+      await page.evaluate(() => {
+        document.addEventListener(
+          'animationend',
+          ({ target }) => {
+            if (
+              target instanceof HTMLElement &&
+              target.dataset.testid === 'drawer--overlay' &&
+              target.dataset.state === 'closed'
+            ) {
+              document.body.dataset.countAtFadeEnd =
+                document.querySelector('[data-testid="exit-count"]')?.textContent ?? '';
+            }
+          },
+          true,
+        );
+      });
 
       await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(exitCount).toHaveText('Exits finished: 1');
+      await expect
+        .poll(() => page.evaluate(() => document.body.dataset.countAtFadeEnd))
+        .toBe('Exits finished: 0');
 
       await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
