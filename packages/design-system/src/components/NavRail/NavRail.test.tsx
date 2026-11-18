@@ -336,6 +336,82 @@ describe('Accessible names', () => {
   });
 });
 
+describe('Tooltip', () => {
+  it('does not mount a tooltip when expanded without a shortcut', () => {
+    render(
+      <NavRail mode='expanded'>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item' />
+      </NavRail>,
+    );
+    // Ark's TooltipTrigger adds data-state; its absence proves Tooltip is unmounted.
+    expect(screen.getByTestId('item')).not.toHaveAttribute('data-state');
+  });
+
+  it('shows only the shortcut in the tooltip when expanded with a shortcut', () => {
+    render(
+      <NavRail mode='expanded'>
+        <NavRailItem icon={Activity} label='Activity' shortcut={['G', 'A']} data-testid='item' />
+      </NavRail>,
+    );
+    // Tooltip is mounted — the trigger has data-state from Ark.
+    expect(screen.getByTestId('item')).toHaveAttribute('data-state');
+  });
+
+  it('mounts a tooltip when collapsed (label + shortcut)', () => {
+    render(
+      <NavRail mode='collapsed'>
+        <NavRailItem icon={Activity} label='Activity' shortcut={['G', 'A']} data-testid='item' />
+      </NavRail>,
+    );
+    expect(screen.getByTestId('item')).toHaveAttribute('data-state');
+  });
+
+  it('mounts a tooltip for the collapsed item without a shortcut', () => {
+    render(
+      <NavRail mode='collapsed'>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item' />
+      </NavRail>,
+    );
+    expect(screen.getByTestId('item')).toHaveAttribute('data-state');
+  });
+
+  it("mounts a tooltip on the compact avatar item showing the user's name", () => {
+    render(
+      <NavRail mode='compact'>
+        <NavRailItem icon={Activity} label='Meow Meow' avatar data-testid='item-user' />
+      </NavRail>,
+    );
+    // The avatar item hides its label in compact, so the tooltip must mount.
+    expect(screen.getByTestId('item-user')).toHaveAttribute('data-state');
+  });
+
+  it('still opens after switching mode while hovered (regression)', () => {
+    const { rerender } = render(
+      <NavRail mode='collapsed'>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item' />
+      </NavRail>,
+    );
+    // Collapsed: tooltip is mounted.
+    expect(screen.getByTestId('item')).toHaveAttribute('data-state');
+
+    // Switch to expanded: label is visible, no shortcut → tooltip unmounted.
+    rerender(
+      <NavRail mode='expanded'>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item' />
+      </NavRail>,
+    );
+    expect(screen.getByTestId('item')).not.toHaveAttribute('data-state');
+
+    // Switch back to collapsed: tooltip re-mounts fresh, no stale zag state.
+    rerender(
+      <NavRail mode='collapsed'>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item' />
+      </NavRail>,
+    );
+    expect(screen.getByTestId('item')).toHaveAttribute('data-state');
+  });
+});
+
 describe('Compact skeleton', () => {
   it('sizes each bar 4px inside the 62x42 compact item', () => {
     render(
