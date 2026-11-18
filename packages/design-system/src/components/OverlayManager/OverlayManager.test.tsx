@@ -1,4 +1,5 @@
 import {
+  Activity,
   createContext,
   lazy,
   type ReactNode,
@@ -639,6 +640,32 @@ describe('OverlayProvider and useOverlay', () => {
     expect(document.body.style.pointerEvents).toBe('');
     expect(document.querySelector('[data-aria-hidden], [data-inerted]')).toBeNull();
     await waitFor(() => expect(screen.getByTestId('open')).toHaveFocus());
+  });
+
+  it('releases the scroll lock when an Activity above the provider hides and reveals it', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    // One element for every render: a stable provider element bails out on the reveal, as an
+    // Activity around an outlet or a memoized subtree does.
+    const app = (
+      <OverlayProvider>
+        <Opener onResult={onResult} />
+      </OverlayProvider>
+    );
+    const { rerender } = render(<Activity mode='visible'>{app}</Activity>);
+    await openConfirm(user);
+    await flushLayers();
+
+    rerender(<Activity mode='hidden'>{app}</Activity>);
+    await flushLayers();
+    rerender(<Activity mode='visible'>{app}</Activity>);
+    await flushLayers();
+
+    // The documented limit: the hide drops the open overlays.
+    expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined);
+    expect(screen.queryByTestId('confirm--content')).toBeNull();
+    expect(document.body).not.toHaveAttribute('data-scroll-lock');
+    expect(document.body.style.overflow).toBe('');
   });
 
   it('returns focus to the opener when a confirm closes the drawer that opened it', async () => {

@@ -29,7 +29,8 @@ export interface OverlayStore {
   reportError: (error: unknown) => void;
   /**
    * Provider mounted or revealed, including the re-run of a StrictMode replay. Cancels a pending
-   * `release`.
+   * `release`. After a detach (an `<Activity>` reveal), drops the settled instances a microtask
+   * later.
    */
   attach: () => void;
   /**
@@ -37,7 +38,10 @@ export interface OverlayStore {
    * StrictMode replay re-attaches synchronously, so only a real unmount detaches.
    */
   release: () => void;
-  /** Settles everything `undefined`, drops all, and later open() calls resolve `undefined` at once. */
+  /**
+   * Settles everything `undefined`, and later open() calls resolve `undefined` at once. The
+   * snapshot keeps its instances until a re-attach drops them.
+   */
   detach: () => void;
 }
 
@@ -141,9 +145,9 @@ export const createOverlayStore = (): OverlayStore => {
       clearTimeout(entry.fallbackTimer);
     }
     live.clear();
-    if (instances.length === 0) return;
-    instances = [];
-    emit();
+    // The snapshot stays until a re-attach. An <Activity> that hid the provider reconnects these
+    // instances on its reveal; dropping them then, from the snapshot the reveal already rendered,
+    // unmounted their roots before zag started them and left its scroll lock on the page.
   };
 
   return {
@@ -214,8 +218,17 @@ export const createOverlayStore = (): OverlayStore => {
     },
     reportError: error => onError(error),
     attach: () => {
+      const revived = detached;
       detached = false;
       attachCount++;
+      if (!revived) return;
+      // A microtask later, after the revealed roots' layout effects queued their start.
+      queueMicrotask(() => {
+        const kept = instances.filter(instance => live.has(instance.id));
+        if (kept.length === instances.length) return;
+        instances = kept;
+        emit();
+      });
     },
     release: () => {
       const releasedAt = attachCount;

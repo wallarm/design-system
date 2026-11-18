@@ -302,7 +302,7 @@ describe('overlayStore', () => {
     await expect(result).resolves.toBe('kept');
   });
 
-  it('detach settles everything, drops all and blocks late inserts', async () => {
+  it('detach settles everything and blocks late inserts; a re-attach drops the instances', async () => {
     const store = createOverlayStore();
     const { result: a } = await openLoaded(store);
     const gate = deferred<ErasedOverlayComponent>();
@@ -312,9 +312,13 @@ describe('overlayStore', () => {
 
     await expect(a).resolves.toBeUndefined();
     await expect(b).resolves.toBeUndefined();
-    expect(store.getSnapshot()).toEqual([]);
     gate.resolve(Overlay);
     await flush();
+    // Kept for an <Activity> reveal, which renders this snapshot before the re-attach.
+    expect(store.getSnapshot()).toHaveLength(1);
+    store.attach();
+    expect(store.getSnapshot()).toHaveLength(1);
+    await Promise.resolve();
     expect(store.getSnapshot()).toEqual([]);
   });
 
@@ -359,10 +363,8 @@ describe('overlayStore', () => {
     const b = store.open(definitionOf(() => gate.promise));
 
     store.release();
-    expect(store.getSnapshot()).toHaveLength(1);
     await Promise.resolve();
 
-    expect(store.getSnapshot()).toEqual([]);
     await expect(a).resolves.toBeUndefined();
     await expect(b).resolves.toBeUndefined();
     await expect(store.open(eager())).resolves.toBeUndefined();
