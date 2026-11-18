@@ -24,17 +24,34 @@ export interface OverlayProps<Result = void> {
 
 type AllKeys<T> = T extends unknown ? keyof T : never;
 
-export type OverlayPayload<Props> = Props extends unknown
-  ? { [K in keyof Props as K extends 'controller' ? never : K]: Props[K] }
-  : never;
+/** The payload `open()` takes: from the overlay's props type, or from its definition (`typeof X`). */
+export type OverlayPayload<T> =
+  T extends OverlayDefinition<infer Payload, unknown>
+    ? Payload
+    : { [K in keyof T as K extends 'controller' ? never : K]: T[K] };
 
-export type OverlayResult<Props> = Props extends OverlayProps<infer Result> ? Result : never;
+/** What `open()` resolves with besides `undefined`: from the props type, or from the definition. */
+export type OverlayResult<T> =
+  T extends OverlayDefinition<unknown, infer Result>
+    ? Result
+    : T extends OverlayProps<infer Result>
+      ? Result
+      : never;
 
 export type OverlayOpenArgs<Payload> = [AllKeys<Payload>] extends [never]
   ? []
-  : Partial<Payload> extends Payload
+  : {} extends Payload
     ? [payload?: Payload]
     : [payload: Payload];
+
+/**
+ * Internal: `defineOverlay`'s extra argument, empty for a valid component. Props without
+ * `controller` (none at all, or only optional ones) or with a `key` make it required, which fails
+ * the call with this message.
+ */
+export type OverlayPropsCheck<Props> = [Props] extends [OverlayProps<never> & { key?: never }]
+  ? []
+  : [error: 'an overlay takes OverlayProps<Result>, with controller and without key'];
 
 export interface OverlayDefinition<Payload, Result> {
   preload: () => Promise<void>;

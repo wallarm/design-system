@@ -4,6 +4,7 @@ export type {
   OverlayCloseKey,
   OverlayController,
   OverlayDefinition,
+  OverlayOpenArgs,
   OverlayPayload,
   OverlayProps,
   OverlayProviderProps,

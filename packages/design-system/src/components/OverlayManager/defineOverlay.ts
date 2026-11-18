@@ -3,7 +3,7 @@ import type {
   ErasedOverlayComponent,
   OverlayDefinition,
   OverlayPayload,
-  OverlayProps,
+  OverlayPropsCheck,
   OverlayResult,
 } from './types';
 
@@ -17,8 +17,10 @@ export interface InternalOverlayDefinition<Payload = unknown, Result = unknown>
  * Describes an overlay once. `load` returns the component itself, never `React.lazy`;
  * importing the definition does not load the overlay's code.
  */
-export const defineOverlay = <Props extends OverlayProps<never>>(
+export const defineOverlay = <Props>(
   load: () => Promise<ComponentType<Props> & { readonly _result?: never }>,
+  // Checked after inference: a constraint on Props would accept a component without props.
+  ..._propsCheck: OverlayPropsCheck<Props>
 ): OverlayDefinition<OverlayPayload<Props>, OverlayResult<Props>> => {
   let cached: Promise<ErasedOverlayComponent> | undefined;
   // `new Promise` calls the loader synchronously and turns a synchronous throw into a rejection.

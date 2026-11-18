@@ -1,15 +1,16 @@
 // Typechecked by tsconfig.typetest.json (part of `pnpm typecheck`). Rstest runs it as a file with no tests.
 // Every @ts-expect-error must be used by a real error, or tsc reports an unused directive.
+// It imports from the public entry, so every type it names is pinned as exported.
 import { lazy } from 'react';
-import { defineOverlay } from './defineOverlay';
-import type {
-  OverlayDefinition,
-  OverlayOpenArgs,
-  OverlayPayload,
-  OverlayProps,
-  OverlayResult,
-} from './types';
-import { useOverlay } from './useOverlay';
+import {
+  defineOverlay,
+  type OverlayDefinition,
+  type OverlayOpenArgs,
+  type OverlayPayload,
+  type OverlayProps,
+  type OverlayResult,
+  useOverlay,
+} from './index';
 
 type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
@@ -24,6 +25,7 @@ interface FilterProps extends OverlayProps {
 }
 type PolicyProps = OverlayProps<boolean> &
   ({ mode: 'create' } | { mode: 'edit'; policyId: string });
+type ModeProps = OverlayProps<boolean> & ({ mode?: 'create' } | { mode: 'edit'; policyId: string });
 
 export type TypeCases = [
   Expect<Equal<OverlayPayload<DeleteProps>, { userId: string; userName: string }>>,
@@ -40,6 +42,13 @@ export type TypeCases = [
   Expect<
     Equal<OverlayPayload<PolicyProps>, { mode: 'create' } | { mode: 'edit'; policyId: string }>
   >,
+  // One union member needs no keys, so the payload is optional.
+  Expect<
+    Equal<
+      OverlayOpenArgs<OverlayPayload<ModeProps>>,
+      [payload?: { mode?: 'create' } | { mode: 'edit'; policyId: string }]
+    >
+  >,
 ];
 
 export const DeleteDialog = ({ controller }: DeleteProps) => {
@@ -54,6 +63,9 @@ export type DefinitionCases = [
   Expect<
     Equal<typeof DeleteOverlay, OverlayDefinition<{ userId: string; userName: string }, boolean>>
   >,
+  // The helpers also take a definition, as a column builder that imports it would write them.
+  Expect<Equal<OverlayPayload<typeof DeleteOverlay>, { userId: string; userName: string }>>,
+  Expect<Equal<OverlayResult<typeof DeleteOverlay>, boolean>>,
 ];
 
 const NotAnOverlay = ({ userId }: { userId: string }) => userId;
@@ -61,6 +73,12 @@ const NotAnOverlay = ({ userId }: { userId: string }) => userId;
 defineOverlay(async () => NotAnOverlay);
 // @ts-expect-error return the component itself, never React.lazy
 defineOverlay(async () => lazy(async () => ({ default: DeleteDialog })));
+// @ts-expect-error a component that takes no props has no `controller` either
+defineOverlay(async () => () => null);
+// @ts-expect-error optional props only, such as a legacy dialog's `title?`, still lack `controller`
+defineOverlay(async () => (_: { title?: string }) => null);
+// @ts-expect-error a `key` prop never reaches a component: React takes it
+defineOverlay(async () => (_: OverlayProps & { key: string }) => null);
 
 const NoPayloadOverlay = defineOverlay(async () => (_: OverlayProps<boolean>) => null);
 
