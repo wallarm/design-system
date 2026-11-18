@@ -32,6 +32,17 @@ const openDrawer = async (page: Page) => {
   await expect(getDrawerContent(page)).toBeVisible();
 };
 
+// zag attaches the drawer's Escape listener no later than the frame that moves focus into it. An
+// Escape pressed as soon as the panel is visible can come earlier and be lost.
+const openDrawerReadyForEscape = async (page: Page) => {
+  await openDrawer(page);
+  await expect
+    .poll(() =>
+      getDrawerContent(page).evaluate(content => content.contains(document.activeElement)),
+    )
+    .toBe(true);
+};
+
 test.describe('Component: Drawer', () => {
   test.describe('Visual', () => {
     test('Should render basic drawer correctly', async ({ page }) => {
@@ -298,12 +309,12 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'Exit Complete');
       const exitCount = page.getByTestId('exit-count');
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(exitCount).toHaveText('Exits finished: 1');
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(exitCount).toHaveText('Exits finished: 2');
@@ -313,7 +324,7 @@ test.describe('Component: Drawer', () => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await drawerStory.goto(page, 'Exit Complete');
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(page.getByTestId('exit-count')).toHaveText('Exits finished: 1');
