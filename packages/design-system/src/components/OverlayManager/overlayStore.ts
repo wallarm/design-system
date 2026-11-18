@@ -25,6 +25,8 @@ export interface OverlayStore {
   /** The first call records the key; a different key sweeps every instance created before it. */
   setCloseKey: (key: OverlayCloseKey) => void;
   setOnError: (onError: (error: unknown) => void) => void;
+  /** Reports through this store's current onError: a nested provider without its own reports here. */
+  reportError: (error: unknown) => void;
   /**
    * Provider mounted or revealed, including the re-run of a StrictMode replay. Cancels a pending
    * `release`.
@@ -201,6 +203,7 @@ export const createOverlayStore = (): OverlayStore => {
     setOnError: handler => {
       onError = handler;
     },
+    reportError: error => onError(error),
     attach: () => {
       detached = false;
       attachCount++;

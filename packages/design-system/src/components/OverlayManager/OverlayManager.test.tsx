@@ -161,6 +161,12 @@ const DeletingDrawer = ({ name, controller }: ConfirmProps) => {
 };
 const DeletingDrawerOverlay = defineOverlay(async () => DeletingDrawer);
 
+const chunkError = new Error('chunk');
+/** A confirm whose code never loads. */
+const FailingOverlay = defineOverlay(async (): Promise<typeof ConfirmDialog> => {
+  throw chunkError;
+});
+
 interface OpenerProps {
   name?: string;
   onResult: (result?: boolean) => void;
@@ -539,6 +545,24 @@ describe('OverlayProvider and useOverlay', () => {
     await openConfirm(user);
 
     expect(screen.getByTestId('confirm--title')).toHaveTextContent('Delete Jane? (none)');
+  });
+
+  it("reports through the enclosing provider's onError when a nested provider has none", async () => {
+    const user = userEvent.setup();
+    const onError = rs.fn();
+    const onResult = rs.fn();
+    render(
+      <OverlayProvider onError={onError}>
+        <OverlayProvider>
+          <Opener definition={FailingOverlay} onResult={onResult} />
+        </OverlayProvider>
+      </OverlayProvider>,
+    );
+
+    await user.click(screen.getByTestId('open'));
+
+    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
+    expect(onError).toHaveBeenCalledExactlyOnceWith(chunkError);
   });
 
   it('throws when useOverlay has no provider', () => {

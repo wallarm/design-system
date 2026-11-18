@@ -1,6 +1,7 @@
 import {
   type FC,
   Suspense,
+  useContext,
   useEffect,
   useLayoutEffect,
   useState,
@@ -54,12 +55,13 @@ const OverlayInstanceView: FC<OverlayInstanceViewProps> = ({ store, instance }) 
  * root route component of each app and remote, wrapping everything that route renders.
  */
 export const OverlayProvider: FC<OverlayProviderProps> = ({ children, closeOnChange, onError }) => {
+  const parent = useContext(OverlayStoreContext);
   const [store] = useState(createOverlayStore);
   const instances = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
 
   useLayoutEffect(() => {
-    store.setOnError(onError ?? reportOverlayError);
-  }, [store, onError]);
+    store.setOnError(onError ?? parent?.reportError ?? reportOverlayError);
+  }, [store, onError, parent]);
 
   // A layout effect, so that a new page's mount useEffect in the same commit opens its overlays
   // after this sweep: every layout effect runs before any passive effect. The store ignores a

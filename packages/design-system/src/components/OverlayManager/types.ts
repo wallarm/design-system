@@ -52,7 +52,10 @@ export interface OverlayProviderProps {
    * rest.
    */
   closeOnChange?: OverlayCloseKey;
-  /** Gets loader and render errors; that overlay's `open()` resolves `undefined`. Defaults to `reportError`. */
+  /**
+   * Gets loader and render errors; that overlay's `open()` resolves `undefined`. Defaults to the
+   * enclosing provider's `onError`, and to `reportError` in the outermost one.
+   */
   onError?: (error: unknown) => void;
 }
 
