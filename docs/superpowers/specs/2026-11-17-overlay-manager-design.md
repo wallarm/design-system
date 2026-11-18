@@ -1,6 +1,8 @@
 # Overlay manager: open the same Dialog or Drawer from anywhere, load it lazily
 
-Status: design spec, 2026-11-17, branch `feat/modal-manager`. Paths are under `packages/design-system/src/` unless marked otherwise.
+Status: design spec, 2026-11-17; implemented 2026-11-17 · branch `feat/modal-manager`. Paths are under `packages/design-system/src/` unless marked otherwise.
+
+As built, the implementation differs from this spec in four places. `guidelines/rules.md` got no wrong → right line: the file has no room under its 2000-character cap. "The exit animation plays" and "Back closes both" are unit tests, not e2e: a 150 ms window would be flaky in e2e, and Storybook has no URL-driven drawer. The StrictMode cleanup test uses a Dialog only; a managed Drawer runs under StrictMode in the test where a Suspense boundary above the provider re-suspends. Closing a dialog opened from a menu item leaves focus on `body` in Chromium, not on the menu trigger; that is an open finding in the repo-root `docs/storybook-docs-findings.md`.
 
 The numbers below come from a recon with adversarial verification: DS overlay internals, core-frontend usage, the legacy console and standalone remotes, Chakra's `createOverlay` source, and other overlay libraries. The design then went through a builder check and three adversarial reviews (lifecycle and accessibility, module identity, API and developer experience), and each serious finding was verified independently.
 
@@ -313,7 +315,7 @@ Each instance's promise settles exactly once:
   - The definition is still shared with the list page's app-level provider, so the duplicated pair still collapses into one definition.
 - **Where `useOverlay` is called.** The call must sit in a component rendered inside that nested provider, for example the actions menu in `DrawerHeader`. It must not sit in the drawer's top-level hook above `<Drawer>`: that call would resolve to the app provider and bring the problem back. Document this.
 - **Recon.** core-frontend's 16 nested pairs are all Drawer→Dialog, where push-back never applies, and at least 9 of them sit in router-owned drawers.
-- **Future push-back.** Push-back for app-level managed overlays must not import Drawer-private contexts from `OverlayManager/` (constraint 8).
+- **Future push-back.** Push-back for app-level managed overlays must not import Drawer-private contexts from `components/OverlayManager/` (constraint 8).
 
 ### Focus
 
@@ -332,14 +334,14 @@ Each instance's promise settles exactly once:
 - **Metrics contract.** Neutral. The manager renders consumer-composed overlays and adds no interactive targets. Wrapping `onOpenChange` composes with the consumer's handler and never replaces it.
 - **Storybook.**
   - Stories go under `Overlay/OverlayManager` and start closed.
-  - Mount the provider through `meta.decorators`, never in `.storybook/preview.tsx`; the website and Claude Design compose stories without it. A story body cannot both mount the provider and call `useOverlay`, and the story rules forbid local wrapper components.
+  - Mount the provider through `meta.decorators`, never in `packages/design-system/.storybook/preview.tsx`; the website and Claude Design compose stories without it. A story body cannot both mount the provider and call `useOverlay`, and the story rules forbid local wrapper components.
   - Story bodies call `useOverlay` with named handlers.
   - The example overlays and their `defineOverlay` calls live in `components/OverlayManager/stories/`. That folder is excluded from dist, from `.d.ts` emission and from the compiler audit.
   - Write the Overview page with `/storybook-docs`.
 - **Docs for the overlay half.** Extracted story code shows only the opener: `useOverlay(X)` plus a relative import. So:
   - add `components/OverlayManager/docs/usage.md` with the full flow: provider in the root route, the definitions module, the overlay component, the opener and `preload()`. MCP serves it as `docs/usage`;
   - name `defineOverlay`, `useOverlay`, `OverlayProps` and the single root-route provider in `parameters.docs.description.component`, which both MCP and the website render;
-  - put the same full flow as a plain `tsx` fence in the confirmation-dialogs guideline, outside `## Examples`. The website renders guideline pages, but not `docs/usage.md`.
+  - put the same full flow as a plain `tsx` fence in the confirmation-dialogs guideline, outside `## Examples`. The website renders guideline pages, but not `components/OverlayManager/docs/usage.md`.
 - **Guidelines** (served to agents through MCP).
   - `guidelines/foundations/layering.md`: add an exception for managed overlays to "Depth comes from the React tree".
   - `guidelines/patterns/confirmation-dialogs.md`: add the managed alternative to "Use one controlled `open` state per dialog", the nested-provider rule for drawers, and the `tsx` fence.
@@ -406,10 +408,6 @@ Made by the designer (Claude), open to override:
 - Router-owned drawers use a nested provider inside `DrawerContent` instead of a new `closeWithOpener` option.
 - A missing provider in a nested MF app is handled by a documented hard rule now; the `OverlayScope` guard is a follow-up.
 - Claude Design omits the manager's guide; gen-ui excludes it.
-
-Waiting on the user:
-
-- Jira keys for both branches and PRs. They are needed only when the branches are pushed.
 
 ## Left to the builder
 

@@ -1,7 +1,7 @@
 ---
 title: Layering
 description: Use when an overlay must paint above another one, or when you consider adding a z-index class to app code.
-components: [Drawer, Dialog, DropdownMenu, Select, Popover, HoverCard, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader]
+components: [Drawer, Dialog, DropdownMenu, Select, Popover, HoverCard, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader, OverlayProvider]
 keywords: [z-index, z, stacking, layer, portal, overlay, modal, nested drawer, dialog over drawer, dropdown in dialog, tooltip above, toast above, sticky header, popper]
 order: 50
 ---
