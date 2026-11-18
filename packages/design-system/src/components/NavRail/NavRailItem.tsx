@@ -100,21 +100,26 @@ export const NavRailItem: FC<NavRailItemProps> = ({
     </Comp>
   );
 
+  const hasShortcut = !!shortcut?.length;
+  const trigger = props['aria-haspopup'] ? <span className='flex flex-1'>{element}</span> : element;
+
+  // A visible label without a shortcut leaves the tooltip nothing to add.
+  // Unmounting (instead of `disabled`) avoids a zag bug where pointerleave is
+  // ignored while disabled, so hasPointerMoveOpened never resets after a mode switch.
+  if (showsLabel && !hasShortcut) return trigger;
+
   return (
     <Tooltip positioning={{ placement: 'right' }}>
-      <TooltipTrigger asChild>
-        {props['aria-haspopup'] ? <span className='flex flex-1'>{element}</span> : element}
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{trigger}</TooltipTrigger>
       <TooltipContent>
-        {label}{' '}
-        {shortcut &&
-          shortcut.length > 0 &&
-          shortcut.map((key, index) => (
-            <Fragment key={key}>
-              {index > 0 && ' then '}
-              <Kbd size='small'>{key}</Kbd>
-            </Fragment>
-          ))}
+        {!showsLabel && label}
+        {!showsLabel && hasShortcut && ' '}
+        {shortcut?.map((key, index) => (
+          <Fragment key={key}>
+            {index > 0 && ' then '}
+            <Kbd size='small'>{key}</Kbd>
+          </Fragment>
+        ))}
       </TooltipContent>
     </Tooltip>
   );
