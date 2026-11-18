@@ -1,3 +1,13 @@
+## [4.20.0](https://github.com/wallarm/design-system/compare/v4.19.2...v4.20.0) (2026-11-18)
+
+### Features
+
+* **drawer:** forward onExitComplete on Drawer and Dialog ([#513](https://github.com/wallarm/design-system/issues/513)) ([0cde0b1](https://github.com/wallarm/design-system/commit/0cde0b12eb4c921b86b7e0bc69a0adf8e661db5f))
+
+### Bug Fixes
+
+* **table:** window mode keeps header in line on focus and reads as one table ([#509](https://github.com/wallarm/design-system/issues/509)) ([d868e01](https://github.com/wallarm/design-system/commit/d868e01d5d63191aa844eb9cd4e35eeffb205cf8))
+
 ## [4.19.2](https://github.com/wallarm/design-system/compare/v4.19.1...v4.19.2) (2026-11-17)
 
 ### Bug Fixes
