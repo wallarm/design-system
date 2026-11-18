@@ -162,6 +162,13 @@ const DeletingDrawer = ({ name, controller }: ConfirmProps) => {
 };
 const DeletingDrawerOverlay = defineOverlay(async () => DeletingDrawer);
 
+/** Breaks the contract: it never renders its root, so nothing can dismiss it or report its exit. */
+const NoRootConfirm = (_: ConfirmProps) => {
+  useEffect(() => unmountSpy, []);
+  return <span data-testid='no-root' />;
+};
+const NoRootOverlay = defineOverlay(async () => NoRootConfirm);
+
 const chunkError = new Error('chunk');
 /** A confirm whose code never loads. */
 const FailingOverlay = defineOverlay(async (): Promise<typeof ConfirmDialog> => {
@@ -218,21 +225,37 @@ describe('OverlayProvider and useOverlay', () => {
     await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
   });
 
-  it('resolves undefined when the user dismisses with Escape', async () => {
-    const user = userEvent.setup();
-    const onResult = rs.fn();
-    render(
-      <OverlayProvider>
-        <Opener onResult={onResult} />
-      </OverlayProvider>,
-    );
+  it.each([
+    ['Escape', (user: ReturnType<typeof userEvent.setup>) => user.keyboard('{Escape}')],
+    [
+      'DialogClose',
+      (user: ReturnType<typeof userEvent.setup>) =>
+        user.click(screen.getByTestId('confirm-cancel')),
+    ],
+  ])(
+    'resolves undefined when the user dismisses with %s, then plays the exit',
+    async (_, dismiss) => {
+      animateExit('[data-testid="confirm--content"]');
+      const user = userEvent.setup();
+      const onResult = rs.fn();
+      render(
+        <OverlayProvider>
+          <Opener onResult={onResult} />
+        </OverlayProvider>,
+      );
 
-    await openConfirm(user);
-    await flushLayers();
-    await user.keyboard('{Escape}');
+      const content = await openConfirm(user);
+      await flushLayers();
+      await dismiss(user);
 
-    await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
-  });
+      await waitFor(() => expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined));
+      await flushLayers();
+      expect(content).toHaveAttribute('data-state', 'closed');
+      expect(content).toBeInTheDocument();
+      fireEvent.animationEnd(content);
+      await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
+    },
+  );
 
   it('keeps the payload and content while the overlay animates out', async () => {
     animateExit('[data-testid="confirm--content"]');
@@ -252,6 +275,7 @@ describe('OverlayProvider and useOverlay', () => {
     expect(content).toHaveAttribute('data-state', 'closed');
     // zag starts tracking the exit animation one frame after the close; an earlier end is lost.
     await flushLayers();
+    expect(content).toBeInTheDocument();
     fireEvent.animationEnd(content);
     await waitFor(() => expect(screen.queryByTestId('confirm--content')).toBeNull());
   });
@@ -273,6 +297,30 @@ describe('OverlayProvider and useOverlay', () => {
     rs.useRealTimers();
 
     await waitFor(() => expect(unmountSpy).toHaveBeenCalled());
+  });
+
+  it('keeps an overlay without a root pending until closeOnChange changes, then drops it', async () => {
+    const user = userEvent.setup();
+    const onResult = rs.fn();
+    const Page = ({ pageKey }: { pageKey: string }) => (
+      <OverlayProvider closeOnChange={pageKey}>
+        <Opener definition={NoRootOverlay} onResult={onResult} />
+      </OverlayProvider>
+    );
+    const { rerender } = render(<Page pageKey='users' />);
+    await user.click(screen.getByTestId('open'));
+    await screen.findByTestId('no-root');
+    await flushLayers();
+    expect(onResult).not.toHaveBeenCalled();
+
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    rerender(<Page pageKey='roles' />);
+    await act(async () => undefined);
+    expect(onResult).toHaveBeenCalledExactlyOnceWith(undefined);
+    expect(unmountSpy).not.toHaveBeenCalled();
+    act(() => rs.advanceTimersByTime(REMOVE_FALLBACK_MS));
+
+    expect(unmountSpy).toHaveBeenCalled();
   });
 
   it('drops the instance after the fallback when the root does not forward onExitComplete', async () => {

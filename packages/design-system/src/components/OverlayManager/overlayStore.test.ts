@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
-import type { InternalOverlayDefinition } from './defineOverlay';
+import { defineOverlay, type InternalOverlayDefinition } from './defineOverlay';
 import {
   createOverlayStore,
   type OverlayStore,
   REMOVE_FALLBACK_MS,
   reportOverlayError,
 } from './overlayStore';
-import type { ErasedOverlayComponent } from './types';
+import type { ErasedOverlayComponent, OverlayProps } from './types';
 
 const deferred = <T>() => {
   let resolve!: (value: T) => void;
@@ -151,7 +151,10 @@ describe('overlayStore', () => {
     const store = createOverlayStore();
     const gate = deferred<ErasedOverlayComponent>();
 
-    const first = store.open(definitionOf(() => gate.promise), { a: 1 });
+    const first = store.open(
+      definitionOf(() => gate.promise),
+      { a: 1 },
+    );
     store.open(eager(), { b: 1 });
     await flush();
     gate.resolve(Overlay);
@@ -215,6 +218,24 @@ describe('overlayStore', () => {
   });
 
   // A definition not made by defineOverlay, such as a mocked definitions module.
+  it('runs the loader again on the next open after a failed load', async () => {
+    const store = createOverlayStore();
+    store.setOnError(rs.fn());
+    const Component = (_: OverlayProps) => null;
+    const load = rs
+      .fn<() => Promise<typeof Component>>()
+      .mockRejectedValueOnce(new Error('chunk'))
+      .mockResolvedValueOnce(Component);
+    const definition = defineOverlay(load) as unknown as InternalOverlayDefinition;
+
+    await expect(store.open(definition)).resolves.toBeUndefined();
+    store.open(definition);
+    await flush();
+
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(store.getSnapshot()).toMatchObject([{ Component, open: true }]);
+  });
+
   it('resolves undefined and reports when the loader throws synchronously', async () => {
     const store = createOverlayStore();
     const onError = rs.fn();

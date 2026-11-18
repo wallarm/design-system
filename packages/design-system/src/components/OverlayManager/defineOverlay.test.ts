@@ -6,6 +6,12 @@ const Overlay = (_: OverlayProps<boolean>) => null;
 const internal = (definition: unknown) => definition as InternalOverlayDefinition;
 
 describe('defineOverlay', () => {
+  it('loads nothing until the first load or preload', () => {
+    const load = rs.fn(async () => Overlay);
+    defineOverlay(load);
+    expect(load).not.toHaveBeenCalled();
+  });
+
   it('loads the component once and caches it', async () => {
     const load = rs.fn(async () => Overlay);
     const definition = internal(defineOverlay(load));
