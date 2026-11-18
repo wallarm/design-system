@@ -13,7 +13,7 @@ export const CLAUDE_DESIGN = {
   outDir: resolve(PACKAGE_DIR, '.claude-design/project'),
   bundleBudgetBytes: 5_700_000,
   cssCapBytes: 2_000_000,
-  /** No guide, no preview: internal primitives and the providers `Root` stands in for. */
+  /** No guide, no preview: internal primitives, the providers `Root` stands in for, and hook-only APIs. */
   internal: new Set([
     'ThemeProvider',
     'DateFormatProvider',
@@ -23,6 +23,8 @@ export const CLAUDE_DESIGN = {
     'Checkmark',
     // RemoteShellPanel renders it; products configure it through RemoteShell's NavConfig.
     'NavPanel',
+    // Hook-only, app-level API: canvas scripts cannot run hooks.
+    'OverlayManager',
   ]) as ReadonlySet<string>,
   /** One metadata entry, one guide per Storybook story file. */
   splitByStoryFile: new Set(['SimpleCharts']) as ReadonlySet<string>,

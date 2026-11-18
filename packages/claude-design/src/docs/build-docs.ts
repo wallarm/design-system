@@ -115,16 +115,30 @@ export const assertStoriesShipped = (
     );
 };
 
-/** Story files outside src/components that have no component guide, by src-relative prefix. */
+const HOOK_ONLY =
+  'hook-only app-level API (canvas scripts cannot run hooks); render Dialog or Drawer with open';
+
+/**
+ * Story files that have no component guide, by src-relative prefix: outside src/components, or in
+ * the folder of a component that has none.
+ */
 const NON_COMPONENT_STORIES: Record<string, string> = {
   'theme/': 'theme gallery story, not a component; see tokens.css',
   'icons/': 'icon gallery story, not a component; see assets/Icons',
   'guidelines/':
     'pattern or template story, not a component; the screen sampler covers the patterns on a canvas',
+  'components/OverlayManager/': HOOK_ONLY,
 };
 
-/** Public providers with no guide: the canvas wraps every artboard in `WallarmDS.Root`. */
-const PROVIDERS: ReadonlySet<string> = new Set(['ThemeProvider', 'DateFormatProvider']);
+/**
+ * Public components with no guide, and why: the canvas wraps every artboard in `WallarmDS.Root`,
+ * and its scripts cannot run hooks.
+ */
+const NO_GUIDE: ReadonlyMap<string, string> = new Map([
+  ['ThemeProvider', 'provider; use WallarmDS.Root on the canvas'],
+  ['DateFormatProvider', 'provider; use WallarmDS.Root on the canvas'],
+  ['OverlayManager', HOOK_ONLY],
+]);
 
 interface Guide {
   name: string;
@@ -206,8 +220,9 @@ export const buildDocs = async ({
   const guides: Guide[] = [];
   const omitted: string[] = [];
   for (const component of metadata.components) {
-    if (PROVIDERS.has(component.name)) {
-      omitted.push(`${component.name}: provider; use WallarmDS.Root on the canvas.`);
+    const noGuide = NO_GUIDE.get(component.name);
+    if (noGuide) {
+      omitted.push(`${component.name}: ${noGuide}.`);
     } else if (CLAUDE_DESIGN.internal.has(component.name)) {
       omitted.push(`${component.name}: internal primitive; no guide.`);
     } else if (CLAUDE_DESIGN.splitByStoryFile.has(component.name)) {

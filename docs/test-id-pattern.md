@@ -135,6 +135,7 @@ All compound components support `data-testid` cascading. Most receive it via the
 | Component | Source | Why |
 |-----------|--------|-----|
 | Toast | `toast.id` (automatic) | Data-driven, no JSX props |
+| Managed overlay (OverlayManager) | `data-testid` on the overlay's own `Dialog`/`Drawer` root | Two instances of one definition can coexist (reopened during its exit, or stacked), so ids can repeat: wait for the closing content to detach, or target the open one |
 
 ## Adding TestId to a new compound component
 

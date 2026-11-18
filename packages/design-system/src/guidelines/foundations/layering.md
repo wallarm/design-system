@@ -1,7 +1,7 @@
 ---
 title: Layering
 description: Use when an overlay must paint above another one, or when you consider adding a z-index class to app code.
-components: [Drawer, Dialog, DropdownMenu, Select, Popover, HoverCard, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader]
+components: [Drawer, Dialog, DropdownMenu, Select, Popover, HoverCard, Calendar, FilterCascade, Tooltip, Toaster, SearchModal, Tour, SelectionBulkBar, TableActionBar, FeedbackPulse, PageHeader, OverlayProvider]
 keywords: [z-index, z, stacking, layer, portal, overlay, modal, nested drawer, dialog over drawer, dropdown in dialog, tooltip above, toast above, sticky header, popper]
 order: 50
 ---
@@ -34,6 +34,7 @@ What does not exist:
 
 - If an overlay opens from inside another overlay, render it as a React child of the parent's content. Depth comes from the React tree.
 - If you open a `Dialog` from a `Drawer`, put the `Dialog` inside `DrawerContent`. Only a React-ancestor drawer or dialog dismisses the nested one.
+- If you open an overlay with `useOverlay` from `@wallarm-org/design-system/OverlayManager`, it renders beside the app, not inside its opener: it still stacks above, but it neither scales its parent back nor closes with it. Inside a drawer that can close from outside, or one that opens a managed `Drawer` it should scale back, mount `<OverlayProvider closeOnChange={entityId}>` in its `DrawerContent`.
 - If you nest a `Drawer` in a `Drawer`, or a `Dialog` in a `Dialog`, expect the parent to scale back. A `Dialog` over a `Drawer` does not scale the drawer.
 - If a dropdown, select, popover, calendar or tooltip sits in any overlay, use it as-is. It already paints above its host.
 - If your app has its own fixed element (chat widget), keep its z-index below 40. At 40 or higher it paints over the drawer backdrop.
