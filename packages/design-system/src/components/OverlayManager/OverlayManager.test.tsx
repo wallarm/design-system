@@ -141,6 +141,26 @@ const PanelDrawer = ({ name, controller }: ConfirmProps) => {
 };
 const PanelOverlay = defineOverlay(async () => PanelDrawer);
 
+/** A managed Drawer that closes itself once the confirm it opens is confirmed, like the stories' edit drawer. */
+const DeletingDrawer = ({ name, controller }: ConfirmProps) => {
+  const confirm = useOverlay(ConfirmOverlay);
+  const handleDelete = async () => {
+    if (await confirm.open({ name })) controller.close(true);
+  };
+  return (
+    <Drawer {...controller.rootProps} data-testid='panel'>
+      <DrawerContent>
+        <DrawerBody>
+          <Button data-testid='panel-delete' onClick={handleDelete}>
+            Delete
+          </Button>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+const DeletingDrawerOverlay = defineOverlay(async () => DeletingDrawer);
+
 interface OpenerProps {
   name?: string;
   onResult: (result?: boolean) => void;
@@ -594,6 +614,39 @@ describe('OverlayProvider and useOverlay', () => {
     expect(document.body.style.overflow).toBe('');
     expect(document.body.style.pointerEvents).toBe('');
     expect(document.querySelector('[data-aria-hidden], [data-inerted]')).toBeNull();
+    await waitFor(() => expect(screen.getByTestId('open')).toHaveFocus());
+  });
+
+  it('returns focus to the opener when a confirm closes the drawer that opened it', async () => {
+    animateExit('[data-testid="panel--content"], [data-testid="confirm--content"]');
+    const user = userEvent.setup();
+    render(
+      <OverlayProvider>
+        <Opener definition={DeletingDrawerOverlay} onResult={rs.fn()} />
+      </OverlayProvider>,
+    );
+    await user.click(screen.getByTestId('open'));
+    const panel = await screen.findByTestId('panel--content');
+    await flushLayers();
+    await user.click(screen.getByTestId('panel-delete'));
+    const confirm = await screen.findByTestId('confirm--content');
+    await flushLayers();
+
+    // A browser click, outside act(): act() commits the confirm's close before the drawer's
+    // close runs, which hides the order the two closes land in.
+    const actEnvironment = Reflect.get(globalThis, 'IS_REACT_ACT_ENVIRONMENT');
+    Reflect.set(globalThis, 'IS_REACT_ACT_ENVIRONMENT', false);
+    try {
+      screen.getByTestId('confirm-ok').click();
+      await waitFor(() => expect(panel).toHaveAttribute('data-state', 'closed'));
+      await flushLayers();
+    } finally {
+      Reflect.set(globalThis, 'IS_REACT_ACT_ENVIRONMENT', actEnvironment);
+    }
+    fireEvent.animationEnd(confirm);
+    fireEvent.animationEnd(panel);
+
+    await waitFor(() => expect(screen.queryByTestId('panel--content')).toBeNull());
     await waitFor(() => expect(screen.getByTestId('open')).toHaveFocus());
   });
 

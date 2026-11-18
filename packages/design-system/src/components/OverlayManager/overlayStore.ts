@@ -93,16 +93,20 @@ export const createOverlayStore = (): OverlayStore => {
     emit();
   };
 
-  /** Settles an open instance and starts its exit without notifying. False when there was nothing to close. */
-  const startClosing = (id: number, result: unknown) => {
+  /**
+   * Starts an open instance's exit without notifying, and returns the call that settles it, or
+   * undefined when there was nothing to close. Callers emit first and settle after: a caller that
+   * awaits open() and closes the overlay below then lands its close in a later commit, so the
+   * focus traps unwind top-down, as with nested overlays.
+   */
+  const startClosing = (id: number) => {
     const entry = live.get(id);
-    if (!entry || !instances.some(instance => instance.id === id && instance.open)) return false;
-    entry.settle(result);
+    if (!entry || !instances.some(instance => instance.id === id && instance.open)) return;
     entry.fallbackTimer = setTimeout(() => remove(id), REMOVE_FALLBACK_MS);
     instances = instances.map(instance =>
       instance.id === id ? { ...instance, open: false } : instance,
     );
-    return true;
+    return entry.settle;
   };
 
   const settlePending = () => {
@@ -168,7 +172,10 @@ export const createOverlayStore = (): OverlayStore => {
       });
     },
     close: (id, result) => {
-      if (startClosing(id, result)) emit();
+      const settle = startClosing(id);
+      if (!settle) return;
+      emit();
+      settle(result);
     },
     remove,
     fail: (id, error) => {
@@ -184,9 +191,12 @@ export const createOverlayStore = (): OverlayStore => {
       recordedKey = { value: key };
       if (!previous || Object.is(previous.value, key)) return;
       settlePending();
-      const open = instances.filter(instance => instance.open);
-      for (const { id } of open) startClosing(id, undefined);
-      if (open.length > 0) emit();
+      const settles = instances
+        .filter(instance => instance.open)
+        .flatMap(({ id }) => startClosing(id) ?? []);
+      if (settles.length === 0) return;
+      emit();
+      for (const settle of settles) settle(undefined);
     },
     setOnError: handler => {
       onError = handler;
