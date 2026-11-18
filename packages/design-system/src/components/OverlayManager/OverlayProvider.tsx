@@ -70,10 +70,10 @@ export const OverlayProvider: FC<OverlayProviderProps> = ({ children, closeOnCha
     store.setCloseKey(closeOnChange);
   }, [store, closeOnChange]);
 
-  // Only a real unmount may settle and drop the overlays. Release in a passive cleanup, because a
-  // Suspense boundary above that re-suspends disconnects only layout effects. StrictMode replays
-  // that cleanup on mount and on a Suspense reveal, but re-runs this layout effect in the same
-  // tick, and the attach cancels the release before its deferred detach.
+  // Only a real unmount (or an <Activity> hide) may settle and drop the overlays. Release in a
+  // passive cleanup, because a Suspense boundary above that re-suspends disconnects only layout
+  // effects. StrictMode replays that cleanup on mount and on a Suspense reveal, but re-runs this
+  // layout effect in the same tick, and the attach cancels the release before its deferred detach.
   useLayoutEffect(() => {
     store.attach();
   }, [store]);

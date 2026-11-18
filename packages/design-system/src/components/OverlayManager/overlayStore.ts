@@ -35,7 +35,8 @@ export interface OverlayStore {
   attach: () => void;
   /**
    * Provider's passive cleanup: detaches one microtask later unless `attach` runs first. A
-   * StrictMode replay re-attaches synchronously, so only a real unmount detaches.
+   * StrictMode replay re-attaches synchronously, so only a real unmount, or an `<Activity>`
+   * hide that runs the same cleanup, detaches.
    */
   release: () => void;
   /**

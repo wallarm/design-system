@@ -24,7 +24,11 @@ export interface OverlayProps<Result = void> {
 
 type AllKeys<T> = T extends unknown ? keyof T : never;
 
-/** The payload `open()` takes: from the overlay's props type, or from its definition (`typeof X`). */
+/**
+ * The payload `open()` takes: from the overlay's props type, or from its definition (`typeof X`).
+ * A conditional type, so declaration emit expands it instead of naming the props interface, which
+ * a library may not export (TS4023).
+ */
 export type OverlayPayload<T> =
   T extends OverlayDefinition<infer Payload, unknown>
     ? Payload
