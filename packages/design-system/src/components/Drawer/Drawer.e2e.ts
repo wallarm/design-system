@@ -32,6 +32,17 @@ const openDrawer = async (page: Page) => {
   await expect(getDrawerContent(page)).toBeVisible();
 };
 
+// zag attaches the drawer's Escape listener no later than the frame that moves focus into it. An
+// Escape pressed as soon as the panel is visible can come earlier and be lost.
+const openDrawerReadyForEscape = async (page: Page) => {
+  await openDrawer(page);
+  await expect
+    .poll(() =>
+      getDrawerContent(page).evaluate(content => content.contains(document.activeElement)),
+    )
+    .toBe(true);
+};
+
 test.describe('Component: Drawer', () => {
   test.describe('Visual', () => {
     test('Should render basic drawer correctly', async ({ page }) => {
@@ -297,13 +308,35 @@ test.describe('Component: Drawer', () => {
     test('Should report one finished exit per close when the drawer closes', async ({ page }) => {
       await drawerStory.goto(page, 'Exit Complete');
       const exitCount = page.getByTestId('exit-count');
+      // Record the count when the closed backdrop's fade ends. This capture listener runs before
+      // zag's listener on the backdrop, which ends the exit, so the count must still be the
+      // previous one: a callback fired at the end of the panel's shorter exit would show here.
+      await page.evaluate(() => {
+        document.addEventListener(
+          'animationend',
+          ({ target }) => {
+            if (
+              target instanceof HTMLElement &&
+              target.dataset.testid === 'drawer--overlay' &&
+              target.dataset.state === 'closed'
+            ) {
+              document.body.dataset.countAtFadeEnd =
+                document.querySelector('[data-testid="exit-count"]')?.textContent ?? '';
+            }
+          },
+          true,
+        );
+      });
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(exitCount).toHaveText('Exits finished: 1');
+      await expect
+        .poll(() => page.evaluate(() => document.body.dataset.countAtFadeEnd))
+        .toBe('Exits finished: 0');
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(exitCount).toHaveText('Exits finished: 2');
@@ -313,7 +346,7 @@ test.describe('Component: Drawer', () => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await drawerStory.goto(page, 'Exit Complete');
 
-      await openDrawer(page);
+      await openDrawerReadyForEscape(page);
       await page.keyboard.press('Escape');
       await expect(getDrawerContent(page)).toBeHidden();
       await expect(page.getByTestId('exit-count')).toHaveText('Exits finished: 1');

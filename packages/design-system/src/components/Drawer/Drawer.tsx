@@ -37,9 +37,11 @@ export interface DrawerProps extends TestableProps {
   /** Fired when the user presses the Escape key while the drawer is open. */
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   /**
-   * Fires once the drawer has finished closing: after the panel's and the backdrop's exit
-   * animations end, or right away when there is no animation. Not fired when the drawer
-   * reopens before the exit ends, when it never opened, or when it unmounts while open or closing.
+   * Fires once per close, after the last of the panel's and the backdrop's exit animations ends,
+   * or about a frame after the close when nothing animates. In a tab hidden when the drawer closes
+   * it fires at once; in one hidden mid-exit, it can wait until the tab is shown again. Not fired
+   * when the drawer reopens before the exit ends, when it never opened, or when it unmounts open or
+   * mid-exit, as a drawer inside another one's content does when the outer one closes.
    */
   onExitComplete?: () => void;
 }
