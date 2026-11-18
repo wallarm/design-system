@@ -156,6 +156,15 @@ export const createOverlayStore = (): OverlayStore => {
     getSnapshot: () => instances,
     open: (definition, payload) => {
       if (detached) return Promise.resolve(undefined);
+      // Before the replace loop, so that a payload that throws (a revoked proxy, a throwing
+      // getter) cancels nothing and still resolves instead of rejecting.
+      let copy: Readonly<Record<string, unknown>>;
+      try {
+        copy = { ...payload };
+      } catch (error) {
+        onError(error);
+        return Promise.resolve(undefined);
+      }
       return new Promise(resolve => {
         // A double click during the first load: the earlier open of this definition gives way.
         for (const [loadingId, loading] of pending) {
@@ -164,7 +173,7 @@ export const createOverlayStore = (): OverlayStore => {
           loading.settle(undefined);
         }
         const id = ++lastId;
-        pending.set(id, { definition, payload: { ...payload }, settle: resolve });
+        pending.set(id, { definition, payload: copy, settle: resolve });
         // Inside the chain, so a loader that throws, or a definition with no load at all (not made
         // by defineOverlay, e.g. a mock), still settles through failLoad.
         new Promise<ErasedOverlayComponent>(resolveLoad => resolveLoad(definition.load())).then(

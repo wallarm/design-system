@@ -147,6 +147,46 @@ describe('overlayStore', () => {
     await expect(second).resolves.toBe('second');
   });
 
+  it('leaves a still-loading open of another definition alone', async () => {
+    const store = createOverlayStore();
+    const gate = deferred<ErasedOverlayComponent>();
+
+    const first = store.open(definitionOf(() => gate.promise), { a: 1 });
+    store.open(eager(), { b: 1 });
+    await flush();
+    gate.resolve(Overlay);
+    await flush();
+
+    expect(store.getSnapshot()).toMatchObject([{ payload: { b: 1 } }, { payload: { a: 1 } }]);
+    store.close(newestId(store), 'first');
+    await expect(first).resolves.toBe('first');
+  });
+
+  it('resolves undefined and reports when reading the payload throws, replacing nothing', async () => {
+    const store = createOverlayStore();
+    const onError = rs.fn();
+    store.setOnError(onError);
+    const gate = deferred<ErasedOverlayComponent>();
+    const definition = definitionOf(() => gate.promise);
+    const revoked = new Error('revoked');
+    const unreadable = Object.defineProperty({}, 'a', {
+      enumerable: true,
+      get: () => {
+        throw revoked;
+      },
+    });
+
+    const first = store.open(definition, { a: 1 });
+    await expect(store.open(definition, unreadable)).resolves.toBeUndefined();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(revoked);
+    gate.resolve(Overlay);
+    await flush();
+
+    expect(store.getSnapshot()).toMatchObject([{ payload: { a: 1 }, open: true }]);
+    store.close(newestId(store), 'first');
+    await expect(first).resolves.toBe('first');
+  });
+
   it('keeps two instances of the same definition once its code is cached', async () => {
     const store = createOverlayStore();
     const definition = eager();
