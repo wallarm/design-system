@@ -671,6 +671,36 @@ export const Controlled: StoryFn<DrawerProps> = () => {
 };
 
 /**
+ * `onExitComplete`, for work that must wait until the panel is fully gone: it fires once the
+ * panel and its backdrop have finished animating out.
+ */
+export const ExitComplete: StoryFn<DrawerProps> = () => {
+  const [exits, setExits] = useState(0);
+  const handleExitComplete = () => setExits(count => count + 1);
+
+  return (
+    <VStack gap={12} align='start'>
+      <Drawer data-testid='drawer' onExitComplete={handleExitComplete}>
+        <DrawerTrigger asChild>
+          <Button variant='outline' color='neutral'>
+            Open Drawer
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Drawer Title</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>
+            <ContentPlaceholder fillHeight />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+      <Text data-testid='exit-count'>Exits finished: {exits}</Text>
+    </VStack>
+  );
+};
+
+/**
  * Escape disabled, for a panel holding unsaved work where a reflex keystroke would lose it.
  */
 export const NoClosableOnEsc: StoryFn<DrawerProps> = () => {

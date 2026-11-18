@@ -21,6 +21,7 @@ const drawerStory = createStoryHelper('overlay-drawer', [
   'Long Values',
   'With Nested Select',
   'With Nested Dialog',
+  'Exit Complete',
 ] as const);
 
 const getDrawerContent = (page: Page) => page.getByTestId('drawer--content');
@@ -291,6 +292,31 @@ test.describe('Component: Drawer', () => {
           .getByTestId('url-text')
           .evaluate(element => element.scrollWidth > element.clientWidth),
       ).toBe(true);
+    });
+
+    test('Should report one finished exit per close when the drawer closes', async ({ page }) => {
+      await drawerStory.goto(page, 'Exit Complete');
+      const exitCount = page.getByTestId('exit-count');
+
+      await openDrawer(page);
+      await page.keyboard.press('Escape');
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(exitCount).toHaveText('Exits finished: 1');
+
+      await openDrawer(page);
+      await page.keyboard.press('Escape');
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(exitCount).toHaveText('Exits finished: 2');
+    });
+
+    test('Should report the finished exit when reduced motion is preferred', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await drawerStory.goto(page, 'Exit Complete');
+
+      await openDrawer(page);
+      await page.keyboard.press('Escape');
+      await expect(getDrawerContent(page)).toBeHidden();
+      await expect(page.getByTestId('exit-count')).toHaveText('Exits finished: 1');
     });
   });
 

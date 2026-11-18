@@ -148,7 +148,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Navigation/Tree | 6 | 6 | `components/Tree/Tree.stories.tsx` |
 | ✅ | Navigation/TreeView | 8 | 8 | `components/TreeView/TreeView.stories.tsx` |
 | ✅ | Overlay/Dialog | 17 | 17 | `components/Dialog/Dialog.stories.tsx` |
-| ✅ | Overlay/Drawer | 16 | 16 | `components/Drawer/Drawer.stories.tsx` |
+| ✅ | Overlay/Drawer | 20 | 20 | `components/Drawer/Drawer.stories.tsx` |
 | ✅ | Overlay/FeedbackPulse | 2 | 2 | `components/FeedbackPulse/FeedbackPulse.stories.tsx` |
 | ☐ | Overlay/HoverCard | 8 | 8 | `components/HoverCard/HoverCard.stories.tsx` |
 | ✅ | Overlay/OverflowTooltip | 7 | 7 | `components/OverflowTooltip/OverflowTooltip.stories.tsx` |

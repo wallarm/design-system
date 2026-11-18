@@ -36,6 +36,12 @@ export interface DrawerProps extends TestableProps {
   onInteractOutside?: (event: DrawerInteractOutsideEvent) => void;
   /** Fired when the user presses the Escape key while the drawer is open. */
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  /**
+   * Fires once the drawer has finished closing: after the panel's and the backdrop's exit
+   * animations end, or right away when there is no animation. Not fired when the drawer
+   * reopens before the exit ends, when it never opened, or when it unmounts while open or closing.
+   */
+  onExitComplete?: () => void;
 }
 
 export const Drawer: FC<DrawerProps> = ({
@@ -52,6 +58,7 @@ export const Drawer: FC<DrawerProps> = ({
   maxWidth,
   onInteractOutside,
   onEscapeKeyDown,
+  onExitComplete,
   'data-testid': testId,
 }) => (
   <DrawerProvider
@@ -71,6 +78,7 @@ export const Drawer: FC<DrawerProps> = ({
       modal={modal}
       onInteractOutside={onInteractOutside}
       onEscapeKeyDown={onEscapeKeyDown}
+      onExitComplete={onExitComplete}
     >
       <TestIdProvider value={testId}>{children}</TestIdProvider>
     </DrawerRoot>
