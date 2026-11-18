@@ -47,7 +47,7 @@ A confirmation dialog asks one question about one action, then runs that action 
 
 - While the request runs, pass `loading={pending}` to confirm (it also disables it; do not add `disabled={pending}`) and ignore close requests. Close only on success; on failure keep it open with an error toast.
 - If the dialog closes, reset the type-to-confirm input to `''`. Match the entity name exactly, case-sensitive.
-- If the dialog opens from a `Drawer`, render it inside `DrawerContent`. See [Layering](../foundations/layering.md).
+- If a plain dialog opens from a `Drawer`, render it inside `DrawerContent`. A managed one opens beside the app, or through an `OverlayProvider` in a drawer that closes from outside. See [Layering](../foundations/layering.md).
 - To guard unsaved changes, intercept `onOpenChange(false)` on the `Drawer`. One handler covers the close X, `Escape` and outside click.
 - **Never** open a confirmation from a toast or from another confirmation.
 - Use one controlled `open` state per dialog, set by the control that starts the action. If several places open it, use a managed overlay (below).
@@ -57,9 +57,16 @@ A confirmation dialog asks one question about one action, then runs that action 
 Define the dialog once and open it from any row, menu or drawer. It renders one `Dialog` root and spreads `controller.rootProps` onto it; `open()` resolves with the value passed to `controller.close`, or `undefined` when dismissed.
 
 ```tsx
+import { Outlet, useMatches } from '@tanstack/react-router';
+import { AppShell } from '@wallarm-org/design-system/AppShell';
 import { Button } from '@wallarm-org/design-system/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@wallarm-org/design-system/Dialog';
-import { defineOverlay, type OverlayProps, useOverlay } from '@wallarm-org/design-system/OverlayManager';
+import {
+  defineOverlay,
+  OverlayProvider,
+  type OverlayProps,
+  useOverlay,
+} from '@wallarm-org/design-system/OverlayManager';
 import { useToast } from '@wallarm-org/design-system/Toast';
 
 interface DeleteUserDialogProps extends OverlayProps<boolean> {
@@ -74,10 +81,12 @@ export const DeleteUserDialog = ({ userId, userName, controller }: DeleteUserDia
   const handleOpenChange = (open: boolean) => {
     if (!deleteUser.isPending) controller.rootProps.onOpenChange(open);
   };
-  // Close only on success; on failure it stays open.
+  // Close only on success; on failure it stays open. The success toast lives here too: a forced
+  // close (navigation) resolves open() with undefined even when the request then succeeds.
   const handleConfirm = async () => {
     try {
       await deleteUser.mutateAsync(userId);
+      toast.create({ type: 'default', title: 'User deleted' });
       controller.close(true);
     } catch {
       toast.create({ type: 'error', title: "Couldn't delete the user" });
@@ -101,16 +110,32 @@ export const DeleteUserOverlay = defineOverlay(() =>
   import('./DeleteUserDialog').then(m => m.DeleteUserDialog),
 );
 
-// One OverlayProvider per app, around everything the root route renders. A drawer that can close
-// from outside (?user=) mounts its own OverlayProvider inside DrawerContent and opens from below it.
+// routes/__root.tsx: one OverlayProvider per app and one per remote, around everything the root
+// route renders. Key it on the leaf match's pathname: a match id also changes with loaderDeps.
+// A drawer that can close from outside (?user=) mounts its own
+// <OverlayProvider closeOnChange={userId}> inside DrawerContent; call useOverlay below it.
+export const RootRoute = () => {
+  const pathname = useMatches({ select: matches => matches.at(-1)?.pathname });
+  return (
+    <OverlayProvider closeOnChange={pathname}>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </OverlayProvider>
+  );
+};
+
 export const DeleteUserButton = ({ userId, userName }: { userId: string; userName: string }) => {
   const deleteUserOverlay = useOverlay(DeleteUserOverlay);
-  const toast = useToast();
+  const handlePreload = () => DeleteUserOverlay.preload();
   const handleDelete = async () => {
-    const deleted = await deleteUserOverlay.open({ userId, userName });
-    if (deleted) toast.create({ type: 'default', title: 'User deleted' });
+    if (await deleteUserOverlay.open({ userId, userName })) clearSelection();
   };
-  return <Button onClick={handleDelete}>Delete user</Button>;
+  return (
+    <Button onPointerEnter={handlePreload} onFocus={handlePreload} onClick={handleDelete}>
+      Delete user
+    </Button>
+  );
 };
 ```
 

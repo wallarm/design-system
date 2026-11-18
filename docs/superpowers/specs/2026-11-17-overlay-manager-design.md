@@ -2,7 +2,7 @@
 
 Status: design spec, 2026-11-17; implemented 2026-11-17 · branch `feat/modal-manager`. Paths are under `packages/design-system/src/` unless marked otherwise.
 
-As built, the implementation differs from this spec in four places. `guidelines/rules.md` got no wrong → right line: the file has no room under its 2000-character cap. "The exit animation plays" and "Back closes both" are unit tests, not e2e: a 150 ms window would be flaky in e2e, and Storybook has no URL-driven drawer. The StrictMode cleanup test uses a Dialog only; a managed Drawer runs under StrictMode in the test where a Suspense boundary above the provider re-suspends. Closing a dialog opened from a menu item leaves focus on `body` in Chromium, not on the menu trigger; that is an open finding in the repo-root `docs/storybook-docs-findings.md`.
+As built, the implementation differs from this spec in these places. `guidelines/rules.md` got no wrong → right line: the file has no room under its 2000-character cap. "The exit animation plays" and "Back closes both" are unit tests, not e2e: a 150 ms window would be flaky in e2e, and Storybook has no URL-driven drawer. The StrictMode cleanup test uses a Dialog only; a managed Drawer runs under StrictMode in the test where a Suspense boundary above the provider re-suspends. The double-click rule replaces an earlier `open()` until the store has inserted it, so it also covers two calls a microtask or two apart with the code cached; StrictMode's doubled mount effect relies on that. A nested provider without `onError` reports through the enclosing provider's. `defineOverlay` checks the inferred props after inference, through a rest argument, because a constraint let a component without props through; the check also rejects a `key` prop. The stuck-exit checks: reduced motion is a Chromium e2e, and neither the drawer classes nor tw-animate-css react to `prefers-reduced-motion`, so the exit animates as usual; the hidden tab is a jsdom unit test, because headless Playwright cannot background a tab. Focus after a dialog opened from a menu item returns to the menu trigger, but lands on `body` when the item is picked in the same frame as its highlight, as automated clicks do; that is an open zag finding in the repo-root `docs/storybook-docs-findings.md`.
 
 The numbers below come from a recon with adversarial verification: DS overlay internals, core-frontend usage, the legacy console and standalone remotes, Chakra's `createOverlay` source, and other overlay libraries. The design then went through a builder check and three adversarial reviews (lifecycle and accessibility, module identity, API and developer experience), and each serious finding was verified independently.
 
@@ -26,13 +26,13 @@ core-frontend today runs DS 4.16.0. 107 files import `/Dialog` or `/Drawer`, def
 1. Define an overlay once: `defineOverlay(loader)`, with markup and logic in one component.
 2. Open it from any component under the app's provider: `useOverlay(definition).open(payload)` returns a promise of the overlay's result.
 3. Load the overlay's code on first open, or earlier with `preload()`. The opener's chunk does not include it.
-4. The exit animation always plays, and the payload stays intact until it ends. No latches and no timers in app code.
+4. The exit animation plays on every close path (close, dismissal, `closeOnChange`), and the payload stays intact until it ends. A provider unmount, an `<Activity>` hide or a render error drops the overlay without one. No latches and no timers in a managed overlay's code.
 5. For overlays that follow the component contract, every `open()` promise settles exactly once, on every path.
 6. No DS module-level state. Each provider owns its store, so stories and tests are isolated. In Module Federation an app is isolated once it mounts its own provider; see "Provider placement" for why it is not automatic under `sharedDesignSystem`.
 
 ## Non-goals (v1)
 
-- URL-driven detail drawers (`?user=`, `?role=`, deployment-management's path-param drawer) stay router-owned. Their deep links, Back-to-close and cross-org redirect already work.
+- URL-driven detail drawers (`?user=`, `?role=`, deployment-management's path-param drawer) stay router-owned. Their deep links and Back-to-close already work, and a `?user=` link that carries another organization's `organizationId` first switches to that organization.
 - Opening an overlay across MF boundaries, such as a remote opening a host overlay. Apps may later pass an `open` function into an SDK contract; the DS does not carry requests between bundles.
 - Opening from non-React code. There is no global `overlays.open()`. Recon found no such caller in core-frontend.
 - Closing an instance from the opener (`close(id)`), updating an open instance's payload, a stack or back-navigation helper.
@@ -65,11 +65,11 @@ Verified on Ark 5.39.2, zag 1.43.3 and React 19.
 7. Same-kind push-back (`DrawerNestingContext`) and ancestor-only dismissal (`DrawerAncestorIdsContext` plus `keepOpenUnlessAncestorCloses`) depend on React-tree ancestry.
 8. `sharedDesignSystem` is on in all 6 core-frontend apps, and also in rules-app and the attacks remote (DS 4.5.1). Every `@wallarm-org/design-system/*` subpath is shared at the exact installed version (`singleton: false`; the first container to load a subpath supplies it). The root barrel stays local, so a root-barrel import and a subpath import can resolve to different module instances. Private modules reached by relative imports from two subpaths can also split.
 9. React Compiler compiles all DS code. Render stays pure, `ref.current` is never read or written in render, and external stores go through `useSyncExternalStore`.
-10. Overlay content reads the React context above the place it renders, not the place it was opened. In core-frontend, overlay content uses `useSdkContext` (56 times), `useQueryClient`, router hooks and `useIpAclApi`, all provided at each app's root or root route.
+10. Overlay content reads the React context above the place it renders, not the place it was opened. In core-frontend, overlay content uses `useSdkContext` (about 30 calls in drawer and dialog files), `useQueryClient`, router hooks and `useIpAclApi`, all provided at each app's root or root route.
 11. The core-frontend host runs in StrictMode.
 12. The manager's code also ships in Claude Design's React 18 canvas bundle, so it uses no React 19-only APIs such as `use` or `useEffectEvent`.
 13. core-frontend remotes render inside the host's React tree: `SdkRemoteApp` renders the remote's `App` inline. Embedded remotes render inside their embedder's tree. With one DS version, `/OverlayManager` and its context object are a single module instance across containers.
-14. TanStack Router's route-scoped hooks (`Route.useX`, `getRouteApi(…).useX`, and `useParams`, `useSearch`, `useLoaderData`, `useRouteContext` or `useMatch` with `from`) throw once their route is no longer matched. TanStack Router also sets `location` when navigation starts, and commits the new matches later.
+14. TanStack Router's hooks that read a route match (`Route.useX` and `getRouteApi(…).useX` other than `useNavigate`, and `useParams`, `useSearch`, `useLoaderData`, `useLoaderDeps`, `useRouteContext` or `useMatch` with `from`) throw once their route is no longer matched. TanStack Router also sets `location` when navigation starts, and commits the new matches later.
 
 ## Approaches
 
@@ -85,22 +85,22 @@ Verified on Ark 5.39.2, zag 1.43.3 and React 19.
 
 ## Change 1: `onExitComplete` on Drawer and Dialog
 
-- Add an optional `onExitComplete?: () => void` prop to `DrawerProps` (and therefore `Dialog`), forwarded through `DrawerRoot` to Ark `Dialog.Root`. It is additive and needs no migration. HoverCard already forwards Ark's `onExitComplete` (`components/HoverCard/HoverCard.tsx`).
+- Add an optional `onExitComplete?: () => void` prop to `DrawerProps` (and therefore `Dialog`), forwarded through `DrawerRoot` to Ark `Dialog.Root`. It is additive and needs no migration; the one DOM difference for every Drawer and Dialog is the backdrop's id, which comes from `useId` instead of zag's default, and nothing reads it. HoverCard already passes its own handler to Ark's `onExitComplete` (`components/HoverCard/HoverCard.tsx`) but does not expose it; Drawer and Dialog are the first DS components with a public `onExitComplete`.
 - **Wait for the backdrop.** The backdrop (`DrawerOverlay`, 200ms fade) outlives the content signal (150ms). Do not change the durations. The backdrop is the shared `Overlay`, which Tour and SearchModal also render, and the anti-goals forbid behavior changes. Instead, fire the forwarded `onExitComplete` only after both the content's exit and the backdrop's exit have finished, for example by also listening for the backdrop's `animationend`. With `overlay={false}`, fire on the content alone. Check it in a browser.
 - **When it fires (zag 1.43.3).** Document these cases:
   - It fires once, when the exit has finished.
   - It also fires when there is no animation: at once when the document is hidden, and after one frame when the animation name is `none`, the duration is `0s` or the content has `display: none`.
-  - A root mounted open and closed within about one frame exits with no animation, and `onExitComplete` still fires.
+  - A root mounted open and then closed, even within its first frame, still waits for its exit animation, and `onExitComplete` still fires.
   - It does not fire if the overlay reopens before the exit ends, if it never opened, or if the root unmounts while open or mid-exit.
   - On a mount-open, Ark's `onEnterComplete` never fires, so it cannot serve as a "presented" signal.
-- **Stuck exits.** On zag 1.43.3, an exit animation that never starts can leave presence suspended with `onExitComplete` never fired; zag 1.47 adds a guard for this. The branch checks this in a browser (reduced motion, hidden tab) and documents what it finds. The manager has its own fallback either way.
+- **Stuck exits.** On zag 1.43.3, an exit animation that never starts can leave presence suspended with `onExitComplete` never fired; zag 1.45 adds a guard for this (`hasRunningAnimation`). The branch checks reduced motion in a browser and a hidden tab in jsdom (see the as-built note above). The manager has its own fallback either way.
 - **Commit type:** `feat` (user's decision), a minor bump, since it adds a public prop.
 
 ## Change 2: the overlay manager
 
 ### Public API
 
-Add a new folder, `components/OverlayManager/`. It is public only through the subpath `@wallarm-org/design-system/OverlayManager` and is not exported from the root barrel. Constraint 8 is why: a root-barrel import of the hook and a subpath import of the provider could resolve to different context objects. `Dialog` already follows the same subpath-only rule.
+Add a new folder, `components/OverlayManager/`. It is public only through the subpath `@wallarm-org/design-system/OverlayManager` and is not exported from the root barrel. Constraint 8 is why: a root-barrel import of the hook and a subpath import of the provider could resolve to different context objects.
 
 Exports:
 
@@ -181,7 +181,7 @@ const handleDelete = async () => {
 
 ### Types
 
-The types below were typechecked by a reviewer with tsc 7.0.2 (strict, `noUncheckedIndexedAccess`, `@types/react` 19.3.0). The check included 12 cases that must fail to compile and a declaration-emit check. Treat this as a known-good starting point, not final code.
+The types below were typechecked by a reviewer with tsc 7.0.2 (strict, `noUncheckedIndexedAccess`, `@types/react` 19.3.0). The check had 12 cases that must fail to compile and a declaration-emit check; `OverlayManager.types.test.ts` keeps 10 of them, drops the two that only demonstrated pitfalls on stand-in declarations, and adds the cases found later (no props, optional props only, a `key` prop). Treat this as a known-good starting point, not final code.
 
 ```ts
 interface OverlayController<R = void> {
@@ -224,7 +224,7 @@ Why these shapes, and what the obvious alternatives break:
 - **Arity from the keys of every union member.** `open()` must look at all union members to decide whether the payload argument is required, optional or absent.
 - **A phantom carrier.** `OverlayDefinition` needs `'~types'` (or a private `unique symbol` key), otherwise `useOverlay` infers `unknown`.
 - **`_result?: never` on the loader result.** It rejects a direct `React.lazy` at compile time. This is cheap feedback only; the per-instance Suspense boundary is what makes a lazy result safe.
-- **No `any`.** The render path needs one `as unknown as Props` cast and never `any`.
+- **No `any`.** The render path needs no cast: `defineOverlay` erases the component's type once when it loads, and `useOverlay` gives the erased store a typed view with one `as unknown as`.
 
 ### Lifecycle
 
@@ -245,7 +245,7 @@ Each instance renders inside its own pair of boundaries:
 </OverlayErrorBoundary>
 ```
 
-The pair is keyed by the instance id and wraps the whole overlay component: above the root, never between the root and its content. Root, content and title still commit together (constraint 5), and an overlay that suspends above its root delays only itself. Examples are `memo(lazy(…))`, `use()` and `useSuspenseQuery`. Such an overlay never reaches a router-level Suspense boundary above the provider; in core-frontend that boundary would blank the whole shell. Code that suspends after open still needs its own boundary below the title, inside the content. The error boundary is a small class inside the folder: the DS has no boundary to reuse, and React Compiler skips classes.
+The pair is keyed by the instance id and wraps the whole overlay component: above the root, never between the root and its content. Root, content and title still commit together (constraint 5), and an overlay that suspends above its root delays only itself. Examples are `memo(lazy(…))`, `use()` and `useSuspenseQuery`. Such an overlay never reaches a router-level Suspense boundary above the provider; in core-frontend that boundary would blank the whole shell. Code that suspends after open still needs its own boundary below the title, inside the content. An overlay that suspends above its root is already inserted while it suspends, so the double-click rule does not cover that wait. The error boundary is a small class inside the folder: the DS has no boundary to reuse, and React Compiler skips classes.
 
 Each instance's promise settles exactly once:
 
@@ -269,7 +269,7 @@ Each instance's promise settles exactly once:
 ### Concurrency
 
 - Every `open()` creates a new instance, and instances of the same definition stack.
-- One exception guards against double clicks during the first load. A second `open()` of the same definition, in the same provider, while the first is still loading, replaces the first; the first resolves with `undefined`.
+- One exception guards against double clicks during the first load. A second `open()` of the same definition, in the same provider, before the store has inserted the first (while its code loads, or a microtask or two later even when the code is cached), replaces the first; the first resolves with `undefined`.
 - Once the code is loaded, a fast double Escape in a guarded form can open its guard twice. The docs show guards keeping a pending flag.
 
 ### Lazy loading and preload
@@ -281,7 +281,7 @@ Each instance's promise settles exactly once:
 
 ### Provider placement and context
 
-- **One provider per app, and one per remote.** Mount `OverlayProvider` in the root route component, wrapping everything that component renders, not only `<Outlet/>`. For example, deployment-management renders its RemoteShell, nav panel and breadcrumb outside `<Outlet/>`. Code outside `RouterProvider` must not call `useOverlay`. Per-instance error boundaries keep overlay errors local, so a provider placed above the app's own error boundary is fine.
+- **One provider per app, and one per remote.** Mount `OverlayProvider` in the root route component, wrapping everything that component renders, not only `<Outlet/>`. For example, deployment-management renders its RemoteShell, nav panel and breadcrumb outside `<Outlet/>`. Code outside `RouterProvider` must not call `useOverlay`. Per-instance error boundaries keep render errors local. An error thrown while an overlay unmounts (an effect cleanup, a ref callback) and an `onError` that throws reach the nearest error boundary above `OverlayProvider`, so keep one there, such as the root route's `errorComponent`.
 - **Whose context overlays see.** Overlays see the provider's context (QueryClient, router, SDK, app-root providers), not the opener's. Page-level data travels in the payload, and live data is fetched by id inside the overlay.
 - **Nested providers.** `useOverlay` uses the nearest provider. Overlays render inside their provider, so an overlay that opens another overlay stacks it in the same provider.
 - **MF fall-through.** Under `sharedDesignSystem`, a remote's React tree sits inside the host's tree (or its embedder's), and it resolves the same `/OverlayManager` module whenever the DS versions match (constraint 13). A remote with no provider of its own, or remote code outside its provider, therefore silently uses the outer app's provider and its contexts: QueryClient, router and remote-root providers. `useOverlay` throws its "no provider" error only when no provider of the same DS version sits above the call. The placement rule is therefore a hard adoption requirement, not a convenience. A guard is listed under Follow-ups.
@@ -291,7 +291,7 @@ Each instance's promise settles exactly once:
 
 - **The prop.** `closeOnChange?: string | number | boolean | null | undefined`. It is a primitive key, so a fresh object literal cannot close everything on each render.
 - **What closes.** When the key changes, every instance created before the change settles with `undefined`. Open instances close with their exit animation, and instances still loading are never inserted. Instances opened after the change are left alone.
-- **When the sweep runs.** It runs in the provider's layout effect and compares against the last committed key held in the store, so StrictMode's effect replay does not sweep. All layout effects run before passive effects, so an overlay that the new page opens from a mount `useEffect` in the same commit survives. Only an `open()` from a descendant's layout effect in that same commit is swept; document this.
+- **When the sweep runs.** It runs in the provider's layout effect and compares against the last committed key held in the store, so StrictMode's effect replay does not sweep. All layout effects run before passive effects, so an overlay that the new page opens from a mount `useEffect` in the same commit survives. Only an `open()` that runs in that same commit before the provider's layout effect is swept: from a descendant's layout effect, a ref callback or `componentDidMount`. Document this.
 - **Choosing the key.** That is the consumer's job: pick a key that changes when the new page commits. On TanStack Router, `location` changes when navigation starts, while page A is still on screen and clickable. A key derived from the committed matches changes in the same commit as the page swap; check it in a browser. To also close on a tenant switch, as `usePendingDrawerRequest` does, include the org id in the key: `` `${orgId}:${path}` ``.
 - **Without the prop**, overlays stay open across navigation.
 
@@ -302,24 +302,24 @@ Each instance's promise settles exactly once:
 
 ### Nesting
 
-- **What app-level overlays lose.** Managed overlays render as siblings in their provider and stack in open order through zag's layer stack (constraint 6). Under the app-level provider they lose two things that React-nested overlays have: same-kind push-back, and cascade-dismiss when a lower overlay closes from outside.
+- **What app-level overlays lose.** Managed overlays render as siblings in their provider and stack in the order they appear (open order, unless an earlier one's code is still loading) through zag's layer stack (constraint 6). Under the app-level provider they lose two things that React-nested overlays have: same-kind push-back, and cascade-dismiss when a lower overlay closes from outside.
 - **When a lower overlay closes from outside:**
   - its root unmounts;
   - its controlled `open` flips, for example a router-owned detail drawer (`?user=`) on a Back press that changes only the search params. `closeOnChange` keyed on the path does not see this.
 
   `keepOpenUnlessAncestorCloses` then actively keeps the managed overlay open, because it has no ancestor ids. "Delete user?" would stay on screen over the list.
-- **Rule: a nested provider.** A drawer that can close from outside, such as a router-owned detail drawer, and that opens managed overlays mounts its own `<OverlayProvider closeOnChange={entityId}>` inside its `DrawerContent`. With that provider:
+- **Rule: a nested provider.** A drawer that can close from outside, such as a router-owned detail drawer, and that opens managed overlays mounts its own `<OverlayProvider closeOnChange={entityId}>` inside its `DrawerContent`; so does a drawer that opens a managed `Drawer` and should scale back. The nested provider reports errors through the enclosing provider's `onError`. With that provider:
   - Overlays opened through it are React descendants of the drawer content, so cascade-dismiss and same-kind push-back work as they do today.
   - They drop when the content unmounts.
   - Switching entities (`?user=A` to `?user=B`) closes them.
   - The definition is still shared with the list page's app-level provider, so the duplicated pair still collapses into one definition.
 - **Where `useOverlay` is called.** The call must sit in a component rendered inside that nested provider, for example the actions menu in `DrawerHeader`. It must not sit in the drawer's top-level hook above `<Drawer>`: that call would resolve to the app provider and bring the problem back. Document this.
-- **Recon.** core-frontend's 16 nested pairs are all Drawer→Dialog, where push-back never applies, and at least 9 of them sit in router-owned drawers.
+- **Recon.** The 16 core-frontend overlays written directly in a parent drawer's own file are all Drawer→Dialog, where push-back never applies, and at least 9 of them sit in router-owned drawers. One component deeper there are also Drawer→Drawer pairs, where push-back applies today: RoleDetailDrawer→PermissionUpsertDrawer, SsoProviderDetailDrawer→SsoRuleCreateDrawer and SsoRuleEditDrawer, PolicyDrawer→its edit drawers. Their outer drawers can close from outside, so the nested-provider rule keeps their push-back.
 - **Future push-back.** Push-back for app-level managed overlays must not import Drawer-private contexts from `components/OverlayManager/` (constraint 8).
 
 ### Focus
 
-- Unchanged from today. With no trigger, zag returns focus to the element that had focus when the trap activated. That is the clicked opener in Chrome, the menu trigger when opened from a menu item, and `body` in Safari or when the opener has unmounted. The async load does not change this, because focus stays on the opener while the code loads.
+- Unchanged from today. With no trigger, zag returns focus to the element that had focus when the trap activated. That is the clicked opener in Chrome, and the menu trigger when opened from a menu item. Safari does not focus a clicked button, so focus goes to the nearest focusable container around it, or `body` at the top level. When the opener has unmounted, focus goes to `body` at the top level; over another open Drawer or Dialog, that overlay's focus trap keeps it. The async load does not change this, because focus stays on the opener while the code loads.
 
 ### Integration in the DS
 
@@ -401,7 +401,7 @@ Made by the designer (Claude), open to override:
 - The injected prop is `controller` (`{ rootProps, close }`); the name `overlay` would clash with Drawer's backdrop prop.
 - `open()` never rejects. Loader and render errors go to `onError` and resolve `undefined`.
 - The promise resolves when closing starts, not after the exit.
-- Every `open()` creates a new instance; a second open of the same definition is replaced only while its code is still loading.
+- Every `open()` creates a new instance; a second open of the same definition replaces the first only until the store has inserted it.
 - Each instance gets its own Suspense and error boundary.
 - Nothing is shown while the code loads; `preload()` covers heavy overlays.
 - `closeOnChange` is a primitive key. It sweeps everything created before the change, including loads, and runs as a layout effect.
@@ -418,7 +418,7 @@ Made by the designer (Claude), open to override:
 ## Follow-ups (not v1)
 
 - **`OverlayScope`.** A context reset exported from `/OverlayManager`: it provides "no provider" and renders no DOM. Each embedder renders it from its own DS import around each `SdkRemoteApp` mount, so a remote without its own provider gets the clear error whatever its DS version. It does not go inside `@wallarm/sdk`: that root barrel is DS-free, and its copy resolves the host's DS version.
-- **Focus return.** Capture the opener in `open()` and pass it as `finalFocusEl`; this needs one more Drawer passthrough.
+- **Focus return.** See the open finding in `docs/storybook-docs-findings.md`. Do not capture `document.activeElement` in `open()`: from a menu item it is the menu's content, which unmounts, and a `finalFocusEl` would override zag's own return to the trigger. Pass the menu trigger instead, through a `finalFocusEl` passthrough on Drawer.
 - **Push-back** for app-level managed overlays.
 - **Opening from outside React**, through an explicit manager object.
 

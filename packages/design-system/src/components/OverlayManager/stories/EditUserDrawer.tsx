@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, useState } from 'react';
+import { type ChangeEvent, type FC, useEffect, useState } from 'react';
 import { Button } from '../../Button';
 import {
   Drawer,
@@ -30,6 +30,13 @@ export const EditUserDrawer: FC<EditUserDrawerProps> = ({ userName, controller }
   const [guarding, setGuarding] = useState(false);
 
   const isDirty = name !== userName;
+
+  // Load both with the drawer: while an inner overlay's code loads nothing is on screen, so an
+  // Escape would close the drawer and leave that overlay to appear on its own.
+  useEffect(() => {
+    ConfirmDeleteOverlay.preload();
+    UnsavedChangesOverlay.preload();
+  }, []);
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);

@@ -56,7 +56,8 @@ These rules apply when writing or modifying any E2E test file (`*.e2e.ts`) in th
 - Locate elements by `data-testid` (`page.getByTestId(...)`); compound components cascade it to sub-components (`{base}--{slot}`) — see [`test-id-pattern.md`](./test-id-pattern.md)
 - `getByRole` is fine for accessibility assertions (role, accessible name)
 - Never use `data-slot` — it is a styling hook. Existing `[data-slot=…]` locators are legacy; migrate them when you touch the file
-- A managed overlay (OverlayManager) keeps its content mounted while it animates out, so reopening it can briefly match its test id twice: `await expect(content).toBeHidden()` before reopening.
+- A managed overlay (OverlayManager) keeps its content mounted while it animates out, and two instances of one definition can stack, so its test id can match twice: `await expect(content).toBeHidden()` before reopening, or target the open instance (`.and(page.locator('[data-state="open"]'))`, or `.last()` for the top of a stack).
+- To assert where focus returns after a dialog opened from a menu item, hover the item and let a frame pass before the click: an item picked in its highlight frame sends focus to `body` (see `storybook-docs-findings.md`).
 
 ## Full Example
 

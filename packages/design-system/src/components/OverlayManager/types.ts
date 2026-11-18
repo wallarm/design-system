@@ -65,8 +65,8 @@ export interface OverlayProviderProps {
   /**
    * Closes every overlay opened before this value changed. Pass the committed page key, from the
    * first render: a key that goes from `undefined` to its first value counts as a change. An
-   * `open()` from a descendant's layout effect in the same commit as a change is closed with the
-   * rest.
+   * `open()` that runs in that commit before this provider's layout effect (a descendant's layout
+   * effect, a ref callback) is closed with the rest.
    */
   closeOnChange?: OverlayCloseKey;
   /**

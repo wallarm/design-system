@@ -15,7 +15,7 @@ import { ConfirmDeleteOverlay, EditUserOverlay } from './stories/overlays';
 import { useOverlay } from './useOverlay';
 
 const DESCRIPTION = [
-  'Opens the same `Dialog` or `Drawer` from any row, menu or drawer: describe it once with `defineOverlay`, mount one `OverlayProvider` in the root route, and await `useOverlay(definition).open(payload)` for the value the overlay passes to `controller.close`.',
+  'Opens the same `Dialog` or `Drawer` from any row, menu or drawer: describe it once with `defineOverlay`, mount one `OverlayProvider` in the root route of each app and remote, and await `useOverlay(definition).open(payload)` for the value the overlay passes to `controller.close`.',
   'The overlay takes `OverlayProps` and spreads `controller.rootProps` onto its single root; for a dialog that only one control opens, a plain controlled `Dialog` is simpler.',
 ].join(' ');
 

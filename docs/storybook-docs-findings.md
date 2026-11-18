@@ -1244,21 +1244,29 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — reviewing `Stepper` (WDS-148).
 - **Status** — Open (documented)
 
-### Dialog opened from a menu item: focus lands on `body` when it closes
+### Dialog opened from a menu item: focus lands on `body` when the item is picked in its highlight frame
 
-- **What** — When a `DropdownMenuItem` opens a `Dialog`, closing the dialog leaves focus on `body`
-  instead of returning it to the menu trigger.
-- **Evidence** — Reproduced in Storybook on Chromium: `Patterns/Confirmation dialogs` → `Default`
-  (a controlled `Dialog` opened from a row's menu item) and `Overlay/OverlayManager` →
-  `From Menu Item` (the same dialog opened through `useOverlay`) both end with
-  `document.activeElement` on `BODY` after Escape, and so does the managed one after confirm. A
-  dialog opened by a button (`Confirm Dialog`) returns focus to that button. The overlay manager
-  design spec expects the menu trigger here.
-- **Why it matters** — A keyboard user who opens a row's menu and cancels the dialog loses their
-  place in the table and has to tab in from the top. The overlay manager does not cause it, so its
-  usage doc only says that focus lands on `body`.
-- **Suggested action** — Decide whether the menu should hand focus back to its trigger after an item
-  that opens another overlay, or the dialog should take the trigger as its return target. Settle it
-  in `DropdownMenu` / `Drawer`, not in the manager.
-- **Found while** — documenting `OverlayManager`.
-- **Status** — Open.
+- **What** — When a `DropdownMenuItem` opens a `Dialog` and the item is picked in the same frame as
+  its highlight, closing the dialog leaves focus on `body` instead of returning it to the menu
+  trigger. Picked a frame or more after its highlight, as a person does, focus returns to the
+  trigger.
+- **Evidence** — Reproduced in Storybook on Chromium through automated clicks (a click with no
+  earlier hover): `Patterns/Confirmation dialogs` → `Default` (a controlled `Dialog` opened from a
+  row's menu item) and `Overlay/OverlayManager` → `From Menu Item` (the same dialog opened through
+  `useOverlay`) both end with `document.activeElement` on `BODY` after Escape. A jsdom probe of the
+  same menu and dialogs returns focus to the trigger after a hover, a frame, then a click (or
+  ArrowDown, a frame, then Enter), managed and controlled alike, and ends on `body` when the click
+  or Enter comes in the highlight's frame. Not yet checked in a browser at human speed.
+- **Cause** — Moving the highlight schedules zag menu's `focusMenu` frame (`menu.machine.mjs`), and
+  closing the menu does not cancel it. In the same frame, the menu first focuses its trigger, the
+  stale frame pulls focus back into the closing menu content, the dialog's focus trap records that
+  content as its return target, and the content unmounts.
+- **Why it matters** — Automated tests that pick a menu item without a hover see focus on `body`,
+  and so would a keyboard user who presses ArrowDown and Enter within one frame. The overlay
+  manager does not cause it.
+- **Suggested action** — Report upstream: zag's menu should drop its `focusMenu` frame once the
+  menu has left the open state. Until then, an e2e focus assertion needs a hover and a frame before
+  the click. Do not capture `document.activeElement` in the overlay manager's `open()`: from a menu
+  item it is the menu content.
+- **Found while** — documenting `OverlayManager`; cause found in the 2026-11-18 spec review.
+- **Status** — Open (upstream).

@@ -170,7 +170,9 @@ export const createOverlayStore = (): OverlayStore => {
         return Promise.resolve(undefined);
       }
       return new Promise(resolve => {
-        // A double click during the first load: the earlier open of this definition gives way.
+        // An earlier open() of this definition that is not inserted yet gives way: a double click
+        // during the first load, or two calls a microtask or two apart (StrictMode's doubled mount
+        // effect) even when the code is cached.
         for (const [loadingId, loading] of pending) {
           if (loading.definition !== definition) continue;
           pending.delete(loadingId);
