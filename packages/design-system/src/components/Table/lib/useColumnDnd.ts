@@ -31,6 +31,8 @@ export const useColumnDnd = <T extends RowData>(
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: column.id,
     disabled: !canDnd,
+    // A column header, not dnd-kit's button: it adds no aria-pressed while dragging then.
+    attributes: { role: 'columnheader', tabIndex: -1 },
   });
 
   const dndStyle = getDndStyles({ canDnd, isDragging, transform, transition });
