@@ -137,6 +137,7 @@ const DECISIONS: Record<string, Decision> = {
       'LineChart',
       'AreaChart',
       'ColumnChart',
+      'BarChart',
     ],
   },
   Skeleton: { excluded: `${PRIMITIVE}; every entry has its own Skeleton` },
