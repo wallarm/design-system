@@ -110,7 +110,8 @@ export const Funnel: FC<FunnelProps> = ({
         })}
       </div>
       {/* After the ribbon in the DOM so the step dividers paint over it. */}
-      <ol className='relative flex flex-1'>
+      {/* min-w-0: without it the list grows to its long names' nowrap width and overflows. */}
+      <ol className='relative flex flex-1 min-w-0'>
         <TestIdProvider value={testId}>
           {steps.map((step, index) => (
             <FunnelContext key={step.key} value={{ index, count }}>

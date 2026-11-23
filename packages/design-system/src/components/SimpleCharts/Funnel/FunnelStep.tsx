@@ -89,7 +89,6 @@ export const FunnelStep: FC<FunnelStepProps> = ({
       data-slot='funnel-step'
       className={cn(
         funnelColumnClasses,
-        'flex',
         // The border shifts this li's edge by < 1px from the ribbon seam; the seam always
         // falls inside the 1px hairline, which paints over the ribbon.
         index > 0 && 'border-l border-border-primary-light',
