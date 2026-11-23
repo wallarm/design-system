@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const story = createStoryHelper('data-display-simplecharts-funnel', [
   'Default',
   'All Hues',
+  'Rare Hues',
   'Gray Start',
   'Steps By Count',
   'Bigger Later Step',
@@ -43,6 +44,26 @@ test.describe('Component: Funnel', () => {
 
     test('Should render empty correctly', async ({ page }) => {
       await story.goto(page, 'Empty');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render every main hue correctly', async ({ page }) => {
+      await story.goto(page, 'All Hues');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render every rare hue correctly', async ({ page }) => {
+      await story.goto(page, 'Rare Hues');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render gray and tint start correctly', async ({ page }) => {
+      await story.goto(page, 'Gray Start');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render 2 to 6 steps correctly', async ({ page }) => {
+      await story.goto(page, 'Steps By Count');
       await expect(page).toHaveScreenshot();
     });
 

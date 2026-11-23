@@ -120,36 +120,67 @@ export const Default: StoryFn<typeof meta> = args => {
   );
 };
 
-/**
- * The five main hues. The ramp always runs from a light tint to the hue's strong end.
- */
-export const AllHues: StoryFn<typeof meta> = args => (
-  <div className='flex flex-col gap-16'>
-    {(['blue', 'red', 'green', 'amber', 'purple'] as const satisfies FunnelColor[]).map(color => (
-      <Card key={color} title={color}>
-        <Funnel {...args} color={color} data-testid={`funnel-${color}`}>
-          {steps(falsePositives)}
-        </Funnel>
-      </Card>
-    ))}
+const MAIN_HUES = ['blue', 'red', 'green', 'amber', 'purple'] as const satisfies FunnelColor[];
+const RARE_HUES = [
+  'brand',
+  'teal',
+  'cyan',
+  'indigo',
+  'pink',
+  'rose',
+] as const satisfies FunnelColor[];
+
+/** One row per hue: gray start on the left, tint on the right. */
+const HueGrid: FC<{ hues: readonly FunnelColor[] }> = ({ hues }) => (
+  <div className='grid grid-cols-2 gap-16'>
+    {hues.map(color =>
+      (['gray', 'tint'] as const).map(start => (
+        <Card key={`${color}-${start}`} title={`${color} · ${start}`}>
+          <Funnel color={color} start={start} data-testid={`funnel-${color}-${start}`}>
+            {steps(falsePositives)}
+          </Funnel>
+        </Card>
+      )),
+    )}
   </div>
 );
 
 /**
- * `start="gray"` makes the first step slate and puts the rest on the hue's strong end — for a
- * funnel whose entry is context rather than a result.
+ * The five everyday hues, each with a gray start (left) and the default tint (right). Colour is
+ * not semantic — red is just a hue here, not danger. Halos are the step colour at 32% and 16%.
+ */
+export const AllHues: StoryFn<typeof meta> = () => <HueGrid hues={MAIN_HUES} />;
+
+/**
+ * Hues for rare cases: brand, teal, cyan, indigo, pink and rose. Same ramp, same rules.
+ */
+export const RareHues: StoryFn<typeof meta> = () => <HueGrid hues={RARE_HUES} />;
+
+/**
+ * The first step: `start="gray"` (option) draws it in slate/300 and the rest in the hue at 600 —
+ * for a funnel whose entry is context rather than a result. `start="tint"` (default) runs one
+ * palette step per stage, light to dark, ending on 600.
  */
 export const GrayStart: StoryFn<typeof meta> = args => (
-  <Card>
-    <Funnel {...args} start='gray'>
-      {steps(falsePositives)}
-    </Funnel>
-  </Card>
+  <div className='flex gap-16'>
+    <Card title='gray'>
+      <Funnel {...args} start='gray'>
+        {steps(falsePositives)}
+      </Funnel>
+    </Card>
+    <Card title='tint'>
+      <Funnel {...args} start='tint'>
+        {steps(falsePositives)}
+      </Funnel>
+    </Card>
+  </div>
 );
 
 /**
- * From two to six steps. Give the card enough width that each column stays around 120px; a
- * narrower card scrolls horizontally instead of hiding steps.
+ * From two to six steps, one palette step per stage and 600 always in: 500→600, 400→600,
+ * 400→700, 300→700, 200→700. Switch `color` in the controls to see each hue's ramp. Give the
+ * card enough width that each column stays around 120px; a narrower card scrolls horizontally
+ * instead of hiding steps.
  */
 export const StepsByCount: StoryFn<typeof meta> = args => (
   <div className='flex flex-col gap-16'>
@@ -269,12 +300,14 @@ export const Empty: StoryFn<typeof meta> = () => (
 );
 
 /**
- * The ramp, dividers and cells follow the `data-theme="dark"` ancestor.
+ * Every hue in both starts, plus a six-step ramp, under a `data-theme="dark"` ancestor. Each
+ * shade flips to 1000 minus it: 600 → 400, 200 → 800, slate/300 → slate/700.
  */
-export const DarkTheme: StoryFn<typeof meta> = args => (
-  <div data-theme='dark' className='bg-bg-surface-1 p-16'>
-    <Card>
-      <Funnel {...args}>{steps(falsePositives)}</Funnel>
+export const DarkTheme: StoryFn<typeof meta> = () => (
+  <div data-theme='dark' className='flex flex-col gap-16 bg-bg-surface-1 p-16'>
+    <HueGrid hues={[...MAIN_HUES, ...RARE_HUES]} />
+    <Card title='6 steps' wide>
+      <Funnel data-testid='funnel-dark-6'>{steps(sixSteps)}</Funnel>
     </Card>
   </div>
 );
