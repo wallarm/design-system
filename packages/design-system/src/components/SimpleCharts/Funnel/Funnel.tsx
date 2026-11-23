@@ -13,7 +13,12 @@ import {
 } from './constants';
 import { FunnelContext } from './FunnelContext';
 import { FunnelStep, type FunnelStepProps } from './FunnelStep';
-import { funnelSegmentPath, funnelStepFills, funnelThicknesses } from './lib/funnelGeometry';
+import {
+  funnelSegmentPath,
+  funnelStepFills,
+  funnelThicknesses,
+  sanitizeFunnelValue,
+} from './lib/funnelGeometry';
 
 export interface FunnelProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
@@ -52,10 +57,12 @@ export const Funnel: FC<FunnelProps> = ({
   const values = steps.map(step => step.props.value);
 
   if (steps.length !== all.length) {
-    warnOnce('Only FunnelStep elements are allowed as direct children; others are ignored.');
+    warnOnce(
+      'Funnel: only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array; fragments and wrapper components are ignored.',
+    );
   }
   if (count === 1 || count > 6) warnOnce(`Funnel expects 2–6 steps, got ${count}.`);
-  if (values.some(v => !(Number.isFinite(v) && v >= 0))) {
+  if (values.some(v => sanitizeFunnelValue(v) !== v)) {
     warnOnce(
       'FunnelStep `value` must be a finite number ≥ 0; negative or non-finite values are drawn as 0.',
     );
@@ -111,10 +118,14 @@ export const Funnel: FC<FunnelProps> = ({
       </div>
       {/* After the ribbon in the DOM so the step dividers paint over it. */}
       {/* min-w-0: without it the list grows to its long names' nowrap width and overflows. */}
-      <ol className='relative flex flex-1 min-w-0'>
+      <ol
+        // biome-ignore lint/a11y/noRedundantRoles: Safari/VoiceOver drops list semantics from lists styled with `list-style: none` (Tailwind preflight); role='list' restores it
+        role='list'
+        className='relative flex flex-1 min-w-0'
+      >
         <TestIdProvider value={testId}>
           {steps.map((step, index) => (
-            <FunnelContext key={step.key} value={{ index, count }}>
+            <FunnelContext key={step.key} value={{ index }}>
               {step}
             </FunnelContext>
           ))}

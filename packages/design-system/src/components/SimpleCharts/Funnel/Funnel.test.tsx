@@ -122,6 +122,27 @@ describe('Funnel — step interaction', () => {
   });
 });
 
+describe('Funnel — disabled step', () => {
+  it('does not call onClick and gates the hover/cursor affordance behind enabled:', async () => {
+    const onClick = rs.fn();
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={2} onClick={onClick} disabled />
+        <FunnelStep name='B' value={1} />
+      </Funnel>,
+    );
+    const [cell] = screen.getAllByTestId('fp--step');
+    expect(cell).toBeDisabled();
+    await userEvent.click(cell);
+    expect(onClick).not.toHaveBeenCalled();
+    const classes = cell.className.split(/\s+/);
+    expect(classes).toContain('enabled:cursor-pointer');
+    expect(classes).toContain('enabled:hover:before:bg-states-primary-hover');
+    expect(classes).not.toContain('cursor-pointer');
+    expect(classes).not.toContain('hover:before:bg-states-primary-hover');
+  });
+});
+
 describe('Funnel — test ids', () => {
   it('cascades test ids: fp--step on each cell, fp--step--delta on the delta, fp--ribbon; consumer data-testid on a step wins', () => {
     render(
@@ -167,6 +188,18 @@ describe('Funnel — ribbon', () => {
       const paths = svg.querySelectorAll('path');
       expect(paths).toHaveLength(3);
       for (const p of paths) expect(p.getAttribute('d')).not.toContain('NaN');
+    }
+  });
+
+  it('carries the dark-theme fill class on every column svg', () => {
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={2} />
+        <FunnelStep name='B' value={1} />
+      </Funnel>,
+    );
+    for (const svg of screen.getByTestId('fp--ribbon').querySelectorAll('svg')) {
+      expect(svg).toHaveClass('in-data-[theme=dark]:[--funnel-fill:var(--funnel-dark)]');
     }
   });
 
@@ -233,7 +266,9 @@ describe('Funnel — dev warnings', () => {
       </Funnel>,
     );
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('FunnelStep'));
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('only direct FunnelStep children are rendered'),
+    );
     expect(screen.queryByText('stray')).toBeNull();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     warn.mockRestore();

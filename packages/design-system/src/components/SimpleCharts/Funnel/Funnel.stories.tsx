@@ -27,7 +27,22 @@ const meta = {
     children: { control: false },
     ref: { control: false },
     className: { control: 'text' },
-    color: { control: 'select' },
+    color: {
+      control: 'select',
+      options: [
+        'blue',
+        'red',
+        'green',
+        'amber',
+        'purple',
+        'brand',
+        'teal',
+        'cyan',
+        'indigo',
+        'pink',
+        'rose',
+      ],
+    },
     start: { control: 'inline-radio' },
   },
 } satisfies Meta<typeof Funnel>;

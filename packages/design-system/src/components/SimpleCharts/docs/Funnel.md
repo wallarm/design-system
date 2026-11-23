@@ -50,13 +50,13 @@ There is no selected / filtered state: the funnel has no selection model.
 
 ## Interactions
 
-- **Click** — only on steps with `onClick`. The step is a native button: Enter and Space run `onClick`, it sits in tab order. The ribbon, halos and non-interactive steps do nothing.
+- **Click** — only on steps with `onClick`. The step is a native button: Enter and Space run `onClick`, it sits in tab order. The ribbon, halos and non-interactive steps do nothing. A step with `disabled` stays a button but shows no hover tint or pointer cursor and does not fire `onClick`.
 - **No hover-sync, no tooltips on the ribbon, no filtering.** The caller owns what a click means (open a drill-down, set a filter elsewhere).
 - Consumer analytics attributes (`data-analytics-*`, `aria-*`), `ref` and event props land on the step's real node — the button when `onClick` is set, a `div` otherwise (not focusable) — per `docs/metrics/contract.md`. There is deliberately no `stepProps` escape hatch.
 
 ## Edge cases & unclear states
 
-- **Steps must be direct children.** Arrays and `.map` are fine (`Children.toArray` flattens them). A fragment, a wrapper component or text is ignored for geometry and rendering, with a dev warning. Reason: `Funnel` computes the ribbon in the same render pass from the children's props (no registration effect → no second render, no flicker, SSR HTML includes the ribbon, React Compiler-safe).
+- **Steps must be direct children.** Arrays and `.map` are fine (`Children.toArray` flattens them). A fragment, a wrapper component or text is ignored for geometry and rendering, with a dev warning ("only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array"). Reason: `Funnel` computes the ribbon in the same render pass from the children's props (no registration effect → no second render, no flicker, SSR HTML includes the ribbon, React Compiler-safe).
 - **Step count.** 1 step or more than 6 renders anyway with a dev warning. 1 step → shade 600. More than 6 → the 6-step ramp, then 700 repeated for the extras.
 - **Negative / non-finite `value`** → treated as `0` for the band and the label, dev warning.
 - **`0`** → drawn as a 4px line; the label says `0`. **All zeros** → every step at 4px, no NaN.
@@ -87,5 +87,4 @@ There is no selected / filtered state: the funnel has no selection model.
   - Root `Funnel` also carries `min-w-240` (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
   - `FunnelStep`'s `ref` is typed `Ref<HTMLElement>` (spec: `Ref<HTMLButtonElement | HTMLDivElement>`), cast per node.
   - `FunnelSkeleton` is a plain frame, no `Skeleton` shimmer; it also takes `data-testid` and root HTML props.
-  - Halo opacities are `0.32` (6px) and `0.16` (12px), as specced.
 - No conversion / drop-off % between steps (a caption can carry it); no animation; no vertical layout; no `packages/gen-ui` catalog entry yet.

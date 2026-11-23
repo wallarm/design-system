@@ -13,6 +13,7 @@ import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/te
 import { FormatNumber } from '../../FormatNumber';
 import { funnelColumnClasses } from './classes';
 import { FunnelContext } from './FunnelContext';
+import { sanitizeFunnelValue } from './lib/funnelGeometry';
 
 const funnelStepCellVariants = cva(
   'relative flex flex-col gap-2 w-full h-100 pt-8 px-12 pb-12 text-left',
@@ -20,9 +21,9 @@ const funnelStepCellVariants = cva(
     variants: {
       interactive: {
         true: [
-          'cursor-pointer outline-none',
+          'enabled:cursor-pointer outline-none',
           'before:absolute before:inset-x-6 before:inset-y-2 before:rounded-10',
-          'hover:before:bg-states-primary-hover',
+          'enabled:hover:before:bg-states-primary-hover',
           'focus-visible:before:bg-states-primary-hover',
           'focus-visible:before:ring-2 focus-visible:before:ring-inset focus-visible:before:ring-focus-primary',
         ].join(' '),
@@ -64,7 +65,7 @@ export const FunnelStep: FC<FunnelStepProps> = ({
 }) => {
   const { index } = useContext(FunnelContext);
   const testId = useTestId('step', testIdProp);
-  const shown = Number.isFinite(value) && value > 0 ? value : 0;
+  const shown = sanitizeFunnelValue(value);
   const interactive = onClick !== undefined;
 
   const content = (

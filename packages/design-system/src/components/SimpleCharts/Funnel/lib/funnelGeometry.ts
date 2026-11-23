@@ -9,9 +9,13 @@ import {
 
 const MID = FUNNEL_BAND_HEIGHT / 2;
 
+/** Negative or non-finite values count as 0. */
+export const sanitizeFunnelValue = (value: number): number =>
+  Number.isFinite(value) && value > 0 ? value : 0;
+
 /** Body thickness in px per step, scaled to the largest value; never below the minimum. */
 export const funnelThicknesses = (values: readonly number[]): number[] => {
-  const safe = values.map(v => (Number.isFinite(v) && v > 0 ? v : 0));
+  const safe = values.map(sanitizeFunnelValue);
   const max = Math.max(0, ...safe);
   if (max === 0) return safe.map(() => FUNNEL_MIN_BODY);
   return safe.map(v => Math.max(FUNNEL_MIN_BODY, (v / max) * FUNNEL_MAX_BODY));

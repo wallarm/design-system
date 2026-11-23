@@ -1,5 +1,10 @@
 import { describe, expect, it } from '@rstest/core';
-import { funnelSegmentPath, funnelStepFills, funnelThicknesses } from './funnelGeometry';
+import {
+  funnelSegmentPath,
+  funnelStepFills,
+  funnelThicknesses,
+  sanitizeFunnelValue,
+} from './funnelGeometry';
 
 describe('funnelThicknesses', () => {
   it('scales to the largest value at 140px', () => {
@@ -63,5 +68,15 @@ describe('funnelStepFills', () => {
       light: 'var(--color-blue-700)',
       dark: 'var(--color-blue-300)',
     });
+  });
+});
+
+describe('sanitizeFunnelValue', () => {
+  it('maps negative and non-finite to 0, keeps the rest', () => {
+    expect(sanitizeFunnelValue(-5)).toBe(0);
+    expect(sanitizeFunnelValue(Number.NaN)).toBe(0);
+    expect(sanitizeFunnelValue(Infinity)).toBe(0);
+    expect(sanitizeFunnelValue(7)).toBe(7);
+    expect(sanitizeFunnelValue(0)).toBe(0);
   });
 });
