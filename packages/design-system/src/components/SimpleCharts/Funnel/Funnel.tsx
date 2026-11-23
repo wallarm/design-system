@@ -1,5 +1,5 @@
 import type { CSSProperties, FC, HTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
-import { Children, isValidElement } from 'react';
+import { Children, isValidElement, useEffect } from 'react';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { funnelColumnClasses } from './classes';
@@ -55,17 +55,22 @@ export const Funnel: FC<FunnelProps> = ({
   const count = steps.length;
   const values = steps.map(step => step.props.value);
 
-  if (steps.length !== all.length) {
-    warnOnce(
-      'only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array; fragments and wrapper components are ignored.',
-    );
-  }
-  if (count === 1 || count > 6) warnOnce(`expects 2–6 steps, got ${count}.`);
-  if (values.some(v => sanitizeFunnelValue(v) !== v)) {
-    warnOnce(
-      'FunnelStep `value` must be a finite number ≥ 0; negative or non-finite values are drawn as 0.',
-    );
-  }
+  const hasStrayChildren = steps.length !== all.length;
+  const hasBadValue = values.some(v => sanitizeFunnelValue(v) !== v);
+
+  useEffect(() => {
+    if (hasStrayChildren) {
+      warnOnce(
+        'only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array; fragments and wrapper components are ignored.',
+      );
+    }
+    if (count === 1 || count > 6) warnOnce(`expects 2–6 steps, got ${count}.`);
+    if (hasBadValue) {
+      warnOnce(
+        'FunnelStep `value` must be a finite number ≥ 0; negative or non-finite values are drawn as 0.',
+      );
+    }
+  }, [hasStrayChildren, count, hasBadValue]);
 
   if (count === 0) return null;
 

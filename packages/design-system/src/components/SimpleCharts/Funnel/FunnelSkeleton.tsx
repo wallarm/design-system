@@ -1,4 +1,4 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
+import type { CSSProperties, FC, HTMLAttributes, Ref } from 'react';
 import { cn } from '../../../utils/cn';
 import type { TestableProps } from '../../../utils/testId';
 import { funnelColumnClasses } from './classes';
@@ -24,19 +24,25 @@ export const FunnelSkeleton: FC<FunnelSkeletonProps> = ({
     data-testid={testId}
     aria-busy='true'
     aria-live='polite'
-    className={cn('relative flex h-288 min-w-240', className)}
+    className={cn('overflow-x-auto overflow-y-hidden', className)}
   >
-    {Array.from({ length: steps }, (_, i) => (
-      <div
-        // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
-        key={i}
-        data-slot='funnel-skeleton-column'
-        className={cn(
-          funnelColumnClasses,
-          'not-first:border-l not-first:border-border-primary-light',
-        )}
-      />
-    ))}
+    {/* Same track as Funnel, so loading and loaded take the same width and scroll alike. */}
+    <div
+      className='relative flex h-288 min-w-[max(240px,calc(var(--funnel-steps)*120px))]'
+      style={{ '--funnel-steps': steps } as CSSProperties}
+    >
+      {Array.from({ length: steps }, (_, i) => (
+        <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
+          key={i}
+          data-slot='funnel-skeleton-column'
+          className={cn(
+            funnelColumnClasses,
+            'not-first:border-l not-first:border-border-primary-light',
+          )}
+        />
+      ))}
+    </div>
   </div>
 );
 

@@ -330,7 +330,7 @@ describe('FunnelSkeleton', () => {
     const root = screen.getByTestId('sk');
     expect(root).toHaveAttribute('data-slot', 'funnel-skeleton');
     expect(root).toHaveAttribute('aria-busy', 'true');
-    expect(root).toHaveClass('h-288');
+    expect(root.firstElementChild).toHaveClass('h-288');
     const cols = root.querySelectorAll('[data-slot="funnel-skeleton-column"]');
     expect(cols).toHaveLength(4);
     expect(root.querySelectorAll('.not-first\\:border-l')).toHaveLength(4);
@@ -341,7 +341,7 @@ describe('FunnelSkeleton', () => {
     const ref = createRef<HTMLDivElement>();
     render(<FunnelSkeleton ref={ref} data-testid='sk' />);
     expect(ref.current).toBe(screen.getByTestId('sk'));
-    expect(ref.current?.children).toHaveLength(3);
+    expect(ref.current?.firstElementChild?.children).toHaveLength(3);
   });
 });
 

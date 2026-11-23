@@ -34,7 +34,7 @@ const funnelStepCellVariants = cva(
 );
 
 export interface FunnelStepProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'name'>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'name' | 'children'>,
     TestableProps {
   /** Lands on the cell: `<button>` with `onClick`, `<div>` without. */
   ref?: Ref<HTMLElement>;

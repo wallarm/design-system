@@ -85,7 +85,8 @@ There is no selected / filtered state: the funnel has no selection model.
 - **Code Connect.** Code Connect for `funnel-section-title` waits for design to rename its variants `Type=Default / Type2` → `State=Default / Hover`. There is no `FunnelStep.figma.ts` until then.
 - **Dark theme via CSS, not `useTheme`.** The ticket suggested `useTheme()`. The dark shade is selected with a `[data-theme='dark']` ancestor instead, because `useTheme` throws outside a `ThemeProvider`, and the CSS selector also works in SSR. It follows a dark scope nested in a light page; a light scope nested inside a dark one is not supported (same as the theme tokens, which only define `[data-theme="dark"]`). Same rule (`1000 − step`), same zero-token outcome.
 - **Code vs spec differences** (code is documented above):
-  - Root `Funnel` also carries `min-w-240` (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
+  - Horizontal scroll (spec non-goal): the root scrolls and the inner track is `max(240px, steps × 120px)` wide, because the `Chart` card would otherwise clip the last steps silently. `FunnelSkeleton` uses the same track. The scroller is not focusable, so without an interactive step it scrolls by pointer only.
+  - The track's `240px` floor (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
   - `FunnelStep`'s `ref` is typed `Ref<HTMLElement>` (spec: `Ref<HTMLButtonElement | HTMLDivElement>`), cast per node.
   - `FunnelSkeleton` is a plain frame, no `Skeleton` shimmer; it also takes `data-testid` and root HTML props.
 - **No automated axe check** — the repo's e2e has no axe tooling; a11y is covered by role/keyboard assertions.
