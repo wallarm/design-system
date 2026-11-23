@@ -31,7 +31,10 @@ export const FunnelSkeleton: FC<FunnelSkeletonProps> = ({
         // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
         key={i}
         data-slot='funnel-skeleton-column'
-        className={cn(funnelColumnClasses, i > 0 && 'border-l border-border-primary-light')}
+        className={cn(
+          funnelColumnClasses,
+          'not-first:border-l not-first:border-border-primary-light',
+        )}
       />
     ))}
   </div>

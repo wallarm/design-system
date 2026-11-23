@@ -67,7 +67,8 @@ There is no selected / filtered state: the funnel has no selection model.
 - **Long content.** Long name and long value → ellipsis (one line); long caption → 2-line clamp.
 - **The step `ol` needs `min-w-0`.** Without it flex `min-width: auto` made the list (and the columns) grow to the long names' `nowrap` width and overflow, so columns were no longer equal. Found and fixed during implementation; keep it when touching `Funnel.tsx`.
 - **Warnings fire once per message per page session** (module-level set), and never in production builds. The count warning includes the count, so `1` and `7` are separate messages.
-- **Dark theme is CSS, not JS.** Each ribbon column defines `--funnel-light` / `--funnel-dark` and switches under `in-data-[theme=dark]`.
+- **Dark theme is CSS, not JS.** Each ribbon column defines `--funnel-light` / `--funnel-dark` and switches under `in-data-[theme=dark]`, which matches any dark ancestor: a dark scope nested in a light page works; a light scope nested inside a dark one is not supported (no light reset).
+- **No horizontal padding on `Funnel`.** The ribbon is positioned against the root's padding box while the step list sits in the content box, so do not add horizontal padding via `className` — pad the card/wrapper instead.
 - **Clean DOM.** No `data-testid` on `Funnel` → no derived test ids anywhere.
 
 ## Accessibility notes
@@ -82,9 +83,10 @@ There is no selected / filtered state: the funnel has no selection model.
 ## Open questions / known limitations
 
 - **Code Connect.** Code Connect for `funnel-section-title` waits for design to rename its variants `Type=Default / Type2` → `State=Default / Hover`. There is no `FunnelStep.figma.ts` until then.
-- **Dark theme via CSS, not `useTheme`.** The ticket suggested `useTheme()`. The dark shade is selected with a `[data-theme='dark']` ancestor instead, because `useTheme` throws outside a `ThemeProvider`, and the CSS selector also follows nested `data-theme` scopes and SSR. Same rule (`1000 − step`), same zero-token outcome.
+- **Dark theme via CSS, not `useTheme`.** The ticket suggested `useTheme()`. The dark shade is selected with a `[data-theme='dark']` ancestor instead, because `useTheme` throws outside a `ThemeProvider`, and the CSS selector also works in SSR. It follows a dark scope nested in a light page; a light scope nested inside a dark one is not supported (same as the theme tokens, which only define `[data-theme="dark"]`). Same rule (`1000 − step`), same zero-token outcome.
 - **Code vs spec differences** (code is documented above):
   - Root `Funnel` also carries `min-w-240` (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
   - `FunnelStep`'s `ref` is typed `Ref<HTMLElement>` (spec: `Ref<HTMLButtonElement | HTMLDivElement>`), cast per node.
   - `FunnelSkeleton` is a plain frame, no `Skeleton` shimmer; it also takes `data-testid` and root HTML props.
+- **No automated axe check** — the repo's e2e has no axe tooling; a11y is covered by role/keyboard assertions.
 - No conversion / drop-off % between steps (a caption can carry it); no animation; no vertical layout; no `packages/gen-ui` catalog entry yet.

@@ -6,13 +6,11 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
-import { useContext } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
 import { FormatNumber } from '../../FormatNumber';
 import { funnelColumnClasses } from './classes';
-import { FunnelContext } from './FunnelContext';
 import { sanitizeFunnelValue } from './lib/funnelGeometry';
 
 const funnelStepCellVariants = cva(
@@ -63,7 +61,6 @@ export const FunnelStep: FC<FunnelStepProps> = ({
   'data-testid': testIdProp,
   ...rest
 }) => {
-  const { index } = useContext(FunnelContext);
   const testId = useTestId('step', testIdProp);
   const shown = sanitizeFunnelValue(value);
   const interactive = onClick !== undefined;
@@ -92,7 +89,7 @@ export const FunnelStep: FC<FunnelStepProps> = ({
         funnelColumnClasses,
         // The border shifts this li's edge by < 1px from the ribbon seam; the seam always
         // falls inside the 1px hairline, which paints over the ribbon.
-        index > 0 && 'border-l border-border-primary-light',
+        'not-first:border-l not-first:border-border-primary-light',
       )}
     >
       {interactive ? (
@@ -101,7 +98,7 @@ export const FunnelStep: FC<FunnelStepProps> = ({
           ref={ref as Ref<HTMLButtonElement>}
           type='button'
           onClick={onClick}
-          data-slot='funnel-step-trigger'
+          data-slot='funnel-step-cell'
           data-testid={testId}
           className={cellClassName}
         >
@@ -112,7 +109,7 @@ export const FunnelStep: FC<FunnelStepProps> = ({
           // Button-only attributes (type, disabled, form…) are meaningless on a div; widen for the spread.
           {...(rest as HTMLAttributes<HTMLElement>)}
           ref={ref as Ref<HTMLDivElement>}
-          data-slot='funnel-step-trigger'
+          data-slot='funnel-step-cell'
           data-testid={testId}
           className={cellClassName}
         >

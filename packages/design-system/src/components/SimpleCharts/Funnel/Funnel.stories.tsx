@@ -3,7 +3,7 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Chart, ChartEmpty, ChartHeader, ChartTitle } from '../Chart';
 import { MetricDelta } from '../Metric';
 import type { FunnelColor } from './constants';
-import { Funnel, type FunnelProps } from './Funnel';
+import { Funnel } from './Funnel';
 import { FunnelSkeleton } from './FunnelSkeleton';
 import { FunnelStep } from './FunnelStep';
 
@@ -88,9 +88,10 @@ const Card: FC<{ title?: string; wide?: boolean; children: ReactNode }> = ({
 
 /**
  * Three steps with captions and a delta on the last one. Every step is a button — click one
- * and the line under the card records it.
+ * and the line under the card records it. Each button carries `data-analytics-id` and
+ * `data-analytics-props` for click tracking.
  */
-export const Default: StoryFn<FunnelProps> = args => {
+export const Default: StoryFn<typeof meta> = args => {
   const [last, setLast] = useState<string>('none');
   return (
     <div className='flex flex-col gap-8'>
@@ -105,6 +106,8 @@ export const Default: StoryFn<FunnelProps> = args => {
               delta={
                 i === 2 ? <MetricDelta value={12} sentiment='negative' trend='up' /> : undefined
               }
+              data-analytics-id={`FUNNEL_STEP_${d.name.toUpperCase().replace(/\W+/g, '_')}`}
+              data-analytics-props={JSON.stringify({ feature: 'funnel', step: i + 1 })}
               onClick={() => setLast(d.name)}
             />
           ))}
@@ -120,7 +123,7 @@ export const Default: StoryFn<FunnelProps> = args => {
 /**
  * The five main hues. The ramp always runs from a light tint to the hue's strong end.
  */
-export const AllHues: StoryFn<FunnelProps> = args => (
+export const AllHues: StoryFn<typeof meta> = args => (
   <div className='flex flex-col gap-16'>
     {(['blue', 'red', 'green', 'amber', 'purple'] as const satisfies FunnelColor[]).map(color => (
       <Card key={color} title={color}>
@@ -136,7 +139,7 @@ export const AllHues: StoryFn<FunnelProps> = args => (
  * `start="gray"` makes the first step slate and puts the rest on the hue's strong end — for a
  * funnel whose entry is context rather than a result.
  */
-export const GrayStart: StoryFn<FunnelProps> = args => (
+export const GrayStart: StoryFn<typeof meta> = args => (
   <Card>
     <Funnel {...args} start='gray'>
       {steps(falsePositives)}
@@ -147,7 +150,7 @@ export const GrayStart: StoryFn<FunnelProps> = args => (
 /**
  * From two to six steps. Give the card enough width that each column stays around 120px.
  */
-export const StepsByCount: StoryFn<FunnelProps> = args => (
+export const StepsByCount: StoryFn<typeof meta> = args => (
   <div className='flex flex-col gap-16'>
     {[2, 3, 4, 5, 6].map(n => (
       <Card key={n} title={`${n} steps`} wide={n > 4}>
@@ -162,7 +165,7 @@ export const StepsByCount: StoryFn<FunnelProps> = args => (
 /**
  * A later step may exceed an earlier one — the ribbon is scaled to the largest step, not the first.
  */
-export const BiggerLaterStep: StoryFn<FunnelProps> = args => (
+export const BiggerLaterStep: StoryFn<typeof meta> = args => (
   <Card>
     <Funnel {...args}>
       {steps([
@@ -177,7 +180,7 @@ export const BiggerLaterStep: StoryFn<FunnelProps> = args => (
 /**
  * A step that is a sliver of the first (1000 → 100 → 1) still keeps a visible minimum body.
  */
-export const TinyStep: StoryFn<FunnelProps> = args => (
+export const TinyStep: StoryFn<typeof meta> = args => (
   <Card>
     <Funnel {...args}>
       {steps([
@@ -192,7 +195,7 @@ export const TinyStep: StoryFn<FunnelProps> = args => (
 /**
  * Long names truncate to one line and captions to two, so the cells keep their height.
  */
-export const LongContent: StoryFn<FunnelProps> = args => (
+export const LongContent: StoryFn<typeof meta> = args => (
   <Card>
     <Funnel {...args}>
       {steps([
@@ -221,7 +224,7 @@ export const LongContent: StoryFn<FunnelProps> = args => (
 /**
  * `delta` takes a `MetricDelta`, shown right after the value — any step can carry one.
  */
-export const WithDelta: StoryFn<FunnelProps> = args => (
+export const WithDelta: StoryFn<typeof meta> = args => (
   <Card>
     <Funnel {...args}>
       <FunnelStep
@@ -249,7 +252,7 @@ export const WithDelta: StoryFn<FunnelProps> = args => (
 /**
  * `FunnelSkeleton` holds the frame and the step dividers while the data loads.
  */
-export const Loading: StoryFn<FunnelProps> = () => (
+export const Loading: StoryFn<typeof meta> = () => (
   <Card>
     <FunnelSkeleton data-testid='funnel-skeleton' />
   </Card>
@@ -258,7 +261,7 @@ export const Loading: StoryFn<FunnelProps> = () => (
 /**
  * With no steps to draw, show `ChartEmpty` inside the card instead.
  */
-export const Empty: StoryFn<FunnelProps> = () => (
+export const Empty: StoryFn<typeof meta> = () => (
   <Card>
     <ChartEmpty>No data for this period</ChartEmpty>
   </Card>
@@ -267,7 +270,7 @@ export const Empty: StoryFn<FunnelProps> = () => (
 /**
  * The ramp, dividers and cells follow the `data-theme="dark"` ancestor.
  */
-export const DarkTheme: StoryFn<FunnelProps> = args => (
+export const DarkTheme: StoryFn<typeof meta> = args => (
   <div data-theme='dark' className='bg-bg-surface-1 p-16'>
     <Card>
       <Funnel {...args}>{steps(falsePositives)}</Funnel>

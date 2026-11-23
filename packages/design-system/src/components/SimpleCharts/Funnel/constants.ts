@@ -1,7 +1,6 @@
 import type { ChartColor } from '../types';
 
 export const FUNNEL_BAND_HEIGHT = 172;
-export const FUNNEL_INSET = 4;
 export const FUNNEL_MAX_BODY = 140;
 export const FUNNEL_MIN_BODY = 4;
 

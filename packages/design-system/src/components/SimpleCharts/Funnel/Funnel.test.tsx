@@ -69,7 +69,6 @@ describe('Funnel — step interaction', () => {
     const [cell] = screen.getAllByTestId('fp--step');
     expect(cell.tagName).toBe('BUTTON');
     expect(cell).toHaveAttribute('type', 'button');
-    expect(cell).toHaveAttribute('data-slot', 'funnel-step-trigger');
 
     await user.click(cell);
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -89,13 +88,13 @@ describe('Funnel — step interaction', () => {
     );
     const [cell] = screen.getAllByTestId('fp--step');
     expect(cell.tagName).toBe('DIV');
-    expect(cell).toHaveAttribute('data-slot', 'funnel-step-trigger');
     expect(cell).not.toHaveAttribute('tabindex');
     expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('forwards data-analytics-id, aria-label and ref to the step button', async () => {
     const captured = captureAnalyticsClicks();
+    const payload = '{"feature":"funnel","step":1}';
     const ref = createRef<HTMLElement>();
     render(
       <Funnel>
@@ -103,6 +102,7 @@ describe('Funnel — step interaction', () => {
           ref={ref}
           data-testid='detected'
           data-analytics-id='FP_DETECTED'
+          data-analytics-props={payload}
           aria-label='Open detected'
           name='Detected'
           value={2}
@@ -114,6 +114,7 @@ describe('Funnel — step interaction', () => {
     const button = screen.getByTestId('detected');
     expect(button.tagName).toBe('BUTTON');
     expect(button).toHaveAttribute('data-analytics-id', 'FP_DETECTED');
+    expect(button).toHaveAttribute('data-analytics-props', payload);
     expect(button).toHaveAttribute('aria-label', 'Open detected');
     expect(ref.current).toBe(button);
 
@@ -156,7 +157,20 @@ describe('Funnel — test ids', () => {
     expect(screen.getAllByTestId('fp--step')).toHaveLength(2);
     expect(screen.getByTestId('fp--step--delta')).toBeInTheDocument();
     expect(screen.getByTestId('fp--ribbon')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByTestId('custom')).toHaveAttribute('data-slot', 'funnel-step-trigger');
+    expect(screen.getByTestId('custom')).toBeInTheDocument();
+  });
+
+  it('draws step dividers with not-first:border-l (first step has none in CSS)', () => {
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={3} />
+        <FunnelStep name='B' value={2} />
+      </Funnel>,
+    );
+    for (const li of screen.getAllByRole('listitem')) {
+      expect(li).toHaveClass('not-first:border-l', 'not-first:border-border-primary-light');
+      expect(li).not.toHaveClass('border-l');
+    }
   });
 
   it('keeps the DOM clean without data-testid', () => {
@@ -218,14 +232,16 @@ describe('Funnel — ribbon', () => {
 });
 
 describe('Funnel — dev warnings', () => {
-  it('warns in dev for 1 or 7 steps ("Funnel expects 2–6 steps")', () => {
+  it('warns in dev for 1 or 7 steps ("expects 2–6 steps")', () => {
     const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const { unmount } = render(
       <Funnel>
         <FunnelStep name='Only' value={1} />
       </Funnel>,
     );
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Funnel expects 2–6 steps'));
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('[Funnel] expects 2–6 steps, got 1.'),
+    );
     unmount();
     warn.mockClear();
     render(
@@ -235,7 +251,9 @@ describe('Funnel — dev warnings', () => {
         ))}
       </Funnel>,
     );
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Funnel expects 2–6 steps'));
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('[Funnel] expects 2–6 steps, got 7.'),
+    );
     expect(screen.getAllByRole('listitem')).toHaveLength(7);
     warn.mockRestore();
   });
@@ -267,7 +285,7 @@ describe('Funnel — dev warnings', () => {
     );
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('only direct FunnelStep children are rendered'),
+      expect.stringContaining('[Funnel] only direct FunnelStep children are rendered'),
     );
     expect(screen.queryByText('stray')).toBeNull();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
@@ -276,7 +294,7 @@ describe('Funnel — dev warnings', () => {
 });
 
 describe('FunnelSkeleton', () => {
-  it('renders N columns with N−1 dividers and aria-busy', () => {
+  it('renders N columns, dividers via not-first:border-l, and aria-busy', () => {
     render(<FunnelSkeleton data-testid='sk' steps={4} />);
     const root = screen.getByTestId('sk');
     expect(root).toHaveAttribute('data-slot', 'funnel-skeleton');
@@ -284,7 +302,7 @@ describe('FunnelSkeleton', () => {
     expect(root).toHaveClass('h-288');
     const cols = root.querySelectorAll('[data-slot="funnel-skeleton-column"]');
     expect(cols).toHaveLength(4);
-    expect(root.querySelectorAll('.border-l')).toHaveLength(3);
+    expect(root.querySelectorAll('.not-first\\:border-l')).toHaveLength(4);
     expect(root.textContent).toBe('');
   });
 

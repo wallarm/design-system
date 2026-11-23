@@ -159,6 +159,11 @@ describe('FormatNumber typography', () => {
     expect(screen.getByTestId('n').querySelector('.text-text-secondary')).not.toBeNull();
   });
 
+  it('renders no empty class attribute for the non-secondary inherit span', () => {
+    render(<FormatNumber value={1200} typography='inherit' data-testid='n' />);
+    expect(screen.getByTestId('n').querySelector('span')).not.toHaveAttribute('class');
+  });
+
   it('keeps the default output unchanged', () => {
     render(<FormatNumber value={1200} data-testid='n' />);
     expect(screen.getByTestId('n').querySelector('p.text-sm')).not.toBeNull();

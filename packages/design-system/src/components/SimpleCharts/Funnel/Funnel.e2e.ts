@@ -68,6 +68,8 @@ test.describe('Component: Funnel', () => {
   });
 
   test.describe('Accessibility', () => {
+    // Stands in for an axe run (no axe tooling in this repo's e2e, see HoverCard.e2e.ts): a11y is
+    // covered by role/keyboard assertions.
     test('Should be operable via keyboard Tab, Enter and Space', async ({ page }) => {
       await story.goto(page, 'Default');
       const steps = page.getByTestId('funnel--step');

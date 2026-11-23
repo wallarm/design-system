@@ -72,7 +72,8 @@ interface InnerProps {
 }
 
 const Inner: FC<InnerProps> = ({ inherit, secondary, children }) => {
-  if (inherit) return <span className={cn(secondary && 'text-text-secondary')}>{children}</span>;
+  if (inherit)
+    return <span className={secondary ? 'text-text-secondary' : undefined}>{children}</span>;
   return (
     <Text size='sm' color={secondary ? 'secondary' : undefined}>
       {children}

@@ -11,7 +11,6 @@ import {
   type FunnelColor,
   type FunnelStart,
 } from './constants';
-import { FunnelContext } from './FunnelContext';
 import { FunnelStep, type FunnelStepProps } from './FunnelStep';
 import {
   funnelSegmentPath,
@@ -58,10 +57,10 @@ export const Funnel: FC<FunnelProps> = ({
 
   if (steps.length !== all.length) {
     warnOnce(
-      'Funnel: only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array; fragments and wrapper components are ignored.',
+      'only direct FunnelStep children are rendered — pass FunnelStep elements directly or as an array; fragments and wrapper components are ignored.',
     );
   }
-  if (count === 1 || count > 6) warnOnce(`Funnel expects 2–6 steps, got ${count}.`);
+  if (count === 1 || count > 6) warnOnce(`expects 2–6 steps, got ${count}.`);
   if (values.some(v => sanitizeFunnelValue(v) !== v)) {
     warnOnce(
       'FunnelStep `value` must be a finite number ≥ 0; negative or non-finite values are drawn as 0.',
@@ -123,13 +122,7 @@ export const Funnel: FC<FunnelProps> = ({
         role='list'
         className='relative flex flex-1 min-w-0'
       >
-        <TestIdProvider value={testId}>
-          {steps.map((step, index) => (
-            <FunnelContext key={step.key} value={{ index }}>
-              {step}
-            </FunnelContext>
-          ))}
-        </TestIdProvider>
+        <TestIdProvider value={testId}>{steps}</TestIdProvider>
       </ol>
     </div>
   );
