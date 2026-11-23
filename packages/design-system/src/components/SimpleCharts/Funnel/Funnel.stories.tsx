@@ -146,15 +146,33 @@ const HueGrid: FC<{ hues: readonly FunnelColor[] }> = ({ hues }) => (
 );
 
 /**
- * The five everyday hues, each with a gray start (left) and the default tint (right). Colour is
- * not semantic — red is just a hue here, not danger. Halos are the step colour at 32% and 16%.
+ * Every `color`, at the default `start="tint"`. Use the everyday hues first; the rare ones are for
+ * a funnel that has to match something already on the page. Colour is not semantic — red is just
+ * a hue here, not danger. Halos are the step colour at 32% and 16%.
  */
-export const AllHues: StoryFn<typeof meta> = () => <HueGrid hues={MAIN_HUES} />;
-
-/**
- * Hues for rare cases: brand, teal, cyan, indigo, pink and rose. Same ramp, same rules.
- */
-export const RareHues: StoryFn<typeof meta> = () => <HueGrid hues={RARE_HUES} />;
+export const Colors: StoryFn<typeof meta> = () => (
+  <div className='flex flex-col gap-24'>
+    {(
+      [
+        ['Everyday', MAIN_HUES],
+        ['Rare', RARE_HUES],
+      ] as const
+    ).map(([label, hues]) => (
+      <section key={label} className='flex flex-col gap-12'>
+        <h3 className='text-sm font-medium text-text-primary'>{label}</h3>
+        <div className='grid grid-cols-2 gap-16'>
+          {hues.map(color => (
+            <Card key={color} title={color}>
+              <Funnel color={color} data-testid={`funnel-${color}`}>
+                {steps(falsePositives)}
+              </Funnel>
+            </Card>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+);
 
 /**
  * The first step: `start="gray"` (option) draws it in slate/300 and the rest in the hue at 600 —
