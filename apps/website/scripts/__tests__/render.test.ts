@@ -197,6 +197,23 @@ describe('renderComponentsMeta', () => {
     expect(renderComponentsMeta([button, empty], none)).not.toContain('button-base');
   });
 
+  it('opens AI Characters with the showcase pages', () => {
+    const avatar: ComponentMetadata = {
+      ...button,
+      name: 'AgentAvatar',
+      examples: [{ ...basic, storyTitle: 'AI Characters/AgentAvatar' }],
+    };
+    const meta = JSON.parse(renderComponentsMeta([avatar, button], none));
+    const group = meta.find((m: Group) => m.label === 'AI Characters');
+    expect(group.items.map((i: { link: string }) => i.link)).toEqual([
+      '/components/meet-the-new-agents',
+      '/components/squish-the-agents',
+      '/components/agent-avatar',
+    ]);
+    const actions = meta.find((m: Group) => m.label === 'Actions');
+    expect(actions.items).toHaveLength(1);
+  });
+
   it('orders categories', () => {
     const meta = JSON.parse(renderComponentsMeta([input, button], none));
     expect(meta).not.toContain('index');

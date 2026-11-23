@@ -363,6 +363,7 @@ Use the appropriate category for the `title` field:
 | ------------------- | -------------------------------------- | -------------------------------- |
 | `Actions`           | Clickable elements                     | Button, ToggleButton, DropdownMenu |
 | `AI`                | Wally assistant                        | Chat, AssistantMessage, ChainOfThought |
+| `AI Characters`     | Agent characters and their showcase pages | AgentAvatar, AgentGlyph, AgentLookBuilder |
 | `Brand`             | Brand marks                            | Logo, WallyIcon                  |
 | `Data Display`      | Displaying data                        | Table, Card, Avatar, CodeSnippet |
 | `Inputs`            | Form controls and filters              | Input, Select, FilterInput       |

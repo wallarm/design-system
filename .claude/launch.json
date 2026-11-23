@@ -4,8 +4,22 @@
     {
       "name": "storybook",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter=@wallarm-org/design-system", "storybook"],
+      "runtimeArgs": [
+        "--filter=@wallarm-org/design-system",
+        "storybook"
+      ],
       "port": 6006
+    },
+    {
+      "name": "website",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter=@wallarm-org/website",
+        "dev",
+        "--port",
+        "3210"
+      ],
+      "port": 3210
     }
   ]
 }

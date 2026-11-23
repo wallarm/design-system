@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const agentAvatarStory = createStoryHelper('ai-agentavatar', [
+const agentAvatarStory = createStoryHelper('ai-characters-agentavatar', [
   'Basic',
   'Cast',
   'States',

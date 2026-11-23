@@ -13,8 +13,10 @@ import {
   renderGuidelinePage,
   renderGuidelinesMeta,
   renderSectionIndex,
+  renderShowcasePage,
   renderTemplatesIndex,
   renderTokensPage,
+  SHOWCASE_PAGES,
 } from './render';
 
 const app = path.resolve(import.meta.dirname, '..');
@@ -122,6 +124,12 @@ writeFileSync(
   renderGuidelinesMeta(foundations, { before: [OVERVIEW, 'tokens'], after: ['icons'] }),
 );
 copyFileSync(metadataPath, path.join(docs, 'public/components.json'));
+// The agents' showcase pages are standalone HTML kept with Storybook's assets; the site shows the same files.
+for (const page of SHOWCASE_PAGES) {
+  writeFileSync(path.join(outDir, `${page.slug}.mdx`), renderShowcasePage(page));
+  mkdirSync(path.dirname(path.join(docs, 'public', page.file)), { recursive: true });
+  copyFileSync(path.join(ds, '.storybook/assets', page.file), path.join(docs, 'public', page.file));
+}
 // Story source by story name, one file per guideline, fetched by the preview dialog's "Copy code".
 const storyCode = path.join(docs, 'public/story-code');
 rmSync(storyCode, { recursive: true, force: true });
