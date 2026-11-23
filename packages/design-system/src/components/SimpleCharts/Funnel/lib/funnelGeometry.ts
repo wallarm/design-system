@@ -1,9 +1,11 @@
+import { funnelFillClasses, funnelGrayFillClasses } from '../classes';
 import {
   FUNNEL_BAND_HEIGHT,
   FUNNEL_MAX_BODY,
   FUNNEL_MIN_BODY,
   FUNNEL_RAMP,
   type FunnelColor,
+  type FunnelShade,
   type FunnelStart,
 } from '../constants';
 
@@ -29,23 +31,20 @@ export const funnelSegmentPath = (from: number, to: number, grow: number): strin
   return `M0 ${t0}C0.45 ${t0} 0.55 ${t1} 1 ${t1}V${b1}C0.55 ${b1} 0.45 ${b0} 0 ${b0}Z`;
 };
 
-/** Light/dark fill per step. Dark mode mirrors the step (`1000 − step`). */
+/** Fill classes per step (light + dark). Dark mode mirrors the shade (`1000 − shade`). */
 export const funnelStepFills = (
   count: number,
   color: FunnelColor,
   start: FunnelStart,
-): { light: string; dark: string }[] => {
-  const hue = color === 'brand' ? 'w-orange' : color;
-  const ramp: readonly number[] =
+): string[] => {
+  const ramp: readonly FunnelShade[] =
     count <= 1
       ? [600]
       : count > 6
-        ? [...FUNNEL_RAMP[6], ...Array.from({ length: count - 6 }, () => 700)]
+        ? [...FUNNEL_RAMP[6], ...Array.from({ length: count - 6 }, () => 700 as const)]
         : FUNNEL_RAMP[count as 2 | 3 | 4 | 5 | 6];
-  return ramp.map((step, i) => {
-    const gray = start === 'gray' && i === 0;
-    const h = gray ? 'slate' : hue;
-    const s = gray ? 300 : start === 'gray' ? 600 : step;
-    return { light: `var(--color-${h}-${s})`, dark: `var(--color-${h}-${1000 - s})` };
+  return ramp.map((shade, i) => {
+    if (start === 'tint') return funnelFillClasses[color][shade];
+    return i === 0 ? funnelGrayFillClasses : funnelFillClasses[color][600];
   });
 };

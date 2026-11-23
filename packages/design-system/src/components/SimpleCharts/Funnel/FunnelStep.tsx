@@ -19,7 +19,8 @@ const funnelStepCellVariants = cva(
     variants: {
       interactive: {
         true: [
-          'enabled:cursor-pointer outline-none',
+          // outline-hidden (not outline-none): forced-colors mode turns it into a visible focus outline.
+          'enabled:cursor-pointer focus-visible:outline-hidden focus-visible:-outline-offset-4',
           'before:absolute before:inset-x-6 before:inset-y-2 before:rounded-10',
           'enabled:hover:before:bg-states-primary-hover',
           'focus-visible:before:bg-states-primary-hover',
@@ -59,6 +60,15 @@ export const FunnelStep: FC<FunnelStepProps> = ({
   onClick,
   className,
   'data-testid': testIdProp,
+  // Button-only attributes: kept on the button, dropped from the non-interactive div.
+  disabled,
+  form,
+  formAction,
+  formEncType,
+  formMethod,
+  formNoValidate,
+  formTarget,
+  type: _type,
   ...rest
 }) => {
   const testId = useTestId('step', testIdProp);
@@ -69,8 +79,12 @@ export const FunnelStep: FC<FunnelStepProps> = ({
     <TestIdProvider value={testId}>
       <span className='relative text-xs text-text-secondary truncate'>{name}</span>
       <span className='relative flex items-center gap-4 min-w-0'>
-        <span className='font-sans-display text-xl leading-xl font-medium tracking-[-0.1px] text-text-primary truncate'>
-          <FormatNumber value={shown} typography='inherit' />
+        <span
+          data-testid={testId ? `${testId}--value` : undefined}
+          className='font-sans-display text-xl leading-xl font-medium tracking-[-0.1px] text-text-primary truncate'
+        >
+          {/* No hint on abbreviated values (1.2K): the full number stays in aria-label only. */}
+          <FormatNumber value={shown} typography='inherit' tooltip={false} />
         </span>
         {delta}
       </span>
@@ -95,6 +109,13 @@ export const FunnelStep: FC<FunnelStepProps> = ({
       {interactive ? (
         <button
           {...rest}
+          disabled={disabled}
+          form={form}
+          formAction={formAction}
+          formEncType={formEncType}
+          formMethod={formMethod}
+          formNoValidate={formNoValidate}
+          formTarget={formTarget}
           ref={ref as Ref<HTMLButtonElement>}
           type='button'
           onClick={onClick}
@@ -106,7 +127,6 @@ export const FunnelStep: FC<FunnelStepProps> = ({
         </button>
       ) : (
         <div
-          // Button-only attributes (type, disabled, form…) are meaningless on a div; widen for the spread.
           {...(rest as HTMLAttributes<HTMLElement>)}
           ref={ref as Ref<HTMLDivElement>}
           data-slot='funnel-step-cell'

@@ -40,34 +40,32 @@ describe('funnelSegmentPath', () => {
 });
 
 describe('funnelStepFills', () => {
-  it('ramps 3 blue steps 400 → 600 and flips them in dark', () => {
+  it('tint ramps light to dark; dark theme mirrors the shade', () => {
     expect(funnelStepFills(3, 'blue', 'tint')).toEqual([
-      { light: 'var(--color-blue-400)', dark: 'var(--color-blue-600)' },
-      { light: 'var(--color-blue-500)', dark: 'var(--color-blue-500)' },
-      { light: 'var(--color-blue-600)', dark: 'var(--color-blue-400)' },
+      'fill-blue-400 in-data-[theme=dark]:fill-blue-600',
+      'fill-blue-500 in-data-[theme=dark]:fill-blue-500',
+      'fill-blue-600 in-data-[theme=dark]:fill-blue-400',
     ]);
   });
-  it('starts gray: slate-300 then hue-600', () => {
+  it('gray start: slate/300 first, the rest on {hue}-600', () => {
     expect(funnelStepFills(3, 'red', 'gray')).toEqual([
-      { light: 'var(--color-slate-300)', dark: 'var(--color-slate-700)' },
-      { light: 'var(--color-red-600)', dark: 'var(--color-red-400)' },
-      { light: 'var(--color-red-600)', dark: 'var(--color-red-400)' },
+      'fill-slate-300 in-data-[theme=dark]:fill-slate-700',
+      'fill-red-600 in-data-[theme=dark]:fill-red-400',
+      'fill-red-600 in-data-[theme=dark]:fill-red-400',
     ]);
   });
-  it('maps brand to w-orange and ramps 6 steps from 200', () => {
-    expect(funnelStepFills(6, 'brand', 'tint')[0]).toEqual({
-      light: 'var(--color-w-orange-200)',
-      dark: 'var(--color-w-orange-800)',
-    });
+  it('brand maps to w-orange; 6 steps reach 200', () => {
+    expect(funnelStepFills(6, 'brand', 'tint')[0]).toBe(
+      'fill-w-orange-200 in-data-[theme=dark]:fill-w-orange-800',
+    );
   });
-  it('clamps counts outside 2–6 to the nearest ramp', () => {
+  it('out of range: 1 step is 600, extra steps stay on 700', () => {
     expect(funnelStepFills(1, 'blue', 'tint')).toEqual([
-      { light: 'var(--color-blue-600)', dark: 'var(--color-blue-400)' },
+      'fill-blue-600 in-data-[theme=dark]:fill-blue-400',
     ]);
-    expect(funnelStepFills(8, 'blue', 'tint').at(-1)).toEqual({
-      light: 'var(--color-blue-700)',
-      dark: 'var(--color-blue-300)',
-    });
+    expect(funnelStepFills(8, 'blue', 'tint').at(-1)).toBe(
+      'fill-blue-700 in-data-[theme=dark]:fill-blue-300',
+    );
   });
 });
 

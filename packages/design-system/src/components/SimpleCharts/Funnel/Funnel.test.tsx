@@ -205,29 +205,18 @@ describe('Funnel — ribbon', () => {
     }
   });
 
-  it('carries the dark-theme fill class on every column svg', () => {
+  it('fills each column from the ramp with a literal light + dark class', () => {
     render(
-      <Funnel data-testid='fp'>
-        <FunnelStep name='A' value={2} />
-        <FunnelStep name='B' value={1} />
-      </Funnel>,
-    );
-    for (const svg of screen.getByTestId('fp--ribbon').querySelectorAll('svg')) {
-      expect(svg).toHaveClass('in-data-[theme=dark]:[--funnel-fill:var(--funnel-dark)]');
-    }
-  });
-
-  it('sets --funnel-light/--funnel-dark from the ramp', () => {
-    render(
-      <Funnel data-testid='fp' color='blue'>
+      <Funnel data-testid='fp' color='teal'>
         <FunnelStep name='A' value={3} />
         <FunnelStep name='B' value={2} />
         <FunnelStep name='C' value={1} />
       </Funnel>,
     );
-    const svg = screen.getByTestId('fp--ribbon').querySelector('svg');
-    expect(svg?.style.getPropertyValue('--funnel-light')).toBe('var(--color-blue-400)');
-    expect(svg?.style.getPropertyValue('--funnel-dark')).toBe('var(--color-blue-600)');
+    const fills = screen.getByTestId('fp--ribbon').querySelectorAll('g');
+    expect(fills).toHaveLength(3);
+    expect(fills[0]).toHaveClass('fill-teal-400', 'in-data-[theme=dark]:fill-teal-600');
+    expect(fills[2]).toHaveClass('fill-teal-600', 'in-data-[theme=dark]:fill-teal-400');
   });
 });
 
@@ -290,6 +279,48 @@ describe('Funnel — dev warnings', () => {
     expect(screen.queryByText('stray')).toBeNull();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     warn.mockRestore();
+  });
+});
+
+describe('Funnel bug fixes', () => {
+  it('drops button-only attributes on a non-interactive step', () => {
+    render(
+      <Funnel>
+        <FunnelStep name='A' value={10} data-testid='a' disabled type='submit' />
+        <FunnelStep name='B' value={5} />
+      </Funnel>,
+    );
+    const cell = screen.getByTestId('a');
+    expect(cell.tagName).toBe('DIV');
+    expect(cell).not.toHaveAttribute('disabled');
+    expect(cell).not.toHaveAttribute('type');
+  });
+
+  it('shows abbreviated values without a tooltip and with a stable value test id', () => {
+    render(
+      <Funnel data-testid='f'>
+        <FunnelStep name='A' value={1234567} />
+        <FunnelStep name='B' value={5} />
+      </Funnel>,
+    );
+    const [value] = screen.getAllByTestId('f--step--value');
+    expect(value).toHaveTextContent('1.2M');
+    expect(value?.querySelector('[aria-label="1,234,567"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid$="--trigger"]')).toBeNull();
+  });
+
+  it('sizes the scroll track by step count so narrow cards scroll', () => {
+    render(
+      <Funnel data-testid='f'>
+        <FunnelStep name='A' value={3} />
+        <FunnelStep name='B' value={2} />
+        <FunnelStep name='C' value={1} />
+      </Funnel>,
+    );
+    const root = screen.getByTestId('f');
+    expect(root).toHaveClass('overflow-x-auto');
+    const track = root.firstElementChild as HTMLElement;
+    expect(track.style.getPropertyValue('--funnel-steps')).toBe('3');
   });
 });
 

@@ -12,14 +12,14 @@ Compound, composed from children — no `data` array. `Funnel` reads `value` fro
   - `color` (optional, `FunnelColor` = `ChartColor` minus `'slate'`, default `'blue'`) — hue of the ramp. `'brand'` maps to the `w-orange` palette, as in `CHART_PALETTE_FILL`. Hues are not semantic (red is a hue, not "danger").
   - `start` (optional, `'tint' | 'gray'`, default `'tint'`) — `'tint'` ramps light → dark across the steps; `'gray'` makes step 1 `slate-300` and every other step `{hue}-600`.
   - `children` — `FunnelStep` elements, direct children, rendered left to right in order. 2–6 steps expected.
-  - `data-testid` — base id; wraps children in `TestIdProvider`. Ribbon: `{base}--ribbon`.
+  - `data-testid` — base id; wraps children in `TestIdProvider`. Ribbon: `{base}--ribbon`. The root is the horizontal scroll container (see Edge cases).
 - `FunnelStep`
   - `name` (required, `ReactNode`) — one line, ellipsis.
-  - `value` (required, `number`, ≥ 0) — rendered with `FormatNumber` (typography inherited), shows what fits then ellipsis.
+  - `value` (required, `number`, ≥ 0) — rendered with `FormatNumber` (typography inherited, `tooltip={false}`): large values are abbreviated (`1.2K`) with no hover hint; the full number is only in the `aria-label`. Shows what fits then ellipsis. Test id `{step}--value`.
   - `caption` (optional, `ReactNode`) — up to 2 lines, then ellipsis.
   - `delta` (optional, `ReactNode`) — slot for `<MetricDelta … />`, placed right after the value. No second delta implementation.
   - `onClick` (optional) — makes the step a real `<button type='button'>`.
-  - Everything else (`data-*`, `aria-*`, `ref`, event handlers, `className`) is spread onto the step's real node. `data-testid` → `{base}--step`; a `data-testid` on the step wins; `MetricDelta` resolves to `{step}--delta`.
+  - Everything else (`data-*`, `aria-*`, `ref`, event handlers, `className`) is spread onto the step's real node. Button-only attributes (`disabled`, `type`, `form*`) are dropped on the non-interactive `div`. `data-testid` → `{base}--step`; a `data-testid` on the step wins; `MetricDelta` resolves to `{step}--delta`.
 - `FunnelSkeleton` — `steps` (default `3`) empty columns. See Loading.
 
 Ramp (palette steps, light → dark, in `constants.ts`):
@@ -32,7 +32,7 @@ Ramp (palette steps, light → dark, in `constants.ts`):
 | 5 | 300 · 400 · 500 · 600 · 700 |
 | 6 | 200 · 300 · 400 · 500 · 600 · 700 |
 
-Fills are palette primitives (`var(--color-{hue}-{step})`) — no new tokens. This intentionally differs from `CHART_PALETTE_FILL` (everything on 500): the funnel is a ramp. 200/300 are faint on white (1.2–1.9:1), so the labels carry the order, not the colour.
+Fills are palette primitives — no new tokens. They are written out as literal `fill-{hue}-{step}` classes in `classes.ts` (`funnelFillClasses`): Tailwind emits only the palette variables it sees used as utilities, so a `var(--color-teal-600)` built at runtime resolved to nothing and the band painted black. This intentionally differs from `CHART_PALETTE_FILL` (everything on 500): the funnel is a ramp. 200/300 are faint on white (1.2–1.9:1), so the labels carry the order, not the colour.
 
 ## States
 
@@ -40,7 +40,7 @@ Fills are palette primitives (`var(--color-{hue}-{step})`) — no new tokens. Th
 | --- | --- | --- |
 | Default | ≥ 1 `FunnelStep` | Title cells over the ribbon; steps without `onClick` have no affordance. |
 | Hover | pointer on a step with `onClick` | Tint behind the title cell (`bg-states-primary-hover`, radius 10, inset 6px sides / 2px top and bottom), pointer cursor. The ribbon is not interactive. |
-| Focus | keyboard focus on a step button | Same tint plus an inset `ring-focus-primary` ring. |
+| Focus | keyboard focus on a step button | Same tint plus an inset `ring-focus-primary` ring. In forced-colors mode (Windows High Contrast) the ring is not painted, so `focus-visible:outline-hidden` shows a system outline instead. |
 | Dark | a `[data-theme='dark']` ancestor | Every step flips to `1000 − step` (600 → 400, 700 → 300, 200 → 800, `slate-300` → `slate-700`). |
 | Loading | consumer renders `<FunnelSkeleton steps={n} />` instead of `Funnel` | Empty 288px frame with only the `n − 1` step dividers; `aria-busy='true'`, `aria-live='polite'`. No shimmer. |
 | Empty | consumer renders `<ChartEmpty />` instead of `Funnel` | "No data", like the rest of the family. `Funnel` with no `FunnelStep` children renders `null`. |
@@ -63,12 +63,12 @@ There is no selected / filtered state: the funnel has no selection model.
 - **Body thickness** = `max(4, value / max(values) × 140)`, centred in a 172px band. The 4px floor keeps a tiny step visible (1000 → 100 → 1 still shows the last step).
 - **A later step may be bigger** than the earlier one; the ribbon widens into it with the same curve. There is no "must be non-increasing" rule.
 - **Curve.** One cubic Bézier per column edge with flat tangents (control points at 45% / 55% of the column); the last column is flat. Each column is one solid colour with a hard seam at the divider; two halos (6px at 32% and 12px at 16% opacity, same colour) sit under the body. Dividers are drawn **over** the ribbon.
-- **No horizontal scroll.** The product sizes the card: 3 steps fit 465px, 5–6 steps need a wider card. Columns are equal (`flex-1`) with `min-width: 120px`, so the root is never narrower than 240px.
+- **Width and scroll.** Columns are equal (`flex-1`) with `min-width: 120px`. The root is a horizontal scroll container (`overflow-x-auto`); an inner track is `max(240px, steps × 120px)` wide and carries the ribbon, so a card too narrow for every step scrolls instead of silently clipping the last steps (the `Chart` card clips overflow). Size the card so it does not scroll: 3 steps fit 465px, 4–6 steps need a wider card.
 - **Long content.** Long name and long value → ellipsis (one line); long caption → 2-line clamp.
 - **The step `ol` needs `min-w-0`.** Without it flex `min-width: auto` made the list (and the columns) grow to the long names' `nowrap` width and overflow, so columns were no longer equal. Found and fixed during implementation; keep it when touching `Funnel.tsx`.
 - **Warnings fire once per message per page session** (module-level set), and never in production builds. The count warning includes the count, so `1` and `7` are separate messages.
-- **Dark theme is CSS, not JS.** Each ribbon column defines `--funnel-light` / `--funnel-dark` and switches under `in-data-[theme=dark]`, which matches any dark ancestor: a dark scope nested in a light page works; a light scope nested inside a dark one is not supported (no light reset).
-- **No horizontal padding on `Funnel`.** The ribbon is positioned against the root's padding box while the step list sits in the content box, so do not add horizontal padding via `className` — pad the card/wrapper instead.
+- **Dark theme is CSS, not JS.** Each ribbon column's `<g>` carries its light fill class plus an `in-data-[theme=dark]:fill-{hue}-{1000−step}` pair (on the `<g>`, not the `<svg>` — the unlayered `svg:not([fill])` reset would win there). The dark variant matches any dark ancestor: a dark scope nested in a light page works; a light scope nested inside a dark one is not supported (no light reset).
+- **RTL.** Under `dir='rtl'` the columns run right to left and each ribbon segment is mirrored (`rtl:-scale-x-100`) so the ribbon stays joined.
 - **Clean DOM.** No `data-testid` on `Funnel` → no derived test ids anywhere.
 
 ## Accessibility notes

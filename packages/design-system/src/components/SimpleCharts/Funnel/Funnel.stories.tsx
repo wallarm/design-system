@@ -148,12 +148,13 @@ export const GrayStart: StoryFn<typeof meta> = args => (
 );
 
 /**
- * From two to six steps. Give the card enough width that each column stays around 120px.
+ * From two to six steps. Give the card enough width that each column stays around 120px; a
+ * narrower card scrolls horizontally instead of hiding steps.
  */
 export const StepsByCount: StoryFn<typeof meta> = args => (
   <div className='flex flex-col gap-16'>
     {[2, 3, 4, 5, 6].map(n => (
-      <Card key={n} title={`${n} steps`} wide={n > 4}>
+      <Card key={n} title={`${n} steps`} wide={n > 3}>
         <Funnel {...args} data-testid={`funnel-${n}`}>
           {steps(sixSteps.slice(0, n))}
         </Funnel>

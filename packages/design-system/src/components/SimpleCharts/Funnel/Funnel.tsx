@@ -73,57 +73,64 @@ export const Funnel: FC<FunnelProps> = ({
   const fills = funnelStepFills(count, color, start);
 
   return (
+    // Scroll root: columns keep min-w-120, so a card too narrow for every step scrolls instead of
+    // clipping the last steps. The track below carries the width so the ribbon spans all columns.
     <div
       {...props}
       ref={ref}
       data-slot='funnel'
       data-testid={testId}
-      className={cn('relative flex h-288 min-w-240', className)}
+      className={cn('overflow-x-auto overflow-y-hidden', className)}
     >
       <div
-        aria-hidden
-        data-slot='funnel-ribbon'
-        data-testid={testId ? `${testId}--ribbon` : undefined}
-        className='absolute inset-x-0 top-100 flex h-172 pointer-events-none'
+        className='relative flex h-288 min-w-[max(240px,calc(var(--funnel-steps)*120px))]'
+        style={{ '--funnel-steps': count } as CSSProperties}
       >
-        {fills.map((fill, i) => {
-          const from = thicknesses[i] ?? FUNNEL_MIN_BODY;
-          const to = thicknesses[i + 1] ?? from;
-          return (
-            <svg
-              // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
-              key={i}
-              viewBox={`0 0 1 ${FUNNEL_BAND_HEIGHT}`}
-              preserveAspectRatio='none'
-              className={cn(
-                funnelColumnClasses,
-                'h-full',
-                '[--funnel-fill:var(--funnel-light)] in-data-[theme=dark]:[--funnel-fill:var(--funnel-dark)]',
-              )}
-              style={{ '--funnel-light': fill.light, '--funnel-dark': fill.dark } as CSSProperties}
-            >
-              {FUNNEL_HALOS.map(grow => (
-                <path
-                  key={grow}
-                  d={funnelSegmentPath(from, to, grow)}
-                  fill='var(--funnel-fill)'
-                  fillOpacity={FUNNEL_HALO_OPACITY[grow]}
-                />
-              ))}
-              <path d={funnelSegmentPath(from, to, 0)} fill='var(--funnel-fill)' fillOpacity={1} />
-            </svg>
-          );
-        })}
+        <div
+          aria-hidden
+          data-slot='funnel-ribbon'
+          data-testid={testId ? `${testId}--ribbon` : undefined}
+          className='absolute inset-x-0 top-100 flex h-172 pointer-events-none'
+        >
+          {fills.map((fill, i) => {
+            const from = thicknesses[i] ?? FUNNEL_MIN_BODY;
+            const to = thicknesses[i + 1] ?? from;
+            return (
+              <svg
+                // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
+                key={i}
+                viewBox={`0 0 1 ${FUNNEL_BAND_HEIGHT}`}
+                preserveAspectRatio='none'
+                className={cn(
+                  funnelColumnClasses,
+                  // In RTL the columns run right to left; mirror each segment so the ribbon stays joined.
+                  'h-full rtl:-scale-x-100',
+                )}
+              >
+                <g data-slot='funnel-ribbon-fill' className={fill}>
+                  {FUNNEL_HALOS.map(grow => (
+                    <path
+                      key={grow}
+                      d={funnelSegmentPath(from, to, grow)}
+                      fillOpacity={FUNNEL_HALO_OPACITY[grow]}
+                    />
+                  ))}
+                  <path d={funnelSegmentPath(from, to, 0)} />
+                </g>
+              </svg>
+            );
+          })}
+        </div>
+        {/* After the ribbon in the DOM so the step dividers paint over it. */}
+        {/* min-w-0: without it the list grows to its long names' nowrap width and overflows. */}
+        <ol
+          // biome-ignore lint/a11y/noRedundantRoles: Safari/VoiceOver drops list semantics from lists styled with `list-style: none` (Tailwind preflight); role='list' restores it
+          role='list'
+          className='relative flex flex-1 min-w-0'
+        >
+          <TestIdProvider value={testId}>{steps}</TestIdProvider>
+        </ol>
       </div>
-      {/* After the ribbon in the DOM so the step dividers paint over it. */}
-      {/* min-w-0: without it the list grows to its long names' nowrap width and overflows. */}
-      <ol
-        // biome-ignore lint/a11y/noRedundantRoles: Safari/VoiceOver drops list semantics from lists styled with `list-style: none` (Tailwind preflight); role='list' restores it
-        role='list'
-        className='relative flex flex-1 min-w-0'
-      >
-        <TestIdProvider value={testId}>{steps}</TestIdProvider>
-      </ol>
     </div>
   );
 };
