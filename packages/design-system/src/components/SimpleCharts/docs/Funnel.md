@@ -1,0 +1,91 @@
+# Funnel
+
+## Overview
+
+`Funnel` is a horizontal step funnel: how a count narrows from stage to stage, left to right. Each stage is a `FunnelStep` title cell (name, count, optional delta, optional caption) above one smooth ribbon scaled to the largest step. It renders the body only — the card frame and title are composed with the shared `Chart` / `ChartHeader` / `ChartTitle`, like every family member. Use it for consecutive stages of one flow (detected → reviewed → confirmed); when the rows are independent categories use `BarList`; when one total splits into parts use `HorizontalBarStack`.
+
+## Data model
+
+Compound, composed from children — no `data` array. `Funnel` reads `value` from its **direct** `FunnelStep` children during render and draws the ribbon from them.
+
+- `Funnel`
+  - `color` (optional, `FunnelColor` = `ChartColor` minus `'slate'`, default `'blue'`) — hue of the ramp. `'brand'` maps to the `w-orange` palette, as in `CHART_PALETTE_FILL`. Hues are not semantic (red is a hue, not "danger").
+  - `start` (optional, `'tint' | 'gray'`, default `'tint'`) — `'tint'` ramps light → dark across the steps; `'gray'` makes step 1 `slate-300` and every other step `{hue}-600`.
+  - `children` — `FunnelStep` elements, direct children, rendered left to right in order. 2–6 steps expected.
+  - `data-testid` — base id; wraps children in `TestIdProvider`. Ribbon: `{base}--ribbon`.
+- `FunnelStep`
+  - `name` (required, `ReactNode`) — one line, ellipsis.
+  - `value` (required, `number`, ≥ 0) — rendered with `FormatNumber` (typography inherited), shows what fits then ellipsis.
+  - `caption` (optional, `ReactNode`) — up to 2 lines, then ellipsis.
+  - `delta` (optional, `ReactNode`) — slot for `<MetricDelta … />`, placed right after the value. No second delta implementation.
+  - `onClick` (optional) — makes the step a real `<button type='button'>`.
+  - Everything else (`data-*`, `aria-*`, `ref`, event handlers, `className`) is spread onto the step's real node. `data-testid` → `{base}--step`; a `data-testid` on the step wins; `MetricDelta` resolves to `{step}--delta`.
+- `FunnelSkeleton` — `steps` (default `3`) empty columns. See Loading.
+
+Ramp (palette steps, light → dark, in `constants.ts`):
+
+| steps | palette steps |
+| --- | --- |
+| 2 | 500 · 600 |
+| 3 | 400 · 500 · 600 |
+| 4 | 400 · 500 · 600 · 700 |
+| 5 | 300 · 400 · 500 · 600 · 700 |
+| 6 | 200 · 300 · 400 · 500 · 600 · 700 |
+
+Fills are palette primitives (`var(--color-{hue}-{step})`) — no new tokens. This intentionally differs from `CHART_PALETTE_FILL` (everything on 500): the funnel is a ramp. 200/300 are faint on white (1.2–1.9:1), so the labels carry the order, not the colour.
+
+## States
+
+| State | Trigger | Behaviour |
+| --- | --- | --- |
+| Default | ≥ 1 `FunnelStep` | Title cells over the ribbon; steps without `onClick` have no affordance. |
+| Hover | pointer on a step with `onClick` | Tint behind the title cell (`bg-states-primary-hover`, radius 10, inset 6px sides / 2px top and bottom), pointer cursor. The ribbon is not interactive. |
+| Focus | keyboard focus on a step button | Same tint plus an inset `ring-focus-primary` ring. |
+| Dark | a `[data-theme='dark']` ancestor | Every step flips to `1000 − step` (600 → 400, 700 → 300, 200 → 800, `slate-300` → `slate-700`). |
+| Loading | consumer renders `<FunnelSkeleton steps={n} />` instead of `Funnel` | Empty 288px frame with only the `n − 1` step dividers; `aria-busy='true'`, `aria-live='polite'`. No shimmer. |
+| Empty | consumer renders `<ChartEmpty />` instead of `Funnel` | "No data", like the rest of the family. `Funnel` with no `FunnelStep` children renders `null`. |
+| Error | — | None, as in the family. |
+
+There is no selected / filtered state: the funnel has no selection model.
+
+## Interactions
+
+- **Click** — only on steps with `onClick`. The step is a native button: Enter and Space run `onClick`, it sits in tab order. The ribbon, halos and non-interactive steps do nothing.
+- **No hover-sync, no tooltips on the ribbon, no filtering.** The caller owns what a click means (open a drill-down, set a filter elsewhere).
+- Consumer analytics attributes (`data-analytics-*`, `aria-*`), `ref` and event props land on the step's real node — the button when `onClick` is set, a `div` otherwise (not focusable) — per `docs/metrics/contract.md`. There is deliberately no `stepProps` escape hatch.
+
+## Edge cases & unclear states
+
+- **Steps must be direct children.** Arrays and `.map` are fine (`Children.toArray` flattens them). A fragment, a wrapper component or text is ignored for geometry and rendering, with a dev warning. Reason: `Funnel` computes the ribbon in the same render pass from the children's props (no registration effect → no second render, no flicker, SSR HTML includes the ribbon, React Compiler-safe).
+- **Step count.** 1 step or more than 6 renders anyway with a dev warning. 1 step → shade 600. More than 6 → the 6-step ramp, then 700 repeated for the extras.
+- **Negative / non-finite `value`** → treated as `0` for the band and the label, dev warning.
+- **`0`** → drawn as a 4px line; the label says `0`. **All zeros** → every step at 4px, no NaN.
+- **Body thickness** = `max(4, value / max(values) × 140)`, centred in a 172px band. The 4px floor keeps a tiny step visible (1000 → 100 → 1 still shows the last step).
+- **A later step may be bigger** than the earlier one; the ribbon widens into it with the same curve. There is no "must be non-increasing" rule.
+- **Curve.** One cubic Bézier per column edge with flat tangents (control points at 45% / 55% of the column); the last column is flat. Each column is one solid colour with a hard seam at the divider; two halos (6px at 32% and 12px at 16% opacity, same colour) sit under the body. Dividers are drawn **over** the ribbon.
+- **No horizontal scroll.** The product sizes the card: 3 steps fit 465px, 5–6 steps need a wider card. Columns are equal (`flex-1`) with `min-width: 120px`, so the root is never narrower than 240px.
+- **Long content.** Long name and long value → ellipsis (one line); long caption → 2-line clamp.
+- **The step `ol` needs `min-w-0`.** Without it flex `min-width: auto` made the list (and the columns) grow to the long names' `nowrap` width and overflow, so columns were no longer equal. Found and fixed during implementation; keep it when touching `Funnel.tsx`.
+- **Warnings fire once per message per page session** (module-level set), and never in production builds. The count warning includes the count, so `1` and `7` are separate messages.
+- **Dark theme is CSS, not JS.** Each ribbon column defines `--funnel-light` / `--funnel-dark` and switches under `in-data-[theme=dark]`.
+- **Clean DOM.** No `data-testid` on `Funnel` → no derived test ids anywhere.
+
+## Accessibility notes
+
+- Ribbon SVGs are `aria-hidden`; the title cells are the readable content.
+- Steps are an ordered list (`<ol>` / `<li>`); the button (or `div`) lives inside the `<li>`, so screen readers announce position in the list.
+- Clickable steps are native buttons (Enter / Space, tab order, `focus-visible` ring). Non-clickable steps are not focusable.
+- `MetricDelta` (`ChartDelta`) already carries `role='img'` + `aria-label` (e.g. "up 10").
+- `FunnelSkeleton` announces `aria-busy` / `aria-live='polite'`.
+- Colour is not the only carrier of order: the ramp shades are subtle, the step labels carry the sequence.
+
+## Open questions / known limitations
+
+- **Code Connect.** Code Connect for `funnel-section-title` waits for design to rename its variants `Type=Default / Type2` → `State=Default / Hover`. There is no `FunnelStep.figma.ts` until then.
+- **Dark theme via CSS, not `useTheme`.** The ticket suggested `useTheme()`. The dark shade is selected with a `[data-theme='dark']` ancestor instead, because `useTheme` throws outside a `ThemeProvider`, and the CSS selector also follows nested `data-theme` scopes and SSR. Same rule (`1000 − step`), same zero-token outcome.
+- **Code vs spec differences** (code is documented above):
+  - Root `Funnel` also carries `min-w-240` (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
+  - `FunnelStep`'s `ref` is typed `Ref<HTMLElement>` (spec: `Ref<HTMLButtonElement | HTMLDivElement>`), cast per node.
+  - `FunnelSkeleton` is a plain frame, no `Skeleton` shimmer; it also takes `data-testid` and root HTML props.
+  - Halo opacities are `0.32` (6px) and `0.16` (12px), as specced.
+- No conversion / drop-off % between steps (a caption can carry it); no animation; no vertical layout; no `packages/gen-ui` catalog entry yet.
