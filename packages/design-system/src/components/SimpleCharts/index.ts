@@ -45,6 +45,15 @@ export {
   type ColumnChartXAxisProps,
 } from './ColumnChart';
 export {
+  Funnel,
+  type FunnelProps,
+  FunnelSkeleton,
+  type FunnelSkeletonProps,
+  type FunnelStart,
+  FunnelStep,
+  type FunnelStepProps,
+} from './Funnel';
+export {
   HorizontalBarStack,
   type HorizontalBarStackDatum,
   type HorizontalBarStackProps,

@@ -124,7 +124,7 @@ Docs live next to the code in `docs/`, not in Storybook MDX or README files. Sto
 
 ## Reuse Before Inventing
 
-Before adding a chart, check the sibling folders — `./Chart` (card container, header, empty state), `./BarList`, `./PieChart`, `./LineChart`, `./AreaChart`, `./ColumnChart`, `./HorizontalBarStack`, `./Metric` — and the shared `./lib`, `./internal`, `./hooks`. Reuse their primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
+Before adding a chart, check the sibling folders — `./Chart` (card container, header, empty state), `./BarList`, `./PieChart`, `./LineChart`, `./AreaChart`, `./ColumnChart`, `./HorizontalBarStack`, `./Funnel`, `./Metric` — and the shared `./lib`, `./internal`, `./hooks`. Reuse their primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
 
 ## Design Tokens
 
