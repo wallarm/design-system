@@ -3,8 +3,10 @@ import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../../testUtils/captureAnalyticsClicks';
+import * as Barrel from '../index';
 import { MetricDelta } from '../Metric';
 import { Funnel } from './Funnel';
+import { FunnelSkeleton } from './FunnelSkeleton';
 import { FunnelStep } from './FunnelStep';
 
 describe('Funnel — root', () => {
@@ -235,5 +237,34 @@ describe('Funnel — dev warnings', () => {
     expect(screen.queryByText('stray')).toBeNull();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     warn.mockRestore();
+  });
+});
+
+describe('FunnelSkeleton', () => {
+  it('renders N columns with N−1 dividers and aria-busy', () => {
+    render(<FunnelSkeleton data-testid='sk' steps={4} />);
+    const root = screen.getByTestId('sk');
+    expect(root).toHaveAttribute('data-slot', 'funnel-skeleton');
+    expect(root).toHaveAttribute('aria-busy', 'true');
+    expect(root).toHaveClass('h-288');
+    const cols = root.querySelectorAll('[data-slot="funnel-skeleton-column"]');
+    expect(cols).toHaveLength(4);
+    expect(root.querySelectorAll('.border-l')).toHaveLength(3);
+    expect(root.textContent).toBe('');
+  });
+
+  it('defaults to 3 columns and forwards ref', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<FunnelSkeleton ref={ref} data-testid='sk' />);
+    expect(ref.current).toBe(screen.getByTestId('sk'));
+    expect(ref.current?.children).toHaveLength(3);
+  });
+});
+
+describe('SimpleCharts barrel', () => {
+  it('exports Funnel, FunnelStep, FunnelSkeleton', () => {
+    expect(Barrel.Funnel).toBe(Funnel);
+    expect(Barrel.FunnelStep).toBe(FunnelStep);
+    expect(Barrel.FunnelSkeleton).toBe(FunnelSkeleton);
   });
 });
