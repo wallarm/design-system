@@ -142,3 +142,25 @@ describe('FormatNumber tooltip={false}', () => {
     expect(screen.getByTestId('num')).toHaveTextContent('12.7 MB');
   });
 });
+
+describe('FormatNumber typography', () => {
+  it('renders no <p> and no text-sm with typography="inherit"', () => {
+    render(<FormatNumber value={1200} typography='inherit' data-testid='n' />);
+    const root = screen.getByTestId('n');
+    expect(root.querySelector('p')).toBeNull();
+    expect(root.querySelector('.text-sm')).toBeNull();
+    expect(root).toHaveTextContent('1.2k');
+    expect(root).toHaveAttribute('aria-label', '1,200');
+  });
+
+  it('keeps the dash secondary colour with typography="inherit"', () => {
+    render(<FormatNumber value={null} typography='inherit' data-testid='n' />);
+    expect(screen.getByTestId('n').querySelector('p')).toBeNull();
+    expect(screen.getByTestId('n').querySelector('.text-text-secondary')).not.toBeNull();
+  });
+
+  it('keeps the default output unchanged', () => {
+    render(<FormatNumber value={1200} data-testid='n' />);
+    expect(screen.getByTestId('n').querySelector('p.text-sm')).not.toBeNull();
+  });
+});

@@ -74,7 +74,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
 | ✅ | Data Display/FormatDateTime | 8 | 8 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
-| ✅ | Data Display/FormatNumber | 9 | 9 | `components/FormatNumber/FormatNumber.stories.tsx` |
+| ✅ | Data Display/FormatNumber | 10 | 10 | `components/FormatNumber/FormatNumber.stories.tsx` |
 | ✅ | Data Display/HttpMethod | 4 | 4 | `components/HttpMethod/HttpMethod.stories.tsx` |
 | ✅ | Data Display/Ip | 3 | 3 | `components/Ip/Ip.stories.tsx` |
 | ✅ | Data Display/List | 5 | 5 | `components/List/List.stories.tsx` |
