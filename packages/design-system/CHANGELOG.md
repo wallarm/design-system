@@ -1,3 +1,9 @@
+## [4.21.0](https://github.com/wallarm/design-system/compare/v4.20.1...v4.21.0) (2026-11-24)
+
+### Features
+
+* **funnel:** add Funnel chart to SimpleCharts ([#523](https://github.com/wallarm/design-system/issues/523)) ([9ae39f6](https://github.com/wallarm/design-system/commit/9ae39f6eeb32f98691aca9a5f915b6752767068a))
+
 ## [4.20.1](https://github.com/wallarm/design-system/compare/v4.20.0...v4.20.1) (2026-11-18)
 
 ### Bug Fixes
