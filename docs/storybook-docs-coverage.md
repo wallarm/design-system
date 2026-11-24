@@ -74,7 +74,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
 | ✅ | Data Display/FormatDateTime | 8 | 8 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
-| ✅ | Data Display/FormatNumber | 9 | 9 | `components/FormatNumber/FormatNumber.stories.tsx` |
+| ✅ | Data Display/FormatNumber | 10 | 10 | `components/FormatNumber/FormatNumber.stories.tsx` |
 | ✅ | Data Display/HttpMethod | 4 | 4 | `components/HttpMethod/HttpMethod.stories.tsx` |
 | ✅ | Data Display/Ip | 3 | 3 | `components/Ip/Ip.stories.tsx` |
 | ✅ | Data Display/List | 5 | 5 | `components/List/List.stories.tsx` |
@@ -91,6 +91,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | ☐ | Data Display/SimpleCharts/Vertical Stacked Columns Chart | 6 | 6 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
+| ☐ | Data Display/SimpleCharts/Funnel | 11 | 11 | `components/SimpleCharts/Funnel/Funnel.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Metric | 4 | 4 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
