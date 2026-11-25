@@ -3,6 +3,7 @@ import { AccordionComponent } from './Accordion';
 import { AlertComponent } from './Alert';
 import { AreaChartComponent } from './AreaChart';
 import { BadgeComponent } from './Badge';
+import { BarChartComponent } from './BarChart';
 import { BarListComponent } from './BarList';
 import { ButtonComponent } from './Button';
 import { CardComponent } from './Card';
@@ -48,6 +49,7 @@ export * from './Accordion';
 export * from './Alert';
 export * from './AreaChart';
 export * from './Badge';
+export * from './BarChart';
 export * from './BarList';
 export * from './Button';
 export * from './Card';
@@ -135,6 +137,7 @@ export const wallarmComponents: readonly GenUiComponent[] = [
   LineChartComponent,
   AreaChartComponent,
   ColumnChartComponent,
+  BarChartComponent,
   TableComponent,
   KeyValueListComponent,
   TimelineComponent,

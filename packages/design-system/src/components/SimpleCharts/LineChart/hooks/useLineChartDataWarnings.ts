@@ -14,7 +14,8 @@ const compareX = (a: unknown, b: unknown): number => {
  * rendering a broken plot:
  *
  * - `xKey` missing on datums (Recharts would draw gaps or break ordering)
- * - `data` not sorted ascending by `xKey` (Recharts assumes an ordered domain)
+ * - `data` not sorted ascending by `xKey` (Recharts assumes an ordered domain) —
+ *   skipped with `ordered: false`, for a category axis whose order is the caller's
  * - `series[].key` not present on any datum (line renders empty)
  *
  * Production builds short-circuit before any iteration to avoid the per-render
@@ -24,10 +25,13 @@ export const useLineChartDataWarnings = ({
   data,
   series,
   xKey,
+  ordered = true,
 }: {
   data: LineChartDatum[];
   series: LineChartSeries[];
   xKey: string;
+  /** Check that `data` is sorted ascending by `xKey`. Off for a category axis (`BarChart`). */
+  ordered?: boolean;
 }): void => {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
@@ -47,7 +51,7 @@ export const useLineChartDataWarnings = ({
     }
 
     let unsortedAt: number | null = null;
-    for (let i = 1; i < data.length; i++) {
+    for (let i = 1; ordered && i < data.length; i++) {
       const prev = data[i - 1]?.[xKey];
       const curr = data[i]?.[xKey];
       if (prev === undefined || curr === undefined || prev === null || curr === null) continue;
@@ -81,5 +85,5 @@ export const useLineChartDataWarnings = ({
           'These lines will render empty. Drop the series or check the key spelling.',
       );
     }
-  }, [data, series, xKey]);
+  }, [data, series, xKey, ordered]);
 };
