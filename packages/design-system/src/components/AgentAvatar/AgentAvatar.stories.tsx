@@ -100,6 +100,35 @@ export const Cast: StoryFn = () => (
   </HStack>
 );
 
+/** Beside a name and role (the hover card), `align='drawing'` centres what is drawn, not the box: a short character no longer hangs below the text. Left: the box centred; right: the drawing. */
+export const BesideText: StoryFn = () => (
+  <VStack gap={16}>
+    {CAST.map(p => (
+      <HStack key={p.id} gap={48}>
+        {(['box', 'drawing'] as const).map(align => (
+          <HStack key={align} gap={12} className='w-240'>
+            <AgentAvatar
+              data-testid={`agent-avatar-${p.id}-${align}`}
+              agent={p.id}
+              seed={p.id}
+              size={56}
+              align={align}
+            />
+            <VStack gap={2}>
+              <Text size='sm' weight='medium'>
+                {p.name}
+              </Text>
+              <Text size='xs' color='secondary'>
+                {p.role}
+              </Text>
+            </VStack>
+          </HStack>
+        ))}
+      </HStack>
+    ))}
+  </VStack>
+);
+
 /** Every state frame of the cast. The eyes and a few body cues carry the state; red and crosses never appear. */
 export const States: StoryFn = () => (
   <div className='grid grid-cols-[repeat(10,auto)] items-center gap-x-16 gap-y-8'>
