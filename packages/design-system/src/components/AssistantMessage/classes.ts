@@ -40,10 +40,11 @@ export const assistantMessageMarkdownListVariants = cva('ps-18', {
 /** GFM task item: the Checkmark takes the bullet's place (provisional). */
 export const assistantMessageMarkdownTaskItemVariants = cva('flex list-none items-start gap-8');
 
-/** GFM column alignment. Unaligned columns, headers included, sit at the end (user decision). */
+/** GFM column alignment. An unaligned column, header included, starts at the left; only `---:`
+ *  right-aligns a column (numbers) and `:---:` centres it. */
 export const assistantMessageMarkdownCellVariants = cva('', {
   variants: { align: { left: 'text-left', center: 'text-center', right: 'text-right' } },
-  defaultVariants: { align: 'right' },
+  defaultVariants: { align: 'left' },
 });
 
 /** Long hashes and tokens wrap instead of overflowing the 444px column; muted in the chain of thought

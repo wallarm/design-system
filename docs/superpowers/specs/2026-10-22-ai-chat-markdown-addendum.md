@@ -16,7 +16,7 @@
 2. **Inline code** in answers and approvals is click-to-copy. In the chain of thought and inside links it stays non-interactive (Q1 = proposal).
 3. **Prism:** **WallyAssistant mounts the lazy Prism adapter itself.** The chunk (~25 KB) loads only when the first code block renders. If the app already provides a `CodeSnippetAdapterProvider`, that provider wins and no second one is mounted.
 4. **Images** are blocked by default and render as alt text only. Enable them through the `img` override (Q6 = proposal).
-6. **Tables (user, 2026-10-22):** every cell is right-aligned by default, headers included (`text-right`). An explicit GFM column alignment (`:---` / `:---:`) still wins for that column.
+6. **Tables (design review, 2026-11-24; was right-aligned since 2026-10-22):** an unaligned column is left-aligned, headers included (`text-left`). Only an explicit GFM alignment moves a column: `---:` right (numbers), `:---:` centred.
 5. **Other open questions** use the proposals as specified:
    - Q2: a floating copy button once the fence closes; no header or height cap.
    - Q4: tables use the DS Table frame look; the other elements follow the proposed design and go to design review later.

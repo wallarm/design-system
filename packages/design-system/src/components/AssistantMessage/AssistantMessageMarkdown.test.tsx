@@ -97,11 +97,19 @@ describe('AssistantMessageMarkdown — elements', () => {
     expect(content().querySelector('ol')).toHaveAttribute('start', '3');
   });
 
-  it('right-aligns every cell of an unaligned table, headers included', () => {
+  it('left-aligns every cell of an unaligned table, headers included', () => {
     renderMd('| IP | Hits |\n| --- | --- |\n| 1.2.3.4 | 120 |');
     const cells = content().querySelectorAll('th, td');
     expect(cells).toHaveLength(4);
-    for (const cell of cells) expect(cell).toHaveClass('text-right');
+    for (const cell of cells) expect(cell).toHaveClass('text-left');
+  });
+
+  it('aligns a column only as the Markdown marks it', () => {
+    renderMd('| IP | Hits | Tag |\n| --- | ---: | :---: |\n| 1.2.3.4 | 120 | a |');
+    const [ip, hits, tag] = content().querySelectorAll('tbody td');
+    expect(ip).toHaveClass('text-left');
+    expect(hits).toHaveClass('text-right');
+    expect(tag).toHaveClass('text-center');
   });
 
   it('renders the blocks without a wrapper element', () => {
