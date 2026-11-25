@@ -3,7 +3,6 @@ import {
   BarChart,
   BarChartBody,
   BarChartEmpty,
-  BarChartGrid,
   BarChartStack,
   BarChartTooltip,
   type BarChartTooltipRenderArgs,
@@ -28,25 +27,25 @@ import { CHART_COLORS } from './BarList';
 // The category label, under a key no series can take.
 const CATEGORY_KEY = '__category';
 
-// The label gutter follows the longest label: about 6px a character at the axis' 10px font,
-// plus the 8px gap to the axis. Past 200px the label is cut and the popover shows it in full.
-const LABEL_CHAR_WIDTH = 6;
-const LABEL_GAP = 8;
-const MIN_LABEL_WIDTH = 64;
-const MAX_LABEL_WIDTH = 200;
+// The label column follows the longest label: 7.2px a character at the row's 12px mono font,
+// plus the 12px gap to the bar. Past 240px the label is cut and the popover shows it in full.
+const LABEL_CHAR_WIDTH = 7.2;
+const LABEL_GAP = 12;
+const MIN_LABEL_WIDTH = 96;
+const MAX_LABEL_WIDTH = 240;
 
 const labelWidthFor = (labels: readonly string[]) => {
   const longest = labels.reduce((max, label) => Math.max(max, label.length), 0);
   return Math.min(
     MAX_LABEL_WIDTH,
-    Math.max(MIN_LABEL_WIDTH, longest * LABEL_CHAR_WIDTH + LABEL_GAP),
+    Math.max(MIN_LABEL_WIDTH, Math.ceil(longest * LABEL_CHAR_WIDTH) + LABEL_GAP),
   );
 };
 
 export const BarChartComponent = defineComponent({
   name: 'BarChart',
   description:
-    'Horizontal bars, one per category (attacks per application, requests per host, findings per endpoint), each split into its series stacked from the axis outwards with the first series on the axis; one series gives plain bars. ' +
+    'Horizontal bars, one per category (attacks per application, requests per host, findings per endpoint), each split into its series stacked left to right in series order and ending with the row total; one series gives plain bars. ' +
     'Pick it over ColumnChart when the categories are not time and their labels are long. ' +
     'series lists the stacks; each point is { x: category label, <series key>: number }, listed top to bottom in the order to show (usually largest total first). ' +
     'A missing or null value counts as 0.',
@@ -111,9 +110,11 @@ export const BarChartComponent = defineComponent({
               <BarChartEmpty>No data</BarChartEmpty>
             ) : (
               <BarChartBody>
-                <BarChartGrid />
-                <BarChartXAxis tickFormatter={formatValue} />
-                <BarChartYAxis width={labelWidthFor(points.map(p => p.x))} />
+                <BarChartXAxis hide />
+                <BarChartYAxis
+                  width={labelWidthFor(points.map(p => p.x))}
+                  totalFormatter={formatValue}
+                />
                 <BarChartStack />
                 <BarChartTooltip>{renderTooltip}</BarChartTooltip>
               </BarChartBody>

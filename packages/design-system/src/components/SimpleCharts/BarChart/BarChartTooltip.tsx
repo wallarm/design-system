@@ -1,6 +1,5 @@
 import { type FC, type ReactNode, useContext } from 'react';
 import { Tooltip, type TooltipContentProps } from 'recharts';
-import { LINE_CURSOR_DASHARRAY } from '../LineChart/constants';
 import { LineChartDataContext, type LineChartDatum } from '../LineChart/LineChartContext';
 import { LineChartHoverPopover } from '../LineChart/LineChartHoverPopover';
 import { LineChartHoverPopoverRow } from '../LineChart/LineChartHoverPopoverRow';
@@ -24,20 +23,13 @@ export interface BarChartTooltipProps {
   categoryFormatter?: (value: unknown) => ReactNode;
 }
 
-// Same ruler as `LineChartTooltip`; in the vertical layout it runs through the bar's middle.
-const TOOLTIP_CURSOR = {
-  stroke: 'var(--color-border-strong-primary)',
-  strokeWidth: 1,
-  strokeDasharray: LINE_CURSOR_DASHARRAY,
-} as const;
-
 const TOOLTIP_ALLOW_ESCAPE = { x: false, y: false };
 
 const NO_RANGES = [] as const;
 
 /**
- * The bar chart's hover ruler and popover — the `LineChartHoverPopover` pieces, positioned next
- * to the pointer. `LineChartTooltip` locks the popover to the plot's vertical middle, which on a
+ * The bar chart's hover popover — the `LineChartHoverPopover` pieces, opened over the
+ * hovered bar part. `LineChartTooltip` locks the popover to the plot's vertical middle, which on a
  * tall bar chart would float it rows away from the hovered bar.
  */
 export const BarChartTooltip: FC<BarChartTooltipProps> = ({ children, categoryFormatter }) => {
@@ -75,7 +67,9 @@ export const BarChartTooltip: FC<BarChartTooltipProps> = ({ children, categoryFo
 
   return (
     <Tooltip
-      cursor={TOOLTIP_CURSOR}
+      // The popover opens over the bar itself; the row hover is `BarChartBody`'s.
+      shared={false}
+      cursor={false}
       isAnimationActive={false}
       allowEscapeViewBox={TOOLTIP_ALLOW_ESCAPE}
       content={renderContent}

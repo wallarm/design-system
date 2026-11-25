@@ -13,7 +13,6 @@ import { LineChartLegendItem } from '../LineChart/LineChartLegendItem';
 import { BarChart } from './BarChart';
 import { BarChartBody } from './BarChartBody';
 import { BarChartEmpty } from './BarChartEmpty';
-import { BarChartGrid } from './BarChartGrid';
 import { BarChartStack } from './BarChartStack';
 import { BarChartTooltip } from './BarChartTooltip';
 import { BarChartXAxis } from './BarChartXAxis';
@@ -21,8 +20,8 @@ import { BarChartYAxis } from './BarChartYAxis';
 
 const DESCRIPTION = [
   'Horizontal stacked bars in the SimpleCharts family — a bar per category (an application, a host, an endpoint), split by series, with a legend over the plot that carries each series and its total.',
-  'Categories run down the left in the order you pass them; parts stack from the axis outwards in legend order, the first series on the axis. Every row is 28px, so the chart grows with the number of categories.',
-  'Hover a bar for its breakdown; hover a legend item to fade the other series out.',
+  'Categories run down the left in the order you pass them; parts stack left to right in legend order. Every row is 32px and ends with its total, so the chart grows with the number of categories.',
+  'Hover a row to highlight it, a bar for its breakdown, a legend item to fade the other series out.',
 ].join(' ');
 
 const meta = {
@@ -31,7 +30,6 @@ const meta = {
   subcomponents: {
     BarChartBody,
     BarChartEmpty,
-    BarChartGrid,
     BarChartStack,
     BarChartTooltip,
     BarChartXAxis,
@@ -78,8 +76,6 @@ const totalsOf = (data: LineChartDatum[]) =>
 
 const findingsTotals = totalsOf(findings);
 
-const formatValueTick = (value: unknown) => formatFullNumber(Number(value));
-
 const Legend = ({
   totals,
   onClick,
@@ -104,8 +100,9 @@ const Legend = ({
 
 /**
  * Findings by application: the legend carries each verdict and its total, a bar per application
- * stacks the verdicts from the axis outwards in legend order. Hover a bar for the application's
- * breakdown, or a legend item to fade the other verdicts out.
+ * stacks the verdicts left to right in legend order and ends with the row total. Hover a row to
+ * highlight it, a bar for the application's breakdown, or a legend item to fade the other
+ * verdicts out.
  */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='w-600'>
@@ -116,14 +113,42 @@ export const Default: StoryFn<typeof meta> = () => (
       <BarChart data={findings} series={verdicts} yKey='application' data-testid='bar-chart'>
         <Legend totals={findingsTotals} />
         <BarChartBody>
-          <BarChartGrid />
-          <BarChartXAxis tickFormatter={formatValueTick} />
+          <BarChartXAxis hide />
           <BarChartYAxis />
           <BarChartStack />
           <BarChartTooltip />
         </BarChartBody>
       </BarChart>
     </Chart>
+  </div>
+);
+
+/**
+ * The row total: on the right edge by default, right before the bar with `total='start'`, or
+ * off with `total={false}` — the hover popover still carries the breakdown.
+ */
+export const Totals: StoryFn<typeof meta> = () => (
+  <div className='flex flex-col gap-16 w-600'>
+    {(['end', 'start', false] as const).map(total => (
+      <Chart key={String(total)}>
+        <ChartHeader>
+          <ChartTitle>{total === false ? 'No total' : `Total — ${total}`}</ChartTitle>
+        </ChartHeader>
+        <BarChart
+          data={findings}
+          series={verdicts}
+          yKey='application'
+          data-testid={`bar-chart-total-${total || 'off'}`}
+        >
+          <BarChartBody total={total}>
+            <BarChartXAxis hide />
+            <BarChartYAxis />
+            <BarChartStack />
+            <BarChartTooltip />
+          </BarChartBody>
+        </BarChart>
+      </Chart>
+    ))}
   </div>
 );
 
@@ -135,19 +160,18 @@ const hosts = toRows([
 ]);
 
 /**
- * The label gutter is 96px by default; a longer category is cut with an ellipsis, and the
- * hover popover shows it in full. Pass `width` to `BarChartYAxis` to widen the gutter.
+ * The label column is 144px by default; a longer category is cut with an ellipsis, and the
+ * hover popover shows it in full. Pass `width` to `BarChartYAxis` to widen the column.
  */
 export const LongLabels: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-600'>
     <Chart>
       <ChartHeader>
-        <ChartTitle>Default gutter — 96px</ChartTitle>
+        <ChartTitle>Default label column — 144px</ChartTitle>
       </ChartHeader>
       <BarChart data={hosts} series={verdicts} yKey='application' data-testid='bar-chart-narrow'>
         <BarChartBody>
-          <BarChartGrid />
-          <BarChartXAxis tickFormatter={formatValueTick} />
+          <BarChartXAxis hide />
           <BarChartYAxis />
           <BarChartStack />
           <BarChartTooltip />
@@ -156,13 +180,12 @@ export const LongLabels: StoryFn<typeof meta> = () => (
     </Chart>
     <Chart>
       <ChartHeader>
-        <ChartTitle>Wide gutter — 200px</ChartTitle>
+        <ChartTitle>Wide label column — 280px</ChartTitle>
       </ChartHeader>
       <BarChart data={hosts} series={verdicts} yKey='application' data-testid='bar-chart-wide'>
         <BarChartBody>
-          <BarChartGrid />
-          <BarChartXAxis tickFormatter={formatValueTick} />
-          <BarChartYAxis width={200} />
+          <BarChartXAxis hide />
+          <BarChartYAxis width={280} />
           <BarChartStack />
           <BarChartTooltip />
         </BarChartBody>
@@ -186,7 +209,7 @@ const tenRows = toRows([
 ]);
 
 /**
- * Every row is 28px — a 16px bar and 12px between bars — so the card grows with the number
+ * Every row is 32px — a 16px bar in the middle — so the card grows with the number
  * of categories instead of squeezing them. Two categories make a short card, ten a tall one.
  */
 export const RowCount: StoryFn<typeof meta> = () => (
@@ -197,8 +220,7 @@ export const RowCount: StoryFn<typeof meta> = () => (
       </ChartHeader>
       <BarChart data={twoRows} series={verdicts} yKey='application' data-testid='bar-chart-two'>
         <BarChartBody>
-          <BarChartGrid />
-          <BarChartXAxis tickFormatter={formatValueTick} />
+          <BarChartXAxis hide />
           <BarChartYAxis />
           <BarChartStack />
           <BarChartTooltip />
@@ -212,8 +234,7 @@ export const RowCount: StoryFn<typeof meta> = () => (
       <BarChart data={tenRows} series={verdicts} yKey='application' data-testid='bar-chart-ten'>
         <Legend totals={totalsOf(tenRows)} />
         <BarChartBody>
-          <BarChartGrid />
-          <BarChartXAxis tickFormatter={formatValueTick} />
+          <BarChartXAxis hide />
           <BarChartYAxis />
           <BarChartStack />
           <BarChartTooltip />
@@ -243,8 +264,7 @@ export const ClickableLegend: StoryFn<typeof meta> = () => {
         <BarChart data={findings} series={verdicts} yKey='application' data-testid='bar-chart'>
           <Legend totals={findingsTotals} onClick={handleLegendClick} />
           <BarChartBody>
-            <BarChartGrid />
-            <BarChartXAxis tickFormatter={formatValueTick} />
+            <BarChartXAxis hide />
             <BarChartYAxis />
             <BarChartStack />
             <BarChartTooltip />
@@ -256,8 +276,8 @@ export const ClickableLegend: StoryFn<typeof meta> = () => {
 };
 
 /**
- * Loading: skeleton legend items over `BarChartEmpty`'s bare frame — the dashed value grid and
- * the category axis. `rows` sizes it for the bars to come, so the card does not jump on load.
+ * Loading: skeleton legend items over a bare `BarChartEmpty` — a skeleton label and bar per
+ * row. `rows` sizes it for the bars to come, so the card does not jump on load.
  */
 export const Loading: StoryFn<typeof meta> = () => (
   <div className='w-600'>
@@ -278,7 +298,7 @@ export const Loading: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Empty: `BarChartEmpty` keeps the plot frame and centres the message on it.
+ * Empty: `BarChartEmpty` keeps the plot's height and centres the message in it.
  */
 export const Empty: StoryFn<typeof meta> = () => (
   <div className='w-600'>

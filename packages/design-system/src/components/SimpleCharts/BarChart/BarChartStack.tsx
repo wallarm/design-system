@@ -47,8 +47,8 @@ const BarChartPart: FC<BarChartPartProps> = ({
 };
 
 /**
- * The bars: every `series` entry stacked into one bar per datum, in legend order from the axis
- * outwards — the first series sits on the axis. Mount once inside `<BarChartBody>`. Hovering a
+ * The bars: every `series` entry stacked into one bar per datum, in legend order from the left —
+ * the first series starts the bar. Mount once inside `<BarChartBody>`. Hovering a
  * legend item fades the other parts out.
  */
 export const BarChartStack: FC = () => {

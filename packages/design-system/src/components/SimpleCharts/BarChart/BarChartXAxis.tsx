@@ -14,6 +14,8 @@ export interface BarChartXAxisProps {
   ticks?: ReadonlyArray<number>;
   /** Recharts domain override. Defaults to `[0, 'auto']`. */
   domain?: [number | 'auto' | 'dataMin' | 'dataMax', number | 'auto' | 'dataMin' | 'dataMax'];
+  /** Keep the value scale but draw no labels — the row totals carry the values. */
+  hide?: boolean;
 }
 
 const renderTick = renderAxisTick<XAxisTickContentProps>();
@@ -21,17 +23,19 @@ const renderTick = renderAxisTick<XAxisTickContentProps>();
 const DEFAULT_DOMAIN: BarChartXAxisProps['domain'] = [0, 'auto'];
 
 /**
- * The value axis under the bars — `LineChartYAxis` turned on its side: labels only, no axis
- * line (the grid carries the values), in the same 16px band as the column chart's labels.
+ * The value scale. Mount it with `hide` — the row totals carry the values and the scale only
+ * sizes the bars. Visible, it draws value labels under the bars in a 16px band, no axis line.
  */
 export const BarChartXAxis: FC<BarChartXAxisProps> = ({
   tickFormatter,
   tickCount,
   ticks,
   domain = DEFAULT_DOMAIN,
+  hide = false,
 }) => (
   <XAxis
     type='number'
+    hide={hide}
     height={BAR_VALUE_LABEL_HEIGHT}
     tickLine={false}
     // The hidden tick line still offsets the label by its 6px length (see `ColumnChartXAxis`).
