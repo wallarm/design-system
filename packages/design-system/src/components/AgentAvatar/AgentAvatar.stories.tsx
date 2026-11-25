@@ -65,7 +65,7 @@ const meta = {
     coverage: {
       control: 'inline-radio',
       options: ['full', 'partial'],
-      description: '`partial` keeps the top of the head in grey felt.',
+      description: '`partial` keeps the top of the head in gray felt.',
     },
     label: {
       control: 'text',
@@ -203,7 +203,7 @@ const LIVE_STATES: AgentAvatarState[] = [
 ];
 
 /** Every persistent state of the cast, live, in one group. On duty plays its idle repertoire and glances at the
- *  neighbors; Needs you plays the same repertoire, looks at you between behaviours and is the only one that hops. */
+ *  neighbors; Needs you plays the same repertoire, looks at you between behaviors and is the only one that hops. */
 export const LiveStates: StoryFn = () => (
   <AgentAvatarGroup>
     <div className='grid grid-cols-[repeat(8,auto)] items-center gap-x-16 gap-y-8'>
