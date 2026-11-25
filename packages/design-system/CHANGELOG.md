@@ -1,3 +1,9 @@
+## [4.22.0](https://github.com/wallarm/design-system/compare/v4.21.0...v4.22.0) (2026-11-25)
+
+### Features
+
+* **simple-charts:** add horizontal stacked BarChart ([#520](https://github.com/wallarm/design-system/issues/520)) ([7ea564e](https://github.com/wallarm/design-system/commit/7ea564e2705fff885ea4a18179d35db3649b77fc))
+
 ## [4.21.0](https://github.com/wallarm/design-system/compare/v4.20.1...v4.21.0) (2026-11-24)
 
 ### Features
