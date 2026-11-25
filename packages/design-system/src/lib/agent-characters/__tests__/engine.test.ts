@@ -9,7 +9,7 @@ import { type Character, createCharacter } from '../engine';
 import type { StateId } from '../eyes';
 import { setPropLibrary } from '../propOf';
 import { propDef } from '../props';
-import { RUNTIME_KEY } from '../runtime';
+import { getRuntime, RUNTIME_KEY } from '../runtime';
 import type { SvgNode } from '../svg';
 
 // Motion parity with the reference page (Look Demo v5): the shared harness runs every scenario on the same virtual
@@ -108,6 +108,8 @@ const adapter = {
       autoReturn: !!s.autoReturn,
       salt: s.salt,
       cue,
+      // the page's Needs you, which the product departs from (AGL-194; tested below)
+      pageNeeds: true,
     });
   },
   svgOf: (c: Character) => c.svg,
@@ -311,6 +313,73 @@ describe('two bundled copies on one page', () => {
     for (let i = 1; i < starts.length; i++)
       expect((starts[i] as number) - (starts[i - 1] as number)).toBeGreaterThanOrEqual(700);
     for (const c of [...rt.live]) (c as Character).dispose();
+    expect(rs.getTimerCount()).toBe(0);
+  });
+});
+
+describe('Needs you on a team page (AGL-194)', () => {
+  afterAll(() => {
+    rs.useRealTimers();
+    stage.remove();
+    delete (globalThis as Record<symbol, unknown>)[RUNTIME_KEY];
+  });
+
+  it('keeps the On duty repertoire, hops inside the budget and never in step', () => {
+    rs.useFakeTimers({
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'requestAnimationFrame',
+        'cancelAnimationFrame',
+        'performance',
+      ],
+    });
+    delete (globalThis as Record<symbol, unknown>)[RUNTIME_KEY];
+    stage.replaceChildren();
+    document.body.appendChild(stage);
+    // six agents waiting for approval, their data from one response: they all start at once
+    const chars = ['radar', 'wally', 'trim', 'sift', 'lens', 'tune'].map((id, i) => {
+      const look = CAST.find(p => p.id === id);
+      if (!look) throw new Error(id);
+      const t = charTree(look, {
+        size: 120,
+        state: 'needs',
+        shadow: false,
+        cover: false,
+        ids: `n${i}`,
+      });
+      const svg = document.createElementNS(NS, 'svg');
+      for (const n of t.children) svg.appendChild(build(n));
+      stage.appendChild(svg);
+      rectAt(svg, i * 268, 0, 120, 113);
+      return createCharacter(svg, look, {
+        size: 120,
+        state: 'needs',
+        live: true,
+        salt: `agent-${i}`,
+      });
+    });
+    const rt = getRuntime();
+    const starts: { t: number; kind: string }[] = [];
+    const seen = new Set<unknown>();
+    rt.onFrame = () => {
+      // every move: a behaviour or a hop, whether or not the budget counted it
+      for (const c of chars)
+        for (const k of c.clips)
+          if ((k.act || k.hop) && !k.rel && !seen.has(k)) {
+            seen.add(k);
+            starts.push({ t: k.t0, kind: k.hop ? 'hop' : (k.kind ?? '') });
+          }
+    };
+    rs.advanceTimersByTime(30_000);
+    rt.onFrame = undefined;
+    starts.sort((x, y) => x.t - y.t);
+    for (let i = 1; i < starts.length; i++)
+      expect(starts[i]!.t - starts[i - 1]!.t).toBeGreaterThanOrEqual(700);
+    const kinds = new Set(starts.map(s => s.kind));
+    expect(kinds.has('hop')).toBe(true);
+    expect(kinds.size).toBeGreaterThanOrEqual(3);
+    for (const c of chars) c.dispose();
     expect(rs.getTimerCount()).toBe(0);
   });
 });

@@ -13,8 +13,8 @@ import { type AgentAvatarHandle, setAgentMotion, useAgentMotion } from './useCha
 const DESCRIPTION = [
   'The character of an AI agent from 40 px up: a soft felt body baked in the browser from its silhouette, a glass visor and two light eyes that carry its state, and the prop that tells its job. Below 40 px use `AgentGlyph`.',
   'The body is baked once per outline, colour and size, off the main thread, and cached; until a layer is ready its flat fill shows.',
-  'With `live` the character moves as the reference does: it blinks, glances, breathes and, on duty, now and then plays with its prop or looks at its neighbours (at most two on the page at once). Hello and Done are beats played through `handleRef`; they play in full, then the character shows `state` again. Reduced motion, or `setAgentMotion(false)` for the user’s setting, shows every state’s static frame.',
-  'Size, liveness and the contact shadow are set by the place the character sits in (Overview rows 40 px, headers and toasts 48, beside people 56, the team card and the drawer 72, the empty chat 120); only the drawer header, the empty chat and 96 px and up get the shadow. Next to the agent’s visible name the character is decorative; give it a `label` only when it stands alone.',
+  'With `live` the character moves as the reference does: it blinks, glances, breathes and, on duty or waiting for you, now and then plays with its prop or looks at its neighbours, and waiting it hops now and then (at most two moves on the page at once, never two starting together). Hello and Done are beats played through `handleRef`; they play in full, then the character shows `state` again. Reduced motion, or `setAgentMotion(false)` for the user’s setting, shows every state’s static frame.',
+  'Size, liveness and the contact shadow are set by the place the character sits in (Overview rows 40 px, headers and toasts 48, beside people 56, the team card and the drawer 72, the empty chat 120, the product’s Agent team card and drawer header 128); only the drawer header, the empty chat and 96 px and up get the shadow. Next to the agent’s visible name the character is decorative; give it a `label` only when it stands alone.',
 ].join(' ');
 
 const STATES: AgentAvatarState[] = [
@@ -55,7 +55,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: [40, 48, 56, 72, 120],
+      options: [40, 48, 56, 72, 120, 128],
       description: 'Set by the place the character sits in.',
     },
     state: { control: 'select', options: STATES, description: 'State frame.' },
@@ -205,7 +205,7 @@ const LIVE_STATES: AgentAvatarState[] = [
 ];
 
 /** Every persistent state of the cast, live, in one group. On duty plays its idle repertoire and glances at the
- *  neighbours; Needs you is the only one that hops. */
+ *  neighbours; Needs you plays the same repertoire, looks at you between behaviours and is the only one that hops. */
 export const LiveStates: StoryFn = () => (
   <AgentAvatarGroup>
     <div className='grid grid-cols-[repeat(8,auto)] items-center gap-x-16 gap-y-8'>

@@ -136,4 +136,9 @@ describe('AgentAvatar (static)', () => {
     expect(svg.getAttribute('data-slot')).toBe('agent-avatar');
     expect([svg.getAttribute('width'), svg.getAttribute('height')]).toEqual(['40', '38']);
   });
+
+  it('draws at 128, the Agent team card and drawer header (AGL-194)', () => {
+    const svg = svgOf(render(<AgentAvatar agent='radar' seed='r' size={128} />).container);
+    expect([svg.getAttribute('width'), svg.getAttribute('height')]).toEqual(['128', '120']);
+  });
 });
