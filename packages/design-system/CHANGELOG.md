@@ -1,3 +1,13 @@
+## [4.23.0](https://github.com/wallarm/design-system/compare/v4.22.0...v4.23.0) (2026-11-25)
+
+### Features
+
+* **agent-avatar:** needs you keeps the repertoire and hops out of step, a 128 size (AGL-194) ([#526](https://github.com/wallarm/design-system/issues/526)) ([808bbc5](https://github.com/wallarm/design-system/commit/808bbc53f4e488cf4888e83e30bda404de98c08f))
+
+### Bug Fixes
+
+* **nav-rail:** hide tooltip that repeats a visible label (CORE-2785) ([#512](https://github.com/wallarm/design-system/issues/512)) ([409ac2b](https://github.com/wallarm/design-system/commit/409ac2ba4e7e9159c1c07137151478f53e1c9221))
+
 ## [4.22.0](https://github.com/wallarm/design-system/compare/v4.21.0...v4.22.0) (2026-11-25)
 
 ### Features
