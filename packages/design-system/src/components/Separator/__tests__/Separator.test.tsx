@@ -26,4 +26,26 @@ describe('Separator', () => {
     expect(separator).toHaveAttribute('id', 'divider-1');
     expect(separator).toHaveAttribute('data-analytics-id', 'section-split');
   });
+
+  it('draws the dot between attributes inline, decorative, in the attribute typography', () => {
+    render(
+      <p>
+        Completed
+        <Separator variant='dot' data-testid='dot' />2 min
+      </p>,
+    );
+    const dot = screen.getByTestId('dot');
+    expect(dot.tagName).toBe('SPAN');
+    expect(dot).toHaveTextContent('•');
+    expect(dot).toHaveAttribute('aria-hidden', 'true');
+    expect(dot).toHaveClass(
+      'mx-4',
+      'font-mono',
+      'font-medium',
+      'text-xs',
+      'leading-xs',
+      'text-text-tertiary',
+    );
+    expect(dot).not.toHaveAttribute('role');
+  });
 });

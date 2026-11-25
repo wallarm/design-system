@@ -83,28 +83,54 @@ const separatorVariants = cva('shrink-0 bg-border-primary', {
   ],
 });
 
+/** The dot between attributes in a line of text («Completed • 2 min • run by Radar»): Geist Mono medium 12/16,
+ *  tertiary, 4px each side. Decorative, so screen readers hear the attributes, not the dots. */
+const separatorDotVariants = cva(
+  'mx-4 font-medium font-mono text-text-tertiary text-xs leading-xs',
+);
+
 export type SeparatorProps = ComponentPropsWithoutRef<'div'> &
   VariantProps<typeof separatorVariants> &
   TestableProps & {
     ref?: Ref<HTMLDivElement>;
+    /** `line` (default): a 1px rule. `dot`: the «•» between attributes in a line of text; `orientation`,
+     *  `spacing` and `decorative` don't apply to it (always 4px each side, always hidden from screen readers). */
+    variant?: 'line' | 'dot';
     orientation?: 'horizontal' | 'vertical';
     decorative?: boolean;
   };
 
 export const Separator: FC<SeparatorProps> = ({
+  variant = 'line',
   orientation = 'horizontal',
   decorative = true,
   spacing,
   className,
+  ref,
   ...props
-}) => (
-  <div
-    {...props}
-    role={decorative ? 'none' : 'separator'}
-    aria-orientation={decorative ? undefined : orientation}
-    data-orientation={orientation}
-    className={cn(separatorVariants({ orientation, spacing }), className)}
-  />
-);
+}) =>
+  variant === 'dot' ? (
+    // A span, not a div: the dot sits inside a line of text. The props are the div's; every one of them is valid
+    // on a span, so they pass through as they are.
+    <span
+      {...(props as ComponentPropsWithoutRef<'span'>)}
+      ref={ref as unknown as Ref<HTMLSpanElement>}
+      aria-hidden
+      data-slot='separator'
+      data-variant='dot'
+      className={cn(separatorDotVariants(), className)}
+    >
+      •
+    </span>
+  ) : (
+    <div
+      {...props}
+      ref={ref}
+      role={decorative ? 'none' : 'separator'}
+      aria-orientation={decorative ? undefined : orientation}
+      data-orientation={orientation}
+      className={cn(separatorVariants({ orientation, spacing }), className)}
+    />
+  );
 
 Separator.displayName = 'Separator';
