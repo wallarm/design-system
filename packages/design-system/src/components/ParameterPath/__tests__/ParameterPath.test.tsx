@@ -20,6 +20,15 @@ const visible = (testId: string): HTMLElement => {
 };
 
 describe('ParameterPath', () => {
+  it('gives a segment the text line box, so a one-segment path is not cut to a 5px row', () => {
+    // `leading-5` is 5px on the 1px spacing scale; two or more segments were propped open by
+    // the joints, a single one collapsed (AGL-250).
+    render(<ParameterPath segments={['query']} data-testid='one' />);
+    const segment = within(visible('one')).getByText('query');
+    expect(segment.className).toContain('leading-sm');
+    expect(segment.className).not.toMatch(/leading-\d/);
+  });
+
   it('renders method, all segments and encoding in order', () => {
     const { container } = render(
       <ParameterPath
