@@ -41,7 +41,7 @@ export type AgentAvatarProps = Omit<
 > &
   AgentAvatarLook & {
     ref?: Ref<SVGSVGElement>;
-    /** Set per place (see PLACES): 40 Overview rows, 48 headers and toasts, 56 beside people and in the hover card, 72 cards and the drawer, 120 the empty chat. */
+    /** Set per place (see PLACES): 40 Overview rows, 48 headers and toasts, 56 beside people and in the hover card, 72 cards and the drawer, 120 the empty chat, 128 the product's Agent team card and drawer header. */
     size: AgentAvatarSize;
     state?: AgentAvatarState;
     /** The agent's template has applications (`applications_scoped`): only then can it show Partial coverage. */

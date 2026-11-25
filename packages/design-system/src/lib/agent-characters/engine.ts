@@ -4,7 +4,10 @@
 // rectEpoch, RM) live on the document runtime. Same constants, easings, springs, RNG streams and draw order, same
 // attribute strings. Left out: cursor follow (`o.follow`, PTR, FINE; D10, no follow in the product). Additions, none
 // of which the page's own flows reach: explicit dispose(), tracked timers, `returnTo` for the one-shots (D27),
-// `requestVeil` and `onCoverEnd` as callbacks.
+// `requestVeil` and `onCoverEnd` as callbacks. One departure (AGL-194): Needs you keeps the On duty repertoire, its
+// hop an accent inside the document's behaviour budget, the first one after a seeded 0.5–4 s; on the page it only
+// hops, the first at 500 ms, so a team page of agents waiting for approval hopped in step. `pageNeeds` restores the
+// page's for the parity harness.
 import { hexOf } from './color';
 import type { AgentLook } from './data.gen';
 import { type EyePose, eyesPath, eyeTargets, helloPop, type StateId } from './eyes';
@@ -73,6 +76,8 @@ export interface CharacterOptions {
   requestVeil?: () => void;
   /** Cover all's fill has ended and dropped the crown */
   onCoverEnd?: () => void;
+  /** the reference page's Needs you (hops only, the first at 500 ms, outside the budget): the parity harness only */
+  pageNeeds?: boolean;
 }
 
 interface Clip {
@@ -397,7 +402,8 @@ export class Character implements LiveChar {
     this.releaseClips(now); // behaviour, beat and greeting clips fade out in 180 ms; the hop and the wobble finish
     if (st === 'hello' && !first) this.helloClips(now);
     if (st === 'failed') this.nextBeat = now + 1700 + this.r2() * 1000;
-    if (st === 'idle') this.nextAct = Math.max(this.nextAct, now + this.actGap() * 0.5);
+    if (st === 'idle' || (st === 'needs' && !this.o.pageNeeds))
+      this.nextAct = Math.max(this.nextAct, now + this.actGap() * 0.5);
     if (st === 'done') this.hop(now, 7);
     if (st === 'failed' && !this.clipBusy('wob', now))
       this.clips.push({
@@ -412,7 +418,8 @@ export class Character implements LiveChar {
         ],
         ease: E_INOUT,
       });
-    if (st === 'needs') this.nextHop = now + 500;
+    // seeded, so agents that start waiting together (one response) don't hop together
+    if (st === 'needs') this.nextHop = now + (this.o.pageNeeds ? 500 : 500 + 3500 * this.r2());
     if (st === 'power') this.startLanding(now, prev);
   }
   private requestVeil() {
@@ -609,10 +616,12 @@ export class Character implements LiveChar {
   private clipBusy(tag: 'hop' | 'wob', now: number) {
     return this.clips.some(c => c[tag] && now - c.t0 < (c.keys[c.keys.length - 1] as Key)[0]);
   }
-  hop(now: number, hgt = 10) {
+  /** `act`: Needs you's hop, which counts in the behaviour budget like a behaviour (other copies read `act`) */
+  hop(now: number, hgt = 10, act = false) {
     if (this.clipBusy('hop', now)) return;
     this.clips.push({
       hop: 1,
+      ...(act && { act: 1, kind: 'hop' }),
       t0: now,
       keys: [
         [0, 0, 1],
@@ -769,19 +778,21 @@ export class Character implements LiveChar {
     this.nextGlance = Math.max(this.nextGlance, now + dur + 300);
     return dur;
   }
+  /** the document's behaviour budget is spent: `cap` behaviours playing, or one started under 700 ms ago */
+  private budgetSpent(now: number) {
+    let n = 0;
+    for (const c of this.rt.live)
+      if (c !== this && c.visible && c.clips.some(k => k.act && !k.rel)) n++;
+    return n >= this.rt.act.cap || now - this.rt.act.last < 700;
+  }
   /** the idle scheduler; true while a behaviour owns the gaze */
   private actTick(now: number) {
     const cur = this.clips.find(c => c.act && !c.rel);
     if (cur) return !!cur.gaze;
     if (!this.repOn() || now < this.nextAct) return false;
-    if (!this.pv) {
-      let n = 0;
-      for (const c of this.rt.live)
-        if (c !== this && c.visible && c.clips.some(k => k.act && !k.rel)) n++;
-      if (n >= this.rt.act.cap || now - this.rt.act.last < 700) {
-        this.nextAct = now + 500 + this.r2() * 900;
-        return false;
-      }
+    if (!this.pv && this.budgetSpent(now)) {
+      this.nextAct = now + 500 + this.r2() * 900;
+      return false;
     }
     const dur = this.play(this.pv || this.pick(now), now);
     this.nextAct = now + dur + (this.pv ? 900 : this.actGap());
@@ -821,7 +832,11 @@ export class Character implements LiveChar {
     }
     // a look or a gaze fiddle owns the gaze while it plays; so do an invite and a hover on Set up
     const owns =
-      this.st === 'idle' ? this.actTick(now) : this.st === 'invite' ? this.invTick(now) : false;
+      this.st === 'idle' || (this.st === 'needs' && !this.o.pageNeeds)
+        ? this.actTick(now)
+        : this.st === 'invite'
+          ? this.invTick(now)
+          : false;
     const st = this.st;
     if (st === 'off' || st === 'box' || st === 'power') {
       if (st === 'off') {
@@ -875,11 +890,22 @@ export class Character implements LiveChar {
       return;
     }
     if (st === 'needs') {
-      this.gx.p = this.gy.p = P_PURSUIT;
-      this.gx.t = 0;
-      this.gy.t = 0;
+      // it looks at you, unless a behaviour has the gaze
+      if (!owns) {
+        this.gx.p = this.gy.p = P_PURSUIT;
+        this.gx.t = 0;
+        this.gy.t = 0;
+      }
       if (this.nextHop && now >= this.nextHop) {
-        this.hop(now, 10);
+        if (this.o.pageNeeds) this.hop(now, 10);
+        else if (this.clips.some(c => c.act && !c.rel) || this.budgetSpent(now)) {
+          // its own behaviour or the document's budget first: never two starts within 700 ms
+          this.nextHop = now + 500 + this.r2() * 900;
+          return;
+        } else {
+          this.hop(now, 10, true);
+          this.rt.act.last = now;
+        }
         this.nextHop = now + logn(this.r, 4500, 0.3, 2800, 8000);
       }
       return;
@@ -906,6 +932,8 @@ export class Character implements LiveChar {
     // back on screen or tab: no behaviour on the first frame
     if (this.lt && now - this.lt > 500) {
       this.nextAct = Math.max(this.nextAct, now + 1500 + this.r2() * 2500);
+      if (this.st === 'needs' && !this.o.pageNeeds)
+        this.nextHop = Math.max(this.nextHop, now + 1500 + this.r2() * 2500);
       if (this.inv) this.inv.next = Math.max(this.inv.next, now + 1500 + 1000 * this.r2());
     }
     this.lt = now;
