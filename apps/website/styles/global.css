@@ -189,3 +189,25 @@ body .rp-sidebar-item--active:hover {
 [data-slot='guideline-components'] summary:hover {
     color: var(--color-text-primary);
 }
+
+/* The agents' look demo (components/meet-the-new-agents): the sidebar stays, and the standalone
+   page fills the rest of the window, so the doc chrome around it (title, outline, padding) goes. */
+.rp-doc-layout__doc-container:has(.look-demo) {
+    padding: 0;
+}
+.rp-doc-layout__container:has(.look-demo)
+    :is(.rp-doc-layout__outline, .rp-doc-layout__outline-placeholder) {
+    display: none;
+}
+.rp-doc-layout__doc:has(.look-demo) {
+    max-width: 100%;
+}
+.rp-doc:has(> .look-demo) > :not(.look-demo) {
+    display: none;
+}
+.look-demo {
+    display: block;
+    width: 100%;
+    height: calc(100vh - var(--rp-nav-height, 64px));
+    border: 0;
+}

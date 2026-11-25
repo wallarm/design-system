@@ -2,7 +2,10 @@ import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 // Measures only: budgets (06 §9) are a team decision, so nothing here asserts a number beyond "it was measured".
-const agentAvatarStory = createStoryHelper('ai-agentavatar', ['Team', 'Many On Screen'] as const);
+const agentAvatarStory = createStoryHelper('ai-characters-agentavatar', [
+  'Team',
+  'Many On Screen',
+] as const);
 
 interface PerfWindow {
   __agentPerf: { firstAvatar?: number; allBaked?: number; layers?: number };

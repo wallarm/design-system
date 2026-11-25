@@ -22,6 +22,7 @@ const CATEGORY_ORDER = [
   'Primitives',
   'Pages',
   'AI',
+  'AI Characters',
   'Brand',
 ];
 
@@ -110,6 +111,36 @@ const CATEGORY_LABELS: Record<string, string> = {
   'Status Indication': 'Status',
   AI: 'AI Assistant',
 };
+
+/**
+ * The agent characters' showcase pages: standalone HTML pages (kept with Storybook's assets,
+ * copied under `docs/public`) that open their category in the sidebar.
+ */
+export const SHOWCASE_CATEGORY = 'AI Characters';
+export const SHOWCASE_PAGES = [
+  {
+    label: 'Meet the new agents',
+    slug: 'meet-the-new-agents',
+    file: 'agent-characters/index.html',
+    description:
+      'Wally and the agent characters: who they are, how the kit works, the builder and the brand rules.',
+  },
+  {
+    label: 'Squish the agents',
+    slug: 'squish-the-agents',
+    file: 'agent-characters-3d/index.html',
+    description:
+      'The agent characters in 3D: turn them, squish them, shoot them in photo mode and take the print files.',
+  },
+] as const;
+
+/** Doc page that keeps the sidebar (styles/global.css `.look-demo` drops the rest of the doc chrome) and shows a showcase page whole. */
+export const renderShowcasePage = (page: (typeof SHOWCASE_PAGES)[number]): string =>
+  [
+    `---\ntitle: ${JSON.stringify(page.label)}\ndescription: ${JSON.stringify(page.description)}\npageType: doc-wide\nfooter: false\n---`,
+    "import { withBase } from '@rspress/core/runtime';",
+    `<iframe\n  title=${JSON.stringify(page.label)}\n  src={withBase('/${page.file}')}\n  className='look-demo'\n/>\n`,
+  ].join('\n\n');
 
 const category = (c: ComponentMetadata): string => c.examples[0]?.storyTitle?.split('/')[0] ?? '';
 
@@ -202,12 +233,21 @@ export function renderComponentsMeta(
     label: categoryLabel(cat),
     collapsible: true,
     collapsed: false,
-    items: list.map(c => ({
-      type: 'custom-link',
-      label: c.name,
-      link: `/components/${kebab(c.name)}`,
-      ...(opts.newComponents.has(c.name) && { tag: 'new' }),
-    })),
+    items: [
+      ...(cat === SHOWCASE_CATEGORY
+        ? SHOWCASE_PAGES.map(p => ({
+            type: 'custom-link',
+            label: p.label,
+            link: `/components/${p.slug}`,
+          }))
+        : []),
+      ...list.map(c => ({
+        type: 'custom-link',
+        label: c.name,
+        link: `/components/${kebab(c.name)}`,
+        ...(opts.newComponents.has(c.name) && { tag: 'new' }),
+      })),
+    ],
   }));
   return `${JSON.stringify([OVERVIEW, ...groups], null, 2)}\n`;
 }
