@@ -44,6 +44,11 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
 
   const contentId = useId();
 
+  // Unmounting the backdrop mid-fade skips its exit, and onExitComplete with it. While closed, keep
+  // the overlay value the drawer was last open with; a change applies on the next open.
+  const [openOverlay, setOpenOverlay] = useState(overlay);
+  if (isOpen && overlay !== openOverlay) setOpenOverlay(overlay);
+
   // Content state
   const [width, setWidth] = useState(initialWidth);
   const [isResizing, setIsResizing] = useState(false);
@@ -58,7 +63,7 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     isOpen,
     onOpenChange: handleOpenChange,
     closeOnEscape,
-    overlay,
+    overlay: isOpen ? overlay : openOverlay,
     modal,
     contentId,
 
