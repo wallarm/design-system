@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 120 pages are written**; 22 are left (see the ☐ rows).
+> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 122 pages are written**; 24 are left (see the ☐ rows).
 
 ## How to use this
 
@@ -74,6 +74,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
 | ✅ | Data Display/FormatDateTime | 8 | 8 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
+| ☐ | Data Display/FormatDuration | 5 | 5 | `components/FormatDuration/FormatDuration.stories.tsx` |
 | ✅ | Data Display/FormatNumber | 10 | 10 | `components/FormatNumber/FormatNumber.stories.tsx` |
 | ✅ | Data Display/HttpMethod | 4 | 4 | `components/HttpMethod/HttpMethod.stories.tsx` |
 | ✅ | Data Display/Ip | 3 | 3 | `components/Ip/Ip.stories.tsx` |

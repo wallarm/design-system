@@ -538,6 +538,11 @@ export {
 } from './components/FilterInput';
 export { Flex, type FlexProps } from './components/Flex';
 export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDateTime';
+export {
+  FormatDuration,
+  type FormatDurationProps,
+  formatDuration,
+} from './components/FormatDuration';
 export { FormatNumber, type FormatNumberProps } from './components/FormatNumber';
 export { Heading, type HeadingProps } from './components/Heading';
 export {
