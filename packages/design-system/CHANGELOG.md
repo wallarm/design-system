@@ -1,3 +1,9 @@
+## [4.26.0](https://github.com/wallarm/design-system/compare/v4.25.0...v4.26.0) (2026-11-26)
+
+### Features
+
+* **format-duration:** add FormatDuration and formatDuration ([#536](https://github.com/wallarm/design-system/issues/536)) ([6689735](https://github.com/wallarm/design-system/commit/6689735e7b8a64362912cfad99986da6bcfabdd7))
+
 ## [4.25.0](https://github.com/wallarm/design-system/compare/v4.24.0...v4.25.0) (2026-11-26)
 
 ### Features
