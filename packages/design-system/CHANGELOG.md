@@ -1,3 +1,17 @@
+## [4.24.0](https://github.com/wallarm/design-system/compare/v4.23.0...v4.24.0) (2026-11-26)
+
+### Features
+
+* **agent-avatar:** align a character beside text by its drawing (AGL-229) ([#530](https://github.com/wallarm/design-system/issues/530)) ([4bd1f8a](https://github.com/wallarm/design-system/commit/4bd1f8a75c742d7fdd4c68d817425a23eb46879b))
+* **separator:** add the dot variant between attributes in a line of text (AGL-229) ([#531](https://github.com/wallarm/design-system/issues/531)) ([fe16c59](https://github.com/wallarm/design-system/commit/fe16c59a9be0e64750e5d404ef98bd9eafd02d95))
+* **simple-charts:** BarList-style rows for BarChart ([#532](https://github.com/wallarm/design-system/issues/532)) ([8602994](https://github.com/wallarm/design-system/commit/8602994cd427d1bc6c55e482736d9fcdea4764de))
+
+### Bug Fixes
+
+* **assistant-message:** left-align unaligned Markdown table columns (AGL-229) ([#529](https://github.com/wallarm/design-system/issues/529)) ([a6957c8](https://github.com/wallarm/design-system/commit/a6957c8125a0e508983da4936359dfd8e8ae5cfa))
+* **parameter-path:** a one-segment path keeps its line box ([#527](https://github.com/wallarm/design-system/issues/527)) ([dd74de1](https://github.com/wallarm/design-system/commit/dd74de19f2baf3eeca7b8bd2527a079efafafebd))
+* **pie-chart:** inset the legend row's fill to a 24px band ([#528](https://github.com/wallarm/design-system/issues/528)) ([9a5d72d](https://github.com/wallarm/design-system/commit/9a5d72d860dbcbe8cef1d8242961dd284d37cd5f))
+
 ## [4.23.0](https://github.com/wallarm/design-system/compare/v4.22.0...v4.23.0) (2026-11-25)
 
 ### Features
