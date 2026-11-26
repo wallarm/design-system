@@ -132,7 +132,6 @@ const SingleDateInputInner: FC<{
  * Inner component for date range input that syncs with Ark UI DatePicker.
  * Shows TWO SEPARATE DateInput boxes with arrow separator between them.
  * Uses controlled mode for reliable sync.
- * Arrow is absolutely positioned per Figma design.
  */
 const RangeDateInputInner: FC<{
   api: UseDatePickerReturn;
