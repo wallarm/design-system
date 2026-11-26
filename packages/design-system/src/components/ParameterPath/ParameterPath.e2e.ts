@@ -9,6 +9,7 @@ const parameterPathStory = createStoryHelper('data-display-parameterpath', [
   'Cookie',
   'Deep Nested Truncated',
   'No Method',
+  'Single Segment',
   'Gallery',
   'Expandable Truncated',
   'Expandable Fits Inline',
@@ -50,6 +51,11 @@ test.describe('Component: ParameterPath', () => {
 
     test('Should render path without method (SOAP/MCP) correctly', async ({ page }) => {
       await parameterPathStory.goto(page, 'No Method');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render a single-segment path at full line height', async ({ page }) => {
+      await parameterPathStory.goto(page, 'Single Segment');
       await expect(page).toHaveScreenshot();
     });
 
