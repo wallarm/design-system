@@ -10,14 +10,15 @@ const getParts = (page: Page, key: string, testId = 'column-chart') =>
   page.getByTestId(`${testId}--part`).and(page.locator(`[data-key="${key}"]`));
 const getLegendItem = (page: Page, key: string) =>
   page.getByTestId('column-chart--legend-item').and(page.locator(`[data-key="${key}"]`));
-// The popover renders inside the `aria-hidden` plot, so `getByRole('tooltip')` never finds it.
-const getHoverPopover = (page: Page) => page.getByTestId('column-chart--hover-popover');
+// Located by test id — role queries would also match other tooltips on the page.
+const getHoverPopover = (page: Page, testId = 'column-chart') =>
+  page.getByTestId(`${testId}--hover-popover`);
 
 // Moves the pointer onto the third column (3 Jan) — recharts' tooltip follows the pointer
 // over the step's band, so the middle of the column's top part is enough. A 0 value draws no
 // part, so `nth()` must index a series that is non-zero on every day: `malicious` is.
-const hoverThirdColumn = async (page: Page) => {
-  const box = await getParts(page, 'malicious').nth(2).boundingBox();
+const hoverThirdColumn = async (page: Page, testId = 'column-chart') => {
+  const box = await getParts(page, 'malicious', testId).nth(2).boundingBox();
   if (!box) throw new Error('third column has no bounding box');
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
 };
@@ -87,6 +88,22 @@ test.describe('Component: ColumnChart', () => {
       await expect(popover).toContainText('3 Jan');
       await expect(popover).toContainText('True positive');
       await expect(popover).toContainText('40');
+    });
+
+    test('Should show the whole popover when it is taller than the card', async ({ page }) => {
+      await columnChartStory.goto(page, 'Card Height');
+      await hoverThirdColumn(page, 'column-chart-min');
+      const popover = getHoverPopover(page, 'column-chart-min');
+      // The popover is portalled out of the 128px card, so its `overflow-clip` cuts nothing.
+      await expect(popover).toBeInViewport({ ratio: 1 });
+    });
+
+    test('Should hide the popover when Escape is pressed', async ({ page }) => {
+      await columnChartStory.goto(page, 'Default');
+      await hoverThirdColumn(page);
+      await expect(getHoverPopover(page)).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(getHoverPopover(page)).toBeHidden();
     });
 
     test('Should fade the other categories when a legend item is hovered', async ({ page }) => {

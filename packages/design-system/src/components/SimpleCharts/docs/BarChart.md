@@ -75,7 +75,7 @@ None — there is no Figma component yet (see *Open questions*).
 - **1px gap between parts** — cut from the *left* of every part that sits after another, so both ends of the bar stay on their true values.
 - **Radius** — 4px on all corners of the whole bar via recharts' `BarStack` clip-path, so it lands on whichever parts are outermost.
 - **Long labels** — cut with `…` to the label column (`width − 12px`); the popover heading carries the full label. `breakAll`, so a label without spaces (a hostname) is cut too.
-- **Popover position** — next to the hovered part, not locked to the plot's middle like `LineChartTooltip`: on a tall chart a locked popover would float rows away from the hovered bar. That is why the chart has its own tooltip slot.
+- **Popover position** — next to the hovered part, not locked to the plot's middle like `LineChartTooltip`: on a tall chart a locked popover would float rows away from the hovered bar. That is why the chart has its own tooltip slot. Like it, the popover is portalled to `body` (`internal/ChartTooltipFloat`) and clamped to the viewport, so the card never clips it.
 - **Row total** — the sum of the row's series values, formatted with `totalFormatter` (default: the full number). With `total='start'` its 56px column sits between the label and the bar; with `total={false}` the bar runs to the row's right inset.
 - **Visible value scale** — `BarChartXAxis` without `hide` (and `BarChartGrid`) still works, but its labels take 16px out of the plot, so rows get slightly shorter than 32px; pass a `height` to make up for it.
 

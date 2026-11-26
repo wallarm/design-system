@@ -1,5 +1,6 @@
 import { type FC, type ReactNode, useContext } from 'react';
-import { Tooltip, type TooltipContentProps } from 'recharts';
+import { Tooltip, type TooltipContentProps, usePlotArea } from 'recharts';
+import { CHART_TOOLTIP_ORIGIN, ChartTooltipFloat } from '../internal/ChartTooltipFloat';
 import { LineChartDataContext, type LineChartDatum } from '../LineChart/LineChartContext';
 import { LineChartHoverPopover } from '../LineChart/LineChartHoverPopover';
 import { LineChartHoverPopoverRow } from '../LineChart/LineChartHoverPopoverRow';
@@ -23,8 +24,6 @@ export interface BarChartTooltipProps {
   categoryFormatter?: (value: unknown) => ReactNode;
 }
 
-const TOOLTIP_ALLOW_ESCAPE = { x: false, y: false };
-
 const NO_RANGES = [] as const;
 
 /**
@@ -34,10 +33,11 @@ const NO_RANGES = [] as const;
  */
 export const BarChartTooltip: FC<BarChartTooltipProps> = ({ children, categoryFormatter }) => {
   const dataCtx = useContext(LineChartDataContext);
+  const plotArea = usePlotArea();
 
   if (!dataCtx) return null;
 
-  const renderContent = ({ active, payload }: TooltipContentProps): ReactNode => {
+  const renderContent = ({ active, payload, coordinate }: TooltipContentProps): ReactNode => {
     if (!active || !payload || payload.length === 0) return null;
     const datum = payload[0]?.payload as LineChartDatum | undefined;
     if (!datum) return null;
@@ -51,17 +51,26 @@ export const BarChartTooltip: FC<BarChartTooltipProps> = ({ children, categoryFo
       xs: NO_RANGES,
     });
 
-    if (children) return children({ datum, rows, category });
-
+    // Portalled so a card can't clip a popover taller or wider than the plot.
     return (
-      <LineChartHoverPopover>
-        <LineChartHoverPopoverTimestamp>
-          {categoryFormatter ? categoryFormatter(category) : String(category)}
-        </LineChartHoverPopoverTimestamp>
-        {rows.map(row => (
-          <LineChartHoverPopoverRow key={row.series.key} series={row.series} value={row.value} />
-        ))}
-      </LineChartHoverPopover>
+      <ChartTooltipFloat coordinate={coordinate} plot={plotArea}>
+        {children ? (
+          children({ datum, rows, category })
+        ) : (
+          <LineChartHoverPopover>
+            <LineChartHoverPopoverTimestamp>
+              {categoryFormatter ? categoryFormatter(category) : String(category)}
+            </LineChartHoverPopoverTimestamp>
+            {rows.map(row => (
+              <LineChartHoverPopoverRow
+                key={row.series.key}
+                series={row.series}
+                value={row.value}
+              />
+            ))}
+          </LineChartHoverPopover>
+        )}
+      </ChartTooltipFloat>
     );
   };
 
@@ -71,7 +80,7 @@ export const BarChartTooltip: FC<BarChartTooltipProps> = ({ children, categoryFo
       shared={false}
       cursor={false}
       isAnimationActive={false}
-      allowEscapeViewBox={TOOLTIP_ALLOW_ESCAPE}
+      position={CHART_TOOLTIP_ORIGIN}
       content={renderContent}
     />
   );

@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useContext, useMemo } from 'react';
 import { Tooltip, type TooltipContentProps, usePlotArea } from 'recharts';
-import { lineChartTooltipCenterClasses } from './classes';
-import { HOVER_POPOVER_TOP, LINE_CURSOR_DASHARRAY } from './constants';
+import { CHART_TOOLTIP_ORIGIN, ChartTooltipFloat } from '../internal/ChartTooltipFloat';
+import { LINE_CURSOR_DASHARRAY } from './constants';
 import {
   LineChartDataContext,
   type LineChartDatum,
@@ -59,10 +59,6 @@ const TOOLTIP_CURSOR = {
   strokeDasharray: LINE_CURSOR_DASHARRAY,
 } as const;
 
-// Keep the popover inside the plot at chart edges — without this recharts
-// allows it to escape the viewBox on tight datasets.
-const TOOLTIP_ALLOW_ESCAPE = { x: false, y: false };
-
 const formatXValue = (
   value: number | string,
   formatter: ((value: unknown) => ReactNode) | undefined,
@@ -98,11 +94,9 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
 
   if (!dataCtx) return null;
 
-  // Falls back to the original top-aligned anchor for the first frame, before
-  // recharts has measured the plot.
-  const centerY = plotArea ? plotArea.y + plotArea.height / 2 : HOVER_POPOVER_TOP;
+  const centerY = plotArea ? plotArea.y + plotArea.height / 2 : undefined;
 
-  const renderContent = ({ active, payload }: TooltipContentProps): ReactNode => {
+  const renderContent = ({ active, payload, coordinate }: TooltipContentProps): ReactNode => {
     if (!active || !payload || payload.length === 0) return null;
     // Hide the hover popover while a zoom drag is in progress or while the
     // confirm popover is up — the floating range popover from
@@ -138,7 +132,12 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
       </LineChartHoverPopover>
     );
 
-    return <div className={lineChartTooltipCenterClasses}>{body}</div>;
+    // Vertically locked to the plot's middle; portalled so a card can't clip a tall popover.
+    return (
+      <ChartTooltipFloat coordinate={coordinate} plot={plotArea} centerY={centerY}>
+        {body}
+      </ChartTooltipFloat>
+    );
   };
 
   return (
@@ -150,8 +149,7 @@ export const LineChartTooltip: FC<LineChartTooltipProps> = ({ children, xTickFor
       // Without this the popover Y interpolates between frames, defeating the
       // lock as the cursor moves between peaks and valleys.
       isAnimationActive={false}
-      position={{ y: centerY }}
-      allowEscapeViewBox={TOOLTIP_ALLOW_ESCAPE}
+      position={CHART_TOOLTIP_ORIGIN}
       content={renderContent}
     />
   );
