@@ -1,46 +1,45 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
+import { Skeleton } from '../../Skeleton';
 import {
-  lineChartEmptyMessageClasses,
-  lineChartEmptyMessageTextClasses,
-  lineChartEmptyRootClasses,
-} from '../LineChart/classes';
-import { LINE_GRID_DASHARRAY } from '../LineChart/constants';
+  barChartEmptyMessageClasses,
+  barChartEmptyRootClasses,
+  barChartEmptyRowClasses,
+} from './classes';
 import {
+  BAR_BODY_BOTTOM_PADDING,
+  BAR_CATEGORY_LABEL_GAP,
   BAR_CATEGORY_LABEL_WIDTH,
-  BAR_DEFAULT_BODY_MARGIN,
   BAR_ROW_HEIGHT,
-  BAR_VALUE_LABEL_HEIGHT,
+  BAR_THICKNESS,
 } from './constants';
 
-// `LineChartEmpty` turned on its side: three dashed value lines and the solid category axis.
-const EMPTY_GRID_LINES = 3;
-
-/** Rows the empty frame is sized for when neither `rows` nor `height` is given. */
+/** Rows the frame is sized for when neither `rows` nor `height` is given. */
 const DEFAULT_ROWS = 5;
 
 export interface BarChartEmptyProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   /**
-   * Size the frame for this many bars (28px each, plus the value-label band) — pass the row
-   * count the loaded chart will have, so the card does not jump when data arrives. Default 5.
+   * Size the frame for this many rows (32px each) — pass the row count the loaded chart will
+   * have, so the card does not jump when data arrives. Default 5.
    */
   rows?: number;
   /** Fixed frame height in pixels. Overrides `rows`. */
   height?: number;
-  /** Width of the category label gutter. Match the chart's `BarChartYAxis width`. Default 96px. */
+  /** Width of the label column. Match the chart's `BarChartYAxis width`. Default 144px. */
   labelWidth?: number;
   /**
-   * Empty-state message, centred in the plot. Omit it for a bare frame — the loading
-   * skeleton idiom. There is no default text.
+   * Empty-state message, centred in the frame. Omit it for the loading state: a skeleton
+   * label and bar per row. There is no default text.
    */
   children?: ReactNode;
 }
 
 /**
- * The bar chart's empty / loading frame: the plot's dashed vertical grid and solid category axis
- * with no bars, and an optional message in the middle. Compose it in place of `<BarChart>`.
+ * The bar chart's empty / loading frame, sized like the loaded plot. With a message it is the
+ * empty state; bare, it draws a skeleton row per category — the `BarListSkeleton` idiom.
+ * Compose it in place of `<BarChart>`.
  */
 export const BarChartEmpty: FC<BarChartEmptyProps> = ({
   rows = DEFAULT_ROWS,
@@ -52,15 +51,8 @@ export const BarChartEmpty: FC<BarChartEmptyProps> = ({
   'data-testid': testId,
   ...props
 }) => {
-  const frameHeight = height ?? rows * BAR_ROW_HEIGHT + BAR_VALUE_LABEL_HEIGHT;
-  // The axis runs down to the value-label band, as in a populated chart.
-  const plotHeight = Math.max(0, frameHeight - BAR_VALUE_LABEL_HEIGHT);
-  const lines = Array.from(
-    { length: EMPTY_GRID_LINES },
-    (_, i) => `${((i + 1) * 100) / (EMPTY_GRID_LINES + 1)}%`,
-  );
-  // Inset matches a populated chart's plot area: left = label gutter, right = body margin.
-  const plotInset = { left: labelWidth, right: BAR_DEFAULT_BODY_MARGIN.right };
+  const frameHeight = height ?? rows * BAR_ROW_HEIGHT + BAR_BODY_BOTTOM_PADDING;
+  const loading = children == null;
 
   return (
     <TestIdProvider value={testId}>
@@ -69,50 +61,24 @@ export const BarChartEmpty: FC<BarChartEmptyProps> = ({
         ref={ref}
         data-slot='bar-chart-empty'
         data-testid={testId}
-        className={cn(lineChartEmptyRootClasses, className)}
+        className={cn(barChartEmptyRootClasses, className)}
         style={{ height: frameHeight }}
       >
-        <svg
-          height={plotHeight}
-          aria-hidden='true'
-          className='absolute top-0'
-          style={{
-            ...plotInset,
-            width: `calc(100% - ${plotInset.left + plotInset.right}px)`,
-          }}
-          data-slot='bar-chart-empty-grid'
-        >
-          {lines.map(x => (
-            <line
-              key={x}
-              x1={x}
-              x2={x}
-              y1={0}
-              y2={plotHeight}
-              stroke='var(--color-border-primary-light)'
-              strokeDasharray={LINE_GRID_DASHARRAY}
-              strokeWidth={1}
-            />
-          ))}
-          {/* Half a pixel in, so the 1px axis is not cut in half by the SVG edge. */}
-          <line
-            x1={0.5}
-            x2={0.5}
-            y1={0}
-            y2={plotHeight}
-            stroke='var(--color-border-primary-light)'
-            strokeWidth={1}
-            data-slot='bar-chart-empty-axis'
-          />
-        </svg>
-        {children != null && (
-          <div
-            className={lineChartEmptyMessageClasses}
-            // Centre the message on the plot, not on the whole card with its label gutter.
-            style={{ ...plotInset, height: plotHeight }}
-          >
-            <span className={lineChartEmptyMessageTextClasses}>{children}</span>
-          </div>
+        {loading ? (
+          Array.from({ length: rows }, (_, i) => (
+            <div key={i} data-slot='bar-chart-empty-row' className={barChartEmptyRowClasses}>
+              <Skeleton
+                width={`${labelWidth - BAR_CATEGORY_LABEL_GAP}px`}
+                height={`${BAR_THICKNESS}px`}
+                rounded={4}
+              />
+              <div className='flex-1 min-w-0'>
+                <Skeleton width='100%' height={`${BAR_THICKNESS}px`} rounded={4} />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className={barChartEmptyMessageClasses}>{children}</div>
         )}
       </div>
     </TestIdProvider>

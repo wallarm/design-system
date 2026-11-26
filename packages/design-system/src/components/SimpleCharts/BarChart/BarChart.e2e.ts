@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const barChartStory = createStoryHelper('data-display-simplecharts-horizontal-stacked-bars-chart', [
   'Default',
+  'Totals',
   'Long Labels',
   'Row Count',
   'Clickable Legend',
@@ -18,12 +19,20 @@ const getLegendItem = (page: Page, key: string) =>
 const getHoverPopover = (page: Page, testId = 'bar-chart') =>
   page.getByTestId(`${testId}--hover-popover`);
 
-// Moves the pointer onto the first bar (Payments API) — recharts' tooltip follows the pointer
-// over the row's band, so the middle of any part is enough.
+// Moves the pointer onto the first bar (Payments API) — the popover opens over the bar's parts
+// only, so aim at the middle of one.
 const hoverFirstBar = async (page: Page, testId = 'bar-chart') => {
   const box = await getParts(page, 'falsePositive', testId).first().boundingBox();
   if (!box) throw new Error('first bar has no bounding box');
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+};
+
+// Moves the pointer onto the first row's label column, left of the bar.
+const hoverFirstLabel = async (page: Page, testId = 'bar-chart') => {
+  const box = await getParts(page, 'malicious', testId).first().boundingBox();
+  const body = await page.getByTestId(`${testId}--body`).boundingBox();
+  if (!box || !body) throw new Error('first row has no bounding box');
+  await page.mouse.move(body.x + 24, box.y + box.height / 2);
 };
 
 test.describe('Component: BarChart', () => {
@@ -53,6 +62,18 @@ test.describe('Component: BarChart', () => {
       await expect(page).toHaveScreenshot();
     });
 
+    test('Should render hovered row without the popover correctly', async ({ page }) => {
+      await barChartStory.goto(page, 'Default');
+      await hoverFirstLabel(page);
+      await expect(page.getByTestId('bar-chart--row-hover')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render total placements correctly', async ({ page }) => {
+      await barChartStory.goto(page, 'Totals');
+      await expect(page).toHaveScreenshot();
+    });
+
     test('Should render truncated long labels correctly', async ({ page }) => {
       await barChartStory.goto(page, 'Long Labels');
       await expect(page).toHaveScreenshot();
@@ -75,7 +96,7 @@ test.describe('Component: BarChart', () => {
   });
 
   test.describe('Interactions', () => {
-    test('Should stack the first legend series on the axis when bars render', async ({ page }) => {
+    test('Should stack the first legend series on the left when bars render', async ({ page }) => {
       await barChartStory.goto(page, 'Default');
       const first = await getParts(page, 'malicious').first().boundingBox();
       const last = await getParts(page, 'benign').first().boundingBox();
@@ -102,6 +123,25 @@ test.describe('Component: BarChart', () => {
       await expect(popover).toContainText('40');
     });
 
+    test('Should highlight the row without the popover when its label is hovered', async ({
+      page,
+    }) => {
+      await barChartStory.goto(page, 'Default');
+      await hoverFirstLabel(page);
+      await expect(page.getByTestId('bar-chart--row-hover')).toBeVisible();
+      await expect(getHoverPopover(page)).toBeHidden();
+    });
+
+    test('Should move the total before the bar when total is start', async ({ page }) => {
+      await barChartStory.goto(page, 'Totals');
+      const end = await getParts(page, 'malicious', 'bar-chart-total-end').first().boundingBox();
+      const start = await getParts(page, 'malicious', 'bar-chart-total-start')
+        .first()
+        .boundingBox();
+      if (!end || !start) throw new Error('parts have no bounding box');
+      expect(start.x).toBeGreaterThan(end.x);
+    });
+
     test('Should show the full category when a truncated bar is hovered', async ({ page }) => {
       await barChartStory.goto(page, 'Long Labels');
       await hoverFirstBar(page, 'bar-chart-narrow');
@@ -124,9 +164,9 @@ test.describe('Component: BarChart', () => {
       const two = await page.getByTestId('bar-chart-two--body').boundingBox();
       const ten = await page.getByTestId('bar-chart-ten--body').boundingBox();
       if (!two || !ten) throw new Error('bodies have no bounding box');
-      // 28px per row + the 16px value-label band.
-      expect(two.height).toBe(2 * 28 + 16);
-      expect(ten.height).toBe(10 * 28 + 16);
+      // 32px per row + the 8px under the last one.
+      expect(two.height).toBe(2 * 32 + 8);
+      expect(ten.height).toBe(10 * 32 + 8);
     });
 
     test('Should size the loading frame like the loaded chart', async ({ page }) => {

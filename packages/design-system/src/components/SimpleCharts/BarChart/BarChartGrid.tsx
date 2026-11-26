@@ -4,8 +4,8 @@ import type { VerticalCoordinatesGenerator } from 'recharts/types/cartesian/Cart
 import { LINE_GRID_DASHARRAY } from '../LineChart/constants';
 
 /**
- * One dashed line per value tick, except the one on the axis: the solid category axis line
- * owns that rail (the same rule `LineChartGrid` applies to the bottom line).
+ * One dashed line per value tick, except the one on zero — the bars start there (the same rule
+ * `LineChartGrid` applies to the bottom line).
  */
 const valueTickCoordinates: VerticalCoordinatesGenerator = ({ xAxis, offset }) => {
   if (!xAxis) return [];
@@ -21,7 +21,7 @@ const valueTickCoordinates: VerticalCoordinatesGenerator = ({ xAxis, offset }) =
   return coords;
 };
 
-/** Vertical dashed grid of the bar chart — `LineChartGrid` turned on its side. */
+/** Optional vertical dashed grid for a visible value scale — `LineChartGrid` turned on its side. */
 export const BarChartGrid: FC = () => (
   <CartesianGrid
     strokeDasharray={LINE_GRID_DASHARRAY}

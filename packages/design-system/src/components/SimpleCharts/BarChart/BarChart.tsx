@@ -27,7 +27,7 @@ export interface BarChartProps<T extends LineChartDatum = LineChartDatum>
   /** One entry per bar (category), top to bottom. The chart does not sort them. */
   data: T[];
   /**
-   * The parts each bar is split into, in legend order — the first one sits on the axis.
+   * The parts each bar is split into, in legend order — the first one starts the bar, on the left.
    * The same schema drives the legend, the parts and the hover popover rows.
    */
   series: LineChartSeries<Extract<keyof T, string>>[];
