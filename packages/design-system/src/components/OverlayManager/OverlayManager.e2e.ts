@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const overlayStory = createStoryHelper('overlay-overlaymanager', [
   'Confirm Dialog',
   'From Menu Item',
+  'Lazy Loading',
   'Stacked Overlays',
   'Unsaved Changes Guard',
 ] as const);
@@ -72,6 +73,34 @@ test.describe('Component: OverlayManager', () => {
       await expect(page.getByTestId('row-menu-delete')).toBeHidden();
       await page.getByTestId('confirm-delete-submit').click();
       await expect(getResult(page)).toHaveText('Result: deleted');
+    });
+
+    test('Should load the code on hover, then open the dialog at once', async ({ page }) => {
+      await overlayStory.goto(page, 'Lazy Loading');
+      const codeStatus = page.getByTestId('code-status');
+      await expect(codeStatus).toHaveText('Dialog code: not loaded');
+
+      await page.getByTestId('open-lazy-confirm').hover();
+      await expect(codeStatus).toHaveText('Dialog code: loading');
+      await expect(codeStatus).toHaveText('Dialog code: loaded');
+
+      await page.getByTestId('open-lazy-confirm').click();
+      await expect(getConfirmContent(page)).toBeVisible();
+      await page.getByTestId('confirm-delete-submit').click();
+      await expect(getResult(page)).toHaveText('Result: deleted');
+    });
+
+    test('Should show nothing until the code arrives when the first open loads it', async ({
+      page,
+    }) => {
+      await overlayStory.goto(page, 'Lazy Loading');
+      // A click event with no pointer move before it, so no hover starts the load early.
+      await page.getByTestId('open-lazy-confirm').dispatchEvent('click');
+
+      await expect(page.getByTestId('code-status')).toHaveText('Dialog code: loading');
+      await expect(getConfirmContent(page)).toBeHidden();
+      await expect(getConfirmContent(page)).toBeVisible();
+      await expect(page.getByTestId('code-status')).toHaveText('Dialog code: loaded');
     });
 
     test('Should close only the top overlay when Escape is pressed over a stack', async ({

@@ -11,7 +11,11 @@ import {
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { OverlayProvider } from './OverlayProvider';
-import { ConfirmDeleteOverlay, EditUserOverlay } from './stories/overlays';
+import {
+  ConfirmDeleteOverlay,
+  EditUserOverlay,
+  SlowConfirmDeleteOverlay,
+} from './stories/overlays';
 import { useOverlay } from './useOverlay';
 
 const DESCRIPTION = [
@@ -103,6 +107,50 @@ export const FromMenuItem: StoryFn<typeof meta> = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </HStack>
+      <Text data-testid='result'>Result: {result}</Text>
+    </VStack>
+  );
+};
+
+/**
+ * The dialog's code loads the first time it is needed. Here its loader waits 1.5 s, like a slow
+ * chunk: hovering or focusing the button starts the load with `preload()`, and a click before it
+ * ends opens the dialog as soon as the code arrives. The code then stays cached, so reload the
+ * page to see the first load again.
+ */
+export const LazyLoading: StoryFn<typeof meta> = () => {
+  const confirmDelete = useOverlay(SlowConfirmDeleteOverlay);
+  const [code, setCode] = useState('not loaded');
+  const [result, setResult] = useState('none yet');
+
+  const loadCode = async () => {
+    setCode('loading');
+    await SlowConfirmDeleteOverlay.preload();
+    setCode('loaded');
+  };
+
+  const handlePreload = () => loadCode();
+
+  const handleOpen = async () => {
+    // open() loads the code itself; loadCode only shows the progress of that same, shared load.
+    loadCode();
+    const deleted = await confirmDelete.open({ userName: 'Jane Cooper' });
+    setResult(deleted ? 'deleted' : 'cancelled');
+  };
+
+  return (
+    <VStack gap={12} align='start'>
+      <Button
+        variant='outline'
+        color='neutral'
+        onPointerEnter={handlePreload}
+        onFocus={handlePreload}
+        onClick={handleOpen}
+        data-testid='open-lazy-confirm'
+      >
+        Delete Jane Cooper
+      </Button>
+      <Text data-testid='code-status'>Dialog code: {code}</Text>
       <Text data-testid='result'>Result: {result}</Text>
     </VStack>
   );

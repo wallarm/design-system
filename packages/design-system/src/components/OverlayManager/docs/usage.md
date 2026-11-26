@@ -135,7 +135,7 @@ const handleDelete = async () => {
 - Await it in an event handler, not inside `startTransition`, a form action or `useActionState`: React would hold that transition, and every other one in the app, until the overlay closes. Start the transition after it resolves: `if (await confirm.open()) startTransition(async () => { await deleteUser(id); })`.
 - The overlay keeps the payload it was opened with. If the opener unmounts first, such as a menu item, the overlay stays open and the original `await` still resolves.
 - A second `open()` of the same definition in the same provider replaces the first until the store has inserted it, and the first resolves `undefined`: while its code loads, and even with the code cached for a call in the same synchronous code (such as StrictMode's doubled effect) or a microtask or two later. Later calls each open another instance and they stack, so guard a double Escape or click with a pending flag.
-- `definition.preload()` loads the code ahead of time and never rejects. Call it when the opener is hovered or focused, and for an overlay with no opener to hover (the next step of a chained flow, an overlay opened from inside another) when the overlay that opens it mounts, or once the browser is idle:
+- `definition.preload()` loads the code ahead of time and never rejects. Call it when the opener is hovered or focused, and for an overlay with no opener to hover (the next step of a chained flow, an overlay opened from inside another) when the overlay that opens it mounts, or once the browser is idle. Its promise resolves when the code is in, so it can also drive a progress hint; the `Lazy Loading` story shows both with a loader that waits 1.5 s:
 
 ```tsx
 const handlePreload = () => DeleteUserOverlay.preload();

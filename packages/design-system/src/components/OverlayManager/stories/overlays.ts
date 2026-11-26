@@ -12,3 +12,10 @@ export const EditUserOverlay = defineOverlay(() =>
 export const UnsavedChangesOverlay = defineOverlay(() =>
   import('./UnsavedChangesDialog').then(m => m.UnsavedChangesDialog),
 );
+
+/** The delete confirm behind a slow network: its first load takes 1.5 s, like a heavy chunk. */
+export const SlowConfirmDeleteOverlay = defineOverlay(async () => {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  const { ConfirmDeleteDialog } = await import('./ConfirmDeleteDialog');
+  return ConfirmDeleteDialog;
+});
