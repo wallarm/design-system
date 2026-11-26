@@ -13,7 +13,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/Funnel',
+  title: 'Charts/Funnel',
   component: Funnel,
   parameters: {
     layout: 'centered',

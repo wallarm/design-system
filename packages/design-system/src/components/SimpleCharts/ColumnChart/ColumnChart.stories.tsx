@@ -27,7 +27,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/Vertical Stacked Columns Chart',
+  title: 'Charts/Vertical Stacked Columns Chart',
   component: ColumnChart,
   subcomponents: { ColumnChartBody, ColumnChartStack, ColumnChartXAxis },
   parameters: {

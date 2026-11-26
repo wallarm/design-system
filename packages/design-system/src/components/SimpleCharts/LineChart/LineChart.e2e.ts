@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', [
+const lineChartStory = createStoryHelper('charts-linechart', [
   'Default',
   'Default Multi',
   'With Metric',

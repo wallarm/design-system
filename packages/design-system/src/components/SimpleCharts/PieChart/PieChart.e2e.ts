@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const pieChartStory = createStoryHelper('data-display-simplecharts-piechart', [
+const pieChartStory = createStoryHelper('charts-piechart', [
   'Default',
   'Selectable',
   'Truncated Labels',

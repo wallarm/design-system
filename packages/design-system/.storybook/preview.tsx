@@ -52,34 +52,46 @@ const preview: Preview = {
         showToolbar: true,
       },
       storySort: {
+        // Everyday components first, in rough order of use; reference material
+        // (type, loading, primitives, patterns, templates) sits at the bottom.
         order: [
           'Documentation',
-          // Real screens from src/guidelines/patterns/<slug>.stories.tsx, right after the docs,
-          // then whole example pages from src/guidelines/templates/<slug>.stories.tsx.
-          'Patterns',
-          'Templates',
-          'Components',
+          'Actions',
+          'Inputs',
+          'Inputs Date',
           'Data Display',
+          'Charts',
           // Chart is pinned last: it's the foundational card frame the other charts compose,
           // not a chart itself. `*` keeps any future chart above it automatically.
           [
-            'SimpleCharts',
-            [
-              'Overview',
-              'BarList',
-              'PieChart',
-              'LineChart',
-              'HorizontalBarStack',
-              'Metric',
-              '*',
-              'Chart',
-            ],
+            'Overview',
+            'BarList',
+            'PieChart',
+            'LineChart',
+            'HorizontalBarStack',
+            'Metric',
+            '*',
+            'Chart',
           ],
+          'Status Indication',
+          'Messaging',
+          'Overlay',
+          'Navigation',
+          'Layout',
+          'Pages',
+          // A new section lands here until it is given a place.
           '*',
           // The chat family, then the agent characters, opened by their two showcase pages.
           'AI',
           'AI Characters',
           ['Meet the new agents', 'Squish the agents', 'AgentAvatar', 'AgentGlyph', '*'],
+          'Typography',
+          'Loading',
+          'Primitives',
+          // Real screens from src/guidelines/patterns/<slug>.stories.tsx,
+          // then whole example pages from src/guidelines/templates/<slug>.stories.tsx.
+          'Patterns',
+          'Templates',
         ],
       },
     },

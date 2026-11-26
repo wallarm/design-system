@@ -364,7 +364,7 @@ Use the appropriate category for the `title` field:
 | `Actions`           | Clickable elements                     | Button, ToggleButton, DropdownMenu |
 | `AI`                | Wally assistant                        | Chat, AssistantMessage, ChainOfThought |
 | `AI Characters`     | Agent characters and their showcase pages | AgentAvatar, AgentGlyph, AgentLookBuilder |
-| `Brand`             | Brand marks                            | Logo, WallyIcon                  |
+| `Charts`            | SimpleCharts family                    | BarList, LineChart, PieChart     |
 | `Data Display`      | Displaying data                        | Table, Card, Avatar, CodeSnippet |
 | `Inputs`            | Form controls and filters              | Input, Select, FilterInput       |
 | `Inputs Date`       | Date and time controls                 | Calendar, DateInput, TimeInput   |
@@ -374,7 +374,7 @@ Use the appropriate category for the `title` field:
 | `Navigation`        | Navigation elements                    | Tabs, Breadcrumbs, Pagination    |
 | `Overlay`           | Floating elements                      | Dialog, Drawer, Tooltip          |
 | `Pages`             | Full-page states                       | EmptyState, UtilityPage          |
-| `Primitives`        | Low-level building blocks              | Separator, Kbd, Icons            |
+| `Primitives`        | Low-level building blocks              | Separator, Kbd, Icons, Logo      |
 | `Status Indication` | Status display                         | Badge, Tag, Indicator            |
 | `Typography`        | Text display                           | Heading, Text, Code              |
 

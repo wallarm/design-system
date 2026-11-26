@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const areaChartStory = createStoryHelper('data-display-simplecharts-areachart', [
+const areaChartStory = createStoryHelper('charts-areachart', [
   'Default',
   'Standard',
   'With Metric',

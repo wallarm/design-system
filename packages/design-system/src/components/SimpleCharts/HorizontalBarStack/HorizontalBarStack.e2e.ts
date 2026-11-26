@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const story = createStoryHelper('data-display-simplecharts-horizontalbarstack', [
+const story = createStoryHelper('charts-horizontalbarstack', [
   'Default',
   'No Delta',
   'No Value',

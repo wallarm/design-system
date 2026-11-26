@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const barListStory = createStoryHelper('data-display-simplecharts-barlist', [
+const barListStory = createStoryHelper('charts-barlist', [
   'Default',
   'Selectable',
   'Colored',

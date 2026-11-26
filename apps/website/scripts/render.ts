@@ -7,23 +7,24 @@ import type {
 } from '@wallarm-org/mcp-core';
 import path from 'node:path';
 
+// Mirrors the Storybook sidebar (`storySort` in packages/design-system/.storybook/preview.tsx).
 const CATEGORY_ORDER = [
   'Actions',
   'Inputs',
   'Inputs Date',
   'Data Display',
-  'Navigation',
-  'Overlay',
-  'Messaging',
+  'Charts',
   'Status Indication',
+  'Messaging',
+  'Overlay',
+  'Navigation',
   'Layout',
-  'Loading',
-  'Typography',
-  'Primitives',
   'Pages',
   'AI',
   'AI Characters',
-  'Brand',
+  'Typography',
+  'Loading',
+  'Primitives',
 ];
 
 const GITHUB_COMPONENTS =

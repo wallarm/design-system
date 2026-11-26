@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const barChartStory = createStoryHelper('data-display-simplecharts-horizontal-stacked-bars-chart', [
+const barChartStory = createStoryHelper('charts-horizontal-stacked-bars-chart', [
   'Default',
   'Totals',
   'Long Labels',
