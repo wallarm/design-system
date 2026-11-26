@@ -1,3 +1,9 @@
+## [4.26.2](https://github.com/wallarm/design-system/compare/v4.26.1...v4.26.2) (2026-11-26)
+
+### Bug Fixes
+
+* **simple-charts:** keep the chart hover popover outside the card clip ([#538](https://github.com/wallarm/design-system/issues/538)) ([439ae8e](https://github.com/wallarm/design-system/commit/439ae8ee31a5e2bacbe416499ce8670bcad0d8ba))
+
 ## [4.26.1](https://github.com/wallarm/design-system/compare/v4.26.0...v4.26.1) (2026-11-26)
 
 ### Bug Fixes
