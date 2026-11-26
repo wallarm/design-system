@@ -1,13 +1,27 @@
-import { createRef } from 'react';
+import { cloneElement, createRef, isValidElement, type ReactNode } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import * as actualRecharts from 'recharts' with { rstest: 'importActual' };
 import { captureAnalyticsClicks } from '../../../testUtils/captureAnalyticsClicks';
 import * as Barrel from '../index';
 import { MetricDelta } from '../Metric';
 import { Funnel } from './Funnel';
 import { FunnelSkeleton } from './FunnelSkeleton';
 import { FunnelStep } from './FunnelStep';
+
+// jsdom has no layout, so recharts' ResponsiveContainer measures 0 and renders nothing.
+// Swap it for a fixed-size passthrough (240px = two 120px columns) so the ribbon mounts.
+rs.mock('recharts', () => ({
+  ...actualRecharts,
+  ResponsiveContainer: ({ children }: { children?: ReactNode }) =>
+    isValidElement<{ width?: number; height?: number }>(children)
+      ? cloneElement(children, { width: 240, height: 172 })
+      : null,
+}));
+
+const fills = (testId: string) =>
+  screen.getByTestId(`${testId}--ribbon`).querySelectorAll('[data-slot="funnel-ribbon-fill"]');
 
 describe('Funnel — root', () => {
   it('renders root with data-slot="funnel", forwards className/aria/data props', () => {
@@ -124,7 +138,7 @@ describe('Funnel — step interaction', () => {
 });
 
 describe('Funnel — disabled step', () => {
-  it('does not call onClick and gates the hover/cursor affordance behind enabled:', async () => {
+  it('does not call onClick and shows no tint on a disabled step and gates the cursor behind enabled:', async () => {
     const onClick = rs.fn();
     render(
       <Funnel data-testid='fp'>
@@ -138,9 +152,8 @@ describe('Funnel — disabled step', () => {
     expect(onClick).not.toHaveBeenCalled();
     const classes = cell.className.split(/\s+/);
     expect(classes).toContain('enabled:cursor-pointer');
-    expect(classes).toContain('enabled:hover:before:bg-states-primary-hover');
+    expect(classes).toContain('data-active:not-disabled:before:bg-states-primary-hover');
     expect(classes).not.toContain('cursor-pointer');
-    expect(classes).not.toContain('hover:before:bg-states-primary-hover');
   });
 });
 
@@ -185,7 +198,7 @@ describe('Funnel — test ids', () => {
 });
 
 describe('Funnel — ribbon', () => {
-  it('draws one ribbon svg per step with three paths each and no NaN in any d attribute', () => {
+  it('draws one segment per step column with three paths each and no NaN in any d attribute', () => {
     render(
       <Funnel data-testid='fp'>
         <FunnelStep name='A' value={0} />
@@ -194,15 +207,26 @@ describe('Funnel — ribbon', () => {
     );
     const ribbon = screen.getByTestId('fp--ribbon');
     expect(ribbon).toHaveAttribute('data-slot', 'funnel-ribbon');
-    const svgs = ribbon.querySelectorAll('svg');
-    expect(svgs).toHaveLength(2);
-    for (const svg of svgs) {
-      expect(svg).toHaveAttribute('viewBox', '0 0 1 172');
-      expect(svg).toHaveAttribute('preserveAspectRatio', 'none');
-      const paths = svg.querySelectorAll('path');
+    expect(ribbon.querySelectorAll('svg.recharts-surface')).toHaveLength(1);
+    const segments = fills('fp');
+    expect(segments).toHaveLength(2);
+    for (const g of segments) {
+      const paths = g.querySelectorAll('path');
       expect(paths).toHaveLength(3);
       for (const p of paths) expect(p.getAttribute('d')).not.toContain('NaN');
     }
+  });
+
+  it('places each segment in its own recharts column, from the column x to x + width', () => {
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={2} />
+        <FunnelStep name='B' value={1} />
+      </Funnel>,
+    );
+    const bodies = [...fills('fp')].map(g => g.querySelector('path:last-child')?.getAttribute('d'));
+    expect(bodies[0]).toMatch(/^M0 16C54 16 66 51 120 51V/);
+    expect(bodies[1]).toMatch(/^M120 51C174 51 186 51 240 51V/);
   });
 
   it('fills each column from the ramp with a literal light + dark class', () => {
@@ -213,10 +237,133 @@ describe('Funnel — ribbon', () => {
         <FunnelStep name='C' value={1} />
       </Funnel>,
     );
-    const fills = screen.getByTestId('fp--ribbon').querySelectorAll('g');
-    expect(fills).toHaveLength(3);
-    expect(fills[0]).toHaveClass('fill-teal-400', 'in-data-[theme=dark]:fill-teal-600');
-    expect(fills[2]).toHaveClass('fill-teal-600', 'in-data-[theme=dark]:fill-teal-400');
+    const segments = fills('fp');
+    expect(segments).toHaveLength(3);
+    expect(segments[0]).toHaveClass('fill-teal-400', 'in-data-[theme=dark]:fill-teal-600');
+    expect(segments[2]).toHaveClass('fill-teal-600', 'in-data-[theme=dark]:fill-teal-400');
+  });
+
+  it('staggers the entrance by step index and turns it off under reduced motion', () => {
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={3} />
+        <FunnelStep name='B' value={2} />
+      </Funnel>,
+    );
+    const segments = fills('fp');
+    expect((segments[1] as SVGElement).style.getPropertyValue('--funnel-i')).toBe('1');
+    expect(segments[0]).toHaveClass('origin-left', 'motion-reduce:animate-none');
+    const [, second] = screen.getAllByRole('listitem');
+    expect(second?.style.getPropertyValue('--funnel-i')).toBe('1');
+  });
+});
+
+// jsdom has no AnimationEvent: `fireEvent.animationEnd` drops `animationName`, and React (seeing no
+// AnimationEvent) listens for the prefixed `webkitAnimationEnd`. Dispatch both, with the name set.
+const animationEnd = (target: Element, animationName: string) =>
+  act(() => {
+    for (const type of ['animationend', 'webkitAnimationEnd']) {
+      target.dispatchEvent(Object.assign(new Event(type, { bubbles: true }), { animationName }));
+    }
+  });
+
+describe('Funnel — entrance', () => {
+  it('turns the band animation off once the last band has grown in, not before', () => {
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={3} />
+        <FunnelStep name='B' value={2} />
+        <FunnelStep name='C' value={1} />
+      </Funnel>,
+    );
+    const ribbon = screen.getByTestId('fp--ribbon');
+    const [first, , last] = fills('fp');
+    expect(first).toHaveClass('in-data-entered:animate-none');
+    animationEnd(first as Element, 'ds-funnel-band-in');
+    animationEnd(last as Element, 'ds-chart-fade-in');
+    expect(ribbon).not.toHaveAttribute('data-entered');
+    animationEnd(last as Element, 'ds-funnel-band-in');
+    expect(ribbon).toHaveAttribute('data-entered', 'true');
+  });
+});
+
+describe('Funnel — hover and focus', () => {
+  const renderFunnel = (onClick?: () => void) =>
+    render(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={3} onClick={onClick} />
+        <FunnelStep name='B' value={2} />
+        <FunnelStep name='C' value={1} />
+      </Funnel>,
+    );
+
+  const state = () => ({
+    cells: screen
+      .getAllByTestId('fp--step')
+      .map(c =>
+        c.hasAttribute('data-active') ? 'active' : c.hasAttribute('data-dimmed') ? 'dim' : '-',
+      ),
+    bands: [...fills('fp')].map(g => (g.hasAttribute('data-dimmed') ? 'dim' : '-')),
+  });
+
+  it('hovering any step column, with or without an action, dims the other steps and bands', () => {
+    renderFunnel();
+    expect(state()).toEqual({ cells: ['-', '-', '-'], bands: ['-', '-', '-'] });
+    fireEvent.pointerEnter(screen.getAllByRole('listitem')[1] as HTMLElement);
+    expect(state()).toEqual({ cells: ['dim', 'active', 'dim'], bands: ['dim', '-', 'dim'] });
+    fireEvent.pointerEnter(screen.getAllByRole('listitem')[2] as HTMLElement);
+    expect(state()).toEqual({ cells: ['dim', 'dim', 'active'], bands: ['dim', 'dim', '-'] });
+  });
+
+  it('leaving the funnel brings every step back', () => {
+    renderFunnel();
+    fireEvent.pointerEnter(screen.getAllByRole('listitem')[0] as HTMLElement);
+    fireEvent.pointerLeave(screen.getByRole('list'));
+    expect(state()).toEqual({ cells: ['-', '-', '-'], bands: ['-', '-', '-'] });
+  });
+
+  it('keyboard focus on a step dims the others; hover wins while the pointer is on another step', () => {
+    renderFunnel(rs.fn());
+    const [button] = screen.getAllByTestId('fp--step');
+    // jsdom never matches :focus-visible; keyboard (Tab) focus does in a browser (see the e2e).
+    const matches = rs.spyOn(Element.prototype, 'matches').mockReturnValue(true);
+    act(() => button?.focus());
+    matches.mockRestore();
+    expect(state().cells).toEqual(['active', 'dim', 'dim']);
+    fireEvent.pointerEnter(screen.getAllByRole('listitem')[2] as HTMLElement);
+    expect(state().cells).toEqual(['dim', 'dim', 'active']);
+    fireEvent.pointerLeave(screen.getByRole('list'));
+    expect(state().cells).toEqual(['active', 'dim', 'dim']);
+    act(() => button?.blur());
+    expect(state().cells).toEqual(['-', '-', '-']);
+  });
+
+  it('ignores focus that is not focus-visible (a mouse click), so leaving restores every step', () => {
+    renderFunnel(rs.fn());
+    const [button] = screen.getAllByTestId('fp--step');
+    const matches = rs.spyOn(Element.prototype, 'matches').mockReturnValue(false);
+    act(() => button?.focus());
+    matches.mockRestore();
+    expect(state().cells).toEqual(['-', '-', '-']);
+  });
+
+  it('drops a highlight that no longer names a step when the steps shrink', () => {
+    const { rerender } = renderFunnel();
+    fireEvent.pointerEnter(screen.getAllByRole('listitem')[2] as HTMLElement);
+    rerender(
+      <Funnel data-testid='fp'>
+        <FunnelStep name='A' value={3} />
+        <FunnelStep name='B' value={2} />
+      </Funnel>,
+    );
+    expect(state()).toEqual({ cells: ['-', '-'], bands: ['-', '-'] });
+  });
+
+  it('keeps the pointer cursor only on a step with onClick', () => {
+    renderFunnel(rs.fn());
+    const [withAction, without] = screen.getAllByTestId('fp--step');
+    expect(withAction).toHaveClass('enabled:cursor-pointer');
+    expect(without?.className).not.toContain('cursor-pointer');
   });
 });
 
@@ -341,7 +488,27 @@ describe('FunnelSkeleton', () => {
     const ref = createRef<HTMLDivElement>();
     render(<FunnelSkeleton ref={ref} data-testid='sk' />);
     expect(ref.current).toBe(screen.getByTestId('sk'));
-    expect(ref.current?.firstElementChild?.children).toHaveLength(3);
+    expect(ref.current?.querySelectorAll('[data-slot="funnel-skeleton-column"]')).toHaveLength(3);
+  });
+
+  it('shimmers name / value / caption per column and a funnel-shaped ribbon', () => {
+    render(<FunnelSkeleton data-testid='sk' steps={2} />);
+    const columns = screen
+      .getByTestId('sk')
+      .querySelectorAll('[data-slot="funnel-skeleton-column"]');
+    for (const col of columns)
+      expect(col.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(3);
+    const ribbon = screen.getByTestId('sk--ribbon');
+    expect(ribbon).toHaveClass('animate-skeleton', '[clip-path:var(--funnel-skeleton-clip)]');
+    const clip = screen.getByTestId('sk').querySelector('clipPath');
+    expect(clip).toHaveAttribute('clipPathUnits', 'objectBoundingBox');
+    const paths = [...(clip?.querySelectorAll('path') ?? [])].map(p => p.getAttribute('d'));
+    expect(paths).toHaveLength(2);
+    // Column 1 narrows 140 → 40, column 2 stays flat at 40; x runs 0..0.5 and 0.5..1.
+    expect(paths[0]).toBe('M0 16C0.225 16 0.275 66 0.5 66V106C0.275 106 0.225 156 0 156Z');
+    expect(paths[1]).toMatch(/^M0\.5 66C.* 1 66V106/);
+    const track = screen.getByTestId('sk').firstElementChild as HTMLElement;
+    expect(track.style.getPropertyValue('--funnel-skeleton-clip')).toBe(`url("#${clip?.id}")`);
   });
 });
 

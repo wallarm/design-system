@@ -1,7 +1,33 @@
 import type { FunnelColor, FunnelShade } from './constants';
 
-/** Shared by the step `<li>` and its ribbon `<svg>` so the two columns always line up. */
+/**
+ * Step column width, shared by the `FunnelStep` `<li>` and the `FunnelSkeleton` columns. The ribbon
+ * splits the same track into equal columns itself (`FunnelRibbon`), so keep columns equal.
+ */
 export const funnelColumnClasses = 'flex-1 min-w-120';
+
+// Hover dimming: 30% (`LINE_INACTIVE_OPACITY`, as in PieChart / HorizontalBarStack), 150ms ease-out.
+// Entrance: `--funnel-i` is the step index; steps follow one another 120ms apart. Fill mode
+// `backwards`, not `both`: a kept end frame would pin opacity / transform and beat the dimming.
+
+/** A ribbon segment `<g>`: grows from its start edge, vertically centred; fades when another step is active. */
+export const funnelBandClasses = [
+  'origin-left [transform-box:fill-box]',
+  'animate-[ds-funnel-band-in_600ms_cubic-bezier(0.85,0,0.15,1)_backwards]',
+  '[animation-delay:calc(var(--funnel-i,0)*120ms)]',
+  'transition-opacity duration-150 ease-out data-dimmed:opacity-30',
+  // Set on the ribbon once the last band is in: resizes remount the shapes, the entrance must not replay.
+  'in-data-entered:animate-none',
+  'motion-reduce:animate-none motion-reduce:transition-none',
+].join(' ');
+
+/** On a step cell: its labels fade in 250ms after their band starts and fade when another step is active. */
+export const funnelCellContentClasses = [
+  '*:animate-[ds-chart-fade-in_350ms_ease-out_backwards]',
+  '*:[animation-delay:calc(var(--funnel-i,0)*120ms_+_250ms)]',
+  '*:transition-opacity *:duration-150 *:ease-out data-dimmed:*:opacity-30',
+  'motion-reduce:*:animate-none motion-reduce:*:transition-none',
+].join(' ');
 
 /**
  * Ribbon fill per hue and light-theme shade; the dark theme flips to `1000 − shade`.

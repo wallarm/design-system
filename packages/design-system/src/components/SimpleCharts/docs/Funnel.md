@@ -2,7 +2,7 @@
 
 ## Overview
 
-`Funnel` is a horizontal step funnel: how a count narrows from stage to stage, left to right. Each stage is a `FunnelStep` title cell (name, count, optional delta, optional caption) above one smooth ribbon scaled to the largest step. It renders the body only — the card frame and title are composed with the shared `Chart` / `ChartHeader` / `ChartTitle`, like every family member. Use it for consecutive stages of one flow (detected → reviewed → confirmed); when the rows are independent categories use `BarList`; when one total splits into parts use `HorizontalBarStack`.
+`Funnel` is a horizontal step funnel: how a count narrows from stage to stage, left to right. Each stage is a `FunnelStep` title cell (name, count, optional delta, optional caption) above one smooth ribbon scaled to the largest step. The ribbon is a recharts `BarChart` (one category per step, no gaps) whose bar `shape` draws the funnel segment; the title cells stay HTML. It renders the body only — the card frame and title are composed with the shared `Chart` / `ChartHeader` / `ChartTitle`, like every family member. Use it for consecutive stages of one flow (detected → reviewed → confirmed); when the rows are independent categories use `BarList`; when one total splits into parts use `HorizontalBarStack`.
 
 ## Data model
 
@@ -20,7 +20,7 @@ Compound, composed from children — no `data` array. `Funnel` reads `value` fro
   - `delta` (optional, `ReactNode`) — slot for `<MetricDelta … />`, placed right after the value. No second delta implementation.
   - `onClick` (optional) — makes the step a real `<button type='button'>`.
   - Everything else (`data-*`, `aria-*`, `ref`, event handlers, `className`) is spread onto the step's real node. Button-only attributes (`disabled`, `type`, `form*`) are dropped on the non-interactive `div`. `data-testid` → `{base}--step`; a `data-testid` on the step wins; `MetricDelta` resolves to `{step}--delta`.
-- `FunnelSkeleton` — `steps` (default `3`) empty columns. See Loading.
+- `FunnelSkeleton` — `steps` (default `3`) placeholder columns; `data-testid` base gives the ribbon `{base}--ribbon`. See Loading.
 
 Ramp (palette steps, light → dark, in `constants.ts`):
 
@@ -39,10 +39,11 @@ Fills are palette primitives — no new tokens. They are written out as literal 
 | State | Trigger | Behaviour |
 | --- | --- | --- |
 | Default | ≥ 1 `FunnelStep` | Title cells over the ribbon; steps without `onClick` have no affordance. |
-| Hover | pointer on a step with `onClick` | Tint behind the title cell (`bg-states-primary-hover`, radius 10, inset 6px sides / 2px top and bottom), pointer cursor. The ribbon is not interactive. |
-| Focus | keyboard focus on a step button | Same tint plus an inset `ring-focus-primary` ring. In forced-colors mode (Windows High Contrast) the ring is not painted, so `focus-visible:outline-hidden` shows a system outline instead. |
+| Entrance | the funnel mounts (first render, or `FunnelSkeleton` swapped for `Funnel` when data arrives) | Each band scales 0 → 1 from its left edge, vertically centred, over 600ms `cubic-bezier(0.85, 0, 0.15, 1)`, 120ms after the previous step. Each step's labels fade in over 350ms ease-out, 250ms after their band starts. Off under `prefers-reduced-motion`. |
+| Hover | pointer anywhere in a step column — title, band or the empty space between the dividers — with or without `onClick` | The step keeps full colour and gets the tint behind its title (`bg-states-primary-hover`, radius 10, inset 6px sides / 2px top and bottom). Every other step — labels and band — fades to 30% (`LINE_INACTIVE_OPACITY`), opacity 150ms ease-out. Leaving the list restores all steps. Pointer cursor only on a step with `onClick`. |
+| Focus | keyboard focus on a step button | Same tint and dimming as hover, plus an inset `ring-focus-primary` ring. In forced-colors mode (Windows High Contrast) the ring is not painted, so `focus-visible:outline-hidden` shows a system outline instead. |
 | Dark | a `[data-theme='dark']` ancestor | Every step flips to `1000 − step` (600 → 400, 700 → 300, 200 → 800, `slate-300` → `slate-700`). |
-| Loading | consumer renders `<FunnelSkeleton steps={n} />` instead of `Funnel` | Empty 288px frame with only the `n − 1` step dividers; `aria-busy='true'`, `aria-live='polite'`. No shimmer. |
+| Loading | consumer renders `<FunnelSkeleton steps={n} />` instead of `Funnel` | Same 288px track and `n − 1` dividers; per column three `Skeleton` shimmer blocks in the title cell's line boxes (name 64×16, value 48×28, caption 96×16), and a shimmering funnel silhouette (140px → 40px, linear) in place of the ribbon. Same height as the loaded funnel, so the card does not jump. `aria-busy='true'`, `aria-live='polite'`. |
 | Empty | consumer renders `<ChartEmpty />` instead of `Funnel` | "No data", like the rest of the family. `Funnel` with no `FunnelStep` children renders `null`. |
 | Error | — | None, as in the family. |
 
@@ -50,8 +51,9 @@ There is no selected / filtered state: the funnel has no selection model.
 
 ## Interactions
 
-- **Click** — only on steps with `onClick`. The step is a native button: Enter and Space run `onClick`, it sits in tab order. The ribbon, halos and non-interactive steps do nothing. A step with `disabled` stays a button but shows no hover tint or pointer cursor and does not fire `onClick`.
-- **No hover-sync, no tooltips on the ribbon, no filtering.** The caller owns what a click means (open a drill-down, set a filter elsewhere).
+- **Click** — only on steps with `onClick`. The step is a native button: Enter and Space run `onClick`, it sits in tab order. The ribbon, halos and non-interactive steps are not clickable. A step with `disabled` stays a button but shows no tint or pointer cursor and does not fire `onClick`; it still dims the others on hover.
+- **Hover / focus highlight** — every step, with or without an action. Hover wins over focus: while the pointer is on one step and keyboard focus on another, the hovered one is highlighted; leaving the list falls back to the focused step, and blurring it clears the highlight. Only keyboard focus counts (`:focus-visible`): a mouse click also focuses the button in Chromium, and that focus would keep the other steps dimmed after the pointer leaves with no ring to explain it. The index is dropped when it no longer names a step (steps shrank under a resting pointer, or a focused button was removed — Firefox / Safari fire no blur). State lives in `Funnel` (`hoverIndex ?? focusIndex`), shared with the steps through `FunnelStepContext` and with the ribbon through `FunnelRibbonContext`.
+- **No tooltips on the ribbon, no filtering.** The caller owns what a click means (open a drill-down, set a filter elsewhere).
 - Consumer analytics attributes (`data-analytics-*`, `aria-*`), `ref` and event props land on the step's real node — the button when `onClick` is set, a `div` otherwise (not focusable) — per `docs/metrics/contract.md`. There is deliberately no `stepProps` escape hatch.
 
 ## Edge cases & unclear states
@@ -68,12 +70,17 @@ There is no selected / filtered state: the funnel has no selection model.
 - **The step `ol` needs `min-w-0`.** Without it flex `min-width: auto` made the list (and the columns) grow to the long names' `nowrap` width and overflow, so columns were no longer equal. Found and fixed during implementation; keep it when touching `Funnel.tsx`.
 - **Warnings fire once per message per page session** (module-level set), and never in production builds. The count warning includes the count, so `1` and `7` are separate messages.
 - **Dark theme is CSS, not JS.** Each ribbon column's `<g>` carries its light fill class plus an `in-data-[theme=dark]:fill-{hue}-{1000−step}` pair (on the `<g>`, not the `<svg>` — the unlayered `svg:not([fill])` reset would win there). The dark variant matches any dark ancestor: a dark scope nested in a light page works; a light scope nested inside a dark one is not supported (no light reset).
-- **RTL.** Under `dir='rtl'` the columns run right to left and each ribbon segment is mirrored (`rtl:-scale-x-100`) so the ribbon stays joined.
+- **RTL.** Under `dir='rtl'` the columns run right to left and the whole ribbon plot is mirrored (`rtl:-scale-x-100`), so step *i* stays under column *i* and the bands grow from the start edge.
+- **Recharts remounts the bar shapes when its rectangle data changes identity** (`AnimatedItems` keys them by an animation id, even with `isAnimationActive={false}`). A remount replays the CSS entrance and skips the dimming transition. So the chart's own props never change on hover or a parent re-render: `data` depends on the step count only, `shape` is a module-level function, and thickness, fill and the active step reach the segments through `FunnelRibbonContext`. Keep it that way when touching `FunnelRibbon.tsx`.
+- **The entrance plays once.** A resize still recomputes recharts' rectangles and remounts the shapes; when the last band's `animationend` fires the ribbon gets `data-entered` and the band animation is off from then on. A remount of `Funnel` itself (new `key`, skeleton → data) plays it again. Fill mode is `backwards`, not `both`: a held end frame would pin `opacity` / `transform` and beat the dimming.
+- **Skeleton silhouette is a clipped `Skeleton`.** The shimmer is a CSS `background-image`, which an SVG path cannot carry, so one `Skeleton` block spans the band and is cut by an `objectBoundingBox` `<clipPath>` (x `0..1` across all steps, y scaled by `1/172`) built with `funnelSegmentPath`. The `url(#id)` rides on a CSS variable on the track because `Skeleton` overwrites its own `style`. The columns sit in their own row after it, so the dividers paint over it and `not-first:` only sees columns.
+- **Ribbon needs layout.** `ResponsiveContainer` measures the track; in jsdom (no layout) it renders nothing, so unit tests mock it with a fixed size (same as the `LineChart` tests). The bands appear one frame after the labels on first paint.
 - **Clean DOM.** No `data-testid` on `Funnel` → no derived test ids anywhere.
 
 ## Accessibility notes
 
-- Ribbon SVGs are `aria-hidden`; the title cells are the readable content.
+- The ribbon is `aria-hidden` (recharts' `accessibilityLayer` is off); the title cells are the readable content.
+- Motion respects `prefers-reduced-motion`: no entrance, and the dimming switches without a transition.
 - Steps are an ordered list (`<ol>` / `<li>`); the button (or `div`) lives inside the `<li>`, so screen readers announce position in the list.
 - Clickable steps are native buttons (Enter / Space, tab order, `focus-visible` ring). Non-clickable steps are not focusable.
 - `MetricDelta` (`ChartDelta`) already carries `role='img'` + `aria-label` (e.g. "up 10").
@@ -88,6 +95,7 @@ There is no selected / filtered state: the funnel has no selection model.
   - Horizontal scroll (spec non-goal): the root scrolls and the inner track is `max(240px, steps × 120px)` wide, because the `Chart` card would otherwise clip the last steps silently. `FunnelSkeleton` uses the same track. The scroller is not focusable, so without an interactive step it scrolls by pointer only.
   - The track's `240px` floor (spec only states `min-w-120` per column; equivalent for 2 steps, a floor for 1).
   - `FunnelStep`'s `ref` is typed `Ref<HTMLElement>` (spec: `Ref<HTMLButtonElement | HTMLDivElement>`), cast per node.
-  - `FunnelSkeleton` is a plain frame, no `Skeleton` shimmer; it also takes `data-testid` and root HTML props.
+  - `FunnelSkeleton` takes `data-testid` and root HTML props.
 - **No automated axe check** — the repo's e2e has no axe tooling; a11y is covered by role/keyboard assertions.
-- No conversion / drop-off % between steps (a caption can carry it); no animation; no vertical layout; no `packages/gen-ui` catalog entry yet.
+- **Entrance duration.** 600ms (the reference measured 1100ms, too long for a dashboard card); to be tuned in Storybook with design (`Entrance` story).
+- No conversion / drop-off % between steps (a caption can carry it); no vertical layout; no `packages/gen-ui` catalog entry yet.

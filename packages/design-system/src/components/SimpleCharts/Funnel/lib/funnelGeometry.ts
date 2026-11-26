@@ -23,12 +23,23 @@ export const funnelThicknesses = (values: readonly number[]): number[] => {
   return safe.map(v => Math.max(FUNNEL_MIN_BODY, (v / max) * FUNNEL_MAX_BODY));
 };
 
-/** Smooth segment path in a `0..1 × 0..172` viewBox, body centred and grown by `grow` px per side. */
-export const funnelSegmentPath = (from: number, to: number, grow: number): string => {
+/**
+ * Smooth segment path over one column `x..x+width` of a 172px-high band, body centred and grown
+ * by `grow` px per side. Defaults to a `0..1` column (the unit tests' frame).
+ */
+export const funnelSegmentPath = (
+  from: number,
+  to: number,
+  grow: number,
+  x = 0,
+  width = 1,
+): string => {
   const a = from / 2 + grow;
   const b = to / 2 + grow;
   const [t0, t1, b1, b0] = [MID - a, MID - b, MID + b, MID + a].map(String);
-  return `M0 ${t0}C0.45 ${t0} 0.55 ${t1} 1 ${t1}V${b1}C0.55 ${b1} 0.45 ${b0} 0 ${b0}Z`;
+  // Flat tangents: control points at 45% / 55% of the column.
+  const [c0, c1, x1] = [x + 0.45 * width, x + 0.55 * width, x + width].map(String);
+  return `M${x} ${t0}C${c0} ${t0} ${c1} ${t1} ${x1} ${t1}V${b1}C${c1} ${b1} ${c0} ${b0} ${x} ${b0}Z`;
 };
 
 /** Fill classes per step (light + dark). Dark mode mirrors the shade (`1000 − shade`). */
