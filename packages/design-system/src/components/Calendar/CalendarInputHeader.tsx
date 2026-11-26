@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useReducer } from 'react';
+import { type FC, type RefObject, useCallback, useReducer, useState } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
 import { cn } from '../../utils/cn';
@@ -11,6 +11,41 @@ export interface CalendarInputHeaderProps {
   /** Additional className for styling */
   className?: string;
 }
+
+/**
+ * Keep a half-typed year in a header `DateInput` instead of handing it to Ark.
+ *
+ * react-stately emits every year keystroke as a whole date (2 → 0002-08-11,
+ * 20 → 0020-08-11, …) and then redraws the field from `value`. Ark clamps that
+ * date to `minDate`/`maxDate` and `Calendar` drops a range whose end precedes
+ * its start, so the field lost what was typed (WDS-165). A date whose year is
+ * under 1000 stays here, shown in place of Ark's value, until the year is
+ * complete or Ark's value for the field changes (a grid pick, a preset, Reset).
+ * The header therefore can't commit a year before 1000.
+ */
+const useHeaderDate = (
+  value: ReactAriaDateValue | null,
+  commit: (value: ReactAriaDateValue | null) => void,
+) => {
+  const [typing, setTyping] = useState<{
+    date: ReactAriaDateValue;
+    over: ReactAriaDateValue | null;
+  } | null>(null);
+
+  const shown =
+    typing && (typing.over === value || sameDate(typing.over, value)) ? typing.date : value;
+
+  const handleChange = (next: ReactAriaDateValue | null) => {
+    if (next && next.year < 1000) {
+      setTyping({ date: next, over: value });
+      return;
+    }
+    setTyping(null);
+    commit(next);
+  };
+
+  return [shown, handleChange] as const;
+};
 
 const SingleDateInputInner: FC<{
   api: UseDatePickerReturn;
@@ -64,12 +99,17 @@ const SingleDateInputInner: FC<{
   // from timeRef; minute granularity also rejects a date-only value.
   const dateTimeValue = inputValue ? toReactAriaDateValue(withTime(inputValue, time)) : null;
 
+  const [shownValue, handleInput] = useHeaderDate(
+    showTime ? dateTimeValue : inputValue,
+    showTime ? handleDateTimeChange : handleChange,
+  );
+
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
       {showTime ? (
         <DateInput
-          value={dateTimeValue}
-          onChange={handleDateTimeChange}
+          value={shownValue}
+          onChange={handleInput}
           readOnly={readonly}
           granularity='minute'
           showTimeDropdown
@@ -77,8 +117,8 @@ const SingleDateInputInner: FC<{
         />
       ) : (
         <DateInput
-          value={inputValue}
-          onChange={handleChange}
+          value={shownValue}
+          onChange={handleInput}
           readOnly={readonly}
           granularity='day'
           showIcon={false}
@@ -138,14 +178,20 @@ const RangeDateInputInner: FC<{
   );
 
   // Use null for controlled mode when no value (not undefined)
-  const startValue = toReactAriaDateValue(api.value[0]);
-  const endValue = toReactAriaDateValue(api.value[1]);
+  const [startValue, handleStartInput] = useHeaderDate(
+    toReactAriaDateValue(api.value[0]),
+    handleStartChange,
+  );
+  const [endValue, handleEndInput] = useHeaderDate(
+    toReactAriaDateValue(api.value[1]),
+    handleEndChange,
+  );
 
   return (
     <div className='relative flex flex-1 items-center gap-4' onKeyDown={e => e.stopPropagation()}>
       <DateInput
         value={startValue}
-        onChange={handleStartChange}
+        onChange={handleStartInput}
         readOnly={readonly}
         granularity='day'
         showIcon={false}
@@ -158,7 +204,7 @@ const RangeDateInputInner: FC<{
       </span>
       <DateInput
         value={endValue}
-        onChange={handleEndChange}
+        onChange={handleEndInput}
         readOnly={readonly}
         granularity='day'
         showIcon={false}
