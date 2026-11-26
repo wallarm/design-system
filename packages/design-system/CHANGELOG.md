@@ -1,3 +1,13 @@
+## [4.25.0](https://github.com/wallarm/design-system/compare/v4.24.0...v4.25.0) (2026-11-26)
+
+### Features
+
+* **simple-charts:** funnel hover, entrance and skeleton on recharts (WDS-209) ([#533](https://github.com/wallarm/design-system/issues/533)) ([0eb70c1](https://github.com/wallarm/design-system/commit/0eb70c1bb3cd9f40c6b8cd82f4faeb411bf1bc9b))
+
+### Bug Fixes
+
+* **country:** keep flag data URIs out of the type declarations ([#535](https://github.com/wallarm/design-system/issues/535)) ([9a3c173](https://github.com/wallarm/design-system/commit/9a3c1738e815bd9d91f0c2d9a408a1a96f6c5cb9))
+
 ## [4.24.0](https://github.com/wallarm/design-system/compare/v4.23.0...v4.24.0) (2026-11-26)
 
 ### Features
