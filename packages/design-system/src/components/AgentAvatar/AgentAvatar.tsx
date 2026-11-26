@@ -2,6 +2,7 @@ import type { CSSProperties, FC, Ref, RefObject, SVGProps } from 'react';
 import { useContext, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { charTree } from '../../lib/agent-characters/char';
 import type { AgentCharacterId, AgentLook } from '../../lib/agent-characters/data.gen';
+import { DRAWING_MIDDLE } from '../../lib/agent-characters/drawing.gen';
 import { hash32, lookOf, rng } from '../../lib/agent-characters/look';
 import type { AgentAvatarSize } from '../../lib/agent-characters/places';
 import { getRuntime } from '../../lib/agent-characters/runtime';
@@ -50,6 +51,10 @@ export type AgentAvatarProps = Omit<
     coverage?: 'full' | 'partial';
     /** The contact shadow: the drawer header, the empty chat and 96 px and up (D1). */
     shadow?: boolean;
+    /** `drawing` centres the character's visible drawing, not its box, on the row: beside a name and role, where a
+     *  short character (Sift, Tune, Lens) would hang below the text. Moves the drawing only; the box keeps its size
+     *  and place. Presets only (a custom look stays where its box is). Default `box`. */
+    align?: 'box' | 'drawing';
     /** Set when the character stands alone; leave unset next to the agent's visible name (decorative). */
     label?: string;
     /** The agent's uid: keeps its timing stable and distinct from its neighbours. */
@@ -82,6 +87,7 @@ type SvgRest = Omit<
   | 'hasApplications'
   | 'coverage'
   | 'shadow'
+  | 'align'
   | 'label'
   | 'seed'
   | 'live'
@@ -93,6 +99,8 @@ type SvgRest = Omit<
 interface FrameProps {
   t: ReturnType<typeof charTree>;
   size: number;
+  /** px to move the drawing down (negative: up), `align='drawing'` */
+  dy: number;
   /** bake the grey veil layers too */
   veil: boolean;
   agent?: AgentCharacterId;
@@ -104,7 +112,7 @@ interface FrameProps {
 }
 
 /** The rendered SVG with its baked layers. Live, the engine owns every attribute it animates. */
-const Frame: FC<FrameProps> = ({ t, size, veil, agent, seed, label, live, rest, svgRef }) => {
+const Frame: FC<FrameProps> = ({ t, size, dy, veil, agent, seed, label, live, rest, svgRef }) => {
   const { className, style, ...props } = rest;
   const baked = useBakedLayers(
     t.layers.filter(l => !l.veil || veil),
@@ -149,9 +157,18 @@ const Frame: FC<FrameProps> = ({ t, size, veil, agent, seed, label, live, rest, 
       height={t.height}
       {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true })}
       // The size wins over a slot's `[&_svg]:icon-*`, as in AgentGlyph.
-      className={cn('w-(--agent-w)! h-(--agent-h)! shrink-0', className)}
+      className={cn(
+        'w-(--agent-w)! h-(--agent-h)! shrink-0',
+        dy && 'translate-y-(--agent-dy)',
+        className,
+      )}
       style={
-        { '--agent-w': `${t.width}px`, '--agent-h': `${t.height}px`, ...style } as CSSProperties
+        {
+          '--agent-w': `${t.width}px`,
+          '--agent-h': `${t.height}px`,
+          ...(dy ? { '--agent-dy': `${dy}px` } : {}),
+          ...style,
+        } as CSSProperties
       }
     >
       {t.children.map(withImages).map((n, i) => renderSvgNode(n, i, bakedImage))}
@@ -166,6 +183,7 @@ interface InnerProps {
   state: AgentAvatarState;
   cover: boolean;
   shadow: boolean;
+  dy: number;
   label?: string;
   seed: string;
   handleRef?: Ref<AgentAvatarHandle>;
@@ -183,6 +201,7 @@ const StaticAvatar: FC<InnerProps> = ({
   state,
   cover,
   shadow,
+  dy,
   label,
   seed,
   handleRef,
@@ -246,6 +265,7 @@ const StaticAvatar: FC<InnerProps> = ({
     <Frame
       t={t}
       size={size}
+      dy={dy}
       veil={t.ghosting}
       agent={agent}
       seed={seed}
@@ -265,6 +285,7 @@ const LiveAvatar: FC<InnerProps> = ({
   state,
   cover,
   shadow,
+  dy,
   label,
   seed,
   handleRef,
@@ -301,6 +322,7 @@ const LiveAvatar: FC<InnerProps> = ({
     <Frame
       t={t}
       size={size}
+      dy={dy}
       veil={veil}
       agent={agent}
       seed={seed}
@@ -326,6 +348,7 @@ export const AgentAvatar: FC<AgentAvatarProps> = ({
   hasApplications = false,
   coverage = 'full',
   shadow = false,
+  align = 'box',
   label,
   seed,
   live = false,
@@ -338,6 +361,9 @@ export const AgentAvatar: FC<AgentAvatarProps> = ({
   // the crown stays in every state but Deactivated (04 §4.11; charTree drops it when off)
   const cover = hasApplications && coverage === 'partial';
   const motion = useAgentMotion(live);
+  // the view box is 136 wide with its middle at 50; the drawing's middle comes from drawing.gen
+  const middle = align === 'drawing' && agent ? DRAWING_MIDDLE[agent] : undefined;
+  const dy = middle === undefined ? 0 : Math.round(((50 - middle) * size * 10) / 136) / 10;
   const inner: InnerProps = {
     c,
     agent,
@@ -345,6 +371,7 @@ export const AgentAvatar: FC<AgentAvatarProps> = ({
     state,
     cover,
     shadow,
+    dy,
     label,
     seed,
     handleRef,

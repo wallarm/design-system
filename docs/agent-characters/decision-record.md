@@ -196,3 +196,17 @@ therefore hopped together, and On duty's repertoire, already in the engine, was 
   waiting, 30 s, no two starts within 700 ms, a hop and at least three kinds of move.
 - **128 px:** a closed size for the product's Agent team card and drawer header, which Figma draws at 128. Nothing
   else changes with it: the size picks the renderer and scales the same artwork. `PLACES` keeps the handoff's table.
+
+## A character beside text is centred by its drawing (AGL-229, 2026-11-25)
+
+The product's design review (Jira AGL-229 §7) found short characters hanging low beside their name and role in the
+hover card. The view box keeps 14 units of headroom for antennae and dishes, so a row that centres the box centres
+Radar and Trim, which fill it, but Sift, Tune, Lens and Patch sit up to 10 px (at 56) below the text.
+
+- **`align='drawing'`** on `AgentAvatar` moves the drawing (a CSS translate, so the box keeps its size and place in the
+  layout, and live motion is not clipped) until its vertical middle is the box's. Default `box`: nothing changes for
+  a place that doesn't ask.
+- **Per character, next to the artwork:** `drawing.gen.ts` holds each preset's middle in view-box units, measured by
+  `scripts/agent-avatars/measure-drawings.ts` (the idle pose's bounding box in the browser: body, parts and prop, no
+  veil, no shadow). Re-run it when the cast's artwork changes. A custom look has no entry and stays where its box is.
+- **Checked:** in the `BesideText` story every preset's drawing is centred on its name and role within 0.1 px.
