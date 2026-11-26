@@ -1,3 +1,10 @@
+## [4.26.1](https://github.com/wallarm/design-system/compare/v4.26.0...v4.26.1) (2026-11-26)
+
+### Bug Fixes
+
+* **calendar:** keep the input header date while its year is typed (WDS-165) ([#537](https://github.com/wallarm/design-system/issues/537)) ([a687274](https://github.com/wallarm/design-system/commit/a68727444f29bc36d92d8a1b24f75c8eb53da950))
+* **drawer:** fire onExitComplete when overlay turns off mid-fade ([#517](https://github.com/wallarm/design-system/issues/517)) ([756c44b](https://github.com/wallarm/design-system/commit/756c44bbcc9ac441a815fa76b7be303fbe309ca0))
+
 ## [4.26.0](https://github.com/wallarm/design-system/compare/v4.25.0...v4.26.0) (2026-11-26)
 
 ### Features
