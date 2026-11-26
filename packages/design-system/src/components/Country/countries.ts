@@ -1,3 +1,11 @@
+interface CountryData {
+  readonly name: string;
+  /** Round flag as an SVG data URI. */
+  readonly flag: string;
+}
+
+// `satisfies`, not `as const`: the keys stay literal (`CountryCode`), the values widen to
+// `string`. With `as const` every flag's data URI became a literal type, a 244 kB `.d.ts`.
 export const countries = {
   AF: {
     name: 'Afghanistan',
@@ -999,6 +1007,6 @@ export const countries = {
     name: 'Zimbabwe',
     flag: 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%20viewBox%3D%220%200%20512%20512%22%20style%3D%22border-radius%3A50%25%22%3E%3Cpath%20fill%3D%22%236da544%22%20d%3D%22M31.4%200H512v512H31.4z%22%2F%3E%3Cpath%20fill%3D%22%23ffda44%22%20d%3D%22M57.8%2073.3H512v73.3l-65.1%20110%2065.1%20110v73.3H57.8z%22%2F%3E%3Cpath%20fill%3D%22%23d80027%22%20d%3D%22M132%20146.6h380v73.3l-27%2036%2027%2037.3v73.3H132z%22%2F%3E%3Cpath%20fill%3D%22%23eee%22%20d%3D%22M0%200v512l279.8-256z%22%2F%3E%3Cpath%20fill%3D%22%23d80027%22%20d%3D%22m103%20189.2%2016.5%2051h53.6l-43.4%2031.6%2016.6%2051-43.4-31.5-43.4%2031.5%2016.6-51-43.4-31.6h53.6z%22%2F%3E%3Cpath%20fill%3D%22%23ffda44%22%20d%3D%22m148.5%20260.2-43.2-15.3-3.4-31a16.7%2016.7%200%201%200-32.5%207.6l-12%2012.1h21.5c0%2022.4-16.7%2022.4-16.7%2044.7l9.2%2022.2h55.7l9.3-22.2a22.2%2022.2%200%200%200%201.7-6.6c8-3.2%2010.4-11.5%2010.4-11.5z%22%2F%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22m31.4%200%20220%20220H512v73.2H250.2L31.4%20512H0l256-256L0%200z%22%2F%3E%3C%2Fsvg%3E',
   },
-} as const;
+} satisfies Record<string, CountryData>;
 
 export type CountryCode = keyof typeof countries;
