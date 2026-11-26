@@ -57,7 +57,7 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 ## States
 
 - **Default** — columns over the dashed grid, legend above.
-- **Hover a column** — a dashed ruler at the column's horizontal centre and the popover: the formatted `xKey` value, then one row per series in legend order (`—` for a missing value). The popover's Y is locked to the plot's middle, as in `LineChart`.
+- **Hover a column** — a dashed ruler at the column's horizontal centre and the popover: the formatted `xKey` value, then one row per series in legend order (`—` for a missing value). The popover's Y is locked to the plot's middle, as in `LineChart`, and it is portalled out of the card — with many categories it is taller than the plot and overlaps the legend and the card edge instead of being clipped.
 - **Hover / focus a legend item** — the other categories fade to 30% (`LINE_INACTIVE_OPACITY`); the item gets the hover background. The hovered parts carry `data-active='true'`.
 - **Clickable legend** — pass `onClick` to `LineChartLegendItem`: it becomes `role='button'`, tabbable, Enter / Space click. What a click does is the consumer's (the Agentic Overview opens the verdict's list); the chart has no filter state.
 - **Empty / Loading** — no chart-specific frame: compose `LineChartEmpty` (with a message, or bare under skeleton legend items) in place of `ColumnChart`, as the stories do.

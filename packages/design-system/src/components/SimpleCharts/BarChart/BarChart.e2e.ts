@@ -15,7 +15,7 @@ const getParts = (page: Page, key: string, testId = 'bar-chart') =>
   page.getByTestId(`${testId}--part`).and(page.locator(`[data-key="${key}"]`));
 const getLegendItem = (page: Page, key: string) =>
   page.getByTestId('bar-chart--legend-item').and(page.locator(`[data-key="${key}"]`));
-// The popover renders inside the `aria-hidden` plot, so `getByRole('tooltip')` never finds it.
+// Located by test id — role queries would also match other tooltips on the page.
 const getHoverPopover = (page: Page, testId = 'bar-chart') =>
   page.getByTestId(`${testId}--hover-popover`);
 

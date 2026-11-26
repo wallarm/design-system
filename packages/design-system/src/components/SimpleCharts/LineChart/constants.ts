@@ -31,10 +31,6 @@ export const LINE_Y_LABEL_WIDTH = 38;
 // `margin` only handles the outer-right inset and zero top/bottom.
 export const LINE_DEFAULT_BODY_MARGIN = { top: 0, right: 12, bottom: 0, left: 0 };
 
-// First-frame fallback before recharts has measured the plot. Once measured,
-// the popover snaps to the plot's vertical centre via `usePlotArea`.
-export const HOVER_POPOVER_TOP = 8;
-
 export const LINE_AXIS_TICK_TEXT_PROPS = {
   fill: 'var(--color-text-secondary)',
   fontSize: 10,

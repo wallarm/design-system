@@ -8,7 +8,7 @@ export interface LineChartHoverPopoverProps extends HTMLAttributes<HTMLDivElemen
 
 /**
  * The line chart's hover popover — the shared `ChartHoverCard` surface with tooltip
- * semantics (`role='tooltip'` + `aria-live`), positioned by the plotting-library tooltip.
+ * semantics (`role='tooltip'` + `aria-live`). `LineChartTooltip` portals and positions it.
  */
 export const LineChartHoverPopover: FC<LineChartHoverPopoverProps> = ({ ref, ...props }) => {
   const testId = useTestId('hover-popover');
