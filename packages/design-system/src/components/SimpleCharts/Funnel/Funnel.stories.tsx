@@ -1,5 +1,6 @@
 import { type FC, type ReactNode, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Button } from '../../Button';
 import { Chart, ChartEmpty, ChartHeader, ChartTitle } from '../Chart';
 import { MetricDelta } from '../Metric';
 import type { FunnelColor } from './constants';
@@ -300,13 +301,40 @@ export const WithDelta: StoryFn<typeof meta> = args => (
 );
 
 /**
- * `FunnelSkeleton` holds the frame and the step dividers while the data loads.
+ * `FunnelSkeleton` holds the card while the data loads: the step dividers, a shimmer per title line and a funnel silhouette in place of the ribbon, at the loaded height so nothing jumps.
  */
 export const Loading: StoryFn<typeof meta> = () => (
   <Card>
     <FunnelSkeleton data-testid='funnel-skeleton' />
   </Card>
 );
+
+/**
+ * The entrance plays when the data arrives: swap `FunnelSkeleton` for `Funnel` and each band grows
+ * from its left edge, one step after another, with the labels fading in just behind. Press the
+ * button to load (or reload) the data. Under `prefers-reduced-motion` the funnel appears at once.
+ */
+export const Entrance: StoryFn<typeof meta> = args => {
+  const [loads, setLoads] = useState(0);
+  const handleLoad = () => setLoads(n => n + 1);
+  return (
+    <div className='flex flex-col items-start gap-8'>
+      <Card>
+        {loads === 0 ? (
+          <FunnelSkeleton data-testid='funnel-skeleton' />
+        ) : (
+          // A new key remounts the funnel, so every load replays the entrance.
+          <Funnel key={loads} {...args}>
+            {steps(falsePositives)}
+          </Funnel>
+        )}
+      </Card>
+      <Button data-testid='funnel-load' variant='outline' color='neutral' onClick={handleLoad}>
+        {loads === 0 ? 'Load data' : 'Reload'}
+      </Button>
+    </div>
+  );
+};
 
 /**
  * With no steps to draw, show `ChartEmpty` inside the card instead.

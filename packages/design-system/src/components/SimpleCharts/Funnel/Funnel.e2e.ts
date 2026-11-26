@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const story = createStoryHelper('charts-funnel', [
@@ -13,7 +13,18 @@ const story = createStoryHelper('charts-funnel', [
   'Loading',
   'Empty',
   'Dark Theme',
+  'Entrance',
 ] as const);
+
+// The bands grow in on mount (CSS keyframes) and dimming fades over 150ms. Force
+// `prefers-reduced-motion: reduce` so both are off and every screenshot shows the final state.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+});
+
+// The cell's labels carry the dimming (the cell itself keeps the tint and focus ring).
+const stepLabel = (page: Page, index: number) =>
+  page.getByTestId('funnel--step').nth(index).locator('> span').first();
 
 test.describe('Component: Funnel', () => {
   // No Selected screenshot: the funnel has no selection state.
@@ -73,6 +84,47 @@ test.describe('Component: Funnel', () => {
   });
 
   test.describe('Interactions', () => {
+    test('Should dim the other steps while a step is hovered', async ({ page }) => {
+      await story.goto(page, 'Default');
+      await page.getByTestId('funnel--step').nth(1).hover();
+      await expect(stepLabel(page, 0)).toHaveCSS('opacity', '0.3');
+      await expect(stepLabel(page, 1)).toHaveCSS('opacity', '1');
+      await expect(stepLabel(page, 2)).toHaveCSS('opacity', '0.3');
+    });
+
+    test('Should dim the other steps when hovering the band under a step', async ({ page }) => {
+      await story.goto(page, 'Default');
+      const ribbon = await page.getByTestId('funnel--ribbon').boundingBox();
+      if (!ribbon) throw new Error('ribbon not laid out');
+      // Centre of the third column, inside the band: the whole column is the hover zone.
+      await page.mouse.move(ribbon.x + (ribbon.width * 5) / 6, ribbon.y + ribbon.height / 2);
+      await expect(stepLabel(page, 2)).toHaveCSS('opacity', '1');
+      await expect(stepLabel(page, 0)).toHaveCSS('opacity', '0.3');
+    });
+
+    test('Should bring every step back when the pointer leaves the funnel', async ({ page }) => {
+      await story.goto(page, 'Default');
+      await page.getByTestId('funnel--step').first().hover();
+      await expect(stepLabel(page, 1)).toHaveCSS('opacity', '0.3');
+      await page.mouse.move(0, 0);
+      for (const i of [0, 1, 2]) await expect(stepLabel(page, i)).toHaveCSS('opacity', '1');
+    });
+
+    test('Should dim the other steps on keyboard focus', async ({ page }) => {
+      await story.goto(page, 'Default');
+      await page.keyboard.press('Tab');
+      await expect(stepLabel(page, 0)).toHaveCSS('opacity', '1');
+      await expect(stepLabel(page, 1)).toHaveCSS('opacity', '0.3');
+    });
+
+    test('Should draw the funnel when the data arrives', async ({ page }) => {
+      await story.goto(page, 'Entrance');
+      await expect(page.getByTestId('funnel-skeleton')).toBeVisible();
+      await page.getByTestId('funnel-load').click();
+      await expect(page.getByTestId('funnel--ribbon')).toBeVisible();
+      await expect(page.getByTestId('funnel--step')).toHaveCount(3);
+    });
+
     test('Should run the step action when a step is clicked', async ({ page }) => {
       await story.goto(page, 'Default');
       const log = page.getByTestId('funnel-last-action');

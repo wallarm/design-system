@@ -1,23 +1,12 @@
 import type { CSSProperties, FC, HTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
-import { Children, isValidElement, useEffect } from 'react';
+import { Children, isValidElement, useEffect, useState } from 'react';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
-import { funnelColumnClasses } from './classes';
-import {
-  FUNNEL_BAND_HEIGHT,
-  FUNNEL_HALO_OPACITY,
-  FUNNEL_HALOS,
-  FUNNEL_MIN_BODY,
-  type FunnelColor,
-  type FunnelStart,
-} from './constants';
+import type { FunnelColor, FunnelStart } from './constants';
+import { FunnelStepContext } from './FunnelContext';
+import { FunnelRibbon } from './FunnelRibbon';
 import { FunnelStep, type FunnelStepProps } from './FunnelStep';
-import {
-  funnelSegmentPath,
-  funnelStepFills,
-  funnelThicknesses,
-  sanitizeFunnelValue,
-} from './lib/funnelGeometry';
+import { funnelStepFills, funnelThicknesses, sanitizeFunnelValue } from './lib/funnelGeometry';
 
 export interface FunnelProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
@@ -40,7 +29,10 @@ const warnOnce = (message: string) => {
 const isStep = (child: ReactNode): child is ReactElement<FunnelStepProps> =>
   isValidElement(child) && child.type === FunnelStep;
 
-/** Horizontal step funnel: a title cell per `FunnelStep` above a smooth ribbon scaled to the largest step. */
+/**
+ * Horizontal step funnel: a title cell per `FunnelStep` above a smooth ribbon scaled to the
+ * largest step. Hovering or focusing a step dims the others; on mount the bands grow in, left to right.
+ */
 export const Funnel: FC<FunnelProps> = ({
   ref,
   color = 'blue',
@@ -54,6 +46,14 @@ export const Funnel: FC<FunnelProps> = ({
   const steps = all.filter(isStep);
   const count = steps.length;
   const values = steps.map(step => step.props.value);
+
+  // Hover wins over focus: the pointer is where the eye is. Moving off the list clears hover,
+  // leaving the focused step (if any) highlighted.
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  // Clamped: the steps can change under a resting pointer or a removed focused button (no blur
+  // fires in Firefox / Safari), leaving an index that no longer names a step.
+  const activeIndex = [hoverIndex, focusIndex].find(i => i !== null && i < count) ?? null;
 
   const hasStrayChildren = steps.length !== all.length;
   const hasBadValue = values.some(v => sanitizeFunnelValue(v) !== v);
@@ -77,6 +77,8 @@ export const Funnel: FC<FunnelProps> = ({
   const thicknesses = funnelThicknesses(values);
   const fills = funnelStepFills(count, color, start);
 
+  const handleListPointerLeave = () => setHoverIndex(null);
+
   return (
     // Scroll root: columns keep min-w-120, so a card too narrow for every step scrolls instead of
     // clipping the last steps. The track below carries the width so the ribbon spans all columns.
@@ -91,49 +93,30 @@ export const Funnel: FC<FunnelProps> = ({
         className='relative flex h-288 min-w-[max(240px,calc(var(--funnel-steps)*120px))]'
         style={{ '--funnel-steps': count } as CSSProperties}
       >
-        <div
-          aria-hidden
-          data-slot='funnel-ribbon'
-          data-testid={testId ? `${testId}--ribbon` : undefined}
-          className='absolute inset-x-0 top-100 flex h-172 pointer-events-none'
-        >
-          {fills.map((fill, i) => {
-            const from = thicknesses[i] ?? FUNNEL_MIN_BODY;
-            const to = thicknesses[i + 1] ?? from;
-            return (
-              <svg
-                // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional
-                key={i}
-                viewBox={`0 0 1 ${FUNNEL_BAND_HEIGHT}`}
-                preserveAspectRatio='none'
-                className={cn(
-                  funnelColumnClasses,
-                  // In RTL the columns run right to left; mirror each segment so the ribbon stays joined.
-                  'h-full rtl:-scale-x-100',
-                )}
-              >
-                <g data-slot='funnel-ribbon-fill' className={fill}>
-                  {FUNNEL_HALOS.map(grow => (
-                    <path
-                      key={grow}
-                      d={funnelSegmentPath(from, to, grow)}
-                      fillOpacity={FUNNEL_HALO_OPACITY[grow]}
-                    />
-                  ))}
-                  <path d={funnelSegmentPath(from, to, 0)} />
-                </g>
-              </svg>
-            );
-          })}
-        </div>
+        <FunnelRibbon
+          thicknesses={thicknesses}
+          fills={fills}
+          activeIndex={activeIndex}
+          testId={testId}
+        />
         {/* After the ribbon in the DOM so the step dividers paint over it. */}
         {/* min-w-0: without it the list grows to its long names' nowrap width and overflows. */}
         <ol
           // biome-ignore lint/a11y/noRedundantRoles: Safari/VoiceOver drops list semantics from lists styled with `list-style: none` (Tailwind preflight); role='list' restores it
           role='list'
           className='relative flex flex-1 min-w-0'
+          onPointerLeave={handleListPointerLeave}
         >
-          <TestIdProvider value={testId}>{steps}</TestIdProvider>
+          <TestIdProvider value={testId}>
+            {steps.map((step, index) => (
+              <FunnelStepContext
+                key={step.key}
+                value={{ index, activeIndex, onHover: setHoverIndex, onFocus: setFocusIndex }}
+              >
+                {step}
+              </FunnelStepContext>
+            ))}
+          </TestIdProvider>
         </ol>
       </div>
     </div>

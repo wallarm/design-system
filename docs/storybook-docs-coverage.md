@@ -91,7 +91,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Charts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | ✅ | Charts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | ☐ | Charts/Vertical Stacked Columns Chart | 6 | 6 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
-| ☐ | Charts/Funnel | 11 | 11 | `components/SimpleCharts/Funnel/Funnel.stories.tsx` |
+| ☐ | Charts/Funnel | 12 | 12 | `components/SimpleCharts/Funnel/Funnel.stories.tsx` |
 | ☐ | Charts/Horizontal Stacked Bars Chart | 7 | 7 | `components/SimpleCharts/BarChart/BarChart.stories.tsx` |
 | ✅ | Charts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | ✅ | Charts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
