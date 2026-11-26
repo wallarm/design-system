@@ -27,30 +27,37 @@ export const pieChartLegendClasses = ['flex flex-1 min-w-0 flex-col', 'pt-0 pr-4
   ' ',
 );
 
+/**
+ * A legend row is 32px and pressable whole, but its hover, focus and selected fill is a
+ * 24px band centred in it (the BarList bar's height) that stops short of the card's
+ * right edge: drawn full-height, the fifth row's fill touched the card's border. The
+ * fill is a `::before` behind the row's content (`isolate` keeps it above the card).
+ */
 export const pieChartLegendItemVariants = cva(
   [
     'group/pie-chart-legend-item',
-    'relative flex items-center w-full h-32 px-8 gap-8',
+    'relative isolate flex items-center w-full h-32 px-8 gap-8',
     'rounded-8',
-    'transition-colors',
     'outline-none',
+    "before:content-[''] before:absolute before:-z-1 before:inset-y-4 before:left-0 before:right-3",
+    'before:rounded-6 before:transition-colors',
   ].join(' '),
   {
     variants: {
       interactive: {
         true: [
           'cursor-pointer',
-          'focus-visible:bg-states-primary-hover',
+          'focus-visible:before:bg-states-primary-hover',
           'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus-primary',
         ].join(' '),
         false: '',
       },
       active: {
-        true: 'bg-states-primary-hover',
-        false: 'hover:bg-states-primary-hover',
+        true: 'before:bg-states-primary-hover',
+        false: 'hover:before:bg-states-primary-hover',
       },
       selected: {
-        true: 'bg-states-primary-active',
+        true: 'before:bg-states-primary-active',
         false: '',
       },
       dimmed: {
