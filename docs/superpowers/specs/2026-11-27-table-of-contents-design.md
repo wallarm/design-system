@@ -98,13 +98,22 @@ with no current need).
 `TableOfContents`, `TableOfContentsItem` + their Props types from
 `components/TableOfContents/index.ts`, re-exported from `src/index.ts`.
 
-`useScrollSpy` lives in `src/hooks/useScrollSpy.ts` (added to `src/hooks/index.ts`), but
-`src/hooks` is internal — `src/index.ts` does not re-export it and `package.json` has no
-`./hooks` subpath. *(Builder-check call)*: re-export **only** `useScrollSpy` + its types
-from `components/TableOfContents/index.ts`, so it reaches both the root and the
-`@wallarm-org/design-system/TableOfContents` subpath (core-frontend imports by subpath).
-Do not re-export the whole hooks barrel — that would publish `useControlled` & co. When
-Tabs integration lands, it imports the same hook from `src/hooks`.
+**Hooks become public (user decision).** Today `src/hooks` is internal: `src/index.ts`
+does not re-export it and `package.json` has no `./hooks` subpath.
+
+- `useScrollSpy` lives in `src/hooks/useScrollSpy.ts`, added to `src/hooks/index.ts`
+  with its option/result types.
+- `src/index.ts` re-exports the whole hooks barrel (`useArrowNav`, `useControlled`,
+  `useCopyToClipboard`, `useIsKeyPressed`, `useOverflowItems`, `useScrollSpy` + types).
+  Check for name clashes with existing root exports first.
+- `package.json` `exports` gets a `./hooks` subpath mirroring `./icons`
+  (`development: ./src/hooks/index.ts`, `types/import/require/default: ./dist/hooks/index.*`)
+  — the build is bundleless, `dist/hooks/index.js` is already emitted. Core-frontend shares
+  DS by subpath, so it imports `@wallarm-org/design-system/hooks`.
+- Each hook gets a JSDoc block (they are public API now) — public surface is checked by
+  the MCP/metadata build; make sure it picks hooks up or note the gap.
+- `TableOfContents/index.ts` does **not** re-export the hook (one public path per thing).
+- `feat:` — additive, no migration.
 
 ## Views
 
