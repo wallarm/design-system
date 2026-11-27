@@ -230,6 +230,27 @@ describe('useScrollSpy', () => {
     expect(root.scrollTo).toHaveBeenCalledWith({ top: -490, behavior: 'smooth' });
   });
 
+  it('finds sections inside root when the same ids exist elsewhere on the page', () => {
+    // Another instance earlier in the document (e.g. a second story on a docs page).
+    mountSections({ a: 0, b: 0 });
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    root.getBoundingClientRect = () => rect(0);
+    Object.defineProperty(root, 'scrollTop', { configurable: true, value: 0, writable: true });
+    root.scrollTo = rs.fn() as unknown as typeof root.scrollTo;
+    for (const [id, top] of Object.entries({ a: -300, b: 500 })) {
+      const el = document.createElement('section');
+      el.id = id;
+      el.getBoundingClientRect = () => rect(top);
+      root.appendChild(el);
+    }
+    const { result } = render({ ids: ['a', 'b'], root });
+    expect(result.current.activeId).toBe('a');
+    act(() => result.current.scrollTo('b'));
+    expect(root.scrollTo).toHaveBeenCalledWith({ top: 500, behavior: 'smooth' });
+    root.remove();
+  });
+
   it('stays idle while root is null', () => {
     const addSpy = rs.spyOn(window, 'addEventListener');
     mountSections({ a: -500, b: -100, c: 900 });

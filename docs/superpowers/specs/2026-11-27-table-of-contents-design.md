@@ -198,7 +198,7 @@ const { activeId, scrollTo } = useScrollSpy({
 ```
 
 - **Active section** = the last id whose element top is at or above the reading line. Before
-  the first section passes the line: the first id. Missing elements are skipped.
+  the first section passes the line: the first id. Missing elements are skipped. With a `root`, sections are looked up inside it first (then `document`), so the same ids repeated elsewhere on the page — two instances, a docs page — do not hijack it.
 - **Bottom of the page**: when the container is scrolled to its end, the last id is active
   (short last sections never reach the line).
 - **Measuring**: `scroll` listener (passive) on `root ?? window` + `resize`, throttled by

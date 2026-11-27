@@ -37,14 +37,19 @@ const isAtBottom = (root: HTMLElement | undefined) => {
   return scrollHeight > clientHeight && scrollTop + clientHeight >= scrollHeight - 1;
 };
 
+// Inside `root` first: the same ids may repeat elsewhere on the page (two instances, docs pages).
+const findSection = (id: string, root: HTMLElement | undefined) =>
+  root?.querySelector<HTMLElement>(`[id="${id.replace(/["\\]/g, '\\$&')}"]`) ??
+  document.getElementById(id);
+
 const measure = (ids: string[], root: HTMLElement | undefined, offset: number) => {
   const top = containerTop(root);
-  const present = ids.filter(id => document.getElementById(id));
+  const present = ids.filter(id => findSection(id, root));
   if (present.length === 0) return undefined;
   if (isAtBottom(root)) return present[present.length - 1];
   let active = present[0];
   for (const id of present) {
-    const el = document.getElementById(id);
+    const el = findSection(id, root);
     if (el && el.getBoundingClientRect().top - top <= offset) active = id;
   }
   return active;
@@ -154,9 +159,9 @@ export const useScrollSpy = ({
 
   const scrollTo = (id: string) => {
     if (root === null) return;
-    const el = document.getElementById(id);
-    if (!el) return;
     const container = root ?? undefined;
+    const el = findSection(id, container);
+    if (!el) return;
     const current = container ? container.scrollTop : window.scrollY;
     const top = el.getBoundingClientRect().top - containerTop(container) + current - offset;
     lockedRef.current = true;
