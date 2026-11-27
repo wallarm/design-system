@@ -32,6 +32,13 @@
       "require": "./dist/icons/index.js",
       "default": "./dist/icons/index.js"
     },
+    "./hooks": {
+      "development": "./src/hooks/index.ts",
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.js",
+      "default": "./dist/hooks/index.js"
+    },
     "./icons/*": {
       "development": "./src/icons/*.tsx",
       "types": "./dist/icons/*.d.ts",

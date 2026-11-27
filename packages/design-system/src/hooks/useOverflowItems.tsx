@@ -43,6 +43,20 @@ interface MeasurementCacheEntry {
 // identity simply misses and re-measures.
 const crossMountCache = new WeakMap<readonly unknown[], MeasurementCacheEntry>();
 
+/**
+ * Splits `items` into the ones that fit in one row of `containerRef` and the
+ * hidden rest. Item widths (and the overflow indicator's, from
+ * `overflowRenderer`) are measured offscreen in `MeasurementContainer`, which
+ * must be rendered, and re-measured on container resize. Measurements are
+ * cached by `items` identity — pass a new array to force a re-measure.
+ *
+ * @example
+ * const { containerRef, visibleItems, hiddenItems, MeasurementContainer } = useOverflowItems({
+ *   items: tags,
+ *   renderItem: tag => <Tag key={tag}>{tag}</Tag>,
+ *   overflowRenderer: rest => <Tag>+{rest.length}</Tag>,
+ * });
+ */
 export function useOverflowItems<T>({
   items,
   renderItem,

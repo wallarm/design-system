@@ -11,6 +11,14 @@ interface UseControlledProps<T = unknown> {
   default: T | undefined;
 }
 
+/**
+ * Controlled / uncontrolled value state. The mode is fixed on mount:
+ * when `controlled` is defined, the returned value mirrors it and the
+ * setter is a no-op; otherwise the hook owns the value, seeded from `default`.
+ *
+ * @example
+ * const [open, setOpen] = useControlled({ controlled: props.open, default: props.defaultOpen });
+ */
 export const useControlled = <T = unknown>(
   props: UseControlledProps<T>,
 ): [T | undefined, (newValue: T | undefined) => void] => {

@@ -16,6 +16,17 @@ function isVisible(el: HTMLElement, container: HTMLElement): boolean {
   return true;
 }
 
+/**
+ * Roving-tabindex keyboard navigation over the items matching `selector`
+ * inside `containerRef`: ArrowUp/ArrowDown (wrapping), Home and End move
+ * focus, Enter clicks the focused item. ArrowLeft/ArrowRight call the
+ * optional handlers. Hidden items are skipped; the `aria-current="page"`
+ * item (or the first one) gets the initial `tabindex=0`.
+ *
+ * @example
+ * const navRef = useRef<HTMLElement>(null);
+ * useArrowNav(navRef, '[role="menuitem"]', { onArrowLeft: closeSubmenu });
+ */
 export function useArrowNav(
   containerRef: RefObject<HTMLElement | null>,
   selector: string,
