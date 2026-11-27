@@ -16,6 +16,7 @@ import {
   EditUserOverlay,
   SlowConfirmDeleteOverlay,
 } from './stories/overlays';
+import { SplitEditUserOverlay } from './stories/SplitEditUserDrawer';
 import { useOverlay } from './useOverlay';
 
 const DESCRIPTION = [
@@ -153,6 +154,24 @@ export const LazyLoading: StoryFn<typeof meta> = () => {
       <Text data-testid='code-status'>Dialog code: {code}</Text>
       <Text data-testid='result'>Result: {result}</Text>
     </VStack>
+  );
+};
+
+/**
+ * A heavy overlay can show its real frame at once. Its light shell, the root with its guard and the
+ * header, ships with the opener; the form below the header loads behind a skeleton that
+ * `lazyOverlayBody` renders and announces. Here the form's first load takes 1.5 s. The code then
+ * stays cached, so reload the page to see the skeleton again.
+ */
+export const SkeletonWhileLoading: StoryFn<typeof meta> = () => {
+  const editUser = useOverlay(SplitEditUserOverlay);
+
+  const handleOpen = () => editUser.open({ userName: 'Jane Cooper' });
+
+  return (
+    <Button variant='outline' color='neutral' onClick={handleOpen} data-testid='open-edit-user'>
+      Edit Jane Cooper
+    </Button>
   );
 };
 

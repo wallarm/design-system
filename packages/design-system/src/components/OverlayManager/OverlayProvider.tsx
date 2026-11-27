@@ -8,7 +8,7 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { InstanceErrorBoundary } from './InstanceErrorBoundary';
-import { OverlayStoreContext } from './OverlayStoreContext';
+import { OverlayInstanceContext, OverlayStoreContext } from './OverlayStoreContext';
 import {
   createOverlayStore,
   type OverlayInstance,
@@ -43,9 +43,11 @@ const OverlayInstanceView: FC<OverlayInstanceViewProps> = ({ store, instance }) 
 
   return (
     <InstanceErrorBoundary onError={handleError}>
-      <Suspense fallback={null}>
-        <Component {...payload} controller={controller} />
-      </Suspense>
+      <OverlayInstanceContext.Provider value={controller}>
+        <Suspense fallback={null}>
+          <Component {...payload} controller={controller} />
+        </Suspense>
+      </OverlayInstanceContext.Provider>
     </InstanceErrorBoundary>
   );
 };

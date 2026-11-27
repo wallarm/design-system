@@ -1,6 +1,6 @@
 # Overlay manager: open the same Dialog or Drawer from anywhere, load it lazily
 
-Status: design spec, 2026-11-17; implemented 2026-11-17 · branch `feat/modal-manager`. Paths are under `packages/design-system/src/` unless marked otherwise.
+Status: design spec, 2026-11-17; implemented 2026-11-17 · branch `feat/modal-manager`. Amended 2026-11-27: a split overlay shows its header and a skeleton while its heavy part loads (`lazyOverlayBody`, branch `feat/overlay-manager-skeleton`; see Skeleton while loading). Paths are under `packages/design-system/src/` unless marked otherwise.
 
 As built, the implementation differs from this spec in these places. `guidelines/rules.md` got no wrong → right line: the file has no room under its 2000-character cap. "The exit animation plays" and "Back closes both" are unit tests, not e2e: a 150 ms window would be flaky in e2e, and Storybook has no URL-driven drawer. The StrictMode cleanup test uses a Dialog only; a managed Drawer runs under StrictMode in the test where a Suspense boundary above the provider re-suspends. The double-click rule replaces an earlier `open()` until the store has inserted it, so it also covers two calls a microtask or two apart with the code cached; StrictMode's doubled mount effect relies on that. A nested provider without `onError` reports through the enclosing provider's. `defineOverlay` checks the inferred props after inference, through a rest argument, because a constraint let a component without props through; the check also rejects a `key` prop. The stuck-exit checks: reduced motion is a Chromium e2e, and neither the drawer classes nor tw-animate-css react to `prefers-reduced-motion`, so the exit animates as usual; the hidden tab is a jsdom unit test, because headless Playwright cannot background a tab. Focus after a dialog opened from a menu item returns to the menu trigger, but lands on `body` when the item is picked in the same frame as its highlight, as automated clicks do; that is an open zag finding in the repo-root `docs/storybook-docs-findings.md`.
 
@@ -25,8 +25,8 @@ core-frontend today runs DS 4.16.0. 107 files import `/Dialog` or `/Drawer`, def
 
 1. Define an overlay once: `defineOverlay(loader)`, with markup and logic in one component.
 2. Open it from any component under the app's provider: `useOverlay(definition).open(payload)` returns a promise of the overlay's result.
-3. Load the overlay's code on first open, or earlier with `preload()`. The opener's chunk does not include it.
-4. The exit animation plays on every close path (close, dismissal, `closeOnChange`), and the payload stays intact until it ends. A provider unmount, an `<Activity>` hide or a render error drops the overlay without one. No latches and no timers in a managed overlay's code.
+3. Load the overlay's code on first open, or earlier with `preload()`. The opener's chunk does not include it, except a split overlay's light shell (see Skeleton while loading).
+4. The exit animation plays on every close path (close, dismissal, `closeOnChange`), and the payload stays intact until it ends. A provider unmount, an `<Activity>` hide or a render error drops the overlay without one, except a split overlay's failing heavy part, which closes it with the exit (see Skeleton while loading). No latches and no timers in a managed overlay's code.
 5. For overlays that follow the component contract, every `open()` promise settles exactly once, on every path.
 6. No DS module-level state. Each provider owns its store, so stories and tests are isolated. In Module Federation an app is isolated once it mounts its own provider; see "Provider placement" for why it is not automatic under `sharedDesignSystem`.
 
@@ -37,7 +37,7 @@ core-frontend today runs DS 4.16.0. 107 files import `/Dialog` or `/Drawer`, def
 - Opening from non-React code. There is no global `overlays.open()`. Recon found no such caller in core-frontend.
 - Closing an instance from the opener (`close(id)`), updating an open instance's payload, a stack or back-navigation helper.
 - Presets such as `confirm()`, `alert()` or `prompt()`. The confirmation-dialogs guideline and the metrics contract keep buttons consumer-composed.
-- A loading shell: a frame with a skeleton shown before the code arrives.
+- A manager-level loading shell, shown for any definition before its code arrives. A heavy overlay splits itself instead (see Skeleton while loading, added on 2026-11-27).
 - Focus return beyond what zag does today (see Focus).
 - Migrating existing core-frontend overlays. That is consumer work, done separately.
 - See Follow-ups for the deferred pieces.
@@ -259,6 +259,7 @@ Each instance's promise settles exactly once:
 | Replaced while still loading (see Concurrency) | resolves with `undefined` | never inserted |
 | Loader rejects | resolves with `undefined`; `onError(error)` is called | never inserted; the next `open()` retries |
 | Overlay throws while rendering | resolves with `undefined` if not settled yet; `onError(error)` is called | removed without an exit animation; other instances are untouched |
+| A split overlay's heavy part fails to load or render | resolves with `undefined` if not settled yet; `onError(error)` is called once, also mid-exit | closes with its exit animation over the skeleton; after a failed load the next open loads it again |
 | Second `close()` or dismissal | no-op | no change |
 | Contract violation: root not rendered, or unmounted while open | stays pending until `closeOnChange` or a provider unmount | stays in the store |
 
@@ -276,8 +277,19 @@ Each instance's promise settles exactly once:
 
 - **Cache.** The loader runs on the first `open()` or on `definition.preload()`. Its promise is cached in the definition object, which lives in consumer module scope: once per bundle, never in DS state. On rejection the cache clears so the next call retries.
 - **`preload()` never rejects.** A failed preload only clears the cache; the next `open()` retries and reports through `onError`.
-- **Nothing is shown while the code loads.** For heavy overlays, the app calls `preload()` when the opener is hovered or focused, or when the browser is idle.
+- **The manager shows nothing while a definition's code loads.** For heavy overlays, the app calls `preload()` when the opener is hovered or focused, or when the browser is idle, or splits the overlay so that its shell shows at once (see Skeleton while loading).
 - **Unmount during a load.** If the provider unmounts while a load is pending, the promise settles and the instance is never inserted.
+
+### Skeleton while loading
+
+Added on 2026-11-27 at the user's request. Three designs were probed in jsdom and judged on UX and accessibility, on this contract, and on cost and risk; all three judges chose this one. A heavy overlay splits below its header with `lazyOverlayBody(load)`, exported from `/OverlayManager`.
+
+- **Shape.** The light shell (the root, the content, and the header with the title and description) ships with the opener, because its definition imports it: `defineOverlay(async () => { Body.preload(); return Shell; })`. The heavy part (the body, and the footer when it needs the body's state) loads behind a Suspense boundary that shows the consumer's skeleton and a hidden polite status (test id `{id}--loading`). The status mounts empty and says "Loading" 100 ms later, because screen readers speak a live region's changes, not its first content, and it sets no `aria-busy`, which would hold the update back.
+- **One root.** The store does not change; the provider only wraps each instance in an internal context. The instance keeps one root for its whole life, so the enter animation, the focus trap, aria-hidden and the stacking order are those of any overlay, and the heavy part swaps in below the header without a remount. On a cold open, initial focus goes to the header's close button and stays there.
+- **Cache.** One `React.lazy` per `lazyOverlayBody` call, replaced after a failed load, so the next open loads again. Each mount pins its lazy in state, so a failed load reaches the boundary even when the shell re-renders before React retries. Once the code is in, the lazy's loader returns a synchronous thenable (React 18.3 and 19 read it at once), so an open after `preload()` renders the heavy part without suspending; React would otherwise hold a shown fallback for at least 300 ms. The definition's loader starts the heavy part's load on its first call and does not wait for it, so `definition.preload()` resolves when the shell is in and, after a failed load of the heavy part, does not start it again; the docs say to preload both on hover.
+- **Failure.** The heavy part has its own error boundary, which keeps the skeleton on screen, reports through the provider's `onError` and closes the instance through an internal context (`OverlayInstanceContext`, not exported), so the exit animation plays. Outside a managed overlay the error goes up to the app's boundary.
+- **Rules the docs carry.** The title, the description and any `data-autofocus` stay in the shell: zag links the first two and picks the initial focus once, a frame after open, which a cold open's heavy part misses and a warm open's does not. Guard state lives in the shell, and the heavy part reports it from its handlers. The skeleton matches the heavy part's height. The shell is inserted a microtask or two after `open()`, so the double-click rule covers only calls in the same task.
+- **Rejected.** A manager-level skeleton, `defineOverlay(load, { skeleton })`, swaps an open root for another: the enter animation plays twice, focus return races zag's timers, the stacking order flips at the swap, and Drawer and Dialog would need a public `skipEnterAnimation` prop. It stays a follow-up in case splitting each heavy overlay proves too costly.
 
 ### Provider placement and context
 
@@ -323,7 +335,7 @@ Each instance's promise settles exactly once:
 
 ### Integration in the DS
 
-- **Files.** Everything lives in `components/OverlayManager/`: store, provider, hook, definition, error boundary, types, `index.ts`, stories, unit tests and e2e. The store and the code that reads it stay inside this folder (constraint 8), and no other DS module imports them.
+- **Files.** Everything lives in `components/OverlayManager/`: store, provider, hook, definition, error boundary, `lazyOverlayBody`, types, `index.ts`, stories, unit tests and e2e. Its shipped files import no DS component (`lazyOverlayBody` uses React and the test-id cascade only); its stories and tests do. The store and the code that reads it stay inside this folder (constraint 8), and no other DS module imports them.
 - **React Compiler.**
   - The provider reads the store with `useSyncExternalStore`, following `components/CodeEditor/lib/portalRegistry.ts` and `PortalOutlet.tsx`.
   - Mutations happen only in handlers and effects.
@@ -403,7 +415,7 @@ Made by the designer (Claude), open to override:
 - The promise resolves when closing starts, not after the exit.
 - Every `open()` creates a new instance; a second open of the same definition replaces the first only until the store has inserted it.
 - Each instance gets its own Suspense and error boundary.
-- Nothing is shown while the code loads; `preload()` covers heavy overlays.
+- The manager shows nothing while a definition's code loads; `preload()` covers heavy overlays, and since 2026-11-27 a heavy overlay can split itself with `lazyOverlayBody` to show its header and a skeleton at once.
 - `closeOnChange` is a primitive key. It sweeps everything created before the change, including loads, and runs as a layout effect.
 - Router-owned drawers use a nested provider inside `DrawerContent` instead of a new `closeWithOpener` option.
 - A missing provider in a nested MF app is handled by a documented hard rule now; the `OverlayScope` guard is a follow-up.
@@ -420,6 +432,7 @@ Made by the designer (Claude), open to override:
 - **`OverlayScope`.** A context reset exported from `/OverlayManager`: it provides "no provider" and renders no DOM. Each embedder renders it from its own DS import around each `SdkRemoteApp` mount, so a remote without its own provider gets the clear error whatever its DS version. It does not go inside `@wallarm/sdk`: that root barrel is DS-free, and its copy resolves the host's DS version.
 - **Focus return.** See the open finding in `docs/storybook-docs-findings.md`. Do not capture `document.activeElement` in `open()`: from a menu item it is the menu's content, which unmounts, and a `finalFocusEl` would override zag's own return to the trigger. Pass the menu trigger instead, through a `finalFocusEl` passthrough on Drawer.
 - **Push-back** for app-level managed overlays.
+- **A manager-level skeleton** (`defineOverlay(load, { skeleton })`), only if splitting each heavy overlay proves too costly; Skeleton while loading lists what it costs. An override for the hidden `Loading` label, when an app localizes.
 - **Opening from outside React**, through an explicit manager object.
 
 ## Adoption notes (outside this work)
