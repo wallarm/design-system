@@ -243,8 +243,10 @@ export const MetricSparkline: FC<MetricSparklineProps> = ({
         onPointerLeave={handlePointerLeave}
       >
         {paths && (
+          // `overflow-visible`: the edge points' half-stroke and round cap would be cut at the
+          // SVG box; the card's `overflow-clip` is the real edge.
           <svg
-            className='block size-full'
+            className='block size-full overflow-visible'
             viewBox={`0 0 ${paths.width} ${HEIGHT}`}
             preserveAspectRatio='none'
           >

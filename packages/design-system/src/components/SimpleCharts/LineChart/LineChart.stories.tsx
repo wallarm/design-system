@@ -253,6 +253,52 @@ export const Curves: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * `shadow` fills under a line with its colour, fading to transparent at the plot bottom — the
+ * `MetricSparkline` look on a full chart. It follows the line's `curve` and adds nothing to the
+ * tooltip or legend; keep it to one or two series so the fills don't muddy each other.
+ */
+export const Shadow: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='grid grid-cols-2 gap-16 w-1120'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Monotone with shadow</ChartTitle>
+        </ChartHeader>
+        <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp'>
+          <MultiLegend />
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartLine seriesKey='requests' shadow />
+            <LineChartLine seriesKey='errors' />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Linear with shadow</ChartTitle>
+        </ChartHeader>
+        <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp'>
+          <MultiLegend />
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            <LineChartLine seriesKey='requests' curve='linear' shadow />
+            <LineChartLine seriesKey='errors' curve='linear' shadow />
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+/**
  * A dashed series against a solid one — the way to separate a threshold or a projection from
  * measured data — and a CSS colour string for a series whose colour is decided elsewhere.
  */

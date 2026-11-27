@@ -14,6 +14,10 @@ export const LINE_ANIMATION_BEGIN = 0;
 
 export const LINE_INACTIVE_OPACITY = 0.3;
 
+// `LineChartLine shadow`: the series colour fades from this opacity under the line to 0 at the
+// plot bottom — the same 20% → 0 gradient as `MetricSparkline`'s area.
+export const LINE_SHADOW_OPACITY = 0.2;
+
 // `<ResponsiveContainer debounce>`: recharts throttles its resize re-render to this interval
 // (trailing), so a container that resizes every frame — a window drag, a side panel sliding —
 // redraws the SVG a few times instead of on every frame. The body clips the stale width meanwhile.

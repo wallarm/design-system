@@ -6,6 +6,7 @@ const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', 
   'Default Multi',
   'With Metric',
   'Curves',
+  'Shadow',
   'Line Styling',
   'Edge Cases',
   'Custom Tooltip',
@@ -68,6 +69,11 @@ test.describe('Component: LineChart', () => {
 
     test('Should render curves correctly', async ({ page }) => {
       await lineChartStory.goto(page, 'Curves');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render line shadow correctly', async ({ page }) => {
+      await lineChartStory.goto(page, 'Shadow');
       await expect(page).toHaveScreenshot();
     });
 

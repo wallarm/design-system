@@ -24,8 +24,9 @@ export const metricCaptionClasses = 'text-xs text-text-secondary';
 export const metricSkeletonLineClasses = 'w-full py-4';
 
 // Sparkline: a sibling right after `Metric` inside `Chart`; the metric's `mt-auto` already pins
-// both to the card's bottom edge. `px-px` is the Figma 1px inset from the card border.
-export const metricSparklineClasses = 'w-full px-px';
+// both to the card's bottom edge. No inset: line and area run into the card border on both sides
+// (an inset left a white strip between them), and the card's `overflow-clip` trims the rest.
+export const metricSparklineClasses = 'w-full';
 export const metricSparklinePlotClasses = 'relative h-48';
 // The ruler is an <svg>: `h-full`, since `inset-y-0` leaves a replaced element at its 150px default.
 export const metricSparklineRulerClasses =

@@ -40,7 +40,7 @@ as one band, use `HorizontalBarStack`; when each part needs its own row, use `Ba
 | `MetricTotal` | The denominator. `connector` = `slash` (`/120`, default) · `of` (`of 120`) · `total` (`120 total`). Numeric child locale-formatted; number in primary text, connector word muted. |
 | `MetricDelta` | Trend chip — a thin wrapper over the shared `ChartDelta`. `sentiment` sets the colour (positive → green, **negative → red**, neutral → slate; default neutral) independently of the `trend` arrow. |
 | `MetricCaption` | Muted secondary subline under the header. |
-| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, the metric's `mt-auto` pins both to the card's bottom edge, `px-px` is the 1px inset from the border. |
+| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, the metric's `mt-auto` pins both to the card's bottom edge. No side inset: the line and area run into the card border (the SVG overflows, the card's `overflow-clip` trims it), so no white strip shows between the area and the border. |
 
 All bricks are optional; only `MetricValue` is expected in practice.
 
