@@ -143,7 +143,9 @@ export const TableHeadCell = <T extends RowData>({
       colSpan={header.colSpan}
       aria-sort={ariaSort}
       {...(canDnd ? { ...listeners, ...attributes } : {})}
-      tabIndex={-1}
+      // Announced as a column header, not "sortable"; its keyboard path is the column menu, not dnd-kit's.
+      aria-roledescription={undefined}
+      aria-describedby={undefined}
     >
       {isNotBasicColumn && content}
 

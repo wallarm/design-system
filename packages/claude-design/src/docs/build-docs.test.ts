@@ -179,6 +179,7 @@ describe('Claude Design documentation', () => {
       'BarList',
       'AreaChart',
       'ColumnChart',
+      'Funnel',
       'HorizontalBarStack',
       'Chart',
       'Overview',

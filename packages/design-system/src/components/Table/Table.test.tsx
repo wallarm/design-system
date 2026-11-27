@@ -1861,3 +1861,47 @@ describe('Agent cell', () => {
     expect(wrapper).not.toHaveClass('overflow-hidden');
   });
 });
+
+describe('Table: column order after a reset', () => {
+  const columns = [
+    columnHelper.accessor('id', { header: 'Id', cell: ctx => ctx.getValue<string>() }),
+    columnHelper.accessor('name', { header: 'Name', cell: ctx => ctx.getValue<string>() }),
+    columnHelper.accessor('status', { header: 'Status', cell: ctx => ctx.getValue<string>() }),
+  ];
+  const OrderHarness: FC = () => {
+    const [order, setOrder] = useState<string[]>(['id', 'status', 'name']);
+    return (
+      <Table
+        data={data}
+        columns={columns}
+        columnOrder={order}
+        onColumnOrderChange={updater =>
+          setOrder(typeof updater === 'function' ? updater(order) : updater)
+        }
+        defaultColumnOrder={[]}
+        data-testid='table'
+      />
+    );
+  };
+  const headers = () =>
+    screen.getAllByRole('columnheader').map(h => h.textContent?.match(/Id|Name|Status/)?.[0]);
+
+  it('is idle once reset, and the columns still move', async () => {
+    render(<OrderHarness />);
+    expect(headers()).toEqual(['Id', 'Status', 'Name']);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Table settings' }));
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
+    const reset = screen.getByRole('button', { name: 'Reset to default' });
+    await userEvent.click(reset);
+    // The reset stores only the pinned master column; the rest is the default order.
+    expect(headers()).toEqual(['Id', 'Name', 'Status']);
+    expect(reset).toBeDisabled();
+    await userEvent.keyboard('{Escape}');
+
+    const nameHeader = screen.getByRole('columnheader', { name: /Name/ });
+    await userEvent.click(within(nameHeader).getByRole('button', { name: 'More' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Move right' }));
+    expect(headers()).toEqual(['Id', 'Status', 'Name']);
+  });
+});

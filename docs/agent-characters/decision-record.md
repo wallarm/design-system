@@ -43,7 +43,7 @@ Glyph pixel parity follows from string identity.
 | Cache | PNG blobs as object URLs, never data-URL strings. LRU of 256 baked layers and 64 height fields; evicted URLs are revoked (06 §9). The key is `LOOK_VERSION`, path, colour, pixel size and material. `LOOK_VERSION` hashes the shading source. | `src/lib/agent-characters/bake.ts`, `queue.ts`; LRU unit-tested. |
 | SVG rendering | **Core-built, React-rendered** (revised in WDS-199). The core builds the markup as a node tree (`charTree`, `glyphTree`) and React renders it; the root is the `<svg>` with `ref: Ref<SVGSVGElement>`, like `AgentGlyph` (07 §6.2's span root was a proposal, «Your call»). Live motion (WDS-201) writes attributes on the rendered nodes outside React render. Previously: **Core-rendered.** The core builds the reference's markup (the `makeChar` template, ported verbatim) and owns every per-frame attribute write. The React wrapper only mounts the node, passes the config and disposes. Final in WDS-199. | Markup ported from strings keeps pixel parity trivial, as the composites above show. Per-frame writes stay outside React render, which the React Compiler needs. |
 | Test runners | Rstest (jsdom) for the pure port, against fixtures captured from the page. Playwright with real browsers for canvas work (`geom`, mask, bake, worker) and side-by-side composites. | jsdom has no canvas or `getBBox`. CI Playwright is Chromium-only in Docker, so WebKit/Firefox parity is a pre-merge manual run of the harness. |
-| Closed sizes | Glyph: 16, 20, 24, 32. 3D: 40, 48, 56, 72, 120, 256. Each place sets liveness and shadow (05 §2.1, D1/D2). | 05 §2.1. No place uses 33–39 px. |
+| Closed sizes | Glyph: 16, 20, 24, 32. 3D: 40, 48, 56, 72, 120, 128 (the product's Agent team card and drawer header, AGL-194), 256. Each place sets liveness and shadow (05 §2.1, D1/D2). | 05 §2.1. No place uses 33–39 px. |
 | Bake scheduling | The page's queue: 14 ms slices, 16 ms apart, dead nodes skipped, front priority. Worker bakes run outside the slices. | `src/lib/agent-characters/queue.ts`, unit-tested. |
 
 ## Requirements from the Phase 0 review, and where they landed
@@ -179,3 +179,34 @@ re-captured byte for byte, so `LOOK_VERSION` stays.
   over a cast preset (`look` on a scenario's character), and adds the bolt and the flag at work, on Hello and as
   the fiddle.
 - `default-look.json` was re-run against the cast of ten.
+
+## Needs you on a team page, and 128 px (AGL-194, 2026-11-25)
+
+The product's design review (Jira AGL-194 §4, §7) found the Agent team page hopping in step. The console shows an agent
+with any approval waiting as Needs you, which is most of them, and the page's Needs you only hops: the first hop 500 ms
+after the state is set, then every 2.8–8 s, outside the behaviour budget. Cards whose data came in one response
+therefore hopped together, and On duty's repertoire, already in the engine, was almost never seen.
+
+- **Departure from the reference:** Needs you keeps the On duty repertoire (`actTick`). The hop is an accent on top of
+  it: the first one comes after a seeded 0.5–4 s, and every hop counts in the document's behaviour budget, like a
+  behaviour (`act`, so other bundled copies count it too), so no two moves start within 700 ms. The gaze still rests
+  on the viewer unless a behaviour holds it. Back on screen, the next hop waits like the next behaviour.
+- **Parity:** `pageNeeds` restores the page's Needs you. Only the parity harness sets it, so the `needs` and `flips`
+  scenarios still match the page frame for frame. The product behaviour is covered by its own test: six agents
+  waiting, 30 s, no two starts within 700 ms, a hop and at least three kinds of move.
+- **128 px:** a closed size for the product's Agent team card and drawer header, which Figma draws at 128. Nothing
+  else changes with it: the size picks the renderer and scales the same artwork. `PLACES` keeps the handoff's table.
+
+## A character beside text is centred by its drawing (AGL-229, 2026-11-25)
+
+The product's design review (Jira AGL-229 §7) found short characters hanging low beside their name and role in the
+hover card. The view box keeps 14 units of headroom for antennae and dishes, so a row that centres the box centres
+Radar and Trim, which fill it, but Sift, Tune, Lens and Patch sit up to 10 px (at 56) below the text.
+
+- **`align='drawing'`** on `AgentAvatar` moves the drawing (a CSS translate, so the box keeps its size and place in the
+  layout, and live motion is not clipped) until its vertical middle is the box's. Default `box`: nothing changes for
+  a place that doesn't ask.
+- **Per character, next to the artwork:** `drawing.gen.ts` holds each preset's middle in view-box units, measured by
+  `scripts/agent-avatars/measure-drawings.ts` (the idle pose's bounding box in the browser: body, parts and prop, no
+  veil, no shadow). Re-run it when the cast's artwork changes. A custom look has no entry and stays where its box is.
+- **Checked:** in the `BesideText` story every preset's drawing is centred on its name and role within 0.1 px.

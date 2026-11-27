@@ -6,9 +6,8 @@ import { Text } from '../Text';
 import { AgentGlyph, type AgentGlyphProps, type AgentGlyphState } from './AgentGlyph';
 
 const DESCRIPTION = [
-  'The character of an AI agent as a flat 16–32 px glyph: the same silhouette, colour, visor and eyes as the 3D `AgentAvatar`, drawn flat so it stays sharp and cheap in text, chips and table rows. It is static and loads no canvas, bake or animation code.',
-  'A glyph is always decorative: put it next to the agent’s visible name, which is what screen readers announce. Use 20 px beside `text-sm` or larger and in table rows, 16 px beside `text-xs`; from 40 px up use `AgentAvatar`.',
-  'With `align="optical"` (the default) the glyph lifts its body onto the text line, so every shape reads as centred next to the name without moving the layout; use `align="box"` in ladders and stacks. Only the top-of-head props are drawn at this size.',
+  'The flat 16–32 px mark of an AI agent for text, chips and table rows: the same silhouette, color and eyes as `AgentAvatar`, with no canvas and no motion. From 40 px up reach for `AgentAvatar`.',
+  'It is always decorative, so it sits next to the agent’s visible name: 20 px beside `text-sm` and in table rows, 16 px beside `text-xs`.',
 ].join(' ');
 
 const STATES: AgentGlyphState[] = [
@@ -35,7 +34,7 @@ const STATE_LABELS: Record<AgentGlyphState, string> = {
 };
 
 const meta = {
-  title: 'AI/AgentGlyph',
+  title: 'AI Characters/AgentGlyph',
   component: AgentGlyph,
   parameters: {
     layout: 'centered',
@@ -132,7 +131,7 @@ export const Sizes: StoryFn = () => (
   </HStack>
 );
 
-/** Beside a name: 20 px with text-sm, 16 px with text-xs. `optical` sits every shape on the text line; `box` centres the box, so short shapes look low. */
+/** Beside a name: 20 px with text-sm, 16 px with text-xs. `optical` sits every shape on the text line; `box` centers the box, so short shapes look low. */
 export const InlineWithText: StoryFn = () => (
   <HStack gap={48} align='start'>
     {(['optical', 'box'] as const).map(align => (
@@ -163,7 +162,7 @@ export const InlineWithText: StoryFn = () => (
   </HStack>
 );
 
-/** Partial coverage: an agent whose template has applications, covering only some of them, shows a grey crown while on duty. */
+/** Partial coverage: an agent whose template has applications, covering only some of them, shows a gray crown while on duty. */
 export const PartialCoverage: StoryFn = () => (
   <HStack gap={24} wrap='wrap'>
     {CAST.map(p => (

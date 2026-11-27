@@ -11,10 +11,8 @@ import { FrameMeter } from './stories/FrameMeter';
 import { type AgentAvatarHandle, setAgentMotion, useAgentMotion } from './useCharacter';
 
 const DESCRIPTION = [
-  'The character of an AI agent from 40 px up: a soft felt body baked in the browser from its silhouette, a glass visor and two light eyes that carry its state, and the prop that tells its job. Below 40 px use `AgentGlyph`.',
-  'The body is baked once per outline, colour and size, off the main thread, and cached; until a layer is ready its flat fill shows.',
-  'With `live` the character moves as the reference does: it blinks, glances, breathes and, on duty, now and then plays with its prop or looks at its neighbours (at most two on the page at once). Hello and Done are beats played through `handleRef`; they play in full, then the character shows `state` again. Reduced motion, or `setAgentMotion(false)` for the user’s setting, shows every state’s static frame.',
-  'Size, liveness and the contact shadow are set by the place the character sits in (Overview rows 40 px, headers and toasts 48, beside people 56, the team card and the drawer 72, the empty chat 120); only the drawer header, the empty chat and 96 px and up get the shadow. Next to the agent’s visible name the character is decorative; give it a `label` only when it stands alone.',
+  'The 3D character of an AI agent, for places with room to show who is working: team cards, the agent drawer and the empty chat. It starts at 40 px; below that, in text, chips and table rows, reach for the flat `AgentGlyph`.',
+  'Its eyes carry the state and its prop tells the job, so status color never goes on the body. Size, motion and the contact shadow follow the place it sits in, and next to the agent’s visible name it is decorative.',
 ].join(' ');
 
 const STATES: AgentAvatarState[] = [
@@ -41,7 +39,7 @@ const STATE_LABELS: Record<AgentAvatarState, string> = {
 };
 
 const meta = {
-  title: 'AI/AgentAvatar',
+  title: 'AI Characters/AgentAvatar',
   component: AgentAvatar,
   parameters: {
     layout: 'centered',
@@ -55,7 +53,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: [40, 48, 56, 72, 120],
+      options: [40, 48, 56, 72, 120, 128],
       description: 'Set by the place the character sits in.',
     },
     state: { control: 'select', options: STATES, description: 'State frame.' },
@@ -67,7 +65,7 @@ const meta = {
     coverage: {
       control: 'inline-radio',
       options: ['full', 'partial'],
-      description: '`partial` keeps the top of the head in grey felt.',
+      description: '`partial` keeps the top of the head in gray felt.',
     },
     label: {
       control: 'text',
@@ -87,7 +85,7 @@ export const Basic: StoryFn<AgentAvatarProps> = args => (
 
 Basic.args = { agent: 'radar', seed: 'radar', size: 72, state: 'idle', shadow: true };
 
-/** The cast of ten on duty at the team-card size. Each is told apart by its shape, colour and prop; a planned agent says so after its role. */
+/** The cast of ten on duty at the team-card size. Each is told apart by its shape, color and prop; a planned agent says so after its role. */
 export const Cast: StoryFn = () => (
   <HStack gap={24} align='start' wrap='wrap'>
     {CAST.map(p => (
@@ -100,6 +98,35 @@ export const Cast: StoryFn = () => (
       </VStack>
     ))}
   </HStack>
+);
+
+/** Beside a name and role (the hover card), `align='drawing'` centres what is drawn, not the box: a short character no longer hangs below the text. Left: the box centred; right: the drawing. */
+export const BesideText: StoryFn = () => (
+  <VStack gap={16}>
+    {CAST.map(p => (
+      <HStack key={p.id} gap={48}>
+        {(['box', 'drawing'] as const).map(align => (
+          <HStack key={align} gap={12} className='w-240'>
+            <AgentAvatar
+              data-testid={`agent-avatar-${p.id}-${align}`}
+              agent={p.id}
+              seed={p.id}
+              size={56}
+              align={align}
+            />
+            <VStack gap={2}>
+              <Text size='sm' weight='medium'>
+                {p.name}
+              </Text>
+              <Text size='xs' color='secondary'>
+                {p.role}
+              </Text>
+            </VStack>
+          </HStack>
+        ))}
+      </HStack>
+    ))}
+  </VStack>
 );
 
 /** Every state frame of the cast. The eyes and a few body cues carry the state; red and crosses never appear. */
@@ -129,7 +156,7 @@ export const States: StoryFn = () => (
   </div>
 );
 
-/** Partial coverage: the agent covers only some of its applications, so the top of its head stays in grey felt. */
+/** Partial coverage: the agent covers only some of its applications, so the top of its head stays in gray felt. */
 export const PartialCoverage: StoryFn = () => (
   <HStack gap={24} wrap='wrap'>
     {CAST.map(p => (
@@ -205,7 +232,7 @@ const LIVE_STATES: AgentAvatarState[] = [
 ];
 
 /** Every persistent state of the cast, live, in one group. On duty plays its idle repertoire and glances at the
- *  neighbours; Needs you is the only one that hops. */
+ *  neighbors; Needs you plays the same repertoire, looks at you between behaviors and is the only one that hops. */
 export const LiveStates: StoryFn = () => (
   <AgentAvatarGroup>
     <div className='grid grid-cols-[repeat(8,auto)] items-center gap-x-16 gap-y-8'>
@@ -317,7 +344,7 @@ export const Inviting: StoryFn = () => {
   );
 };
 
-/** Activate: from Not set up the ghost lands, the colour fills from the floor and the eyes power on (1.15 s). */
+/** Activate: from Not set up the ghost lands, the color fills from the floor and the eyes power on (1.15 s). */
 export const Activation: StoryFn = () => {
   const [state, setState] = useState<AgentAvatarState>('box');
   const toggle = () => setState(state === 'box' ? 'idle' : 'box');
@@ -343,7 +370,7 @@ export const Activation: StoryFn = () => {
   );
 };
 
-/** Cover all applications: the grey crown fills to the top in 480 ms and the agent plays Done. Hover or focus on the
+/** Cover all applications: the gray crown fills to the top in 480 ms and the agent plays Done. Hover or focus on the
  *  button raises the line first. */
 export const Coverage: StoryFn = () => {
   const [handles] = useState(() => CAST.map(() => createRef<AgentAvatarHandle>()));

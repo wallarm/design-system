@@ -136,4 +136,37 @@ describe('AgentAvatar (static)', () => {
     expect(svg.getAttribute('data-slot')).toBe('agent-avatar');
     expect([svg.getAttribute('width'), svg.getAttribute('height')]).toEqual(['40', '38']);
   });
+
+  it('draws at 128, the Agent team card and drawer header (AGL-194)', () => {
+    const svg = svgOf(render(<AgentAvatar agent='radar' seed='r' size={128} />).container);
+    expect([svg.getAttribute('width'), svg.getAttribute('height')]).toEqual(['128', '120']);
+  });
+});
+
+describe('AgentAvatar align', () => {
+  const dyOf = (el: HTMLElement) => svgOf(el).style.getPropertyValue('--agent-dy');
+
+  it('centres the box by default: no offset', () => {
+    const { container } = render(<AgentAvatar agent='sift' seed='s' size={56} />);
+    expect(dyOf(container)).toBe('');
+    expect(svgOf(container).getAttribute('class')).not.toContain('translate-y');
+  });
+
+  it('lifts a short drawing to the middle of its box beside text', () => {
+    // Sift's drawing sits low: its middle is 67.8 of the 136 × 128 view box, the box's is 50.
+    const { container } = render(<AgentAvatar agent='sift' seed='s' size={56} align='drawing' />);
+    expect(dyOf(container)).toBe('-7.3px');
+    expect(svgOf(container).getAttribute('class')).toContain('translate-y-(--agent-dy)');
+  });
+
+  it('moves a tall drawing (Radar, its dish) a little down, and scales with the size', () => {
+    const { container } = render(<AgentAvatar agent='radar' seed='r' size={128} align='drawing' />);
+    expect(dyOf(container)).toBe('1.1px');
+  });
+
+  it('leaves a custom look where its box is', () => {
+    const look = CAST[2] as (typeof CAST)[number];
+    const { container } = render(<AgentAvatar look={look} seed='l' size={56} align='drawing' />);
+    expect(dyOf(container)).toBe('');
+  });
 });

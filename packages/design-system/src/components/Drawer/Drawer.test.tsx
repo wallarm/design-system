@@ -808,6 +808,22 @@ describe('Exit complete', () => {
     </Drawer>
   );
 
+  const ExitDialog = ({
+    open,
+    overlay,
+    onExitComplete,
+  }: {
+    open: boolean;
+    overlay?: boolean;
+    onExitComplete?: () => void;
+  }) => (
+    <Dialog open={open} overlay={overlay} onExitComplete={onExitComplete} data-testid='exit-dialog'>
+      <DialogContent>
+        <DialogBody>Body</DialogBody>
+      </DialogContent>
+    </Dialog>
+  );
+
   it('fires once after the drawer closes', async () => {
     const onExitComplete = rs.fn();
     const { rerender } = render(<ExitDrawer open onExitComplete={onExitComplete} />);
@@ -840,6 +856,32 @@ describe('Exit complete', () => {
     await flushLayers();
     expect(onExitComplete).toHaveBeenCalledTimes(1);
   });
+
+  it.each([
+    { name: 'Drawer', Root: ExitDrawer, testId: 'exit-drawer' },
+    { name: 'Dialog', Root: ExitDialog, testId: 'exit-dialog' },
+  ])(
+    '$name fires once when overlay turns off while the backdrop still fades',
+    async ({ Root, testId }) => {
+      animateBackdrop();
+      const onExitComplete = rs.fn();
+      const { rerender } = render(<Root open onExitComplete={onExitComplete} />);
+      rerender(<Root open={false} onExitComplete={onExitComplete} />);
+      await waitForElementToBeRemoved(() => screen.queryByTestId(`${testId}--content`));
+      const backdrop = screen.getByTestId(`${testId}--overlay`);
+      rerender(<Root open={false} overlay={false} onExitComplete={onExitComplete} />);
+      fireEvent.animationEnd(backdrop);
+      await waitFor(() => expect(onExitComplete).toHaveBeenCalledTimes(1));
+      await flushLayers();
+      expect(onExitComplete).toHaveBeenCalledTimes(1);
+      expect(screen.queryByTestId(`${testId}--overlay`)).toBeNull();
+
+      // The new value applies on the next open.
+      rerender(<Root open overlay={false} onExitComplete={onExitComplete} />);
+      await screen.findByTestId(`${testId}--content`);
+      expect(screen.queryByTestId(`${testId}--overlay`)).toBeNull();
+    },
+  );
 
   it('fires once in total when the drawer reopens before the backdrop finishes', async () => {
     animateBackdrop();

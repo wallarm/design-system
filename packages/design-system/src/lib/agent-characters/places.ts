@@ -3,7 +3,8 @@
 // Liveness and the contact shadow are set per place; a new place gets them from design.
 
 export type AgentGlyphSize = 16 | 20 | 24 | 32;
-export type AgentAvatarSize = 40 | 48 | 56 | 72 | 120;
+// 128: the product's Agent team card and agent drawer header, as Figma draws them (AGL-194).
+export type AgentAvatarSize = 40 | 48 | 56 | 72 | 120 | 128;
 
 interface GlyphPlace {
   size: AgentGlyphSize;

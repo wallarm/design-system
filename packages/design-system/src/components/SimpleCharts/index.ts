@@ -8,6 +8,23 @@ export {
   type AreaChartVariant,
 } from './AreaChart';
 export {
+  BarChart,
+  BarChartBody,
+  type BarChartBodyProps,
+  BarChartEmpty,
+  type BarChartEmptyProps,
+  BarChartGrid,
+  type BarChartProps,
+  BarChartStack,
+  BarChartTooltip,
+  type BarChartTooltipProps,
+  type BarChartTooltipRenderArgs,
+  BarChartXAxis,
+  type BarChartXAxisProps,
+  BarChartYAxis,
+  type BarChartYAxisProps,
+} from './BarChart';
+export {
   BarList,
   BarListBar,
   type BarListBarProps,
@@ -44,6 +61,16 @@ export {
   ColumnChartXAxis,
   type ColumnChartXAxisProps,
 } from './ColumnChart';
+export {
+  Funnel,
+  type FunnelColor,
+  type FunnelProps,
+  FunnelSkeleton,
+  type FunnelSkeletonProps,
+  type FunnelStart,
+  FunnelStep,
+  type FunnelStepProps,
+} from './Funnel';
 export {
   HorizontalBarStack,
   type HorizontalBarStackDatum,

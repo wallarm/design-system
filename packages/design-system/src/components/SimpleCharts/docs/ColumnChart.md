@@ -2,7 +2,7 @@
 
 ## Overview
 
-`ColumnChart` — *Vertical stacked columns chart* in Figma and Storybook (`Data Display/SimpleCharts/Vertical Stacked Columns Chart`) — draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
+`ColumnChart` — *Vertical stacked columns chart* in Figma and Storybook (`Data Display/SimpleCharts/Vertical Stacked Columns Chart`) — draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `BarChart` for the same bars laid horizontally per category (no time axis), `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
 
 It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` model — so the legend, grid, Y axis and hover popover are the `LineChart` slots, unchanged. It adds only what columns need: its own root, body, the stack, and an X axis that centres every label under its column.
 
@@ -57,7 +57,7 @@ No sorting, aggregation or bucketing happens inside — one datum is one column.
 ## States
 
 - **Default** — columns over the dashed grid, legend above.
-- **Hover a column** — a dashed ruler at the column's horizontal centre and the popover: the formatted `xKey` value, then one row per series in legend order (`—` for a missing value). The popover's Y is locked to the plot's middle, as in `LineChart`.
+- **Hover a column** — a dashed ruler at the column's horizontal centre and the popover: the formatted `xKey` value, then one row per series in legend order (`—` for a missing value). The popover's Y is locked to the plot's middle, as in `LineChart`, and it is portalled out of the card — with many categories it is taller than the plot and overlaps the legend and the card edge instead of being clipped.
 - **Hover / focus a legend item** — the other categories fade to 30% (`LINE_INACTIVE_OPACITY`); the item gets the hover background. The hovered parts carry `data-active='true'`.
 - **Clickable legend** — pass `onClick` to `LineChartLegendItem`: it becomes `role='button'`, tabbable, Enter / Space click. What a click does is the consumer's (the Agentic Overview opens the verdict's list); the chart has no filter state.
 - **Empty / Loading** — no chart-specific frame: compose `LineChartEmpty` (with a message, or bare under skeleton legend items) in place of `ColumnChart`, as the stories do.

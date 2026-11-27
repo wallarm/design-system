@@ -218,3 +218,14 @@ export const SpecialValues: StoryFn<typeof meta> = () => (
     <FormatNumber value={Number.POSITIVE_INFINITY} />
   </div>
 );
+
+/**
+ * `typography='inherit'` drops the built-in 14px body text and renders a plain span, so the
+ * number takes its font, size, weight and colour from the parent — handy inside headings
+ * and buttons.
+ */
+export const InheritTypography: StoryFn<typeof meta> = () => (
+  <div className='font-sans-display text-xl font-medium text-text-primary'>
+    <FormatNumber value={12_042} typography='inherit' />
+  </div>
+);

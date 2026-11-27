@@ -40,3 +40,15 @@ export const Basic: StoryFn<typeof meta> = () => (
     </HStack>
   </VStack>
 );
+
+/** `variant='dot'` is the «•» between attributes in one line of text — a status, a time, a duration, who did it. It sits inline in a `Text`, 4px each side, and screen readers skip it. Use it instead of typing «·» or «•» into a string. */
+export const Dot: StoryFn<typeof meta> = () => (
+  <Text size='sm' color='secondary'>
+    Completed
+    <Separator variant='dot' />
+    17 hours ago
+    <Separator variant='dot' />2 min
+    <Separator variant='dot' />
+    run by Radar
+  </Text>
+);

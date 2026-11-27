@@ -10,7 +10,7 @@ import {
   getAlignClass,
   getExpandBorderClass,
   TABLE_EXPAND_COLUMN_ID,
-  useColumnDnd,
+  useColumnDndStyle,
   useColumnPinning,
   useRenderEveryTime,
   useTableValue,
@@ -54,7 +54,7 @@ export const TableBodyCell = <T extends RowData>({
   const isExpandedToggle = isExpandColumn && (isRowExpanded || cell.row.depth > 0);
   const size = useTableValue(() => column.getSize());
 
-  const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
+  const dndStyle = useColumnDndStyle(column.id);
   const { isPinned, pinningStyles, lastPinnedLeft: lastLeft } = useColumnPinning(column);
   const { isMasterTrigger, handleClick, tooltipText } = useMasterCell<T>(column.id, cell.row.id);
 
@@ -123,7 +123,6 @@ export const TableBodyCell = <T extends RowData>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       lastRow={lastRow}
-      ref={canDnd ? setNodeRef : undefined}
       onClick={isMasterTrigger ? handleClick : undefined}
       style={{
         ...pinningStyles,

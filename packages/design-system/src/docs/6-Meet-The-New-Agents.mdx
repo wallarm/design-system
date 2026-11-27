@@ -1,0 +1,16 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="AI Characters/Meet the new agents" />
+
+{/*
+  The look demo of the agent characters: who they are, how the kit works, the builder and the
+  brand rules. It is a standalone page (.storybook/assets/agent-characters/index.html), shown
+  whole over the docs canvas so it keeps its own type, layout and section rail. The URL is
+  relative to Storybook's iframe.html, so it resolves in dev and under /design-system/storybook/.
+*/}
+
+<iframe
+  title="Meet the new agents"
+  src="./agent-characters/index.html"
+  style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0, zIndex: 10, background: '#fff' }}
+/>

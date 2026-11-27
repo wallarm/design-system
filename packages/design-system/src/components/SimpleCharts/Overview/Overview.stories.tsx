@@ -10,6 +10,7 @@ import { BarListValue } from '../BarList/BarListValue';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
+import { Funnel, FunnelStep } from '../Funnel';
 import {
   HorizontalBarStack,
   type HorizontalBarStackDatum,
@@ -68,6 +69,12 @@ const severityData: HorizontalBarStackDatum[] = [
   { name: 'Critical', value: 42, color: 'red' },
   { name: 'High', value: 31, color: 'brand' },
   { name: 'Medium', value: 18, color: 'amber' },
+];
+
+const funnelSteps = [
+  { name: 'Detected', value: 1200, caption: 'All flagged requests' },
+  { name: 'Reviewed', value: 430, caption: 'Checked by an analyst' },
+  { name: 'Confirmed FP', value: 310, caption: 'Marked as false positive' },
 ];
 
 const DESCRIPTION = [
@@ -191,9 +198,22 @@ const MetricCard = () => (
   </Chart>
 );
 
+const FunnelCard = () => (
+  <Chart>
+    <ChartHeader>
+      <ChartTitle>False positives</ChartTitle>
+    </ChartHeader>
+    <Funnel>
+      {funnelSteps.map(step => (
+        <FunnelStep key={step.name} {...step} />
+      ))}
+    </Funnel>
+  </Chart>
+);
+
 /**
  * One card per chart, at its default: a `BarList` top-five, a `PieChart` share-of-total, a
- * `LineChart` over time, a `HorizontalBarStack` composition and a bare `Metric`.
+ * `LineChart` over time, a `HorizontalBarStack` composition, a bare `Metric` and a `Funnel` of steps.
  */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-832'>
@@ -206,5 +226,6 @@ export const Default: StoryFn<typeof meta> = () => (
       <HorizontalBarStackCard />
       <MetricCard />
     </div>
+    <FunnelCard />
   </div>
 );

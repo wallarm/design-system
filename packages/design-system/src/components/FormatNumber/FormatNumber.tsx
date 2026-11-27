@@ -1,4 +1,4 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import {
   abbreviateNumber,
   formatBytes,
@@ -47,6 +47,13 @@ interface FormatNumberBaseProps {
    */
   tooltip?: boolean;
 
+  /**
+   * 'default' renders the value as 14px regular body text. 'inherit' renders a plain span so
+   * font, size, weight and colour come from the parent (e.g. a heading or button).
+   * Default: 'default'.
+   */
+  typography?: 'default' | 'inherit';
+
   ref?: Ref<HTMLSpanElement>;
 }
 
@@ -58,6 +65,22 @@ const DASHED_UNDERLINE = 'border-b-1 border-dashed border-border-strong-primary'
 
 const TOOLTIP_POSITIONING = { placement: 'top' as const };
 
+interface InnerProps {
+  inherit: boolean;
+  secondary?: boolean;
+  children: ReactNode;
+}
+
+const Inner: FC<InnerProps> = ({ inherit, secondary, children }) => {
+  if (inherit)
+    return <span className={secondary ? 'text-text-secondary' : undefined}>{children}</span>;
+  return (
+    <Text size='sm' color={secondary ? 'secondary' : undefined}>
+      {children}
+    </Text>
+  );
+};
+
 export const FormatNumber: FC<FormatNumberProps> = ({
   value,
   type = 'decimal',
@@ -65,18 +88,21 @@ export const FormatNumber: FC<FormatNumberProps> = ({
   unit,
   decimals = 0,
   tooltip: showTooltip = true,
+  typography = 'default',
   ref,
   ...props
 }) => {
+  const inherit = typography === 'inherit';
+
   // Null / undefined → em dash with "No data" tooltip
   if (value == null) {
     return (
       <Tooltip positioning={TOOLTIP_POSITIONING}>
         <TooltipTrigger asChild>
           <span ref={ref} className='w-fit' data-slot='format-number' {...props}>
-            <Text size='sm' color='secondary'>
+            <Inner inherit={inherit} secondary>
               —
-            </Text>
+            </Inner>
           </span>
         </TooltipTrigger>
         <TooltipContent>No data</TooltipContent>
@@ -88,9 +114,9 @@ export const FormatNumber: FC<FormatNumberProps> = ({
   if (!Number.isFinite(value)) {
     return (
       <span ref={ref} data-slot='format-number' {...props}>
-        <Text size='sm' color='secondary'>
+        <Inner inherit={inherit} secondary>
           —
-        </Text>
+        </Inner>
       </span>
     );
   }
@@ -99,7 +125,7 @@ export const FormatNumber: FC<FormatNumberProps> = ({
   if (type === 'percent') {
     return (
       <span ref={ref} data-slot='format-number' {...props}>
-        <Text size='sm'>{formatPercent(value, decimals)}</Text>
+        <Inner inherit={inherit}>{formatPercent(value, decimals)}</Inner>
       </span>
     );
   }
@@ -120,11 +146,11 @@ export const FormatNumber: FC<FormatNumberProps> = ({
               aria-label={full}
               {...props}
             >
-              <Text size='sm'>
+              <Inner inherit={inherit}>
                 <span className={cn('whitespace-nowrap tabular-nums', DASHED_UNDERLINE)}>
                   {display}
                 </span>
-              </Text>
+              </Inner>
             </span>
           </TooltipTrigger>
           <TooltipContent>{full}</TooltipContent>
@@ -135,9 +161,9 @@ export const FormatNumber: FC<FormatNumberProps> = ({
     if (isAbbreviated) {
       return (
         <span ref={ref} data-slot='format-number' aria-label={full} {...props}>
-          <Text size='sm'>
+          <Inner inherit={inherit}>
             <span className='whitespace-nowrap tabular-nums'>{display}</span>
-          </Text>
+          </Inner>
         </span>
       );
     }
@@ -145,7 +171,7 @@ export const FormatNumber: FC<FormatNumberProps> = ({
     // Standard notation for bytes
     return (
       <span ref={ref} data-slot='format-number' {...props}>
-        <Text size='sm'>{full}</Text>
+        <Inner inherit={inherit}>{full}</Inner>
       </span>
     );
   }
@@ -167,11 +193,11 @@ export const FormatNumber: FC<FormatNumberProps> = ({
             aria-label={fullWithUnit}
             {...props}
           >
-            <Text size='sm'>
+            <Inner inherit={inherit}>
               <span className={cn('whitespace-nowrap tabular-nums', DASHED_UNDERLINE)}>
                 {abbreviated}
               </span>
-            </Text>
+            </Inner>
           </span>
         </TooltipTrigger>
         <TooltipContent>{fullWithUnit}</TooltipContent>
@@ -184,9 +210,9 @@ export const FormatNumber: FC<FormatNumberProps> = ({
 
     return (
       <span ref={ref} data-slot='format-number' aria-label={fullWithUnit} {...props}>
-        <Text size='sm'>
+        <Inner inherit={inherit}>
           <span className='whitespace-nowrap tabular-nums'>{displayValue}</span>
-        </Text>
+        </Inner>
       </span>
     );
   }
@@ -196,7 +222,7 @@ export const FormatNumber: FC<FormatNumberProps> = ({
 
   return (
     <span ref={ref} data-slot='format-number' {...props}>
-      <Text size='sm'>{displayValue}</Text>
+      <Inner inherit={inherit}>{displayValue}</Inner>
     </span>
   );
 };

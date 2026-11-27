@@ -29,7 +29,7 @@ A detail drawer is a `Drawer` with no footer. It shows one entity as `Attribute`
 
 - Mount one controlled `Drawer` (`open`, `onOpenChange`) for the list. **Never** one per row.
 - Open it from the list `Table` `onMasterCellClick`; mark the row with `activeRowId`. Row-menu clicks do not open it.
-- Keep the last entity in state after close so content does not blank.
+- Keep the last entity in state after close so content does not blank. To reset state after close, use `onExitComplete`: it fires once the exit animation ends.
 - Pass `width={640}`. Use 700 (the Figma frame) only if design confirms it. `width` is read once on mount.
 - If resizable, put `DrawerResizeHandle` first in `DrawerContent` (400–1130px).
 - **Never** add a `DrawerFooter` or your own close button.

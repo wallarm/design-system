@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties, useLayoutEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import type { Column, RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext/useTableContext';
@@ -17,10 +17,11 @@ interface UseColumnDndResult {
   listeners: UseSortableReturn['listeners'];
 }
 
+/** For the header cell only: it is the one node of the column dnd-kit knows. */
 export const useColumnDnd = <T extends RowData>(
   column: Column<DSTableFeatures, T, unknown>,
 ): UseColumnDndResult => {
-  const { columnDndEnabled, alwaysPinnedLeft } = useTableContext<T>();
+  const { columnDndEnabled, alwaysPinnedLeft, columnDndStyles } = useTableContext<T>();
   const isPinned = useTableValue(() => column.getIsPinned());
   const isResizing = useTableValue(() => column.getIsResizing());
 
@@ -30,9 +31,13 @@ export const useColumnDnd = <T extends RowData>(
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: column.id,
     disabled: !canDnd,
+    // A column header, not dnd-kit's button: it adds no aria-pressed while dragging then.
+    attributes: { role: 'columnheader', tabIndex: -1 },
   });
 
   const dndStyle = getDndStyles({ canDnd, isDragging, transform, transition });
+  // The column's body cells follow it through useColumnDndStyle.
+  useLayoutEffect(() => columnDndStyles.set(column.id, dndStyle));
 
   return { canDnd, isDragging, setNodeRef, dndStyle, attributes, listeners };
 };

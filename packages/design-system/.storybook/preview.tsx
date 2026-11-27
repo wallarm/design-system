@@ -75,6 +75,11 @@ const preview: Preview = {
               'Chart',
             ],
           ],
+          '*',
+          // The chat family, then the agent characters, opened by their two showcase pages.
+          'AI',
+          'AI Characters',
+          ['Meet the new agents', 'Squish the agents', 'AgentAvatar', 'AgentGlyph', '*'],
         ],
       },
     },

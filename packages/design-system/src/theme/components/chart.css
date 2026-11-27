@@ -6,3 +6,10 @@
     opacity: 1;
   }
 }
+
+/* Funnel entrance: a band grows from its start edge, vertically centred (`origin-left` + `fill-box`). */
+@keyframes ds-funnel-band-in {
+  from {
+    transform: scale(0);
+  }
+}

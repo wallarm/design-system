@@ -1,3 +1,84 @@
+## [4.26.2](https://github.com/wallarm/design-system/compare/v4.26.1...v4.26.2) (2026-11-26)
+
+### Bug Fixes
+
+* **simple-charts:** keep the chart hover popover outside the card clip ([#538](https://github.com/wallarm/design-system/issues/538)) ([439ae8e](https://github.com/wallarm/design-system/commit/439ae8ee31a5e2bacbe416499ce8670bcad0d8ba))
+
+## [4.26.1](https://github.com/wallarm/design-system/compare/v4.26.0...v4.26.1) (2026-11-26)
+
+### Bug Fixes
+
+* **calendar:** keep the input header date while its year is typed (WDS-165) ([#537](https://github.com/wallarm/design-system/issues/537)) ([a687274](https://github.com/wallarm/design-system/commit/a68727444f29bc36d92d8a1b24f75c8eb53da950))
+* **drawer:** fire onExitComplete when overlay turns off mid-fade ([#517](https://github.com/wallarm/design-system/issues/517)) ([756c44b](https://github.com/wallarm/design-system/commit/756c44bbcc9ac441a815fa76b7be303fbe309ca0))
+
+## [4.26.0](https://github.com/wallarm/design-system/compare/v4.25.0...v4.26.0) (2026-11-26)
+
+### Features
+
+* **format-duration:** add FormatDuration and formatDuration ([#536](https://github.com/wallarm/design-system/issues/536)) ([6689735](https://github.com/wallarm/design-system/commit/6689735e7b8a64362912cfad99986da6bcfabdd7))
+
+## [4.25.0](https://github.com/wallarm/design-system/compare/v4.24.0...v4.25.0) (2026-11-26)
+
+### Features
+
+* **simple-charts:** funnel hover, entrance and skeleton on recharts (WDS-209) ([#533](https://github.com/wallarm/design-system/issues/533)) ([0eb70c1](https://github.com/wallarm/design-system/commit/0eb70c1bb3cd9f40c6b8cd82f4faeb411bf1bc9b))
+
+### Bug Fixes
+
+* **country:** keep flag data URIs out of the type declarations ([#535](https://github.com/wallarm/design-system/issues/535)) ([9a3c173](https://github.com/wallarm/design-system/commit/9a3c1738e815bd9d91f0c2d9a408a1a96f6c5cb9))
+
+## [4.24.0](https://github.com/wallarm/design-system/compare/v4.23.0...v4.24.0) (2026-11-26)
+
+### Features
+
+* **agent-avatar:** align a character beside text by its drawing (AGL-229) ([#530](https://github.com/wallarm/design-system/issues/530)) ([4bd1f8a](https://github.com/wallarm/design-system/commit/4bd1f8a75c742d7fdd4c68d817425a23eb46879b))
+* **separator:** add the dot variant between attributes in a line of text (AGL-229) ([#531](https://github.com/wallarm/design-system/issues/531)) ([fe16c59](https://github.com/wallarm/design-system/commit/fe16c59a9be0e64750e5d404ef98bd9eafd02d95))
+* **simple-charts:** BarList-style rows for BarChart ([#532](https://github.com/wallarm/design-system/issues/532)) ([8602994](https://github.com/wallarm/design-system/commit/8602994cd427d1bc6c55e482736d9fcdea4764de))
+
+### Bug Fixes
+
+* **assistant-message:** left-align unaligned Markdown table columns (AGL-229) ([#529](https://github.com/wallarm/design-system/issues/529)) ([a6957c8](https://github.com/wallarm/design-system/commit/a6957c8125a0e508983da4936359dfd8e8ae5cfa))
+* **parameter-path:** a one-segment path keeps its line box ([#527](https://github.com/wallarm/design-system/issues/527)) ([dd74de1](https://github.com/wallarm/design-system/commit/dd74de19f2baf3eeca7b8bd2527a079efafafebd))
+* **pie-chart:** inset the legend row's fill to a 24px band ([#528](https://github.com/wallarm/design-system/issues/528)) ([9a5d72d](https://github.com/wallarm/design-system/commit/9a5d72d860dbcbe8cef1d8242961dd284d37cd5f))
+
+## [4.23.0](https://github.com/wallarm/design-system/compare/v4.22.0...v4.23.0) (2026-11-25)
+
+### Features
+
+* **agent-avatar:** needs you keeps the repertoire and hops out of step, a 128 size (AGL-194) ([#526](https://github.com/wallarm/design-system/issues/526)) ([808bbc5](https://github.com/wallarm/design-system/commit/808bbc53f4e488cf4888e83e30bda404de98c08f))
+
+### Bug Fixes
+
+* **nav-rail:** hide tooltip that repeats a visible label (CORE-2785) ([#512](https://github.com/wallarm/design-system/issues/512)) ([409ac2b](https://github.com/wallarm/design-system/commit/409ac2ba4e7e9159c1c07137151478f53e1c9221))
+
+## [4.22.0](https://github.com/wallarm/design-system/compare/v4.21.0...v4.22.0) (2026-11-25)
+
+### Features
+
+* **simple-charts:** add horizontal stacked BarChart ([#520](https://github.com/wallarm/design-system/issues/520)) ([7ea564e](https://github.com/wallarm/design-system/commit/7ea564e2705fff885ea4a18179d35db3649b77fc))
+
+## [4.21.0](https://github.com/wallarm/design-system/compare/v4.20.1...v4.21.0) (2026-11-24)
+
+### Features
+
+* **funnel:** add Funnel chart to SimpleCharts ([#523](https://github.com/wallarm/design-system/issues/523)) ([9ae39f6](https://github.com/wallarm/design-system/commit/9ae39f6eeb32f98691aca9a5f915b6752767068a))
+
+## [4.20.1](https://github.com/wallarm/design-system/compare/v4.20.0...v4.20.1) (2026-11-18)
+
+### Bug Fixes
+
+* **table:** a draggable header is announced as a column header ([#516](https://github.com/wallarm/design-system/issues/516)) ([492c6dc](https://github.com/wallarm/design-system/commit/492c6dcf9e6caf8a6990675ca274ab4c95186ffc))
+
+## [4.20.0](https://github.com/wallarm/design-system/compare/v4.19.2...v4.20.0) (2026-11-18)
+
+### Features
+
+* **drawer:** forward onExitComplete on Drawer and Dialog ([#513](https://github.com/wallarm/design-system/issues/513)) ([0cde0b1](https://github.com/wallarm/design-system/commit/0cde0b12eb4c921b86b7e0bc69a0adf8e661db5f))
+
+### Bug Fixes
+
+* **table:** window mode keeps header in line on focus and reads as one table ([#509](https://github.com/wallarm/design-system/issues/509)) ([d868e01](https://github.com/wallarm/design-system/commit/d868e01d5d63191aa844eb9cd4e35eeffb205cf8))
+
 ## [4.19.2](https://github.com/wallarm/design-system/compare/v4.19.1...v4.19.2) (2026-11-17)
 
 ### Bug Fixes

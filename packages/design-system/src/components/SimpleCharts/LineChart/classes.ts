@@ -14,7 +14,7 @@ export const lineChartRootClasses = ['relative w-full flex flex-col min-h-0'].jo
 // reduced motion.
 // `overflow-x-clip`: between resizes (see `LINE_RESIZE_DEBOUNCE_MS`) the SVG keeps its last
 // width, and recharts' zero-width, overflow-visible inner div would let a wider one spill past
-// the card. Only the x axis — the tooltip stays inside the plot anyway (`allowEscapeViewBox`).
+// the card. Only the x axis — the hover popover is portalled out of the card anyway.
 export const lineChartBodyClasses = [
   'relative flex-1 min-h-0 min-w-0 overflow-x-clip',
   '[&_*]:outline-none',
@@ -136,12 +136,6 @@ export const lineChartZoomPopoverConfirmClasses = [
   'hover:bg-states-brand-hover',
   'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus-brand',
 ].join(' ');
-
-// Shifts the popover up by half its own height so the y-coordinate recharts
-// hands us is the popover's visual centre — paired with the plot-area centre
-// anchor in `<LineChartTooltip>` so the popover stays vertically locked
-// between peaks and valleys.
-export const lineChartTooltipCenterClasses = '-translate-y-1/2';
 
 export const lineChartEmptyRootClasses = ['relative w-full'].join(' ');
 

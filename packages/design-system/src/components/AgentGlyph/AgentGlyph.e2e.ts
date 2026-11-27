@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const agentGlyphStory = createStoryHelper('ai-agentglyph', [
+const agentGlyphStory = createStoryHelper('ai-characters-agentglyph', [
   'Basic',
   'Cast',
   'Sizes',

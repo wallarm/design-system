@@ -32,7 +32,8 @@
       "!**/doc_build_local",
       "!**/.rspress",
       "!**/.claude-design",
-      "!packages/claude-design/src/assets/cover.html"
+      "!packages/claude-design/src/assets/cover.html",
+      "!**/.storybook/assets/agent-characters*/index.html"
     ]
   },
   "overrides": [

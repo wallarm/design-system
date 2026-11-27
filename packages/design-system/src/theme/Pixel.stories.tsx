@@ -26,7 +26,10 @@ export default meta;
 type PixelStep = {
   /** Name of the matching text style in Figma. */
   token: string;
-  /** Utilities that reproduce it — note lg is 16px, so it maps to text-base. */
+  /**
+   * Utilities that reproduce it. The names are offset from the text-* utilities: lg is 16px,
+   * so it maps to text-base, and md is 14px, so it maps to text-sm.
+   */
   utilities: string;
   /** Size / leading in px. */
   metrics: string;
@@ -37,10 +40,11 @@ const STEPS: PixelStep[] = [
   { token: 'pixel-2xl', utilities: 'font-pixel text-2xl', metrics: '24 / 32' },
   { token: 'pixel-xl', utilities: 'font-pixel text-xl', metrics: '20 / 28' },
   { token: 'pixel-lg', utilities: 'font-pixel text-base', metrics: '16 / 24' },
+  { token: 'pixel-md', utilities: 'font-pixel text-sm', metrics: '14 / 20' },
 ];
 
 /**
- * The four sanctioned steps, with the Figma token beside each. Two ship today —
+ * The five sanctioned steps, with the Figma token beside each. Two ship today —
  * `EmptyStateTitle` at 16 on 24 and `HoverCardTitle variant='agent'` at 20 on 28 — so treat the
  * rest as available rather than established.
  */

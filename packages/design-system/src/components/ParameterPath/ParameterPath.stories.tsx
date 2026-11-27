@@ -96,6 +96,12 @@ export const NoMethod: StoryFn<typeof meta> = () => (
   <ParameterPath segments={['cookie', 'session_id']} attack />
 );
 
+/**
+ * One segment, e.g. a whole query or a path index: the row keeps the text's line box with no
+ * joint to hold it open.
+ */
+export const SingleSegment: StoryFn<typeof meta> = () => <ParameterPath segments={['query']} />;
+
 // 600px keeps a wide margin below the path's natural width (~720px), so
 // truncation survives font-metric differences between environments.
 /**
