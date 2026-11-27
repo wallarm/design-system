@@ -6,6 +6,7 @@ export { MetricSkeleton, type MetricSkeletonProps } from './MetricSkeleton';
 export {
   MetricSparkline,
   type MetricSparklineColor,
+  type MetricSparklineCurve,
   type MetricSparklinePoint,
   type MetricSparklineProps,
 } from './MetricSparkline';

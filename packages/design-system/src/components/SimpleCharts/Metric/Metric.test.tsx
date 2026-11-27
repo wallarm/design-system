@@ -249,6 +249,65 @@ describe('MetricSparkline', () => {
     expect(area).toHaveAttribute('d', 'M0,48 L0,40 L1,4 L1,48 Z M3,48 L3,22 L3,48 Z');
   });
 
+  describe('curve', () => {
+    const spiky = [3, 0, 40, 2, 2, 39, 1, 0, 25].map((value, x) => ({ x, value }));
+    const pathOf = (curve?: 'linear' | 'monotone', d = spiky) => {
+      const { unmount } = render(<MetricSparkline data-testid='s' data={d} curve={curve} />);
+      const [area, line] = screen.getByTestId('s--plot').querySelectorAll('path');
+      const out = { area: area.getAttribute('d') ?? '', line: line.getAttribute('d') ?? '' };
+      unmount();
+      return out;
+    };
+    const ysOf = (d: string) =>
+      (d.match(/-?[\d.e-]+,-?[\d.e-]+/g) ?? []).map(p => Number(p.split(',')[1]));
+
+    it('defaults to linear segments, unchanged', () => {
+      expect(pathOf()).toEqual(pathOf('linear'));
+      expect(pathOf().line).not.toContain('C');
+    });
+
+    it('monotone draws cubics whose control points stay inside the 4..40 plot band', () => {
+      const { line, area } = pathOf('monotone');
+      expect(line.match(/C/g)).toHaveLength(spiky.length - 1);
+      // A Bézier stays inside its control points' hull, so this bounds the drawn curve.
+      for (const y of ysOf(line)) {
+        expect(y).toBeGreaterThanOrEqual(4);
+        expect(y).toBeLessThanOrEqual(40);
+      }
+      expect(area.startsWith('M0,48 L0,')).toBe(true);
+      expect(area.endsWith('L8,48 Z')).toBe(true);
+    });
+
+    it('monotone keeps flat runs flat and the single-point / constant midline', () => {
+      expect(pathOf('monotone', [{ x: 1, value: 5 }]).line).toBe('M0,22 L1,22');
+      expect(
+        ysOf(
+          pathOf(
+            'monotone',
+            [5, 5, 5].map((value, x) => ({ x, value })),
+          ).line,
+        ),
+      ).toEqual(new Array(7).fill(22));
+      // The 2,2 plateau (x=3..4) gets zero tangents: both control points sit on it (y=38.2).
+      const plateau = ysOf(pathOf('monotone').line.split(' C')[4]);
+      expect(plateau).toHaveLength(3);
+      for (const y of plateau) expect(y).toBeCloseTo(38.2);
+    });
+
+    it('monotone splits runs at a gap, and a two-point run stays straight', () => {
+      const { line, area } = pathOf(
+        'monotone',
+        [10, 30, 20, Number.NaN, 20, 10, Number.NaN, 5].map((value, x) => ({ x, value })),
+      );
+      const runs = line.split(' M');
+      expect(runs).toHaveLength(3);
+      expect(runs[0].match(/C/g)).toHaveLength(2);
+      expect(runs[1]).toMatch(/^4,[\d.]+ L5,[\d.]+$/);
+      expect(runs[2]).toMatch(/^7,[\d.]+$/);
+      expect(area.match(/Z/g)).toHaveLength(3);
+    });
+  });
+
   it('renders an empty plot (no svg) for empty data', () => {
     render(<MetricSparkline data-testid='s' data={[]} />);
     expect(screen.getByTestId('s--plot').querySelector('svg')).toBeNull();

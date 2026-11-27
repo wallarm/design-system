@@ -147,6 +147,7 @@ export {
   type MetricSkeletonProps,
   MetricSparkline,
   type MetricSparklineColor,
+  type MetricSparklineCurve,
   type MetricSparklinePoint,
   type MetricSparklineProps,
   MetricTotal,

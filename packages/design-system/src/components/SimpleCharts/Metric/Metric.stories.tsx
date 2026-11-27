@@ -248,3 +248,25 @@ export const SparklineColors: StoryFn = () => (
     </div>
   </div>
 );
+
+/**
+ * `curve='monotone'` joins the points with a smooth monotone cubic instead of straight segments.
+ * It never overshoots the data: the line stays between the series' min and max.
+ */
+export const SparklineCurve: StoryFn = () => (
+  <div className='w-400'>
+    <Chart>
+      <ChartHeader>
+        <ChartTitle>Attacks</ChartTitle>
+      </ChartHeader>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' sentiment='positive' />
+        </MetricHeader>
+        <MetricCaption>last 9 days</MetricCaption>
+      </Metric>
+      <MetricSparkline data-testid='sparkline' data={attacks} curve='monotone' label='Attacks' />
+    </Chart>
+  </div>
+);

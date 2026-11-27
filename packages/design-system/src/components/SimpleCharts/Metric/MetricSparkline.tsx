@@ -25,6 +25,8 @@ import {
 
 export type MetricSparklineColor = 'brand' | 'positive' | 'negative' | 'neutral';
 
+export type MetricSparklineCurve = 'linear' | 'monotone';
+
 export interface MetricSparklinePoint {
   /** The point's position on the period — a date (`Date`, timestamp, ISO string) or any label. */
   x: Date | number | string;
@@ -42,6 +44,11 @@ export interface MetricSparklineProps
    * `positive` (success) · `negative` (danger) · `neutral` (slate).
    */
   color?: MetricSparklineColor;
+  /**
+   * How points are joined, as on `LineChartLine`. `linear` (default) · straight segments;
+   * `monotone` · a smooth monotone cubic (d3 `curveMonotoneX`) that never overshoots the data.
+   */
+  curve?: MetricSparklineCurve;
   /** Series name on the hover popover row (Figma "Attribute"). */
   label?: ReactNode;
   /** Formats the hovered point's `x` for the popover. Defaults to `1 Jan, 2026` for dates. */
@@ -69,11 +76,40 @@ const POPOVER_OFFSET_X = 8;
 const POPOVER_OFFSET_Y = 14;
 
 /**
+ * The path commands after a run's first point. `monotone` is d3's `curveMonotoneX` (Fritsch–Carlson
+ * tangents) at a fixed step of 1: each Bézier's control points stay between its two end values, so
+ * the curve never dips below the min or rises over the max. Two points stay a straight segment.
+ */
+const runSegments = (start: number, ys: number[], curve: MetricSparklineCurve) => {
+  const rest = ys.slice(1);
+  if (curve === 'linear' || ys.length < 3) return rest.map((y, k) => `L${start + k + 1},${y}`);
+  // `?? 0` only satisfies noUncheckedIndexedAccess — every index below is in range.
+  const secants = rest.map((y, k) => y - (ys[k] ?? 0));
+  const last = ys.length - 1;
+  const tangents = ys.map((_, k) => {
+    if (k === 0 || k === last) return 0;
+    const s0 = secants[k - 1] ?? 0;
+    const s1 = secants[k] ?? 0;
+    const t =
+      (Math.sign(s0) + Math.sign(s1)) *
+      Math.min(Math.abs(s0), Math.abs(s1), 0.25 * Math.abs(s0 + s1));
+    return t || 0;
+  });
+  tangents[0] = (3 * (secants[0] ?? 0) - (tangents[1] ?? 0)) / 2;
+  tangents[last] = (3 * (secants[last - 1] ?? 0) - (tangents[last - 1] ?? 0)) / 2;
+  return rest.map((y1, k) => {
+    const x0 = start + k;
+    const y0 = ys[k] ?? 0;
+    return `C${x0 + 1 / 3},${y0 + (tangents[k] ?? 0) / 3} ${x0 + 2 / 3},${y1 - (tangents[k + 1] ?? 0) / 3} ${x0 + 1},${y1}`;
+  });
+};
+
+/**
  * One SVG unit per data step on X, one pixel on Y: with `preserveAspectRatio='none'` the plot
  * stretches to any card width without measuring, and `non-scaling-stroke` keeps the line 1.5px.
  * The Y domain is the data's own min..max — a sparkline shows shape, not magnitude.
  */
-const buildPaths = (values: number[]) => {
+const buildPaths = (values: number[], curve: MetricSparklineCurve) => {
   // A lone point becomes a flat line across the card.
   const ys = values.length === 1 ? values.concat(values) : values;
   const finite = ys.filter(Number.isFinite);
@@ -85,19 +121,21 @@ const buildPaths = (values: number[]) => {
   // A non-finite value leaves a gap: each run of finite points is its own line + area segment.
   const line: string[] = [];
   const area: string[] = [];
-  let runEnd = -1;
+  let run: number[] = [];
+  const flush = (end: number) => {
+    const [y0] = run;
+    if (y0 === undefined) return;
+    const start = end - run.length + 1;
+    const segments = runSegments(start, run, curve);
+    line.push(`M${start},${y0}`, ...segments);
+    area.push(`M${start},${HEIGHT} L${start},${y0}`, ...segments, `L${end},${HEIGHT} Z`);
+    run = [];
+  };
   ys.forEach((v, i) => {
-    if (!Number.isFinite(v)) {
-      if (runEnd >= 0) area.push(`L${runEnd},${HEIGHT} Z`);
-      runEnd = -1;
-      return;
-    }
-    const y = toY(v);
-    line.push(`${runEnd < 0 ? 'M' : 'L'}${i},${y}`);
-    area.push(runEnd < 0 ? `M${i},${HEIGHT} L${i},${y}` : `L${i},${y}`);
-    runEnd = i;
+    if (Number.isFinite(v)) run.push(toY(v));
+    else flush(i - 1);
   });
-  if (runEnd >= 0) area.push(`L${runEnd},${HEIGHT} Z`);
+  flush(ys.length - 1);
   return { width: ys.length - 1, line: line.join(' '), area: area.join(' ') };
 };
 
@@ -120,6 +158,7 @@ interface HoverState {
 export const MetricSparkline: FC<MetricSparklineProps> = ({
   data,
   color = 'brand',
+  curve = 'linear',
   label,
   formatX,
   formatValue,
@@ -135,7 +174,13 @@ export const MetricSparkline: FC<MetricSparklineProps> = ({
   const [hover, setHover] = useState<HoverState | null>(null);
 
   const { line, area } = SPARKLINE_COLORS[color];
-  const paths = data.length > 0 ? buildPaths(data.map(d => d.value)) : null;
+  const paths =
+    data.length > 0
+      ? buildPaths(
+          data.map(d => d.value),
+          curve,
+        )
+      : null;
   const last = data.length - 1;
   const fractionOf = (index: number) => (last === 0 ? 0.5 : index / last);
 
