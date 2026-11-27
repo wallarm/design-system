@@ -121,6 +121,9 @@ export const useScrollSpy = ({
       lockedRef.current = false;
     };
     const onKeyDown = (event: KeyboardEvent) => {
+      // Keys typed into a field don't scroll the page.
+      const target = event.target as HTMLElement | null;
+      if (target?.isContentEditable || target?.closest?.('input, textarea, select')) return;
       if (SCROLL_KEYS.has(event.key)) onUserScroll();
     };
 

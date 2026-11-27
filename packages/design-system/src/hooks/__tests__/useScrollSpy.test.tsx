@@ -148,6 +148,20 @@ describe('useScrollSpy', () => {
     expect(result.current.activeId).toBe('b');
   });
 
+  it('scroll keys typed into an editable field keep the lock', () => {
+    mountSections({ a: -500, b: 0, c: 900 });
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    const { result } = render({ ids: ['a', 'b', 'c'] });
+    act(() => result.current.scrollTo('c'));
+    act(() => {
+      fireEvent.keyDown(input, { key: ' ' });
+    });
+    scrollWindow();
+    expect(result.current.activeId).toBe('c');
+    input.remove();
+  });
+
   it.each(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '])(
     '%j cancels the scrollTo lock',
     key => {
