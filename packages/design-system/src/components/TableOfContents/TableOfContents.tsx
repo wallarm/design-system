@@ -1,6 +1,6 @@
 import { type ComponentProps, type FC, type Ref, useId } from 'react';
 import { useControlled } from '../../hooks/useControlled';
-import { PanelLeftClose, PanelLeftOpen } from '../../icons';
+import { PanelLeftClose, PanelRightClose } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { Button } from '../Button';
@@ -21,7 +21,7 @@ export interface TableOfContentsProps
   /** Uncontrolled initial view. */
   defaultView?: TableOfContentsView;
   onViewChange?: (view: TableOfContentsView) => void;
-  /** Header label in the Full view and the nav's accessible name. */
+  /** Header label in the Full view; the accessible name of the nav, the toggle and the popover unless `aria-label` is passed. */
   title?: string;
   ref?: Ref<HTMLElement>;
 }
@@ -36,15 +36,18 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
   className,
   children,
   ref,
+  'aria-label': ariaLabel,
   'data-testid': testId,
   ...props
 }) => {
+  const label = ariaLabel ?? title;
   const [view = defaultView, setView] = useControlled({
     controlled: viewProp,
     default: defaultView,
   });
   const full = view === 'full';
   const headerId = useId();
+  const listId = useId();
   const slotTestId = (slot: string) => (testId ? `${testId}--${slot}` : undefined);
 
   const handleToggle = () => {
@@ -57,7 +60,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
     <nav
       {...props}
       ref={ref}
-      aria-label={title}
+      aria-label={label}
       data-slot='table-of-contents'
       data-view={view}
       data-testid={testId}
@@ -69,13 +72,15 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
             variant='ghost'
             color='neutral'
             size='small'
-            aria-label={full ? 'Collapse table of contents' : 'Expand table of contents'}
+            // A stable name: the state is in aria-expanded, not in the label.
+            aria-label={label}
             aria-expanded={full}
+            aria-controls={full ? listId : undefined}
             onClick={handleToggle}
             data-slot='table-of-contents-toggle'
             data-testid={slotTestId('toggle')}
           >
-            {full ? <PanelLeftClose /> : <PanelLeftOpen />}
+            {full ? <PanelLeftClose /> : <PanelRightClose />}
           </Button>
           {full && (
             <span className='truncate text-xs font-medium text-text-secondary'>{title}</span>
@@ -84,6 +89,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
         {full ? (
           <TableOfContentsContext value={{ value, onValueChange, mode: 'row' }}>
             <ul
+              id={listId}
               data-slot='table-of-contents-list'
               data-testid={slotTestId('list')}
               className='-m-3 flex min-h-0 flex-col gap-1 overflow-y-auto p-3'
@@ -94,7 +100,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
         ) : (
           <TableOfContentsMinimized
             anchorId={headerId}
-            title={title}
+            label={label}
             value={value}
             onValueChange={onValueChange}
           >

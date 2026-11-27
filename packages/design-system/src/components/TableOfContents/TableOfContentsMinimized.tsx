@@ -11,7 +11,8 @@ const POPOVER_WIDTH = '220px';
 interface TableOfContentsMinimizedProps {
   /** Id of the header row with the expand button — the popover anchors under it. */
   anchorId: string;
-  title: string;
+  /** Accessible name of the popover. */
+  label: string;
   value: string | undefined;
   onValueChange: ((value: string) => void) | undefined;
   children: ReactNode;
@@ -20,7 +21,7 @@ interface TableOfContentsMinimizedProps {
 /** Dashes plus the popover that opens over them: hover (mouse) or tap (touch / pen). */
 export const TableOfContentsMinimized: FC<TableOfContentsMinimizedProps> = ({
   anchorId,
-  title,
+  label,
   value,
   onValueChange,
   children,
@@ -96,7 +97,7 @@ export const TableOfContentsMinimized: FC<TableOfContentsMinimizedProps> = ({
         </TableOfContentsContext>
       </div>
       <PopoverContent
-        aria-label={title}
+        aria-label={label}
         data-slot='table-of-contents-popover'
         data-testid={popoverTestId}
         minWidth={POPOVER_WIDTH}

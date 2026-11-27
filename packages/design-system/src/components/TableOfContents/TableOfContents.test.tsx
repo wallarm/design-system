@@ -25,6 +25,14 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('navigation', { name: 'On this page' })).toBeInTheDocument();
   });
 
+  it('consumer aria-label wins over title', () => {
+    renderToc({ 'aria-label': 'Report sections' });
+    expect(screen.getByRole('navigation', { name: 'Report sections' })).toHaveTextContent(
+      'On this page',
+    );
+    expect(screen.getByTestId('toc--toggle')).toHaveAccessibleName('Report sections');
+  });
+
   it('uses a custom title', () => {
     renderToc({ title: 'Contents' });
     expect(screen.getByRole('navigation', { name: 'Contents' })).toHaveTextContent('Contents');
@@ -342,6 +350,31 @@ describe('TableOfContents — minimized', () => {
     await nextFrame();
     expect(popover()).toBeNull();
     expect(onValueChange).toHaveBeenCalledOnce();
+  });
+
+  it('item click in popover closes it without onValueChange (browser follows the link)', async () => {
+    renderMinimized();
+    await openByTap();
+    const critical = within(popover() as HTMLElement).getByRole('link', { name: /Critical/ });
+    expect(fireEvent.click(critical)).toBe(true);
+    await advance(0);
+    await nextFrame();
+    expect(popover()).toBeNull();
+  });
+
+  it('item click in popover keeps it open when the consumer prevents default', async () => {
+    render(
+      <TableOfContents data-testid='toc' defaultView='minimized'>
+        <TableOfContentsItem value='a' onClick={event => event.preventDefault()}>
+          A
+        </TableOfContentsItem>
+      </TableOfContents>,
+    );
+    await openByTap();
+    fireEvent.click(within(popover() as HTMLElement).getByRole('link', { name: 'A' }));
+    await advance(0);
+    await nextFrame();
+    expect(popover()).toBeInTheDocument();
   });
 
   it('toggle from minimized back to full keeps aria-current on the same item', () => {

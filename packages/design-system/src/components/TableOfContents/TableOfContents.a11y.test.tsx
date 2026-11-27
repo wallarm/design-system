@@ -33,12 +33,16 @@ describe('TableOfContents — accessibility', () => {
     expect(screen.getByRole('link', { current: 'location' })).toHaveTextContent('B');
   });
 
-  it('toggle has an accessible name and aria-expanded', async () => {
+  it('toggle keeps a stable name, aria-expanded reflects Full, aria-controls points at the list', async () => {
     renderToc();
-    const toggle = screen.getByRole('button', { name: 'Collapse table of contents' });
+    const toggle = screen.getByRole('button', { name: 'On this page' });
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveAttribute('aria-controls', screen.getByRole('list').id);
+    expect(screen.getByRole('list').id).not.toBe('');
     await userEvent.click(toggle);
-    const expand = screen.getByRole('button', { name: 'Expand table of contents' });
-    expect(expand).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: 'On this page' })).toBe(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    // The list is unmounted in Minimized: no dangling IDREF.
+    expect(toggle).not.toHaveAttribute('aria-controls');
   });
 });

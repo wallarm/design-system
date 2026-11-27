@@ -36,17 +36,13 @@ export const TableOfContentsItem: FC<TableOfContentsItemProps> = ({
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
-    // Intercept only a plain click on an in-page link the root handles; otherwise the browser navigates.
-    if (
-      event.defaultPrevented ||
-      !onValueChange ||
-      !href.startsWith('#') ||
-      isModifiedClick(event)
-    ) {
-      return;
+    if (event.defaultPrevented || isModifiedClick(event)) return;
+    // Intercept only an in-page link the root handles; otherwise the browser navigates.
+    if (onValueChange && href.startsWith('#')) {
+      event.preventDefault();
+      onValueChange(value);
     }
-    event.preventDefault();
-    onValueChange(value);
+    // A plain click picks the item either way — close the popover.
     onItemSelect?.();
   };
 

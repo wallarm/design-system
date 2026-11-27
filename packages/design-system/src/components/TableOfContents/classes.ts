@@ -1,8 +1,8 @@
 import { cva } from 'class-variance-authority';
 
-/** Row link — NavPanel row states, plus the ToC rail indent and an outer focus ring. */
+/** Row link — NavPanel row states (focus-visible gets the hover fill), plus the ToC rail indent and a focus ring over the fill. */
 export const tableOfContentsItemVariants = cva(
-  'overlay flex min-h-32 w-full cursor-pointer items-start gap-8 rounded-10 py-6 pr-8 text-sm text-text-secondary transition-colors outline-none hover:overlay-states-primary-hover hover:text-text-primary active:overlay-states-primary-pressed active:text-text-primary focus-visible:ring-3 focus-visible:ring-focus-primary',
+  'overlay flex min-h-32 w-full cursor-pointer items-start gap-8 rounded-10 py-6 pr-8 text-sm text-text-secondary transition-colors outline-none hover:overlay-states-primary-hover hover:text-text-primary active:overlay-states-primary-pressed active:text-text-primary focus-visible:overlay-states-primary-hover focus-visible:text-text-primary focus-visible:ring-3 focus-visible:ring-focus-primary',
   {
     variants: {
       level: {
