@@ -54,7 +54,7 @@ All bricks are optional; only `MetricValue` is expected in practice.
     placed by index, not by time).
   - `color`: `'brand'` (default) · `'positive'` · `'negative'` · `'neutral'` — line tokens
     `bg/fill/brand` · `bg/fill/success` · `bg/fill/danger` · `border/strong/primary`. The area is the
-    same token as a vertical gradient 20% → 0%; neutral's area uses `bg/strong/primary`.
+    same token as a vertical gradient 20% → 6% (not 0%, so the fill reaches the bottom border instead of fading into a white strip); neutral's area uses `bg/strong/primary`.
   - `curve`: `'linear'` (default, straight segments) · `'monotone'` (smooth monotone cubic, d3
     `curveMonotoneX`) — same names as `LineChartLine.curve`, but the default stays `linear`.
   - `label` — series name on the popover row; `formatX(x)` / `formatValue(value: number)` override

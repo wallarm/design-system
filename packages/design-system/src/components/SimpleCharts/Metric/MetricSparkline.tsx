@@ -14,7 +14,11 @@ import { type TestableProps, useTestId } from '../../../utils/testId';
 import { useDateFormat } from '../../DateFormatProvider/useDateFormat';
 import { ChartHoverCardRow } from '../internal/ChartHoverCard';
 import { LineChartHoverPopover, LineChartHoverPopoverTimestamp } from '../LineChart';
-import { LINE_CURSOR_DASHARRAY } from '../LineChart/constants';
+import {
+  LINE_CURSOR_DASHARRAY,
+  LINE_SHADOW_END_OPACITY,
+  LINE_SHADOW_OPACITY,
+} from '../LineChart/constants';
 import { formatChartDate } from '../lib/timeFormatters';
 import {
   metricSparklineClasses,
@@ -58,7 +62,8 @@ export interface MetricSparklineProps
 }
 
 // Line and area tokens per colour. Figma puts the area's 20% on the layer (a token can't
-// carry opacity), so the gradient stops below apply it. Neutral's area is a lighter slate.
+// carry opacity), so the gradient stops below apply it; the bottom stays at 6%, not 0, so the
+// fill reaches the card border instead of fading into a white strip. Neutral's area is a lighter slate.
 const SPARKLINE_COLORS: Record<MetricSparklineColor, { line: string; area: string }> = {
   brand: { line: 'var(--color-bg-fill-brand)', area: 'var(--color-bg-fill-brand)' },
   positive: { line: 'var(--color-bg-fill-success)', area: 'var(--color-bg-fill-success)' },
@@ -252,8 +257,8 @@ export const MetricSparkline: FC<MetricSparklineProps> = ({
           >
             <defs>
               <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
-                <stop offset='0' stopColor={area} stopOpacity={0.2} />
-                <stop offset='1' stopColor={area} stopOpacity={0} />
+                <stop offset='0' stopColor={area} stopOpacity={LINE_SHADOW_OPACITY} />
+                <stop offset='1' stopColor={area} stopOpacity={LINE_SHADOW_END_OPACITY} />
               </linearGradient>
             </defs>
             <path d={paths.area} fill={`url(#${gradientId})`} />

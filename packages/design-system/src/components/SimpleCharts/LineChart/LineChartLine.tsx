@@ -5,6 +5,7 @@ import { useTestId } from '../../../utils/testId';
 import {
   LINE_DASH_DASHARRAY,
   LINE_INACTIVE_OPACITY,
+  LINE_SHADOW_END_OPACITY,
   LINE_SHADOW_OPACITY,
   LINE_STROKE_FILL,
   LINE_STROKE_WIDTH,
@@ -38,7 +39,7 @@ export interface LineChartLineProps {
   /** Stroke width override. Defaults to `LINE_STROKE_WIDTH`. */
   strokeWidth?: number;
   /**
-   * Fill under the line: the series colour fading from 20% to transparent at the plot bottom,
+   * Fill under the line: the series colour fading from 20% to 6% at the plot bottom,
    * following the same `curve` and gaps. Decorative — it takes no pointer events.
    */
   shadow?: boolean;
@@ -138,7 +139,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
         <defs>
           <linearGradient id={shadowId} x1='0' y1='0' x2='0' y2='1'>
             <stop offset='0' stopColor={stroke} stopOpacity={LINE_SHADOW_OPACITY} />
-            <stop offset='1' stopColor={stroke} stopOpacity={0} />
+            <stop offset='1' stopColor={stroke} stopOpacity={LINE_SHADOW_END_OPACITY} />
           </linearGradient>
         </defs>
         <Curve

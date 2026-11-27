@@ -14,9 +14,10 @@ export const LINE_ANIMATION_BEGIN = 0;
 
 export const LINE_INACTIVE_OPACITY = 0.3;
 
-// `LineChartLine shadow`: the series colour fades from this opacity under the line to 0 at the
-// plot bottom — the same 20% → 0 gradient as `MetricSparkline`'s area.
+// `LineChartLine shadow` and `MetricSparkline`'s area: the series colour fades from 20% under the
+// line to 6% at the plot bottom. Not to 0 — that left a near-white strip along the card's border.
 export const LINE_SHADOW_OPACITY = 0.2;
+export const LINE_SHADOW_END_OPACITY = 0.06;
 
 // `<ResponsiveContainer debounce>`: recharts throttles its resize re-render to this interval
 // (trailing), so a container that resizes every frame — a window drag, a side panel sliding —
