@@ -71,4 +71,22 @@ describe('TableOfContents — analytics (docs/metrics/contract.md)', () => {
     await userEvent.click(screen.getByTestId('toc--toggle'));
     expect(screen.getByTestId('toc')).toHaveAttribute('data-analytics-id', 'REPORT_TOC');
   });
+
+  it('closed-target gap TOC-1/TOC-2 (ANALYTICS_GAPS.md): toggle and dashes take no consumer attributes; view changes reach onViewChange', async () => {
+    const onViewChange = rs.fn();
+    render(
+      <TableOfContents data-testid='toc' data-analytics-id='REPORT_TOC' onViewChange={onViewChange}>
+        <TableOfContentsItem value='a'>A</TableOfContentsItem>
+      </TableOfContents>,
+    );
+    const captured = captureAnalyticsClicks();
+    const toggle = screen.getByTestId('toc--toggle');
+    // The root's attributes stay on the <nav>: the toggle has no seam of its own.
+    expect(toggle).not.toHaveAttribute('data-analytics-id');
+    await userEvent.click(toggle);
+    expect(onViewChange).toHaveBeenCalledExactlyOnceWith('minimized');
+    // A click resolves to the root id (container-level), never to the toggle itself.
+    expect(captured).toHaveBeenLastCalledWith('REPORT_TOC');
+    expect(screen.getByTestId('toc--dashes')).not.toHaveAttribute('data-analytics-id');
+  });
 });
