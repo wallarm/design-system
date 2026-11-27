@@ -1,10 +1,12 @@
 import { type FC, type MouseEvent, useContext, useEffect, useId } from 'react';
-import { Line, LineDrawShape, type LineDrawShapeProps } from 'recharts';
+import { Curve, Line, LineDrawShape, type LineDrawShapeProps } from 'recharts';
 import type { CurveMouseEventHandler } from 'recharts/types/shape/Curve';
 import { useTestId } from '../../../utils/testId';
 import {
   LINE_DASH_DASHARRAY,
   LINE_INACTIVE_OPACITY,
+  LINE_SHADOW_END_OPACITY,
+  LINE_SHADOW_OPACITY,
   LINE_STROKE_FILL,
   LINE_STROKE_WIDTH,
   resolveSeriesColor,
@@ -36,6 +38,11 @@ export interface LineChartLineProps {
   connectNulls?: boolean;
   /** Stroke width override. Defaults to `LINE_STROKE_WIDTH`. */
   strokeWidth?: number;
+  /**
+   * Fill under the line: the series colour fading from 20% to 6% at the plot bottom,
+   * following the same `curve` and gaps. Decorative — it takes no pointer events.
+   */
+  shadow?: boolean;
   onClick?: (event: MouseEvent<SVGPathElement>) => void;
   onMouseEnter?: (event: MouseEvent<SVGPathElement>) => void;
   onMouseLeave?: (event: MouseEvent<SVGPathElement>) => void;
@@ -53,6 +60,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   disableAnimation = false,
   connectNulls = false,
   strokeWidth = LINE_STROKE_WIDTH,
+  shadow = false,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -63,6 +71,8 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   const inRangeTestId = useTestId('line-in-range');
   const clipId = useId();
   const baseClipId = useId();
+  const shadowId = useId();
+  const shadowTestId = useTestId('line-shadow');
   const { ranges } = useContext(LineChartRangeContext);
   const geometry = useRangeEdges();
 
@@ -119,25 +129,70 @@ export const LineChartLine: FC<LineChartLineProps> = ({
   }
   outsideRects.push({ key: 'out-end', x1: cursor, x2: Number.POSITIVE_INFINITY });
 
-  const renderClippedShape =
-    (id: string, rects: { key: string; x1: number; x2: number }[]) =>
-    (shapeProps: LineDrawShapeProps) => (
+  // The shadow is a closed curve from the line's own points down to the plot bottom, drawn in the
+  // base line's `shape` before the stroke — recharts' `<LineChart>` ignores an `<Area>` child, and
+  // reusing the points keeps the fill on the exact same `curve`, gaps included.
+  const plotBottom = geometry ? geometry.plotArea.y + geometry.plotArea.height : null;
+  const renderShadow = (shapeProps: LineDrawShapeProps) =>
+    plotBottom !== null && (
       <>
         <defs>
-          <clipPath id={id}>
-            {rects.map(rect => {
-              // SVG rejects infinite lengths — the outer rects only need to clear the chart.
-              const x1 = Math.max(rect.x1, -1e6);
-              const x2 = Math.min(rect.x2, 1e6);
-              return (
-                <rect key={rect.key} x={x1} y={top} width={Math.max(0, x2 - x1)} height={height} />
-              );
-            })}
-          </clipPath>
+          <linearGradient id={shadowId} x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0' stopColor={stroke} stopOpacity={LINE_SHADOW_OPACITY} />
+            <stop offset='1' stopColor={stroke} stopOpacity={LINE_SHADOW_END_OPACITY} />
+          </linearGradient>
         </defs>
-        <LineDrawShape {...shapeProps} clipPath={`url(#${id})`} />
+        <Curve
+          points={shapeProps.points}
+          type={curve}
+          connectNulls={connectNulls}
+          baseLine={plotBottom}
+          stroke='none'
+          fill={`url(#${shadowId})`}
+          pointerEvents='none'
+          data-slot='line-chart-line-shadow'
+          data-testid={shadowTestId}
+        />
       </>
     );
+
+  const renderShape =
+    (
+      clip: { id: string; rects: { key: string; x1: number; x2: number }[] } | null,
+      withShadow: boolean,
+    ) =>
+    (shapeProps: LineDrawShapeProps) => (
+      <>
+        {withShadow && renderShadow(shapeProps)}
+        {clip ? (
+          <>
+            <defs>
+              <clipPath id={clip.id}>
+                {clip.rects.map(rect => {
+                  // SVG rejects infinite lengths — the outer rects only need to clear the chart.
+                  const x1 = Math.max(rect.x1, -1e6);
+                  const x2 = Math.min(rect.x2, 1e6);
+                  return (
+                    <rect
+                      key={rect.key}
+                      x={x1}
+                      y={top}
+                      width={Math.max(0, x2 - x1)}
+                      height={height}
+                    />
+                  );
+                })}
+              </clipPath>
+            </defs>
+            <LineDrawShape {...shapeProps} clipPath={`url(#${clip.id})`} />
+          </>
+        ) : (
+          <LineDrawShape {...shapeProps} />
+        )}
+      </>
+    );
+
+  const hasRanges = clipRects.length > 0;
 
   const base = (
     <Line
@@ -161,11 +216,15 @@ export const LineChartLine: FC<LineChartLineProps> = ({
       data-testid={testId}
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
-      shape={clipRects.length > 0 ? renderClippedShape(baseClipId, outsideRects) : undefined}
+      shape={
+        hasRanges || shadow
+          ? renderShape(hasRanges ? { id: baseClipId, rects: outsideRects } : null, shadow)
+          : undefined
+      }
     />
   );
 
-  if (clipRects.length === 0) return base;
+  if (!hasRanges) return base;
 
   return (
     <>
@@ -190,7 +249,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
         onClick={wrap(onClick)}
         onMouseEnter={wrap(onMouseEnter)}
         onMouseLeave={wrap(onMouseLeave)}
-        shape={renderClippedShape(clipId, clipRects)}
+        shape={renderShape({ id: clipId, rects: clipRects }, false)}
         data-slot='line-chart-line-in-range'
         data-testid={inRangeTestId}
         data-key={seriesKey}

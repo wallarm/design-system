@@ -40,7 +40,7 @@ as one band, use `HorizontalBarStack`; when each part needs its own row, use `Ba
 | `MetricTotal` | The denominator. `connector` = `slash` (`/120`, default) · `of` (`of 120`) · `total` (`120 total`). Numeric child locale-formatted; number in primary text, connector word muted. |
 | `MetricDelta` | Trend chip — a thin wrapper over the shared `ChartDelta`. `sentiment` sets the colour (positive → green, **negative → red**, neutral → slate; default neutral) independently of the `trend` arrow. |
 | `MetricCaption` | Muted secondary subline under the header. |
-| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, the metric's `mt-auto` pins both to the card's bottom edge, `px-px` is the 1px inset from the border. |
+| `MetricSparkline` | The trend under the metric. A **sibling after `Metric`** inside `Chart`, not a child: the metric's bottom `py-8` is the Figma 8px gap, the metric's `mt-auto` pins both to the card's bottom edge. No side inset: the line and area run into the card border (the SVG overflows, the card's `overflow-clip` trims it), so no white strip shows between the area and the border. |
 
 All bricks are optional; only `MetricValue` is expected in practice.
 
@@ -54,7 +54,9 @@ All bricks are optional; only `MetricValue` is expected in practice.
     placed by index, not by time).
   - `color`: `'brand'` (default) · `'positive'` · `'negative'` · `'neutral'` — line tokens
     `bg/fill/brand` · `bg/fill/success` · `bg/fill/danger` · `border/strong/primary`. The area is the
-    same token as a vertical gradient 20% → 0%; neutral's area uses `bg/strong/primary`.
+    same token as a vertical gradient 20% → 6% (not 0%, so the fill reaches the bottom border instead of fading into a white strip); neutral's area uses `bg/strong/primary`.
+  - `curve`: `'linear'` (default, straight segments) · `'monotone'` (smooth monotone cubic, d3
+    `curveMonotoneX`) — same names as `LineChartLine.curve`, but the default stays `linear`.
   - `label` — series name on the popover row; `formatX(x)` / `formatValue(value: number)` override
     the popover text.
 
@@ -68,7 +70,7 @@ combinations.
 It renders a value-sized block (72×36) plus a thin caption line on the DS `Skeleton` shimmer,
 sized to the loaded layout so the card doesn't jump; announces `aria-busy` / `aria-live`.
 
-**Sparkline** — `Sparkline` / `SparklineColors` stories. Empty `data` keeps the 48px box with
+**Sparkline** — `Sparkline` / `SparklineColors` / `SparklineCurve` stories. Empty `data` keeps the 48px box with
 nothing drawn, so the card doesn't jump while data loads.
 
 ## Interactions
@@ -96,6 +98,9 @@ popover — date and the value row. Pointer leave hides both. No click, no selec
 - **Sparkline Y domain is the data's own min..max**, mapped to 4px…40px of the 48px plot (top
   headroom for the stroke, bottom room so the area reads under the lowest point). A constant series
   or a single point draws a flat midline. It shows shape, not magnitude — don't read it against zero.
+- **`curve='monotone'` never overshoots** — Fritsch–Carlson tangents (zero at a local extremum or a
+  plateau) keep every Bézier's control points between its two end values, so the line stays inside
+  min..max and a count never dips under its lowest value. A two-point run stays a straight segment.
 - **Plain SVG, no recharts** — `viewBox` is one unit per step × 48px with
   `preserveAspectRatio='none'`, and the line uses `vector-effect: non-scaling-stroke`, so it stretches
   to any card width at a constant 1.5px without measuring the container.

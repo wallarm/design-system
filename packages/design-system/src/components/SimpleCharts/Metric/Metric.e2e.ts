@@ -6,6 +6,7 @@ const story = createStoryHelper('data-display-simplecharts-metric', [
   'Loading',
   'Sparkline',
   'Sparkline Colors',
+  'Sparkline Curve',
 ] as const);
 
 /** Hover the sparkline at `ratio` of its width (0 = first point, 1 = last). */
@@ -40,6 +41,11 @@ test.describe('Component: Metric', () => {
 
     test('Should render all sparkline colors correctly', async ({ page }) => {
       await story.goto(page, 'Sparkline Colors');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render monotone sparkline curve correctly', async ({ page }) => {
+      await story.goto(page, 'Sparkline Curve');
       await expect(page).toHaveScreenshot();
     });
 
