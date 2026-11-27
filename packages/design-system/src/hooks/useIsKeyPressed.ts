@@ -1,5 +1,14 @@
 import { useEffect, useRef } from 'react';
 
+/**
+ * Tracks whether `targetKey` (a `KeyboardEvent.key`) is held down, via
+ * window `keydown`/`keyup`. Returns a ref, so reading it never re-renders —
+ * read `.current` in event handlers, not during render.
+ *
+ * @example
+ * const shiftPressed = useIsKeyPressed('Shift');
+ * const handleClick = () => (shiftPressed.current ? selectRange() : selectOne());
+ */
 export const useIsKeyPressed = (targetKey: string): React.RefObject<boolean> => {
   const ref = useRef(false);
 

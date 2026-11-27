@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 122 pages are written**; 24 are left (see the ☐ rows).
+> **Last updated:** 2026-10-22, against main at v3.3.0. **99 of 123 pages are written**; 24 are left (see the ☐ rows).
 
 ## How to use this
 
@@ -147,6 +147,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ☐ | Navigation/SearchModal | 8 | 8 | `components/SearchModal/SearchModal.stories.tsx` |
 | ✅ | Navigation/SegmentedTabs | 9 | 9 | `components/SegmentedTabs/SegmentedTabs.stories.tsx` |
 | ☐ | Navigation/Stepper | 10 | 10 | `components/Stepper/Stepper.stories.tsx` |
+| ✅ | Navigation/TableOfContents | 8 | 8 | `components/TableOfContents/TableOfContents.stories.tsx` |
 | ✅ | Navigation/Tabs | 11 | 11 | `components/Tabs/Tabs.stories.tsx` |
 | ✅ | Navigation/Tree | 6 | 6 | `components/Tree/Tree.stories.tsx` |
 | ✅ | Navigation/TreeView | 8 | 8 | `components/TreeView/TreeView.stories.tsx` |

@@ -7,3 +7,4 @@ export {
   type UseOverflowItemsResult,
   useOverflowItems,
 } from './useOverflowItems';
+export { type UseScrollSpyOptions, type UseScrollSpyResult, useScrollSpy } from './useScrollSpy';

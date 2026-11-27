@@ -1071,6 +1071,13 @@ export {
   type TableVisibilityState,
 } from './components/Table';
 export {
+  TableOfContents,
+  TableOfContentsItem,
+  type TableOfContentsItemProps,
+  type TableOfContentsProps,
+  type TableOfContentsView,
+} from './components/TableOfContents';
+export {
   Tabs,
   TabsButton,
   TabsContent,
@@ -1230,5 +1237,17 @@ export {
   type WallyIconStyle,
 } from './components/WallyIcon';
 export { WallySkeleton, type WallySkeletonProps } from './components/WallySkeleton';
+export {
+  type UseOverflowItemsOptions,
+  type UseOverflowItemsResult,
+  type UseScrollSpyOptions,
+  type UseScrollSpyResult,
+  useArrowNav,
+  useControlled,
+  useCopyToClipboard,
+  useIsKeyPressed,
+  useOverflowItems,
+  useScrollSpy,
+} from './hooks';
 export { cn } from './utils/cn';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';
