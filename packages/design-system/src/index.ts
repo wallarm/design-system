@@ -1071,6 +1071,13 @@ export {
   type TableVisibilityState,
 } from './components/Table';
 export {
+  TableOfContents,
+  TableOfContentsItem,
+  type TableOfContentsItemProps,
+  type TableOfContentsProps,
+  type TableOfContentsView,
+} from './components/TableOfContents';
+export {
   Tabs,
   TabsButton,
   TabsContent,
