@@ -1,3 +1,9 @@
+## [4.27.0](https://github.com/wallarm/design-system/compare/v4.26.2...v4.27.0) (2026-11-27)
+
+### Features
+
+* **table-of-contents:** add TableOfContents and useScrollSpy (WDS-210) ([#540](https://github.com/wallarm/design-system/issues/540)) ([1fdaaec](https://github.com/wallarm/design-system/commit/1fdaaecd46f322186801b938d8b121e2babbed5e))
+
 ## [4.26.2](https://github.com/wallarm/design-system/compare/v4.26.1...v4.26.2) (2026-11-26)
 
 ### Bug Fixes
