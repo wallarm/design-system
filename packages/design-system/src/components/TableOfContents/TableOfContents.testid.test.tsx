@@ -10,14 +10,9 @@ describe('TableOfContents — test ids', () => {
         <TableOfContentsItem value='b'>B</TableOfContentsItem>
       </TableOfContents>,
     );
-    const slots: [string, string][] = [
-      ['toc', 'table-of-contents'],
-      ['toc--toggle', 'table-of-contents-toggle'],
-      ['toc--list', 'table-of-contents-list'],
-    ];
-    for (const [testId, slot] of slots) {
-      expect(screen.getByTestId(testId)).toHaveAttribute('data-slot', slot);
-    }
+    expect(screen.getByTestId('toc').tagName).toBe('NAV');
+    expect(screen.getByTestId('toc--toggle').tagName).toBe('BUTTON');
+    expect(screen.getByTestId('toc--list').tagName).toBe('UL');
     const items = screen.getAllByTestId('toc--item');
     expect(items).toHaveLength(2);
     for (const item of items) expect(item.tagName).toBe('A');
@@ -52,7 +47,7 @@ describe('TableOfContents — test ids', () => {
       </TableOfContents>,
     );
     const dashes = screen.getByTestId('toc--dashes');
-    expect(dashes).toHaveAttribute('data-slot', 'table-of-contents-dashes');
+    expect(dashes).toHaveAttribute('aria-hidden', 'true');
     fireEvent.pointerDown(dashes, { pointerType: 'touch' });
     fireEvent.click(dashes);
     await act(() => Promise.resolve());

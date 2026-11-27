@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const tocStory = createStoryHelper('navigation-tableofcontents', [
@@ -14,7 +14,8 @@ const tocStory = createStoryHelper('navigation-tableofcontents', [
 
 const getItem = (page: Page, name: string, scope = page.getByTestId('toc')) =>
   scope.getByTestId('toc--item').filter({ hasText: name });
-const getActive = (page: Page) => page.getByTestId('toc').locator('[aria-current="location"]');
+const expectActive = (page: Page, name: string, scope?: Locator) =>
+  expect(getItem(page, name, scope)).toHaveAttribute('aria-current', 'location');
 
 test.describe('Component: TableOfContents', () => {
   test.describe('Visual', () => {
@@ -48,6 +49,14 @@ test.describe('Component: TableOfContents', () => {
       await expect(page).toHaveScreenshot();
     });
 
+    test('Should render pressed state correctly', async ({ page }) => {
+      await tocStory.goto(page, 'Basic');
+      await getItem(page, 'Impact').hover();
+      await page.mouse.down();
+      await expect(page).toHaveScreenshot();
+      await page.mouse.up();
+    });
+
     test('Should render keyboard focus ring correctly', async ({ page }) => {
       await tocStory.goto(page, 'Basic');
       await page.keyboard.press('Tab');
@@ -63,9 +72,9 @@ test.describe('Component: TableOfContents', () => {
   test.describe('Interactions', () => {
     test('Should move the active item when an item is clicked', async ({ page }) => {
       await tocStory.goto(page, 'Basic');
-      await expect(getActive(page)).toHaveText('Findings');
+      await expectActive(page, 'Findings');
       await getItem(page, 'Remediation').click();
-      await expect(getActive(page)).toHaveText('Remediation');
+      await expectActive(page, 'Remediation');
       await expect(getItem(page, 'Findings')).not.toHaveAttribute('aria-current');
     });
 
@@ -76,7 +85,7 @@ test.describe('Component: TableOfContents', () => {
       await expect(page.getByTestId('toc')).toHaveAttribute('data-view', 'minimized');
       await expect(page.getByTestId('toc--list')).toBeHidden();
       await page.getByTestId('toc--toggle').click();
-      await expect(getActive(page)).toHaveText('Impact');
+      await expectActive(page, 'Impact');
     });
 
     test('Should open the popover when the dashes are hovered', async ({ page }) => {
@@ -84,8 +93,24 @@ test.describe('Component: TableOfContents', () => {
       await page.getByTestId('toc--dashes').hover();
       const popover = page.getByTestId('toc--popover');
       await expect(popover).toBeVisible();
-      await expect(popover.locator('[aria-current="location"]')).toHaveText(/Findings/);
+      await expectActive(page, 'Findings', popover);
       await page.mouse.move(600, 400);
+      await expect(popover).toBeHidden();
+    });
+
+    test('Should open the popover when the dashes are tapped', async ({ page }) => {
+      await tocStory.goto(page, 'Minimized');
+      const dashes = page.getByTestId('toc--dashes');
+      const popover = page.getByTestId('toc--popover');
+      // A touch tap: the pointerType of the pointerdown tells it apart from a mouse click.
+      const tap = async () => {
+        await dashes.dispatchEvent('pointerdown', { pointerType: 'touch', isPrimary: true });
+        await dashes.dispatchEvent('click');
+      };
+      await tap();
+      await expect(popover).toBeVisible();
+      await expectActive(page, 'Findings', popover);
+      await tap();
       await expect(popover).toBeHidden();
     });
 
@@ -96,7 +121,7 @@ test.describe('Component: TableOfContents', () => {
       await getItem(page, 'Impact', popover).click();
       await expect(popover).toBeHidden();
       await page.getByTestId('toc--toggle').click();
-      await expect(getActive(page)).toHaveText(/Impact/);
+      await expectActive(page, 'Impact');
     });
 
     test('Should scroll to the section and activate it when an item is clicked', async ({
@@ -105,26 +130,25 @@ test.describe('Component: TableOfContents', () => {
       await tocStory.goto(page, 'With Scroll Spy');
       const content = page.getByTestId('toc-content');
       await getItem(page, 'Remediation').click();
-      await expect(getActive(page)).toHaveText('Remediation');
-      await expect(content.locator('#remediation')).toBeInViewport();
+      await expectActive(page, 'Remediation');
+      await expect(page.getByTestId('toc-section-remediation')).toBeInViewport();
       await expect.poll(() => content.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     });
 
     test('Should activate the section when the content is scrolled', async ({ page }) => {
       await tocStory.goto(page, 'With Scroll Spy');
       const content = page.getByTestId('toc-content');
-      await expect(getActive(page)).toHaveText('TL;DR');
+      await expectActive(page, 'TL;DR');
       await content.evaluate(el => el.scrollTo({ top: el.scrollHeight }));
-      await expect(getActive(page)).toHaveText('Appendix');
+      await expectActive(page, 'Appendix');
     });
 
     test('Should drive segmented tabs when the content is scrolled', async ({ page }) => {
       await tocStory.goto(page, 'With Segmented Tabs');
       await page.getByTestId('toc-content').evaluate(el => el.scrollTo({ top: el.scrollHeight }));
-      await expect(page.getByRole('tab', { name: 'Appendix' })).toHaveAttribute(
-        'aria-selected',
-        'true',
-      );
+      await expect(
+        page.getByTestId('toc-tabs--trigger').filter({ hasText: 'Appendix' }),
+      ).toHaveAttribute('aria-selected', 'true');
     });
   });
 
@@ -141,9 +165,11 @@ test.describe('Component: TableOfContents', () => {
         'aria-current',
         'location',
       );
-      await expect(nav.getByRole('button', { name: 'Collapse table of contents' })).toHaveAttribute(
-        'aria-expanded',
-        'true',
+      const toggle = nav.getByRole('button', { name: 'On this page' });
+      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      await expect(toggle).toHaveAttribute(
+        'aria-controls',
+        (await page.getByTestId('toc--list').getAttribute('id')) ?? '',
       );
     });
 
@@ -154,7 +180,7 @@ test.describe('Component: TableOfContents', () => {
       const nav = page.getByRole('navigation', { name: 'On this page' });
       await expect(page.getByTestId('toc--dashes')).toHaveAttribute('aria-hidden', 'true');
       await expect(nav.getByRole('link')).toHaveCount(0);
-      await expect(nav.getByRole('button', { name: 'Expand table of contents' })).toHaveAttribute(
+      await expect(nav.getByRole('button', { name: 'On this page' })).toHaveAttribute(
         'aria-expanded',
         'false',
       );

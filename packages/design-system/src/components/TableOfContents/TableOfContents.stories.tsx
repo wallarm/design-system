@@ -68,10 +68,10 @@ export const Basic: Story = (args: TableOfContentsProps) => {
 };
 
 /** The page passes each `number` itself — nothing is counted — and it stays on the first line. */
-export const Numbered: Story = () => {
+export const Numbered: Story = (args: TableOfContentsProps) => {
   const [value, setValue] = useState('findings');
   return (
-    <TableOfContents value={value} onValueChange={setValue} data-testid='toc'>
+    <TableOfContents {...args} value={value} onValueChange={setValue} data-testid='toc'>
       <TableOfContentsItem value='tldr'>TL;DR</TableOfContentsItem>
       <TableOfContentsItem value='findings' number='1'>
         Findings
@@ -87,10 +87,10 @@ export const Numbered: Story = () => {
 };
 
 /** Two levels at most: `level={2}` indents a subsection under its parent on the same rail. */
-export const Levels: Story = () => {
+export const Levels: Story = (args: TableOfContentsProps) => {
   const [value, setValue] = useState('critical');
   return (
-    <TableOfContents value={value} onValueChange={setValue} data-testid='toc'>
+    <TableOfContents {...args} value={value} onValueChange={setValue} data-testid='toc'>
       <TableOfContentsItem value='findings' number='1'>
         Findings
       </TableOfContentsItem>
@@ -111,11 +111,12 @@ export const Levels: Story = () => {
 };
 
 /** A dash per section, longest for the active one; hover or tap the dashes to read the rows in a popover. */
-export const Minimized: Story = () => {
+export const Minimized: Story = (args: TableOfContentsProps) => {
   const [value, setValue] = useState('findings');
   return (
     <TableOfContents
       defaultView='minimized'
+      {...args}
       value={value}
       onValueChange={setValue}
       data-testid='toc'
@@ -135,10 +136,10 @@ export const Minimized: Story = () => {
 };
 
 /** Labels wrap to two lines, then end in an ellipsis; the rail grows with the row. */
-export const LongLabels: Story = () => {
+export const LongLabels: Story = (args: TableOfContentsProps) => {
   const [value, setValue] = useState('short');
   return (
-    <TableOfContents value={value} onValueChange={setValue} data-testid='toc'>
+    <TableOfContents {...args} value={value} onValueChange={setValue} data-testid='toc'>
       <TableOfContentsItem value='short'>Summary</TableOfContentsItem>
       <TableOfContentsItem value='two-lines' number='1'>
         Attacks blocked by the filtering node
@@ -151,11 +152,11 @@ export const LongLabels: Story = () => {
 };
 
 /** The list scrolls inside the height its parent gives it, while the header stays put. */
-export const LongList: Story = () => {
+export const LongList: Story = (args: TableOfContentsProps) => {
   const [value, setValue] = useState('section-1');
   return (
     <div className='flex h-240'>
-      <TableOfContents value={value} onValueChange={setValue} data-testid='toc'>
+      <TableOfContents {...args} value={value} onValueChange={setValue} data-testid='toc'>
         {LONG_LIST.map(section => (
           <TableOfContentsItem key={section.id} value={section.id}>
             {section.label}
@@ -185,7 +186,12 @@ export const WithScrollSpy: Story = () => {
         className='flex-1 overflow-y-auto rounded-8 border border-border-primary p-16'
       >
         {SECTIONS.map(section => (
-          <section key={section.id} id={section.id} className='min-h-200 pb-16'>
+          <section
+            key={section.id}
+            id={section.id}
+            data-testid={`toc-section-${section.id}`}
+            className='min-h-200 pb-16'
+          >
             <Text size='lg' weight='medium'>
               {section.label}
             </Text>
@@ -218,7 +224,12 @@ export const WithSegmentedTabs: Story = () => {
         className='flex-1 overflow-y-auto rounded-8 border border-border-primary p-16'
       >
         {SECTIONS.map(section => (
-          <section key={section.id} id={section.id} className='min-h-200 pb-16'>
+          <section
+            key={section.id}
+            id={section.id}
+            data-testid={`toc-section-${section.id}`}
+            className='min-h-200 pb-16'
+          >
             <Text size='lg' weight='medium'>
               {section.label}
             </Text>
