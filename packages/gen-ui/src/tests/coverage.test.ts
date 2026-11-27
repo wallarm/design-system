@@ -152,6 +152,9 @@ const DECISIONS: Record<string, Decision> = {
   Stepper: { excluded: 'a wizard: its current step is app state, not an answer' },
   Switch: { entries: ['Switch'] },
   Table: { entries: ['Table'] },
+  TableOfContents: {
+    excluded: `${CHROME}: the page hosting a long report builds it from the report's headings`,
+  },
   Tabs: { entries: ['Tabs'] },
   Tag: { excluded: 'interactive chip: a static label is Badge, a choice is Select or Checkbox' },
   TemporalCore: { entries: ['DateInput', 'DateRangeInput', 'TimeInput'] },
