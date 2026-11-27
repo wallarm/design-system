@@ -1,3 +1,9 @@
+## [4.28.0](https://github.com/wallarm/design-system/compare/v4.27.0...v4.28.0) (2026-11-27)
+
+### Features
+
+* **simple-charts:** sparkline curve + edge-to-edge, LineChartLine shadow ([#542](https://github.com/wallarm/design-system/issues/542)) ([0c65cef](https://github.com/wallarm/design-system/commit/0c65cefbc05f722a5a2b8430abebe868566b7f42))
+
 ## [4.27.0](https://github.com/wallarm/design-system/compare/v4.26.2...v4.27.0) (2026-11-27)
 
 ### Features
