@@ -69,8 +69,15 @@ with no current need).
   switches Full and Minimized"). No built-in breakpoint: the page decides the view
   (`view` + `onViewChange`, or `defaultView`). A "no toggle" option is out of scope until a
   consumer asks. *(Builder-check call)*
-- Root renders `<nav aria-label={title}>` with `data-slot="table-of-contents"`, `ref`,
-  rest props spread on the `nav`. View uses `useControlled` (`src/hooks/useControlled.ts`).
+- Root renders `<nav aria-label={ariaLabel ?? title}>` with `data-slot="table-of-contents"`, `ref`,
+  rest props spread on the `nav` — a consumer `aria-label` wins over `title`, and the same name
+  labels the toggle and the popover.
+- The toggle keeps a stable accessible name (that same label); the state is in
+  `aria-expanded` (`true` in Full), and in Full `aria-controls` points at the list's `useId`
+  id (omitted in Minimized, where the list is unmounted).
+- The toggle and the Minimized dashes take no consumer attributes: closed-target gaps
+  recorded in `TableOfContents/ANALYTICS_GAPS.md` (workaround `onViewChange`; popover open is
+  not observable). View uses `useControlled` (`src/hooks/useControlled.ts`).
 - `value` is controlled only — the page owns the active section. No `defaultValue`.
 - The list is a `<ul>`; each item an `<li>` holding the link.
 
@@ -91,6 +98,8 @@ with no current need).
   (no ctrl/meta/shift/alt, primary button). Otherwise the browser navigates normally, so a
   ToC without `onValueChange` still works as plain anchor links, and an `href` to another
   route is never silently dead. *(Builder-check call)*
+- In the Minimized popover every unmodified primary click that is not `defaultPrevented`
+  closes the popover, whether or not it was intercepted (no `onValueChange`, non-`#` href).
 - Active item: `aria-current="location"` on the `<a>`, `data-active` for styling.
 
 ### Exports
@@ -122,7 +131,7 @@ Take sizes, tokens and colors from Figma `get_design_context` on the component s
 
 ### Full (200px wide in Figma)
 
-- Header row 32px: icon button (collapse) on the left + title.
+- Header row 32px: icon button (collapse, `PanelLeftClose`) on the left + title.
 - Items on one shared vertical rail (left border of the list). Row min-height 32px, 1px gap.
 - Active: the rail segment beside the row turns dark, label switches to ink color.
 - States Default / Hover (light fill) / Pressed (darker fill); focus is
@@ -135,7 +144,8 @@ Take sizes, tokens and colors from Figma `get_design_context` on the component s
 
 ### Minimized
 
-- Icon button (expand) at the top, then one dash per item (14px rows).
+- Icon button (expand, `PanelRightClose` — as in Figma `toc-progress` Type=Mini) at the top,
+  then one dash per item (14px rows).
 - Dash length by level (level 1 long, level 2 short); active dash is the longest and dark.
   Dashes have no hover/pressed look, are `aria-hidden`, not focusable.
 - Popover over the dashes, opened by:
@@ -147,7 +157,8 @@ Take sizes, tokens and colors from Figma `get_design_context` on the component s
   Figma). It starts right under the expand button, is pinned to the top-right and grows to
   the left, covering the dashes (`placement: 'bottom-end'` against the button area; verify
   against Figma frame "Minimized").
-- Clicking an item in the popover calls `onValueChange` and closes the popover.
+- Clicking an item in the popover calls `onValueChange` (when intercepted) and closes the
+  popover (see the click rule above).
 - Build on Ark `Popover` controlled (HoverCard / zag hover-card ignores touch pointers, so it
   can't do the tap path). Render content through the existing `Popover` / `PopoverContent`
   if their surface fits; otherwise Ark directly with the same classes.
@@ -196,7 +207,10 @@ const { activeId, scrollTo } = useScrollSpy({
 - **`scrollTo(id)`**: scrolls so the element's top sits at the reading line; sets `activeId`
   to `id` immediately and ignores measurements until the scroll settles (`scrollend` where
   supported, else no scroll event for ~100ms), so intermediate sections don't flash.
-  A user wheel/touch/key scroll during that window cancels the lock.
+  A user wheel/touch scroll, or a scrolling key (ArrowUp/Down, PageUp/Down, Home, End, Space),
+  during that window cancels the lock; other keys do not. The lock survives effect re-runs
+  (new `ids` / `root` / `offset` mid-flight re-arm the settle timer) and clears only when
+  settled or cancelled.
 - Updates `history`? **No** — the hook does not touch the URL. Consumers can.
 - SSR-safe: no `window` access during render.
 - Rules of React / React Compiler: state via `useState`, listeners in `useEffect`, no ref
