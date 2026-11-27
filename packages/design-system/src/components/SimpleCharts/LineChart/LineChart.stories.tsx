@@ -62,7 +62,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/LineChart',
+  title: 'Charts/LineChart',
   component: LineChart,
   subcomponents: {
     LineChartBody,

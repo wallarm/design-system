@@ -64,8 +64,8 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Actions/DropdownMenu | 9 | 9 | `components/DropdownMenu/DropdownMenu.stories.tsx` |
 | ✅ | Actions/SplitButton | 5 | 5 | `components/SplitButton/SplitButton.stories.tsx` |
 | ✅ | Actions/ToggleButton | 8 | 8 | `components/ToggleButton/ToggleButton.stories.tsx` |
-| ✅ | Brand/Logo | 4 | 4 | `components/Logo/Logo.stories.tsx` |
-| ✅ | Brand/WallyIcon | 3 | 3 | `components/WallyIcon/WallyIcon.stories.tsx` |
+| ✅ | Primitives/Logo | 4 | 4 | `components/Logo/Logo.stories.tsx` |
+| ✅ | Primitives/WallyIcon | 3 | 3 | `components/WallyIcon/WallyIcon.stories.tsx` |
 | ✅ | Data Display/Accordion | 8 | 8 | `components/Accordion/Accordion.stories.tsx` |
 | ✅ | Data Display/Attribute | 19 | 19 | `components/Attribute/Attribute.stories.tsx` |
 | ✅ | Data Display/Avatar | 10 | 10 | `components/Avatar/Avatar.stories.tsx` |
@@ -88,17 +88,17 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Data Display/Timeline | 3 | 3 | `components/Timeline/Timeline.stories.tsx` |
 | ✅ | Data Display/CodeEditor | 32 | 32 | `components/CodeEditor/CodeEditor.stories.tsx` |
 | ✅ | Data Display/CodeSnippet/CodeSnippet | 26 | 26 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
-| ☐ | Data Display/SimpleCharts/AreaChart | 7 | 7 | `components/SimpleCharts/AreaChart/AreaChart.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
-| ☐ | Data Display/SimpleCharts/Vertical Stacked Columns Chart | 6 | 6 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
-| ☐ | Data Display/SimpleCharts/Funnel | 12 | 12 | `components/SimpleCharts/Funnel/Funnel.stories.tsx` |
-| ☐ | Data Display/SimpleCharts/Horizontal Stacked Bars Chart | 7 | 7 | `components/SimpleCharts/BarChart/BarChart.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/Metric | 4 | 4 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/Overview | 1 | 1 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
-| ✅ | Data Display/SimpleCharts/PieChart | 12 | 12 | `components/SimpleCharts/PieChart/PieChart.stories.tsx` |
+| ☐ | Charts/AreaChart | 7 | 7 | `components/SimpleCharts/AreaChart/AreaChart.stories.tsx` |
+| ✅ | Charts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
+| ✅ | Charts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
+| ☐ | Charts/Vertical Stacked Columns Chart | 6 | 6 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
+| ☐ | Charts/Funnel | 12 | 12 | `components/SimpleCharts/Funnel/Funnel.stories.tsx` |
+| ☐ | Charts/Horizontal Stacked Bars Chart | 7 | 7 | `components/SimpleCharts/BarChart/BarChart.stories.tsx` |
+| ✅ | Charts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
+| ✅ | Charts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
+| ✅ | Charts/Metric | 4 | 4 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
+| ✅ | Charts/Overview | 1 | 1 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
+| ✅ | Charts/PieChart | 12 | 12 | `components/SimpleCharts/PieChart/PieChart.stories.tsx` |
 | ✅ | Inputs Date/Calendar | 16 | 16 | `components/Calendar/Calendar.stories.tsx` |
 | ✅ | Inputs Date/DateInput | 10 | 10 | `components/DateInput/DateInput.stories.tsx` |
 | ✅ | Inputs Date/DateRangeInput | 9 | 9 | `components/DateRangeInput/DateRangeInput.stories.tsx` |

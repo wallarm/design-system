@@ -2,7 +2,7 @@
 
 ## Overview
 
-`BarChart` — *Horizontal stacked bars chart* in Storybook (`Data Display/SimpleCharts/Horizontal Stacked Bars Chart`) — draws a horizontal bar per category (an application, a host, an endpoint), each split by series: "how much, and of what kind, per thing". It reads as a list, like `BarList`: a row per category with its label, a stacked bar and the row total. Use it for categories that are not a time axis and whose labels are too long to sit under a column. Pick `ColumnChart` when the categories are steps in time, `HorizontalBarStack` for one bar of shares, `BarList` for a top-N of single values.
+`BarChart` — *Horizontal stacked bars chart* in Storybook (`Charts/Horizontal Stacked Bars Chart`) — draws a horizontal bar per category (an application, a host, an endpoint), each split by series: "how much, and of what kind, per thing". It reads as a list, like `BarList`: a row per category with its label, a stacked bar and the row total. Use it for categories that are not a time axis and whose labels are too long to sit under a column. Pick `ColumnChart` when the categories are steps in time, `HorizontalBarStack` for one bar of shares, `BarList` for a top-N of single values.
 
 It is built on the `LineChart` contexts, like `ColumnChart`, so the legend (`LineChartLegend` / `LineChartLegendItem`) and the popover pieces are reused unchanged. The plot slots are its own. The row — label, hover, total — follows `BarList`: 12px mono primary text, a 32px row, the hover tint across the whole row.
 

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const chartStory = createStoryHelper('data-display-simplecharts-chart', [
+const chartStory = createStoryHelper('charts-chart', [
   'Default',
   'With Always Visible Actions',
   'Custom Size',

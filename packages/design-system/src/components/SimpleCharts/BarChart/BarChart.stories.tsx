@@ -25,7 +25,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/Horizontal Stacked Bars Chart',
+  title: 'Charts/Horizontal Stacked Bars Chart',
   component: BarChart,
   subcomponents: {
     BarChartBody,

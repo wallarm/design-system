@@ -9,7 +9,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Brand/Logo',
+  title: 'Primitives/Logo',
   component: Logo,
   parameters: {
     layout: 'centered',

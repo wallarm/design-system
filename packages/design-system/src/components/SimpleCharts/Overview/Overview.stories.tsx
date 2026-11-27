@@ -83,7 +83,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data Display/SimpleCharts/Overview',
+  title: 'Charts/Overview',
   parameters: {
     layout: 'padded',
     docs: { description: { component: DESCRIPTION } },

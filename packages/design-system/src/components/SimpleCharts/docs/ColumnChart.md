@@ -2,7 +2,7 @@
 
 ## Overview
 
-`ColumnChart` — *Vertical stacked columns chart* in Figma and Storybook (`Data Display/SimpleCharts/Vertical Stacked Columns Chart`) — draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `BarChart` for the same bars laid horizontally per category (no time axis), `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
+`ColumnChart` — *Vertical stacked columns chart* in Figma and Storybook (`Charts/Vertical Stacked Columns Chart`) — draws vertical stacked columns: a column per step (a day, an hour), each split by category — the Agentic Overview's *Findings by verdict* and *Remediations by status*. It answers "how much, and of what kind, per step". Pick `BarChart` for the same bars laid horizontally per category (no time axis), `HorizontalBarStack` for one bar of shares (no time axis), `AreaChart` when the steps are dense enough to read as a trend, `BarList` for a top-N.
 
 It is built on the `LineChart` contexts — the same `data` / `series` / `xKey` model — so the legend, grid, Y axis and hover popover are the `LineChart` slots, unchanged. It adds only what columns need: its own root, body, the stack, and an X axis that centres every label under its column.
 

@@ -60,7 +60,7 @@ Optional, added only when needed:
 
 ## Stories Rules
 
-- `title: 'Data Display/SimpleCharts/<ChartName>'`.
+- `title: 'Charts/<ChartName>'`.
 - Use `satisfies Meta<typeof Component>` and `StoryFn<typeof meta>`.
 - Cover every visual state the chart supports: default, hover, selected/active, focused, empty, loading/skeleton, filtered (if applicable), with-data-variants.
 - Keep story data in the file — small, readable, self-contained. Do not fetch or randomize.
@@ -70,7 +70,7 @@ Optional, added only when needed:
 Follow [`docs/e2e-test-rules.md`](../../../../../docs/e2e-test-rules.md). In short:
 
 - Tests live next to the component as `ChartName.e2e.ts`.
-- Use `createStoryHelper('data-display-simplecharts-<chartname>', [...stories] as const)` — the id is derived from the story `title`.
+- Use `createStoryHelper('charts-<chartname>', [...stories] as const)` — the id is derived from the story `title`.
 - Group tests as the rules describe (`Visual` / `Interactions` / `Accessibility`). Existing chart specs still use a `Screenshots` group — rename it when you touch the file.
 - Locate elements by `data-testid` (`getByTestId`); `getByRole` is fine for accessibility assertions. Never locate by `data-slot` — existing `data-slot` locators in chart specs are legacy to migrate.
 - **Required screenshot coverage per chart**: `Default`, `Hover`, `Selected`, `Focus`. Add more states (`Filtered`, `Empty`, `Loading`, …) when the chart supports them.

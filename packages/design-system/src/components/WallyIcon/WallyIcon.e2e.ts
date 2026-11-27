@@ -1,7 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const wallyIconStory = createStoryHelper('brand-wallyicon', ['Basic', 'Styles', 'Sizes'] as const);
+const wallyIconStory = createStoryHelper('primitives-wallyicon', [
+  'Basic',
+  'Styles',
+  'Sizes',
+] as const);
 
 test.describe('Component: WallyIcon', () => {
   test.describe('Visual', () => {

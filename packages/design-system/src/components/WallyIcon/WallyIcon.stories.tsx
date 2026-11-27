@@ -8,7 +8,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Brand/WallyIcon',
+  title: 'Primitives/WallyIcon',
   component: WallyIcon,
   parameters: {
     layout: 'centered',
