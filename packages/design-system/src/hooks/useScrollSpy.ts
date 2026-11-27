@@ -24,6 +24,8 @@ export interface UseScrollSpyResult {
 /** No scroll event for this long means a `scrollTo` has settled (browsers without `scrollend`). */
 const SETTLE_MS = 100;
 const USER_SCROLL_EVENTS = ['wheel', 'touchstart'] as const;
+/** Keys that scroll the page: only these take over from a `scrollTo` in flight. */
+const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
 
 const containerTop = (root: HTMLElement | undefined) => root?.getBoundingClientRect().top ?? 0;
 
@@ -71,6 +73,7 @@ export const useScrollSpy = ({
 }: UseScrollSpyOptions): UseScrollSpyResult => {
   const [measured, setMeasured] = useState<string | undefined>(undefined);
   // While a scrollTo is in flight, measurements are ignored so passing sections don't flash.
+  // It outlives effect re-runs (new ids, root or offset mid-flight) and clears once settled.
   const lockedRef = useRef(false);
   // Set by the effect: re-arms the settle timer. Called from scrollTo (a handler).
   const settleRef = useRef<(() => void) | undefined>(undefined);
@@ -117,27 +120,31 @@ export const useScrollSpy = ({
       clearTimeout(settleTimer);
       lockedRef.current = false;
     };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (SCROLL_KEYS.has(event.key)) onUserScroll();
+    };
 
     settleRef.current = settle;
-    update();
+    // A scrollTo still in flight from before the re-run: re-arm its settle timer here.
+    if (lockedRef.current) settle();
+    else update();
 
     target.addEventListener('scroll', onScroll, { passive: true });
     target.addEventListener('scrollend', onScrollEnd);
     for (const type of USER_SCROLL_EVENTS) {
       target.addEventListener(type, onUserScroll, { passive: true });
     }
-    window.addEventListener('keydown', onUserScroll);
+    window.addEventListener('keydown', onKeyDown);
     window.addEventListener('resize', onScroll, { passive: true });
 
     return () => {
       target.removeEventListener('scroll', onScroll);
       target.removeEventListener('scrollend', onScrollEnd);
       for (const type of USER_SCROLL_EVENTS) target.removeEventListener(type, onUserScroll);
-      window.removeEventListener('keydown', onUserScroll);
+      window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', onScroll);
       if (frame) cancelAnimationFrame(frame);
       clearTimeout(settleTimer);
-      lockedRef.current = false;
       settleRef.current = undefined;
     };
   }, [root, idsKey, offset]);

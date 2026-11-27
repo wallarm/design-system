@@ -130,6 +130,67 @@ describe('useScrollSpy', () => {
     expect(result.current.activeId).toBe('b');
   });
 
+  it('only scrolling keys cancel the scrollTo lock', () => {
+    mountSections({ a: -500, b: 0, c: 900 });
+    const { result } = render({ ids: ['a', 'b', 'c'] });
+    act(() => result.current.scrollTo('c'));
+    for (const key of ['a', 'Tab', 'Shift', 'Enter']) {
+      act(() => {
+        fireEvent.keyDown(window, { key });
+      });
+      scrollWindow();
+      expect(result.current.activeId).toBe('c');
+    }
+    act(() => {
+      fireEvent.keyDown(window, { key: 'PageDown' });
+    });
+    scrollWindow();
+    expect(result.current.activeId).toBe('b');
+  });
+
+  it.each(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '])(
+    '%j cancels the scrollTo lock',
+    key => {
+      mountSections({ a: -500, b: 0, c: 900 });
+      const { result } = render({ ids: ['a', 'b', 'c'] });
+      act(() => result.current.scrollTo('c'));
+      act(() => {
+        fireEvent.keyDown(window, { key });
+      });
+      scrollWindow();
+      expect(result.current.activeId).toBe('b');
+    },
+  );
+
+  it('keeps the scrollTo lock across an effect re-run', () => {
+    rs.useFakeTimers();
+    mountSections({ a: -500, b: 0, c: 900 });
+    const { result, rerender } = render({ ids: ['a', 'b', 'c'] });
+    act(() => result.current.scrollTo('c'));
+    // New ids re-run the effect mid-flight.
+    mountSections({ a: -500, b: 0, c: 900, d: 1400 });
+    rerender({ ids: ['a', 'b', 'c', 'd'] });
+    scrollWindow();
+    expect(result.current.activeId).toBe('c');
+    act(() => {
+      rs.advanceTimersByTime(100);
+    });
+    expect(result.current.activeId).toBe('b');
+  });
+
+  it('settles a lock re-armed before the effect re-ran', () => {
+    rs.useFakeTimers();
+    mountSections({ a: -500, b: 0, c: 900 });
+    const { result, rerender } = render({ ids: ['a', 'b', 'c'], offset: 0 });
+    act(() => result.current.scrollTo('c'));
+    rerender({ ids: ['a', 'b', 'c'], offset: 10 });
+    // No scroll event after the re-run: the lock still settles on its own.
+    act(() => {
+      rs.advanceTimersByTime(100);
+    });
+    expect(result.current.activeId).toBe('b');
+  });
+
   it('measures against a custom root element', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
