@@ -155,7 +155,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Overlay/FeedbackPulse | 2 | 2 | `components/FeedbackPulse/FeedbackPulse.stories.tsx` |
 | ☐ | Overlay/HoverCard | 8 | 8 | `components/HoverCard/HoverCard.stories.tsx` |
 | ✅ | Overlay/OverflowTooltip | 7 | 7 | `components/OverflowTooltip/OverflowTooltip.stories.tsx` |
-| ✅ | Overlay/OverlayManager | 5 | 5 | `components/OverlayManager/OverlayManager.stories.tsx` |
+| ✅ | Overlay/OverlayManager | 6 | 6 | `components/OverlayManager/OverlayManager.stories.tsx` |
 | ✅ | Overlay/Popover | 4 | 4 | `components/Popover/Popover.stories.tsx` |
 | ✅ | Overlay/Tooltip | 4 | 4 | `components/Tooltip/Tooltip.stories.tsx` |
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |

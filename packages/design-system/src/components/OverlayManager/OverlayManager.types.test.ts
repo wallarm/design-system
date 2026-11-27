@@ -1,9 +1,11 @@
 // Typechecked by tsconfig.typetest.json (part of `pnpm typecheck`). Rstest runs it as a file with no tests.
 // Every @ts-expect-error must be used by a real error, or tsc reports an unused directive.
 // It imports from the public entry, so every type it names is pinned as exported.
-import { lazy } from 'react';
+import { createElement, lazy } from 'react';
 import {
   defineOverlay,
+  type LazyOverlayBody,
+  lazyOverlayBody,
   type OverlayDefinition,
   type OverlayOpenArgs,
   type OverlayPayload,
@@ -81,6 +83,25 @@ defineOverlay(async () => (_: { title?: string }) => null);
 defineOverlay(async () => (_: OverlayProps & { key: string }) => null);
 
 const NoPayloadOverlay = defineOverlay(async () => (_: OverlayProps<boolean>) => null);
+
+const EditBody = (_: { userId: string }) => null;
+export const EditBodyPart = lazyOverlayBody(async () => EditBody);
+
+export type LazyBodyCases = [
+  Expect<Equal<typeof EditBodyPart, LazyOverlayBody<{ userId: string }>>>,
+];
+
+createElement(EditBodyPart, { fallback: null, userId: '1' });
+// @ts-expect-error the fallback is required
+createElement(EditBodyPart, { userId: '1' });
+// @ts-expect-error the body's own props are required
+createElement(EditBodyPart, { fallback: null });
+// @ts-expect-error and keep their types
+createElement(EditBodyPart, { fallback: null, userId: 1 });
+// @ts-expect-error return the body component itself, never React.lazy
+lazyOverlayBody(async () => lazy(async () => ({ default: EditBody })));
+// @ts-expect-error a body prop named `fallback` never arrives: the helper takes it
+lazyOverlayBody(async () => (_: { fallback: string }) => null);
 
 export const CallSites = () => {
   const del = useOverlay(DeleteOverlay);

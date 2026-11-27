@@ -57,6 +57,7 @@ These rules apply when writing or modifying any E2E test file (`*.e2e.ts`) in th
 - `getByRole` is fine for accessibility assertions (role, accessible name)
 - Never use `data-slot` — it is a styling hook. Existing `[data-slot=…]` locators are legacy; migrate them when you touch the file
 - A managed overlay (OverlayManager) keeps its content mounted while it animates out, and two instances of one definition can stack, so its test id can match twice: `await expect(content).toBeHidden()` before reopening, or target the open instance (`.and(page.locator('[data-state="open"]'))`, or `.last()` for the top of a stack).
+- A split managed overlay (`lazyOverlayBody`) is on screen, named and focusable before its heavy part loads: its `{id}--content` and `{id}--title` appear first, and its skeleton can carry the same `{id}--body` and `{id}--footer` ids as the real parts. Wait for an element of the heavy part before interacting with the form. The hidden `{id}--loading` status is screen-reader only, so assert it with `toBeAttached()` or `toHaveCount(0)`, not `toBeVisible()`. To keep the skeleton on screen for an assertion, hold the chunk with `page.route` (see `OverlayManager.e2e.ts`).
 - To assert where focus returns after a dialog opened from a menu item, hover the item and let a frame pass before the click: an item picked in its highlight frame sends focus to `body` (see `storybook-docs-findings.md`).
 
 ## Full Example

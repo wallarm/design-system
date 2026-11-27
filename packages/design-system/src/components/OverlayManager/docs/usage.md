@@ -91,7 +91,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({ userId, userName, 
 
 - `controller` carries `rootProps` (`open`, `onOpenChange`, `onExitComplete`) and `close(result)`. Spread `controller.rootProps` onto the root. Override only `onOpenChange`, to guard; your own `onExitComplete` must call `controller.rootProps.onExitComplete()` too, or the closed overlay stays mounted until the 1 s fallback.
 - Render exactly one root at the component's top level, the same one from the first render to the last: no early return, no conditional root, no wrapper whose key or type changes, nothing that suspends above it. Loading, error and not-found states go inside `DialogBody` or `DrawerBody`. An overlay that decides not to show calls `controller.close()` from an effect or a handler.
-- Code that suspends inside the overlay (`useSuspenseQuery`, `use()`, a `React.lazy` tab) needs its own `<Suspense>` inside `DialogBody` or `DrawerBody`, below the title, and no Suspense boundary may sit between the root and its content. Without one, the overlay's own boundary catches the suspension and hides the whole overlay until it resolves.
+- Code that suspends inside the overlay (`useSuspenseQuery`, `use()`, a `React.lazy` tab) needs its own `<Suspense>` inside the content, below the header, such as inside `DialogBody` or `DrawerBody` (`lazyOverlayBody` brings one for the part it loads), and no Suspense boundary may sit between the root and its content. Without one, the overlay's own boundary catches the suspension and hides the whole overlay until it resolves.
 - Render the title from the first frame, with placeholder text while data loads.
 - Guard dismissal by wrapping `onOpenChange`: ignore it while a request is pending, ask first while the form is dirty, and end every path by closing, with `controller.rootProps.onOpenChange(false)` or, after the guard's Leave, `controller.close()`. A wrapper that never closes leaves the overlay on screen and its `open()` pending. Escape, an outside click and the close X all go through it.
 - `controller.close(result)` settles the `open()` promise with `result`. Dismissal settles it with `undefined`. Close with a plain value, never a promise: `open()` would follow it, and its rejection would reject `open()`.
@@ -115,7 +115,7 @@ export const DeleteUserOverlay = defineOverlay(() =>
 
 - The loader returns the component itself, never `React.lazy`: `React.lazy` keeps a failed chunk forever, and a failed load here clears so the next `open()` retries. An eager definition is `defineOverlay(async () => Component)`.
 - Create definitions at module scope, never during render: the code cache and the double-click rule belong to the definition object.
-- Importing the module loads no overlay code.
+- Importing the module loads no overlay code. A split overlay's definition sits next to its light shell and loads that shell (see Show a skeleton while it loads).
 
 ## Open it
 
@@ -147,10 +147,68 @@ return (
 );
 ```
 
+## Show a skeleton while it loads
+
+Nothing is on screen while an overlay's code loads. A heavy overlay, such as a form drawer, can split below its header with `lazyOverlayBody`: its light shell (the root, the content and the header) opens at once, and the heavy part below the header loads behind a skeleton. Keep confirms and other small overlays whole; `preload()` covers them.
+
+```tsx
+// features/users/EditUserDrawer.tsx: the light shell, loaded with the opener
+import { defineOverlay, lazyOverlayBody } from '@wallarm-org/design-system/OverlayManager';
+
+// The heavy part: DrawerBody and DrawerFooter, with all the form state.
+const EditUserForm = lazyOverlayBody(() => import('./EditUserForm').then(m => m.EditUserForm));
+
+const EditUserFormSkeleton = () => (
+  <>
+    <DrawerBody>{/* Skeleton bars where the fields go */}</DrawerBody>
+    <DrawerFooter>{/* Skeleton bars the size of the buttons */}</DrawerFooter>
+  </>
+);
+
+export const EditUserDrawer: FC<EditUserDrawerProps> = ({ userId, userName, controller }) => {
+  const [isDirty, setIsDirty] = useState(false);
+  // handleOpenChange guards with isDirty, as in "Define an overlay".
+
+  return (
+    <Drawer {...controller.rootProps} onOpenChange={handleOpenChange}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Edit user</DrawerTitle>
+          <DrawerDescription>{userName}</DrawerDescription>
+        </DrawerHeader>
+        <EditUserForm
+          fallback={<EditUserFormSkeleton />}
+          userId={userId}
+          controller={controller}
+          onDirtyChange={setIsDirty}
+        />
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+// Next to its shell, which it imports eagerly: open() and a hover preload() also load the form.
+export const EditUserOverlay = defineOverlay(async () => {
+  EditUserForm.preload();
+  return EditUserDrawer;
+});
+```
+
+- Cut inside `DialogContent` or `DrawerContent`, after the header. The shell keeps the root with its props (width, the `onOpenChange` guard), the content, and the header with the title and description: zag links the title and description once, a frame after open, so ones that arrive with the heavy part are never announced.
+- `lazyOverlayBody(load)` takes a loader that returns the component itself, as `defineOverlay` does. Call it at module scope, never during render. Its result takes the heavy part's props plus `fallback`, so a heavy part with its own `fallback` prop does not compile. `preload()` loads the code ahead of time and never rejects.
+- Shape the fallback like what it replaces: a body placeholder, plus a footer placeholder of the same height when the footer is in the heavy part, so nothing moves when it arrives. A centred `Dialog` re-centres when the heights differ, so match the body's height or keep the dialog whole. `lazyOverlayBody` announces the load itself with a hidden `Loading` status (test id `{id}--loading`); the skeleton bars stay `aria-hidden`.
+- Keep the shell light (design-system components, `Skeleton`, the helper): it ships in the opener's chunk, because its definition imports it.
+- Guard state, such as the dirty flag, lives in the shell next to `onOpenChange`. The heavy part reports it from its change handlers or its form library's change callback, never from an effect.
+- Focus goes to the header's close button when the overlay opens and stays there when the heavy part arrives. `data-autofocus` in the heavy part is ignored, and React's `autoFocus` would move focus at least 300 ms after open, under a user who may already be typing.
+- Without a preload the skeleton shows for at least 300 ms: React holds a fallback it has shown that long. Once the code is in, an open renders the heavy part at once, with no skeleton.
+- Escape, an outside click and the close button work while the heavy part loads, through the shell's `onOpenChange`. The shell opens within a microtask or two, so the second click of a double click lands on its backdrop and dismisses it, as with any overlay whose code is cached.
+- A heavy part that fails to load or render closes the overlay with its exit animation over the skeleton and reports to `onError`, also after the user dismissed it; `open()` resolves `undefined`, and the next open loads it again.
+- Split only a managed overlay's own root. A plain `Dialog` split this way inside a managed overlay closes that managed overlay when its heavy part fails.
+
 ## Nesting
 
 - Overlays of one provider are siblings, stacked in the order they appear: open order, unless an earlier one's code is still loading when a later one's is ready. To open two at once in a fixed order, `await Promise.all([a.preload(), b.preload()])` first. `useOverlay` inside an overlay opens another sibling in the same provider, above it: the edit drawer in the stories opens its delete confirm and its unsaved-changes guard that way, and preloads both when it mounts.
-- While an inner overlay's code loads, nothing is on screen, so the user can still dismiss the outer one, and the inner one then appears alone over the page. Preload the inner definitions when the outer overlay mounts, or open them through a nested provider.
+- While an inner overlay's code loads, nothing is on screen, so the user can still dismiss the outer one, and the inner one then appears alone over the page. Preload the inner definitions when the outer overlay mounts, split them so their shell shows at once, or open them through a nested provider.
 - Compared with overlays nested as React children, app-level overlays lose same-kind push-back and cascade-dismiss. When a lower overlay closes from outside (its root unmounts, or its controlled `open` flips, like a router-owned drawer on Back), a managed overlay above it stays open.
 - A drawer that can close from outside, such as a router-owned detail drawer, and that opens managed overlays mounts its own `OverlayProvider` inside `DrawerContent`. So does a `Drawer` that opens a managed `Drawer` and should scale back:
 
