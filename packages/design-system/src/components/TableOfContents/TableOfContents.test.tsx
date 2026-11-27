@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
-import { describe, expect, it, rs } from '@rstest/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TableOfContents, TableOfContentsItem, type TableOfContentsProps } from '.';
 
@@ -190,5 +190,163 @@ describe('TableOfContents', () => {
     expect(navRef).toHaveBeenCalledWith(expect.any(HTMLElement));
     expect((navRef.mock.calls[0]?.[0] as HTMLElement).tagName).toBe('NAV');
     expect((itemRef.mock.calls[0]?.[0] as HTMLElement).tagName).toBe('A');
+  });
+});
+
+// zag flushes state a microtask after the event; Presence unmounts on the next animation frame.
+const flushMicrotasks = () => act(() => Promise.resolve());
+const advance = async (ms: number) => {
+  await flushMicrotasks();
+  await act(async () => {
+    rs.advanceTimersByTime(ms);
+  });
+};
+const nextFrame = () =>
+  act(() => new Promise<void>(resolve => requestAnimationFrame(() => resolve())));
+
+// The dismissable layer attaches and dispatches its listeners a frame or two after the event.
+const settle = async () => {
+  for (let frame = 0; frame < 3; frame++) {
+    await advance(0);
+    await nextFrame();
+  }
+};
+
+const renderMinimized = (props: Partial<TableOfContentsProps> = {}) =>
+  renderToc({ defaultView: 'minimized', value: 'findings', ...props });
+const dashes = () => screen.getByTestId('toc--dashes');
+const popover = () => screen.queryByTestId('toc--popover');
+const hover = (el: Element) => fireEvent.pointerEnter(el, { pointerType: 'mouse' });
+const unhover = (el: Element) => fireEvent.pointerLeave(el, { pointerType: 'mouse' });
+const tap = (el: Element) => {
+  fireEvent.pointerDown(el, { pointerType: 'touch' });
+  fireEvent.click(el);
+};
+const openByTap = async () => {
+  tap(dashes());
+  await settle();
+};
+
+describe('TableOfContents — minimized', () => {
+  beforeEach(() => {
+    // Only the delay timers: faking queueMicrotask stalls zag's state flush.
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  });
+
+  afterEach(() => {
+    rs.useRealTimers();
+  });
+
+  it('minimized renders one aria-hidden dash per item, none focusable', () => {
+    renderMinimized();
+    expect(dashes()).toHaveAttribute('aria-hidden', 'true');
+    expect(dashes().children).toHaveLength(3);
+    expect(within(dashes()).queryAllByRole('link', { hidden: true })).toHaveLength(0);
+    expect(dashes().querySelector('a, button, [tabindex]')).toBeNull();
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
+  });
+
+  it('active dash has data-active', () => {
+    renderMinimized();
+    const [tldr, findings, critical] = Array.from(dashes().children);
+    expect(findings).toHaveAttribute('data-active');
+    expect(tldr).not.toHaveAttribute('data-active');
+    expect(critical).not.toHaveAttribute('data-active');
+  });
+
+  it('dash level from item level', () => {
+    renderMinimized();
+    const levels = Array.from(dashes().children, dash => dash.getAttribute('data-level'));
+    expect(levels).toEqual(['1', '1', '2']);
+  });
+
+  it('hover on dashes opens the popover after the open delay', async () => {
+    renderMinimized();
+    hover(dashes());
+    await advance(99);
+    expect(popover()).toBeNull();
+    await advance(1);
+    expect(popover()).toBeInTheDocument();
+  });
+
+  it('pointer leaving dashes and popover closes it', async () => {
+    renderMinimized();
+    hover(dashes());
+    await advance(100);
+    unhover(dashes());
+    hover(popover() as HTMLElement);
+    await advance(1000);
+    expect(popover()).toBeInTheDocument();
+    unhover(popover() as HTMLElement);
+    await advance(299);
+    expect(popover()).toBeInTheDocument();
+    await advance(1);
+    await nextFrame();
+    expect(popover()).toBeNull();
+  });
+
+  it('touch pointer does not open on enter', async () => {
+    renderMinimized();
+    fireEvent.pointerEnter(dashes(), { pointerType: 'touch' });
+    await advance(1000);
+    expect(popover()).toBeNull();
+  });
+
+  it('tap on dashes toggles the popover', async () => {
+    renderMinimized();
+    await openByTap();
+    expect(popover()).toBeInTheDocument();
+    tap(dashes());
+    await advance(0);
+    await nextFrame();
+    expect(popover()).toBeNull();
+  });
+
+  it('tap outside closes', async () => {
+    renderMinimized();
+    await openByTap();
+    fireEvent.pointerDown(document.body, { pointerType: 'mouse' });
+    await settle();
+    expect(popover()).toBeNull();
+  });
+
+  it('Escape closes', async () => {
+    renderMinimized();
+    await openByTap();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await advance(0);
+    await nextFrame();
+    expect(popover()).toBeNull();
+  });
+
+  it('popover shows the same items as rows, no header', async () => {
+    renderMinimized();
+    await openByTap();
+    const content = popover() as HTMLElement;
+    const rows = within(content).getAllByRole('link');
+    expect(rows.map(row => row.textContent)).toEqual(['TL;DR', '1Findings', '1.1Critical']);
+    expect(within(content).getByRole('link', { current: 'location' })).toHaveTextContent(
+      'Findings',
+    );
+    expect(within(content).queryByText('On this page')).toBeNull();
+    expect(within(content).queryByRole('button')).toBeNull();
+  });
+
+  it('item click in popover closes it', async () => {
+    const onValueChange = rs.fn();
+    renderMinimized({ onValueChange });
+    await openByTap();
+    fireEvent.click(within(popover() as HTMLElement).getByRole('link', { name: /Critical/ }));
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith('critical');
+    await advance(0);
+    await nextFrame();
+    expect(popover()).toBeNull();
+    expect(onValueChange).toHaveBeenCalledOnce();
+  });
+
+  it('toggle from minimized back to full keeps aria-current on the same item', () => {
+    renderMinimized();
+    fireEvent.click(screen.getByTestId('toc--toggle'));
+    expect(screen.getByRole('link', { current: 'location' })).toHaveTextContent('Findings');
   });
 });

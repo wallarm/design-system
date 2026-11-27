@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { TableOfContents, TableOfContentsItem } from '.';
 
 describe('TableOfContents — test ids', () => {
@@ -43,5 +43,20 @@ describe('TableOfContents — test ids', () => {
     );
     expect(screen.getByTestId('section-a').tagName).toBe('A');
     expect(screen.getAllByTestId('toc--item')).toHaveLength(1);
+  });
+
+  it('cascades toc--dashes and toc--popover in the minimized view', async () => {
+    render(
+      <TableOfContents data-testid='toc' defaultView='minimized'>
+        <TableOfContentsItem value='a'>A</TableOfContentsItem>
+      </TableOfContents>,
+    );
+    const dashes = screen.getByTestId('toc--dashes');
+    expect(dashes).toHaveAttribute('data-slot', 'table-of-contents-dashes');
+    fireEvent.pointerDown(dashes, { pointerType: 'touch' });
+    fireEvent.click(dashes);
+    await act(() => Promise.resolve());
+    expect(screen.getByTestId('toc--popover')).toBeInTheDocument();
+    expect(screen.getByTestId('toc--item')).toHaveAttribute('href', '#a');
   });
 });

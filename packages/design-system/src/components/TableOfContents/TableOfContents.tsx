@@ -1,10 +1,11 @@
-import type { ComponentProps, FC, Ref } from 'react';
+import { type ComponentProps, type FC, type Ref, useId } from 'react';
 import { useControlled } from '../../hooks/useControlled';
 import { PanelLeftClose, PanelLeftOpen } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { Button } from '../Button';
 import { TableOfContentsContext } from './TableOfContentsContext';
+import { TableOfContentsMinimized } from './TableOfContentsMinimized';
 
 export type TableOfContentsView = 'full' | 'minimized';
 
@@ -43,6 +44,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
     default: defaultView,
   });
   const full = view === 'full';
+  const headerId = useId();
   const slotTestId = (slot: string) => (testId ? `${testId}--${slot}` : undefined);
 
   const handleToggle = () => {
@@ -62,7 +64,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
       className={cn('flex min-h-0 flex-col', full ? 'w-200' : 'w-48', className)}
     >
       <TestIdProvider value={testId}>
-        <div className='flex h-32 shrink-0 items-center gap-4 pr-8 pl-4'>
+        <div id={headerId} className='flex h-32 shrink-0 items-center gap-4 pr-8 pl-4'>
           <Button
             variant='ghost'
             color='neutral'
@@ -79,7 +81,7 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
             <span className='truncate text-xs font-medium text-text-secondary'>{title}</span>
           )}
         </div>
-        {full && (
+        {full ? (
           <TableOfContentsContext value={{ value, onValueChange, mode: 'row' }}>
             <ul
               data-slot='table-of-contents-list'
@@ -89,6 +91,15 @@ export const TableOfContents: FC<TableOfContentsProps> = ({
               {children}
             </ul>
           </TableOfContentsContext>
+        ) : (
+          <TableOfContentsMinimized
+            anchorId={headerId}
+            title={title}
+            value={value}
+            onValueChange={onValueChange}
+          >
+            {children}
+          </TableOfContentsMinimized>
         )}
       </TestIdProvider>
     </nav>

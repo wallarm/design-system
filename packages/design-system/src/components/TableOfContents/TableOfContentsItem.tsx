@@ -1,7 +1,7 @@
 import type { ComponentProps, FC, MouseEvent, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
-import { tableOfContentsItemVariants } from './classes';
+import { tableOfContentsDashVariants, tableOfContentsItemVariants } from './classes';
 import { useTableOfContentsContext } from './TableOfContentsContext';
 
 export interface TableOfContentsItemProps extends ComponentProps<'a'>, TestableProps {
@@ -21,7 +21,7 @@ export const TableOfContentsItem: FC<TableOfContentsItemProps> = ({
   value,
   level = 1,
   number,
-  href = `#${value}`,
+  href: hrefProp,
   onClick,
   className,
   children,
@@ -29,8 +29,9 @@ export const TableOfContentsItem: FC<TableOfContentsItemProps> = ({
   'data-testid': testIdProp,
   ...props
 }) => {
-  const { value: activeValue, onValueChange, onItemSelect } = useTableOfContentsContext();
+  const { value: activeValue, onValueChange, mode, onItemSelect } = useTableOfContentsContext();
   const testId = useTestId('item', testIdProp);
+  const href = hrefProp ?? `#${value}`;
   const active = activeValue === value;
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -48,6 +49,18 @@ export const TableOfContentsItem: FC<TableOfContentsItemProps> = ({
     onValueChange(value);
     onItemSelect?.();
   };
+
+  // The dash copy is decorative: the consumer's ref and props stay on the row link.
+  if (mode === 'dash') {
+    return (
+      <span
+        data-active={active || undefined}
+        data-level={level}
+        data-slot='table-of-contents-dash'
+        className={tableOfContentsDashVariants({ level, active })}
+      />
+    );
+  }
 
   return (
     <li className='relative before:absolute before:top-0 before:-bottom-px before:left-16 before:w-px before:bg-border-primary last:before:bottom-0'>
