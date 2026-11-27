@@ -293,9 +293,12 @@ describe('lazyOverlayBody', () => {
       expect(screen.getByTestId('form-skeleton')).toBeInTheDocument();
       const status = screen.getByTestId('split--loading');
       expect(status).toHaveAttribute('role', 'status');
-      expect(status).toHaveTextContent('Loading');
+      expect(status).not.toHaveAttribute('aria-busy');
+      // Empty when it mounts: screen readers speak a live region's changes, not what it starts with.
+      expect(status).toBeEmptyDOMElement();
       expect(screen.queryByTestId('form-field')).toBeNull();
       await flushLayers();
+      expect(status).toHaveTextContent('Loading');
       expect(content).toHaveAttribute('aria-labelledby', title.id);
       expect(content).toHaveAttribute(
         'aria-describedby',

@@ -92,7 +92,7 @@ export const SplitEditUserDrawer: FC<SplitEditUserDrawerProps> = ({ userName, co
 
 SplitEditUserDrawer.displayName = 'SplitEditUserDrawer';
 
-/** Defined next to its shell, which it imports eagerly; open() and preload() start the form's load. */
+/** Defined next to its shell, which it imports eagerly; its first open() or preload() also starts the form's load. */
 export const SplitEditUserOverlay = defineOverlay(async () => {
   EditUserFormPart.preload();
   return SplitEditUserDrawer;

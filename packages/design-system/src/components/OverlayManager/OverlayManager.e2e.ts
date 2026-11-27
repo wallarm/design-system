@@ -231,6 +231,8 @@ test.describe('Component: OverlayManager', () => {
 
       await expect(page.getByRole('dialog', { name: 'Edit user' })).toBeVisible();
       await expect(page.getByRole('status')).toHaveText('Loading');
+      // A busy live region would hold the announcement back.
+      await expect(page.getByRole('status')).not.toHaveAttribute('aria-busy', 'true');
       await release();
     });
 

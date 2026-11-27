@@ -5,6 +5,7 @@ import {
   type ReactNode,
   Suspense,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import { useTestId } from '../../utils/testId';
@@ -23,6 +24,32 @@ export type LazyOverlayBody<Props> = FC<LazyOverlayBodyProps<Props>> & {
 };
 
 type ErasedBody = ComponentType<Record<string, unknown>>;
+
+/** As React Aria's live announcer waits: long enough for a screen reader to see the new region. */
+const ANNOUNCE_DELAY_MS = 100;
+
+/**
+ * A polite live region that mounts empty and says "Loading" a moment later. Screen readers speak a
+ * region's changes, not the text it is created with, and the delay lets the dialog's own
+ * announcement go first. No `aria-busy` here: on a live region it would hold the update back.
+ */
+const LoadingStatus: FC = () => {
+  const testId = useTestId('loading');
+  const [text, setText] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setText('Loading'), ANNOUNCE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <span role='status' className='sr-only' data-testid={testId}>
+      {text}
+    </span>
+  );
+};
+
+LoadingStatus.displayName = 'LazyOverlayBodyLoadingStatus';
 
 interface LazyBodyViewProps {
   /** Returns the lazy a new mount pins; the factory replaces it after a failed load. */
@@ -44,7 +71,6 @@ const LazyBodyView: FC<LazyBodyViewProps> = ({ getBody, fallback, props }) => {
   const [Body] = useState(getBody);
   const controller = useContext(OverlayInstanceContext);
   const store = useContext(OverlayStoreContext);
-  const statusTestId = useTestId('loading');
 
   const handleError = (error: unknown) => {
     (store?.reportError ?? reportOverlayError)(error);
@@ -56,9 +82,7 @@ const LazyBodyView: FC<LazyBodyViewProps> = ({ getBody, fallback, props }) => {
     <Suspense
       fallback={
         <>
-          <span role='status' aria-busy='true' className='sr-only' data-testid={statusTestId}>
-            Loading
-          </span>
+          <LoadingStatus />
           {fallback}
         </>
       }
@@ -83,14 +107,18 @@ LazyBodyView.displayName = 'LazyOverlayBodyView';
  * once, and the heavy part below it loads behind `fallback`. Call it at module scope with a loader
  * that returns the component itself, as `defineOverlay` takes, and render the result inside
  * `DialogContent` or `DrawerContent`, after the header. A body that fails to load or render closes
- * the overlay and reports to the provider's `onError`; the next open loads it again.
+ * the overlay and reports to the provider's `onError`. After a failed load the next open loads it
+ * again.
  */
 export const lazyOverlayBody = <Props extends object>(
   load: () => Promise<ComponentType<Props> & { readonly _result?: never }>,
-  // Empty unless the body has its own `fallback` prop, which would never arrive.
-  ..._fallbackCheck: 'fallback' extends keyof Props
-    ? [error: 'the body has a `fallback` prop, which lazyOverlayBody takes for itself']
-    : []
+  // Empty unless the body, or a member of its props union, declares a `fallback` prop, which would
+  // never arrive. Extract ignores index signatures, so loose props pass.
+  ..._fallbackCheck: [Props extends unknown ? Extract<keyof Props, 'fallback'> : never] extends [
+    never,
+  ]
+    ? []
+    : [error: 'the body has a `fallback` prop, which lazyOverlayBody takes for itself']
 ): LazyOverlayBody<Props> => {
   let loaded: ErasedBody | undefined;
   let loading: Promise<ErasedBody> | undefined;

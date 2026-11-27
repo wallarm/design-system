@@ -102,6 +102,10 @@ createElement(EditBodyPart, { fallback: null, userId: 1 });
 lazyOverlayBody(async () => lazy(async () => ({ default: EditBody })));
 // @ts-expect-error a body prop named `fallback` never arrives: the helper takes it
 lazyOverlayBody(async () => (_: { fallback: string }) => null);
+// @ts-expect-error nor one that only a union member has
+lazyOverlayBody(async () => (_: { mode: 'a'; fallback: string } | { mode: 'b' }) => null);
+// A body with loose props declares no `fallback`, so it compiles.
+lazyOverlayBody(async () => (_: Record<string, unknown>) => null);
 
 export const CallSites = () => {
   const del = useOverlay(DeleteOverlay);
