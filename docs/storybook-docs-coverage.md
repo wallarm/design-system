@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 122 pages are written**; 24 are left (see the ☐ rows).
+> **Last updated:** 2026-10-22, against main at v3.3.0. **99 of 123 pages are written**; 24 are left (see the ☐ rows).
 
 ## How to use this
 
@@ -39,7 +39,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 
 ## Snapshot
 
-- **98 written to the standard · 21 left**, across 119 story pages. `Table` has grown a story without a sentence (`InlineCellEditing`) since it was levelled.
+- **99 written to the standard · 21 left**, across 120 story pages. `Table` has grown a story without a sentence (`InlineCellEditing`) since it was levelled.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -155,6 +155,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ✅ | Overlay/FeedbackPulse | 2 | 2 | `components/FeedbackPulse/FeedbackPulse.stories.tsx` |
 | ☐ | Overlay/HoverCard | 8 | 8 | `components/HoverCard/HoverCard.stories.tsx` |
 | ✅ | Overlay/OverflowTooltip | 7 | 7 | `components/OverflowTooltip/OverflowTooltip.stories.tsx` |
+| ✅ | Overlay/OverlayManager | 5 | 5 | `components/OverlayManager/OverlayManager.stories.tsx` |
 | ✅ | Overlay/Popover | 4 | 4 | `components/Popover/Popover.stories.tsx` |
 | ✅ | Overlay/Tooltip | 4 | 4 | `components/Tooltip/Tooltip.stories.tsx` |
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |

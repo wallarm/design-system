@@ -105,6 +105,7 @@ const DECISIONS: Record<string, Decision> = {
   OverflowList: { excluded: PRIMITIVE },
   OverflowTooltip: { excluded: PRIMITIVE },
   Overlay: { excluded: PRIMITIVE },
+  OverlayManager: { excluded: PROVIDER },
   Page: { excluded: `${CHROME}; an answer is laid out with Section` },
   Pagination: { entries: ['Table'] },
   ParameterPath: VALUE,
